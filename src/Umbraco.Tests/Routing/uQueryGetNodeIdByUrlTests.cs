@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class uQueryGetNodeIdByUrlTests : BaseRoutingTest
 	{

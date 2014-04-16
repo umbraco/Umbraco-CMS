@@ -18,6 +18,7 @@ using System.Linq;
 
 namespace Umbraco.Tests.Publishing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class PublishingStrategyTests : BaseDatabaseFactoryTest
     {

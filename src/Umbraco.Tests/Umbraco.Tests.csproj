@@ -50,7 +50,7 @@
   <ItemGroup>
     <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.53.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -154,8 +154,13 @@
     <Compile Include="Cache\HttpRuntimeCacheProviderTests.cs" />
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
     <Compile Include="Cache\RuntimeCacheProviderTests.cs" />
+    <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
+    <Compile Include="Migrations\MigrationRunnerTests.cs" />
+    <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
+    <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
+    <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Models\Collections\Item.cs" />
     <Compile Include="Models\Collections\OrderItem.cs" />
@@ -180,7 +185,6 @@
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BootManagers\WebBootManagerTests.cs" />
-    <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\ContentTypeAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\DescriptionAttribute.cs" />
@@ -233,8 +237,10 @@
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
+    <Compile Include="Persistence\SyntaxProvider\MySqlSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PublishedContent\PublishedContentRequestEngineTests.cs" />
+    <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
@@ -246,6 +252,7 @@
     <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
+    <Compile Include="Services\RelationServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
     <Compile Include="Integration\InstallPackage.cs" />
@@ -257,7 +264,6 @@
     <Compile Include="CoreStrings\DefaultShortStringHelperTests.cs" />
     <Compile Include="CoreStrings\LegacyStringExtensionsTests.cs" />
     <Compile Include="CoreStrings\MockShortStringHelper.cs" />
-    <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\TargetVersionSixthOneZeroMigrationsTest.cs" />
@@ -270,7 +276,7 @@
     </Compile>
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
-    <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
+    <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
     <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
@@ -289,7 +295,7 @@
     <Compile Include="Persistence\Querying\MediaTypeRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Repositories\ServerRegistrationRepositoryTest.cs" />
     <Compile Include="Persistence\SchemaValidationTest.cs" />
-    <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />
+    <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlConverterTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\LegacyExamineBackedMediaTests.cs" />
@@ -345,6 +351,7 @@
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
+    <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
@@ -526,6 +533,7 @@
     <EmbeddedResource Include="Migrations\SqlScripts\SqlResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

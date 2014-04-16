@@ -33,13 +33,13 @@ namespace umbraco.MacroEngines.Library
         public dynamic NodeById(int Id)
         {
             var node = new DynamicNode(Id);
-            if (node != null && node.Id == 0) return new DynamicNull();
+            if (node.Id == 0) return new DynamicNull();
             return node;
         }
         public dynamic NodeById(string Id)
         {
             var node = new DynamicNode(Id);
-            if (node != null && node.Id == 0) return new DynamicNull();
+            if (node.Id == 0) return new DynamicNull();
             return node;
         }
         public dynamic NodeById(DynamicNull Id)
@@ -53,7 +53,7 @@ namespace umbraco.MacroEngines.Library
                 return new DynamicNull();
             }
             var node = new DynamicNode(Id);
-            if (node != null && node.Id == 0) return new DynamicNull();
+            if (node.Id == 0) return new DynamicNull();
             return node;
         }
         public dynamic NodesById(List<object> Ids)

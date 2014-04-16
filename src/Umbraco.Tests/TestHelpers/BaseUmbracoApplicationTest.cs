@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Reflection;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.ObjectResolution;
@@ -96,7 +97,20 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (PluginManager.Current == null || PluginManagerResetRequired)
             {
-                PluginManager.Current = new PluginManager(false);    
+                PluginManager.Current = new PluginManager(false);
+                PluginManager.Current.AssembliesToScan = new[]
+                {
+                    Assembly.Load("Umbraco.Core"),
+                    Assembly.Load("umbraco"),
+                    Assembly.Load("Umbraco.Tests"),
+                    Assembly.Load("businesslogic"),
+                    Assembly.Load("cms"),
+                    Assembly.Load("controls"),
+                    Assembly.Load("umbraco.editorControls"),
+                    Assembly.Load("umbraco.MacroEngines"),
+                    Assembly.Load("umbraco.providers"),
+                    Assembly.Load("Umbraco.Web.UI"),
+                };
             }
         }
 

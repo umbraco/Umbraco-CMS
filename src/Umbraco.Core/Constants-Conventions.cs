@@ -85,7 +85,7 @@ namespace Umbraco.Core
 
 				/// <summary>
 				/// MediaType alias for a folder.
-				/// </summary>
+                /// </summary>
 				public const string Folder = "Folder";
 
 				/// <summary>
@@ -93,10 +93,10 @@ namespace Umbraco.Core
 				/// </summary>
 				public const string Image = "Image";
 			}
-
+            
 		    /// <summary>
 		    /// Constants for Umbraco Member property aliases.
-		    /// </summary>
+		    /// </summary>		    
 		    public static class Member
 		    {
                 public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
@@ -106,63 +106,63 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Property alias for a Members Password Question
                 /// </summary>
-                public const string PasswordQuestion = "umbracoPasswordRetrievalQuestionPropertyTypeAlias";
+                public const string PasswordQuestion = "umbracoMemberPasswordRetrievalQuestion";
 
                 public const string PasswordQuestionLabel = "Password Question";
 
                 /// <summary>
                 /// Property alias for Members Password Answer
                 /// </summary>
-                public const string PasswordAnswer = "umbracoPasswordRetrievalAnswerPropertyTypeAlias";
+                public const string PasswordAnswer = "umbracoMemberPasswordRetrievalAnswer";
 
                 public const string PasswordAnswerLabel = "Password Answer";
 
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>
-                public const string Comments = "umbracoCommentPropertyTypeAlias";
+                public const string Comments = "umbracoMemberComments";
 
-		        public const string CommentsLabel = "Comments";
+                public const string CommentsLabel = "Comments";
 
                 /// <summary>
                 /// Property alias for the Approved boolean of a Member
                 /// </summary>
-                public const string IsApproved = "umbracoApprovePropertyTypeAlias";
+                public const string IsApproved = "umbracoMemberApproved";
 
-		        public const string IsApprovedLabel = "Is Approved";
+                public const string IsApprovedLabel = "Is Approved";
 
                 /// <summary>
                 /// Property alias for the Locked out boolean of a Member
                 /// </summary>
-                public const string IsLockedOut = "umbracoLockPropertyTypeAlias";
+                public const string IsLockedOut = "umbracoMemberLockedOut";
 
-		        public const string IsLockedOutLabel = "Is Locked Out";
+                public const string IsLockedOutLabel = "Is Locked Out";
 
                 /// <summary>
                 /// Property alias for the last date the Member logged in
                 /// </summary>
-                public const string LastLoginDate = "umbracoLastLoginPropertyTypeAlias";
+                public const string LastLoginDate = "umbracoMemberLastLogin";
 
-		        public const string LastLoginDateLabel = "Last Login Date";
+                public const string LastLoginDateLabel = "Last Login Date";
 
                 /// <summary>
                 /// Property alias for the last date a Member changed its password
                 /// </summary>
-                public const string LastPasswordChangeDate = "umbracoMemberLastPasswordChange";
+                public const string LastPasswordChangeDate = "umbracoMemberLastPasswordChangeDate";
 
                 public const string LastPasswordChangeDateLabel = "Last Password Change Date";
 
                 /// <summary>
                 /// Property alias for the last date a Member was locked out
                 /// </summary>
-                public const string LastLockoutDate = "umbracoMemberLastLockout";
+                public const string LastLockoutDate = "umbracoMemberLastLockoutDate";
 
                 public const string LastLockoutDateLabel = "Last Lockout Date";
 
                 /// <summary>
                 /// Property alias for the number of failed login attemps
                 /// </summary>
-		        public const string FailedPasswordAttempts = "umbracoFailedPasswordAttemptsPropertyTypeAlias";
+                public const string FailedPasswordAttempts = "umbracoMemberFailedPasswordAttempts";
 
                 public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 
@@ -177,7 +177,7 @@ namespace Umbraco.Core
 		                {
 		                    {
 		                        Comments,
-		                        new PropertyType(new Guid(PropertyEditors.TextboxMultiple), DataTypeDatabaseType.Ntext)
+		                        new PropertyType(new Guid(PropertyEditors.TextboxMultiple), DataTypeDatabaseType.Ntext, true)
 		                            {
 		                                Alias = Comments,
 		                                Name = CommentsLabel
@@ -185,7 +185,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        FailedPasswordAttempts,
-		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Integer)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Integer, true)
 		                            {
 		                                Alias = FailedPasswordAttempts,
 		                                Name = FailedPasswordAttemptsLabel
@@ -193,7 +193,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        IsApproved,
-		                        new PropertyType(new Guid(PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer)
+		                        new PropertyType(new Guid(PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer, true)
 		                            {
 		                                Alias = IsApproved,
 		                                Name = IsApprovedLabel
@@ -201,7 +201,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        IsLockedOut,
-		                        new PropertyType(new Guid(PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer)
+		                        new PropertyType(new Guid(PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer, true)
 		                            {
 		                                Alias = IsLockedOut,
 		                                Name = IsLockedOutLabel
@@ -209,7 +209,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastLockoutDate,
-		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date, true)
 		                            {
 		                                Alias = LastLockoutDate,
 		                                Name = LastLockoutDateLabel
@@ -217,7 +217,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastLoginDate,
-		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date, true)
 		                            {
 		                                Alias = LastLoginDate,
 		                                Name = LastLoginDateLabel
@@ -225,7 +225,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastPasswordChangeDate,
-		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date, true)
 		                            {
 		                                Alias = LastPasswordChangeDate,
 		                                Name = LastPasswordChangeDateLabel
@@ -233,7 +233,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        PasswordAnswer,
-		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar, true)
 		                            {
 		                                Alias = PasswordAnswer,
 		                                Name = PasswordAnswerLabel
@@ -241,7 +241,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        PasswordQuestion,
-		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar, true)
 		                            {
 		                                Alias = PasswordQuestion,
 		                                Name = PasswordQuestionLabel

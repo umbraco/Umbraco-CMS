@@ -36,7 +36,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<string> list;
             try
             {
+                //needs to be open to read the schema name
                 db.OpenSharedConnection();
+
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @TableSchema",
@@ -55,7 +57,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<ColumnInfo> list;
             try
             {
+                //needs to be open to read the schema name
                 db.OpenSharedConnection();
+
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = @TableSchema",
@@ -78,6 +82,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<Tuple<string, string>> list;
             try
             {
+                //needs to be open to read the schema name
+                db.OpenSharedConnection();
+
                 //Does not include indexes and constraints are named differently
                 var items =
                     db.Fetch<dynamic>(
@@ -97,6 +104,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<Tuple<string, string, string>> list;
             try
             {
+                //needs to be open to read the schema name
+                db.OpenSharedConnection();
+
                 //Does not include indexes and constraints are named differently
                 var items =
                     db.Fetch<dynamic>(
@@ -115,12 +125,43 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        {
+            List<Tuple<string, string, string, bool>> list;
+            try
+            {
+                //needs to be open to read the schema name
+                db.OpenSharedConnection();
+
+                var indexes =
+                db.Fetch<dynamic>(@"SELECT DISTINCT
+    TABLE_NAME, INDEX_NAME, COLUMN_NAME, CASE NON_UNIQUE WHEN 1 THEN 0 ELSE 1 END AS `UNIQUE`
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA = @TableSchema
+AND INDEX_NAME <> COLUMN_NAME AND INDEX_NAME <> 'PRIMARY'
+ORDER BY TABLE_NAME, INDEX_NAME",
+                    new { TableSchema = db.Connection.Database });
+                list =
+                    indexes.Select(
+                        item =>
+                        new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE == 1))
+                         .ToList();
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+            return list;
+        }
+
         public override bool DoesTableExist(Database db, string tableName)
         {
             long result;
             try
             {
+                //needs to be open to read the schema name
                 db.OpenSharedConnection();
+
                 result =
                     db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
                                            "WHERE TABLE_NAME = @TableName AND " +
@@ -177,7 +218,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             string primaryKey = string.Empty;
             var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
-            if (columnDefinition != null && columnDefinition.PrimaryKeyColumns.Contains(",") == false)
+            if (columnDefinition != null)
             {
                 string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)

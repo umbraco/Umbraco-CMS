@@ -13,7 +13,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                          {
                              CreatorId = 0,
                              Email = email,
-                             Password = password,
+                             RawPasswordValue = password,
                              Username = username
                          };
 

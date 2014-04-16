@@ -15,13 +15,10 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
 
 		public override void Initialize()
 		{                       
@@ -79,7 +76,8 @@ namespace Umbraco.Tests.Routing
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 			{
                 PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1174),
-				TemplateModel = template
+				TemplateModel = template,
+                RenderingEngine = RenderingEngine.Mvc
 			};
 
 			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);

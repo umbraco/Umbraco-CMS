@@ -16,16 +16,15 @@
 
     var logoutModel = new PostRedirectModel();
     
-    /*
-     * Here you can specify a redirect URL for after logging out, by default umbraco will simply
-     * redirect to the current page. Example to redirect to the home page:
-     * 
-     *   logoutModel.RedirectUrl = "/";
-     *   
-     */
+    @*
+        Here you can specify a redirect URL for after logging out, by default umbraco will simply
+        redirect to the current page. Example to redirect to the home page:
+        
+        logoutModel.RedirectUrl = "/"; 
+    *@
 }
 
-@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
+@* NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed *@
 @Html.RenderJsHere()
 
 @if (loginStatusModel.IsLoggedIn)

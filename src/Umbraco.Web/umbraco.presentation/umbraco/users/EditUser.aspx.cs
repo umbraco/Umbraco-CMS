@@ -73,15 +73,7 @@ namespace umbraco.cms.presentation.user
 
         private MembershipProvider BackOfficeProvider
         {
-            get
-            {
-                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
-                if (provider == null)
-                {
-                    throw new ProviderException("The membership provider " + UmbracoSettings.DefaultBackofficeProvider + " was not found");
-                }
-                return provider;
-            }
+            get { return MembershipProviderExtensions.GetUsersMembershipProvider(); }
         }
 
         protected void Page_Load(object sender, EventArgs e)

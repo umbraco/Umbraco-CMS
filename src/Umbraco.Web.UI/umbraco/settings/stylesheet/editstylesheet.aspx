@@ -18,9 +18,9 @@
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
                     editorSourceElement: $('#<%= editorSource.ClientID %>'), 
                     text: {
-                        cssErrorHeader: '<%= umbraco.ui.Text("speechBubbles", "cssErrorHeader") %>',
-                        cssSavedHeader: '<%= umbraco.ui.Text("speechBubbles", "cssSavedHeader") %>',
-                        cssSavedText: '<%= umbraco.ui.Text("speechBubbles", "cssSavedText") %>',
+                        cssErrorHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "cssErrorHeader")) %>',
+                        cssSavedHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "cssSavedHeader")) %>',
+                        cssSavedText: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "cssSavedText")) %>',
                         cssErrorText: 'Please make sure that you have permissions set correctly',
                     }
                 });

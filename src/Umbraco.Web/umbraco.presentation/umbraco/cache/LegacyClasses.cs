@@ -52,7 +52,7 @@ namespace umbraco.presentation.cache
         /// <returns></returns>
         public ICacheRefresher[] GetAll()
         {
-            return CacheRefreshersResolver.Current.CacheResolvers.ToArray();
+            return CacheRefreshersResolver.Current.CacheRefreshers.ToArray();
         }
 
         #endregion

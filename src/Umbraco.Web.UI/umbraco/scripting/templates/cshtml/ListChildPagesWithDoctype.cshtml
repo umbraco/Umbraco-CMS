@@ -7,9 +7,8 @@
 	Settings section).
 *@
 
-
 @{    
-	@*Build a query and return the visible items *@
+	@* Build a query and return the visible items *@
     var selection= Model.Textpages.Where("Visible");
     
     @*
@@ -18,8 +17,7 @@
     *@
 }
 
-
-@*Determine if there are any nodes in the selection, then render list *@
+@* Determine if there are any nodes in the selection, then render list *@
 @if(selection.Any()){
 
    <ul>

@@ -57,7 +57,8 @@ namespace Umbraco.Core.Models
             Trashed = trashed;
         }
 
-        public UmbracoEntity(int trashed)
+        // for MySql
+        public UmbracoEntity(UInt64 trashed)
         {
             AdditionalData = new Dictionary<string, object>();
             UmbracoProperties = new List<UmbracoProperty>();

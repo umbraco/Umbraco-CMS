@@ -159,41 +159,46 @@ namespace umbraco.presentation.templateControls
         /// </summary>
         /// <param name="item">The item.</param>
         protected virtual void ParseMacros(Item item)
-        {
-
-            //Don't parse macros if there's a content item assigned since the content value
-            // converters take care of that
-            if (item.ContentItem != null) return;
-
+        {  
             // do nothing if the macros have already been rendered
             if (item.Controls.Count > 0)
                 return;
+            
+            var elementText = GetFieldContents(item);
 
-            string elementText = GetFieldContents(item);
-
-            using (DisposableTimer.DebugDuration<ItemRenderer>("Parsing Macros"))
+            //Don't parse macros if there's a content item assigned since the content value
+            // converters take care of that, just add the already parsed text
+            if (item.ContentItem != null)
             {
-
-                MacroTagParser.ParseMacros(
-                    elementText,
-
-                    //callback for when a text block is parsed
-                    textBlock => item.Controls.Add(new LiteralControl(textBlock)),
-
-                    //callback for when a macro is parsed:
-                    (macroAlias, attributes) =>
-                    {
-                        var macroControl = new Macro
-                                               {
-                                                   Alias = macroAlias
-                                               };
-                        foreach (var i in attributes.Where(i => macroControl.Attributes[i.Key] == null))
-                        {
-                            macroControl.Attributes.Add(i.Key, i.Value);
-                        }
-                        item.Controls.Add(macroControl);
-                    });
+                item.Controls.Add(new LiteralControl(elementText));
             }
+            else
+            {
+                using (DisposableTimer.DebugDuration<ItemRenderer>("Parsing Macros"))
+                {
+
+                    MacroTagParser.ParseMacros(
+                        elementText,
+
+                        //callback for when a text block is parsed
+                        textBlock => item.Controls.Add(new LiteralControl(textBlock)),
+
+                        //callback for when a macro is parsed:
+                        (macroAlias, attributes) =>
+                        {
+                            var macroControl = new Macro
+                            {
+                                Alias = macroAlias
+                            };
+                            foreach (var i in attributes.Where(i => macroControl.Attributes[i.Key] == null))
+                            {
+                                macroControl.Attributes.Add(i.Key, i.Value);
+                            }
+                            item.Controls.Add(macroControl);
+                        });
+                }
+            }
+            
         }
 
         /// <summary>

@@ -5,11 +5,27 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
+
     /// <summary>
     /// Defines the MemberService, which is an easy access to operations involving (umbraco) members.
     /// </summary>
     public interface IMemberService : IMembershipMemberService
     {
+        IMember CreateMember(string username, string email, string name, string memberTypeAlias);
+        IMember CreateMember(string username, string email, string name, IMemberType memberType);
+        IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias);
+        IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
+        
+        /// <summary>
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
+        /// </summary>
+        /// <param name="member">The member to save the password for</param>
+        /// <param name="password"></param>
+        /// <remarks>
+        /// This method exists so that Umbraco developers can use one entry point to create/update members if they choose to.
+        /// </remarks>
+        void SavePassword(IMember member, string password);
+
         /// <summary>
         /// Checks if a member with the id exists
         /// </summary>

@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class ContentFinderByNiceUrlAndTemplateTests : BaseRoutingTest
 	{

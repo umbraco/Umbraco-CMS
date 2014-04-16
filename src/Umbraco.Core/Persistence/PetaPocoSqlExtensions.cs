@@ -37,7 +37,8 @@ namespace Umbraco.Core.Persistence
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            var syntax = string.Format("{0}.{1}",
+            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
+            var syntax = string.Format("({0}.{1})",
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
 

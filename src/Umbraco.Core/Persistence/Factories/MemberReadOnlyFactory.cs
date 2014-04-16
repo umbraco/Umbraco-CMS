@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var properties = CreateProperties(_memberTypes[dto.ContentTypeAlias], dto.Properties, dto.CreateDate);
 
-            var member = new Member(dto.Text, dto.Email, dto.LoginName, dto.Password, dto.ParentId, _memberTypes[dto.ContentTypeAlias])
+            var member = new Member(dto.Text, dto.Email, dto.LoginName, dto.Password, _memberTypes[dto.ContentTypeAlias])
                          {
                              Id = dto.NodeId,
                              CreateDate = dto.CreateDate,
@@ -33,7 +33,6 @@ namespace Umbraco.Core.Persistence.Factories
                              Path = dto.Path,
                              SortOrder = dto.SortOrder,
                              Version = dto.VersionId,
-                             ContentTypeAlias = dto.ContentTypeAlias,
                              Properties = new PropertyCollection(properties)
                          };
 

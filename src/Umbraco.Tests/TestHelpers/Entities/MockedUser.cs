@@ -20,7 +20,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     Language = "en",
                     IsApproved = true,
                     Name = "TestUser" + suffix,
-                    Password = "testing",
+                    RawPasswordValue = "testing",
                     IsLockedOut = false,
                     DefaultPermissions = new[]{"A", "B", "C"},
                     StartContentId = -1,

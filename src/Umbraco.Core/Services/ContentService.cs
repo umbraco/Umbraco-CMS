@@ -65,12 +65,12 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
-        public void AssignContentPermissions(IContent entity, char permission, IEnumerable<int> userIds)
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {
-                repository.AssignEntityPermissions(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, userIds);
             }
         }
 
@@ -176,7 +176,15 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
 
+            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
             {
                 content.WasCancelled = true;
                 return content;
@@ -190,6 +198,8 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 uow.Commit();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
@@ -216,7 +226,15 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
 
+            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
             {
                 content.WasCancelled = true;
                 return content;
@@ -230,6 +248,8 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 uow.Commit();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
@@ -1984,6 +2004,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Create
         /// </summary>
+        [Obsolete("Use the Created event instead, the Creating and Created events both offer the same functionality, Creating event has been deprecated.")]
         public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Creating;
 
         /// <summary>

@@ -15,17 +15,6 @@ namespace Umbraco.Tests.Membership
     [TestFixture, RequiresSTA]
     public class UmbracoServiceMembershipProviderTests
     {
-       
-        [Test]
-        public void Throws_On_Empty_Default_Member_Type_On_Init()
-        {
-            var mServiceMock = new Mock<IMembershipMemberService>();
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
-            mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("");
-
-            Assert.Throws<ProviderException>(() => provider.Initialize("test", new NameValueCollection()));            
-        }
-
         [Test]
         public void Sets_Default_Member_Type_From_Service_On_Init()
         {
@@ -94,8 +83,8 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateMemberWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, string p, string m, bool b) =>
+                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                        .Callback((string u, string e, string p, string m) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
@@ -107,8 +96,8 @@ namespace Umbraco.Tests.Membership
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
-            Assert.AreNotEqual("test", createdMember.PasswordAnswer);
-            Assert.AreEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
+            Assert.AreNotEqual("test", createdMember.RawPasswordAnswerValue);
+            Assert.AreEqual(provider.EncryptString("test"), createdMember.RawPasswordAnswerValue);
         }
 
         [Test]
@@ -125,8 +114,8 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateMemberWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, string p, string m, bool b) =>
+                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                        .Callback((string u, string e, string p, string m) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
@@ -139,8 +128,8 @@ namespace Umbraco.Tests.Membership
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
-            Assert.AreNotEqual("test", createdMember.Password);
-            var decrypted = provider.DecryptPassword(createdMember.Password);
+            Assert.AreNotEqual("test", createdMember.RawPasswordValue);
+            var decrypted = provider.DecryptPassword(createdMember.RawPasswordValue);
             Assert.AreEqual("testtest$1", decrypted);
         }
 
@@ -158,8 +147,8 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateMemberWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, string p, string m, bool b) =>
+                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                        .Callback((string u, string e, string p, string m) =>
                         {
                             createdMember = new Member("test", e, u, p, memberType);
                         })
@@ -172,10 +161,10 @@ namespace Umbraco.Tests.Membership
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
-            Assert.AreNotEqual("test", createdMember.Password);
+            Assert.AreNotEqual("test", createdMember.RawPasswordValue);
             
             string salt;
-            var storedPassword = provider.StoredPassword(createdMember.Password, out salt);
+            var storedPassword = provider.StoredPassword(createdMember.RawPasswordValue, out salt);
             var hashedPassword = provider.EncryptOrHashPassword("testtest$1", salt);
             Assert.AreEqual(hashedPassword, storedPassword);
         }

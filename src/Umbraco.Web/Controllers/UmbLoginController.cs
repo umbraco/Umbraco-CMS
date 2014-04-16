@@ -32,9 +32,9 @@ namespace Umbraco.Web.Controllers
             }
 
             //redirect to current page by default
-            TempData.Add("LoginSuccess", true);
-            //return RedirectToCurrentUmbracoPage();
-            return RedirectToCurrentUmbracoUrl();
+            TempData["LoginSuccess"] = true;
+            return RedirectToCurrentUmbracoPage();
+            //return RedirectToCurrentUmbracoUrl();
         }
     }
 }

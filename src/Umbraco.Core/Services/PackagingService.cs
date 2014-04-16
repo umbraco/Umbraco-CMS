@@ -12,6 +12,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -341,7 +343,9 @@ namespace Umbraco.Core.Services
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                var propertyGroup = propertyType.PropertyGroupId == null 
+                                    ? null 
+                                    : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
@@ -698,7 +702,7 @@ namespace Umbraco.Core.Services
             {
                 var prevalue = new XElement("PreValue");
                 prevalue.Add(new XAttribute("Id", pv.Value.Id));
-                prevalue.Add(new XAttribute("Value", pv.Value.Value));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value == null ? "" : pv.Value.Value));
                 prevalue.Add(new XAttribute("Alias", pv.Key));
                 prevalue.Add(new XAttribute("SortOrder", sort));
                 prevalues.Add(prevalue);
@@ -731,7 +735,7 @@ namespace Umbraco.Core.Services
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
-                                       : new List<XElement> { element.Element("DataType") };
+                                       : new List<XElement> { element };
 
             foreach (var dataTypeElement in dataTypeElements)
             {
@@ -1197,6 +1201,22 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Stylesheets
+        #endregion
+
+        #region Installation
+
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
+        {
+            //TODO Add events ?
+            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
+            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
+            var installer = new PackageInstallation(this, new PackageExtraction());
+            return installer.InstallPackage(packageFilePath, userId);
+        }
+
+        #endregion
+
+        #region Package Building
         #endregion
     }
 }

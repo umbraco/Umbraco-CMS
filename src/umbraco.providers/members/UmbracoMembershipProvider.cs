@@ -8,10 +8,10 @@ using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using umbraco.BusinessLogic;
 using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
@@ -21,6 +21,7 @@ using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using Member = umbraco.cms.businesslogic.member.Member;
 using MemberType = umbraco.cms.businesslogic.member.MemberType;
+using User = umbraco.BusinessLogic.User;
 
 #endregion
 
@@ -30,7 +31,7 @@ namespace umbraco.providers.members
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
     [Obsolete("This has been superceded by Umbraco.Web.Security.Providers.MembersMembershipProvider")]
-    public class UmbracoMembershipProvider : UmbracoMembershipProviderBase, IUmbracoContentTypeMembershipProvider
+    public class UmbracoMembershipProvider : UmbracoMembershipProviderBase, IUmbracoMemberTypeMembershipProvider
     {
         public UmbracoMembershipProvider()
         {
@@ -48,7 +49,9 @@ namespace umbraco.providers.members
         #region Fields
 
         private string _defaultMemberTypeAlias = "Member";
-        private string _providerName = Member.UmbracoMemberProviderName;       
+        private string _providerName = Member.UmbracoMemberProviderName;
+        private volatile bool _hasDefaultMember = false;
+        private static readonly object Locker = new object();
 
         #endregion
 
@@ -110,7 +113,7 @@ namespace umbraco.providers.members
             // Intialize values from web.config
             if (config == null) throw new ArgumentNullException("config");
 
-            if (string.IsNullOrEmpty(name)) name = "UmbracoMembershipProvider";
+            if (string.IsNullOrEmpty(name)) name = Constants.Conventions.Member.UmbracoMemberProviderName;
             
             base.Initialize(name, config);
             
@@ -118,11 +121,14 @@ namespace umbraco.providers.members
             
             // test for membertype (if not specified, choose the first member type available)
             if (config["defaultMemberTypeAlias"] != null)
+            {
                 _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
-            else if (MemberType.GetAll.Length == 1)
-                _defaultMemberTypeAlias = MemberType.GetAll[0].Alias;
-            else
-                throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
+                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                {
+                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                }
+                _hasDefaultMember = true;
+            }
 
             // test for approve status
             if (config["umbracoApprovePropertyTypeAlias"] != null)
@@ -233,7 +239,26 @@ namespace umbraco.providers.members
 
         public override string DefaultMemberTypeAlias
         {
-            get { return _defaultMemberTypeAlias; }
+            get
+            {
+                if (_hasDefaultMember == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_hasDefaultMember == false)
+                        {
+                            var types = MemberType.GetAll;
+                            if (types.Length == 1)
+                                _defaultMemberTypeAlias = types[0].Alias;
+                            else
+                                throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
+
+                            _hasDefaultMember = true;
+                        }
+                    }
+                }
+                return _defaultMemberTypeAlias;
+            }
         }
 
         /// <summary>
@@ -350,7 +375,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
             
             var collection = new MembershipUserCollection();                        
             foreach (var m in byEmail)
@@ -372,7 +397,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
             
             var collection = new MembershipUserCollection();            
             foreach (var m in byEmail)
@@ -395,7 +420,7 @@ namespace umbraco.providers.members
         {
             var membersList = new MembershipUserCollection();
 
-            var pagedMembers = ApplicationContext.Current.Services.MemberService.GetAllMembers(pageIndex, pageSize, out totalRecords);
+            var pagedMembers = ApplicationContext.Current.Services.MemberService.GetAll(pageIndex, pageSize, out totalRecords);
 
             foreach (var m in pagedMembers)
             {
@@ -412,7 +437,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override int GetNumberOfUsersOnline()
         {
-            return ApplicationContext.Current.Services.MemberService.GetMemberCount(MemberCountType.Online);
+            return ApplicationContext.Current.Services.MemberService.GetCount(MemberCountType.Online);
         }
 
         /// <summary>

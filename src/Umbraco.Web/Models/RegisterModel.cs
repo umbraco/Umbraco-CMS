@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
+    [ModelBinder(typeof(RegisterModelBinder))]
     public class RegisterModel : PostRedirectModel
     {
         /// <summary>
@@ -58,6 +60,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// The member type alias to use to register the member
         /// </summary>
+        [Editable(false)]
         public string MemberTypeAlias { get; set; }
 
         /// <summary>
@@ -89,6 +92,17 @@ namespace Umbraco.Web.Models
         /// Specifies if the member should be logged in if they are succesfully created
         /// </summary>
         public bool LoginOnSuccess { get; set; }
+
+        /// <summary>
+        /// A custom model binder for MVC because the default ctor performs a lookup!
+        /// </summary>
+        internal class RegisterModelBinder : DefaultModelBinder
+        {
+            protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Type modelType)
+            {
+                return RegisterModel.CreateModel();
+            }
+        }
 
     }
 }

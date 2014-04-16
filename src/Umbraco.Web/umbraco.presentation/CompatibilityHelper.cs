@@ -57,7 +57,7 @@ namespace Umbraco.Web.umbraco.presentation
 
             public INode Parent
             {
-                get { return ConvertToNode(_doc.Parent); }
+                get { return _doc.Parent == null ? null : ConvertToNode(_doc.Parent); }
             }
             public int Id { get; private set; }
             public int template { get; private set; }

@@ -275,7 +275,7 @@ namespace Umbraco.Core
 
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
-                () => PluginManager.Current.ResolveMigrationTypes());
+                () => PluginManager.Current.ResolveTypes<IMigration>());
 
             // todo: remove once we drop IPropertyEditorValueConverter support.
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(

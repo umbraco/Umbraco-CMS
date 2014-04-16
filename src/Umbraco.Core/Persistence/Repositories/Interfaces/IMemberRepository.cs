@@ -50,5 +50,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IMember, string>> orderBy);
 
+        IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
+            Sql sql, int pageIndex, int pageSize, out int totalRecords,
+            Func<IEnumerable<TDto>, int[]> resolveIds);
+
     }
 }

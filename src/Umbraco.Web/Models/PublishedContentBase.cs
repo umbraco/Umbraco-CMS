@@ -50,7 +50,7 @@ namespace Umbraco.Web.Models
 						_url = prop.Value.ToString();
 						break;
 					default:
-						throw new ArgumentOutOfRangeException();
+						throw new NotSupportedException();
 				}
 
 				return _url;

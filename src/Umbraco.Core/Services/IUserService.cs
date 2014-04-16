@@ -10,6 +10,16 @@ namespace Umbraco.Core.Services
     public interface IUserService : IMembershipUserService
     {
         /// <summary>
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
+        /// </summary>
+        /// <param name="user">The user to save the password for</param>
+        /// <param name="password"></param>
+        /// <remarks>
+        /// This method exists so that Umbraco developers can use one entry point to create/update users if they choose to.
+        /// </remarks>
+        void SavePassword(IUser user, string password);
+
+        /// <summary>
         /// To permanently delete the user pass in true, otherwise they will just be disabled
         /// </summary>
         /// <param name="user"></param>
@@ -54,12 +64,12 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
-        void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
+        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
 
         #region User types
 

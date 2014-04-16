@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Security;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.umbraco.dashboard
 {
@@ -13,7 +14,7 @@ namespace umbraco.presentation.umbraco.dashboard
     {
         protected MembershipProvider Provider
         {
-            get { return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider]; }
+            get { return MembershipProviderExtensions.GetUsersMembershipProvider(); }
         }
 
         protected override void OnLoad(EventArgs e)

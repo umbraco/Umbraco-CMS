@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -11,6 +12,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class MemberTypeRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -61,11 +63,26 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
 
                 Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(2));
                 Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+            }
+        }
+
+        [Test]
+        public void Cannot_Persist_Member_Type_Without_Alias()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberType.Alias = null;
+                repository.AddOrUpdate(memberType);
+
+                Assert.Throws<InvalidOperationException>(unitOfWork.Commit);
             }
         }
 
@@ -149,7 +166,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 memberType = repository.Get(memberType.Id);
 
                 Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(2));
             }
         }
 

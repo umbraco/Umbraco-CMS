@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Css;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
@@ -113,7 +114,7 @@ namespace umbraco.cms.businesslogic.member
         public static IEnumerable<Member> GetAllAsList()
         {
             int totalRecs;
-            return ApplicationContext.Current.Services.MemberService.GetAllMembers(0, int.MaxValue, out totalRecs)
+            return ApplicationContext.Current.Services.MemberService.GetAll(0, int.MaxValue, out totalRecs)
                 .Select(x => new Member(x))
                 .ToArray();
         }
@@ -140,9 +141,14 @@ namespace umbraco.cms.businesslogic.member
                 }
             }
 
-            return ApplicationContext.Current.Services.MemberService.GetAllMembers(ids.ToArray())
-                .Select(x => new Member(x))
-                .ToArray();
+            if (ids.Any())
+            {
+                return ApplicationContext.Current.Services.MemberService.GetAllMembers(ids.ToArray())
+                    .Select(x => new Member(x))
+                    .ToArray();
+            }
+
+            return new Member[] { };
         }
 
         /// <summary>
@@ -153,7 +159,8 @@ namespace umbraco.cms.businesslogic.member
         public static Member[] getMemberFromFirstLetter(char letter)
         {
             int totalRecs;
-            return ApplicationContext.Current.Services.MemberService.FindMembersByUsername(
+
+            return ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
                 letter.ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
                                      .Select(x => new Member(x))
                                      .ToArray();
@@ -170,7 +177,7 @@ namespace umbraco.cms.businesslogic.member
             }
             else
             {
-                var found = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(
+                var found = ApplicationContext.Current.Services.MemberService.FindByUsername(
                     usernameToMatch, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith);
                 return found.Select(x => new Member(x)).ToArray();
             }
@@ -215,20 +222,21 @@ namespace umbraco.cms.businesslogic.member
         {
             if (mbt == null) throw new ArgumentNullException("mbt");            
             var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;
-            
+
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             //NOTE: This check is ONLY for backwards compatibility, this check shouldn't really be here it is up to the Membership provider
             // logic to deal with this but it was here before so we can't really change that.
             // Test for e-mail
-            if (Email != "" && GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
+            if (Email != "" && GetMemberFromEmail(Email) != null && provider.RequiresUniqueEmail)
                 throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             if (GetMemberFromLoginName(loginName) != null)
                 throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             var model = ApplicationContext.Current.Services.MemberService.CreateMemberWithIdentity(
-                loginName, Email.ToLower(), "", mbt.MemberTypeItem);
-            model.Name = Name;
+                loginName, Email.ToLower(), Name, mbt.MemberTypeItem);
 
-            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
+            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Saving' event has been cancelled, so we return null.
             if (((Entity)model).WasCancelled)
                 return null;
 
@@ -290,7 +298,7 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             int totalRecs;
-            var found = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(
+            var found = ApplicationContext.Current.Services.MemberService.FindByEmail(
                 email, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
 
             return found.Select(x => new Member(x)).ToArray();
@@ -309,8 +317,10 @@ namespace umbraco.cms.businesslogic.member
         {
             if (IsMember(loginName))
             {
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
                 // validate user via provider
-                if (Membership.ValidateUser(loginName, password))
+                if (provider.ValidateUser(loginName, password))
                 {
                     return GetMemberFromLoginName(loginName);
                 }
@@ -348,7 +358,8 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use MembershipProviderExtensions.IsUmbracoMembershipProvider instead")]
         public static bool InUmbracoMemberMode()
         {
-            return Membership.Provider.IsUmbracoMembershipProvider();
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            return provider.IsUmbracoMembershipProvider();
         }
 
         public static bool IsUsingUmbracoRoles()
@@ -472,7 +483,7 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                return MemberItem.Password;
+                return MemberItem.RawPasswordValue;
             }
             set
             {
@@ -480,7 +491,8 @@ namespace umbraco.cms.businesslogic.member
                 // To write directly to the db use the ChangePassword method
                 // this is not pretty but nessecary due to a design flaw (the membership provider should have been a part of the cms project)
                 var helper = new MemberShipHelper();
-                MemberItem.Password = helper.EncodePassword(value, Membership.Provider.PasswordFormat);
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                MemberItem.RawPasswordValue = helper.EncodePassword(value, provider.PasswordFormat);
             }
         }
 
@@ -571,11 +583,13 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         public override void Save()
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             //Due to backwards compatibility with this API we need to check for duplicate emails here if required.
             // This check should not be done here, as this logic is based on the MembershipProvider            
-            var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
+            var requireUniqueEmail = provider.RequiresUniqueEmail;
             //check if there's anyone with this email in the db that isn't us
-            if (requireUniqueEmail && GetMembersFromEmail(Email).Any(x => x.Id != Id))
+            var membersFromEmail = GetMembersFromEmail(Email);
+            if (requireUniqueEmail && membersFromEmail != null && membersFromEmail.Any(x => x.Id != Id))
             {
                 throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             }
@@ -743,7 +757,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
-            Password = newPassword;            
+            MemberItem.RawPasswordValue = newPassword;            
         }
 
         /// <summary>
@@ -752,7 +766,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns></returns>
         public string GetPassword()
         {
-            return MemberItem.Password;
+            return MemberItem.RawPasswordValue;
         }
 
         /// <summary>
@@ -1067,7 +1081,13 @@ namespace umbraco.cms.businesslogic.member
             // For backwards compatibility between umbraco members and .net membership
             if (HttpContext.Current.User.Identity.IsAuthenticated)
             {
-                int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out currentMemberId);
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                var member = provider.GetCurrentUser();
+                if (member == null)
+                {
+                    throw new InvalidOperationException("No member object found with username " + provider.GetCurrentUserName());
+                }
+                int.TryParse(member.ProviderUserKey.ToString(), out currentMemberId);
             }
 
             return currentMemberId;
@@ -1083,8 +1103,15 @@ namespace umbraco.cms.businesslogic.member
             {
                 if (HttpContext.Current.User.Identity.IsAuthenticated)
                 {
+                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                    var member = provider.GetCurrentUser();
+                    if (member == null)
+                    {
+                        throw new InvalidOperationException("No member object found with username " + provider.GetCurrentUserName());
+                    }
+
                     int currentMemberId = 0;
-                    if (int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out currentMemberId))
+                    if (int.TryParse(member.ProviderUserKey.ToString(), out currentMemberId))
                     {
                         var m = new Member(currentMemberId);
                         return m;

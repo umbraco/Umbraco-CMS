@@ -131,6 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {            
             var list = new List<string>
                            {
+                               "DELETE FROM cmsTask WHERE userId = @Id",
+                               "DELETE FROM cmsTask WHERE parentUserId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
                                "DELETE FROM umbracoUserLogins WHERE userId = @Id",
@@ -325,15 +327,15 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
-        public void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.AssignUserPermissions(userId, permissions, entityIds);
+            repo.ReplaceUserPermissions(userId, permissions, entityIds);
         }
 
         #endregion

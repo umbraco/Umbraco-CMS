@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Increases the version number in ClientDependency.config by 1
+        /// Changes the version number in ClientDependency.config to a random value to avoid stale caches
         /// </summary>
         internal bool IncreaseVersionNumber()
         {

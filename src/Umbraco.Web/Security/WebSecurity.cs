@@ -135,7 +135,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var membershipProvider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+            var membershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
         

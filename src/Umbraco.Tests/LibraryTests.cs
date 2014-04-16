@@ -56,10 +56,6 @@ namespace Umbraco.Tests
 			UmbracoContext.Current = null;
 		}
 
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
 
 		[Test]
 		public void Get_Item_User_Property()

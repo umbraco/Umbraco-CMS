@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
 
         private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
         private static readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
-
+        
         /// <summary>
         /// Returns the Alias of the PropertyType, which this Property is based on
         /// </summary>
@@ -59,9 +59,14 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns the DatabaseType that the underlaying DataType is using to store its values
         /// </summary>
-        /// <remarks>Only used internally when saving the property value</remarks>
+        /// <remarks>
+        /// Only used internally when saving the property value.
+        /// </remarks>
         [IgnoreDataMember]
-        internal DataTypeDatabaseType DataTypeDatabaseType { get { return _propertyType.DataTypeDatabaseType; } }
+        internal DataTypeDatabaseType DataTypeDatabaseType
+        {
+            get { return _propertyType.DataTypeDatabaseType; }
+        }
 
         /// <summary>
         /// Returns the PropertyType, which this Property is based on

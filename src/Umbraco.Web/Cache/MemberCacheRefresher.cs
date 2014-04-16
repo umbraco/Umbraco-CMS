@@ -14,7 +14,7 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
     /// </remarks>
-    public class MemberCacheRefresher : CacheRefresherBase<MemberCacheRefresher>
+    public class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
     {
 
         protected override MemberCacheRefresher Instance
@@ -42,6 +42,18 @@ namespace Umbraco.Web.Cache
         {
             ClearCache(id);
             base.Remove(id);
+        }
+
+        public override void Refresh(IMember instance)
+        {
+            ClearCache(instance.Id);
+            base.Refresh(instance);
+        }
+
+        public override void Remove(IMember instance)
+        {
+            ClearCache(instance.Id);
+            base.Remove(instance);
         }
 
         private void ClearCache(int id)

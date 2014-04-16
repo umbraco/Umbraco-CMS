@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
-        void AssignContentPermissions(IContent entity, char permission, IEnumerable<int> userIds);
+        void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds);
 
         /// <summary>
         /// Gets the list of permissions for the content item

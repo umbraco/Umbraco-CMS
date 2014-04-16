@@ -44,10 +44,10 @@
 
         submitSucces: function(t) {
             if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', this._opts.text.fileErrorHeader, this._opts.text.fileErrorText);
+                top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.fileErrorHeader), unescape(this._opts.text.fileErrorText));
             }
             else {
-                top.UmbSpeechBubble.ShowMessage('save', this._opts.text.fileSavedHeader, this._opts.text.fileSavedText);
+                top.UmbSpeechBubble.ShowMessage('save', unescape(this._opts.text.fileSavedHeader), unescape(this._opts.text.fileSavedText));
             }
 
 
@@ -60,7 +60,7 @@
         },
 
         submitFailure: function(t) {
-            top.UmbSpeechBubble.ShowMessage('error', this._opts.text.fileErrorHeader, this._opts.text.fileErrorText);
+            top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.fileErrorHeader), unescape(this._opts.text.fileErrorText));
         }
     });
 })(jQuery);

@@ -44,7 +44,9 @@ namespace Umbraco.Core.Models
 
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value == "_umbracoSystemDefaultProtectType" ? value : value.ToSafeAlias();
+                    _alias = value == "_umbracoSystemDefaultProtectType" 
+                        ? value 
+                        : (value == null ? string.Empty : value.ToSafeAlias() );
                     return _alias;
                 }, _alias, AliasSelector);
             }

@@ -4,14 +4,25 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
+using System.Xml;
+using System.Xml.Linq;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
+    /// <summary>
+    /// A readonly member profile model
+    /// </summary>
+    [ModelBinder(typeof(ProfileModelBinder))]
     public class ProfileModel : PostRedirectModel
     {
+
         public static ProfileModel CreateModel()
         {
             var model = new ProfileModel(false);
@@ -24,7 +35,7 @@ namespace Umbraco.Web.Models
             if (doLookup)
             {
                 var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
-                var model = helper.CreateProfileModel();
+                var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }   
         }
@@ -49,7 +60,6 @@ namespace Umbraco.Web.Models
         /// The member's member type alias
         /// </summary>        
         [ReadOnly(true)]
-        [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public string MemberTypeAlias { get; set; }
 
         [ReadOnly(true)]
@@ -90,5 +100,16 @@ namespace Umbraco.Web.Models
         /// </remarks>
         public List<UmbracoProperty> MemberProperties { get; set; }
 
+        /// <summary>
+        /// A custom model binder for MVC because the default ctor performs a lookup!
+        /// </summary>
+        internal class ProfileModelBinder : DefaultModelBinder
+        {
+            protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Type modelType)
+            {
+                return ProfileModel.CreateModel();
+            }
+
+        }
     }
 }

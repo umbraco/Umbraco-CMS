@@ -5,12 +5,15 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class MemberServiceTests : BaseServiceTest
     {
@@ -380,7 +383,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(members);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.GetAllMembers(0, 2, out totalRecs);
+            var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs);
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(10, totalRecs);
@@ -400,7 +403,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            var found = ServiceContext.MemberService.FindByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -417,7 +420,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            var found = ServiceContext.MemberService.FindByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -434,7 +437,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            var found = ServiceContext.MemberService.FindByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -451,7 +454,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            var found = ServiceContext.MemberService.FindByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -468,7 +471,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            var found = ServiceContext.MemberService.FindByUsername("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -485,7 +488,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("llo", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            var found = ServiceContext.MemberService.FindByUsername("llo", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -502,7 +505,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            var found = ServiceContext.MemberService.FindByUsername("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -519,7 +522,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("hello", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            var found = ServiceContext.MemberService.FindByUsername("hello", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -849,7 +852,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.All);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.All);
 
             Assert.AreEqual(11, found);
         }
@@ -866,7 +869,7 @@ namespace Umbraco.Tests.Services
             customMember.SetValue(Constants.Conventions.Member.LastLoginDate, DateTime.Now);
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.Online);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.Online);
 
             Assert.AreEqual(9, found);
         }
@@ -883,7 +886,7 @@ namespace Umbraco.Tests.Services
             customMember.SetValue(Constants.Conventions.Member.IsLockedOut, true);
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.LockedOut);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.LockedOut);
 
             Assert.AreEqual(6, found);
         }
@@ -900,7 +903,7 @@ namespace Umbraco.Tests.Services
             customMember.SetValue(Constants.Conventions.Member.IsApproved, false);
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.Approved);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.Approved);
 
             Assert.AreEqual(5, found);
         }
@@ -920,8 +923,58 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             var found = ServiceContext.MemberService.GetById(customMember.Id);
+
+            Assert.IsTrue(found.Comments.IsNullOrWhiteSpace());
+        }
+
+        /// <summary>
+        /// Because we are forcing some of the built-ins to be Labels which have an underlying db type as nvarchar but we need
+        /// to ensure that the dates/int get saved to the correct column anyways. 
+        /// </summary>
+        [Test]
+        public void Setting_DateTime_Property_On_Built_In_Member_Property_Saves_To_Correct_Column()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "test", "test");
+            var date = DateTime.Now;
+            member.LastLoginDate = DateTime.Now;            
+            ServiceContext.MemberService.Save(member);
+
+            var result = ServiceContext.MemberService.GetById(member.Id);
+            Assert.AreEqual(
+                date.TruncateTo(DateTimeExtensions.DateTruncate.Second), 
+                result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
+
+            //now ensure the col is correct
+            var sql = new Sql().Select("cmsPropertyData.*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
+                .Where<PropertyDataDto>(dto => dto.NodeId == member.Id)
+                .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
             
-            Assert.AreEqual(string.Empty, found.Comments);
+            var colResult = DatabaseContext.Database.Fetch<PropertyDataDto>(sql);
+
+            Assert.AreEqual(1, colResult.Count);
+            Assert.IsTrue(colResult.First().Date.HasValue);
+            Assert.IsFalse(colResult.First().Integer.HasValue);
+            Assert.IsNull(colResult.First().Text);
+            Assert.IsNull(colResult.First().VarChar);
+        }
+
+        [Test]
+        public void New_Member_Approved_By_Default()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetById(customMember.Id);
+
+            Assert.IsTrue(found.IsApproved);
         }
 
     }

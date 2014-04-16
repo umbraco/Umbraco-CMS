@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections;
+using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -64,17 +66,17 @@ namespace umbraco.cms.presentation.developer
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDataTypes>().Tree.Alias)
-                    .SyncTree("-1,init," + _id.ToString(), false);
+                    .SyncTree("-1,init," + _id, false);
 
             }
 
             if (dt.DataType != null)
                 litGuid.Text = dt.DataType.Id.ToString();
-            Panel1.Text = umbraco.ui.Text("edit") + " datatype: " + dt.Text;
-            insertPrevalueEditor();
+            Panel1.Text = ui.Text("edit") + " datatype: " + dt.Text;
+            InsertPrevalueEditor();
         }
 
-        private void insertPrevalueEditor()
+        private void InsertPrevalueEditor()
         {
             try
             {
@@ -93,7 +95,10 @@ namespace umbraco.cms.presentation.developer
                     plcEditorPrevalueControl.Controls.Add(new LiteralControl("No editor control selected"));
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                LogHelper.Error<editDatatype>("An error occurred inserting pre-value editor", ex);
+            }
 
         }
 
@@ -106,41 +111,122 @@ namespace umbraco.cms.presentation.developer
             dt.Text = txtName.Text;
 
             dt.DataType = f.DataType(new Guid(ddlRenderControl.SelectedValue));
-            dt.Save();
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
-
-            ClientTools.SyncTree(dt.Path, true);
+            try
+            {
+                dt.Save();
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
+                ClientTools.SyncTree(dt.Path, true);
+            }
+            catch (DuplicateNameException)
+            {
+                DuplicateNameValidator.IsValid = false;
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, "A data type with the name " + dt.Text + " already exists", "");
+            }            
         }
-
-
-        #region Web Form Designer generated code
-
 
         override protected void OnInit(EventArgs e)
         {
             save = Panel1.Menu.NewImageButton();
             save.ID = "save";
-            save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
+            save.Click += save_click;
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
             Panel1.hasMenu = true;
 
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
             base.OnInit(e);
         }
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
+        protected CustomValidator DuplicateNameValidator;
 
-        }
-        #endregion
+        /// <summary>
+        /// Panel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+
+        /// <summary>
+        /// pane_control control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_control;
+
+        /// <summary>
+        /// pp_name control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+
+        /// <summary>
+        /// txtName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtName;
+
+        /// <summary>
+        /// pp_renderControl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_renderControl;
+
+        /// <summary>
+        /// ddlRenderControl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlRenderControl;
+
+        /// <summary>
+        /// pp_guid control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_guid;
+
+        /// <summary>
+        /// litGuid control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litGuid;
+
+        /// <summary>
+        /// pane_settings control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_settings;
+
+        /// <summary>
+        /// plcEditorPrevalueControl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder plcEditorPrevalueControl;
     }
 }

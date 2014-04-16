@@ -322,7 +322,7 @@ namespace Umbraco.Core.ObjectResolution
 		}
 
 		/// <summary>
-		/// Clears the list of types.
+		/// Clears the list of types
 		/// </summary>
 		/// <exception cref="InvalidOperationException">the resolver does not support clearing types.</exception>
 		public virtual void Clear()
@@ -335,6 +335,20 @@ namespace Umbraco.Core.ObjectResolution
 				_instanceTypes.Clear();
 			}
 		}
+
+        /// <summary>
+        /// WARNING! Do not use this unless you know what you are doing, clear all types registered and instances
+        /// created. Typically only used if a resolver is no longer used in an application and memory is to be GC'd
+        /// </summary>
+        internal void ResetCollections()
+        {
+            using (new WriteLock(_lock))
+            {
+                _instanceTypes.Clear();
+                _sortedValues = null;
+                _applicationInstances = null;
+            }
+        }
 
 		/// <summary>
 		/// Inserts a type at the specified index.

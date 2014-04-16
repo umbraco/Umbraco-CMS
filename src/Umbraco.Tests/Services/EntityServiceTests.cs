@@ -11,6 +11,7 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the EntityService
     /// </summary>
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture, RequiresSTA]
     public class EntityServiceTests : BaseServiceTest
     {
@@ -25,12 +26,7 @@ namespace Umbraco.Tests.Services
         {
             base.TearDown();
         }
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
-
+        
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
         {

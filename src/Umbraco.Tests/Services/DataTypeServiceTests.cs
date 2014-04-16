@@ -4,12 +4,14 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
     /// <summary>
     /// Tests covering the DataTypeService
     /// </summary>
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class DataTypeServiceTests : BaseServiceTest
     {

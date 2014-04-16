@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
@@ -75,7 +76,23 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IUser CreateMemberWithIdentity(string username, string email, string password, IUserType userType, bool raiseEvents = true)
+        public IUser CreateUserWithIdentity(string username, string email, IUserType userType)
+        {
+            return CreateUserWithIdentity(username, email, "", userType);
+        }
+
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
+        {
+            var userType = GetUserTypeByAlias(memberTypeAlias);
+            if (userType == null)
+            {
+                throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
+            }
+
+            return CreateUserWithIdentity(username, email, rawPasswordValue, userType);
+        }
+
+        private IUser CreateUserWithIdentity(string username, string email, string rawPasswordValue, IUserType userType)
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
@@ -94,8 +111,7 @@ namespace Umbraco.Core.Services
                     Email = email,
                     Language = Configuration.GlobalSettings.DefaultUILanguage,
                     Name = username,
-                    Password = password,
-                    DefaultPermissions = userType.Permissions,
+                    RawPasswordValue = rawPasswordValue,                    
                     Username = username,
                     StartContentId = -1,
                     StartMediaId = -1,
@@ -103,31 +119,16 @@ namespace Umbraco.Core.Services
                     IsApproved = true
                 };
 
-                if (raiseEvents)
-                {
-                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
-                        return user;
-                }
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
+                    return user;
 
                 repository.AddOrUpdate(user);
                 uow.Commit();
 
-                if (raiseEvents)
-                    SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
 
                 return user;
             }
-        }
-
-        public IUser CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
-        {
-            var userType = GetUserTypeByAlias(memberTypeAlias);
-            if (userType == null)
-            {
-                throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
-            }
-
-            return CreateMemberWithIdentity(username, email, password, userType);
         }
 
         public IUser GetById(int id)
@@ -192,6 +193,37 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
+        /// </summary>
+        /// <param name="user">The user to save the password for</param>
+        /// <param name="password"></param>
+        /// <remarks>
+        /// This method exists so that Umbraco developers can use one entry point to create/update users if they choose to.
+        /// </remarks>
+        public void SavePassword(IUser user, string password)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider())
+            {
+                provider.ChangePassword(user.Username, "", password);
+            }
+
+            //go re-fetch the member and update the properties that may have changed
+            var result = GetByUsername(user.Username);
+            if (result != null)
+            {
+                //should never be null but it could have been deleted by another thread.
+                user.RawPasswordValue = result.RawPasswordValue;
+                user.LastPasswordChangeDate = result.LastPasswordChangeDate;
+                user.UpdateDate = user.UpdateDate;
+            }
+
+            throw new NotSupportedException("When using a non-Umbraco membership provider you must change the user password by using the MembershipProvider.ChangePassword method");
+        }
+
+        /// <summary>
         /// To permanently delete the user pass in true, otherwise they will just be disabled
         /// </summary>
         /// <param name="user"></param>
@@ -218,37 +250,37 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void Save(IUser membershipUser, bool raiseEvents = true)
+        public void Save(IUser entity, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(membershipUser), this))
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entity), this))
                     return;
             }
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
             {
-                repository.AddOrUpdate(membershipUser);
+                repository.AddOrUpdate(entity);
                 uow.Commit();
             }
 
             if (raiseEvents)
-                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(membershipUser, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entity, false), this);
         }
 
-        public void Save(IEnumerable<IUser> members, bool raiseEvents = true)
+        public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(members), this))
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(entities), this))
                     return;
             }
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
             {
-                foreach (var member in members)
+                foreach (var member in entities)
                 {
                     repository.AddOrUpdate(member);                 
                 }
@@ -257,10 +289,10 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(members, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entities, false), this);
         }
 
-        public IEnumerable<IUser> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IUser> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
@@ -292,7 +324,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IUser> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IUser> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
@@ -324,7 +356,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public int GetMemberCount(MemberCountType countType)
+        public int GetCount(MemberCountType countType)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -360,7 +392,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IUser> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
+        public IEnumerable<IUser> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
@@ -399,17 +431,17 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
-        public void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
             {
-                repository.AssignUserPermissions(userId, permissions, entityIds);
+                repository.ReplaceUserPermissions(userId, permissions, entityIds);
             }
         }
 

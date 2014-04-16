@@ -152,12 +152,21 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                // look for the first domain that would be the base of the hint
-                var hintWithSlash = current.EndPathWithSlash();
+                // look for the first domain that would be the base of the current url
+                // ie current is www.example.com/foo/bar, look for domain www.example.com
+                var currentWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
-                    .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
+                    .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
+                if (domainAndUri != null) return domainAndUri;
+
+                // look for the first domain that the current url would be the base of
+                // ie current is www.example.com, look for domain www.example.com/foo/bar
+                domainAndUri = domainsAndUris
+                    .FirstOrDefault(d => currentWithSlash.IsBaseOf(d.Uri.EndPathWithSlash()));
+                if (domainAndUri != null) return domainAndUri;
+
                 // if none matches, then try to run the filter to pick a domain
-                if (domainAndUri == null && filter != null)
+                if (filter != null)
                 {
                     domainAndUri = filter(domainsAndUris);
                     // if still nothing, pick the first one?

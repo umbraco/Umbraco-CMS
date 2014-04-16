@@ -226,6 +226,18 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                                                indexItem.INDEX_NAME))).ToList();
         }
 
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        {
+            var items =
+                db.Fetch<dynamic>(
+                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES 
+WHERE INDEX_NAME NOT LIKE 'PK_%'
+ORDER BY TABLE_NAME, INDEX_NAME");
+            return
+                items.Select(
+                    item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE));
+        }
+
         public override bool DoesTableExist(Database db, string tableName)
         {
             var result =

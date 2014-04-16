@@ -5,14 +5,12 @@
     Show:True   Alias:propertyAlias     Name:Property Alias    Type:Textstring
 *@   
 
-
 @{
     
     @* Get the property alias we want to filter on from the macro parameter *@
     var propertyAlias = Parameter.propertyAlias;
     var selection = Model.Children.Where("Visible").OrderBy(propertyAlias);
 }
-
 
 <ul>
     @foreach (var page in selection)
