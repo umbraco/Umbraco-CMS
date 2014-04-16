@@ -14,9 +14,13 @@ namespace Umbraco.Core.Services
         IEnumerable<T> GetMembersInRole(string roleName);
         IEnumerable<T> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
         bool DeleteRole(string roleName, bool throwIfBeingUsed);
+        void AssignRole(string username, string roleName); 
         void AssignRoles(string[] usernames, string[] roleNames);
+        void DissociateRole(string username, string roleName); 
         void DissociateRoles(string[] usernames, string[] roleNames);
+        void AssignRole(int memberId, string roleName); 
         void AssignRoles(int[] memberIds, string[] roleNames);
+        void DissociateRole(int memberId, string roleName);
         void DissociateRoles(int[] memberIds, string[] roleNames);
     }
 }
