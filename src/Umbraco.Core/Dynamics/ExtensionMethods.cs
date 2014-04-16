@@ -36,42 +36,22 @@ namespace Umbraco.Core.Dynamics
         [Obsolete("This method should not be used and will be removed in the future")]
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles)
         {
-        	if (haystack == null) throw new ArgumentNullException("haystack");
-        	if (!string.IsNullOrEmpty(haystack) || needles.Any())
-            {
-            	return needles.Any(haystack.Contains);
-            }
-            return false;
+            return StringExtensions.ContainsAny(haystack, needles);
         }
         [Obsolete("This method should not be used and will be removed in the future")]
         public static bool ContainsAny(this string haystack, params string[] needles)
         {
-        	if (haystack == null) throw new ArgumentNullException("haystack");
-        	if (!string.IsNullOrEmpty(haystack) || needles.Length > 0)
-            {
-            	return needles.Any(haystack.Contains);
-            }
-            return false;
+        	return StringExtensions.ContainsAny(haystack, needles);
         }
         [Obsolete("This method should not be used and will be removed in the future")]
 		public static bool ContainsAny(this string haystack, StringComparison comparison, IEnumerable<string> needles)
         {
-        	if (haystack == null) throw new ArgumentNullException("haystack");
-        	if (!string.IsNullOrEmpty(haystack) || needles.Any())
-            {
-            	return needles.Any(value => haystack.IndexOf(value, comparison) >= 0);
-            }
-            return false;
+            return StringExtensions.ContainsAny(haystack, needles, comparison);
         }
         [Obsolete("This method should not be used and will be removed in the future")]
         public static bool ContainsAny(this string haystack, StringComparison comparison, params string[] needles)
         {
-        	if (haystack == null) throw new ArgumentNullException("haystack");
-        	if (!string.IsNullOrEmpty(haystack) || needles.Length > 0)
-            {
-            	return needles.Any(value => haystack.IndexOf(value, comparison) >= 0);
-            }
-            return false;
+            return StringExtensions.ContainsAny(haystack, needles, comparison);
         }
         [Obsolete("This method should not be used and will be removed in the future")]
         public static bool ContainsInsensitive(this string haystack, string needle)

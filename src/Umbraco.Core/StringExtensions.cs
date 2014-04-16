@@ -1180,5 +1180,15 @@ namespace Umbraco.Core
             */
         }
 
+        public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)
+        {
+            if (haystack == null) throw new ArgumentNullException("haystack");
+            if (string.IsNullOrEmpty(haystack) == false || needles.Any())
+            {
+                return needles.Any(value => haystack.IndexOf(value) >= 0);
+            }
+            return false;
+        }
+
     }
 }
