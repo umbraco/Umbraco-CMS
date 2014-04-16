@@ -37,7 +37,7 @@ namespace Umbraco.Web.PublishedCache
             }
 
             _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
-                (t, p, v) => new RawValueProperty(t, v ?? string.Empty))
+                (t, v) => new RawValueProperty(t, v ?? string.Empty))
                 .ToArray();
         }
 

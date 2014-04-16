@@ -24,45 +24,35 @@ namespace Umbraco.Web.Models
         /// <remarks>Ensures that all conversions took place correctly.</remarks>
         internal static IEnumerable<IPublishedProperty> MapProperties(
             IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
-            Func<PublishedPropertyType, Property, object, IPublishedProperty> map)
+            Func<PublishedPropertyType, object, IPublishedProperty> map)
         {
-            var peResolver = PropertyEditorResolver.Current;
-            var dtService = ApplicationContext.Current.Services.DataTypeService;
-            return MapProperties(propertyTypes, properties, peResolver, dtService, map);
-        }
+            var propertyEditorResolver = PropertyEditorResolver.Current;
+            var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
-        /// <summary>
-        /// Maps a collection of Property to a collection of IPublishedProperty for a specified collection of PublishedPropertyType.
-        /// </summary>
-        /// <param name="propertyTypes">The published property types.</param>
-        /// <param name="properties">The properties.</param>
-        /// <param name="map">A mapping function.</param>
-        /// <param name="propertyEditorResolver">A PropertyEditorResolver instance.</param>
-        /// <param name="dataTypeService">An IDataTypeService instance.</param>
-        /// <returns>A collection of IPublishedProperty corresponding to the collection of PublishedPropertyType
-        /// and taking values from the collection of Property.</returns>
-        /// <remarks>Ensures that all conversions took place correctly.</remarks>
-        internal static IEnumerable<IPublishedProperty> MapProperties(
-            IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
-            PropertyEditorResolver propertyEditorResolver, IDataTypeService dataTypeService,
-            Func<PublishedPropertyType, Property, object, IPublishedProperty> map)
-        {
-            return propertyTypes
-                .Select(x =>
+            return propertyTypes.Select(x =>
                 {
                     var p = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
                     var v = p == null || p.Value == null ? null : p.Value;
                     if (v != null)
                     {
                         var e = propertyEditorResolver.GetByAlias(x.PropertyEditorAlias);
+
+                        // We are converting to string, even for database values which are integer or
+                        // DateTime, which is not optimum. Doing differently would require that we have a way to tell
+                        // whether the conversion to XML string changes something or not... which we don't, and we
+                        // don't want to implement it as PropertyValueEditor.ConvertDbToXml/String should die anyway.
+
+                        // Don't think about improving the situation here: this is a corner case and the real
+                        // thing to do is to get rig of PropertyValueEditor.ConvertDbToXml/String.
+
+                        // Use ConvertDbToString to keep it simple, although everywhere we use ConvertDbToXml and
+                        // nothing ensures that the two methods are consistent.
+
                         if (e != null)
                             v = e.ValueEditor.ConvertDbToString(p, p.PropertyType, dataTypeService);
                     }
-                    // fixme - means that the IPropertyValueConverter will always get a string
-                    // fixme   and never an int or DateTime that's in the DB unless the value editor has
-                    // fixme   a way to say it's OK to use what's in the DB?
 
-                    return map(x, p, v);
+                    return map(x, v);
                 });
         }
     }
