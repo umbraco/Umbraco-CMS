@@ -67,8 +67,11 @@ namespace Umbraco.Core.Persistence.Caching
             {
                 //ensure the key doesn't exist anymore in the tracker
                 _keyTracker.Remove(key);
+                return null;
             }
-            return result;
+
+            //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+            return (IEntity)result.DeepClone();
         }
 
         public IEnumerable<IEntity> GetByIds(Type type, List<Guid> ids)
@@ -88,7 +91,8 @@ namespace Umbraco.Core.Persistence.Caching
                 }
                 else
                 {
-                    collection.Add(result);
+                    //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                    collection.Add((IEntity)result.DeepClone());
                 }
             }
             return collection;
@@ -113,7 +117,8 @@ namespace Umbraco.Core.Persistence.Caching
                     }
                     else
                     {
-                        collection.Add(result);
+                        //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                        collection.Add((IEntity)result.DeepClone());
                     }
                 }
             }
@@ -122,6 +127,9 @@ namespace Umbraco.Core.Persistence.Caching
 
         public void Save(Type type, IEntity entity)
         {
+            //IMPORTANT: we must clone to store, see: http://issues.umbraco.org/issue/U4-4259
+            entity = (IEntity)entity.DeepClone();
+
             var key = GetCompositeId(type, entity.Id);
             
             _keyTracker.TryAdd(key);
