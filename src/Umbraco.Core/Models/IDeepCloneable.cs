@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Models.EntityBase
+namespace Umbraco.Core.Models
 {
     public interface IDeepCloneable
     {
