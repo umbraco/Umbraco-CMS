@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Models
 {
-    internal static class DeepCloneHelper
+    public static class DeepCloneHelper
     {
         /// <summary>
         /// Used to deep clone any reference properties on the object (should be done after a MemberwiseClone for which the outcome is 'output')
