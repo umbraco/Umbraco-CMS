@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Configuration;
@@ -155,6 +156,14 @@ namespace umbraco.presentation.umbraco.webservices
                     {
                         // get the current file
                         var uploadFile = context.Request.Files[j];
+
+                        //Are we allowed to upload this?
+                        var ext = uploadFile.FileName.Substring(uploadFile.FileName.LastIndexOf('.') + 1).ToLower();
+                        if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext))
+                        {
+                            LogHelper.Warn<MediaUploader>("Cannot upload file " + uploadFile + ", it is not an approved file type");
+                            continue;
+                        }
 
                         using (var inputStream = uploadFile.InputStream)
                         {
