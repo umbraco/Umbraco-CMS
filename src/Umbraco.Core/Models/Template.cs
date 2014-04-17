@@ -205,7 +205,7 @@ namespace Umbraco.Core.Models
             clone._alias = Alias;
             clone._name = Name;
 
-            clone.ResetDirtyProperties(true);
+            clone.ResetDirtyProperties(false);
 
             return clone;
         }

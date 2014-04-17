@@ -238,7 +238,7 @@ namespace Umbraco.Core.Models.EntityBase
             var clone = (Entity)MemberwiseClone();
             //Automatically deep clone ref properties that are IDeepCloneable
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
-            clone.ResetDirtyProperties(true);
+            clone.ResetDirtyProperties(false);
             return clone;
 
             //Using data contract serializer - has issues

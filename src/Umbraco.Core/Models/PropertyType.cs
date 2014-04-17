@@ -446,7 +446,7 @@ namespace Umbraco.Core.Models
                 clone._propertyGroupId = new Lazy<int>(() => propGroupId);    
             }
 
-            clone.ResetDirtyProperties(true);
+            clone.ResetDirtyProperties(false);
 
             return clone;
         }

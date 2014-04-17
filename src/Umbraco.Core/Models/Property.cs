@@ -154,7 +154,7 @@ namespace Umbraco.Core.Models
 
             //need to manually assign since this is a readonly property
             clone._propertyType = (PropertyType)PropertyType.DeepClone();
-            clone.ResetDirtyProperties(true);
+            clone.ResetDirtyProperties(false);
             
             return clone;
         }
