@@ -37,7 +37,10 @@ namespace Umbraco.Core.Persistence.Caching
             var containsKey = _cache.ContainsKey(compositeKey);
             if (containsKey)
             {
-                return _cache[compositeKey];
+                var result = _cache[compositeKey];
+
+                //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                return (IEntity)result.DeepClone();
             }
 
             return null;
@@ -56,7 +59,12 @@ namespace Umbraco.Core.Persistence.Caching
                             into key
                             let containsKey = _cache.ContainsKey(key)
                             where containsKey
-                            select _cache[key]).ToList();
+                            select _cache[key]
+                            into result 
+                            //don't return null objects
+                            where result != null
+                            //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                            select (IEntity)result.DeepClone()).ToList();
             return list;
         }
 
@@ -67,7 +75,14 @@ namespace Umbraco.Core.Persistence.Caching
         /// <returns></returns>
         public IEnumerable<IEntity> GetAllByType(Type type)
         {
-            var list = _cache.Keys.Where(key => key.Contains(type.Name)).Select(key => _cache[key]).ToList();
+            var list = _cache.Keys
+                .Where(key => key.Contains(type.Name))
+                .Select(key => _cache[key])
+                //don't return null objects
+                .Where(result => result != null)
+                //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                .Select(result => (IEntity)result.DeepClone())
+                .ToList();
             return list;
         }
 
@@ -78,6 +93,9 @@ namespace Umbraco.Core.Persistence.Caching
         /// <param name="entity"></param>
         public void Save(Type type, IEntity entity)
         {
+            //IMPORTANT: we must clone to store, see: http://issues.umbraco.org/issue/U4-4259
+            entity = (IEntity)entity.DeepClone();
+
             _cache.AddOrUpdate(GetCompositeId(type, entity.Id), entity, (x, y) => entity);
         }
 

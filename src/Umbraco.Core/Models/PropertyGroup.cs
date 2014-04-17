@@ -109,23 +109,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        internal PropertyGroup Clone()
-        {
-            var clone = (PropertyGroup) this.MemberwiseClone();
-            var collection = new PropertyTypeCollection();
-            foreach (var propertyType in this.PropertyTypes)
-            {
-                var property = propertyType.Clone();
-                property.ResetIdentity();
-                property.ResetDirtyProperties(false);
-                collection.Add(property);
-            }
-            clone.PropertyTypes = collection;
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
-
         /// <summary>
         /// Sets the ParentId from the lazy integer id
         /// </summary>
@@ -159,5 +142,24 @@ namespace Umbraco.Core.Models
             //Calculate the hash code for the product. 
             return hashName ^ hashId;
         }
+
+        //TODO: Remove this, its mostly a shallow clone and is not thread safe
+        internal PropertyGroup Clone()
+        {
+            var clone = (PropertyGroup)this.MemberwiseClone();
+            var collection = new PropertyTypeCollection();
+            foreach (var propertyType in this.PropertyTypes)
+            {
+                var property = propertyType.Clone();
+                property.ResetIdentity();
+                property.ResetDirtyProperties(false);
+                collection.Add(property);
+            }
+            clone.PropertyTypes = collection;
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
+        }
+
     }
 }

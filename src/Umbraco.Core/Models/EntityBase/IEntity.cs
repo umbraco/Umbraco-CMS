@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.EntityBase
     /// </summary>
     /// <remarks>The current database schema doesn't provide a modified date
     /// for all entities, so this will have to be changed at a later stage.</remarks>
-    public interface IEntity
+    public interface IEntity : IDeepCloneable
     {
         /// <summary>
         /// The Id of the entity

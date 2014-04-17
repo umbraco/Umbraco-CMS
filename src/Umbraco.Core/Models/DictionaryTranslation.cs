@@ -65,5 +65,6 @@ namespace Umbraco.Core.Models
                 }, _value, ValueSelector);
             }
         }
+
     }
 }

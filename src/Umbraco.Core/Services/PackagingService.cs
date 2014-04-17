@@ -922,11 +922,13 @@ namespace Umbraco.Core.Services
                                                         .Select(x => x.Attribute("Value").Value);
 
                 var valuesWithKeys = prevaluesElement.Elements("PreValue")
-                                                     .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
-                                                     .ToDictionary(key => (string) key.Attribute("Alias"), val => new PreValue((string) val.Attribute("Value")));
+                    .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                    .ToDictionary(
+                        key => (string) key.Attribute("Alias"),
+                        val => new PreValue((string) val.Attribute("Value")));
                 
                 //save the values with keys
-                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithKeys);
+                _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
 
                 //save the values without keys (this is legacy)
                 _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);

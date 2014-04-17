@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
+
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class User : TracksChangesEntityBase, IUser
+    public class User : Entity, IUser
     {
         public User(IUserType userType)
         {
@@ -57,8 +57,6 @@ namespace Umbraco.Core.Models.Membership
         }
 
         private IUserType _userType;
-        private bool _hasIdentity;
-        private int _id;
         private string _name;
         private Type _userTypeKey;
         private readonly List<string> _addedSections;
@@ -81,7 +79,6 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartContentId);
         private static readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
         private static readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.AllowedSections);
-        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<User, object>(x => x.Id);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
         private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<User, Type>(x => x.ProviderUserKeyType);
         
@@ -93,52 +90,8 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
         private static readonly PropertyInfo DefaultPermissionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.DefaultPermissions);
         private static readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
-        private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.HasIdentity);
         private static readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
-
-        #region Implementation of IEntity
-
-        [IgnoreDataMember]
-        public bool HasIdentity
-        {
-            get
-            {
-                return _hasIdentity;
-            }
-            protected set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _hasIdentity = value;
-                    return _hasIdentity;
-                }, _hasIdentity, HasIdentitySelector);
-            }
-        }
-
-        [DataMember]
-        public int Id
-        {
-            get
-            {
-                return _id;
-            }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _id = value;
-                    HasIdentity = true; //set the has Identity
-                    return _id;
-                }, _id, IdSelector);
-            }
-        }
-
-        //this doesn't get used
-        [IgnoreDataMember]
-        public Guid Key { get; set; }
-
-        #endregion
-
+        
         #region Implementation of IMembershipUser
 
         [IgnoreDataMember]
@@ -256,11 +209,7 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public string RawPasswordAnswerValue { get; set; }
         [IgnoreDataMember]
-        public string Comments { get; set; }
-        [IgnoreDataMember]
-        public DateTime CreateDate { get; set; }
-        [IgnoreDataMember]
-        public DateTime UpdateDate { get; set; }
+        public string Comments { get; set; }        
         [IgnoreDataMember]
         public DateTime LastLoginDate { get; set; }
         [IgnoreDataMember]
@@ -491,7 +440,7 @@ namespace Umbraco.Core.Models.Membership
                 _removedSections.Add(e.OldItems.Cast<string>().First());
             }
         }
-
+        
         /// <summary>
         /// Internal class used to wrap the user in a profile
         /// </summary>
@@ -514,6 +463,24 @@ namespace Umbraco.Core.Models.Membership
             {
                 get { return _user.Name; }
                 set { _user.Name = value; }
+            }
+
+            protected bool Equals(UserProfile other)
+            {
+                return _user.Equals(other._user);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((UserProfile) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return _user.GetHashCode();
             }
         }
     }

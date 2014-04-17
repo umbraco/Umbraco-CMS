@@ -319,7 +319,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        private readonly IDictionary<string, object> _additionalData;
+        private IDictionary<string, object> _additionalData;
         /// <summary>
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>

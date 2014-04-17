@@ -41,6 +41,12 @@ namespace Umbraco.Core.Cache
             return result.Select(x => x.TryConvertTo<T>().Result);
         }
 
+        public static IEnumerable<T> GetCacheItemsByKeyExpression<T>(this ICacheProvider provider, string regexString)
+        {
+            var result = provider.GetCacheItemsByKeyExpression(regexString);
+            return result.Select(x => x.TryConvertTo<T>().Result);
+        }
+
         public static T GetCacheItem<T>(this ICacheProvider provider, string cacheKey)
         {
             var result = provider.GetCacheItem(cacheKey);

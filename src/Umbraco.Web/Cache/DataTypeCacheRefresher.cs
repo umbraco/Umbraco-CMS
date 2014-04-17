@@ -129,10 +129,14 @@ namespace Umbraco.Web.Cache
             payloads.ForEach(payload =>
             {
                 //clear both the Id and Unique Id cache since we cache both in the legacy classes :(
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                    string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.Id));
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                    string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.Id));                
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                     string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.UniqueId));
+
+                //clears the prevalue cache
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
+                    string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
 
                 PublishedContentType.ClearDataType(payload.Id);
             });

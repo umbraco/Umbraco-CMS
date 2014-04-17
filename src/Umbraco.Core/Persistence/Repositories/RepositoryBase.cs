@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Deletes the passed in entity
         /// </summary>
         /// <param name="entity"></param>
-        public void Delete(TEntity entity)
+        public virtual void Delete(TEntity entity)
         {
             if(_work != null)
             {

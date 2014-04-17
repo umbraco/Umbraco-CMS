@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -13,9 +14,10 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract]
-    public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged
+    public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged, IDeepCloneable
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
+        
         internal Action OnAdd;
 
         internal PropertyGroupCollection()
@@ -130,6 +132,16 @@ namespace Umbraco.Core.Models
             {
                 CollectionChanged(this, args);
             }
+        }
+
+        public object DeepClone()
+        {
+            var newGroup = new PropertyGroupCollection();
+            foreach (var p in this)
+            {
+                newGroup.Add((PropertyGroup)p.DeepClone());
+            }            
+            return newGroup;
         }
     }
 }

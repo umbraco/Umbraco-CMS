@@ -26,7 +26,7 @@
         /// <summary>
         /// The value stored for the pre-value field
         /// </summary>
-        public string Value { get; private set; }
+        public string Value { get; set; }
 
         /// <summary>
         /// The database id for the pre-value field value
