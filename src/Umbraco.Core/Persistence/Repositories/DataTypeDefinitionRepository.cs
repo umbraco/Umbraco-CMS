@@ -462,7 +462,7 @@ AND umbracoNode.id <> @id",
             //go get the data
             var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
             var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
-            var collection = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
+            var collection = PreValueConverter.ConvertToPreValuesCollection(list);
 
             //now create the cache key, this needs to include all pre-value ids so that we can use this cached item in the GetPreValuesAsString method
             //the key will be: "UmbracoPreValDATATYPEID-CSVOFPREVALIDS
@@ -600,7 +600,43 @@ AND id <> @id",
                 Database.Update(dto);
             }
         }
-    
+
+        internal static class PreValueConverter
+        {
+            /// <summary>
+            /// Converts the tuple to a pre-value collection
+            /// </summary>
+            /// <param name="list"></param>
+            /// <returns></returns>
+            internal static PreValueCollection ConvertToPreValuesCollection(IEnumerable<Tuple<PreValue, string, int>> list)
+            {
+                //now we need to determine if they are dictionary based, otherwise they have to be array based
+                var dictionary = new Dictionary<string, PreValue>();
+
+                //need to check all of the keys, if there's only one and it is empty then it's an array
+                var keys = list.Select(x => x.Item2).Distinct().ToArray();
+                if (keys.Length == 1 && keys[0].IsNullOrWhiteSpace())
+                {
+                    return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item1));
+                }
+
+                foreach (var item in list
+                    .OrderBy(x => x.Item3) //we'll order them first so we maintain the order index in the dictionary
+                    .GroupBy(x => x.Item2)) //group by alias
+                {
+                    if (item.Count() > 1)
+                    {
+                        //if there's more than 1 item per key, then it cannot be a dictionary, just return the array
+                        return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item1));
+                    }
+
+                    dictionary.Add(item.Key, item.First().Item1);
+                }
+
+                return new PreValueCollection(dictionary);
+            }
+        }
+
     }
 
 
