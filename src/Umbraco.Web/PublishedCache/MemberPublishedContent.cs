@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache
                 throw new InvalidOperationException("Could not get member type with alias " + _member.ContentTypeAlias);
             }
             _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
-                (t, p, v) => new RawValueProperty(t, v ?? string.Empty))
+                (t, v) => new RawValueProperty(t, v ?? string.Empty))
                 .ToArray();
         }
 
