@@ -63,7 +63,8 @@ namespace Umbraco.Core.Persistence
             return new DataTypeDefinitionRepository(
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
-                _cacheHelper);
+                _cacheHelper,
+                CreateContentTypeRepository(uow));
         }
 
         public virtual IDictionaryRepository CreateDictionaryRepository(IDatabaseUnitOfWork uow)

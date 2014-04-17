@@ -316,31 +316,9 @@ namespace Umbraco.Core.Services
                 return;
 
             var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
-                //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-                var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id);
-                var contentTypes = repository.GetByQuery(query);
-
-                //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
-                foreach (var contentType in contentTypes)
-                {
-                    if (contentType == null) continue;
-
-                    foreach (var group in contentType.PropertyGroups)
-                    {
-                        var types = @group.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id).ToList();
-                        foreach (var propertyType in types)
-                        {
-                            @group.PropertyTypes.Remove(propertyType);
-                        }
-                    }
-
-                    repository.AddOrUpdate(contentType);
-                }
-
-                var dataTypeRepository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow);
-                dataTypeRepository.Delete(dataTypeDefinition);
+                repository.Delete(dataTypeDefinition);
 
                 uow.Commit();
 

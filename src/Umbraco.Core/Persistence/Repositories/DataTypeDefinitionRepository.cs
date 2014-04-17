@@ -24,19 +24,24 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
         private readonly CacheHelper _cacheHelper;
-        private DataTypePreValueRepository _preValRepository;
+        private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper)
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper,
+            IContentTypeRepository contentTypeRepository)
 			: base(work)
         {
             _cacheHelper = cacheHelper;
+            _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
         }
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper)
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper,
+            IContentTypeRepository contentTypeRepository)
             : base(work, cache)
         {
             _cacheHelper = cacheHelper;
+            _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
         }
 
@@ -94,6 +99,37 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 yield return Get(dataTypeDto.DataTypeId);
             }
+        }
+
+        /// <summary>
+        /// Override the delete method so that we can ensure that all related content type's are updated as part of the overall transaction
+        /// </summary>
+        /// <param name="entity"></param>
+        public override void Delete(IDataTypeDefinition entity)
+        {
+            //Find ContentTypes using this IDataTypeDefinition on a PropertyType
+            var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == entity.Id);
+            var contentTypes = _contentTypeRepository.GetByQuery(query);
+
+            //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
+            foreach (var contentType in contentTypes)
+            {
+                if (contentType == null) continue;
+
+                foreach (var group in contentType.PropertyGroups)
+                {
+                    var types = @group.PropertyTypes.Where(x => x.DataTypeDefinitionId == entity.Id).ToList();
+                    foreach (var propertyType in types)
+                    {
+                        @group.PropertyTypes.Remove(propertyType);
+                    }
+                }
+
+                _contentTypeRepository.AddOrUpdate(contentType);
+            }
+
+            //call the base method to queue the deletion of this data type
+            base.Delete(entity);
         }
 
         #endregion

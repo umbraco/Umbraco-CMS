@@ -28,7 +28,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(unitOfWork, NullCacheProvider.Current, CacheHelper.CreateDisabledCacheHelper());
+            var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(
+                unitOfWork, NullCacheProvider.Current, CacheHelper.CreateDisabledCacheHelper(),
+                new ContentTypeRepository(unitOfWork, NullCacheProvider.Current,
+                    new TemplateRepository(unitOfWork, NullCacheProvider.Current)));
             return dataTypeDefinitionRepository;
         }
 
@@ -363,8 +366,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
 
             Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
-                unitOfWork,
-                NullCacheProvider.Current, cache);
+                unitOfWork, NullCacheProvider.Current, cache,
+                new ContentTypeRepository(unitOfWork, NullCacheProvider.Current,
+                    new TemplateRepository(unitOfWork, NullCacheProvider.Current)));
 
             DataTypeDefinition dtd;
             using (var repository = creator())
@@ -399,8 +403,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
 
             Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
-                unitOfWork,
-                NullCacheProvider.Current, cache);
+                unitOfWork, NullCacheProvider.Current, cache,
+                new ContentTypeRepository(unitOfWork, NullCacheProvider.Current,
+                    new TemplateRepository(unitOfWork, NullCacheProvider.Current)));
 
             DataTypeDefinition dtd;
             using (var repository = creator())
