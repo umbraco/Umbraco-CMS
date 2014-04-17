@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
+using NullCacheProvider = Umbraco.Core.Persistence.Caching.NullCacheProvider;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -23,17 +24,20 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
         private readonly CacheHelper _cacheHelper;
+        private DataTypePreValueRepository _preValRepository;
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper)
 			: base(work)
         {
             _cacheHelper = cacheHelper;
+            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
         }
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper)
             : base(work, cache)
         {
             _cacheHelper = cacheHelper;
+            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
         }
 
         private readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
@@ -125,6 +129,42 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Unit of Work Implementation
+
+        public override void PersistUpdatedItem(IEntity entity)
+        {
+            if (entity is PreValue)
+            {
+                _preValRepository.PersistUpdatedItem(entity);
+            }
+            else
+            {
+                base.PersistUpdatedItem(entity);    
+            }
+        }
+
+        public override void PersistNewItem(IEntity entity)
+        {
+            if (entity is PreValue)
+            {
+                _preValRepository.PersistNewItem(entity);
+            }
+            else
+            {
+                base.PersistNewItem(entity);
+            }
+        }
+
+        public override void PersistDeletedItem(IEntity entity)
+        {
+            if (entity is PreValue)
+            {
+                _preValRepository.PersistDeletedItem(entity);
+            }
+            else
+            {
+                base.PersistDeletedItem(entity);
+            }
+        }
 
         protected override void PersistNewItem(IDataTypeDefinition entity)
         {
@@ -300,6 +340,82 @@ AND umbracoNode.id <> @id",
             }
         }
 
+        public void AddOrUpdatePreValues(int dataTypeId, IDictionary<string, PreValue> values)
+        {
+            var dtd = Get(dataTypeId);
+            if (dtd == null)
+            {
+                throw new InvalidOperationException("No data type found with id " + dataTypeId);
+            }
+            AddOrUpdatePreValues(dtd, values);
+        }
+
+        public void AddOrUpdatePreValues(IDataTypeDefinition dataType, IDictionary<string, PreValue> values)
+        {
+            var currentVals = new DataTypePreValueDto[]{};
+            if (dataType.HasIdentity)
+            {
+                //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
+                var sql = new Sql().Select("*")
+                                   .From<DataTypePreValueDto>()
+                                   .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
+                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
+                currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();    
+            }
+
+            //already existing, need to be updated
+            var valueIds = values.Where(x => x.Value.Id > 0).Select(x => x.Value.Id).ToArray();
+            var existingByIds = currentVals.Where(x => valueIds.Contains(x.Id)).ToArray();
+
+            //These ones need to be removed from the db, they no longer exist in the new values
+            var deleteById = currentVals.Where(x => valueIds.Contains(x.Id) == false);
+
+            foreach (var d in deleteById)
+            {
+                _preValRepository.Delete(new PreValueEntity
+                {
+                    Alias = d.Alias,
+                    Id = d.Id,
+                    Value = d.Value,
+                    DataType = dataType,
+                    SortOrder = d.SortOrder
+                });
+            }
+
+            var sortOrder = 1;
+
+            foreach (var pre in values)
+            {
+                var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
+                if (existing != null)
+                {
+                    existing.Value = pre.Value.Value;
+                    existing.SortOrder = sortOrder;
+                    _preValRepository.AddOrUpdate(new PreValueEntity
+                    {
+                        Alias = existing.Alias,
+                        Id = existing.Id,
+                        SortOrder = existing.SortOrder,
+                        Value = existing.Value,
+                        DataType = dataType,
+                    });
+                }
+                else
+                {
+                    _preValRepository.AddOrUpdate(new PreValueEntity
+                    {
+                        Alias = pre.Key,
+                        SortOrder = sortOrder,
+                        Value = pre.Value.Value,
+                        DataType = dataType,
+                    });
+                }
+
+                sortOrder++;
+            }
+
+        }
+
         private string GetPrefixedCacheKey(int dataTypeId)
         {
             return CacheKeys.DataTypePreValuesCacheKey + dataTypeId + "-";
@@ -327,5 +443,129 @@ AND umbracoNode.id <> @id",
 
             return collection;
         }
+
+        /// <summary>
+        /// Private class to handle pre-value crud based on units of work with transactions
+        /// </summary>
+        public class PreValueEntity : Entity, IAggregateRoot
+        {
+            public string Value { get; set; }
+            public string Alias { get; set; }
+            public IDataTypeDefinition DataType { get; set; }
+            public int SortOrder { get; set; }         
+        }
+
+        /// <summary>
+        /// Private class to handle pre-value crud based on standard principles and units of work with transactions
+        /// </summary>
+        private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
+        {
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+            {
+            }
+
+            #region Not implemented (don't need to for the purposes of this repo)
+            protected override PreValueEntity PerformGet(int id)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<PreValueEntity> PerformGetAll(params int[] ids)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<PreValueEntity> PerformGetByQuery(IQuery<PreValueEntity> query)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override Sql GetBaseQuery(bool isCount)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override string GetBaseWhereClause()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                return new List<string>();
+            }
+
+            protected override Guid NodeObjectTypeId
+            {
+                get { throw new NotImplementedException(); }
+            } 
+            #endregion
+
+            protected override void PersistDeletedItem(PreValueEntity entity)
+            {
+                Database.Execute(
+                    "DELETE FROM cmsDataTypePreValues WHERE id=@Id",
+                    new { Id = entity.Id });
+            }
+
+            protected override void PersistNewItem(PreValueEntity entity)
+            {
+                if (entity.DataType.HasIdentity == false)
+                {
+                    throw new InvalidOperationException("Cannot insert a pre value for a data type that has no identity");
+                }
+
+                //Cannot add a duplicate alias
+                var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataTypePreValues
+WHERE alias = @alias
+AND datatypeNodeId = @dtdid",
+                        new { alias = entity.Alias, dtdid = entity.DataType.Id });
+                if (exists > 0)
+                {
+                    throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
+                }
+
+                var dto = new DataTypePreValueDto
+                {
+                    DataTypeNodeId = entity.DataType.Id,
+                    Value = entity.Value,
+                    SortOrder = entity.SortOrder,
+                    Alias = entity.Alias
+                };
+                Database.Insert(dto);
+            }
+
+            protected override void PersistUpdatedItem(PreValueEntity entity)
+            {
+                if (entity.DataType.HasIdentity == false)
+                {
+                    throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
+                }
+
+                //Cannot change to a duplicate alias
+                var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataTypePreValues
+WHERE alias = @alias
+AND datatypeNodeId = @dtdid
+AND id <> @id",
+                        new { id = entity.Id, alias = entity.Alias, dtdid = entity.DataType.Id });
+                if (exists > 0)
+                {
+                    throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
+                }
+
+                var dto = new DataTypePreValueDto
+                {
+                    DataTypeNodeId = entity.DataType.Id,
+                    Id = entity.Id,
+                    Value = entity.Value,
+                    SortOrder = entity.SortOrder,
+                    Alias = entity.Alias
+                };
+                Database.Update(dto);
+            }
+        }
+    
     }
+
+
 }
