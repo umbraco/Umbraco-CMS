@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(new[]
                 {
-                    new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar)
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 3,
                         Alias = "test",
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Models
                         ValidationRegExp = "xxxx",
                         DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     },
-                    new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar)
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 4,
                         Alias = "test2",
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(new[]
                 {
-                    new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar)
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 3,
                         Alias = "test",
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Models
                         ValidationRegExp = "xxxx",
                         DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     },
-                    new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar)
+                    new PropertyType("TestPropertyEditor2", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 4,
                         Alias = "test2",

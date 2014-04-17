@@ -50,12 +50,12 @@ namespace Umbraco.Tests.Models
             item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test",
-                DataTypeControlId = Guid.NewGuid()
+                PropertyEditorAlias = "TestPropertyEditor"
             });
             item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test2",
-                DataTypeControlId = Guid.NewGuid()
+                PropertyEditorAlias = "TestPropertyEditor2"
             });
 
             var clone = (UmbracoEntity)item.DeepClone();
@@ -128,12 +128,12 @@ namespace Umbraco.Tests.Models
             item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test",
-                DataTypeControlId = Guid.NewGuid()
+                PropertyEditorAlias = "TestPropertyEditor"
             });
             item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test2",
-                DataTypeControlId = Guid.NewGuid()
+                PropertyEditorAlias = "TestPropertyEditor2"
             });
 
             var result = ss.ToStream(item);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Services
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Services
                     new Tuple<PreValue, string, int>(new PreValue(13, "value4"), "key4", 1)
                 };
 
-            var result = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
+            var result = DataTypeDefinitionRepository.PreValueConverter.ConvertToPreValuesCollection(list);
 
             Assert.Throws<InvalidOperationException>(() =>
                 {
@@ -47,7 +48,7 @@ namespace Umbraco.Tests.Services
                     new Tuple<PreValue, string, int>(new PreValue(13, "value4"), "", 1)
                 };
 
-            var result = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
+            var result = DataTypeDefinitionRepository.PreValueConverter.ConvertToPreValuesCollection(list);
 
             Assert.Throws<InvalidOperationException>(() =>
                 {
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.Services
                     new Tuple<PreValue, string, int>(new PreValue(13, "value4"), "key4", 1)
                 };
 
-            var result = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
+            var result = DataTypeDefinitionRepository.PreValueConverter.ConvertToPreValuesCollection(list);
 
             Assert.Throws<InvalidOperationException>(() =>
                 {
