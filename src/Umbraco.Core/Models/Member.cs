@@ -650,7 +650,7 @@ namespace Umbraco.Core.Models
 
             //need to manually clone this since it's not settable
             clone._contentType = (IMemberType)ContentType.DeepClone();
-            clone.ResetDirtyProperties(true);
+            clone.ResetDirtyProperties(false);
 
             return clone;
 

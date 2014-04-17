@@ -306,7 +306,7 @@ namespace Umbraco.Core.Models
 
             protected bool Equals(UmbracoProperty other)
             {
-                return DataTypeControlId.Equals(other.DataTypeControlId) && string.Equals(Value, other.Value);
+                return PropertyEditorAlias.Equals(other.PropertyEditorAlias) && string.Equals(Value, other.Value);
             }
 
             public override bool Equals(object obj)
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Models
             {
                 unchecked
                 {
-                    return (DataTypeControlId.GetHashCode()*397) ^ (Value != null ? Value.GetHashCode() : 0);
+                    return (PropertyEditorAlias.GetHashCode() * 397) ^ (Value != null ? Value.GetHashCode() : 0);
                 }
             }
         }

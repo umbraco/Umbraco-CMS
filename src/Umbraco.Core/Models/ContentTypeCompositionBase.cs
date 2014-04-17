@@ -225,7 +225,7 @@ namespace Umbraco.Core.Models
             //need to manually assign since this is an internal field and will not be automatically mapped
             clone.RemovedContentTypeKeyTracker = new List<int>();
             clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
-            clone.ResetDirtyProperties(true);
+            clone.ResetDirtyProperties(false);
 
             return clone;
         }
