@@ -149,7 +149,14 @@ namespace Umbraco.Core
         /// <param name="connectionString"></param>
         public void ConfigureDatabaseConnection(string connectionString)
         {
-            SaveConnectionString(connectionString, string.Empty);
+            var provider = DbConnectionExtensions.DetectProviderFromConnectionString(connectionString);
+            var databaseProvider = provider.ToString();
+            var providerName = "System.Data.SqlClient";
+            if (databaseProvider.ToLower().Contains("mysql"))
+            {
+                providerName = "MySql.Data.MySqlClient";
+            }
+            SaveConnectionString(connectionString, providerName);
             Initialize(string.Empty);
         }
 
@@ -169,7 +176,7 @@ namespace Umbraco.Core
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
         }
-
+        
         public string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
             providerName = "System.Data.SqlClient";
