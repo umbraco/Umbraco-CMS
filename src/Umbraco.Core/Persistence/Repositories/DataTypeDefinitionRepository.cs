@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -11,6 +13,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -19,15 +22,21 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
-		public DataTypeDefinitionRepository(IDatabaseUnitOfWork work)
+        private readonly CacheHelper _cacheHelper;
+
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper)
 			: base(work)
         {
+            _cacheHelper = cacheHelper;
         }
 
-		public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper)
             : base(work, cache)
         {
+            _cacheHelper = cacheHelper;
         }
+
+        private readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
@@ -238,5 +247,85 @@ AND umbracoNode.id <> @id",
         }
 
         #endregion
+
+        public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
+        {
+            using (var l = new UpgradeableReadLock(Locker))
+            {
+                var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
+                if (cached != null && cached.Any())
+                {
+                    //return from the cache
+                    return cached.First();
+                }
+
+                l.UpgradeToWriteLock();
+
+                return GetAndCachePreValueCollection(dataTypeId);
+            }
+        }
+
+        public string GetPreValueAsString(int preValueId)
+        {
+            using (var l = new UpgradeableReadLock(Locker))
+            {
+                //We need to see if we can find the cached PreValueCollection based on the cache key above
+
+                var regex = CacheKeys.DataTypePreValuesCacheKey + @"[\d]+-[,\d]*" + preValueId + @"[,\d$]*";
+
+                var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(regex);
+                if (cached != null && cached.Any())
+                {
+                    //return from the cache
+                    var collection = cached.First();
+                    var preVal = collection.PreValuesAsArray.Single(x => x.Id == preValueId);
+                    return preVal.Value;
+                }
+
+                l.UpgradeToWriteLock();
+
+                //go and find the data type id for the pre val id passed in
+
+                var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId = preValueId });
+                if (dto == null)
+                {
+                    return string.Empty;
+                }
+                // go cache the collection
+                var preVals = GetAndCachePreValueCollection(dto.DataTypeNodeId);
+
+                //return the single value for this id
+                var pv = preVals.PreValuesAsArray.Single(x => x.Id == preValueId);
+                return pv.Value;
+            }
+        }
+
+        private string GetPrefixedCacheKey(int dataTypeId)
+        {
+            return CacheKeys.DataTypePreValuesCacheKey + dataTypeId + "-";
+        }
+
+        private PreValueCollection GetAndCachePreValueCollection(int dataTypeId)
+        {
+            //go get the data
+            var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
+            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
+            var collection = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
+
+            //now create the cache key, this needs to include all pre-value ids so that we can use this cached item in the GetPreValuesAsString method
+            //the key will be: "UmbracoPreValDATATYPEID-CSVOFPREVALIDS
+
+            var key = GetPrefixedCacheKey(dataTypeId)
+                      + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());                      
+
+            //store into cache
+            _cacheHelper.RuntimeCache.InsertCacheItem(key, () => collection,
+                //30 mins
+                new TimeSpan(0, 0, 30),
+                //sliding is true
+                true);
+
+            return collection;
+        }
     }
 }

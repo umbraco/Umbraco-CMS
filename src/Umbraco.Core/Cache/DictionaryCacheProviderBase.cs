@@ -171,6 +171,26 @@ namespace Umbraco.Core.Cache
                     select c.Value).ToList();
         }
 
+        public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        {
+            var found = new List<object>();
+            foreach (var item in DictionaryCache)
+            {
+                var c = new DictionaryItemWrapper(item);
+                var s = c.Key as string;
+                if (s != null)
+                {
+                    var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
+                    if (Regex.IsMatch(withoutPrefix, regexString))
+                    {
+                        found.Add(c.Value);
+                    }
+                }
+            }
+
+            return found;
+        }
+
         /// <summary>
         /// Returns a cache item by key, does not update the cache if it isn't there.
         /// </summary>

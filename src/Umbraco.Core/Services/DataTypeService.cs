@@ -108,10 +108,11 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of string values</returns>
         public IEnumerable<string> GetPreValuesByDataTypeId(int id)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
             {
-                var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = id });
-                var list = dtos.Select(x => x.Value).ToList();
+                var collection = repository.GetPreValuesCollectionByDataTypeId(id);
+                //now convert the collection to a string list
+                var list = collection.PreValuesAsArray.Select(x => x.Value).ToList();
                 return list;
             }
         }
@@ -123,12 +124,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
             {
-                var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = id });
-                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
-
-                return PreValueConverter.ConvertToPreValuesCollection(list);
+                return repository.GetPreValuesCollectionByDataTypeId(id);
             }
         }
 
@@ -139,10 +137,9 @@ namespace Umbraco.Core.Services
         /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int id)
         {
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
             {
-                var dto = uow.Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @Id", new { Id = id });
-                return dto != null ? dto.Value : string.Empty;
+                return repository.GetPreValueAsString(id);
             }
         }
 

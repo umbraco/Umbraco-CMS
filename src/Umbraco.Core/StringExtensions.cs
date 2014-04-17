@@ -1190,5 +1190,14 @@ namespace Umbraco.Core
             return false;
         }
 
+        public static bool CsvContains(this string csv, string value)
+        {
+            if (string.IsNullOrEmpty(csv))
+            {
+                return false;
+            }
+            var idCheckList = csv.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            return idCheckList.Contains(value);
+        }
     }
 }
