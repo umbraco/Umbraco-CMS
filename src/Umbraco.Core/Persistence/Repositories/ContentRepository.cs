@@ -516,11 +516,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query)
         {
+            // we WANT to return contents in top-down order, ie parents should come before children
+            // ideal would be pure xml "document order" which can be achieved with:
+            // ORDER BY substring(path, 1, len(path) - charindex(',', reverse(path))), sortOrder
+            // but that's probably an overkill - sorting by level,sortOrder should be enough
+
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
                                 .Where<DocumentDto>(x => x.Published)
-                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                                .OrderBy<NodeDto>(x => x.Level)
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
             //NOTE: This doesn't allow properties to be part of the query
