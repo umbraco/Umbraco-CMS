@@ -93,6 +93,9 @@ namespace Umbraco.Web
         /// <param name="furtherOptions">
         /// The further options.
         /// </param>
+        /// <param name="ratioMode">
+        /// Use a dimension as a ratio
+        /// </param>         
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -108,7 +111,9 @@ namespace Umbraco.Web
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true, 
-             string furtherOptions = null)
+             string furtherOptions = null,
+             ImageCropRatioMode? ratioMode = null         
+            )
         {
             string imageCropperValue = null;
 
@@ -133,7 +138,7 @@ namespace Umbraco.Web
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions)
+                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode)
                 : string.Empty;
         }
 
@@ -176,6 +181,9 @@ namespace Umbraco.Web
         /// <param name="furtherOptions">
         /// The further options.
         /// </param>
+        /// <param name="ratioMode">
+        /// Use a dimension as a ratio
+        /// </param>         
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -191,7 +199,9 @@ namespace Umbraco.Web
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             string cacheBusterValue = null, 
-            string furtherOptions = null)
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null
+        )
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
             {
@@ -235,14 +245,26 @@ namespace Umbraco.Web
                     imageResizerUrl.Append("&quality=" + quality);
                 }
 
-                if (width != null && useCropDimensions == false)
+                if (width != null && useCropDimensions == false && ratioMode != ImageCropRatioMode.Width)
                 {
                     imageResizerUrl.Append("&width=" + width);
                 }
 
-                if (height != null && useCropDimensions == false)
+                if (height != null && useCropDimensions == false && ratioMode != ImageCropRatioMode.Height)
                 {
                     imageResizerUrl.Append("&height=" + height);
+                }
+
+                if (ratioMode == ImageCropRatioMode.Width)
+                {
+                    var widthRatio = (decimal)width/(decimal)height;
+                    imageResizerUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));                    
+                }
+
+                if (ratioMode == ImageCropRatioMode.Height)
+                {
+                    var heightRatio = (decimal)height/(decimal)width;
+                    imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (furtherOptions != null)
