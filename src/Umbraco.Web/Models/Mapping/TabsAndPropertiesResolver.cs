@@ -157,8 +157,12 @@ namespace Umbraco.Web.Models.Mapping
             {
                 var aggregateProperties = new List<ContentPropertyDisplay>();
                 
-                //add the properties from each composite property group
-                foreach (var current in propertyGroups)
+                // Add the properties from each composite property group
+                // - order by Id to ensure the base type properties come before the inherited ones
+                //   and thus always appear first in the list of properties for editing (given the 
+                //   inherited type must have been created after the base one, it will have a higher Id
+                //   value)
+                foreach (var current in propertyGroups.OrderBy(x => x.Id))
                 {
                     var propsForGroup = content.GetPropertiesForGroup(current)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
