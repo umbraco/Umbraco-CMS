@@ -30,7 +30,7 @@ angular.module("umbraco")
             var await = [];
 
             //queue file loading
-            if (!tinymce) { // Don't reload tinymce if already loaded
+            if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
                 await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
             }
 
