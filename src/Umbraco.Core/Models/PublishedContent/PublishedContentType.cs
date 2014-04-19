@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // create detached content type - ie does not match anything in the DB
-        internal PublishedContentType(string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+        public PublishedContentType(string alias, IEnumerable<PublishedPropertyType> propertyTypes)
             : this (0, alias, propertyTypes)
         { }
 
