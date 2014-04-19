@@ -114,6 +114,13 @@ namespace Umbraco.Core.Cache
                     select c.Value).ToList();
         }
 
+        public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        {
+            return (from c in MemoryCache
+                    where Regex.IsMatch(c.Key, regexString)
+                    select c.Value).ToList();
+        }
+
         public virtual object GetCacheItem(string cacheKey)
         {
             var result = MemoryCache.Get(cacheKey);

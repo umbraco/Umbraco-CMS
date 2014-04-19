@@ -419,14 +419,6 @@ namespace Umbraco.Core.Models
             return true;
         }
 
-        internal PropertyType Clone()
-        {
-            var clone = (PropertyType) MemberwiseClone();
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
-
         public bool Equals(PropertyType other)
         {
             //Check whether the compared object is null. 
@@ -449,6 +441,31 @@ namespace Umbraco.Core.Models
 
             //Calculate the hash code for the product. 
             return hashName ^ hashAlias;
+        }
+
+        //TODO: Remove this
+        internal PropertyType Clone()
+        {
+            var clone = (PropertyType)this.MemberwiseClone();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (PropertyType)base.DeepClone();
+
+            //need to manually assign the Lazy value as it will not be automatically mapped
+            if (PropertyGroupId != null)
+            {
+                var propGroupId = PropertyGroupId.Value;
+                clone._propertyGroupId = new Lazy<int>(() => propGroupId);    
+            }
+
+            clone.ResetDirtyProperties(false);
+
+            return clone;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
-        private readonly List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
+        private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
         internal List<int> RemovedContentTypeKeyTracker = new List<int>();
 
         protected ContentTypeCompositionBase(int parentId) : base(parentId)
@@ -216,6 +216,18 @@ namespace Umbraco.Core.Models
             return ContentTypeComposition
                 .Select(x => x.Id)
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (ContentTypeCompositionBase)base.DeepClone();
+
+            //need to manually assign since this is an internal field and will not be automatically mapped
+            clone.RemovedContentTypeKeyTracker = new List<int>();
+            clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
+            clone.ResetDirtyProperties(false);
+
+            return clone;
         }
     }
 }

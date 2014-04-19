@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Property : Entity
     {
-        private readonly PropertyType _propertyType;
+        private PropertyType _propertyType;
         private Guid _version;
         private object _value;
         private readonly PropertyTags _tagSupport = new PropertyTags();
@@ -155,6 +155,17 @@ namespace Umbraco.Core.Models
         public bool IsValid(object value)
         {
             return _propertyType.IsPropertyValueValid(value);
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (Property)base.DeepClone();
+
+            //need to manually assign since this is a readonly property
+            clone._propertyType = (PropertyType)PropertyType.DeepClone();
+            clone.ResetDirtyProperties(false);
+            
+            return clone;
         }
     }
 }

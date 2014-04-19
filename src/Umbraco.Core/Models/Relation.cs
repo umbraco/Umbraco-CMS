@@ -107,5 +107,6 @@ namespace Umbraco.Core.Models
         {
             get { return _relationType.Id; }
         }
+
     }
 }

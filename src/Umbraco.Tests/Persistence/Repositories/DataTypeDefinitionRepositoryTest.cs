@@ -3,14 +3,16 @@ using System.Data;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
+using NullCacheProvider = Umbraco.Core.Persistence.Caching.NullCacheProvider;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -26,7 +28,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(unitOfWork, NullCacheProvider.Current);
+            var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(
+                unitOfWork, NullCacheProvider.Current, CacheHelper.CreateDisabledCacheHelper(),
+                new ContentTypeRepository(unitOfWork, NullCacheProvider.Current,
+                    new TemplateRepository(unitOfWork, NullCacheProvider.Current)));
             return dataTypeDefinitionRepository;
         }
 
@@ -301,6 +306,137 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(exists, Is.True);
                 Assert.That(doesntExist, Is.False);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Pre_Value_Collection()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            int dtid;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                repository.AddOrUpdate(dataTypeDefinition);
+                unitOfWork.Commit();
+                dtid = dataTypeDefinition.Id;
+            }
+
+            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
+            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var collection = repository.GetPreValuesCollectionByDataTypeId(dtid);
+                Assert.AreEqual(2, collection.PreValuesAsArray.Count());
+            }
+        }
+
+        [Test]
+        public void Can_Get_Pre_Value_As_String()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            int dtid;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                repository.AddOrUpdate(dataTypeDefinition);
+                unitOfWork.Commit();
+                dtid = dataTypeDefinition.Id;
+            }
+
+            var id = DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
+            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var val = repository.GetPreValueAsString(Convert.ToInt32(id));
+                Assert.AreEqual("test1", val);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Pre_Value_Collection_With_Cache()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
+
+            Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
+                unitOfWork, NullCacheProvider.Current, cache,
+                new ContentTypeRepository(unitOfWork, NullCacheProvider.Current,
+                    new TemplateRepository(unitOfWork, NullCacheProvider.Current)));
+
+            DataTypeDefinition dtd;
+            using (var repository = creator())
+            {
+                dtd = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                repository.AddOrUpdate(dtd);
+                unitOfWork.Commit();                
+            }
+
+            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+
+            //this will cache the result
+            using (var repository = creator())
+            {
+                var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
+            }
+
+            var cached = cache.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+
+            Assert.IsNotNull(cached);
+            Assert.AreEqual(1, cached.Count());
+            Assert.AreEqual(2, cached.Single().FormatAsDictionary().Count);
+        }
+
+        [Test]
+        public void Can_Get_Pre_Value_As_String_With_Cache()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
+
+            Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
+                unitOfWork, NullCacheProvider.Current, cache,
+                new ContentTypeRepository(unitOfWork, NullCacheProvider.Current,
+                    new TemplateRepository(unitOfWork, NullCacheProvider.Current)));
+
+            DataTypeDefinition dtd;
+            using (var repository = creator())
+            {
+                dtd = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                repository.AddOrUpdate(dtd);
+                unitOfWork.Commit();
+            }
+
+            var id = DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+            DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+
+            //this will cache the result
+            using (var repository = creator())
+            {
+                var val = repository.GetPreValueAsString(Convert.ToInt32(id));
+            }
+
+            var cached = cache.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+
+            Assert.IsNotNull(cached);
+            Assert.AreEqual(1, cached.Count());
+            Assert.AreEqual(2, cached.Single().FormatAsDictionary().Count);
+
+            using (var repository = creator())
+            {
+                //ensure it still gets resolved!
+                var val = repository.GetPreValueAsString(Convert.ToInt32(id));
+                Assert.AreEqual("test1", val);
             }
         }
 

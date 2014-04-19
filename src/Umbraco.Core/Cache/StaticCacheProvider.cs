@@ -59,6 +59,13 @@ namespace Umbraco.Core.Cache
                     select c.Value).ToList();
         }
 
+        public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        {
+            return (from KeyValuePair<string, object> c in StaticCache
+                    where Regex.IsMatch(c.Key, regexString) 
+                    select c.Value).ToList();
+        }
+
         public virtual object GetCacheItem(string cacheKey)
         {
             var result = StaticCache[cacheKey];

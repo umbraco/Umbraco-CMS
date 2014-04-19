@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -28,6 +28,9 @@ namespace Umbraco.Core.Persistence.Caching
     /// Also note that we don't always keep checking if HttpContext.Current == null and instead check for _memoryCache != null. This is because
     /// when there are async requests being made even in the context of a web request, the HttpContext.Current will be null but the HttpRuntime.Cache will
     /// always be available.
+    /// 
+    /// TODO: Each item that get's added to this cache will be a clone of the original with it's dirty properties reset, and every item that is resolved from the cache
+    /// is a clone of the item that is in there, otherwise we end up with thread safety issues since multiple thread would be working on the exact same entity at the same time.
     /// 
     /// </remarks>
     internal sealed class RuntimeCacheProvider : IRepositoryCacheProvider
@@ -64,8 +67,11 @@ namespace Umbraco.Core.Persistence.Caching
             {
                 //ensure the key doesn't exist anymore in the tracker
                 _keyTracker.Remove(key);
+                return null;
             }
-            return result;
+
+            //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+            return (IEntity)result.DeepClone();
         }
 
         public IEnumerable<IEntity> GetByIds(Type type, List<Guid> ids)
@@ -85,7 +91,8 @@ namespace Umbraco.Core.Persistence.Caching
                 }
                 else
                 {
-                    collection.Add(result);
+                    //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                    collection.Add((IEntity)result.DeepClone());
                 }
             }
             return collection;
@@ -110,7 +117,8 @@ namespace Umbraco.Core.Persistence.Caching
                     }
                     else
                     {
-                        collection.Add(result);
+                        //IMPORTANT: we must clone to resolve, see: http://issues.umbraco.org/issue/U4-4259
+                        collection.Add((IEntity)result.DeepClone());
                     }
                 }
             }
@@ -119,6 +127,9 @@ namespace Umbraco.Core.Persistence.Caching
 
         public void Save(Type type, IEntity entity)
         {
+            //IMPORTANT: we must clone to store, see: http://issues.umbraco.org/issue/U4-4259
+            entity = (IEntity)entity.DeepClone();
+
             var key = GetCompositeId(type, entity.Id);
             
             _keyTracker.TryAdd(key);

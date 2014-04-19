@@ -53,5 +53,6 @@ namespace Umbraco.Core.Cache
         public const string StylesheetPropertyCacheKey = "UmbracoStylesheetProperty";
 
         public const string DataTypeCacheKey = "UmbracoDataTypeDefinition";
+        public const string DataTypePreValuesCacheKey = "UmbracoPreVal";
     }
 }

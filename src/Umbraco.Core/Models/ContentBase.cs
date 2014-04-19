@@ -15,10 +15,13 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents an abstract class for base Content properties and methods
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : Entity, IContentBase
     {
         protected IContentTypeComposition ContentTypeBase;
+        
         private Lazy<int> _parentId;
         private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
         private int _sortOrder;
@@ -257,6 +260,7 @@ namespace Umbraco.Core.Models
         }
 
         private readonly IDictionary<string, object> _additionalData;
+
         /// <summary>
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
@@ -445,6 +449,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns a collection of the result of the last validation process, this collection contains all invalid properties.
         /// </summary>
+        [IgnoreDataMember]
         internal IEnumerable<Property> LastInvalidProperties
         {
             get { return _lastInvalidProperties; }
@@ -466,5 +471,6 @@ namespace Umbraco.Core.Models
                 prop.ResetDirtyProperties(rememberPreviouslyChangedProperties);
             }
         }
+        
     }
 }

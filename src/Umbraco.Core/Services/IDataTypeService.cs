@@ -103,17 +103,24 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a list of PreValues for a given DataTypeDefinition
         /// </summary>
-        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="dataTypeId">Id of the DataTypeDefinition to save PreValues for</param>
         /// <param name="values">List of string values to save</param>
         [Obsolete("This should no longer be used, use the alternative SavePreValues or SaveDataTypeAndPreValues methods instead. This will only insert pre-values without keys")]
-        void SavePreValues(int id, IEnumerable<string> values);
+        void SavePreValues(int dataTypeId, IEnumerable<string> values);
 
         /// <summary>
         /// Saves a list of PreValues for a given DataTypeDefinition
         /// </summary>
-        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="dataTypeId">Id of the DataTypeDefinition to save PreValues for</param>
         /// <param name="values">List of key/value pairs to save</param>
-        void SavePreValues(int id, IDictionary<string, PreValue> values);
+        void SavePreValues(int dataTypeId, IDictionary<string, PreValue> values);
+
+        /// <summary>
+        /// Saves a list of PreValues for a given DataTypeDefinition
+        /// </summary>
+        /// <param name="dataTypeDefinition">The DataTypeDefinition to save PreValues for</param>
+        /// <param name="values">List of key/value pairs to save</param>
+        void SavePreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values);
 
         /// <summary>
         /// Saves the data type and it's prevalues

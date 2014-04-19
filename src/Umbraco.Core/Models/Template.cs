@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -14,20 +15,18 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Template : File, ITemplate
     {
-        private readonly string _alias;
-        private readonly string _name;
+        private string _alias;
+        private string _name;
         private int _creatorId;
         private int _level;
         private int _sortOrder;
         private int _parentId;
-        private int _masterTemplateId;
         private string _masterTemplateAlias;
 
         private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.CreatorId);
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.Level);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.SortOrder);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.ParentId);
-        //private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.MasterTemplateId);
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
         
         public Template(string path, string name, string alias)
@@ -188,6 +187,19 @@ namespace Umbraco.Core.Models
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
             MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (Template)base.DeepClone();
+
+            //need to manually assign since they are readonly properties
+            clone._alias = Alias;
+            clone._name = Name;
+
+            clone.ResetDirtyProperties(false);
+
+            return clone;
         }
     }
 }
