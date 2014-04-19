@@ -212,21 +212,49 @@ namespace Umbraco.Web
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     if (cropDataSet != null)
                     {
-                        var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, preferFocalPoint, cacheBusterValue);
-                        
+                        var crop = cropDataSet.GetCrop(cropAlias);
+
                         // if crop alias has been specified but not found in the Json we should return null
-                        if (string.IsNullOrEmpty(cropAlias) == false && cropUrl == null)
+                        if (string.IsNullOrEmpty(cropAlias) == false && crop == null)
                         {
                             return null;
                         }
 
                         imageResizerUrl.Append(cropDataSet.Src);
-                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, preferFocalPoint, cacheBusterValue));
+
+                        if ((preferFocalPoint && cropDataSet.HasFocalPoint()) || (crop != null && crop.Coordinates == null && cropDataSet.HasFocalPoint()) || (string.IsNullOrEmpty(cropAlias) && cropDataSet.HasFocalPoint()))
+                        {
+                            imageResizerUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
+                            imageResizerUrl.Append("&mode=crop");
+                        }
+                        else if (crop != null && crop.Coordinates != null)
+                        {
+                            imageResizerUrl.Append("?crop=");
+                            imageResizerUrl.Append(crop.Coordinates.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
+                            imageResizerUrl.Append(crop.Coordinates.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
+                            imageResizerUrl.Append(crop.Coordinates.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
+                            imageResizerUrl.Append(crop.Coordinates.Y2.ToString(CultureInfo.InvariantCulture));
+                            imageResizerUrl.Append("&cropmode=percentage");
+                        }
+                        else
+                        {
+                            imageResizerUrl.Append("?anchor=center");
+                            imageResizerUrl.Append("&mode=crop");
+                        }
+
+                        if (crop!= null & useCropDimensions)
+                        {
+                            width = crop.Width;
+                            height = crop.Height;
+                        }
+
                     }
                 }
                 else
                 {
+
                     imageResizerUrl.Append(imageUrl);
+
                     if (imageCropMode == null)
                     {
                         imageCropMode = ImageCropMode.Pad;
@@ -245,12 +273,12 @@ namespace Umbraco.Web
                     imageResizerUrl.Append("&quality=" + quality);
                 }
 
-                if (width != null && useCropDimensions == false && ratioMode != ImageCropRatioMode.Width)
+                if (width != null && ratioMode != ImageCropRatioMode.Width)
                 {
                     imageResizerUrl.Append("&width=" + width);
                 }
 
-                if (height != null && useCropDimensions == false && ratioMode != ImageCropRatioMode.Height)
+                if (height != null && ratioMode != ImageCropRatioMode.Height)
                 {
                     imageResizerUrl.Append("&height=" + height);
                 }
@@ -270,6 +298,11 @@ namespace Umbraco.Web
                 if (furtherOptions != null)
                 {
                     imageResizerUrl.Append(furtherOptions);
+                }
+
+                if (cacheBusterValue != null)
+                {
+                    imageResizerUrl.Append("&rnd=").Append(cacheBusterValue);
                 }
 
                 return imageResizerUrl.ToString();
