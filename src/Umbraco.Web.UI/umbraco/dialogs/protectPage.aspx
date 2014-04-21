@@ -75,7 +75,7 @@
 
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <style> .umb-dialog { overflow: auto; } </style>
+    <style> .umb-dialog { overflow: auto; } .umb-dialog-footer { position: relative; }</style>
 
     <input id="tempFile" type="hidden" name="tempFile" runat="server" />
 
