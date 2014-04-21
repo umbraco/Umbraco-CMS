@@ -95,6 +95,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
+        /// </param>  
+        /// <param name="upScale">
+        /// If the image should be upscaled to requested dimensions
         /// </param>         
         /// <returns>
         /// The <see cref="string"/>.
@@ -112,7 +115,8 @@ namespace Umbraco.Web
              bool useCropDimensions = false,
              bool cacheBuster = true, 
              string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null         
+             ImageCropRatioMode? ratioMode = null,     
+             bool upScale = true
             )
         {
             string imageCropperValue = null;
@@ -138,7 +142,7 @@ namespace Umbraco.Web
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode)
+                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale)
                 : string.Empty;
         }
 
@@ -183,6 +187,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
+        /// </param>  
+        /// <param name="upScale">
+        /// If the image should be upscaled to requested dimensions
         /// </param>         
         /// <returns>
         /// The <see cref="string"/>.
@@ -200,7 +207,8 @@ namespace Umbraco.Web
             bool useCropDimensions = false,
             string cacheBusterValue = null, 
             string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true
         )
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
@@ -285,6 +293,11 @@ namespace Umbraco.Web
                     }
                     var heightRatio = (decimal)height/(decimal)width;
                     imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
+                }
+
+                if (upScale == false)
+                {
+                    imageResizerUrl.Append("&upscale=false");                    
                 }
 
                 if (furtherOptions != null)
