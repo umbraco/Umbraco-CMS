@@ -22,7 +22,7 @@ We need node to run tests and automated less compiling and other automated tasks
 
 
 ###Install dependencies
-Next we need to install all the required packages. This is done with the package tool, included with node.js, open /Umbraco.Belle.Client in cmd.exe or osx terminal and run the command:
+Next we need to install all the required packages. This is done with the package tool, included with node.js, open /src/Umbraco.Web.UI.Client in cmd.exe or osx terminal and run the command:
 
 	npm install
 
@@ -42,7 +42,7 @@ So run the command:
 	
 	sudo npm install grunt-cli -g
 
-Now that you have node and grunt installed, you can open `/Umbraco.Belle.Client` in either `cmd.exe` or terminal and run: 
+Now that you have node and grunt installed, you can open `/src/Umbraco.Web.UI.Client` in either `cmd.exe` or terminal and run: 
 
 	grunt dev
 
@@ -56,8 +56,8 @@ The current prototype simply uses in-memory storage, so no database dependencies
 
 ##Project Structure
 
-All project files are located in /umbraco.belle.client/src which only contains client-side files, everything 
-related to asp.net are in umbraco.bell
+All project files are located in /src/Umbraco.Web.UI.Client which only contains client-side files, everything 
+related to asp.net are in /src/Umbraco.Web.UI
 
 after building Belle files are located in /build/belle, with all files following AngularJs 
 conventions:
