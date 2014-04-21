@@ -265,14 +265,24 @@ namespace Umbraco.Web
                     imageResizerUrl.Append("&height=" + height);
                 }
 
-                if (ratioMode == ImageCropRatioMode.Width)
+                if (ratioMode == ImageCropRatioMode.Width && height != null)
                 {
+                    //if only height specified then assume a sqaure
+                    if (width == null)
+                    {
+                        width = height;
+                    }
                     var widthRatio = (decimal)width/(decimal)height;
                     imageResizerUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));                    
                 }
 
-                if (ratioMode == ImageCropRatioMode.Height)
+                if (ratioMode == ImageCropRatioMode.Height && width != null)
                 {
+                    //if only width specified then assume a sqaure
+                    if (height == null)
+                    {
+                        height = width;
+                    }
                     var heightRatio = (decimal)height/(decimal)width;
                     imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
                 }
