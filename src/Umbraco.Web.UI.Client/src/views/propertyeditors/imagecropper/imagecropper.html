@@ -45,7 +45,7 @@
 
 				<ul class="umb-sortable-thumbnails" >
 					<li ng-repeat="(key,value) in model.value.crops">
-						<a href title="{{value.alias}}: {{value.height}}px x {{value.width}}px" ng-click="crop(value)">
+						<a href title="{{value.alias}}: {{value.width}}px x {{value.height}}px" ng-click="crop(value)">
 							<umb-image-thumbnail
 								center="model.value.focalPoint"
 								crop="value.coordinates"
