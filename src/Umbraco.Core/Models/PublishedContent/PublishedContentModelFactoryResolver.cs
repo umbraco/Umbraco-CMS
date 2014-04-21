@@ -5,7 +5,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <summary>
     /// Resolves the IPublishedContentModelFactory object.
     /// </summary>
-    internal class PublishedContentModelFactoryResolver : SingleObjectResolverBase<PublishedContentModelFactoryResolver, IPublishedContentModelFactory>
+    public class PublishedContentModelFactoryResolver : SingleObjectResolverBase<PublishedContentModelFactoryResolver, IPublishedContentModelFactory>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentModelFactoryResolver"/>.

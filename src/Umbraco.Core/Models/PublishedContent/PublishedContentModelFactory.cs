@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides strongly typed published content models services.
     /// </summary>
-    internal static class PublishedContentModelFactory
+    public static class PublishedContentModelFactory
     {
         /// <summary>
         /// Creates a strongly typed published content model for an internal published content.

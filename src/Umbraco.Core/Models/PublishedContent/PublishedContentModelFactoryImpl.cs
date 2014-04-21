@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <summary>
     /// Implements a strongly typed content model factory
     /// </summary>
-    internal class PublishedContentModelFactoryImpl : IPublishedContentModelFactory
+    public class PublishedContentModelFactoryImpl : IPublishedContentModelFactory
     {
         //private readonly Dictionary<string, ConstructorInfo> _constructors
         //    = new Dictionary<string, ConstructorInfo>();

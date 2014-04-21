@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <remarks>By default, the name of the class is assumed to be the content type alias. The
     /// <c>PublishedContentModelAttribute</c> can be used to indicate a different alias.</remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    internal sealed class PublishedContentModelAttribute : Attribute
+    public sealed class PublishedContentModelAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentModelAttribute"/> class with a content type alias.
