@@ -214,32 +214,16 @@ namespace Umbraco.Web
                     {
                         var crop = cropDataSet.GetCrop(cropAlias);
 
-                        // if crop alias has been specified but not found in the Json we should return null
-                        if (string.IsNullOrEmpty(cropAlias) == false && crop == null)
-                        {
-                            return null;
-                        }
-
                         imageResizerUrl.Append(cropDataSet.Src);
 
-                        if ((preferFocalPoint && cropDataSet.HasFocalPoint()) || (crop != null && crop.Coordinates == null && cropDataSet.HasFocalPoint()) || (string.IsNullOrEmpty(cropAlias) && cropDataSet.HasFocalPoint()))
+                        var cropBaseUrl = cropDataSet.GetCropBaseUrl(cropAlias, preferFocalPoint);
+                        if (cropBaseUrl != null)
                         {
-                            imageResizerUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
-                            imageResizerUrl.Append("&mode=crop");
-                        }
-                        else if (crop != null && crop.Coordinates != null)
-                        {
-                            imageResizerUrl.Append("?crop=");
-                            imageResizerUrl.Append(crop.Coordinates.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                            imageResizerUrl.Append(crop.Coordinates.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                            imageResizerUrl.Append(crop.Coordinates.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
-                            imageResizerUrl.Append(crop.Coordinates.Y2.ToString(CultureInfo.InvariantCulture));
-                            imageResizerUrl.Append("&cropmode=percentage");
+                            imageResizerUrl.Append(cropBaseUrl);
                         }
                         else
                         {
-                            imageResizerUrl.Append("?anchor=center");
-                            imageResizerUrl.Append("&mode=crop");
+                            return null;
                         }
 
                         if (crop!= null & useCropDimensions)
@@ -247,12 +231,10 @@ namespace Umbraco.Web
                             width = crop.Width;
                             height = crop.Height;
                         }
-
                     }
                 }
                 else
                 {
-
                     imageResizerUrl.Append(imageUrl);
 
                     if (imageCropMode == null)

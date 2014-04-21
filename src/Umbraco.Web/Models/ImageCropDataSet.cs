@@ -32,24 +32,10 @@ namespace Umbraco.Web.Models
 
             var sb = new StringBuilder();
 
-            if ((useFocalPoint && HasFocalPoint()) || (crop != null && crop.Coordinates == null && HasFocalPoint()) || (string.IsNullOrEmpty(alias) && HasFocalPoint()))
+            var cropBaseUrl = this.GetCropBaseUrl(alias, useFocalPoint);
+            if (cropBaseUrl != null)
             {
-                sb.Append("?center=" + FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                sb.Append("&mode=crop");
-            }
-            else if (crop != null && crop.Coordinates != null)
-            {
-                sb.Append("?crop=");
-                sb.Append(crop.Coordinates.X1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
-                sb.Append(crop.Coordinates.Y1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
-                sb.Append(crop.Coordinates.X2.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
-                sb.Append(crop.Coordinates.Y2.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                sb.Append("&cropmode=percentage");
-            }
-            else
-            {                
-                sb.Append("?anchor=center");
-                sb.Append("&mode=crop");
+                sb.Append(cropBaseUrl);
             }
 
             if (crop != null && useCropDimensions)

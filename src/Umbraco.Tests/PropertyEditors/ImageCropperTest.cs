@@ -41,5 +41,26 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
         }
 
+        /// <summary>
+        /// Test that if a crop alias has been specified that doesn't exist the method returns null
+        /// </summary>
+        [Test]
+        public void GetCropUrlNullTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "Banner", useCropDimensions: true);
+            Assert.AreEqual(null, urlString);
+        }
+
+        /// <summary>
+        /// Test the GetCropUrl method on the ImageCropDataSet Model
+        /// </summary>
+        [Test]
+        public void GetBaseCropUrlFromModelTest()
+        {
+            var cropDataSet = cropperJson.SerializeToCropDataSet();
+            var urlString = cropDataSet.GetCropUrl("thumb");
+            Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
+        }
+
     }
 }
