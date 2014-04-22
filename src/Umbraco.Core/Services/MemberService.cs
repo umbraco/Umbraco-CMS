@@ -702,7 +702,7 @@ namespace Umbraco.Core.Services
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
         {
             var memberType = FindMemberTypeByAlias(memberTypeAlias);
-            return CreateMemberWithIdentity(username, email, memberType);
+            return CreateMemberWithIdentity(username, email, username, rawPasswordValue, memberType);
         }
 
         private IMember CreateMemberWithIdentity(string username, string email, string name, string rawPasswordValue, IMemberType memberType)

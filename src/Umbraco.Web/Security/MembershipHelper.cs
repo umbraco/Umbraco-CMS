@@ -173,7 +173,7 @@ namespace Umbraco.Web.Security
             provider.GetUser(model.Username, true);
 
             //Log them in
-            FormsAuthentication.SetAuthCookie(membershipUser.UserName, true);
+            FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
 
             return membershipUser;
         }

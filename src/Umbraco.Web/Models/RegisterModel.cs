@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models
             UsernameIsEmail = true;
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;
-
+            CreatePersistentLoginCookie = true;
             if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {
                 var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
@@ -92,6 +92,11 @@ namespace Umbraco.Web.Models
         /// Specifies if the member should be logged in if they are succesfully created
         /// </summary>
         public bool LoginOnSuccess { get; set; }
+
+        /// <summary>
+        /// Default is true to create a persistent cookie if LoginOnSuccess is true
+        /// </summary>
+        public bool CreatePersistentLoginCookie { get; set; }
 
         /// <summary>
         /// A custom model binder for MVC because the default ctor performs a lookup!
