@@ -68,31 +68,5 @@ namespace Umbraco.Core
 			return new FileInfo(path);
 		}
 
-        /// <summary>
-        /// Gets the <see cref="AssemblyName"/> objects for all the assemblies recursively referenced by a specified assembly.
-        /// </summary>
-        /// <param name="assembly">The assembly.</param>
-        /// <returns>The <see cref="AssemblyName"/> objects for all the assemblies recursively referenced by the specified assembly.</returns>
-        public static IEnumerable<AssemblyName> GetDeepReferencedAssemblies(this Assembly assembly)
-        {
-            var allAssemblies = TypeFinder.GetAllAssemblies();
-            var visiting = new Stack<Assembly>();
-            var visited = new HashSet<Assembly>();
-
-            visiting.Push(assembly);
-            visited.Add(assembly);
-            while (visiting.Count > 0)
-            {
-                var visAsm = visiting.Pop();
-                foreach (var refAsm in visAsm.GetReferencedAssemblies()
-                    .Select(refAsmName => allAssemblies.SingleOrDefault(x => string.Equals(x.GetName().Name, refAsmName.Name, StringComparison.Ordinal)))
-                    .Where(x => x != null && visited.Contains(x) == false))
-                {
-                    yield return refAsm.GetName();
-                    visiting.Push(refAsm);
-                    visited.Add(refAsm);
-                }
-            }
-        }
 	}
 }
