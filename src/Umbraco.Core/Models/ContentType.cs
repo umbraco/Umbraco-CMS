@@ -143,35 +143,19 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// //TODO: REmove this as it's mostly just a shallow clone and not thread safe
-        /// Creates a clone of the current entity
+        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
         /// </summary>
         /// <returns></returns>
         public IContentType Clone(string alias)
         {
-            var clone = (ContentType)this.MemberwiseClone();
+            var clone = (ContentType)DeepClone();
             clone.Alias = alias;
             clone.Key = Guid.Empty;
-            var propertyGroups = this.PropertyGroups.Select(x => x.Clone()).ToList();
+            var propertyGroups = PropertyGroups.Select(x => x.Clone()).ToList();
             clone.PropertyGroups = new PropertyGroupCollection(propertyGroups);
-            clone.PropertyTypes = this.PropertyTypeCollection.Select(x => x.Clone()).ToList();
+            clone.PropertyTypes = PropertyTypeCollection.Select(x => x.Clone()).ToList();
             clone.ResetIdentity();
             clone.ResetDirtyProperties(false);
-
-            foreach (var propertyGroup in clone.PropertyGroups)
-            {
-                propertyGroup.ResetIdentity();
-                foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
-                    propertyType.ResetIdentity();
-                }
-            }
-
-            foreach (var propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
-            {
-                propertyType.ResetIdentity();
-            }
-
             return clone;
         }
 
