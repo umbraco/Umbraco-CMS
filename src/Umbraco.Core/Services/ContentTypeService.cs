@@ -47,6 +47,89 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
+        /// </summary>
+        /// <param name="original">
+        /// The content type to copy
+        /// </param>
+        /// <param name="alias">
+        /// The new alias of the content type
+        /// </param>
+        /// <param name="name">
+        /// The new name of the content type
+        /// </param>
+        /// <param name="parentId">
+        /// The parent to copy the content type to, default is -1 (root)
+        /// </param>
+        /// <returns></returns>
+        public IContentType Copy(IContentType original, string alias, string name, int parentId = -1)
+        {
+            IContentType parent = null;            
+            if (parentId > 0)
+            {
+                parent = GetContentType(parentId);
+                if (parent == null)
+                {
+                    throw new InvalidOperationException("Could not find content type with id " + parentId);
+                }
+            }
+            return Copy(original, alias, name, parent);
+        }
+
+        /// <summary>
+        /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
+        /// </summary>
+        /// <param name="original">
+        /// The content type to copy
+        /// </param>
+        /// <param name="alias">
+        /// The new alias of the content type
+        /// </param>
+        /// <param name="name">
+        /// The new name of the content type
+        /// </param>
+        /// <param name="parent">
+        /// The parent to copy the content type to, default is null (root)
+        /// </param>
+        /// <returns></returns>
+        public IContentType Copy(IContentType original, string alias, string name, IContentType parent)
+        {
+            Mandate.ParameterNotNull(original, "original");
+            Mandate.ParameterNotNullOrEmpty(alias, "alias");
+            if (parent != null)
+            {
+                Mandate.That(parent.HasIdentity, () => new InvalidOperationException("The parent content type must have an identity"));    
+            }
+
+            var clone = original.DeepCloneWithResetIdentities(alias);
+
+            clone.Name = name;
+
+            var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
+            //remove all composition that is not it's current alias
+            foreach (var a in compositionAliases)
+            {
+                clone.RemoveContentType(a);
+            }
+
+            //if a parent is specified set it's composition and parent
+            if (parent != null)
+            {
+                //add a new parent composition
+                clone.AddContentType(parent);
+                clone.ParentId = parent.Id;
+            }
+            else
+            {
+                //set to root
+                clone.ParentId = -1;
+            }
+            
+            Save(clone);
+            return clone;
+        }
+
+        /// <summary>
         /// Gets an <see cref="IContentType"/> object by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IContentType"/> to retrieve</param>

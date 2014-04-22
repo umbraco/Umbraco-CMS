@@ -145,31 +145,17 @@ namespace umbraco.dialogs
 
         private void HandleDocumentTypeCopy()
         {
-
-            //TODO: This should be a method on the service!!!
-
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentType = contentTypeService.GetContentType(
                 int.Parse(Request.GetItemAsString("id")));
 
-            var alias = rename.Text.Trim().Replace("'", "''");
-            var clone = ((Umbraco.Core.Models.ContentType) contentType).Clone(alias);
-			clone.Name = rename.Text.Trim();
-
             //set the master
             //http://issues.umbraco.org/issue/U4-2843
             //http://issues.umbraco.org/issue/U4-3552
-            var parent = int.Parse(masterType.SelectedValue);
-            if (parent > 0)
-            {
-                clone.ParentId = parent;
-            }
-            else
-            {
-                clone.ParentId = -1;
-            }
-
-            contentTypeService.Save(clone);
+            var parentId = int.Parse(masterType.SelectedValue);
+            
+            var alias = rename.Text.Trim().Replace("'", "''");
+            var clone = contentTypeService.Copy(contentType, alias, rename.Text.Trim(), parentId);
 
             var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, clone.Id);
 

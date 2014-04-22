@@ -72,5 +72,11 @@ namespace Umbraco.Core.Models
         /// Changes the Published state of the content object
         /// </summary>
         void ChangePublishedState(PublishedState state);
+
+        /// <summary>
+        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
+        /// </summary>
+        /// <returns></returns>
+        IContent DeepCloneWithResetIdentities();
     }
 }
