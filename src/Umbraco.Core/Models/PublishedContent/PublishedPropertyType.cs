@@ -396,7 +396,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>Only a published property type that has not already been detached or nested, can be detached.</para>
         /// <para>Use detached published property type when creating detached properties outside of a published content.</para>
         /// </remarks>
-        public PublishedPropertyType Detached()
+        internal PublishedPropertyType Detached()
         {
             // verify
             if (IsDetachedOrNested)
@@ -426,7 +426,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>Only a published property type that has not already been detached or nested, can be nested.</para>
         /// <para>Use nested published property type when creating detached properties within a published content.</para>
         /// </remarks>
-        public PublishedPropertyType Nested(PublishedPropertyType containerType)
+        internal PublishedPropertyType Nested(PublishedPropertyType containerType)
         {
             // verify
             if (IsDetachedOrNested)
