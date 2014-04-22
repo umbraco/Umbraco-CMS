@@ -141,16 +141,17 @@ namespace Umbraco.Core.Models
             return hashName ^ hashId;
         }
 
-        //TODO: Remove this, its mostly a shallow clone and is not thread safe
+        /// <summary>
+        /// Creates a deep clone of the current entity with its identity and it's property identities reset
+        /// </summary>
+        /// <returns></returns>
         internal PropertyGroup Clone()
         {
-            var clone = (PropertyGroup)this.MemberwiseClone();
+            var clone = (PropertyGroup)DeepClone();
             var collection = new PropertyTypeCollection();
-            foreach (var propertyType in this.PropertyTypes)
+            foreach (var propertyType in PropertyTypes)
             {
-                var property = propertyType.Clone();
-                property.ResetIdentity();
-                property.ResetDirtyProperties(false);
+                var property = propertyType.Clone();                
                 collection.Add(property);
             }
             clone.PropertyTypes = collection;

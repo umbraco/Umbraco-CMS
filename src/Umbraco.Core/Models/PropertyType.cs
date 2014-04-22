@@ -426,10 +426,13 @@ namespace Umbraco.Core.Models
             return hashName ^ hashAlias;
         }
 
-        //TODO: Remove this
+        /// <summary>
+        /// Creates a deep clone of the current entity with its identity and it's property identities reset
+        /// </summary>
+        /// <returns></returns>
         internal PropertyType Clone()
         {
-            var clone = (PropertyType)this.MemberwiseClone();
+            var clone = (PropertyType)DeepClone();
             clone.ResetIdentity();
             clone.ResetDirtyProperties(false);
             return clone;
