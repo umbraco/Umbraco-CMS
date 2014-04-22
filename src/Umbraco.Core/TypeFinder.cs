@@ -431,7 +431,7 @@ namespace Umbraco.Core
             if (TypeHelper.IsTypeAssignableFrom<Attribute>(attributeType) == false)
                 throw new ArgumentException("The type specified: " + attributeType + " is not an Attribute type");
 
-            var foundAssignableTypes = new HashSet<Type>();
+            var foundAttributedTypes = new HashSet<Type>();
 
             var assemblyList = assemblies.ToArray();
 
@@ -440,23 +440,78 @@ namespace Umbraco.Core
             //contain a class that has this attribute.
             var referencedAssemblies = TypeHelper.GetReferencedAssemblies(attributeType, assemblyList);
 
+            //get a list of non-referenced assemblies (we'll use this when we recurse below)
+            var otherAssemblies = assemblyList.Where(x => referencedAssemblies.Contains(x) == false).ToArray();
+
+            //loop through the referenced assemblies
             foreach (var a in referencedAssemblies)
             {
-                //get all types in the assembly that are sub types of the current type
-                var allTypes = GetTypesWithFormattedException(a).ToArray();
+                //get all types in this assembly
+                var allTypes = GetTypesWithFormattedException(a)
+                    .ToArray();
 
-                var types = allTypes.Where(t => TypeHelper.IsNonStaticClass(t)
-                                                && (onlyConcreteClasses == false || t.IsAbstract == false)
-                    //the type must have this attribute
-                                                && t.GetCustomAttributes(attributeType, false).Any());
+                //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes but have
+                //the specified attribute
+                var attributedTypes = allTypes
+                    .Where(t => (TypeHelper.IsNonStaticClass(t)
+                                 && (onlyConcreteClasses == false || t.IsAbstract == false))
+                                 //the type must have this attribute
+                                 && t.GetCustomAttributes(attributeType, false).Any())
+                    .ToArray();
 
-                foreach (var t in types)
+                //add the types to our list to return
+                foreach (var t in attributedTypes)
                 {
-                    foundAssignableTypes.Add(t);
+                    foundAttributedTypes.Add(t);
+                }
+
+                //get all attributes of the type being searched for
+                var allAttributeTypes = allTypes.Where(attributeType.IsAssignableFrom);
+
+                //now we need to include types that may be inheriting from sub classes of the attribute type being searched for
+                //so we will search in assemblies that reference those types too.
+                foreach (var subTypesInAssembly in allAttributeTypes.GroupBy(x => x.Assembly)){
+
+                    //So that we are not scanning too much, we need to group the sub types:    
+                    // * if there is more than 1 sub type in the same assembly then we should only search on the 'lowest base' type.
+                    // * We should also not search for sub types if the type is sealed since you cannot inherit from a sealed class
+                    // * We should not search for sub types if the type is static since you cannot inherit from them.
+                    var subTypeList = subTypesInAssembly
+                        .Where(t => t.IsSealed == false && TypeHelper.IsStaticClass(t) == false)
+                        .ToArray();
+
+                    var baseClassAttempt = TypeHelper.GetLowestBaseType(subTypeList);
+
+                    //if there's a base class amongst the types then we'll only search for that type.
+                    //otherwise we'll have to search for all of them.
+                    var subTypesToSearch = new HashSet<Type>();
+                    if (baseClassAttempt.Success)
+                    {
+                        subTypesToSearch.Add(baseClassAttempt.Result);
+                    }
+                    else
+                    {
+                        foreach (var t in subTypeList)
+                        {
+                            subTypesToSearch.Add(t);
+                        }
+                    }
+
+                    foreach (var typeToSearch in subTypesToSearch)
+                    {
+                        //recursively find the types inheriting from this sub type in the other non-scanned assemblies.
+                        var foundTypes = FindClassesWithAttribute(typeToSearch, otherAssemblies, onlyConcreteClasses);
+
+                        foreach (var f in foundTypes)
+                        {
+                            foundAttributedTypes.Add(f);
+                        }
+                    }
+
                 }
             }
 
-            return foundAssignableTypes;
+            return foundAttributedTypes;
         }
 
 
