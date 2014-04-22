@@ -420,7 +420,17 @@ namespace Umbraco.Core.Models
         /// Creates a deep clone of the current entity with its identity and it's property identities reset
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Use DeepCloneWithResetIdentities instead")]
         public IContent Clone()
+        {
+            return DeepCloneWithResetIdentities();
+        }
+
+        /// <summary>
+        /// Creates a deep clone of the current entity with its identity and it's property identities reset
+        /// </summary>
+        /// <returns></returns>
+        public IContent DeepCloneWithResetIdentities()
         {
             var clone = (Content)DeepClone();
             clone.Key = Guid.Empty;

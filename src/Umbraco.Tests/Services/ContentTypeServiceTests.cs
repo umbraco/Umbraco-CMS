@@ -300,6 +300,140 @@ namespace Umbraco.Tests.Services
             
 	    }
 
+        [Test]
+        public void Can_Copy_ContentType_To_New_Parent_By_Performing_Clone()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            
+            var parentContentType1 = MockedContentTypes.CreateSimpleContentType("parent1", "Parent1");
+            service.Save(parentContentType1);
+            var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2");
+            service.Save(parentContentType2);
+            
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1);
+            service.Save(simpleContentType);
+
+            // Act
+            var clone = simpleContentType.Clone("newcategory");
+            clone.RemoveContentType("parent1");
+            clone.AddContentType(parentContentType2);
+            clone.ParentId = parentContentType2.Id;
+            service.Save(clone);
+
+            // Assert
+            Assert.That(clone.HasIdentity, Is.True);
+
+            var clonedContentType = service.GetContentType(clone.Id);
+            var originalContentType = service.GetContentType(simpleContentType.Id);
+
+            Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
+            Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
+
+            Assert.AreEqual(clonedContentType.Path, "-1," + parentContentType2.Id + "," + clonedContentType.Id);
+            Assert.AreEqual(clonedContentType.PropertyTypes.Count(), originalContentType.PropertyTypes.Count());
+            
+            Assert.AreNotEqual(clonedContentType.ParentId, originalContentType.ParentId);
+            Assert.AreEqual(clonedContentType.ParentId, parentContentType2.Id);
+
+            Assert.AreNotEqual(clonedContentType.Id, originalContentType.Id);
+            Assert.AreNotEqual(clonedContentType.Key, originalContentType.Key);
+            Assert.AreNotEqual(clonedContentType.Path, originalContentType.Path);
+
+            Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id, originalContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
+            Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
+
+        }
+
+        [Test]
+        public void Can_Copy_ContentType_With_Service_To_Root()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var metaContentType = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaContentType);
+
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", metaContentType);
+            service.Save(simpleContentType);
+            var categoryId = simpleContentType.Id;
+
+            // Act
+            var clone = service.Copy(simpleContentType, "newcategory", "new category");
+
+            // Assert
+            Assert.That(clone.HasIdentity, Is.True);
+
+            var cloned = service.GetContentType(clone.Id);
+            var original = service.GetContentType(categoryId);
+
+
+            Assert.That(cloned.CompositionAliases().Any(x => x.Equals("meta")), Is.False); //it's been copied to root
+            Assert.AreEqual(cloned.ParentId, -1);
+            Assert.AreEqual(cloned.Level, 1);
+            Assert.AreEqual(cloned.PropertyTypes.Count(), original.PropertyTypes.Count());
+            Assert.AreEqual(cloned.PropertyGroups.Count(), original.PropertyGroups.Count());
+            for (int i = 0; i < cloned.PropertyGroups.Count; i++)
+            {
+                Assert.AreEqual(cloned.PropertyGroups[i].PropertyTypes.Count, original.PropertyGroups[i].PropertyTypes.Count);
+                foreach (var propertyType in cloned.PropertyGroups[i].PropertyTypes)
+                {
+                    Assert.IsTrue(propertyType.HasIdentity);
+                }
+            }
+            foreach (var propertyType in cloned.PropertyTypes)
+            {
+                Assert.IsTrue(propertyType.HasIdentity);
+            }
+            Assert.AreNotEqual(cloned.Id, original.Id);
+            Assert.AreNotEqual(cloned.Key, original.Key);
+            Assert.AreNotEqual(cloned.Path, original.Path);
+            Assert.AreNotEqual(cloned.SortOrder, original.SortOrder);
+            Assert.AreNotEqual(cloned.PropertyTypes.First(x => x.Alias.Equals("title")).Id, original.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
+            Assert.AreNotEqual(cloned.PropertyGroups.First(x => x.Name.Equals("Content")).Id, original.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
+
+        }
+
+        [Test]
+        public void Can_Copy_ContentType_To_New_Parent_With_Service()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var parentContentType1 = MockedContentTypes.CreateSimpleContentType("parent1", "Parent1");
+            service.Save(parentContentType1);
+            var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2");
+            service.Save(parentContentType2);
+
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1);
+            service.Save(simpleContentType);
+
+            // Act
+            var clone = service.Copy(simpleContentType, "newAlias", "new alias", parentContentType2);
+
+            // Assert
+            Assert.That(clone.HasIdentity, Is.True);
+
+            var clonedContentType = service.GetContentType(clone.Id);
+            var originalContentType = service.GetContentType(simpleContentType.Id);
+
+            Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
+            Assert.That(clonedContentType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);
+
+            Assert.AreEqual(clonedContentType.Path, "-1," + parentContentType2.Id + "," + clonedContentType.Id);
+            Assert.AreEqual(clonedContentType.PropertyTypes.Count(), originalContentType.PropertyTypes.Count());
+
+            Assert.AreNotEqual(clonedContentType.ParentId, originalContentType.ParentId);
+            Assert.AreEqual(clonedContentType.ParentId, parentContentType2.Id);
+
+            Assert.AreNotEqual(clonedContentType.Id, originalContentType.Id);
+            Assert.AreNotEqual(clonedContentType.Key, originalContentType.Key);
+            Assert.AreNotEqual(clonedContentType.Path, originalContentType.Path);
+
+            Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id, originalContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
+            Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
+
+        }
+
         private ContentType CreateComponent()
         {
             var component = new ContentType(-1)

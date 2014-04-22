@@ -1147,7 +1147,7 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                var copy = ((Content)content).Clone();
+                var copy = content.DeepCloneWithResetIdentities();
                 copy.ParentId = parentId;
 
                 // A copy should never be set to published automatically even if the original was.

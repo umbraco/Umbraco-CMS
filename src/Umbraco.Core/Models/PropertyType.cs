@@ -426,18 +426,6 @@ namespace Umbraco.Core.Models
             return hashName ^ hashAlias;
         }
 
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        internal PropertyType Clone()
-        {
-            var clone = (PropertyType)DeepClone();
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
-
         public override object DeepClone()
         {
             var clone = (PropertyType)base.DeepClone();
@@ -445,8 +433,7 @@ namespace Umbraco.Core.Models
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {
-                var propGroupId = PropertyGroupId.Value;
-                clone._propertyGroupId = new Lazy<int>(() => propGroupId);    
+                clone._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);    
             }
 
             clone.ResetDirtyProperties(false);
