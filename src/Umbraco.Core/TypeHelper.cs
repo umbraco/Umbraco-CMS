@@ -51,29 +51,21 @@ namespace Umbraco.Core
             //contain sub type's of the one we're currently looking for
             return assemblies
                 .Where(assembly =>
-                       assembly == assignTypeFrom.Assembly || HasReferenceToAssemblyWithName(assembly, assignTypeFrom.Assembly.GetName().Name))
+                       assembly == assignTypeFrom.Assembly 
+                        || HasReferenceToAssemblyWithName(assembly, assignTypeFrom.Assembly.GetName().Name))
                 .ToArray();
         }
 
-        /// <summary>
-        /// checks if the assembly has a reference with the same name as the expected assembly name.
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <param name="expectedAssemblyName"></param>
-        /// <returns></returns>
+	    /// <summary>
+	    /// checks if the assembly has a reference with the same name as the expected assembly name.
+	    /// </summary>
+	    /// <param name="assembly"></param>
+	    /// <param name="expectedAssemblyName"></param>
+	    /// <returns></returns>
         private static bool HasReferenceToAssemblyWithName(Assembly assembly, string expectedAssemblyName)
         {
-            // The following code was not recursive ie if assembly.1 -> assembly.2 -> assembly.3, and expected is assembly.3,
-            // it would not consider that assembly.1 has a reference to assembly.3. Can cause issues eg when assembly.3
-            // contains an attribute, assembly.2 defines a new attribute that inherit from that attribute, and assembly.1
-            // uses the attribute in assembly.2. When looking for assemblies that have a chance to use the attribute, we
-            // look for assemblies that reference assembly.3, and we would fail to consider assembly.1.
-            //
-            // Better get deep-referenced assemblies. Has an impact on perfs obviously but only when the app starts.
-
             return assembly
-                //.GetReferencedAssemblies()
-                .GetDeepReferencedAssemblies()
+                .GetReferencedAssemblies()
                 .Select(a => a.Name)
                 .Contains(expectedAssemblyName, StringComparer.Ordinal);
         }
