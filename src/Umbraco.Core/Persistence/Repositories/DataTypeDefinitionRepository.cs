@@ -354,8 +354,8 @@ AND umbracoNode.id <> @id",
                 {
                     //return from the cache
                     var collection = cached.First();
-                    var preVal = collection.PreValuesAsArray.Single(x => x.Id == preValueId);
-                    return preVal.Value;
+                    var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
+                    return preVal.Value.Value;
                 }
 
                 l.UpgradeToWriteLock();
@@ -371,8 +371,8 @@ AND umbracoNode.id <> @id",
                 var preVals = GetAndCachePreValueCollection(dto.DataTypeNodeId);
 
                 //return the single value for this id
-                var pv = preVals.PreValuesAsArray.Single(x => x.Id == preValueId);
-                return pv.Value;
+                var pv = preVals.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
+                return pv.Value.Value;
             }
         }
 
