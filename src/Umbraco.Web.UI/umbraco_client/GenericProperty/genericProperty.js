@@ -24,17 +24,15 @@ function duplicatePropertyNameAsSafeAlias(nameId, aliasId) {
 }
 
 function checkAlias(aliasId) {
-    var input = $(aliasId);
-    
-    input.keyup(function(event) {
-        var value = $(this).val();
+    $(aliasId).keyup(function (event) {
+        var input = $(this);
+        var value = input.val();
         validateSafeAlias(aliasId, value, false, function (isSafe) {
             input.toggleClass('aliasValidationError', !isSafe);
         });
-    });
-
-    input.blur(function(event) {
-        var value = $(this).val();
+    }).blur(function(event) {
+        var input = $(this);
+        var value = input.val();
         getSafeAlias(aliasId, value, true, function (alias) {
             if (value.toLowerCase() != alias.toLowerCase())
                 input.val(alias);

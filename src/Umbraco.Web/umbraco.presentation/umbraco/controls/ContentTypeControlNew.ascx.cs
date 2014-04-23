@@ -125,7 +125,7 @@ namespace umbraco.controls
             else
                 lt_icon.Text = _contentType.IconUrl.TrimStart('.');
 
-            checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
+            checkTxtAliasJs.Text = string.Format("checkAlias('#{0}');", txtAlias.ClientID);
         }
         
         /// <summary>
