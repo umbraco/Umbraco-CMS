@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -173,7 +174,8 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                     {
-                        _alias = value.ToSafeAlias();
+                        //_alias = value.ToSafeAlias();
+                        _alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
                         return _alias;
                     }, _alias, AliasSelector);
             }

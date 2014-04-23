@@ -5,6 +5,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -26,7 +27,9 @@ namespace umbraco
                                   ? new ContentType(-1)
                                   : new ContentType(ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentId));
             contentType.CreatorId = User.Id;
-            contentType.Alias = Alias.Replace("'", "''");
+            // when creating a content type, enforce PascalCase
+            // preserve separator because contentType.Alias will re-alias it
+            contentType.Alias = Alias.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase, ' ');
             contentType.Name = Alias.Replace("'", "''");
             contentType.Icon = ".sprTreeFolder";
 
