@@ -383,7 +383,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					{
 						//first check in Examine as this is WAY faster
 						var criteria = searchProvider.CreateSearchCriteria("media");
-                        var filter = criteria.ParentId(parentId);
+                        
+                        var filter = criteria.ParentId(parentId).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                        //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
+                        //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
+
 					    ISearchResults results;
 
                         //we want to check if the indexer for this searcher has "sortOrder" flagged as sortable.
