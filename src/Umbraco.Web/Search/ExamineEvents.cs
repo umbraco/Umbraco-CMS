@@ -158,19 +158,33 @@ namespace Umbraco.Web.Search
                             switch (payload.Operation)
                             {
                                 case MediaCacheRefresher.OperationType.Saved:
-                                    var media = ApplicationContext.Current.Services.MediaService.GetById(payload.Id);
-                                    if (media != null)
+                                    var media1 = ApplicationContext.Current.Services.MediaService.GetById(payload.Id);
+                                    if (media1 != null)
                                     {
-                                        ReIndexForMedia(media, media.Trashed == false);
+                                        ReIndexForMedia(media1, media1.Trashed == false);
                                     }                                    
                                     break;
                                 case MediaCacheRefresher.OperationType.Trashed:
+                                    
                                     //keep if trashed for indexes supporting unpublished
+                                    //(delete the index from all indexes not supporting unpublished content)
+                                    
                                     DeleteIndexForEntity(payload.Id, true);
+
+                                    //We then need to re-index this item for all indexes supporting unpublished content
+                                    var media2 = ApplicationContext.Current.Services.MediaService.GetById(payload.Id);
+                                    if (media2 != null)
+                                    {
+                                        ReIndexForMedia(media2, false);
+                                    }
+
                                     break;
                                 case MediaCacheRefresher.OperationType.Deleted:
+
                                     //permanently remove from all indexes
+                                    
                                     DeleteIndexForEntity(payload.Id, false);
+
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();

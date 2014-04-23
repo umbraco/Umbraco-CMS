@@ -968,8 +968,19 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
+                var originalPath = content.Path;
+
+                if (Trashing.IsRaisedEventCancelled(
+                    new MoveEventArgs<IContent>(
+                        new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)), this))
+                {
                     return;
+                }
+
+                var moveInfo = new List<MoveEventInfo<IContent>>
+                {
+                    new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)
+                };
 
                 //Make sure that published content is unpublished before being moved to the Recycle Bin
                 if (HasPublishedVersion(content.Id))
@@ -994,6 +1005,8 @@ namespace Umbraco.Core.Services
                     //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                     foreach (var descendant in descendants)
                     {
+                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
+
                         descendant.WriterId = userId;
                         descendant.ChangeTrashedState(true, descendant.ParentId);
                         repository.AddOrUpdate(descendant);
@@ -1002,7 +1015,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
+                Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this);
 
                 Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
             }
@@ -1029,76 +1042,21 @@ namespace Umbraco.Core.Services
                     MoveToRecycleBin(content, userId);
                     return;
                 }
-
-                if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
+                
+                if (Moving.IsRaisedEventCancelled(
+                    new MoveEventArgs<IContent>(
+                        new MoveEventInfo<IContent>(content, content.Path, parentId)), this))
+                {
                     return;
-
-                content.WriterId = userId;
-                if (parentId == -1)
-                {
-                    content.Path = string.Concat("-1,", content.Id);
-                    content.Level = 1;
-                }
-                else
-                {
-                    var parent = GetById(parentId);
-                    content.Path = string.Concat(parent.Path, ",", content.Id);
-                    content.Level = parent.Level + 1;
                 }
 
+                //used to track all the moved entities to be given to the event
+                var moveInfo = new List<MoveEventInfo<IContent>>();
 
-                //If Content is being moved away from Recycle Bin, its state should be un-trashed
-                if (content.Trashed && parentId != -20)
-                {
-                    content.ChangeTrashedState(false, parentId);
-                }
-                else
-                {
-                    content.ParentId = parentId;
-                }
+                //call private method that does the recursive moving
+                PerformMove(content, parentId, userId, moveInfo);
 
-                //If Content is published, it should be (re)published from its new location
-                if (content.Published)
-                {
-                    //If Content is Publishable its saved and published
-                    //otherwise we save the content without changing the publish state, and generate new xml because the Path, Level and Parent has changed.
-                    if (IsPublishable(content))
-                    {
-                        SaveAndPublish(content, userId);
-                    }
-                    else
-                    {
-                        Save(content, false, userId, true);
-
-                        using (var uow = _uowProvider.GetUnitOfWork())
-                        {
-                            var xml = content.ToXml();
-                            var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-                            var exists =
-                                uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
-                                null;
-                            int result = exists
-                                             ? uow.Database.Update(poco)
-                                             : Convert.ToInt32(uow.Database.Insert(poco));
-                        }
-                    }
-                }
-                else
-                {
-                    Save(content, userId);
-                }
-
-                //Ensure that Path and Level is updated on children
-                var children = GetChildren(content.Id).ToArray();
-                if (children.Any())
-                {
-                    foreach (var child in children)
-                    {
-                        Move(child, content.Id, userId);
-                    }
-                }
-
-                Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
+                Moved.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this);
 
                 Audit.Add(AuditTypes.Move, "Move Content performed by user", userId, content.Id);
             }
@@ -1145,6 +1103,9 @@ namespace Umbraco.Core.Services
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
         {
+            //TODO: This all needs to be managed correctly so that the logic is submitted in one
+            // transaction, the CRUD needs to be moved to the repo
+
             using (new WriteLock(Locker))
             {
                 var copy = content.DeepCloneWithResetIdentities();
@@ -1167,6 +1128,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     //Special case for the Upload DataType
+                    //TODO: This really shouldn't be here! What about the cropper in v7, we'll have the same issue.
                     var uploadDataTypeId = new Guid(Constants.PropertyEditors.UploadField);
                     if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
                     {
@@ -1460,6 +1422,79 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Private Methods
+
+        private void PerformMove(IContent content, int parentId, int userId, ICollection<MoveEventInfo<IContent>> moveInfo)
+        {
+            //add a tracking item to use in the Moved event
+            moveInfo.Add(new MoveEventInfo<IContent>(content, content.Path, parentId));
+
+            content.WriterId = userId;
+            if (parentId == -1)
+            {
+                content.Path = string.Concat("-1,", content.Id);
+                content.Level = 1;
+            }
+            else
+            {
+                var parent = GetById(parentId);
+                content.Path = string.Concat(parent.Path, ",", content.Id);
+                content.Level = parent.Level + 1;
+            }
+
+            //If Content is being moved away from Recycle Bin, its state should be un-trashed
+            if (content.Trashed && parentId != Constants.System.RecycleBinContent)
+            {
+                content.ChangeTrashedState(false, parentId);
+            }
+            else
+            {
+                content.ParentId = parentId;
+            }
+
+            //If Content is published, it should be (re)published from its new location
+            if (content.Published)
+            {
+                //If Content is Publishable its saved and published
+                //otherwise we save the content without changing the publish state, and generate new xml because the Path, Level and Parent has changed.
+                if (IsPublishable(content))
+                {
+                    //TODO: This is raising events, probably not desirable as this costs performance for event listeners like Examine
+                    SaveAndPublish(content, userId);
+                }
+                else
+                {
+                    //TODO: This is raising events, probably not desirable as this costs performance for event listeners like Examine
+                    Save(content, false, userId);
+
+                    using (var uow = _uowProvider.GetUnitOfWork())
+                    {
+                        var xml = content.ToXml();
+                        var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                        var exists =
+                            uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
+                            null;
+                        int result = exists
+                                         ? uow.Database.Update(poco)
+                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                    }
+                }
+            }
+            else
+            {
+                //TODO: This is raising events, probably not desirable as this costs performance for event listeners like Examine
+                Save(content, userId);
+            }
+
+            //Ensure that Path and Level is updated on children
+            var children = GetChildren(content.Id).ToArray();
+            if (children.Any())
+            {
+                foreach (var child in children)
+                {
+                    PerformMove(child, content.Id, userId, moveInfo);
+                }
+            }
+        }
 
         //TODO: WE should make a base class for ContentService and MediaService to share! 
         // currently we have this logic duplicated (nearly the same) for media types and soon to be member types
