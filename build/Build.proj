@@ -71,7 +71,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <BuildConfiguration>Release</BuildConfiguration>
+    <BuildConfiguration>Debug</BuildConfiguration>
     <BuildFolder>_BuildOutput\</BuildFolder>
     <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
     <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
