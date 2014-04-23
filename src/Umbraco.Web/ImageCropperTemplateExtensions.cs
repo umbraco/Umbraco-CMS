@@ -93,6 +93,12 @@ namespace Umbraco.Web
         /// <param name="furtherOptions">
         /// The further options.
         /// </param>
+        /// <param name="ratioMode">
+        /// Use a dimension as a ratio
+        /// </param>  
+        /// <param name="upScale">
+        /// If the image should be upscaled to requested dimensions
+        /// </param>         
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -108,7 +114,10 @@ namespace Umbraco.Web
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true, 
-             string furtherOptions = null)
+             string furtherOptions = null,
+             ImageCropRatioMode? ratioMode = null,     
+             bool upScale = true
+            )
         {
             string imageCropperValue = null;
 
@@ -133,7 +142,7 @@ namespace Umbraco.Web
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions)
+                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale)
                 : string.Empty;
         }
 
@@ -176,6 +185,12 @@ namespace Umbraco.Web
         /// <param name="furtherOptions">
         /// The further options.
         /// </param>
+        /// <param name="ratioMode">
+        /// Use a dimension as a ratio
+        /// </param>  
+        /// <param name="upScale">
+        /// If the image should be upscaled to requested dimensions
+        /// </param>         
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -191,7 +206,10 @@ namespace Umbraco.Web
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             string cacheBusterValue = null, 
-            string furtherOptions = null)
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true
+        )
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
             {
@@ -202,21 +220,31 @@ namespace Umbraco.Web
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     if (cropDataSet != null)
                     {
-                        var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, preferFocalPoint, cacheBusterValue);
-                        
-                        // if crop alias has been specified but not found in the Json we should return null
-                        if (string.IsNullOrEmpty(cropAlias) == false && cropUrl == null)
+                        var crop = cropDataSet.GetCrop(cropAlias);
+
+                        imageResizerUrl.Append(cropDataSet.Src);
+
+                        var cropBaseUrl = cropDataSet.GetCropBaseUrl(cropAlias, preferFocalPoint);
+                        if (cropBaseUrl != null)
+                        {
+                            imageResizerUrl.Append(cropBaseUrl);
+                        }
+                        else
                         {
                             return null;
                         }
 
-                        imageResizerUrl.Append(cropDataSet.Src);
-                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, preferFocalPoint, cacheBusterValue));
+                        if (crop!= null & useCropDimensions)
+                        {
+                            width = crop.Width;
+                            height = crop.Height;
+                        }
                     }
                 }
                 else
                 {
                     imageResizerUrl.Append(imageUrl);
+
                     if (imageCropMode == null)
                     {
                         imageCropMode = ImageCropMode.Pad;
@@ -235,19 +263,51 @@ namespace Umbraco.Web
                     imageResizerUrl.Append("&quality=" + quality);
                 }
 
-                if (width != null && useCropDimensions == false)
+                if (width != null && ratioMode != ImageCropRatioMode.Width)
                 {
                     imageResizerUrl.Append("&width=" + width);
                 }
 
-                if (height != null && useCropDimensions == false)
+                if (height != null && ratioMode != ImageCropRatioMode.Height)
                 {
                     imageResizerUrl.Append("&height=" + height);
+                }
+
+                if (ratioMode == ImageCropRatioMode.Width && height != null)
+                {
+                    //if only height specified then assume a sqaure
+                    if (width == null)
+                    {
+                        width = height;
+                    }
+                    var widthRatio = (decimal)width/(decimal)height;
+                    imageResizerUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));                    
+                }
+
+                if (ratioMode == ImageCropRatioMode.Height && width != null)
+                {
+                    //if only width specified then assume a sqaure
+                    if (height == null)
+                    {
+                        height = width;
+                    }
+                    var heightRatio = (decimal)height/(decimal)width;
+                    imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
+                }
+
+                if (upScale == false)
+                {
+                    imageResizerUrl.Append("&upscale=false");                    
                 }
 
                 if (furtherOptions != null)
                 {
                     imageResizerUrl.Append(furtherOptions);
+                }
+
+                if (cacheBusterValue != null)
+                {
+                    imageResizerUrl.Append("&rnd=").Append(cacheBusterValue);
                 }
 
                 return imageResizerUrl.ToString();

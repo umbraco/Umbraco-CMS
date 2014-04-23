@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
+using Umbraco.Web.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web;
 
@@ -41,5 +42,55 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
         }
 
+        /// <summary>
+        /// Test that if a crop alias has been specified that doesn't exist the method returns null
+        /// </summary>
+        [Test]
+        public void GetCropUrlNullTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "Banner", useCropDimensions: true);
+            Assert.AreEqual(null, urlString);
+        }
+
+        /// <summary>
+        /// Test the GetCropUrl method on the ImageCropDataSet Model
+        /// </summary>
+        [Test]
+        public void GetBaseCropUrlFromModelTest()
+        {
+            var cropDataSet = cropperJson.SerializeToCropDataSet();
+            var urlString = cropDataSet.GetCropUrl("thumb");
+            Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
+        }
+
+        /// <summary>
+        /// Test the height ratio mode with predefined crop dimensions
+        /// </summary>
+        [Test]
+        public void GetCropUrl_CropAliasHeightRatioModeTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "Thumb", useCropDimensions: true, ratioMode:ImageCropRatioMode.Height);
+            Assert.AreEqual(mediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&heightratio=1", urlString);
+        }
+
+        /// <summary>
+        /// Test the height ratio mode with manual width/height dimensions
+        /// </summary>
+        [Test]
+        public void GetCropUrl_WidthHeightRatioModeTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, ratioMode:ImageCropRatioMode.Height);
+            Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=300&heightratio=0.5", urlString);
+        }
+
+        /// <summary>
+        /// Test the height ratio mode with width/height dimensions
+        /// </summary>
+        [Test]
+        public void GetCropUrl_HeightWidthRatioModeTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, ratioMode: ImageCropRatioMode.Width);
+            Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&height=150&widthratio=2", urlString);
+        }
     }
 }
