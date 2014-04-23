@@ -1,5 +1,5 @@
 @ECHO OFF
-SET release=7.1.1
+SET release=7.1.2
 SET comment=
 SET version=%release%
 
@@ -36,9 +36,10 @@ ren .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
 ren .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO Packing the NuGet release files
-..\src\.nuget\NuGet.exe pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
-..\src\.nuget\NuGet.exe pack NuSpecs\UmbracoCms.nuspec -Version %version%
-
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.Symbols.nuspec -Symbols -Version %version%
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version%
+                        
 IF ERRORLEVEL 1 GOTO :showerror
 
 GOTO :EOF
