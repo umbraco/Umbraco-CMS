@@ -29,7 +29,7 @@ namespace Umbraco.Core.Events
 		/// <remarks>
 		/// This is protected so that inheritors can expose it with their own name
 		/// </remarks>
-		protected T EventObject { get; private set; }
+		protected T EventObject { get; set; }
 
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
@@ -126,22 +127,21 @@ namespace Umbraco.Web.Cache
 
             //Bind to media events
 
-            MediaService.Saved += MediaServiceSaved;
-            //We need to perform all of the 'before' events here because we need a reference to the
-            //media item's Path before it is moved/deleting/trashed
-            //see: http://issues.umbraco.org/issue/U4-1653
-            MediaService.Deleting += MediaServiceDeleting;
-            MediaService.Moving += MediaServiceMoving;
-            MediaService.Trashing += MediaServiceTrashing;
+            MediaService.Saved += MediaServiceSaved;            
+            MediaService.Deleted += MediaServiceDeleted;
+            MediaService.Moved += MediaServiceMoved;
+            MediaService.Trashed += MediaServiceTrashed;
+            MediaService.EmptiedRecycleBin += MediaServiceEmptiedRecycleBin;
 
             //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
-
+            
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Copied += ContentServiceCopied;
-            //NOTE: we do not listen for the trashed event because there is no cache to update for content in that case since
-            // the unpublishing event handles that, and for examine with unpublished content indexes, we want to keep that data 
-            // in the index, it's not until it's complete deleted that we want to remove it.
+            //TODO: The Move method of the content service fires Saved/Published events during its execution so we don't need to listen to moved
+            //ContentService.Moved += ContentServiceMoved;
+            ContentService.Trashed += ContentServiceTrashed;
+            ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
 
             //public access events
             Access.AfterSave += Access_AfterSave;
@@ -158,8 +158,31 @@ namespace Umbraco.Web.Cache
 
         #region Content service event handlers
 
+        static void ContentServiceEmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e)
+        {
+            if (e.RecycleBinEmptiedSuccessfully && e.IsContentRecycleBin)
+            {
+                DistributedCache.Instance.RemoveUnpublishedCachePermanently(e.Ids.ToArray());
+            }
+        }
+        
         /// <summary>
-        /// Handles cache refreshgi for when content is copied
+        /// Handles cache refreshing for when content is trashed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// This is for the unpublished page refresher - the entity will be unpublished before being moved to the trash
+        /// and the unpublished event will take care of remove it from any published caches
+        /// </remarks>
+        static void ContentServiceTrashed(IContentService sender, MoveEventArgs<IContent> e)
+        {
+            DistributedCache.Instance.RefreshUnpublishedPageCache(
+                e.MoveInfoCollection.Select(x => x.Entity).ToArray());
+        }
+
+        /// <summary>
+        /// Handles cache refreshing for when content is copied
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -176,7 +199,7 @@ namespace Umbraco.Web.Cache
                 DistributedCache.Instance.RefreshAllUserPermissionsCache();
             }
 
-            //run the un-published cache refresher
+            //run the un-published cache refresher since copied content is not published
             DistributedCache.Instance.RefreshUnpublishedPageCache(e.Copy);
         }
 
@@ -626,19 +649,28 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Media event handlers
-        static void MediaServiceTrashing(IMediaService sender, MoveEventArgs<IMedia> e)
+
+        static void MediaServiceEmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e)
         {
-            DistributedCache.Instance.RemoveMediaCache(false, e.Entity);
+            if (e.RecycleBinEmptiedSuccessfully && e.IsMediaRecycleBin)
+            {
+                DistributedCache.Instance.RemoveMediaCachePermanently(e.Ids.ToArray());
+            }
         }
 
-        static void MediaServiceMoving(IMediaService sender, MoveEventArgs<IMedia> e)
+        static void MediaServiceTrashed(IMediaService sender, MoveEventArgs<IMedia> e)
         {
-            DistributedCache.Instance.RefreshMediaCache(e.Entity);
+            DistributedCache.Instance.RemoveMediaCacheAfterRecycling(e.MoveInfoCollection.ToArray());
         }
 
-        static void MediaServiceDeleting(IMediaService sender, DeleteEventArgs<IMedia> e)
+        static void MediaServiceMoved(IMediaService sender, MoveEventArgs<IMedia> e)
         {
-            DistributedCache.Instance.RemoveMediaCache(true, e.DeletedEntities.ToArray());
+            DistributedCache.Instance.RefreshMediaCacheAfterMoving(e.MoveInfoCollection.ToArray());
+        }
+
+        static void MediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> e)
+        {
+            DistributedCache.Instance.RemoveMediaCachePermanently(e.DeletedEntities.Select(x => x.Id).ToArray());
         }
 
         static void MediaServiceSaved(IMediaService sender, SaveEventArgs<IMedia> e)

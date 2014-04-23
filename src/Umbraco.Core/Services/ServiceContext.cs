@@ -44,10 +44,10 @@ namespace Umbraco.Core.Services
         /// <param name="packagingService"></param>
         /// <param name="entityService"></param>
         /// <param name="relationService"></param>
-        /// <param name="sectionService"></param>
-        /// <param name="treeService"></param>
-        /// <param name="tagService"></param>
         /// <param name="memberGroupService"></param>
+        /// <param name="memberTypeService"></param>
+        /// <param name="memberService"></param>
+        /// <param name="userService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -59,6 +59,9 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IRelationService relationService,
             IMemberGroupService memberGroupService,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService,
+            IUserService userService,
             ISectionService sectionService,
             IApplicationTreeService treeService,
             ITagService tagService)
@@ -75,7 +78,11 @@ namespace Umbraco.Core.Services
             _relationService = new Lazy<IRelationService>(() => relationService);
             _sectionService = new Lazy<ISectionService>(() => sectionService);
             _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
+            _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
             _treeService = new Lazy<IApplicationTreeService>(() => treeService);
+            _memberService = new Lazy<IMemberService>(() => memberService);
+            _userService = new Lazy<IUserService>(() => userService);
+
         }
 
         /// <summary>

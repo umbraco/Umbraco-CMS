@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
@@ -43,6 +44,31 @@ namespace Umbraco.Web.Cache
         {
             var serializer = new JavaScriptSerializer();
             var items = media.Select(x => FromMedia(x, operation)).ToArray();
+            var json = serializer.Serialize(items);
+            return json;
+        }
+
+        internal static string SerializeToJsonPayloadForMoving(OperationType operation, MoveEventInfo<IMedia>[] media)
+        {
+            var serializer = new JavaScriptSerializer();
+            var items = media.Select(x => new JsonPayload
+            {
+                Id = x.Entity.Id,
+                Operation = operation,
+                Path = x.OriginalPath
+            }).ToArray();
+            var json = serializer.Serialize(items);
+            return json;
+        }
+
+        internal static string SerializeToJsonPayloadForPermanentDeletion(params int[] mediaIds)
+        {
+            var serializer = new JavaScriptSerializer();
+            var items = mediaIds.Select(x => new JsonPayload
+            {
+                Id = x,
+                Operation = OperationType.Deleted
+            }).ToArray();
             var json = serializer.Serialize(items);
             return json;
         }
@@ -129,17 +155,26 @@ namespace Umbraco.Web.Cache
 
             payloads.ForEach(payload =>
                 {
-                    foreach (var idPart in payload.Path.Split(','))
+                    //if there's no path, then just use id (this will occur on permanent deletion like emptying recycle bin)
+                    if (payload.Path.IsNullOrWhiteSpace())
                     {
                         ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                            string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
-
-                        // Also clear calls that only query this specific item!
-                        if (idPart == payload.Id.ToString(CultureInfo.InvariantCulture))
-                            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                                string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
-
+                            string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
                     }
+                    else
+                    {
+                        foreach (var idPart in payload.Path.Split(','))
+                        {
+                            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
+                                string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
+
+                            // Also clear calls that only query this specific item!
+                            if (idPart == payload.Id.ToString(CultureInfo.InvariantCulture))
+                                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
+                                    string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
+
+                        }   
+                    }                    
                 });
 
             

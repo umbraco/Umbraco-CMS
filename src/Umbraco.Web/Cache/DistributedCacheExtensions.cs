@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic.web;
@@ -265,6 +266,17 @@ namespace Umbraco.Web.Cache
             dc.Remove(new Guid(DistributedCache.UnpublishedPageCacheRefresherId), x => x.Id, content);
         }
 
+        /// <summary>
+        /// invokes the unpublished page cache refresher to mark all ids for permanent removal
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="contentIds"></param>
+        public static void RemoveUnpublishedCachePermanently(this DistributedCache dc, params int[] contentIds)
+        {
+            dc.RefreshByJson(new Guid(DistributedCache.UnpublishedPageCacheRefresherId),
+                UnpublishedPageCacheRefresher.SerializeToJsonPayloadForPermanentDeletion(contentIds));
+        }
+
         #endregion
 
         #region Member cache
@@ -339,7 +351,7 @@ namespace Umbraco.Web.Cache
         #region Media Cache
         
         /// <summary>
-        /// Refreshes the cache amongst servers for a media item
+        /// Refreshes the cache amongst servers for media items
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="media"></param>
@@ -347,6 +359,18 @@ namespace Umbraco.Web.Cache
         {
             dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
                 MediaCacheRefresher.SerializeToJsonPayload(MediaCacheRefresher.OperationType.Saved, media));
+        }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a media item after it's been moved
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="media"></param>
+        public static void RefreshMediaCacheAfterMoving(this DistributedCache dc, params MoveEventInfo<IMedia>[] media)
+        {
+            dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId),
+                MediaCacheRefresher.SerializeToJsonPayloadForMoving(
+                    MediaCacheRefresher.OperationType.Saved, media));
         }
 
         /// <summary>
@@ -366,18 +390,27 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Removes the cache amongst servers for media items
+        /// Removes the cache among servers for media items when they are recycled
         /// </summary>
         /// <param name="dc"></param>
-        /// <param name="isPermanentlyDeleted"></param>
         /// <param name="media"></param>
-        public static void RemoveMediaCache(this DistributedCache dc, bool isPermanentlyDeleted, params IMedia[] media)
+        public static void RemoveMediaCacheAfterRecycling(this DistributedCache dc, params MoveEventInfo<IMedia>[] media)
         {
             dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId),
-                MediaCacheRefresher.SerializeToJsonPayload(
-                    isPermanentlyDeleted ? MediaCacheRefresher.OperationType.Deleted : MediaCacheRefresher.OperationType.Trashed,
-                    media));
-        } 
+                MediaCacheRefresher.SerializeToJsonPayloadForMoving(
+                    MediaCacheRefresher.OperationType.Trashed, media));
+        }
+
+        /// <summary>
+        /// Removes the cache among servers for media items when they are permanently deleted
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="mediaIds"></param>
+        public static void RemoveMediaCachePermanently(this DistributedCache dc, params int[] mediaIds)
+        {
+            dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId),
+                MediaCacheRefresher.SerializeToJsonPayloadForPermanentDeletion(mediaIds));
+        }
 
         #endregion
 
