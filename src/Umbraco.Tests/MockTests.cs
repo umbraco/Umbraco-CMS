@@ -96,7 +96,7 @@ namespace Umbraco.Tests
                     new Mock<IMemberGroupService>().Object,
                     new Mock<IMemberTypeService>().Object,
                     new Mock<IMemberService>().Object,
-                    new Mock<IUserService>().Object),
+                    new Mock<IUserService>().Object,
                     new Mock<ISectionService>().Object,
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object),
