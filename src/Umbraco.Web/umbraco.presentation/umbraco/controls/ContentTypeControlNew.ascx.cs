@@ -17,6 +17,7 @@ using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 using Umbraco.Web.UI.Controls;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
@@ -294,7 +295,7 @@ namespace umbraco.controls
                     global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
-                    _contentType.ContentTypeItem.Alias = txtAlias.Text;
+                    _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
                     _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
                     _contentType.ContentTypeItem.Description = description.Text;
                     _contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
@@ -834,7 +835,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             GenericProperty gpData = gp.GenricPropertyControl;
             if (string.IsNullOrEmpty(gpData.Name.Trim()) == false && string.IsNullOrEmpty(gpData.Alias.Trim()) == false)
             {
-                var propertyTypeAlias = gpData.Alias.ToSafeAlias();
+                // when creating a property don't do anything special, propertyType.Alias will take care of it
+                // don't enforce camel here because the user might have changed what the CoreStringsController returned
+                var propertyTypeAlias = gpData.Alias;
                 if (contentTypeItem.PropertyTypeExists(propertyTypeAlias) == false)
                 {
                     //Find the DataTypeDefinition that the PropertyType should be based on
@@ -891,7 +894,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 var propertyType = contentTypeItem.PropertyTypes.First(x => x.Alias == gpw.PropertyType.Alias);
                 if (propertyType == null) continue;
                 var dataTypeDefinition = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(gpw.GenricPropertyControl.Type);
-                propertyType.Alias = gpw.GenricPropertyControl.Alias.ToSafeAlias();
+                // when saving, respect user's casing, so do nothing here as propertyType takes care of it
+                propertyType.Alias = gpw.GenricPropertyControl.Alias;
                 propertyType.Name = gpw.GenricPropertyControl.Name;
                 propertyType.Description = gpw.GenricPropertyControl.Description;
                 propertyType.ValidationRegExp = gpw.GenricPropertyControl.Validation;

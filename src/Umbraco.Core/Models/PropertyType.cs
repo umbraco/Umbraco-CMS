@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -94,7 +95,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value;
+                    _alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
                     return _alias;
                 }, _alias, AliasSelector);
             }

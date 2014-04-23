@@ -5,6 +5,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Strings;
 using umbraco.DataLayer;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
@@ -52,7 +53,9 @@ namespace umbraco
                                   ? new ContentType(-1)
                                   : new ContentType(ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentId));
             contentType.CreatorId = _userID;
-            contentType.Alias = Alias.Replace("'", "''");
+            // when creating a content type, enforce PascalCase
+            // preserve separator because contentType.Alias will re-alias it
+            contentType.Alias = Alias.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase, ' ');
             contentType.Name = Alias.Replace("'", "''");
             contentType.Icon = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
                                    ? ".sprTreeFolder"

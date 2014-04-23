@@ -20,9 +20,11 @@ namespace Umbraco.Web.WebServices
         [HttpGet]
         public JsonResult ToSafeAlias(string value)
         {
+            // always return a proper camel-cased alias
+            // when checking... javascript does a case-unsensitive comparison
             return value == null 
                 ? Json(new {error = "no value."}, JsonRequestBehavior.AllowGet) 
-                : Json(new { alias = value.ToSafeAlias() }, JsonRequestBehavior.AllowGet);
+                : Json(new { alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.CamelCase) }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
