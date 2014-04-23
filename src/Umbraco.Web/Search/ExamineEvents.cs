@@ -311,9 +311,32 @@ namespace Umbraco.Web.Search
                     {
                         DeleteIndexForEntity(c4.Id, false);
                     }
-                    break;
-                case MessageType.RefreshAll:                
+                    break;                
                 case MessageType.RefreshByJson:
+
+                    var jsonPayloads = UnpublishedPageCacheRefresher.DeserializeFromJsonPayload((string)e.MessageObject);
+                    if (jsonPayloads.Any())
+                    {
+                        foreach (var payload in jsonPayloads)
+                        {
+                            switch (payload.Operation)
+                            {
+                                case UnpublishedPageCacheRefresher.OperationType.Deleted:                                   
+
+                                    //permanently remove from all indexes
+                                    
+                                    DeleteIndexForEntity(payload.Id, false);
+
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }                            
+                        }                        
+                    }
+
+                    break;
+
+                case MessageType.RefreshAll:                
                 default:
                     //We don't support these, these message types will not fire for unpublished content
                     break;

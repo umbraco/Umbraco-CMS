@@ -131,15 +131,15 @@ namespace Umbraco.Web.Cache
             MediaService.EmptiedRecycleBin += MediaServiceEmptiedRecycleBin;
 
             //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
-
-            ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
+            
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Copied += ContentServiceCopied;
             //TODO: The Move method of the content service fires Saved/Published events during its execution so we don't need to listen to moved
             //ContentService.Moved += ContentServiceMoved;
             ContentService.Trashed += ContentServiceTrashed;
-            
+            ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
+
             //public access events
             Access.AfterSave += Access_AfterSave;
         }
