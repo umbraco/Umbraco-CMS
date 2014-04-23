@@ -832,7 +832,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             GenericProperty gpData = gp.GenricPropertyControl;
             if (string.IsNullOrEmpty(gpData.Name.Trim()) == false && string.IsNullOrEmpty(gpData.Alias.Trim()) == false)
             {
-                var propertyTypeAlias = Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim());
+                var propertyTypeAlias = gpData.Alias.ToSafeAlias();
                 if (contentTypeItem.PropertyTypeExists(propertyTypeAlias) == false)
                 {
                     //Find the DataTypeDefinition that the PropertyType should be based on
@@ -889,7 +889,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 var propertyType = contentTypeItem.PropertyTypes.First(x => x.Alias == gpw.PropertyType.Alias);
                 if (propertyType == null) continue;
                 var dataTypeDefinition = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(gpw.GenricPropertyControl.Type);
-                propertyType.Alias = gpw.GenricPropertyControl.Alias;
+                propertyType.Alias = gpw.GenricPropertyControl.Alias.ToSafeAlias();
                 propertyType.Name = gpw.GenricPropertyControl.Name;
                 propertyType.Description = gpw.GenricPropertyControl.Description;
                 propertyType.ValidationRegExp = gpw.GenricPropertyControl.Validation;
