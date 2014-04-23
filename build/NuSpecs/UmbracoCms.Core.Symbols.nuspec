@@ -58,11 +58,10 @@
 		
         <file src="..\..\src\Umbraco.Web\obj\Debug\umbraco.dll" target="lib" />
         <file src="..\..\src\Umbraco.Web\obj\Debug\umbraco.pdb" target="lib" />
-		<file src="..\..\src\Umbraco.Web\obj\Release\umbraco.XmlSerializers.dll" target="lib" />
 		<file src="..\..\src\Umbraco.Web\**\*.cs" exclude="..\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web" />
 		
-        <file src="..\..\src\Umbraco.Web.UI\bin\Umbraco.Web.UI.dll" target="lib" />
-        <file src="..\..\src\Umbraco.Web.UI\bin\Umbraco.Web.UI.pdb" target="lib" />
+        <file src="..\..\src\bin\Debug\Umbraco.Web.UI.dll" target="lib" />
+        <file src="..\..\src\bin\Debug\Umbraco.Web.UI.pdb" target="lib" />
 		<file src="..\..\src\Umbraco.Web.UI\**\*.cs" exclude="..\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web.UI" />
 				
         <file src="..\..\src\UmbracoExamine\obj\Debug\UmbracoExamine.dll" target="lib" />
