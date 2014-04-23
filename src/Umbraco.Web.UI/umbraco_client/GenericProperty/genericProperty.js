@@ -13,13 +13,14 @@ function expandCollapse(theId) {
     }
 }
 function duplicatePropertyNameAsSafeAlias(nameId, aliasId) {
-    var input = $('#' + aliasId);
-
-    $('#' + nameId).keyup(function(event) {
-        var value = $(this).val();
-        getSafeAlias(aliasId, value, false, function (alias) {
-            input.val(alias);
+    var inputName = $('#' + nameId);
+    var inputAlias = $('#' + aliasId);
+    inputName.on('input', function (event) {
+        getSafeAlias(inputAlias, inputName.val(), false, function (alias) {
+            inputAlias.val(alias);
         });
+    }).on('blur', function (event) {
+        $(this).off('input');
     });
 }
 
