@@ -515,7 +515,7 @@ namespace umbraco.providers.members
                 //don't raise events for this! It just sets the member dates, if we do raise events this will
                 // cause all distributed cache to execute - which will clear out some caches we don't want.
                 // http://issues.umbraco.org/issue/U4-3451
-                m.Save();
+                m.Save(false);
             }
 
             return ConvertToMembershipUser(m);
@@ -555,7 +555,7 @@ namespace umbraco.providers.members
                     //don't raise events for this! It just sets the member dates, if we do raise events this will
                     // cause all distributed cache to execute - which will clear out some caches we don't want.
                     // http://issues.umbraco.org/issue/U4-3451
-                    m.Save();
+                    m.Save(false);
                 }
                 return ConvertToMembershipUser(m);    
             }
