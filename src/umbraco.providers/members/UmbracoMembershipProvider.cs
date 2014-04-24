@@ -512,6 +512,11 @@ namespace umbraco.providers.members
             if (userIsOnline && LastLoginPropertyTypeAlias.IsNullOrWhiteSpace() == false)
             {
                 UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+
+                //don't raise events for this! It just sets the member dates, if we do raise events this will
+                // cause all distributed cache to execute - which will clear out some caches we don't want.
+                // http://issues.umbraco.org/issue/U4-3451
+                m.Save(false);
             }
 
             return ConvertToMembershipUser(m);
@@ -534,6 +539,10 @@ namespace umbraco.providers.members
                 if (userIsOnline && LastLoginPropertyTypeAlias.IsNullOrWhiteSpace() == false)
                 {
                     UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+                    //don't raise events for this! It just sets the member dates, if we do raise events this will
+                    // cause all distributed cache to execute - which will clear out some caches we don't want.
+                    // http://issues.umbraco.org/issue/U4-3451
+                    m.Save(false);
                 }
                 return ConvertToMembershipUser(m);    
             }
@@ -544,6 +553,10 @@ namespace umbraco.providers.members
                 if (userIsOnline && LastLoginPropertyTypeAlias.IsNullOrWhiteSpace() == false)
                 {
                     UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+                    //don't raise events for this! It just sets the member dates, if we do raise events this will
+                    // cause all distributed cache to execute - which will clear out some caches we don't want.
+                    // http://issues.umbraco.org/issue/U4-3451
+                    m.Save(false);
                 }
                 return ConvertToMembershipUser(m);    
             }
@@ -744,7 +757,11 @@ namespace umbraco.providers.members
                 }
 
                 // persist data
-                m.Save();
+
+                //don't raise events for this! It just sets the member dates, if we do raise events this will
+                // cause all distributed cache to execute - which will clear out some caches we don't want.
+                // http://issues.umbraco.org/issue/U4-3451
+                m.Save(false);
 
                 return true;
             }
@@ -768,7 +785,11 @@ namespace umbraco.providers.members
                         UpdateMemberProperty(m, LastLockedOutPropertyTypeAlias, DateTime.Now);
                         LogHelper.Info<UmbracoMembershipProvider>("Member " + username + " is now locked out, max invalid password attempts exceeded");
                     }
-                    m.Save();
+
+                    //don't raise events for this! It just sets the member dates, if we do raise events this will
+                    // cause all distributed cache to execute - which will clear out some caches we don't want.
+                    // http://issues.umbraco.org/issue/U4-3451
+                    m.Save(false);
                 }
 
             }

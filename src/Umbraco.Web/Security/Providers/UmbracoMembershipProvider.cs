@@ -330,7 +330,10 @@ namespace Umbraco.Web.Security.Providers
             {
                 member.LastLoginDate = DateTime.Now;
                 member.UpdateDate = DateTime.Now;
-                MemberService.Save(member);
+                //don't raise events for this! It just sets the member dates, if we do raise events this will
+                // cause all distributed cache to execute - which will clear out some caches we don't want.
+                // http://issues.umbraco.org/issue/U4-3451
+                MemberService.Save(member, false);
             }
 
             return ConvertToMembershipUser(member);
@@ -356,7 +359,10 @@ namespace Umbraco.Web.Security.Providers
             {
                 member.LastLoginDate = DateTime.Now;
                 member.UpdateDate = DateTime.Now;
-                MemberService.Save(member);
+                //don't raise events for this! It just sets the member dates, if we do raise events this will
+                // cause all distributed cache to execute - which will clear out some caches we don't want.
+                // http://issues.umbraco.org/issue/U4-3451
+                MemberService.Save(member, false);
             }
 
             return ConvertToMembershipUser(member);
@@ -530,7 +536,11 @@ namespace Umbraco.Web.Security.Providers
                 member.LastLoginDate = DateTime.Now;
             }
 
-            MemberService.Save(member);
+            //don't raise events for this! It just sets the member dates, if we do raise events this will
+            // cause all distributed cache to execute - which will clear out some caches we don't want.
+            // http://issues.umbraco.org/issue/U4-3451
+            MemberService.Save(member, false);
+
             return authenticated;
         }
 

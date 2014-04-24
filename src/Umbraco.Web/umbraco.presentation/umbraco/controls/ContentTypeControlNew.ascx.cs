@@ -18,6 +18,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 using Umbraco.Web.UI.Controls;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
