@@ -114,7 +114,7 @@
 
         checkAlias('.prop-alias');
    
-        duplicatePropertyNameAsSafeAlias('ul.addNewProperty .prop-name', 'ul.addNewProperty .prop-alias');
+        duplicatePropertyNameAsSafeAlias('ul.addNewProperty');
    
         jQuery(".picker-icons").click(function(){
             var that = this;

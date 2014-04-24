@@ -12,31 +12,35 @@ function expandCollapse(theId) {
         document.getElementById("desc" + theId).style.display = 'block';
     }
 }
-function duplicatePropertyNameAsSafeAlias(nameId, aliasId) {
-    var input = $(aliasId);
-
-    $(nameId).keyup(function(event) {
-        var value = $(this).val();
-        getSafeAlias(aliasId, value, false, function (alias) {
-            input.val(alias);
+function duplicatePropertyNameAsSafeAlias(propertySelector) {
+    $(propertySelector).each(function() {
+        var prop = $(this);
+        var inputName = prop.find('.prop-name');
+        var inputAlias = prop.find('.prop-alias');
+        inputName.on('input', function (event) {
+            getSafeAlias(inputAlias, inputName.val(), false, function (alias) {
+                inputAlias.val(alias);
+            });
+        }).on('blur', function (event) {
+            $(this).off('input');
         });
     });
 }
 
-function checkAlias(aliasId) {
-    $(aliasId).keyup(function (event) {
+function checkAlias(aliasSelector) {
+    $(aliasSelector).keyup(function (event) {
         var input = $(this);
         var value = input.val();
-        validateSafeAlias(aliasId, value, false, function (isSafe) {
-            input.toggleClass('aliasValidationError', !isSafe);
+        validateSafeAlias(input, value, false, function (isSafe) {
+            input.toggleClass('highlight-error', !isSafe);
         });
     }).blur(function(event) {
         var input = $(this);
         var value = input.val();
-        getSafeAlias(aliasId, value, true, function (alias) {
+        getSafeAlias(input, value, true, function (alias) {
             if (value.toLowerCase() != alias.toLowerCase())
                 input.val(alias);
-            input.removeClass('aliasValidationError');
+            input.removeClass('highlight-error');
         });
     });
 }

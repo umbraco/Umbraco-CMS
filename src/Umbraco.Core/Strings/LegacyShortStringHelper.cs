@@ -74,11 +74,11 @@ function safeAlias(alias) {{
     return alias;
 }}
 
-function getSafeAlias(id, value, immediate, callback) {{
+function getSafeAlias(input, value, immediate, callback) {{
     callback(safeAlias(value));
 }}
 
-function validateSafeAlias(id, value, immediate, callback) {{
+function validateSafeAlias(input, value, immediate, callback) {{
     callback(value == safeAlias(value));
 }}
 
