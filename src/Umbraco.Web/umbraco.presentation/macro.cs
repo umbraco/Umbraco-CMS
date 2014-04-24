@@ -228,8 +228,17 @@ namespace umbraco
 
             if (CacheByPersonalization)
             {
-                int currentMember = Member.CurrentMemberId();
-                id.AppendFormat("m{0}-", currentMember);
+                object memberId = 0;
+                if (HttpContext.Current.User.Identity.IsAuthenticated)
+                {
+                    var provider = Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    var member = Umbraco.Core.Security.MembershipProviderExtensions.GetCurrentUser(provider);
+                    if (member != null)
+                    {
+                        memberId = member.ProviderUserKey ?? 0;
+                    }
+                }
+                id.AppendFormat("m{0}-", memberId);
             }
 
             foreach (var prop in model.Properties)

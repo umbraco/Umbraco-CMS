@@ -65,7 +65,9 @@ namespace Umbraco.Core.Security
         public static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)
         {
             var username = membershipProvider.GetCurrentUserName();
-            return membershipProvider.GetUser(username, true);
+            return username.IsNullOrWhiteSpace()
+                ? null
+                : membershipProvider.GetUser(username, true);
         }
 
         /// <summary>
@@ -78,7 +80,7 @@ namespace Umbraco.Core.Security
             if (HostingEnvironment.IsHosted)
             {
                 HttpContext current = HttpContext.Current;
-                if (current != null)
+                if (current != null && current.User != null && current.User.Identity != null)
                     return current.User.Identity.Name;
             }
             IPrincipal currentPrincipal = Thread.CurrentPrincipal;
