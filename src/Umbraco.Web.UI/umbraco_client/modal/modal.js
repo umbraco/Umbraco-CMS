@@ -118,6 +118,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// The callback will receive one parameter with 2 properties:
                 /// modalContent = the jQuery object for the popup window to query against
                 /// outVal = the value passed to the close window method that was used to close the window (if it was specified)
+                /// </param>
                 /// <returns>The generated jquery object bound to the modal window</returns>
 
 
@@ -355,7 +356,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
     $.fn.jqmAddClose = function(e) { return hs(this, e, 'jqmHide'); };
     $.fn.jqmAddTrigger = function(e) { return hs(this, e, 'jqmShow'); };
     $.fn.jqmShow = function(t) { return this.each(function() { $.jqm.open(this._jqm, t); }); };
-    $.fn.jqmHide = function(t) { return this.each(function() { $.jqm.close(this._jqm, t) }); };
+    $.fn.jqmHide = function(t) { return this.each(function() { $.jqm.close(this._jqm, t); }); };
 
     $.jqm = {
         hash: {},
