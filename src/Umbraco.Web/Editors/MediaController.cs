@@ -96,6 +96,8 @@ namespace Umbraco.Web.Editors
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
+                //HandleContentNotFound will throw an exception
+                return null;
             }
             return Mapper.Map<IMedia, MediaItemDisplay>(foundContent);
         }

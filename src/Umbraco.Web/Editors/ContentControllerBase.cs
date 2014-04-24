@@ -154,9 +154,11 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         protected TPersisted GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
         {
-            return Request.Properties.ContainsKey(typeof (TPersisted).ToString()) == false
-                       ? getFromService()
-                       : (TPersisted) Request.Properties[typeof (TPersisted).ToString()];
+            //checks if the request contains the key and the item is not null, if that is the case, return it from the request, otherwise return
+            // it from the callback
+            return Request.Properties.ContainsKey(typeof(TPersisted).ToString()) && Request.Properties[typeof(TPersisted).ToString()] != null
+                ? (TPersisted) Request.Properties[typeof (TPersisted).ToString()]
+                : getFromService();
         } 
 
         /// <summary>
