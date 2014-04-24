@@ -577,11 +577,11 @@ namespace umbraco.cms.businesslogic.member
                 Version = MemberItem.Version;
         }
 
-
         /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// Used to persist object changes to the database
         /// </summary>
-        public override void Save()
+        /// <param name="raiseEvents"></param>
+        public void Save(bool raiseEvents)
         {
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             //Due to backwards compatibility with this API we need to check for duplicate emails here if required.
@@ -595,17 +595,19 @@ namespace umbraco.cms.businesslogic.member
             }
 
             var e = new SaveEventArgs();
-            FireBeforeSave(e);
+            if (raiseEvents)
+            {
+                FireBeforeSave(e);    
+            }
 
             foreach (var property in GenericProperties)
             {
                 MemberItem.SetValue(property.PropertyType.Alias, property.Value);
             }
 
-            if (!e.Cancel)
+            if (e.Cancel == false)
             {
-                
-                ApplicationContext.Current.Services.MemberService.Save(MemberItem);
+                ApplicationContext.Current.Services.MemberService.Save(MemberItem, raiseEvents);
 
                 //base.VersionDate = MemberItem.UpdateDate;
 
@@ -621,88 +623,19 @@ namespace umbraco.cms.businesslogic.member
                     SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
                 }
 
-                FireAfterSave(e);
+                if (raiseEvents)
+                {
+                    FireAfterSave(e);    
+                }
             }
+        }
 
-            //var e = new SaveEventArgs();
-            //FireBeforeSave(e);
-
-            //if (!e.Cancel)
-            //{
-            //    var db = ApplicationContext.Current.DatabaseContext.Database;
-            //    using (var transaction = db.GetTransaction())
-            //    {
-            //        foreach (var property in GenericProperties)
-            //        {
-            //            var poco = new PropertyDataDto
-            //                           {
-            //                               Id = property.Id,
-            //                               PropertyTypeId = property.PropertyType.Id,
-            //                               NodeId = Id,
-            //                               VersionId = property.VersionId
-            //                           };
-            //            if (property.Value != null)
-            //            {
-            //                string dbType = property.PropertyType.DataTypeDefinition.DbType;
-            //                if (dbType.Equals("Integer"))
-            //                {
-            //                    if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
-            //                    {
-            //                        poco.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
-            //                              ? 0
-            //                              : Convert.ToInt32(property.Value);
-            //                    }
-            //                    else
-            //                    {
-            //                        int value = 0;
-            //                        if (int.TryParse(property.Value.ToString(), out value))
-            //                        {
-            //                            poco.Integer = value;
-            //                        }
-            //                    }
-            //                }
-            //                else if (dbType.Equals("Date"))
-            //                {
-            //                    DateTime date;
-
-            //                    if (DateTime.TryParse(property.Value.ToString(), out date))
-            //                        poco.Date = date;
-            //                }
-            //                else if (dbType.Equals("Nvarchar"))
-            //                {
-            //                    poco.VarChar = property.Value.ToString();
-            //                }
-            //                else
-            //                {
-            //                    poco.Text = property.Value.ToString();
-            //                }
-            //            }
-            //            bool isNew = db.IsNew(poco);
-            //            if (isNew)
-            //            {
-            //                db.Insert(poco);
-            //            }
-            //            else
-            //            {
-            //                db.Update(poco);
-            //            }
-            //        }
-            //        transaction.Complete();
-            //    }
-
-            //    // re-generate xml
-            //    var xd = new XmlDocument();
-            //    XmlGenerate(xd);
-
-            //    // generate preview for blame history?
-            //    if (UmbracoSettings.EnableGlobalPreviewStorage)
-            //    {
-            //        // Version as new guid to ensure different versions are generated as members are not versioned currently!
-            //        SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
-            //    }
-
-            //    FireAfterSave(e);
-            //}
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        public override void Save()
+        {
+            Save(true);
         }
 
         /// <summary>
