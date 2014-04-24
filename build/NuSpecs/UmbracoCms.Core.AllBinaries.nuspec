@@ -68,7 +68,6 @@
         <file src="..\_BuildOutput\bin\umbraco.MacroEngines.dll" target="lib\umbraco.MacroEngines.dll" />
         <file src="..\_BuildOutput\bin\umbraco.providers.dll" target="lib\umbraco.providers.dll" />
         <file src="..\_BuildOutput\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
-        <file src="..\_BuildOutput\bin\umbraco.XmlSerializers.dll" target="lib\umbraco.XmlSerializers.dll" />
         <file src="..\_BuildOutput\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
         <file src="..\_BuildOutput\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
     </files>
