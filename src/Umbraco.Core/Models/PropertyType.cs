@@ -389,7 +389,9 @@ namespace Umbraco.Core.Models
                 }
                 
             }
-
+            
+            //TODO: We must ensure that the property value can actually be saved based on the specified database type
+            
             //TODO Add PropertyEditor validation when its relevant to introduce
             /*if (value is IEditorModel && DataTypeControlId != Guid.Empty)
             {
