@@ -228,8 +228,8 @@ namespace umbraco
 
             if (CacheByPersonalization)
             {
-                var currentMember = Member.GetCurrentMember();
-                id.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
+                int currentMember = Member.CurrentMemberId();
+                id.AppendFormat("m{0}-", currentMember);
             }
 
             foreach (var prop in model.Properties)
@@ -537,7 +537,7 @@ namespace umbraco
             if (Model.CacheDuration > 0)
             {
                 // do not add to cache if there's no member and it should cache by personalization
-                if (!Model.CacheByMember || (Model.CacheByMember && Member.GetCurrentMember() != null))
+                if (!Model.CacheByMember || (Model.CacheByMember && Member.IsLoggedOn()))
                 {
                     if (macroControl != null)
                     {
