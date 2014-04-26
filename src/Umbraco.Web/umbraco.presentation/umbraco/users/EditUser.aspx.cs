@@ -452,6 +452,8 @@ namespace umbraco.cms.presentation.user
 
                     //perform the changing password logic
                     ChangePassword(passwordChangerControl, membershipUser, passwordChangerValidator);
+                    var tmpUser = BusinessLogic.User.GetUser(u.Id);
+                    u.Password = tmpUser.Password;
 
                     //update the membership provider
                     UpdateMembershipProvider(membershipUser);
