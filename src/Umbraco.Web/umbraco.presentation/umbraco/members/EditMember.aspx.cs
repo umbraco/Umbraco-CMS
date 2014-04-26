@@ -411,6 +411,8 @@ namespace umbraco.cms.presentation.members
                 var passwordChangerControl = (passwordChanger)MemberPasswordTxt.Controls[0];
                 var passwordChangerValidator = (CustomValidator)MemberPasswordTxt.Controls[1].Controls[0].Controls[0];
                 ChangePassword(passwordChangerControl, _membershipUser, passwordChangerValidator);
+                var tmpEntity = new Member(_memberEntity.Id);
+                _memberEntity.Password = tmpEntity.Password;
 
                 if (provider.IsUmbracoMembershipProvider())
                 {

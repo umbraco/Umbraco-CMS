@@ -45,6 +45,11 @@ namespace Umbraco.Web.UI.Install.Steps
                         PasswordValidator.ErrorMessage = "Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols";
                         return;
                     }
+                    else
+                    {
+                        var tmpUser = User.GetUser(0);
+                        user.Password = tmpUser.Password;
+                    }
                 }
                 catch (Exception ex)
                 {
