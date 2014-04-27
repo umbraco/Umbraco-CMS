@@ -149,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsPropertyType WHERE contentTypeId = @Id",
                                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id",
                                "DELETE FROM cmsMemberType WHERE NodeId = @Id",
-                               "DELETE FROM cmsContentType WHERE NodeId = @Id",
+                               "DELETE FROM cmsContentType WHERE nodeId = @Id",
                                "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
