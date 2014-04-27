@@ -529,10 +529,15 @@ namespace Umbraco.Core
         {
             return compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;
         }
-
+        
         public static bool InvariantContains(this IEnumerable<string> compare, string compareTo)
         {
             return compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        public static bool InvariantContains(this IEnumerable<string> compare, string compareTo, Boolean ignoreCase = true)
+        {
+            return compare.Contains(compareTo, ignoreCase ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture);
         }
 
         /// <summary>
