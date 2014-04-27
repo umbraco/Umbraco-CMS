@@ -92,5 +92,15 @@ namespace Umbraco.Tests.PropertyEditors
             var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, ratioMode: ImageCropRatioMode.Width);
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&height=150&widthratio=2", urlString);
         }
+
+        /// <summary>
+        /// Test that if Crop mode is specified as anything other than Crop the image doesn't use the crop
+        /// </summary>
+        [Test]
+        public void GetCropUrl_SpecifiedCropModeTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
+            Assert.AreEqual(mediaPath + "?mode=max&width=300&height=150", urlString);
+        }
     }
 }
