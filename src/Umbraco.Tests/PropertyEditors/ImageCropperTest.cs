@@ -102,5 +102,15 @@ namespace Umbraco.Tests.PropertyEditors
             var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
             Assert.AreEqual(mediaPath + "?mode=max&width=300&height=150", urlString);
         }
+
+        /// <summary>
+        /// Test for upload property type
+        /// </summary>
+        [Test]
+        public void GetCropUrl_UploadTypeTest()
+        {
+            var urlString = mediaPath.GetCropUrl(width: 100, height: 270, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
+            Assert.AreEqual(mediaPath + "?mode=crop&anchor=center&width=100&height=270", urlString);
+        }
     }
 }
