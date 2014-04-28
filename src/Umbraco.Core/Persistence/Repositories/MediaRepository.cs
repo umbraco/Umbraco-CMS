@@ -22,13 +22,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
+        private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
 		public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
             _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
-
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current);
             EnsureUniqueNaming = true;
         }
 
@@ -37,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _mediaTypeRepository = mediaTypeRepository;
             _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
-
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current);
             EnsureUniqueNaming = true;
         }
 
@@ -183,6 +184,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
 
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(contentExists, content, xml));
+        }
+
+        public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
+        {
+            var previewExists =
+                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                    new { Id = content.Id, Version = content.Version }) != 0;
+
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(previewExists, content, xml));
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)

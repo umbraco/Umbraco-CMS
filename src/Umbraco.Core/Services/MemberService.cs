@@ -5,6 +5,7 @@ using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -20,6 +21,7 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
+
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
@@ -742,6 +744,12 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(member);
                 //insert the xml
                 repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
+                // generate preview for blame history?
+                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                {
+                    repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
+                }
+
                 uow.Commit();
             }
 
@@ -847,6 +855,12 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(entity);
                 repository.AddOrUpdateContentXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
+                // generate preview for blame history?
+                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                {
+                    repository.AddOrUpdatePreviewXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
+                }
+
                 uow.Commit();
             }
 
@@ -872,6 +886,11 @@ namespace Umbraco.Core.Services
                     {
                         repository.AddOrUpdate(member);
                         repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
+                        // generate preview for blame history?
+                        if (UmbracoSettings.EnableGlobalPreviewStorage)
+                        {
+                            repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
+                        }
                     }
 
                     //commit the whole lot in one go

@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly CacheHelper _cacheHelper;
-        private readonly ContentPreviewRepository _contentPreviewRepository;
+        private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
 
         public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, CacheHelper cacheHelper)
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current);
             _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
 
             EnsureUniqueNaming = true;
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current);
             _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
 
             EnsureUniqueNaming = true;
@@ -586,7 +586,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
                                                     new { Id = content.Id, Version = content.Version }) != 0;
 
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity(previewExists, content, xml));
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IContent>(previewExists, content, xml));
         }
         
         #endregion
@@ -649,123 +649,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return currentName;
         }
-
-        #region Private classes
-
-        /// <summary>
-        /// Used content repository in order to add an entity to the persisted collection to be saved
-        /// in a single transaction during saving an entity
-        /// </summary>
-        private class ContentPreviewEntity : ContentXmlEntity<IContent>
-        {
-            public ContentPreviewEntity(bool previewExists, IContent content, Func<IContent, XElement> xml)
-                : base(previewExists, content, xml)
-            {
-                Version = content.Version;
-            }
-
-            public Guid Version { get; private set; }
-        }
-
-        /// <summary>
-        /// Private class to handle preview insert/update based on standard principles and units of work with transactions
-        /// </summary>
-        private class ContentPreviewRepository : PetaPocoRepositoryBase<int, ContentPreviewEntity>
-        {
-            public ContentPreviewRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-                : base(work, cache)
-            {
-            }
-
-            #region Not implemented (don't need to for the purposes of this repo)
-            protected override ContentPreviewEntity PerformGet(int id)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<ContentPreviewEntity> PerformGetAll(params int[] ids)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<ContentPreviewEntity> PerformGetByQuery(IQuery<ContentPreviewEntity> query)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override Sql GetBaseQuery(bool isCount)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<string> GetDeleteClauses()
-            {
-                return new List<string>();
-            }
-
-            protected override Guid NodeObjectTypeId
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            protected override void PersistDeletedItem(ContentPreviewEntity entity)
-            {
-                throw new NotImplementedException();
-            }
-            #endregion
-
-            protected override void PersistNewItem(ContentPreviewEntity entity)
-            {
-                if (entity.Content.HasIdentity == false)
-                {
-                    throw new InvalidOperationException("Cannot insert a preview for a content item that has no identity");
-                }
-                
-                var previewPoco = new PreviewXmlDto
-                {
-                    NodeId = entity.Id,
-                    Timestamp = DateTime.Now,
-                    VersionId = entity.Version,
-                    Xml = entity.Xml.ToString(SaveOptions.None)
-                };
-
-                Database.Insert(previewPoco);                
-            }
-
-            protected override void PersistUpdatedItem(ContentPreviewEntity entity)
-            {
-                if (entity.Content.HasIdentity == false)
-                {
-                    throw new InvalidOperationException("Cannot update a preview for a content item that has no identity");
-                }
-
-                 var previewPoco = new PreviewXmlDto
-                {
-                    NodeId = entity.Id,
-                    Timestamp = DateTime.Now,
-                    VersionId = entity.Version,
-                    Xml = entity.Xml.ToString(SaveOptions.None)
-                };
-
-                Database.Update<PreviewXmlDto>(
-                    "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                    new
-                    {
-                        Xml = previewPoco.Xml,
-                        Timestamp = previewPoco.Timestamp,
-                        Id = previewPoco.NodeId,
-                        Version = previewPoco.VersionId
-                    });
-            }
-        }
-
-        #endregion
-
 
     }
 }

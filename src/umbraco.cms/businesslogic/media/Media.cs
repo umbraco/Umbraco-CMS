@@ -282,17 +282,7 @@ namespace umbraco.cms.businesslogic.media
                 base.VersionDate = MediaItem.UpdateDate;
 
                 base.Save();
-
-                XmlDocument xd = new XmlDocument();
-                XmlGenerate(xd);
-
-                // generate preview for blame history?
-                if (UmbracoSettings.EnableGlobalPreviewStorage)
-                {
-                    // Version as new guid to ensure different versions are generated as media are not versioned currently!
-                    SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
-                }
-
+                
                 FireAfterSave(e);
             }
         }

@@ -1083,7 +1083,7 @@ namespace Umbraco.Core.Configuration
 					bool globalPreviewEnabled = false;
 					string value = GetKey("/settings/content/GlobalPreviewStorageEnabled");
 					if (bool.TryParse(value, out globalPreviewEnabled))
-						return !globalPreviewEnabled;
+						return globalPreviewEnabled;
 					// Return default
 					return false;
 				}

@@ -190,6 +190,7 @@
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="MacroErrorBehaviour.cs" />
     <Compile Include="Media\IImageUrlProvider.cs" />
+    <Compile Include="Models\ContentPreviewEntity.cs" />
     <Compile Include="Models\ContentTypeBase.cs" />
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeExtensions.cs" />
@@ -233,6 +234,7 @@
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
     <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
+    <Compile Include="Persistence\Repositories\ContentPreviewRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentXmlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMemberGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepository.cs" />

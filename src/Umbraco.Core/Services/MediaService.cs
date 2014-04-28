@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -158,6 +159,11 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(media);
 
                     repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    // generate preview for blame history?
+                    if (UmbracoSettings.EnableGlobalPreviewStorage)
+                    {
+                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    }
 
                     uow.Commit();
                 }
@@ -212,6 +218,12 @@ namespace Umbraco.Core.Services
                     media.CreatorId = userId;
                     repository.AddOrUpdate(media);
                     repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    // generate preview for blame history?
+                    if (UmbracoSettings.EnableGlobalPreviewStorage)
+                    {
+                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    }
+
                     uow.Commit();
                 }
             }
@@ -808,6 +820,11 @@ namespace Umbraco.Core.Services
                     media.CreatorId = userId;
                     repository.AddOrUpdate(media);
                     repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    // generate preview for blame history?
+                    if (UmbracoSettings.EnableGlobalPreviewStorage)
+                    {
+                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    }
 
                     uow.Commit();
                 }
@@ -845,6 +862,11 @@ namespace Umbraco.Core.Services
                         media.CreatorId = userId;
                         repository.AddOrUpdate(media);
                         repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                        // generate preview for blame history?
+                        if (UmbracoSettings.EnableGlobalPreviewStorage)
+                        {
+                            repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                        }
                     }
 
                     //commit the whole lot in one go
@@ -898,6 +920,11 @@ namespace Umbraco.Core.Services
 
                         repository.AddOrUpdate(media);
                         repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                        // generate preview for blame history?
+                        if (UmbracoSettings.EnableGlobalPreviewStorage)
+                        {
+                            repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                        }
                     }
 
                     uow.Commit();

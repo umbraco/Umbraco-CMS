@@ -62,5 +62,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="xml"></param>
         void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml);
 
+        /// <summary>
+        /// Used to add/update preview xml for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="xml"></param>
+        void AddOrUpdatePreviewXml(IMember content, Func<IMember, XElement> xml);
+
     }
 }
