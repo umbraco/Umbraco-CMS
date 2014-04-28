@@ -113,11 +113,12 @@ namespace Umbraco.Core
 		}
 
 
-		/// <summary>
-		/// Determines whether the specified type is enumerable.
-		/// </summary>
-		/// <param name="type">The type.</param>
-        internal static bool HasParameters(this MethodInfo method, params Type[] parameterTypes)
+	    /// <summary>
+	    /// Determines whether the specified type is enumerable.
+	    /// </summary>
+	    /// <param name="method">The type.</param>
+	    /// <param name="parameterTypes"></param>
+	    internal static bool HasParameters(this MethodInfo method, params Type[] parameterTypes)
         {
             var methodParameters = method.GetParameters().Select(parameter => parameter.ParameterType).ToArray();
 

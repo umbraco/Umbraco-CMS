@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -170,8 +171,42 @@ namespace Umbraco.Core.Persistence.Repositories
             var userFactory = new UserFactory(entity.UserType);
             var userDto = userFactory.BuildDto(entity);
 
-            Database.Update(userDto);
+            var dirtyEntity = (ICanBeDirty)entity;
 
+            //build list of columns to check for saving - we don't want to save the password if it hasn't changed!
+            //List the columns to save, NOTE: would be nice to not have hard coded strings here but no real good way around that
+            var colsToSave = new Dictionary<string, string>()
+            {
+                {"userDisabled", "IsApproved"},
+                {"userNoConsole", "IsLockedOut"},
+                {"userType", "UserType"},
+                {"startStructureID", "StartContentId"},
+                {"startMediaID", "StartMediaId"},
+                {"userName", "Name"},
+                {"userLogin", "Username"},                
+                {"userEmail", "Email"},                
+                {"userLanguage", "Language"},
+                {"defaultToLiveEditing", "DefaultToLiveEditing"}
+            };
+
+            //create list of properties that have changed
+            var changedCols = colsToSave
+                .Where(col => dirtyEntity.IsPropertyDirty(col.Value))
+                .Select(col => col.Key)
+                .ToList();
+
+            // DO NOT update the password if it has not changed or if it is null or empty
+            if (dirtyEntity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
+            {
+                changedCols.Add("userPassword");
+            }
+
+            //only update the changed cols
+            if (changedCols.Count > 0)
+            {
+                Database.Update(userDto, changedCols);
+            }
+            
             //update the sections if they've changed
             var user = (User)entity;
             if (user.IsPropertyDirty("AllowedSections"))
