@@ -215,7 +215,7 @@ namespace Umbraco.Web
             {
                 var imageResizerUrl = new StringBuilder();
 
-                if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson())
+                if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
                 {
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     if (cropDataSet != null)
