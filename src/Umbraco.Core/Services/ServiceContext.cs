@@ -121,13 +121,13 @@ namespace Umbraco.Core.Services
                 _userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory.Value));
 
             if (_memberService == null)
-                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value, _memberGroupService.Value));
+                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, DataTypeService));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, _dataTypeService.Value));
 
             if (_mediaService == null)
-                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value, DataTypeService));
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value, _dataTypeService.Value));
 
             if (_contentTypeService == null)
                 _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));

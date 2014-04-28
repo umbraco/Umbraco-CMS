@@ -28,7 +28,8 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IMemberGroupService _memberGroupService;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-
+        private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
+        private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         public MemberService(RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
@@ -49,6 +50,24 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
             _memberGroupService = memberGroupService;
             _uowProvider = provider;
+            _dataTypeService = new DataTypeService(provider, repositoryFactory);
+        }
+
+        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
+            : this(provider, new RepositoryFactory(), memberGroupService, dataTypeService)
+        {
+
+        }
+
+        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
+        {
+            if (provider == null) throw new ArgumentNullException("provider");
+            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
+            if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
+            _repositoryFactory = repositoryFactory;
+            _memberGroupService = memberGroupService;
+            _uowProvider = provider;
+            _dataTypeService = dataTypeService;
         }
 
         #region IMemberService Implementation
@@ -724,7 +743,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 //insert the xml
-                var xml = member.ToXml();
+                var xml = _entitySerializer.Serialize(_dataTypeService, member);
                 CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
@@ -831,7 +850,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(entity);
                 uow.Commit();
 
-                var xml = entity.ToXml();
+                var xml = _entitySerializer.Serialize(_dataTypeService, entity);
                 CreateAndSaveMemberXml(xml, entity.Id, uow.Database);
             }
 
@@ -841,9 +860,11 @@ namespace Umbraco.Core.Services
 
         public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
+            var asArray = entities.ToArray();
+
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entities), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(asArray), this))
                     return;
             }
             using (new WriteLock(Locker))
@@ -851,7 +872,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMemberRepository(uow))
                 {
-                    foreach (var member in entities)
+                    foreach (var member in asArray)
                     {
                         repository.AddOrUpdate(member);
                     }
@@ -859,14 +880,15 @@ namespace Umbraco.Core.Services
                     //commit the whole lot in one go
                     uow.Commit();
 
-                    foreach (var member in entities)
+                    foreach (var member in asArray)
                     {
-                        CreateAndSaveMemberXml(member.ToXml(), member.Id, uow.Database);
+                        var xml = _entitySerializer.Serialize(_dataTypeService, member);
+                        CreateAndSaveMemberXml(xml, member.Id, uow.Database);
                     }
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMember>(entities, false), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IMember>(asArray, false), this);
             }
         }
 
@@ -1072,7 +1094,7 @@ namespace Umbraco.Core.Services
                 var xmlItems = new List<ContentXmlDto>();
                 foreach (var c in list)
                 {
-                    var xml = c.ToXml();
+                    var xml = _entitySerializer.Serialize(_dataTypeService, c);
                     xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                 }
 
