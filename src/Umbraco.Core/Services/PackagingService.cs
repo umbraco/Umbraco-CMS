@@ -5,9 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Xml;
 using System.Xml.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -17,7 +15,6 @@ using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -69,79 +66,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
         public XElement Export(IContent content, bool deep = false)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var xml = Export(content, nodeName);
-            xml.Add(new XAttribute("nodeType", content.ContentType.Id));
-            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
-            xml.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
-            xml.Add(new XAttribute("writerID", content.WriterId));
-            xml.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString(CultureInfo.InvariantCulture)));
-            xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
-
-            if (deep)
-            {
-                var descendants = content.Descendants().ToArray();
-                var currentChildren = descendants.Where(x => x.ParentId == content.Id);
-                AddChildXml(descendants, currentChildren, xml);
-            }
-
-            return xml;
-        }
-
-        /// <summary>
-        /// Part of the export of IContent and IMedia and IMember which is shared
-        /// </summary>
-        /// <param name="contentBase">Base Content or Media to export</param>
-        /// <param name="nodeName">Name of the node</param>
-        /// <returns><see cref="XElement"/></returns>
-        private XElement Export(IContentBase contentBase, string nodeName)
-        {
-            //NOTE: that one will take care of umbracoUrlName
-            var url = contentBase.GetUrlSegment();
-
-            var xml = new XElement(nodeName,
-                                   new XAttribute("id", contentBase.Id),
-                                   new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
-                                   new XAttribute("level", contentBase.Level),
-                                   new XAttribute("creatorID", contentBase.CreatorId),
-                                   new XAttribute("sortOrder", contentBase.SortOrder),
-                                   new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
-                                   new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
-                                   new XAttribute("nodeName", contentBase.Name),
-                                   new XAttribute("urlName", url),
-                                   new XAttribute("path", contentBase.Path),
-                                   new XAttribute("isDoc", ""));
-
-            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
-            {
-                xml.Add(property.ToXml());
-            }
-
-            return xml;
-        }
-
-        /// <summary>
-        /// Used by Content Export to recursively add children
-        /// </summary>
-        /// <param name="originalDescendants"></param>
-        /// <param name="currentChildren"></param>
-        /// <param name="currentXml"></param>
-        private void AddChildXml(IContent[] originalDescendants, IEnumerable<IContent> currentChildren, XElement currentXml)
-        {
-            foreach (var child in currentChildren)
-            {
-                //add the child's xml
-                var childXml = Export(child);
-                currentXml.Add(childXml);
-                //copy local (out of closure)
-                var c = child;
-                //get this item's children                
-                var children = originalDescendants.Where(x => x.ParentId == c.Id);
-                //recurse and add it's children to the child xml element
-                AddChildXml(originalDescendants, children, childXml);
-            }
+            var exporter = new EntityXmlSerializer();
+            return exporter.Serialize(_contentService, _dataTypeService, content, deep);
         }
 
         /// <summary>
@@ -964,20 +890,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="member">Member to export</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
-        internal XElement Export(IMember member)
+        public XElement Export(IMember member)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var xml = Export(member, nodeName);
-            xml.Add(new XAttribute("nodeType", member.ContentType.Id));
-            xml.Add(new XAttribute("nodeTypeAlias", member.ContentType.Alias));
-
-            xml.Add(new XAttribute("loginName", member.Username));
-            xml.Add(new XAttribute("email", member.Email));
-            xml.Add(new XAttribute("key", member.Key));
-
-            return xml;
+            var exporter = new EntityXmlSerializer();
+            return exporter.Serialize(_dataTypeService, member);
         }
 
         #endregion
@@ -990,49 +906,10 @@ namespace Umbraco.Core.Services
         /// <param name="media">Media to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        internal XElement Export(IMedia media, bool deep = false)
+        public XElement Export(IMedia media, bool deep = false)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var xml = Export(media, nodeName);
-            xml.Add(new XAttribute("nodeType", media.ContentType.Id));
-            xml.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
-            xml.Add(new XAttribute("writerID", media.CreatorId));
-            xml.Add(new XAttribute("version", media.Version));
-            xml.Add(new XAttribute("template", 0));
-            xml.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
-
-            if (deep)
-            {
-                var descendants = media.Descendants().ToArray();
-                var currentChildren = descendants.Where(x => x.ParentId == media.Id);
-                AddChildXml(descendants, currentChildren, xml);
-            }
-
-            return xml;
-        }
-
-        /// <summary>
-        /// Used by Media Export to recursively add children
-        /// </summary>
-        /// <param name="originalDescendants"></param>
-        /// <param name="currentChildren"></param>
-        /// <param name="currentXml"></param>
-        private void AddChildXml(IMedia[] originalDescendants, IEnumerable<IMedia> currentChildren, XElement currentXml)
-        {
-            foreach (var child in currentChildren)
-            {
-                //add the child's xml
-                var childXml = Export(child);
-                currentXml.Add(childXml);
-                //copy local (out of closure)
-                var c = child;
-                //get this item's children                
-                var children = originalDescendants.Where(x => x.ParentId == c.Id);
-                //recurse and add it's children to the child xml element
-                AddChildXml(originalDescendants, children, childXml);
-            }
+            var exporter = new EntityXmlSerializer();
+            return exporter.Serialize(_mediaService, _dataTypeService, media, deep);
         }
 
         #endregion

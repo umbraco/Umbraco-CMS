@@ -85,7 +85,8 @@ namespace Umbraco.Tests.Models
 
             // Act
 
-            var xml = property.ToXml(dataTypeSvcMock.Object);
+            var entitySerializer = new EntityXmlSerializer();
+            var xml = entitySerializer.Serialize(dataTypeSvcMock.Object, property);
 
             // Assert
 

@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value, _memberGroupService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, DataTypeService));
 
             if (_mediaService == null)
                 _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value));

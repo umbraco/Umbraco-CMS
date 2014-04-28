@@ -29,6 +29,9 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly RepositoryFactory _repositoryFactory;
+        private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
+        private readonly IDataTypeService _dataTypeService;
+
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
@@ -57,6 +60,18 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
             _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
+            _dataTypeService = new DataTypeService(provider, repositoryFactory);
+        }
+
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService)
+        {
+            if (provider == null) throw new ArgumentNullException("provider");
+            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
+            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+            _uowProvider = provider;
+            _publishingStrategy = publishingStrategy;
+            _repositoryFactory = repositoryFactory;
+            _dataTypeService = dataTypeService;
         }
 
         /// <summary>
@@ -1302,13 +1317,14 @@ namespace Umbraco.Core.Services
             var shouldBePublished = new List<IContent>();
             var shouldBeSaved = new List<IContent>();
 
+            var asArray = items.ToArray();
             using (new WriteLock(Locker))
             {
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
                     int i = 0;
-                    foreach (var content in items)
+                    foreach (var content in asArray)
                     {
                         //If the current sort order equals that of the content
                         //we don't need to update it, so just increment the sort order
@@ -1332,30 +1348,25 @@ namespace Umbraco.Core.Services
                             shouldBeSaved.Add(content);
 
                         repository.AddOrUpdate(content);
+
+                        //Generate a new preview
+                        var local = content;
+                        repository.AddOrUpdatePreviewXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                    }
+                    
+                    foreach (var content in shouldBePublished)
+                    {                    
+                        //Create and Save ContentXml DTO
+                        var local = content;
+                        repository.AddOrUpdateContentXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
                     }
 
                     uow.Commit();
-
-                    foreach (var content in shouldBeSaved)
-                    {
-                        //Create and Save PreviewXml DTO
-                        var xml = content.ToXml();
-                        CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
-                    }
-
-                    foreach (var content in shouldBePublished)
-                    {
-                        //Create and Save PreviewXml DTO
-                        var xml = content.ToXml();
-                        CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
-                        //Create and Save ContentXml DTO
-                        CreateAndSaveContentXml(xml, content.Id, uow.Database);
-                    }
                 }
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IContent>(items, false), this);
+                Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false), this);
 
             if (shouldBePublished.Any())
                 _publishingStrategy.PublishingFinalized(shouldBePublished, false);
@@ -1468,7 +1479,8 @@ namespace Umbraco.Core.Services
 
                     using (var uow = _uowProvider.GetUnitOfWork())
                     {
-                        var xml = content.ToXml();
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, content);
+
                         var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
                         var exists =
                             uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
@@ -1526,7 +1538,7 @@ namespace Umbraco.Core.Services
                 var xmlItems = new List<ContentXmlDto>();
                 foreach (var c in list)
                 {
-                    var xml = c.ToXml();
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, c);
                     xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                 }
 
@@ -1650,7 +1662,7 @@ namespace Umbraco.Core.Services
 
                     foreach (var c in updated)
                     {
-                        var xml = c.ToXml();
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, c);
                         var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
                         var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
                                         null;
@@ -1763,17 +1775,17 @@ namespace Umbraco.Core.Services
 
                     repository.AddOrUpdate(content);
 
-                    uow.Commit();
-
-                    var xml = content.ToXml();
-                    //Preview Xml
-                    CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
-
+                    //Generate a new preview
+                    var local = content;
+                    repository.AddOrUpdatePreviewXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                    
                     if (published)
                     {
                         //Content Xml
-                        CreateAndSaveContentXml(xml, content.Id, uow.Database);
+                        repository.AddOrUpdateContentXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
                     }
+
+                    uow.Commit();
                 }
 
                 if (raiseEvents)
@@ -1830,11 +1842,12 @@ namespace Umbraco.Core.Services
                         content.ChangePublishedState(PublishedState.Saved);
 
                     repository.AddOrUpdate(content);
-                    uow.Commit();
 
-                    //Preview Xml
-                    var xml = content.ToXml();
-                    CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
+                    //Generate a new preview
+                    var local = content;
+                    repository.AddOrUpdatePreviewXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+
+                    uow.Commit();
                 }
 
                 if (raiseEvents)
@@ -1906,39 +1919,7 @@ namespace Umbraco.Core.Services
             }
 
             return PublishStatusType.Success;
-        }
-
-        private void CreateAndSavePreviewXml(XElement xml, int id, Guid version, UmbracoDatabase db)
-        {
-            var previewPoco = new PreviewXmlDto
-            {
-                NodeId = id,
-                Timestamp = DateTime.Now,
-                VersionId = version,
-                Xml = xml.ToString(SaveOptions.None)
-            };
-            var previewExists =
-                db.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                new { Id = id, Version = version }) != 0;
-            int previewResult = previewExists
-                                    ? db.Update<PreviewXmlDto>(
-                                        "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                                        new
-                                            {
-                                                Xml = previewPoco.Xml,
-                                                Timestamp = previewPoco.Timestamp,
-                                                Id = previewPoco.NodeId,
-                                                Version = previewPoco.VersionId
-                                            })
-                                    : Convert.ToInt32(db.Insert(previewPoco));
-        }
-
-        private void CreateAndSaveContentXml(XElement xml, int id, UmbracoDatabase db)
-        {
-            var contentPoco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
-            var contentExists = db.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = id }) != 0;
-            int contentResult = contentExists ? db.Update(contentPoco) : Convert.ToInt32(db.Insert(contentPoco));
-        }
+        }        
 
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
