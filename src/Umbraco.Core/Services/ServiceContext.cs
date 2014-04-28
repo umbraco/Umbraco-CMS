@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services
                 _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, DataTypeService));
 
             if (_mediaService == null)
-                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value));
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value, DataTypeService));
 
             if (_contentTypeService == null)
                 _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));

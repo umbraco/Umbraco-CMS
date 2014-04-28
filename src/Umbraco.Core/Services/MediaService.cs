@@ -26,6 +26,8 @@ namespace Umbraco.Core.Services
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
+        private readonly IDataTypeService _dataTypeService;
 
         public MediaService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
@@ -36,6 +38,14 @@ namespace Umbraco.Core.Services
         {
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
+            _dataTypeService = new DataTypeService(provider, repositoryFactory);
+        }
+
+        public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IDataTypeService dataTypeService)
+        {
+            _uowProvider = provider;
+            _repositoryFactory = repositoryFactory;
+            _dataTypeService = dataTypeService;
         }
 
         /// <summary>
@@ -148,7 +158,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(media);
                     uow.Commit();
 
-                    var xml = media.ToXml();
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
                     CreateAndSaveMediaXml(xml, media.Id, uow.Database);
                 }
             }
@@ -203,7 +213,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(media);
                     uow.Commit();
 
-                    var xml = media.ToXml();
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
                     CreateAndSaveMediaXml(xml, media.Id, uow.Database);
                 }
             }
@@ -801,7 +811,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(media);
                     uow.Commit();
 
-                    var xml = media.ToXml();
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
                     CreateAndSaveMediaXml(xml, media.Id, uow.Database);
                 }
             }
@@ -820,17 +830,20 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
         {
+            var asArray = medias.ToArray();
+
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(medias), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this))
                     return;
             }
+            
             using (new WriteLock(Locker))
             {
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMediaRepository(uow))
                 {
-                    foreach (var media in medias)
+                    foreach (var media in asArray)
                     {
                         media.CreatorId = userId;
                         repository.AddOrUpdate(media);
@@ -839,14 +852,15 @@ namespace Umbraco.Core.Services
                     //commit the whole lot in one go
                     uow.Commit();
 
-                    foreach (var media in medias)
+                    foreach (var media in asArray)
                     {
-                        CreateAndSaveMediaXml(media.ToXml(), media.Id, uow.Database);
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
+                        CreateAndSaveMediaXml(xml, media.Id, uow.Database);
                     }
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(medias, false), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
 
                 Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId, -1);
             }
@@ -862,9 +876,11 @@ namespace Umbraco.Core.Services
         /// <returns>True if sorting succeeded, otherwise False</returns>
         public bool Sort(IEnumerable<IMedia> items, int userId = 0, bool raiseEvents = true)
         {
+            var asArray = items.ToArray();
+
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(items), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this))
                     return false;
             }
 
@@ -876,7 +892,7 @@ namespace Umbraco.Core.Services
                 using (var repository = _repositoryFactory.CreateMediaRepository(uow))
                 {
                     int i = 0;
-                    foreach (var media in items)
+                    foreach (var media in asArray)
                     {
                         //If the current sort order equals that of the media
                         //we don't need to update it, so just increment the sort order
@@ -899,14 +915,14 @@ namespace Umbraco.Core.Services
                     foreach (var content in shouldBeCached)
                     {
                         //Create and Save ContentXml DTO
-                        var xml = content.ToXml();
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, content);
                         CreateAndSaveMediaXml(xml, content.Id, uow.Database);
                     }
                 }
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMedia>(items, false), this);
+                Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
 
             Audit.Add(AuditTypes.Sort, "Sorting Media performed by user", userId, 0);
 
@@ -950,7 +966,7 @@ namespace Umbraco.Core.Services
                 var xmlItems = new List<ContentXmlDto>();
                 foreach (var c in list)
                 {
-                    var xml = c.ToXml();
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, c);
                     xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                 }
 
