@@ -1198,6 +1198,10 @@ namespace Umbraco.Core.Services
 
             foreach (var macro in macros)
             {
+                var existing = _macroService.GetByAlias(macro.Alias);
+                if (existing != null)
+                    macro.Id = existing.Id;
+
                 _macroService.Save(macro, userId);
             }
 
