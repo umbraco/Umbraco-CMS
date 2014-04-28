@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
@@ -24,6 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
+        private readonly ContentXmlRepository<IMember> _contentXmlRepository;
 
         public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository)
             : base(work)
@@ -31,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             _memberTypeRepository = memberTypeRepository;
             _memberGroupRepository = memberGroupRepository;
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current);
         }
 
         public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository)
@@ -39,6 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             _memberTypeRepository = memberTypeRepository;
             _memberGroupRepository = memberGroupRepository;
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -592,6 +596,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 return Enumerable.Empty<IMember>();
             }
             return GetAll(resolveIds(pagedResult.Items)).ToArray();
+        }
+
+        public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
+        {
+            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(contentExists, content, xml));
         }
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)

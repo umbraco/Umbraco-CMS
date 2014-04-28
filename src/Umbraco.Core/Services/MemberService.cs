@@ -740,11 +740,9 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 repository.AddOrUpdate(member);
-                uow.Commit();
-
                 //insert the xml
-                var xml = _entitySerializer.Serialize(_dataTypeService, member);
-                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
+                repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
+                uow.Commit();
             }
 
             Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
@@ -848,10 +846,8 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 repository.AddOrUpdate(entity);
+                repository.AddOrUpdateContentXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
                 uow.Commit();
-
-                var xml = _entitySerializer.Serialize(_dataTypeService, entity);
-                CreateAndSaveMemberXml(xml, entity.Id, uow.Database);
             }
 
             if (raiseEvents)
@@ -875,16 +871,11 @@ namespace Umbraco.Core.Services
                     foreach (var member in asArray)
                     {
                         repository.AddOrUpdate(member);
+                        repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                     }
 
                     //commit the whole lot in one go
                     uow.Commit();
-
-                    foreach (var member in asArray)
-                    {
-                        var xml = _entitySerializer.Serialize(_dataTypeService, member);
-                        CreateAndSaveMemberXml(xml, member.Id, uow.Database);
-                    }
                 }
 
                 if (raiseEvents)
@@ -1143,14 +1134,7 @@ namespace Umbraco.Core.Services
                 }
             }
         }
-
-        private void CreateAndSaveMemberXml(XElement xml, int id, UmbracoDatabase db)
-        {
-            var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
-            var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
-            int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
-        }
-
+        
         #region Event Handlers
 
         /// <summary>
