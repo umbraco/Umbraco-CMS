@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -20,11 +21,13 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MediaRepository : VersionableRepositoryBase<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
+        private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
 
 		public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
 
             EnsureUniqueNaming = true;
         }
@@ -33,6 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
 
             EnsureUniqueNaming = true;
         }
@@ -172,6 +176,13 @@ namespace Umbraco.Core.Persistence.Repositories
             // http://issues.umbraco.org/issue/U4-1946
             ((Entity)media).ResetDirtyProperties(false);
             return media;
+        }
+
+        public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
+        {
+            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(contentExists, content, xml));
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)

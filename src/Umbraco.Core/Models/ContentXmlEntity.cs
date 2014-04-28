@@ -8,12 +8,13 @@ namespace Umbraco.Core.Models
     /// Used in content/media/member repositories in order to add this type of entity to the persisted collection to be saved
     /// in a single transaction during saving an entity
     /// </summary>
-    internal class ContentXmlEntity : IAggregateRoot
+    internal class ContentXmlEntity<TContent> : IAggregateRoot
+        where TContent : IContentBase
     {
         private readonly bool _entityExists;
-        private readonly Func<XElement> _xml;
+        private readonly Func<TContent, XElement> _xml;
 
-        public ContentXmlEntity(bool entityExists, IContentBase content, Func<XElement> xml)
+        public ContentXmlEntity(bool entityExists, TContent content, Func<TContent, XElement> xml)
         {            
             if (content == null) throw new ArgumentNullException("content");
             _entityExists = entityExists;
@@ -23,9 +24,9 @@ namespace Umbraco.Core.Models
 
         public XElement Xml
         {
-            get { return _xml(); }
+            get { return _xml(Content); }
         }
-        public IContentBase Content { get; private set; }
+        public TContent Content { get; private set; }
 
         public int Id
         {
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Models
 
         public object DeepClone()
         {
-            var clone = (ContentXmlEntity)MemberwiseClone();
+            var clone = (ContentXmlEntity<TContent>)MemberwiseClone();
             //Automatically deep clone ref properties that are IDeepCloneable
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
             return clone;

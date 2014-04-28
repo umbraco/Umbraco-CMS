@@ -156,10 +156,10 @@ namespace Umbraco.Core.Services
                 {
                     media.CreatorId = userId;
                     repository.AddOrUpdate(media);
-                    uow.Commit();
 
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
-                    CreateAndSaveMediaXml(xml, media.Id, uow.Database);
+                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+
+                    uow.Commit();
                 }
             }
 
@@ -211,10 +211,8 @@ namespace Umbraco.Core.Services
                 {
                     media.CreatorId = userId;
                     repository.AddOrUpdate(media);
+                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
                     uow.Commit();
-
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
-                    CreateAndSaveMediaXml(xml, media.Id, uow.Database);
                 }
             }
 
@@ -809,10 +807,9 @@ namespace Umbraco.Core.Services
                 {
                     media.CreatorId = userId;
                     repository.AddOrUpdate(media);
-                    uow.Commit();
+                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
 
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
-                    CreateAndSaveMediaXml(xml, media.Id, uow.Database);
+                    uow.Commit();
                 }
             }
 
@@ -847,16 +844,11 @@ namespace Umbraco.Core.Services
                     {
                         media.CreatorId = userId;
                         repository.AddOrUpdate(media);
+                        repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
                     }
 
                     //commit the whole lot in one go
                     uow.Commit();
-
-                    foreach (var media in asArray)
-                    {
-                        var xml = _entitySerializer.Serialize(this, _dataTypeService, media);
-                        CreateAndSaveMediaXml(xml, media.Id, uow.Database);
-                    }
                 }
 
                 if (raiseEvents)
@@ -884,8 +876,6 @@ namespace Umbraco.Core.Services
                     return false;
             }
 
-            var shouldBeCached = new List<IMedia>();
-
             using (new WriteLock(Locker))
             {
                 var uow = _uowProvider.GetUnitOfWork();
@@ -907,17 +897,10 @@ namespace Umbraco.Core.Services
                         i++;
 
                         repository.AddOrUpdate(media);
-                        shouldBeCached.Add(media);
+                        repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
                     }
 
                     uow.Commit();
-
-                    foreach (var content in shouldBeCached)
-                    {
-                        //Create and Save ContentXml DTO
-                        var xml = _entitySerializer.Serialize(this, _dataTypeService, content);
-                        CreateAndSaveMediaXml(xml, content.Id, uow.Database);
-                    }
                 }
             }
 
@@ -928,6 +911,8 @@ namespace Umbraco.Core.Services
 
             return true;
         }
+
+        //TODO: This needs to be put into the MediaRepository, all CUD logic!
 
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all media
@@ -1052,12 +1037,12 @@ namespace Umbraco.Core.Services
             return list;
         }
 
-        private void CreateAndSaveMediaXml(XElement xml, int id, UmbracoDatabase db)
-        {
-            var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
-            var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
-            int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
-        }
+        //private void CreateAndSaveMediaXml(XElement xml, int id, UmbracoDatabase db)
+        //{
+        //    var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+        //    var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
+        //    int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
+        //}
 
         private IMediaType FindMediaTypeByAlias(string mediaTypeAlias)
         {

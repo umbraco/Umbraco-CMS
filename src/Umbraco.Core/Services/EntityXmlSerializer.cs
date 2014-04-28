@@ -10,6 +10,8 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
+    //TODO: Move the rest of the logic for the PackageService.Export methods to here!
+
     /// <summary>
     /// A helper class to serialize entities to XML
     /// </summary>

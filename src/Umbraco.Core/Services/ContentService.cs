@@ -1350,15 +1350,13 @@ namespace Umbraco.Core.Services
                         repository.AddOrUpdate(content);
 
                         //Generate a new preview
-                        var local = content;
-                        repository.AddOrUpdatePreviewXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
                     }
                     
                     foreach (var content in shouldBePublished)
                     {                    
                         //Create and Save ContentXml DTO
-                        var local = content;
-                        repository.AddOrUpdateContentXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
                     }
 
                     uow.Commit();
@@ -1510,6 +1508,8 @@ namespace Umbraco.Core.Services
 
         //TODO: WE should make a base class for ContentService and MediaService to share! 
         // currently we have this logic duplicated (nearly the same) for media types and soon to be member types
+
+        //TODO: This needs to be put into the ContentRepository, all CUD logic!
 
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
@@ -1776,13 +1776,12 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    var local = content;
-                    repository.AddOrUpdatePreviewXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
                     
                     if (published)
                     {
                         //Content Xml
-                        repository.AddOrUpdateContentXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
                     }
 
                     uow.Commit();
@@ -1844,8 +1843,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    var local = content;
-                    repository.AddOrUpdatePreviewXml(content, () => _entitySerializer.Serialize(this, _dataTypeService, local));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
 
                     uow.Commit();
                 }

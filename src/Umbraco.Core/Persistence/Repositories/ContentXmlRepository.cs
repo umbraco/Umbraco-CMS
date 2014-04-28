@@ -12,7 +12,8 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Internal class to handle content/published xml insert/update based on standard principles and units of work with transactions
     /// </summary>
-    internal class ContentXmlRepository : PetaPocoRepositoryBase<int, ContentXmlEntity>
+    internal class ContentXmlRepository<TContent> : PetaPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
+        where TContent : IContentBase
     {
         public ContentXmlRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
@@ -20,17 +21,17 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #region Not implemented (don't need to for the purposes of this repo)
-        protected override ContentXmlEntity PerformGet(int id)
+        protected override ContentXmlEntity<TContent> PerformGet(int id)
         {
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<ContentXmlEntity> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ContentXmlEntity<TContent>> PerformGetAll(params int[] ids)
         {
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<ContentXmlEntity> PerformGetByQuery(IQuery<ContentXmlEntity> query)
+        protected override IEnumerable<ContentXmlEntity<TContent>> PerformGetByQuery(IQuery<ContentXmlEntity<TContent>> query)
         {
             throw new NotImplementedException();
         }
@@ -55,13 +56,13 @@ namespace Umbraco.Core.Persistence.Repositories
             get { throw new NotImplementedException(); }
         }
 
-        protected override void PersistDeletedItem(ContentXmlEntity entity)
+        protected override void PersistDeletedItem(ContentXmlEntity<TContent> entity)
         {
             throw new NotImplementedException();
         }
         #endregion
 
-        protected override void PersistNewItem(ContentXmlEntity entity)
+        protected override void PersistNewItem(ContentXmlEntity<TContent> entity)
         {
             if (entity.Content.HasIdentity == false)
             {
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(poco);
         }
 
-        protected override void PersistUpdatedItem(ContentXmlEntity entity)
+        protected override void PersistUpdatedItem(ContentXmlEntity<TContent> entity)
         {
             if (entity.Content.HasIdentity == false)
             {

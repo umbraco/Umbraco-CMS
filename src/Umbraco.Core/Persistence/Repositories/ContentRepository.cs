@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplateRepository _templateRepository;
         private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository _contentPreviewRepository;
-        private readonly ContentXmlRepository _contentXmlRepository;
+        private readonly ContentXmlRepository<IContent> _contentXmlRepository;
 
         public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, CacheHelper cacheHelper)
             : base(work)
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _cacheHelper = cacheHelper;
             _contentPreviewRepository = new ContentPreviewRepository(work, NullCacheProvider.Current);
-            _contentXmlRepository = new ContentXmlRepository(work, NullCacheProvider.Current);
+            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
 
             EnsureUniqueNaming = true;
         }
@@ -47,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _cacheHelper = cacheHelper;
             _contentPreviewRepository = new ContentPreviewRepository(work, NullCacheProvider.Current);
-            _contentXmlRepository = new ContentXmlRepository(work, NullCacheProvider.Current);
+            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
 
             EnsureUniqueNaming = true;
         }
@@ -566,18 +567,20 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Adds/updates content/published xml
         /// </summary>
         /// <param name="content"></param>
-        public void AddOrUpdateContentXml(IContent content, Func<XElement> xml)
+        /// <param name="xml"></param>
+        public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
         {
             var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
 
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity(contentExists, content, xml));
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(contentExists, content, xml));
         }
 
         /// <summary>
         /// Adds/updates preview xml
         /// </summary>
         /// <param name="content"></param>
-        public void AddOrUpdatePreviewXml(IContent content, Func<XElement> xml)
+        /// <param name="xml"></param>
+        public void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml)
         {
             var previewExists =
                     Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
@@ -585,7 +588,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity(previewExists, content, xml));
         }
-
+        
         #endregion
         
         /// <summary>
@@ -653,9 +656,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Used content repository in order to add an entity to the persisted collection to be saved
         /// in a single transaction during saving an entity
         /// </summary>
-        private class ContentPreviewEntity : ContentXmlEntity
+        private class ContentPreviewEntity : ContentXmlEntity<IContent>
         {
-            public ContentPreviewEntity(bool previewExists, IContentBase content, Func<XElement> xml)
+            public ContentPreviewEntity(bool previewExists, IContent content, Func<IContent, XElement> xml)
                 : base(previewExists, content, xml)
             {
                 Version = content.Version;
