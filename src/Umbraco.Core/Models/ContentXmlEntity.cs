@@ -22,6 +22,12 @@ namespace Umbraco.Core.Models
             Content = content;
         }
 
+        public ContentXmlEntity(TContent content)
+        {
+            if (content == null) throw new ArgumentNullException("content");
+            Content = content;
+        }
+
         public XElement Xml
         {
             get { return _xml(Content); }

@@ -55,12 +55,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { throw new NotImplementedException(); }
         }
+        
+        #endregion
 
         protected override void PersistDeletedItem(ContentXmlEntity<TContent> entity)
         {
-            throw new NotImplementedException();
+            //Remove 'published' xml from the cmsContentXml table for the unpublished content
+            Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = entity.Id });
         }
-        #endregion
 
         protected override void PersistNewItem(ContentXmlEntity<TContent> entity)
         {

@@ -576,6 +576,15 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
+        /// Used to remove the content xml for a content item
+        /// </summary>
+        /// <param name="content"></param>
+        public void DeleteContentXml(IContent content)
+        {
+            _contentXmlRepository.Delete(new ContentXmlEntity<IContent>(content));
+        }
+
+        /// <summary>
         /// Adds/updates preview xml
         /// </summary>
         /// <param name="content"></param>

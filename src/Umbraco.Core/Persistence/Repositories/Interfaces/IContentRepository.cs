@@ -47,6 +47,12 @@ namespace Umbraco.Core.Persistence.Repositories
         void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml);
 
         /// <summary>
+        /// Used to remove the content xml for a content item
+        /// </summary>
+        /// <param name="content"></param>
+        void DeleteContentXml(IContent content);
+
+        /// <summary>
         /// Used to add/update preview xml for the content item
         /// </summary>
         /// <param name="content"></param>

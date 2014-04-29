@@ -284,6 +284,13 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
             bool published = contentService.Publish(content, 0);
 
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
+
             // Act
             bool unpublished = contentService.UnPublish(content, 0);
 
@@ -291,6 +298,12 @@ namespace Umbraco.Tests.Services
             Assert.That(published, Is.True);
             Assert.That(unpublished, Is.True);
             Assert.That(content.Published, Is.False);
+
+            uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+            }
         }
 
         /// <summary>
