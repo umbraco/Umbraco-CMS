@@ -1191,10 +1191,11 @@ namespace Umbraco.Core
         /// <returns>Updated string</returns>
         public static string Replace(this string source, string oldString, string newString, StringComparison stringComparison)
         {
-            int index;
+            // Initialised to zero so it can be used as startIndex on first iteration.
+            int index = 0;
 
-            // Determine if there are any matches left in source.
-            while((index = source.IndexOf(oldString, stringComparison)) >= 0)
+            // Determine if there are any matches left in source, starting from last found match.
+            while((index = source.IndexOf(oldString, index, stringComparison)) >= 0)
             {
                 // Remove the old text.
                 source = source.Remove(index, oldString.Length);
