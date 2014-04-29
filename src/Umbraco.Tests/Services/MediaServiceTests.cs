@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -74,6 +78,25 @@ namespace Umbraco.Tests.Services
             Assert.That(media.Trashed, Is.False);
             Assert.That(mediaChild.ParentId, Is.EqualTo(mediaItems.Item4.Id));
             Assert.That(mediaChild.Trashed, Is.False);
+        }
+
+        [Test]
+        public void Ensure_Content_Xml_Created()
+        {
+            var mediaService = ServiceContext.MediaService;
+            var mediaType = MockedContentTypes.CreateVideoMediaType();
+            ServiceContext.ContentTypeService.Save(mediaType);
+            var media = mediaService.CreateMedia("Test", -1, "video");
+
+            mediaService.Save(media);
+
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IMediaRepository>(uow))
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
+            }
+
         }
 
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()

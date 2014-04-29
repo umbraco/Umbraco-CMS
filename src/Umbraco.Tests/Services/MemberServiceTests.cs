@@ -7,6 +7,8 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -975,6 +977,24 @@ namespace Umbraco.Tests.Services
             var found = ServiceContext.MemberService.GetById(customMember.Id);
 
             Assert.IsTrue(found.IsApproved);
+        }
+
+        [Test]
+        public void Ensure_Content_Xml_Created()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            ServiceContext.MemberService.Save(customMember);
+
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IMemberRepository>(uow))
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
+            }
+
         }
 
     }

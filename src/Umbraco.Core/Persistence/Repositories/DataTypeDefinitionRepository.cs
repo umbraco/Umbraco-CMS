@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
         }
 
-        private readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
@@ -165,42 +165,6 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Unit of Work Implementation
-
-        public override void PersistUpdatedItem(IEntity entity)
-        {
-            if (entity is PreValue)
-            {
-                _preValRepository.PersistUpdatedItem(entity);
-            }
-            else
-            {
-                base.PersistUpdatedItem(entity);    
-            }
-        }
-
-        public override void PersistNewItem(IEntity entity)
-        {
-            if (entity is PreValue)
-            {
-                _preValRepository.PersistNewItem(entity);
-            }
-            else
-            {
-                base.PersistNewItem(entity);
-            }
-        }
-
-        public override void PersistDeletedItem(IEntity entity)
-        {
-            if (entity is PreValue)
-            {
-                _preValRepository.PersistDeletedItem(entity);
-            }
-            else
-            {
-                base.PersistDeletedItem(entity);
-            }
-        }
 
         protected override void PersistNewItem(IDataTypeDefinition entity)
         {
@@ -326,7 +290,7 @@ AND umbracoNode.id <> @id",
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            using (var l = new UpgradeableReadLock(Locker))
+            using (var l = new UpgradeableReadLock(_locker))
             {
                 var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
                 if (cached != null && cached.Any())
@@ -343,7 +307,7 @@ AND umbracoNode.id <> @id",
 
         public string GetPreValueAsString(int preValueId)
         {
-            using (var l = new UpgradeableReadLock(Locker))
+            using (var l = new UpgradeableReadLock(_locker))
             {
                 //We need to see if we can find the cached PreValueCollection based on the cache key above
 
@@ -429,8 +393,9 @@ AND umbracoNode.id <> @id",
                     existing.SortOrder = sortOrder;
                     _preValRepository.AddOrUpdate(new PreValueEntity
                     {
-                        Alias = existing.Alias,
+                        //setting an id will update it
                         Id = existing.Id,
+                        Alias = existing.Alias,                        
                         SortOrder = existing.SortOrder,
                         Value = existing.Value,
                         DataType = dataType,
@@ -483,7 +448,7 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Private class to handle pre-value crud based on units of work with transactions
         /// </summary>
-        public class PreValueEntity : Entity, IAggregateRoot
+        private class PreValueEntity : Entity, IAggregateRoot
         {
             public string Value { get; set; }
             public string Alias { get; set; }

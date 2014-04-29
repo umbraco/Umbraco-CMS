@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -37,5 +38,26 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityId"></param>
         /// <returns></returns>
         IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
+
+        /// <summary>
+        /// Used to add/update published xml for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="xml"></param>
+        void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml);
+
+        /// <summary>
+        /// Used to remove the content xml for a content item
+        /// </summary>
+        /// <param name="content"></param>
+        void DeleteContentXml(IContent content);
+
+        /// <summary>
+        /// Used to add/update preview xml for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="xml"></param>
+        void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml);
+
     }
 }

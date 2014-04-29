@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -21,6 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagsRepository _tagRepository;
+        private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
+        private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
         public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository, ITagsRepository tagRepository)
             : base(work)
@@ -29,7 +32,8 @@ namespace Umbraco.Core.Persistence.Repositories
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current);
             EnsureUniqueNaming = true;
         }
 
@@ -40,7 +44,8 @@ namespace Umbraco.Core.Persistence.Repositories
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current);
             EnsureUniqueNaming = true;
         }
 
@@ -179,6 +184,22 @@ namespace Umbraco.Core.Persistence.Repositories
             // http://issues.umbraco.org/issue/U4-1946
             ((Entity)media).ResetDirtyProperties(false);
             return media;
+        }
+
+        public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
+        {
+            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(contentExists, content, xml));
+        }
+
+        public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
+        {
+            var previewExists =
+                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                    new { Id = content.Id, Version = content.Version }) != 0;
+
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(previewExists, content, xml));
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
