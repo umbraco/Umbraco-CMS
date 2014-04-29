@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using umbraco.interfaces;
 
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Services
         public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
@@ -59,7 +60,7 @@ namespace Umbraco.Core.Services
         public XElement Serialize(IMediaService mediaService, IDataTypeService dataTypeService, IMedia media, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
@@ -88,7 +89,7 @@ namespace Umbraco.Core.Services
         public XElement Serialize(IDataTypeService dataTypeService, IMember member)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, member, nodeName);
             xml.Add(new XAttribute("nodeType", member.ContentType.Id));
@@ -103,37 +104,27 @@ namespace Umbraco.Core.Services
 
         public XElement Serialize(IDataTypeService dataTypeService, Property property)
         {
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
+            var propertyType = property.PropertyType;
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
 
-            var xd = new XmlDocument();
-            var xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");
+            var xElement = new XElement(nodeName);
 
             //Add the property alias to the legacy schema
-            if (UmbracoSettings.UseLegacyXmlSchema)
+            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
             {
-                var alias = xd.CreateAttribute("alias");
-                alias.Value = property.Alias.ToSafeAlias();
-                xmlNode.Attributes.Append(alias);
+                var a = new XAttribute("alias", property.Alias.ToSafeAlias());
+                xElement.Add(a);
             }
 
-            //This seems to fail during testing 
-            //SD: With the new null checks below, this shouldn't fail anymore.
-            var dt = property.PropertyType.DataType(property.Id, dataTypeService);
-            if (dt != null && dt.Data != null)
+            //Get the property editor for thsi property and let it convert it to the xml structure
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+            if (propertyEditor != null)
             {
-                //We've already got the value for the property so we're going to give it to the 
-                // data type's data property so it doesn't go re-look up the value from the db again.
-                var defaultData = dt.Data as IDataValueSetter;
-                if (defaultData != null)
-                {
-                    defaultData.SetValue(property.Value, property.PropertyType.DataTypeDatabaseType.ToString());
-                }
-
-                xmlNode.AppendChild(dt.Data.ToXMl(xd));
+                var xmlValue = propertyEditor.ValueEditor.ConvertDbToXml(property, propertyType, dataTypeService);
+                xElement.Add(xmlValue);
             }
 
-            var element = xmlNode.GetXElement();
-            return element;
+            return xElement;
         }
 
         /// <summary>

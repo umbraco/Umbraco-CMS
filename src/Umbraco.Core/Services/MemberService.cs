@@ -747,7 +747,7 @@ namespace Umbraco.Core.Services
                 //insert the xml
                 repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                 // generate preview for blame history?
-                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                 {
                     repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                 }
@@ -860,7 +860,7 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(entity);
                 repository.AddOrUpdateContentXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
                 // generate preview for blame history?
-                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                 {
                     repository.AddOrUpdatePreviewXml(entity, m => _entitySerializer.Serialize(_dataTypeService, m));
                 }
@@ -891,7 +891,7 @@ namespace Umbraco.Core.Services
                         repository.AddOrUpdate(member);
                         repository.AddOrUpdateContentXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                         // generate preview for blame history?
-                        if (UmbracoSettings.EnableGlobalPreviewStorage)
+                        if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                         {
                             repository.AddOrUpdatePreviewXml(member, m => _entitySerializer.Serialize(_dataTypeService, m));
                         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -70,8 +71,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
         public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
             var exporter = new EntityXmlSerializer();
-            return exporter.Serialize(_contentService, _dataTypeService, content, deep);
+            var xml = exporter.Serialize(_contentService, _dataTypeService, content, deep);
 
             if (raiseEvents)
             {
@@ -1295,8 +1297,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
         public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
             var exporter = new EntityXmlSerializer();
-            return exporter.Serialize(_mediaService, _dataTypeService, media, deep);
+            var xml = exporter.Serialize(_mediaService, _dataTypeService, media, deep);
 
             if (raiseEvents)
             {
