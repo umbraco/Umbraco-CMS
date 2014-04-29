@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 
@@ -54,6 +55,28 @@ namespace Umbraco.Web
             //if (convert.Success) return convert.Result;
 
             return defaultValue;
+        }
+
+        #endregion
+
+        #region IPublishedContentProperty.GetValue<T>
+
+        // see notes in IPublishedProperty
+
+        public static T GetValue<T>(this IPublishedContentProperty property)
+        {
+            var property2 = property as IPublishedProperty;
+            if (property2 == null) // should never happen
+                throw new ArgumentException("Not an IPublishedProperty.", "property");
+            return property2.GetValue(false, default(T));
+        }
+
+        public static T GetValue<T>(this IPublishedContentProperty property, T defaultValue)
+        {
+            var property2 = property as IPublishedProperty;
+            if (property2 == null) // should never happen
+                throw new ArgumentException("Not an IPublishedProperty.", "property");
+            return property2.GetValue(true, defaultValue);
         }
 
         #endregion
