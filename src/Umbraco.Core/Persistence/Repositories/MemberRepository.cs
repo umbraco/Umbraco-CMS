@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
@@ -25,6 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagsRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
+        private readonly ContentXmlRepository<IMember> _contentXmlRepository;
+        private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
         public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagsRepository tagRepository)
             : base(work)
@@ -34,6 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, NullCacheProvider.Current);
         }
 
         public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagsRepository tagRepository)
@@ -44,6 +49,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, NullCacheProvider.Current);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -601,6 +608,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 return Enumerable.Empty<IMember>();
             }
             return GetAll(resolveIds(pagedResult.Items)).ToArray();
+        }
+
+        public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
+        {
+            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(contentExists, content, xml));
+        }
+
+        public void AddOrUpdatePreviewXml(IMember content, Func<IMember, XElement> xml)
+        {
+            var previewExists =
+                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                    new { Id = content.Id, Version = content.Version }) != 0;
+
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(previewExists, content, xml));
         }
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)

@@ -262,14 +262,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     };
 
     $scope.preview = function(content){
-            if(!content.id){
-                $scope.save().then(function(data){
-                      $window.open('dialogs/preview.aspx?id='+data.id,'umbpreview');  
-                });
-            }
-            else {
-                $window.open('dialogs/preview.aspx?id='+content.id,'umbpreview');
-            }    
+        $scope.save().then(function (data) {
+            $window.open('dialogs/preview.aspx?id=' + data.id, 'umbpreview');
+        });
     };
     
     /** this method is called for all action buttons and then we proxy based on the btn definition */
