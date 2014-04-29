@@ -1191,17 +1191,15 @@ namespace Umbraco.Core
         /// <returns>Updated string</returns>
         public static string Replace(this string source, string oldString, string newString, StringComparison stringComparison)
         {
-            var index = source.IndexOf(oldString, stringComparison);
+            int index;
 
-            // Determine if we found a match
-            var matchFound = index >= 0;
-
-            if (matchFound)
+            // Determine if there are any matches left in source.
+            while((index = source.IndexOf(oldString, stringComparison)) >= 0)
             {
-                // Remove the old text
+                // Remove the old text.
                 source = source.Remove(index, oldString.Length);
 
-                // Add the replacemenet text
+                // Add the replacemenet text.
                 source = source.Insert(index, newString);
             }
 
