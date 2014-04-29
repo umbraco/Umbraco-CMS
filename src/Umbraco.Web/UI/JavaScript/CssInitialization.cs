@@ -14,7 +14,6 @@ namespace Umbraco.Web.UI.JavaScript
     internal class CssInitialization : AssetInitialization
     {
         private readonly ManifestParser _parser;
-
         public CssInitialization(ManifestParser parser)
         {
             _parser = parser;
@@ -57,7 +56,7 @@ namespace Umbraco.Web.UI.JavaScript
         {
             var sb = new StringBuilder();
             foreach (var file in files)
-                sb.AppendFormat("{0}yepnope.injectCss('{1}');", Environment.NewLine, file);
+                sb.AppendFormat("{0}LazyLoad.css('{1}');", Environment.NewLine, file);
 
             return sb.ToString();
         }

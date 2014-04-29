@@ -61,7 +61,6 @@ namespace Umbraco.Web.UI.JavaScript
             }
                 
                 return ParseMain(
-                    noCache,
                     result.ToString(),
                     IOHelper.ResolveUrl(SystemDirectories.Umbraco));
         }
