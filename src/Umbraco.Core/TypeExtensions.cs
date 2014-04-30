@@ -112,11 +112,11 @@ namespace Umbraco.Core
 			return type.GetCustomAttributes(typeof (T), inherited).OfType<T>();		
 		}
 
-
-		/// <summary>
-		/// Determines whether the specified type is enumerable.
-		/// </summary>
-		/// <param name="type">The type.</param>
+        /// <summary>
+        /// Determines whether the specified type is enumerable.
+        /// </summary>
+        /// <param name="method">The type.</param>
+        /// <param name="parameterTypes"></param>
         internal static bool HasParameters(this MethodInfo method, params Type[] parameterTypes)
         {
             var methodParameters = method.GetParameters().Select(parameter => parameter.ParameterType).ToArray();

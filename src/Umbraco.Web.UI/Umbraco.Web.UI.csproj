@@ -646,7 +646,9 @@
       <DependentUpon>UI.xml</DependentUpon>
     </None>
     <Content Include="Global.asax" />
-    <Content Include="Umbraco\Config\Lang\en_us.xml" />
+    <Content Include="Umbraco\Config\Lang\en_us.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\he.xml" />
     <Content Include="Umbraco\Config\Lang\ja.xml" />
     <Content Include="Umbraco\Config\Lang\pl.xml" />
@@ -1800,10 +1802,18 @@
     <Content Include="Umbraco\Actions\publish.aspx" />
     <Content Include="Umbraco\Channels\rsd.aspx" />
     <Content Include="Umbraco\Channels\wlwmanifest.aspx" />
-    <Content Include="Umbraco\Config\Lang\da.xml" />
-    <Content Include="Umbraco\Config\Lang\de.xml" />
-    <Content Include="Umbraco\Config\Lang\es.xml" />
-    <Content Include="Umbraco\Config\Lang\fr.xml" />
+    <Content Include="Umbraco\Config\Lang\da.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Umbraco\Config\Lang\de.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Umbraco\Config\Lang\es.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Umbraco\Config\Lang\fr.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\it.xml" />
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\no.xml" />
