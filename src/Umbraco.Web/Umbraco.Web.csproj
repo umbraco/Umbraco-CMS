@@ -309,6 +309,7 @@
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\DetachedContent.cs" />
+    <Compile Include="Models\DetachedPublishedContent.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
     <Compile Include="Models\ImageCropCoordinates.cs" />
     <Compile Include="Models\ImageCropDataSet.cs" />
@@ -2101,10 +2102,6 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup />
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

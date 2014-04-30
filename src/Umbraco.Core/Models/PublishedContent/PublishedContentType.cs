@@ -34,7 +34,7 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+        public PublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
         {
             Id = id;
             Alias = alias;
