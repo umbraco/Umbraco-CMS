@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -232,14 +231,6 @@ namespace Umbraco.Tests.PublishedContent
         public object Value { get; set; }
         public bool HasValue { get; set; }
         public object XPathValue { get; set; }
-
-        // see notes in IPublishedProperty
-        [Obsolete("Use PropertyTypeAlias.", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Alias { get { return PropertyTypeAlias; } }
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Guid Version { get { return Guid.Empty; } }
     }
 
     [PublishedContentModel("ContentType2")]

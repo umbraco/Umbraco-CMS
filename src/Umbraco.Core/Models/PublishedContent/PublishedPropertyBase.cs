@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -28,13 +27,5 @@ namespace Umbraco.Core.Models.PublishedContent
         public abstract object DataValue { get; }
         public abstract object Value { get; }
         public abstract object XPathValue { get; }
-
-        // see notes in IPublishedProperty
-        [Obsolete("Use PropertyTypeAlias.", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Alias { get { return PropertyTypeAlias; } }
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Guid Version { get { return Guid.Empty; } }
     }
 }

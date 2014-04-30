@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using Umbraco.Core.Models;
 using System.Web;
 
@@ -44,13 +43,5 @@ namespace Umbraco.Core.Dynamics
             var value = Value;
 			return value == null ? string.Empty : value.ToString();
         }
-
-        // see notes in IPublishedProperty
-        [Obsolete("Use PropertyTypeAlias.", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Alias { get { return PropertyTypeAlias; } }
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Guid Version { get { return Guid.Empty; } }
     }
 }

@@ -1,12 +1,9 @@
-using System;
-using System.ComponentModel;
-
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a property of an <c>IPublishedContent</c>.
     /// </summary>
-	public interface IPublishedProperty : IPublishedContentProperty
+	public interface IPublishedProperty
 	{
         /// <summary>
         /// Gets the alias of the property.
@@ -48,7 +45,7 @@ namespace Umbraco.Core.Models
         /// <para>It can be null, or any type of CLR object.</para>
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        new object Value { get; }
+        object Value { get; }
 
         /// <summary>
         /// Gets the XPath value of the property.
@@ -59,15 +56,5 @@ namespace Umbraco.Core.Models
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
         object XPathValue { get; }
-	}
-
-    // had to re-introduce that one for backward-compatibility reasons
-    [Obsolete("Use IPublishedProperty.", false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IPublishedContentProperty
-	{
-		string Alias { get; }
-		object Value { get; }
-		Guid Version { get; }
 	}
 }
