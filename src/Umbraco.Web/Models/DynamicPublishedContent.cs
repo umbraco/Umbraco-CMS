@@ -435,7 +435,7 @@ namespace Umbraco.Web.Models
             return PublishedContent.GetIndex();
         }
 
-        ICollection<IPublishedProperty> IPublishedContent.Properties
+        ICollection<IPublishedContentProperty> IPublishedContent.Properties
         {
             get { return PublishedContent.Properties; }
         }
@@ -445,7 +445,7 @@ namespace Umbraco.Web.Models
             get { return PublishedContent.Children; }
         }
 
-        IPublishedProperty IPublishedContent.GetProperty(string alias)
+        IPublishedContentProperty IPublishedContent.GetProperty(string alias)
         {
             return PublishedContent.GetProperty(alias);
         }
@@ -545,7 +545,7 @@ namespace Umbraco.Web.Models
         //    get { return PublishedContent.Published; }
         //}
 
-		public IEnumerable<IPublishedProperty> Properties
+		public IEnumerable<IPublishedContentProperty> Properties
 		{
 			get { return PublishedContent.Properties; }
 		}
@@ -562,14 +562,14 @@ namespace Umbraco.Web.Models
         // enhanced versions of the extension methods that exist for IPublishedContent,
         // here we support the recursive (_) and reflected (@) syntax
 
-        public IPublishedProperty GetProperty(string alias)
+        public IPublishedContentProperty GetProperty(string alias)
         {
             return alias.StartsWith("_")
                 ? GetProperty(alias.Substring(1), true)
                 : GetProperty(alias, false);
         }
 
-        public IPublishedProperty GetProperty(string alias, bool recurse)
+        public IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             if (alias.StartsWith("@")) return GetReflectedProperty(alias.Substring(1));
 

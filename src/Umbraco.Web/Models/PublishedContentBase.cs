@@ -123,7 +123,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// Gets the properties of the content.
         /// </summary>
-        public abstract ICollection<IPublishedProperty> Properties { get; }
+        public abstract ICollection<IPublishedContentProperty> Properties { get; }
 
         /// <summary>
         /// Gets the value of a property identified by its alias.
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Models
         /// <para>The returned property may have no value (ie <c>HasValue</c> is <c>false</c>).</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public abstract IPublishedProperty GetProperty(string alias);
+        public abstract IPublishedContentProperty GetProperty(string alias);
 
         /// <summary>
         /// Gets a property identified by its alias.
@@ -172,7 +172,7 @@ namespace Umbraco.Web.Models
         /// return the first property that was found with the alias but had no value (ie <c>HasValue</c> is <c>false</c>).</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public virtual IPublishedProperty GetProperty(string alias, bool recurse)
+        public virtual IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             var property = GetProperty(alias);
             if (recurse == false) return property;

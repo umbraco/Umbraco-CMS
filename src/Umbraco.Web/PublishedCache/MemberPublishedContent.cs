@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache
 
         private readonly IMember _member;
         private readonly MembershipUser _membershipUser;
-        private readonly IPublishedProperty[] _properties;
+        private readonly IPublishedContentProperty[] _properties;
         private readonly PublishedContentType _publishedMemberType;
 
         public MemberPublishedContent(IMember member, MembershipUser membershipUser)
@@ -106,12 +106,12 @@ namespace Umbraco.Web.PublishedCache
             get { return Enumerable.Empty<IPublishedContent>(); }
         }
 
-        public override ICollection<IPublishedProperty> Properties
+        public override ICollection<IPublishedContentProperty> Properties
         {
             get { return _properties; }
         }
 
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
+        public override IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             if (recurse)
             {
@@ -120,7 +120,7 @@ namespace Umbraco.Web.PublishedCache
             return GetProperty(alias);
         }
 
-        public override IPublishedProperty GetProperty(string alias)
+        public override IPublishedContentProperty GetProperty(string alias)
         {
             return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
         }

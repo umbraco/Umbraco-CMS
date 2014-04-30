@@ -185,14 +185,14 @@ namespace Umbraco.Tests.PublishedContent
 
         #region Properties
 
-        public ICollection<IPublishedProperty> Properties { get; set; }
+        public ICollection<IPublishedContentProperty> Properties { get; set; }
 
-        public IPublishedProperty GetProperty(string alias)
+        public IPublishedContentProperty GetProperty(string alias)
         {
             return Properties.FirstOrDefault(p => p.PropertyTypeAlias.InvariantEquals(alias));
         }
 
-        public IPublishedProperty GetProperty(string alias, bool recurse)
+        public IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             var property = GetProperty(alias);
             if (recurse == false) return property;
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    class SolidPublishedProperty : IPublishedProperty
+    class SolidPublishedProperty : IPublishedContentProperty
     {
         public SolidPublishedProperty()
         {

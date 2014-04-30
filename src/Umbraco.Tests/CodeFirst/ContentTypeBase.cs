@@ -93,7 +93,7 @@ namespace Umbraco.Tests.CodeFirst
 
         //Using this attribute to hide Properties from Intellisense (when compiled?)
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public ICollection<IPublishedProperty> Properties
+        public ICollection<IPublishedContentProperty> Properties
         {
             get { return _content.Properties; }
         }
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.CodeFirst
 
         //Using this attribute to hide Properties from Intellisense (when compiled?)
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public IPublishedProperty GetProperty(string alias)
+        public IPublishedContentProperty GetProperty(string alias)
         {
             return _content.GetProperty(alias);
         }

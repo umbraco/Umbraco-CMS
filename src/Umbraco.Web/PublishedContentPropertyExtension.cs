@@ -11,17 +11,17 @@ namespace Umbraco.Web
     {
         #region GetValue<T>
 
-        public static T GetValue<T>(this IPublishedProperty property)
+        public static T GetValue<T>(this IPublishedContentProperty property)
         {
             return property.GetValue(false, default(T));
         }
 
-        public static T GetValue<T>(this IPublishedProperty property, T defaultValue)
+        public static T GetValue<T>(this IPublishedContentProperty property, T defaultValue)
         {
             return property.GetValue(true, defaultValue);
         }
 
-        internal static T GetValue<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue)
+        internal static T GetValue<T>(this IPublishedContentProperty property, bool withDefaultValue, T defaultValue)
         {
             if (property.HasValue == false && withDefaultValue) return defaultValue;
 

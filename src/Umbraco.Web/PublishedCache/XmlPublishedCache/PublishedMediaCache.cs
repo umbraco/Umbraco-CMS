@@ -317,7 +317,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		/// <param name="dd"> </param>
 		/// <param name="alias"></param>
 		/// <returns></returns>
-		private IPublishedProperty GetProperty(DictionaryPublishedContent dd, string alias)
+		private IPublishedContentProperty GetProperty(DictionaryPublishedContent dd, string alias)
 		{
 			if (dd.LoadedFromExamine)
 			{
@@ -485,7 +485,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryPublishedContent, IPublishedContent> getParent,
 				Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> getChildren,
-				Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
+				Func<DictionaryPublishedContent, string, IPublishedContentProperty> getProperty,
 				bool fromExamine)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
@@ -524,12 +524,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					}, "parentID");
 
 			    _contentType = PublishedContentType.Get(PublishedItemType.Media, _documentTypeAlias);
-				_properties = new Collection<IPublishedProperty>();
+				_properties = new Collection<IPublishedContentProperty>();
 
 				//loop through remaining values that haven't been applied
 				foreach (var i in valueDictionary.Where(x => !_keysAdded.Contains(x.Key)))
 				{
-				    IPublishedProperty property;
+				    IPublishedContentProperty property;
 
                     // must ignore that one
 				    if (i.Key == "version" || i.Key == "isDoc") continue;
@@ -595,7 +595,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
 			private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
-			private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
+			private readonly Func<DictionaryPublishedContent, string, IPublishedContentProperty> _getProperty;
 
 			/// <summary>
 			/// Returns 'Media' as the item type
@@ -700,7 +700,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 get { return false; }
             }
 
-			public override ICollection<IPublishedProperty> Properties
+			public override ICollection<IPublishedContentProperty> Properties
 			{
 				get { return _properties; }
 			}
@@ -710,7 +710,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				get { return _getChildren(this); }
 			}
 
-			public override IPublishedProperty GetProperty(string alias)
+			public override IPublishedContentProperty GetProperty(string alias)
 			{
 				return _getProperty(this, alias);
 			}
@@ -723,11 +723,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // override to implement cache
             //   cache at context level, ie once for the whole request
             //   but cache is not shared by requests because we wouldn't know how to clear it
-            public override IPublishedProperty GetProperty(string alias, bool recurse)
+            public override IPublishedContentProperty GetProperty(string alias, bool recurse)
             {
                 if (recurse == false) return GetProperty(alias);
 
-                IPublishedProperty property;
+                IPublishedContentProperty property;
                 string key = null;
                 var cache = UmbracoContextCache.Current;
                 
@@ -737,7 +737,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     object o;
                     if (cache.TryGetValue(key, out o))
                     {
-                        property = o as IPublishedProperty;
+                        property = o as IPublishedContentProperty;
                         if (property == null)
                             throw new InvalidOperationException("Corrupted cache.");
                         return property;
@@ -770,7 +770,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			private DateTime _updateDate;
 			private Guid _version;
 			private int _level;
-			private readonly ICollection<IPublishedProperty> _properties;
+			private readonly ICollection<IPublishedContentProperty> _properties;
 		    private readonly PublishedContentType _contentType;
 
 			private void ValidateAndSetProperty(IDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)

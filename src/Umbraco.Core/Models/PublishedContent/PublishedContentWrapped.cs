@@ -183,7 +183,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Properties
 
-        public virtual ICollection<IPublishedProperty> Properties
+        public virtual ICollection<IPublishedContentProperty> Properties
         {
             get { return Content.Properties; }
         }
@@ -193,12 +193,12 @@ namespace Umbraco.Core.Models.PublishedContent
             get { return Content[alias]; }
         }
 
-        public virtual IPublishedProperty GetProperty(string alias)
+        public virtual IPublishedContentProperty GetProperty(string alias)
         {
             return Content.GetProperty(alias);
         }
 
-        public virtual IPublishedProperty GetProperty(string alias, bool recurse)
+        public virtual IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             return Content.GetProperty(alias, recurse);
         }

@@ -226,7 +226,7 @@ namespace Umbraco.Tests.PublishedContent
                     Url = "/content-1",
                     ParentId = -1,
                     ChildIds = new int[] {},
-                    Properties = new Collection<IPublishedProperty>
+                    Properties = new Collection<IPublishedContentProperty>
                         {
                             new SolidPublishedProperty
                                 {
@@ -249,7 +249,7 @@ namespace Umbraco.Tests.PublishedContent
                     Url = "/content-2",
                     ParentId = -1,
                     ChildIds = new int[] { },
-                    Properties = new Collection<IPublishedProperty>
+                    Properties = new Collection<IPublishedContentProperty>
                             {
                                 new SolidPublishedProperty
                                     {
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.PublishedContent
                 Url = "/content-2sub",
                 ParentId = -1,
                 ChildIds = new int[] { },
-                Properties = new Collection<IPublishedProperty>
+                Properties = new Collection<IPublishedContentProperty>
                             {
                                 new SolidPublishedProperty
                                     {

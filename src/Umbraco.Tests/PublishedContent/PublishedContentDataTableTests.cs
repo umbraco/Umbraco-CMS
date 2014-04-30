@@ -145,8 +145,8 @@ namespace Umbraco.Tests.PublishedContent
 					WriterName = "Shannon",
 					Parent = null,
 					Level = 1,
-					Properties = new Collection<IPublishedProperty>(
-						new List<IPublishedProperty>()
+					Properties = new Collection<IPublishedContentProperty>(
+						new List<IPublishedContentProperty>()
 							{
 								new PropertyResult("property1", "value" + indexVals, Guid.NewGuid(), PropertyResultType.UserProperty),
 								new PropertyResult("property2", "value" + (indexVals + 1), Guid.NewGuid(), PropertyResultType.UserProperty)
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.PublishedContent
             public bool IsDraft { get; set; }
             public int GetIndex() { throw new NotImplementedException();}
             
-            public ICollection<IPublishedProperty> Properties { get; set; }
+            public ICollection<IPublishedContentProperty> Properties { get; set; }
 
 	        public object this[string propertyAlias]
 	        {
@@ -220,12 +220,12 @@ namespace Umbraco.Tests.PublishedContent
 
 	        public IEnumerable<IPublishedContent> Children { get; set; }
 
-	        public IPublishedProperty GetProperty(string alias)
+	        public IPublishedContentProperty GetProperty(string alias)
 	        {
 	            return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 	        }
 
-	        public IPublishedProperty GetProperty(string alias, bool recurse)
+	        public IPublishedContentProperty GetProperty(string alias, bool recurse)
 	        {
 	            var property = GetProperty(alias);
 	            if (recurse == false) return property;

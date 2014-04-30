@@ -96,7 +96,7 @@ namespace Umbraco.Tests.PublishedContent
             pc.Setup(content => content.Version).Returns(Guid.NewGuid);
             pc.Setup(content => content.Parent).Returns(() => null);
             pc.Setup(content => content.Version).Returns(Guid.NewGuid);
-            pc.Setup(content => content.Properties).Returns(new Collection<IPublishedProperty>());
+            pc.Setup(content => content.Properties).Returns(new Collection<IPublishedContentProperty>());
             return pc;
         }
 

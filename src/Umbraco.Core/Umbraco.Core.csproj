@@ -201,6 +201,7 @@
     <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\IMemberGroup.cs" />
+    <Compile Include="Models\IPublishedContentProperty.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\MemberGroup.cs" />
@@ -737,7 +738,6 @@
     <Compile Include="Dynamics\Signature.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Models\IPublishedContent.cs" />
-    <Compile Include="Models\IPublishedProperty.cs" />
     <Compile Include="ActionsResolver.cs" />
     <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />

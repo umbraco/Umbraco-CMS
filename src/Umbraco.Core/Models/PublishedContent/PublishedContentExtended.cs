@@ -66,10 +66,10 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region IPublishedContentExtended
 
-        void IPublishedContentExtended.AddProperty(IPublishedProperty property)
+        void IPublishedContentExtended.AddProperty(IPublishedContentProperty property)
         {
             if (_properties == null)
-                _properties = new Collection<IPublishedProperty>();
+                _properties = new Collection<IPublishedContentProperty>();
             _properties.Add(property);
         }
 
@@ -113,9 +113,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Properties
 
-        private ICollection<IPublishedProperty> _properties;
+        private ICollection<IPublishedContentProperty> _properties;
 
-        public override ICollection<IPublishedProperty> Properties
+        public override ICollection<IPublishedContentProperty> Properties
         {
             get
             {
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
         }
 
-        public override IPublishedProperty GetProperty(string alias)
+        public override IPublishedContentProperty GetProperty(string alias)
         {
             return _properties == null
                 ? Content.GetProperty(alias)

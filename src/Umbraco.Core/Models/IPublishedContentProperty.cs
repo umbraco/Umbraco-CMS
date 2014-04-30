@@ -3,7 +3,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a property of an <c>IPublishedContent</c>.
     /// </summary>
-	public interface IPublishedProperty
+	public interface IPublishedContentProperty
 	{
         /// <summary>
         /// Gets the alias of the property.
