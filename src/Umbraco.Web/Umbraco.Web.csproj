@@ -309,7 +309,6 @@
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\DetachedContent.cs" />
-    <Compile Include="Models\DetachedPublishedContent.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
     <Compile Include="Models\ImageCropCoordinates.cs" />
     <Compile Include="Models\ImageCropDataSet.cs" />
