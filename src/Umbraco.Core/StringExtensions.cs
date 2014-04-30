@@ -1123,17 +1123,18 @@ namespace Umbraco.Core
         /// <returns>Updated string</returns>
         public static string Replace(this string source, string oldString, string newString, StringComparison stringComparison)
         {
-            var index = source.IndexOf(oldString, stringComparison);
+            // This initialisation ensures the first check starts at index zero of the source. On successive checks for
+            // a match, the source is skipped to immediately after the last replaced occurrence for efficiency
+            // and to avoid infinite loops when oldString and newString compare equal. 
+            int index = -1 * newString.Length;
 
-            // Determine if we found a match
-            var matchFound = index >= 0;
-
-            if (matchFound)
+            // Determine if there are any matches left in source, starting from just after the result of replacing the last match.
+            while((index = source.IndexOf(oldString, index + newString.Length, stringComparison)) >= 0)
             {
-                // Remove the old text
+                // Remove the old text.
                 source = source.Remove(index, oldString.Length);
 
-                // Add the replacemenet text
+                // Add the replacemenet text.
                 source = source.Insert(index, newString);
             }
 
