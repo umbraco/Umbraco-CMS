@@ -13,13 +13,13 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public class MigrationRunner
     {
-        private readonly Version _configuredVersion;
+        private readonly Version _currentVersion;
         private readonly Version _targetVersion;
         private readonly string _productName;
 
-        public MigrationRunner(Version configuredVersion, Version targetVersion, string productName)
+        public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
         {
-            _configuredVersion = configuredVersion;
+            _currentVersion = currentVersion;
             _targetVersion = targetVersion;
             _productName = productName;
         }
@@ -46,20 +46,20 @@ namespace Umbraco.Core.Persistence.Migrations
         {
             LogHelper.Info<MigrationRunner>("Initializing database migrations");
 
-	        var foundMigrations = MigrationResolver.Current.Migrations.ToArray();
+            var foundMigrations = MigrationResolver.Current.Migrations.ToArray();
 
             //filter all non-schema migrations
             var migrations = isUpgrade
                                  ? OrderedUpgradeMigrations(foundMigrations).ToList()
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
-            
+
             //SD: Why do we want this?
-            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _configuredVersion, _targetVersion, true), this))
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, true), this))
                 return false;
 
             //Loop through migrations to generate sql
             var migrationContext = InitializeMigrations(migrations, database, databaseProvider, isUpgrade);
-            
+
             try
             {
                 ExecuteMigrations(migrationContext, database);
@@ -81,13 +81,13 @@ namespace Umbraco.Core.Persistence.Migrations
                 throw;
             }
 
-            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _configuredVersion, _targetVersion, false), this);
+            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _currentVersion, _targetVersion, false), this);
 
             return true;
         }
 
-	    private void ExecuteMigrations(IMigrationContext context, Database database)
-	    {
+        private void ExecuteMigrations(IMigrationContext context, Database database)
+        {
             //Transactional execution of the sql that was generated from the found migrations
             using (var transaction = database.GetTransaction())
             {
@@ -108,13 +108,13 @@ namespace Umbraco.Core.Persistence.Migrations
 
                 transaction.Complete();
             }
-	    }
+        }
 
         internal MigrationContext InitializeMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
-	    {
+        {
             //Loop through migrations to generate sql
             var context = new MigrationContext(databaseProvider, database);
-            
+
             foreach (var migration in migrations)
             {
                 var baseMigration = migration as MigrationBase;
@@ -148,35 +148,49 @@ namespace Umbraco.Core.Persistence.Migrations
             }
 
             return context;
-	    }
+        }
 
+        /// <summary>
+        /// Filters and orders migrations based on the migrations listed and the currently configured version and the target installation version
+        /// </summary>
+        /// <param name="foundMigrations"></param>
+        /// <returns></returns>
         internal IEnumerable<IMigration> OrderedUpgradeMigrations(IEnumerable<IMigration> foundMigrations)
         {
             var migrations = (from migration in foundMigrations
-                let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)                   
-                from migrationAttribute in migrationAttributes
-                where migrationAttribute != null
-                where
-                    migrationAttribute.TargetVersion > _configuredVersion &&
-                    migrationAttribute.TargetVersion <= _targetVersion &&
-                    migrationAttribute.ProductName == _productName
-                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending
-                select migration).Distinct();
+                              let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
+                              from migrationAttribute in migrationAttributes
+                              where migrationAttribute != null
+                              where
+                                  migrationAttribute.TargetVersion > _currentVersion &&
+                                  migrationAttribute.TargetVersion <= _targetVersion &&
+                                  migrationAttribute.ProductName == _productName &&
+                                  //filter if the migration specifies a minimum current version for which to execute
+                                  (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationAttribute.MinimumCurrentVersion)
+                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending
+                              select migration).Distinct();
             return migrations;
         }
 
+        /// <summary>
+        /// Filters and orders migrations based on the migrations listed and the currently configured version and the target installation version
+        /// </summary>
+        /// <param name="foundMigrations"></param>
+        /// <returns></returns>
         public IEnumerable<IMigration> OrderedDowngradeMigrations(IEnumerable<IMigration> foundMigrations)
         {
             var migrations = (from migration in foundMigrations
-                let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
-                from migrationAttribute in migrationAttributes
-                where migrationAttribute != null
-                where
-                    migrationAttribute.TargetVersion > _configuredVersion &&
-                    migrationAttribute.TargetVersion <= _targetVersion &&
-                    migrationAttribute.ProductName == _productName
-                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
-                select migration).Distinct();
+                              let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
+                              from migrationAttribute in migrationAttributes
+                              where migrationAttribute != null
+                              where
+                                  migrationAttribute.TargetVersion > _currentVersion &&
+                                  migrationAttribute.TargetVersion <= _targetVersion &&
+                                  migrationAttribute.ProductName == _productName &&
+                                  //filter if the migration specifies a minimum current version for which to execute
+                                  (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationAttribute.MinimumCurrentVersion)
+                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
+                              select migration).Distinct();
             return migrations;
         }
 

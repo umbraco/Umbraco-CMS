@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Migrations
         {
             var runner = new MigrationRunner(new Version(4, 0, 0), new Version(6, 0, 0), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> {new MultiMigration()});
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration() });
 
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Migrations
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }
-        
+
         [Migration("6.0.0", 1, "Test")]
         [Migration("5.0.0", 1, "Test")]
         private class MultiMigration : MigrationBase
