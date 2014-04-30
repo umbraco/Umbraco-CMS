@@ -92,7 +92,7 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// Flag mask for role.
         /// </summary>
-        RoleMask = UrlSegment | Alias | FileName | ConvertCase,
+        RoleMask = UrlSegment | Alias | UnderscoreAlias | FileName | ConvertCase,
 
         /// <summary>
         ///  Url role.
@@ -112,6 +112,12 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// ConvertCase role.
         /// </summary>
-        ConvertCase = 0x080000
+        ConvertCase = 0x080000,
+
+        /// <summary>
+        /// UnderscoreAlias role.
+        /// </summary>
+        /// <remarks>This is Alias + leading underscore.</remarks>
+        UnderscoreAlias = 0x100000
     }
 }
