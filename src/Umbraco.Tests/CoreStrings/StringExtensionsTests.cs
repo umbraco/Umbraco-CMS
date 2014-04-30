@@ -80,6 +80,18 @@ namespace Umbraco.Tests.CoreStrings
             Assert.AreEqual(shouldBe, trimmed);
         }
 
+        [TestCase("Hello this is my string", "hello", "replaced", "replaced this is my string", StringComparison.CurrentCultureIgnoreCase)]
+        [TestCase("Hello this is hello my string", "hello", "replaced", "replaced this is replaced my string", StringComparison.CurrentCultureIgnoreCase)]
+        [TestCase("Hello this is my string", "nonexistent", "replaced", "Hello this is my string", StringComparison.CurrentCultureIgnoreCase)]
+        [TestCase("Hellohello this is my string", "hello", "replaced", "replacedreplaced this is my string", StringComparison.CurrentCultureIgnoreCase)]
+        // Ensure replacing with the same string doesn't cause infinite loop.
+        [TestCase("Hello this is my string", "hello", "hello", "hello this is my string", StringComparison.CurrentCultureIgnoreCase)]
+        public void ReplaceWithStringComparison(string input, string oldString, string newString, string shouldBe, StringComparison stringComparison)
+        {
+            var replaced = input.Replace(oldString, newString, stringComparison);
+            Assert.AreEqual(shouldBe, replaced);
+        }
+
         [TestCase(null, null)]
         [TestCase("", "")]
         [TestCase("x", "X")]
