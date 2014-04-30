@@ -34,7 +34,7 @@ namespace Umbraco.Core.Models
         {
             base.Path = path;
             ParentId = -1;
-            //_name = name.Replace("/", ".").Replace("\\", ""); // why? that's just the name!
+            _name = name; //.Replace("/", ".").Replace("\\", ""); // why? that's just the name!
             _alias = alias.ToSafeAlias();
         }
 
