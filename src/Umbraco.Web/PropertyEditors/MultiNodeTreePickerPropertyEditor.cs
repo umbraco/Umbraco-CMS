@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("filter", "Filter out items with type", "textstring", Description = "Seperate with comma")]
             public string Filter { get; set; }
 
-            [PreValueField("minNumber", "Minumum number of items", "number")]
+            [PreValueField("minNumber", "Minimum number of items", "number")]
             public string MinNumber { get; set; }
 
             [PreValueField("maxNumber", "Maximum number of items", "number")]
