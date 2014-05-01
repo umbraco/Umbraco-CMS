@@ -118,8 +118,7 @@ namespace Umbraco.Core
             {
                 foreach (TItem item in items)
                 {
-                    if(item != null)
-                        action(item);
+                    action(item);
                 }
             }
 
