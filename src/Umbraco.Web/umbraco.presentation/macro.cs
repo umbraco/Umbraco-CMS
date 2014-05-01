@@ -815,9 +815,9 @@ namespace umbraco
         {
             foreach (MacroPropertyModel mp in Model.Properties)
             {
-                if (attributes.ContainsKey(mp.Key.ToLower()))
+                if (attributes.ContainsKey(mp.Key.ToLowerInvariant()))
                 {
-                    mp.Value = attributes[mp.Key.ToLower()].ToString();
+                    mp.Value = attributes[mp.Key.ToLowerInvariant()].ToString();
                 }
                 else
                 {

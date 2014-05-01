@@ -77,7 +77,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		private DateTime _createDate;
 		private DateTime _updateDate;
 		private Guid _version;
-	    private IPublishedProperty[] _properties;
+	    private IPublishedContentProperty[] _properties;
 		private int _sortOrder;
 		private int _level;
 	    private bool _isDraft;
@@ -96,7 +96,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			}
 		}
 
-		public override IPublishedProperty GetProperty(string alias)
+		public override IPublishedContentProperty GetProperty(string alias)
 		{
 			return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 		}
@@ -104,7 +104,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // override to implement cache
         //   cache at context level, ie once for the whole request
         //   but cache is not shared by requests because we wouldn't know how to clear it
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
+        public override IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             if (recurse == false) return GetProperty(alias);
 
@@ -118,7 +118,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (value == null) 
                 return null;
 
-            var property = value as IPublishedProperty;
+            var property = value as IPublishedContentProperty;
             if (property == null)
                 throw new InvalidOperationException("Corrupted cache.");
 
@@ -310,7 +310,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        }
 	    }
 
-		public override ICollection<IPublishedProperty> Properties
+		public override ICollection<IPublishedContentProperty> Properties
 		{
 			get
 			{
@@ -422,7 +422,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
                         ? new XmlPublishedProperty(p, _isPreviewing, n)
                         : new XmlPublishedProperty(p, _isPreviewing);		        
-		        }).Cast<IPublishedProperty>().ToArray();
+		        }).Cast<IPublishedContentProperty>().ToArray();
 
             // warn: this is not thread-safe...
             _initialized = true;

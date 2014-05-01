@@ -193,6 +193,12 @@ namespace Umbraco.Core.Strings
                     : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
                 StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
                 BreakTermsOnUpper = false
+            }).WithConfig(CleanStringType.UnderscoreAlias, new Config
+            {
+                PreFilter = ApplyUrlReplaceCharacters,
+                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
+                StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
+                BreakTermsOnUpper = false
             }).WithConfig(CleanStringType.ConvertCase, new Config
             {
                 PreFilter = null,

@@ -19,7 +19,7 @@ namespace Umbraco.Web.umbraco.presentation
             return node;
         }
 
-        private static IProperty ConvertToNodeProperty(IPublishedProperty prop)
+        private static IProperty ConvertToNodeProperty(IPublishedContentProperty prop)
         {
             return new ConvertedProperty(prop);
         }
@@ -118,9 +118,9 @@ namespace Umbraco.Web.umbraco.presentation
 
         private class ConvertedProperty : IProperty, IHtmlString
         {
-            private readonly IPublishedProperty _prop;
+            private readonly IPublishedContentProperty _prop;
 
-            public ConvertedProperty(IPublishedProperty prop)
+            public ConvertedProperty(IPublishedContentProperty prop)
             {
                 _prop = prop;
             }

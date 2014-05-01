@@ -10,7 +10,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Represents an <see cref="IPublishedProperty"/> type.
+    /// Represents an <see cref="IPublishedContentProperty"/> type.
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedPropertyType"/> class are immutable, ie
     /// if the property type changes, then a new class needs to be created.</remarks>

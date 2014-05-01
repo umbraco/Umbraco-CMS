@@ -1,18 +1,17 @@
 ﻿using System;
-using System.ComponentModel;
 using Umbraco.Core.Models;
 using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class PropertyResult : IPublishedProperty, IHtmlString
+	internal class PropertyResult : IPublishedContentProperty, IHtmlString
 	{
-	    private readonly IPublishedProperty _source;
+	    private readonly IPublishedContentProperty _source;
 	    private readonly string _alias;
 	    private readonly object _value;
         private readonly PropertyResultType _type;
 
-		internal PropertyResult(IPublishedProperty source, PropertyResultType type)
+		internal PropertyResult(IPublishedContentProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
             
@@ -44,13 +43,5 @@ namespace Umbraco.Core.Dynamics
             var value = Value;
 			return value == null ? string.Empty : value.ToString();
         }
-
-        // see notes in IPublishedProperty
-        [Obsolete("Use PropertyTypeAlias.", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Alias { get { return PropertyTypeAlias; } }
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Guid Version { get { return Guid.Empty; } }
     }
 }

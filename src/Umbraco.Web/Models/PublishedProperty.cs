@@ -24,9 +24,9 @@ namespace Umbraco.Web.Models
         /// <returns>A collection of IPublishedProperty corresponding to the collection of PublishedPropertyType
         /// and taking values from the collection of Property.</returns>
         /// <remarks>Ensures that all conversions took place correctly.</remarks>
-        internal static IEnumerable<IPublishedProperty> MapProperties(
+        internal static IEnumerable<IPublishedContentProperty> MapProperties(
             IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
-            Func<PublishedPropertyType, object, IPublishedProperty> map)
+            Func<PublishedPropertyType, object, IPublishedContentProperty> map)
         {
             return propertyTypes.Select(x =>
             {

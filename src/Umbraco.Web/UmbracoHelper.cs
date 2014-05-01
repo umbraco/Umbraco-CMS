@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -160,7 +161,7 @@ namespace Umbraco.Web
 			{
 				//TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
 				// looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
-				macroProps.Add(i.Key.ToLower(), i.Value);
+				macroProps.Add(i.Key.ToLowerInvariant(), i.Value);
 			}
 			var macroControl = m.renderMacro(macroProps,
 				UmbracoContext.Current.PublishedContentRequest.UmbracoPage.Elements,

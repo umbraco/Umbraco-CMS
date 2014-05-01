@@ -11,7 +11,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     class PublishedFragment : PublishedContentBase
     {
         private readonly PublishedContentType _contentType;
-        private readonly IPublishedProperty[] _properties;
+        private readonly IPublishedContentProperty[] _properties;
 
         public PublishedFragment(string contentTypeAlias, IDictionary<string, object> dataValues,
             bool isPreviewing, bool managed)
@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         ? new PublishedFragmentProperty(x, this, dataValue)
                         : new PublishedFragmentProperty(x, this);
                 })
-                .Cast<IPublishedProperty>()
+                .Cast<IPublishedContentProperty>()
                 .ToArray();
         }
 
@@ -142,12 +142,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             get { throw new NotImplementedException(); }
         }
 
-        public override ICollection<IPublishedProperty> Properties
+        public override ICollection<IPublishedContentProperty> Properties
         {
             get { return _properties; }
         }
 
-        public override IPublishedProperty GetProperty(string alias)
+        public override IPublishedContentProperty GetProperty(string alias)
         {
             return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
         }

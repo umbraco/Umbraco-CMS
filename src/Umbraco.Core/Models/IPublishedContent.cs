@@ -107,7 +107,7 @@ namespace Umbraco.Core.Models
         /// <para>The properties collection of an IPublishedContent instance should be read-only ie it is illegal
         /// to add properties to the collection.</para>
         /// </remarks>
-		ICollection<IPublishedProperty> Properties { get; }
+		ICollection<IPublishedContentProperty> Properties { get; }
 
         /// <summary>
         /// Gets a property identified by its alias.
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Models
         /// <para>otherwise return a property -- that may have no value (ie <c>HasValue</c> is <c>false</c>).</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        IPublishedProperty GetProperty(string alias);
+        IPublishedContentProperty GetProperty(string alias);
 
         /// <summary>
         /// Gets a property identified by its alias.
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Models
         /// return the first property that was found with the alias but had no value (ie <c>HasValue</c> is <c>false</c>).</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        IPublishedProperty GetProperty(string alias, bool recurse);
+        IPublishedContentProperty GetProperty(string alias, bool recurse);
 
         /// <summary>
 		/// Gets the value of a property identified by its alias.

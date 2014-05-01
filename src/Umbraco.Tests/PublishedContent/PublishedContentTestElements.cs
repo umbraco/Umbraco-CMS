@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -186,14 +185,14 @@ namespace Umbraco.Tests.PublishedContent
 
         #region Properties
 
-        public ICollection<IPublishedProperty> Properties { get; set; }
+        public ICollection<IPublishedContentProperty> Properties { get; set; }
 
-        public IPublishedProperty GetProperty(string alias)
+        public IPublishedContentProperty GetProperty(string alias)
         {
             return Properties.FirstOrDefault(p => p.PropertyTypeAlias.InvariantEquals(alias));
         }
 
-        public IPublishedProperty GetProperty(string alias, bool recurse)
+        public IPublishedContentProperty GetProperty(string alias, bool recurse)
         {
             var property = GetProperty(alias);
             if (recurse == false) return property;
@@ -220,7 +219,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    class SolidPublishedProperty : IPublishedProperty
+    class SolidPublishedProperty : IPublishedContentProperty
     {
         public SolidPublishedProperty()
         {
@@ -232,14 +231,6 @@ namespace Umbraco.Tests.PublishedContent
         public object Value { get; set; }
         public bool HasValue { get; set; }
         public object XPathValue { get; set; }
-
-        // see notes in IPublishedProperty
-        [Obsolete("Use PropertyTypeAlias.", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Alias { get { return PropertyTypeAlias; } }
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Guid Version { get { return Guid.Empty; } }
     }
 
     [PublishedContentModel("ContentType2")]

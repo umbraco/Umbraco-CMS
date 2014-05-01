@@ -1702,7 +1702,7 @@ namespace Umbraco.Web
 								};
 
 						var userVals = new Dictionary<string, object>();
-                        foreach (var p in from IPublishedProperty p in n.Properties where p.DataValue != null select p)
+                        foreach (var p in from IPublishedContentProperty p in n.Properties where p.DataValue != null select p)
                         {
                             // probably want the "object value" of the property here...
 							userVals[p.PropertyTypeAlias] = p.Value;

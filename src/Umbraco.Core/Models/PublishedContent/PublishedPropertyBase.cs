@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -7,7 +6,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// Provides a base class for <c>IPublishedProperty</c> implementations which converts and caches
     /// the value source to the actual value to use when rendering content.
     /// </summary>
-    internal abstract class PublishedPropertyBase : IPublishedProperty
+    internal abstract class PublishedPropertyBase : IPublishedContentProperty
     {
         public readonly PublishedPropertyType PropertyType;
 
@@ -28,13 +27,5 @@ namespace Umbraco.Core.Models.PublishedContent
         public abstract object DataValue { get; }
         public abstract object Value { get; }
         public abstract object XPathValue { get; }
-
-        // see notes in IPublishedProperty
-        [Obsolete("Use PropertyTypeAlias.", true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Alias { get { return PropertyTypeAlias; } }
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Guid Version { get { return Guid.Empty; } }
     }
 }

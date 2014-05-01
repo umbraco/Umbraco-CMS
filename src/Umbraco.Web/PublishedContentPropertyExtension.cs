@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 
@@ -12,17 +11,17 @@ namespace Umbraco.Web
     {
         #region GetValue<T>
 
-        public static T GetValue<T>(this IPublishedProperty property)
+        public static T GetValue<T>(this IPublishedContentProperty property)
         {
             return property.GetValue(false, default(T));
         }
 
-        public static T GetValue<T>(this IPublishedProperty property, T defaultValue)
+        public static T GetValue<T>(this IPublishedContentProperty property, T defaultValue)
         {
             return property.GetValue(true, defaultValue);
         }
 
-        internal static T GetValue<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue)
+        internal static T GetValue<T>(this IPublishedContentProperty property, bool withDefaultValue, T defaultValue)
         {
             if (property.HasValue == false && withDefaultValue) return defaultValue;
 
@@ -55,28 +54,6 @@ namespace Umbraco.Web
             //if (convert.Success) return convert.Result;
 
             return defaultValue;
-        }
-
-        #endregion
-
-        #region IPublishedContentProperty.GetValue<T>
-
-        // see notes in IPublishedProperty
-
-        public static T GetValue<T>(this IPublishedContentProperty property)
-        {
-            var property2 = property as IPublishedProperty;
-            if (property2 == null) // should never happen
-                throw new ArgumentException("Not an IPublishedProperty.", "property");
-            return property2.GetValue(false, default(T));
-        }
-
-        public static T GetValue<T>(this IPublishedContentProperty property, T defaultValue)
-        {
-            var property2 = property as IPublishedProperty;
-            if (property2 == null) // should never happen
-                throw new ArgumentException("Not an IPublishedProperty.", "property");
-            return property2.GetValue(true, defaultValue);
         }
 
         #endregion
