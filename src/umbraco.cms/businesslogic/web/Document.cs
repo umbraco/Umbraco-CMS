@@ -1025,10 +1025,10 @@ namespace umbraco.cms.businesslogic.web
                     return result;
                 }
 
-                return Attempt<PublishStatus>.Fail();
+                return new Attempt<PublishStatus>(false, new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
             }
 
-            return Attempt<PublishStatus>.Fail();
+            return new Attempt<PublishStatus>(false, new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
         }
 
         /// <summary>
