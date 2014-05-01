@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Services.Importing
             AddLanguages();
 
             // Act
-            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+            var dictionaryItems = ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
 
             // Assert
             Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(parentKey), "DictionaryItem parentKey does not exist");
@@ -425,7 +425,7 @@ namespace Umbraco.Tests.Services.Importing
             var childDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(childKey);
             
             Assert.That(parentDictionaryItem.ParentId, Is.Not.EqualTo(childDictionaryItem.ParentId));
-            Assert.That(childDictionaryItem.ParentId, Is.EqualTo(parentDictionaryItem.Id));
+            Assert.That(childDictionaryItem.ParentId, Is.EqualTo(parentDictionaryItem.Key));
         }
 
         [Test]
