@@ -235,6 +235,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._rVal = rVal;
                 top.focus();
                 this._obj.jqmHide(); //do the hiding, this will call the onHide handler
+                //fixes issue with IE9+ and pickers
+                if ($("#right").length)
+	        {
+	            $("#right").contents().find("body").focus();
+	        }
             },
             _close: function() {
                 /// <summary>Finalizes the objects counter and instance manager</summary>
