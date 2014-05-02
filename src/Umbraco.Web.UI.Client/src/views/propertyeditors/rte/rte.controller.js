@@ -85,6 +85,9 @@ angular.module("umbraco")
                 style_formats: styleFormats
             };
 
+        if (tinyMceConfig.customConfig.templates) {
+            tinyMceConfig.customConfig.templates = JSON.parse(tinyMceConfig.customConfig.templates);
+        }
 
         if(tinyMceConfig.customConfig){
             angular.extend(baseLineConfigObj, tinyMceConfig.customConfig);
