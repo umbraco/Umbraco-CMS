@@ -109,3 +109,4 @@ src/Umbraco.Web.UI/umbraco/plugins/*
 src/Umbraco.Web.UI/umbraco/js/init.js
 build/ApiDocs/*
 build/ApiDocs/Output/*
+src/Umbraco.Web.UI.Client/bower_components/*
