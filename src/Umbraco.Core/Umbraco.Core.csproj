@@ -342,7 +342,7 @@
     <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\IMemberGroup.cs" />
-    <Compile Include="Models\IPublishedContentProperty.cs" />
+    <Compile Include="Models\IPublishedProperty.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />

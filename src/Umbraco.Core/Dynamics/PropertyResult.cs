@@ -4,14 +4,14 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class PropertyResult : IPublishedContentProperty, IHtmlString
+	internal class PropertyResult : IPublishedProperty, IHtmlString
 	{
-	    private readonly IPublishedContentProperty _source;
+        private readonly IPublishedProperty _source;
 	    private readonly string _alias;
 	    private readonly object _value;
         private readonly PropertyResultType _type;
 
-		internal PropertyResult(IPublishedContentProperty source, PropertyResultType type)
+        internal PropertyResult(IPublishedProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
             
