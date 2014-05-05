@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsTask WHERE parentUserId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
-                               "DELETE FROM umbracoUserLogins WHERE userId = @Id",
+                               "DELETE FROM umbracoUserLogins WHERE userID = @Id",
                                "DELETE FROM umbracoUser2app WHERE " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id"
                            };

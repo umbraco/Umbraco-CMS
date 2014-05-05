@@ -175,6 +175,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
             //Add valid and invalid foreign key differences to the result object
+            // We'll need to do invariant contains with case insensitivity because foreign key, primary key, and even index naming w/ MySQL is not standardized
+            // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
                 if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown) || indexesInSchema.InvariantContains(unknown))

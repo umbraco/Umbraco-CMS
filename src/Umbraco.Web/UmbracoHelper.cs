@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -254,7 +255,7 @@ namespace Umbraco.Web
                 
                 
                 //NOTE: the value could have html encoded values, so we need to deal with that
-                macroProps.Add(i.Key.ToLower(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
+                macroProps.Add(i.Key.ToLowerInvariant(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
             var macroControl = m.renderMacro(macroProps,
                 umbracoPage.Elements,

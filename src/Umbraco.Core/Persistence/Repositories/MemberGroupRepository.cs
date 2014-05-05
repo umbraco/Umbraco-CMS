@@ -120,7 +120,8 @@ namespace Umbraco.Core.Persistence.Repositories
             group.AddingEntity();
             var dto = _modelFactory.BuildDto(group);
             var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
-
+            group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
+            
             //Update with new correct path and id            
             dto.Path = string.Concat("-1,", dto.NodeId);
             Database.Update(dto);

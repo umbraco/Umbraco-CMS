@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Models
             base.Path = path;
             ParentId = -1;
             _name = name; //.Replace("/", ".").Replace("\\", ""); // why? that's just the name!
-            _alias = alias.ToSafeAlias();
+            _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
         }
 
         [DataMember]

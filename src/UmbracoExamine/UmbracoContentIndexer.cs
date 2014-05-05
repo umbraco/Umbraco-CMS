@@ -299,6 +299,19 @@ namespace UmbracoExamine
         }
 
         /// <summary>
+        /// Used to refresh the current IndexerData from the data in the DataService. This can be used
+        /// if there are more properties added/removed from the database
+        /// </summary>
+        public void RefreshIndexerDataFromDataService()
+        {
+            //TODO: This would be much better done if the IndexerData property had read/write locks applied
+            // to it! Unless we update the base class there's really no way to prevent the IndexerData from being
+            // changed during an operation that is reading from it.
+            var newIndexerData = GetIndexerData(IndexSets.Instance.Sets[IndexSetName]);
+            IndexerData = newIndexerData;
+        }
+
+        /// <summary>
         /// Override this method to strip all html from all user fields before raising the event, then after the event 
         /// ensure our special Path field is added to the collection
         /// </summary>
