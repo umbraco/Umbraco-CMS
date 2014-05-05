@@ -188,6 +188,11 @@ angular.module('umbraco.services')
          */
         load: function (pathArray, scope) {
             var promise;
+
+            if (!angular.isArray(pathArray)) {
+                throw "pathArray must be an array";
+            }
+
             var nonEmpty = _.reject(pathArray, function(item) {
                 return item === undefined || item === "";
             });

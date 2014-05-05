@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi
@@ -19,6 +20,7 @@ namespace Umbraco.Web.WebApi
     /// </remarks>
     public class AngularJsonMediaTypeFormatter : JsonMediaTypeFormatter
     {
+
         /// <summary>
         /// This will prepend the special chars to the stream output that angular will strip
         /// </summary>
@@ -28,43 +30,41 @@ namespace Umbraco.Web.WebApi
         /// <param name="content"></param>
         /// <param name="transportContext"></param>
         /// <returns></returns>
-        public async override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
+        public override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
         {
+            //Before we were calling the base method to do this however it was causing problems:
+            // http://issues.umbraco.org/issue/U4-4546
+            // though I can't seem to figure out why the null ref exception was being thrown, it is very strange.
+            // This code is basically what the base class does and at least we can track/test exactly what is going on.
+
+            if (type == null) throw new ArgumentNullException("type");
+            if (writeStream == null) throw new ArgumentNullException("writeStream");
             
-            using (var memStream = new MemoryStream())
+            var task = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    //Let the base class do all the processing using our custom stream
-                    await base.WriteToStreamAsync(type, value, memStream, content, transportContext);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<AngularJsonMediaTypeFormatter>("An error occurred writing to the output stream", ex);
-                    throw;
-                }
+                var effectiveEncoding = SelectCharacterEncoding(content == null ? null : content.Headers);
 
-                memStream.Flush();
-                memStream.Position = 0;
-
-                //read the result string from the stream
-                // (see: http://docs.angularjs.org/api/ng.$http)
-                string output;
-                using (var reader = new StreamReader(memStream))
+                using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding))
+                using (var jsonTextWriter = new JsonTextWriter(streamWriter)
                 {
-                    output = reader.ReadToEnd();
-                }
-
-                //pre-pend the angular chars to the result
-                output = ")]}',\n" + output;
-
-                //write out the result to the original stream
-                using (var writer = new StreamWriter(writeStream))
+                    CloseOutput = false
+                })
                 {
-                    writer.Write(output);
+                    //write the special encoding for angular json to the start
+                    // (see: http://docs.angularjs.org/api/ng.$http)
+                    streamWriter.Write(")]}',\n");
+
+                    if (Indent)
+                    {
+                        jsonTextWriter.Formatting = Formatting.Indented;
+                    }
+                    var jsonSerializer = JsonSerializer.Create(SerializerSettings);
+                    jsonSerializer.Serialize(jsonTextWriter, value);
+
+                    jsonTextWriter.Flush();
                 }
-            }
-            
+            });
+            return task;
         }
 
     }
