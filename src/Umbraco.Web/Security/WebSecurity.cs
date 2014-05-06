@@ -70,7 +70,7 @@ namespace Umbraco.Web.Security
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        internal IUser CurrentUser
+        public IUser CurrentUser
         {
             get
             {
