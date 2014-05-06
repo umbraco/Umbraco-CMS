@@ -34,7 +34,7 @@ module.exports = function (grunt) {
           var bower = require('bower');
           var done = this.async();
 
-          bower.commands.install(undefined, { offline: true }, { interactive: false, offline: true })
+          bower.commands.install(undefined, { }, { interactive: false })
               .on('log', function (data) {
                   grunt.log.write(data.message + "\n");
               })

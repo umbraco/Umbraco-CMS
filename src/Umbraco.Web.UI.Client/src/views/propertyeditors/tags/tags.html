@@ -4,6 +4,7 @@
 
     <input type="text"
            id="tags-{{model.alias}}"
+           class="typeahead"
            ng-keydown="addTag($event)"
            placeholder="Type to add tags.."
            ng-model="tagToAdd" />

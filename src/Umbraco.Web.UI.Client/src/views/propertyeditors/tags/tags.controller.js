@@ -1,31 +1,40 @@
 angular.module("umbraco")
 .controller("Umbraco.PropertyEditors.TagsController",
-    function ($rootScope, $scope, $log, assetsService, umbRequestHelper) {
-        
+    function ($rootScope, $scope, $log, assetsService, umbRequestHelper, angularHelper, $timeout) {
+
         //load current value
         $scope.currentTags = [];
         if ($scope.model.value) {
             $scope.currentTags = $scope.model.value.split(",");
         }
 
+        //Helper method to add a tag on enter or on typeahead select
+        function addTag(tagToAdd) {
+            if (tagToAdd.length > 0) {
+                if ($scope.currentTags.indexOf(tagToAdd) < 0) {
+                    $scope.currentTags.push(tagToAdd);
+                }
+            }
+        }
+
         $scope.addTag = function (e) {
             var code = e.keyCode || e.which;
             if (code == 13) { //Enter keycode   
 
-                //this is required, otherwise the html form will attempt to submit.
-                e.preventDefault();
-
-                if ($scope.currentTags.indexOf($scope.tagToAdd) < 0) {
-                    $scope.currentTags.push($scope.tagToAdd);
+                if ($('#tags-Tags').parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
+                    //this is required, otherwise the html form will attempt to submit.
+                    e.preventDefault();
+                    addTag($scope.tagToAdd);
+                    $scope.tagToAdd = "";
                 }
-                $scope.tagToAdd = "";
+
             }
         };
 
         $scope.removeTag = function (tag) {
             var i = $scope.currentTags.indexOf(tag);
             if (i >= 0) {
-                $scope.currentTags.splice(i, 1);
+                $scope.currentTags.splice(i, 1);               
             }
         };
 
@@ -42,55 +51,71 @@ angular.module("umbraco")
         };
 
         assetsService.loadJs("lib/typeahead/typeahead.bundle.min.js").then(function () {
-            
+
             //configure the tags data source
+            //TODO: We'd like to be able to filter the shown list items to not show the tags that are currently
+            // selected but that is difficult, i've tried a number of things and also this link suggests we cannot do 
+            // it currently without a lot of hacking:
+            // http://stackoverflow.com/questions/21044906/twitter-typeahead-js-remove-datum-upon-selection
+
+            //helper method to format the data for bloodhound
+            function dataTransform(list) {
+                //transform the result to what bloodhound wants
+                return _.map(list, function (i) {
+                    return { value: i.text };
+                });
+            }
 
             var tagsHound = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace("value"),
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
+                dupDetector : function(remoteMatch, localMatch) {
+                    return (remoteMatch["value"] == localMatch["value"]);
+                },
                 //pre-fetch the tags for this category
                 prefetch: {
                     url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", [{ tagGroup: $scope.model.config.group }]),
                     //TTL = 5 minutes
                     ttl: 300000,
-                    filter: function (list) { 
-                        return _.map(list, function (i) {
-                            return { value: i.text };
-                        });
-                    }
+                    filter: dataTransform
                 },
-                //dynamically get the tags for this category
+                //dynamically get the tags for this category (they may have changed on the server)
                 remote: {
                     url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", [{ tagGroup: $scope.model.config.group }]),
-                    filter: function (list) {
-                        return _.map(list, function (i) {
-                            return { value: i.text };
-                        });
-                    }
+                    filter: dataTransform
                 }
             });
 
             tagsHound.initialize();
 
             //configure the type ahead
-
-            $('#tags-' + $scope.model.alias).typeahead(
+            $timeout(function() {
+                $('#tags-' + $scope.model.alias).typeahead(
                 //use the default options
                 null, {
-                //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
-                // name = the data set name, we'll make this the tag group name
-                name: $scope.model.config.group,
-                // apparently thsi should be the same as the value above in the call to Bloodhound.tokenizers.obj.whitespace
-                // this isn't very clear in the docs but you can see that it's consistent with this statement here:
-                // http://twitter.github.io/typeahead.js/examples/
-                displayKey: "value",
-                source: tagsHound.ttAdapter()
+                    //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
+                    // name = the data set name, we'll make this the tag group name
+                    name: $scope.model.config.group,
+                    displayKey: "value",
+                    source: tagsHound.ttAdapter(),
+                    highlight: true,
+                    hint: true
+                }).bind("typeahead:selected", function (obj, datum, name) {
+
+                    angularHelper.safeApply($scope, function () {
+                        addTag(datum["value"]);
+                        $scope.tagToAdd = "";
+                    });
+
+                });
+            });
+
+            $scope.$on('$destroy', function () {
+                $('#tags-' + $scope.model.alias).typeahead('destroy');
+                delete tagsHound;
             });
 
         });
-
-        //on destroy:
-        // $('.typeahead').typeahead('destroy');
 
     }
 );
