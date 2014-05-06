@@ -25,7 +25,7 @@ module.exports = function(karma) {
 
          'lib/underscore/underscore.js',
          'lib/umbraco/Extensions.js', 
-         'lib/yepnope/yepnope.min.js',
+         'lib/lazyload/lazyload.min.js',
 
 
          'test/config/app.unit.js',
@@ -94,15 +94,8 @@ module.exports = function(karma) {
     // CLI --report-slower-than 500
     reportSlowerThan: 500,
 
-    // compile coffee scripts
-    preprocessors: {
-      '**/*.coffee': 'coffee'
-    },
-
     plugins: [
       'karma-jasmine',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
       'karma-phantomjs-launcher'
     ]
   });
