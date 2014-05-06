@@ -88,7 +88,7 @@ namespace Umbraco.Core.ObjectResolution
         /// Gets a value indicating whether a the singleton nstance has been set.
         /// </summary>
         /// <remarks>To be used in unit tests.</remarks>
-        internal static bool HasCurrent
+        protected static bool HasCurrent
         {
             get
             {
