@@ -2,7 +2,9 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
     function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
 
-        tinyMceService.configuration().then(function(tinyMceConfig){
+        $scope.isLoading = true;
+
+        tinyMceService.configuration().then(function (tinyMceConfig) {
 
             //config value from general tinymce.config file
             var validElements = tinyMceConfig.validElements;
@@ -12,14 +14,14 @@ angular.module("umbraco")
             var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style]";
 
             var invalidElements = tinyMceConfig.inValidElements;
-            var plugins = _.map(tinyMceConfig.plugins, function(plugin){ 
-                                            if(plugin.useOnFrontend){
-                                                return plugin.name;   
-                                            }
-                                        }).join(" ");
-            
+            var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
+                if (plugin.useOnFrontend) {
+                    return plugin.name;
+                }
+            }).join(" ");
+
             var editorConfig = $scope.model.config.editor;
-            if(!editorConfig || angular.isString(editorConfig)){
+            if (!editorConfig || angular.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
 
@@ -35,11 +37,11 @@ angular.module("umbraco")
             }
 
             //queue rules loading
-            angular.forEach(editorConfig.stylesheets, function(val, key){
+            angular.forEach(editorConfig.stylesheets, function (val, key) {
                 stylesheets.push("../css/" + val + ".css?" + new Date().getTime());
-                
-                await.push(stylesheetResource.getRulesByName(val).then(function(rules) {
-                    angular.forEach(rules, function(rule) {
+
+                await.push(stylesheetResource.getRulesByName(val).then(function (rules) {
+                    angular.forEach(rules, function (rule) {
                         var r = {};
                         r.title = rule.name;
                         if (rule.selector[0] == ".") {
@@ -65,40 +67,39 @@ angular.module("umbraco")
 
             //wait for queue to end
             $q.all(await).then(function () {
-                
 
-            //create a baseline Config to exten upon
-            var baseLineConfigObj = {
-                mode: "exact",
-                skin: "umbraco",
-                plugins: plugins,
-                valid_elements: validElements,
-                invalid_elements: invalidElements,
-                extended_valid_elements: extendedValidElements,
-                menubar: false,
-                statusbar: false,
-                height: editorConfig.dimensions.height,
-                width: editorConfig.dimensions.width,
-                toolbar: toolbar,
-                content_css: stylesheets.join(','),
-                relative_urls: false,
-                style_formats: styleFormats
-            };
+                //create a baseline Config to exten upon
+                var baseLineConfigObj = {
+                    mode: "exact",
+                    skin: "umbraco",
+                    plugins: plugins,
+                    valid_elements: validElements,
+                    invalid_elements: invalidElements,
+                    extended_valid_elements: extendedValidElements,
+                    menubar: false,
+                    statusbar: false,
+                    height: editorConfig.dimensions.height,
+                    width: editorConfig.dimensions.width,
+                    toolbar: toolbar,
+                    content_css: stylesheets.join(','),
+                    relative_urls: false,
+                    style_formats: styleFormats
+                };
 
 
-        if(tinyMceConfig.customConfig){
-            angular.extend(baseLineConfigObj, tinyMceConfig.customConfig);
-        }    
-        
-        //set all the things that user configs should not be able to override
-        baseLineConfigObj.elements = $scope.model.alias + "_rte";
-        baseLineConfigObj.setup = function (editor) {
+                if (tinyMceConfig.customConfig) {
+                    angular.extend(baseLineConfigObj, tinyMceConfig.customConfig);
+                }
+
+                //set all the things that user configs should not be able to override
+                baseLineConfigObj.elements = $scope.model.alias + "_rte";
+                baseLineConfigObj.setup = function (editor) {
 
                     //set the reference
                     tinyMceEditor = editor;
 
                     //enable browser based spell checking
-                    editor.on('init', function(e) {
+                    editor.on('init', function (e) {
                         editor.getBody().setAttribute('spellcheck', true);
                     });
 
@@ -126,7 +127,7 @@ angular.module("umbraco")
                             $scope.model.value = editor.getContent();
                         });
                     });
-                    
+
                     //when buttons modify content
                     editor.on('ExecCommand', function (e) {
                         editor.save();
@@ -137,26 +138,26 @@ angular.module("umbraco")
 
                     // Update model on keypress
                     editor.on('KeyUp', function (e) {
-                      editor.save();
-                      angularHelper.safeApply($scope, function () {
-                          $scope.model.value = editor.getContent();
-                      });
-                    });
-
-                    // Update model on change, i.e. copy/pasted text, plugins altering content
-                    editor.on('SetContent', function (e) {
-                      if(!e.initial){
                         editor.save();
                         angularHelper.safeApply($scope, function () {
                             $scope.model.value = editor.getContent();
                         });
-                      }
-                    });    
+                    });
+
+                    // Update model on change, i.e. copy/pasted text, plugins altering content
+                    editor.on('SetContent', function (e) {
+                        if (!e.initial) {
+                            editor.save();
+                            angularHelper.safeApply($scope, function () {
+                                $scope.model.value = editor.getContent();
+                            });
+                        }
+                    });
 
 
-                    editor.on('ObjectResized', function(e) {
+                    editor.on('ObjectResized', function (e) {
                         var qs = "?width=" + e.width + "px&height=" + e.height + "px";
-                        var srcAttr =  $(e.target).attr("src");
+                        var srcAttr = $(e.target).attr("src");
                         var path = srcAttr.split("?")[0];
                         $(e.target).attr("data-mce-src", path + qs);
                     });
@@ -176,19 +177,22 @@ angular.module("umbraco")
                 };
 
 
-        
+
 
                 /** Loads in the editor */
                 function loadTinyMce() {
-                    
+
                     //we need to add a timeout here, to force a redraw so TinyMCE can find
                     //the elements needed
                     $timeout(function () {
                         tinymce.DOM.events.domLoaded = true;
                         tinymce.init(baseLineConfigObj);
+
+                        $scope.isLoading = false;
+
                     }, 200, false);
                 }
-                
+
 
 
 
@@ -203,7 +207,7 @@ angular.module("umbraco")
                     // is required for our plugins listening to this event to execute
                     tinyMceEditor.fire('LoadContent', null);
                 };
-                
+
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
