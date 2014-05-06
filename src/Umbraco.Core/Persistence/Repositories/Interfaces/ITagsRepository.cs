@@ -5,6 +5,10 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface ITagsRepository : IRepositoryQueryable<int, ITag>
     {
+        IEnumerable<int> GetIdsForEntityTypeByTagGroup(TaggableObjectTypes objectType, string tagGroup);
+
+        IEnumerable<int> GetIdsForEntityTypeByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null);
+
         /// <summary>
         /// Returns all tags for an entity type (content/media/member)
         /// </summary>

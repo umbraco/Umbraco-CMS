@@ -160,6 +160,50 @@ namespace Umbraco.Core.Persistence.Repositories
 
         //TODO: Consider caching implications.
 
+
+        public IEnumerable<int> GetIdsForEntityTypeByTagGroup(TaggableObjectTypes objectType, string tagGroup)
+        {
+            var nodeObjectType = GetNodeObjectType(objectType);
+
+            var sql = new Sql()
+                .Select("DISTINCT cmsTagRelationship.nodeId")
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>()
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+                .InnerJoin<ContentDto>()
+                .On<ContentDto, TagRelationshipDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType)
+                .Where<TagDto>(dto => dto.Group == tagGroup);                
+
+            return ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(sql);  
+        }
+
+        public IEnumerable<int> GetIdsForEntityTypeByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null)
+        {
+            var nodeObjectType = GetNodeObjectType(objectType);
+
+            var sql = new Sql()
+                .Select("DISTINCT cmsTagRelationship.nodeId")
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>()
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+                .InnerJoin<ContentDto>()
+                .On<ContentDto, TagRelationshipDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType)
+                .Where<TagDto>(dto => dto.Tag == tag);
+
+            if (tagGroup.IsNullOrWhiteSpace() == false)
+            {
+                sql = sql.Where<TagDto>(dto => dto.Group == tagGroup);
+            }
+
+            return ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(sql);
+        }
+
         public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null)
         {
             var nodeObjectType = GetNodeObjectType(objectType);

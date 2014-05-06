@@ -15,7 +15,14 @@ namespace Umbraco.Core.Services
     /// to the content, media and member services respectively.
     /// </remarks>
     public interface ITagService : IService
-    {   
+    {
+
+        IEnumerable<int> GetContentIdsByTagGroup(string tagGroup);
+        IEnumerable<int> GetContentIdsByTag(string tag, string tagGroup = null);
+        IEnumerable<int> GetMediaIdsByTagGroup(string tagGroup);
+        IEnumerable<int> GetMediaIdsByTag(string tag, string tagGroup = null);
+        IEnumerable<int> GetMemberIdsByTagGroup(string tagGroup);
+        IEnumerable<int> GetMemberIdsByTag(string tag, string tagGroup = null);
 
         /// <summary>
         /// Get every tag stored in the database (with optional group)
