@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
+using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using System.Web.Security;
 using Umbraco.Core.Strings;
@@ -50,6 +51,28 @@ namespace Umbraco.Core
             input = input.Trim();
             return (input.StartsWith("{") && input.EndsWith("}"))
                    || (input.StartsWith("[") && input.EndsWith("]"));
+        }
+
+        /// <summary>
+        /// Returns a JObject/JArray instance if the string can be converted to json, otherwise returns the string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        internal static object ConvertToJsonIfPossible(this string input)
+        {
+            if (input.DetectIsJson() == false)
+            {
+                return input;
+            }
+            try
+            {
+                var obj = JsonConvert.DeserializeObject(input);
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                return input;
+            }
         }
 
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
