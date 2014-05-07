@@ -70,6 +70,11 @@
 
             //TODO: Fill in the rest!
 
+            /// <summary>
+            /// alias for the media tree.
+            /// </summary>
+            public const string Templates = "template";
+
         }
 	}
 
