@@ -98,6 +98,11 @@
 			public const string MultipleTextstring = "5359AD0B-06CC-4182-92BD-0A9117448D3F";
 
 			/// <summary>
+			/// Guid for the MultiUrlPicker data-type.
+			/// </summary>
+			public const string MultiUrlPicker = "C8C2E949-0971-4E85-BCF6-EF2EF8D977BC";
+
+			/// <summary>
 			/// Guid for the No edit datatype.
 			/// </summary>
 			public const string NoEdit = "6C738306-4C17-4D88-B9BD-6546F3771597";
@@ -171,6 +176,11 @@
 			/// Guid for the Upload field datatype.
 			/// </summary>
 			public const string UploadField = "5032A6E6-69E3-491D-BB28-CD31CD11086C";
+
+			/// <summary>
+			/// Guid for the UrlPicker data-type.
+			/// </summary>
+			public const string UrlPicker = "0136484A-8278-4444-BC7B-DF24D2F6DAFC";
 
 			/// <summary>
 			/// Guid for the XPath CheckBoxList datatype.

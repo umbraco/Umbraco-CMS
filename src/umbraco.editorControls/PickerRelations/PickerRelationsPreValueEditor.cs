@@ -212,7 +212,7 @@ namespace umbraco.editorControls.PickerRelations
         }
 
         /// <summary>
-        /// Replaces the base class writer and instead uses the shared uComponents extension method, to inject consistant markup
+        /// Replaces the base class writer and instead uses the shared extension method, to inject consistant markup
         /// </summary>
         /// <param name="writer"></param>
         protected override void RenderContents(HtmlTextWriter writer)
