@@ -41,51 +41,51 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
         }
 
-        public IEnumerable<int> GetContentIdsByTagGroup(string tagGroup)
+        public IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string tagGroup)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetIdsForEntityTypeByTagGroup(TaggableObjectTypes.Content, tagGroup);
+                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
             }         
         }
 
-        public IEnumerable<int> GetContentIdsByTag(string tag, string tagGroup = null)
+        public IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string tagGroup = null)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetIdsForEntityTypeByTag(TaggableObjectTypes.Content, tag, tagGroup);
+                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
             }         
         }
 
-        public IEnumerable<int> GetMediaIdsByTagGroup(string tagGroup)
+        public IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string tagGroup)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetIdsForEntityTypeByTagGroup(TaggableObjectTypes.Media, tagGroup);
+                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
             }    
         }
 
-        public IEnumerable<int> GetMediaIdsByTag(string tag, string tagGroup = null)
+        public IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string tagGroup = null)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetIdsForEntityTypeByTag(TaggableObjectTypes.Media, tag, tagGroup);
+                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
             }    
         }
 
-        public IEnumerable<int> GetMemberIdsByTagGroup(string tagGroup)
+        public IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string tagGroup)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetIdsForEntityTypeByTagGroup(TaggableObjectTypes.Member, tagGroup);
+                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
             }    
         }
 
-        public IEnumerable<int> GetMemberIdsByTag(string tag, string tagGroup = null)
+        public IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string tagGroup = null)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetIdsForEntityTypeByTag(TaggableObjectTypes.Member, tag, tagGroup);
+                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
             }    
         }
 

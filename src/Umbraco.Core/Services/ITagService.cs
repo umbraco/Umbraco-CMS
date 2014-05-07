@@ -17,12 +17,12 @@ namespace Umbraco.Core.Services
     public interface ITagService : IService
     {
 
-        IEnumerable<int> GetContentIdsByTagGroup(string tagGroup);
-        IEnumerable<int> GetContentIdsByTag(string tag, string tagGroup = null);
-        IEnumerable<int> GetMediaIdsByTagGroup(string tagGroup);
-        IEnumerable<int> GetMediaIdsByTag(string tag, string tagGroup = null);
-        IEnumerable<int> GetMemberIdsByTagGroup(string tagGroup);
-        IEnumerable<int> GetMemberIdsByTag(string tag, string tagGroup = null);
+        IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string tagGroup);
+        IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string tagGroup = null);
+        IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string tagGroup);
+        IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string tagGroup = null);
+        IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string tagGroup);
+        IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string tagGroup = null);
 
         /// <summary>
         /// Get every tag stored in the database (with optional group)

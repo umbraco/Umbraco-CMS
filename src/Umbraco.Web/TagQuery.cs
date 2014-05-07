@@ -38,7 +38,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetContentByTag(string tag, string tagGroup = null)
         {
-            var ids = _tagService.GetContentIdsByTag(tag, tagGroup);
+            var ids = _tagService.GetTaggedContentByTag(tag, tagGroup)
+                .Select(x => x.EntityId);
             return _contentQuery.TypedContent(ids)
                 .Where(x => x != null);
         }
@@ -50,7 +51,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetContentByTagGroup(string tagGroup)
         {
-            var ids = _tagService.GetContentIdsByTagGroup(tagGroup);
+            var ids = _tagService.GetTaggedContentByTagGroup(tagGroup)
+                .Select(x => x.EntityId);
             return _contentQuery.TypedContent(ids)
                 .Where(x => x != null);
         }
@@ -63,7 +65,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string tagGroup = null)
         {
-            var ids = _tagService.GetMediaIdsByTag(tag, tagGroup);
+            var ids = _tagService.GetTaggedMediaByTag(tag, tagGroup)
+                .Select(x => x.EntityId);
             return _contentQuery.TypedMedia(ids)
                 .Where(x => x != null);
         }
@@ -75,7 +78,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetMediaByTagGroup(string tagGroup)
         {
-            var ids = _tagService.GetMediaIdsByTagGroup(tagGroup);
+            var ids = _tagService.GetTaggedMediaByTagGroup(tagGroup)
+                .Select(x => x.EntityId);
             return _contentQuery.TypedMedia(ids)
                 .Where(x => x != null);
         }
