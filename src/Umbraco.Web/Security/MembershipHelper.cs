@@ -206,6 +206,14 @@ namespace Umbraco.Web.Security
             return true;
         }
 
+        /// <summary>
+        /// Logs out the current member
+        /// </summary>
+        public void Logout()
+        {
+            FormsAuthentication.SignOut();
+        }
+
         #region Querying for front-end
 
         public IPublishedContent GetByProviderKey(object key)
