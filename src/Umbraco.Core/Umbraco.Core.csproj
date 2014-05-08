@@ -350,7 +350,7 @@
     <Compile Include="Models\IPublishedProperty.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
-    <Compile Include="Models\IStyleSheet.cs" />
+    <Compile Include="Models\IStylesheet.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\MemberGroup.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
@@ -1039,7 +1039,6 @@
     <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
-    <Compile Include="Services\IMacroProperty.cs" />
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberGroupService.cs" />
