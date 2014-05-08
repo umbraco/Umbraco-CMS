@@ -278,6 +278,20 @@ namespace Umbraco.Web.Security
             var provider = MPE.GetMembersMembershipProvider();
             return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, true));
         }
+
+        /// <summary>
+        /// Returns the currently logged in member id, -1 if they are not logged in
+        /// </summary>
+        /// <returns></returns>
+        public int GetCurrentMemberId()
+        {
+            if (IsLoggedIn() == false)
+            {
+                return -1;
+            }
+            var result = GetCurrentMember();
+            return result == null ? -1 : result.Id;
+        }
         
         #endregion
 
