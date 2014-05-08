@@ -837,6 +837,36 @@ namespace Umbraco.Core.Services
             return list;
         }
 
+                                            
+        //public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement element, int userId = 0, bool raiseEvents = true)
+        //{
+
+        //    if (raiseEvents)
+        //    {
+        //        if (ImportingDictionaryItem.IsRaisedEventCancelled(new ImportEventArgs<IDictionaryItem>(element), this))
+        //            return Enumerable.Empty<IDictionaryItem>();
+        //    }
+
+        //    var name = element.Name.LocalName;
+        //    if (name.Equals(Constants.Packaging.DictionaryItemsNodeName) == false)
+        //    {
+        //        throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called '" + Constants.Packaging.DictionaryItemsNodeName + "' for import");
+        //    }
+
+        //    IEnumerable<IDataTypeDefinition> list = Enumerable.Empty<IDataTypeDefinition>();
+
+        //    //throw new NotImplementedException();
+
+
+        //    if (raiseEvents)
+        //    {
+                
+        //        ImportedDataType.RaiseEvent(new ImportEventArgs<IDataTypeDefinition>(list, element, false), this);
+        //    }
+
+        //    return list;
+        //}
+
         private void SavePrevaluesFromXml(List<IDataTypeDefinition> dataTypes, IEnumerable<XElement> dataTypeElements)
         {
             foreach (var dataTypeElement in dataTypeElements)
@@ -1474,47 +1504,29 @@ namespace Umbraco.Core.Services
             return templates;
         }
 
-        public IEnumerable<ILanguage> ImportLanguage(XElement element, int userId = 0)
+
+        public IEnumerable<IStylesheet> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
         {
-            throw new NotImplementedException();
+
+            if (raiseEvents)
+            {
+                if (ImportingStylesheets.IsRaisedEventCancelled(new ImportEventArgs<IStylesheet>(element), this))
+                    return Enumerable.Empty<IStylesheet>();
+            }
+
+            IEnumerable<IStylesheet> styleSheets = Enumerable.Empty<IStylesheet>();
+
+            if(element.Elements().Any())
+                throw new NotImplementedException("This needs to be implimentet");
+
+            
+            if (raiseEvents)
+                ImportingStylesheets.RaiseEvent(new ImportEventArgs<IStylesheet>(styleSheets, element, false), this);
+
+            return styleSheets;
+
         }
 
-        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0)
-        {
-            throw new NotImplementedException();
-
-
-            //foreach (XmlNode n in xmlNodeList.OfType<XmlNode>())
-            //{
-            //    StyleSheet s = StyleSheet.MakeNew(
-            //        currentUser,
-            //        XmlHelper.GetNodeValue(n.SelectSingleNode("Name")),
-            //        XmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
-            //        XmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
-
-            //    foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
-            //    {
-            //        StylesheetProperty sp = StylesheetProperty.MakeNew(
-            //            xmlHelper.GetNodeValue(prop.SelectSingleNode("Name")),
-            //            s,
-            //            currentUser);
-            //        sp.Alias = XmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
-            //        sp.value = XmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
-            //    }
-            //    s.saveCssToFile();
-            //    s.Save();
-            //}
-        }
-
-        public IEnumerable<IMacro> ImportMacros(XElement xElement, int userId = 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement xElement, int userId = 0)
-        {
-            throw new NotImplementedException();
-        }
 
         private bool IsMasterPageSyntax(string code)
         {
@@ -1738,6 +1750,12 @@ namespace Umbraco.Core.Services
         /// Occurs before Importing Template
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<ITemplate>> ImportingTemplate;
+
+        /// <summary>
+        /// Occurs before Importing Stylesheets
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IStylesheet>> ImportingStylesheets;
+        
 
         /// <summary>
         /// Occurs after Template is Imported and Saved
