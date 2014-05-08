@@ -268,7 +268,7 @@ namespace Umbraco.Web.Security
         /// Returns the currently logged in member as IPublishedContent
         /// </summary>
         /// <returns></returns>
-        public IPublishedContent GetCurrent()
+        public IPublishedContent GetCurrentMember()
         {
             if (IsLoggedIn() == false)
             {
