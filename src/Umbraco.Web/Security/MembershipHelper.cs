@@ -255,6 +255,21 @@ namespace Umbraco.Web.Security
             var result = _applicationContext.Services.MemberService.GetByEmail(email);
             return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
         }
+
+        /// <summary>
+        /// Returns the currently logged in member as IPublishedContent
+        /// </summary>
+        /// <returns></returns>
+        public IPublishedContent GetCurrent()
+        {
+            if (IsLoggedIn() == false)
+            {
+                return null;
+            }
+            var result = GetCurrentMember();
+            var provider = MPE.GetMembersMembershipProvider();
+            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, true));
+        }
         
         #endregion
 
