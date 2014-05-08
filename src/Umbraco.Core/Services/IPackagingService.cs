@@ -71,7 +71,7 @@ namespace Umbraco.Core.Services
         IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="Models.ITemplate"/>
+        /// Imports and saves package xml as <see cref="ITemplate"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
