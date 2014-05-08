@@ -47,10 +47,10 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
         /// </summary>
-        /// <param name="element">Xml to import</param>
+        /// <param name="dictionaryItemElementList">Xml to import</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of dictionary items</returns>
-        IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement element, bool raiseEvents = true);
+        IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
