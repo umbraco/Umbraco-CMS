@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetAll(UmbracoObjectTypes.Document).ToArray();
+            var entities = service.GetAll(UmbracoObjectTypes.Document);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(4));
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
             var service = ServiceContext.EntityService;
 
             var objectTypeId = new Guid(Constants.ObjectTypes.Document);
-            var entities = service.GetAll(objectTypeId).ToArray();
+            var entities = service.GetAll(objectTypeId);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(4));
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetAll<IContent>().ToArray();
+            var entities = service.GetAll<IContent>();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(4));
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetChildren(-1, UmbracoObjectTypes.Document).ToArray();
+            var entities = service.GetChildren(-1, UmbracoObjectTypes.Document);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetAll(UmbracoObjectTypes.DocumentType).ToArray();
+            var entities = service.GetAll(UmbracoObjectTypes.DocumentType);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Services
             var service = ServiceContext.EntityService;
 
             var objectTypeId = new Guid(Constants.ObjectTypes.DocumentType);
-            var entities = service.GetAll(objectTypeId).ToArray();
+            var entities = service.GetAll(objectTypeId);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetAll<IContentType>().ToArray();
+            var entities = service.GetAll<IContentType>();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -126,16 +126,16 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetAll(UmbracoObjectTypes.Media).ToArray();
+            var entities = service.GetAll(UmbracoObjectTypes.Media);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(3));
-
+            //Assert.That(entities.Any(x => ((UmbracoEntity)x).UmbracoFile != string.Empty), Is.True);
             Assert.That(
                 entities.Any(
                     x =>
-                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty 
-                        && ((UmbracoEntity.EntityProperty)y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
+                    ((UmbracoEntity) x).UmbracoProperties.Any(
+                        y => y.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
         private static bool _isSetup = false;

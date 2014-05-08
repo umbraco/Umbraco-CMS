@@ -47,13 +47,12 @@ namespace Umbraco.Tests.Models
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
-
-            item.AdditionalData.Add("test3", new UmbracoEntity.EntityProperty()
+            item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test",
                 PropertyEditorAlias = "TestPropertyEditor"
             });
-            item.AdditionalData.Add("test4", new UmbracoEntity.EntityProperty()
+            item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test2",
                 PropertyEditorAlias = "TestPropertyEditor2"
@@ -83,6 +82,12 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
             Assert.AreEqual(clone.AdditionalData.Count, item.AdditionalData.Count);
             Assert.AreEqual(clone.AdditionalData, item.AdditionalData);
+            Assert.AreEqual(clone.UmbracoProperties.Count, item.UmbracoProperties.Count);
+            for (var i = 0; i < clone.UmbracoProperties.Count; i++)
+            {
+                Assert.AreNotSame(clone.UmbracoProperties[i], item.UmbracoProperties[i]);
+                Assert.AreEqual(clone.UmbracoProperties[i], item.UmbracoProperties[i]);
+            }
             
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
@@ -120,12 +125,12 @@ namespace Umbraco.Tests.Models
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
-            item.AdditionalData.Add("test3", new UmbracoEntity.EntityProperty()
+            item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test",
                 PropertyEditorAlias = "TestPropertyEditor"
             });
-            item.AdditionalData.Add("test4", new UmbracoEntity.EntityProperty()
+            item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
             {
                 Value = "test2",
                 PropertyEditorAlias = "TestPropertyEditor2"

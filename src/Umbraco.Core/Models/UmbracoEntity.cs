@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -48,11 +47,13 @@ namespace Umbraco.Core.Models
         public UmbracoEntity()
         {
             AdditionalData = new Dictionary<string, object>();
+            UmbracoProperties = new List<UmbracoProperty>();
         }
 
         public UmbracoEntity(bool trashed)
         {
             AdditionalData = new Dictionary<string, object>();
+            UmbracoProperties = new List<UmbracoProperty>();
             Trashed = trashed;
         }
 
@@ -60,6 +61,7 @@ namespace Umbraco.Core.Models
         public UmbracoEntity(UInt64 trashed)
         {
             AdditionalData = new Dictionary<string, object>();
+            UmbracoProperties = new List<UmbracoProperty>();
             Trashed = trashed == 1;
         }
 
@@ -285,31 +287,15 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public override object DeepClone()
-        {
-            var clone = (UmbracoEntity) base.DeepClone();
-
-            //This ensures that any value in the dictionary that is deep cloneable is cloned too
-            foreach (var key in clone.AdditionalData.Keys.ToArray())
-            {
-                var deepCloneable = clone.AdditionalData[key] as IDeepCloneable;
-                if (deepCloneable != null)
-                {
-                    clone.AdditionalData[key] = deepCloneable.DeepClone();
-                }
-            }
-
-            return clone;
-        }
-
         /// <summary>
-        /// A struction that can be contained in the additional data of an UmbracoEntity representing 
-        /// a user defined property
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
-        public class EntityProperty : IDeepCloneable
+        public IList<UmbracoProperty> UmbracoProperties { get; set; }
+        
+        internal class UmbracoProperty : IDeepCloneable
         {
             public string PropertyEditorAlias { get; set; }
-            public object Value { get; set; }
+            public string Value { get; set; }
             public object DeepClone()
             {
                 //Memberwise clone on Entity will work since it doesn't have any deep elements
@@ -318,7 +304,7 @@ namespace Umbraco.Core.Models
                 return clone;
             }
 
-            protected bool Equals(EntityProperty other)
+            protected bool Equals(UmbracoProperty other)
             {
                 return PropertyEditorAlias.Equals(other.PropertyEditorAlias) && string.Equals(Value, other.Value);
             }
@@ -328,7 +314,7 @@ namespace Umbraco.Core.Models
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((EntityProperty) obj);
+                return Equals((UmbracoProperty) obj);
             }
 
             public override int GetHashCode()
