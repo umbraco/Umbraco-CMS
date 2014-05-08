@@ -4,7 +4,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
     function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout) {
 
         //check the pre-values for multi-picker
-        var multiPicker = $scope.model.config.multiPicker !== '0' ? true : false;
+        var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
 
         if (!$scope.model.config.startNodeId)
              $scope.model.config.startNodeId = -1;
