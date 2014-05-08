@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
-    public interface IMacroProperty
+    internal interface IMacroProperty
     {
         /// <summary>
         /// The sortorder

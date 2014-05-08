@@ -47,10 +47,10 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
         /// </summary>
-        /// <param name="dictionaryItemElementList">Xml to import</param>
+        /// <param name="element">Xml to import</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of dictionary items</returns>
-        IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, bool raiseEvents = true);
+        IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement element, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
@@ -71,13 +71,22 @@ namespace Umbraco.Core.Services
         IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="ITemplate"/>
+        /// Imports and saves package xml as <see cref="Models.ITemplate"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
         IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IStylesheet"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of generated stylesheets</returns>
+        IEnumerable<IStylesheet> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>

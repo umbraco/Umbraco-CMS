@@ -1,23 +1,18 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Packaging
 {
     public class UnpackHelper : IUnpackHelper
     {
-        public string UnPackToTempDirectory(string filePath)
+        public string ReadTextFileFromArchive(string packageFilePath, string fileToRead)
         {
-            string tempDir = IOHelper.MapPath(SystemDirectories.Data) + Path.DirectorySeparatorChar + Guid.NewGuid();
-            Directory.CreateDirectory(tempDir);
-            UnPack(filePath, tempDir);
-            return tempDir;
-        }
+            CheckPackageExists(packageFilePath);
 
-        public string ReadTextFileFromArchive(string sourcefilePath, string fileToRead)
-        {
-            using (var fs = File.OpenRead(sourcefilePath))
+            using (var fs = File.OpenRead(packageFilePath))
             {
                 using (var zipStream = new ZipInputStream(fs))
                 {
@@ -38,32 +33,50 @@ namespace Umbraco.Core.Packaging
                 fs.Close();
             }
 
-            throw new FileNotFoundException(string.Format("Could not find file in package file {0}", sourcefilePath), fileToRead);
+            throw new FileNotFoundException(string.Format("Could not find file in package file {0}", packageFilePath), fileToRead);
         }
 
-        public void UnPack(string sourcefilePath, string destinationDirectory)
+        private static void CheckPackageExists(string packageFilePath)
         {
-            // Unzip
-            using (var fs = File.OpenRead(sourcefilePath))
+            if (File.Exists(packageFilePath) == false)
+                throw new ArgumentException(string.Format("Package file: {0} could not be found", packageFilePath),
+                    "packageFilePath");
+        }
+
+
+        public bool CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath)
+        {
+            CheckPackageExists(packageFilePath);
+
+            bool fileFoundInArchive = false;
+            bool fileOverwritten = false;
+
+            using (var fs = File.OpenRead(packageFilePath))
             {
                 using (var zipInputStream = new ZipInputStream(fs))
                 {
                     ZipEntry zipEntry;
                     while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                     {
-                        string fileName = Path.GetFileName(zipEntry.Name);
-                        if (string.IsNullOrEmpty(fileName)) continue;
-
-                        using ( var streamWriter = File.Create(Path.Combine(destinationDirectory, fileName))) 
+                        if(zipEntry.Name.Equals(fileInPackageName))
                         {
-                            var data = new byte[2048];
-                            int size;
-                            while ((size = zipInputStream.Read(data, 0, data.Length)) > 0)
+                            fileFoundInArchive = true;
+
+                            fileOverwritten = File.Exists(destinationfilePath);
+
+                            using (var streamWriter = File.Open(destinationfilePath, FileMode.Create))
                             {
-                                streamWriter.Write(data, 0, size);
+                                var data = new byte[2048];
+                                int size;
+                                while ((size = zipInputStream.Read(data, 0, data.Length)) > 0)
+                                {
+                                    streamWriter.Write(data, 0, size);
+                                }
+
+                                streamWriter.Close();
                             }
 
-                            streamWriter.Close();
+                            break;
                         }
                     }
 
@@ -71,6 +84,39 @@ namespace Umbraco.Core.Packaging
                 }
                 fs.Close();
             }
+
+            if (fileFoundInArchive == false) throw new ArgumentException(string.Format("Could not find file: {0} in package file: {1}", fileInPackageName, packageFilePath), "fileInPackageName");
+
+            return fileOverwritten;
+        }
+
+        public IEnumerable<string> FindMissingFiles(string packageFilePath, IEnumerable<string> expectedFiles)
+        {
+            CheckPackageExists(packageFilePath);
+
+            var exp = expectedFiles.ToDictionary(k => k, v => true);
+
+            using (var fs = File.OpenRead(packageFilePath))
+            {
+                using (var zipInputStream = new ZipInputStream(fs))
+                {
+                    ZipEntry zipEntry;
+                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
+                    {
+                        if (exp.ContainsKey(zipEntry.Name))
+                        {
+                            exp[zipEntry.Name] = false;
+                        }
+                    }
+
+                    zipInputStream.Close();
+                }
+                fs.Close();
+            }
+
+
+            return exp.Where(kv => kv.Value).Select(kv => kv.Key);
+
         }
     }
 }

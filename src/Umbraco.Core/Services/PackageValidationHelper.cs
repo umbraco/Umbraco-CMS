@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
             else throw new ArgumentNullException("macroService");
         }
 
-        public bool StylesheetExists(string styleSheetName, out Stylesheet existingStyleSheet)
+        public bool StylesheetExists(string styleSheetName, out IStylesheet existingStyleSheet)
         {
             existingStyleSheet = _fileService.GetStylesheetByName(styleSheetName);
             return existingStyleSheet != null;

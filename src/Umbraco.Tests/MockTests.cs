@@ -44,6 +44,10 @@ namespace Umbraco.Tests
                     new Mock<ILocalizationService>().Object,
                     new RepositoryFactory(true),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
+                new PackageInstallerService(
+                    new Mock<IPackagingService>().Object,
+                    new Mock<IMacroService>().Object,
+                    new Mock<IFileService>().Object),
                 new Mock<IEntityService>().Object,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
@@ -89,6 +93,10 @@ namespace Umbraco.Tests
                         new Mock<ILocalizationService>().Object,
                         new RepositoryFactory(true),
                         new Mock<IDatabaseUnitOfWorkProvider>().Object),
+                    new PackageInstallerService(
+                        new Mock<IPackagingService>().Object,
+                        new Mock<IMacroService>().Object,
+                        new Mock<IFileService>().Object),
                     new Mock<IEntityService>().Object,
                     new RelationService(
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,

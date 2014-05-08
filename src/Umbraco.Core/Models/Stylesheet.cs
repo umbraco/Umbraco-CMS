@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Stylesheet : File
+    public class Stylesheet : File, IStylesheet
     {
         public Stylesheet(string path) : base(path)
         {

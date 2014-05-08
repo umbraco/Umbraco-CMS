@@ -1,94 +1,168 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Web.Hosting;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
-using File = System.IO.File;
 
 namespace Umbraco.Core.Services
 {
     public class PackageInstallerService : IPackageInstallerService
     {
-        private readonly IPackageValidationHelper _packageValidationHelper;
+        private readonly IFileService _fileService;
+        private readonly IMacroService _macroService;
         private readonly IPackagingService _packagingService;
-        private readonly IUnpackHelper _unpackHelper;
+        private IPackageValidationHelper _packageValidationHelper;
+        private IUnpackHelper _unpackHelper;
 
-
-        public PackageInstallerService(IPackagingService packagingService, IUnpackHelper unpackHelper, IPackageValidationHelper packageValidationHelper)
+        public PackageInstallerService(IPackagingService packagingService, IMacroService macroService,
+            IFileService fileService)
         {
-            if (packageValidationHelper != null) _packageValidationHelper = packageValidationHelper; else throw new ArgumentNullException("packageValidationHelper");
-            if (packagingService != null) _packagingService = packagingService; else throw new ArgumentNullException("packagingService");
-            if (unpackHelper != null) _unpackHelper = unpackHelper; else throw new ArgumentNullException("unpackHelper");
+            if (macroService != null) _macroService = macroService;
+            else throw new ArgumentNullException("macroService");
+            if (fileService != null) _fileService = fileService;
+            else throw new ArgumentNullException("fileService");
+            if (packagingService != null) _packagingService = packagingService;
+            else throw new ArgumentNullException("packagingService");
         }
 
 
-        public PackageInstallationSummary InstallPackageFile(string packageFilePath, int userId)
+        public IPackageValidationHelper PackageValidationHelper
         {
-            FileInfo fi = GetPackageFileInfo(packageFilePath);
-            string tempDir = null;
-            try
+            private get
             {
-                tempDir = _unpackHelper.UnPackToTempDirectory(fi.FullName);
-                return InstallFromDirectory(tempDir, userId);
+                return _packageValidationHelper ??
+                       (_packageValidationHelper = new PackageValidationHelper(_macroService, _fileService));
             }
-            finally
+            set
             {
-                if (string.IsNullOrEmpty(tempDir) == false && Directory.Exists(tempDir))
+                if (_packageValidationHelper != null)
                 {
-                    Directory.Delete(tempDir, true);
+                    throw new PropertyConstraintException("This property allraedy have a value");
                 }
+                _packageValidationHelper = value;
             }
         }
+
+
+        public IUnpackHelper UnpackHelper
+        {
+            private get { return _unpackHelper ?? (_unpackHelper = new UnpackHelper()); }
+            set
+            {
+                if (_unpackHelper != null)
+                {
+                    throw new PropertyConstraintException("This property allraedy have a value");
+                }
+                _unpackHelper = value;
+            }
+        }
+
+        private string _fullpathToRoot;
+        public string FullpathToRoot
+        {
+            private get { return _fullpathToRoot ?? (_fullpathToRoot = GlobalSettings.FullpathToRoot); }
+            set
+            {
+
+                if (_fullpathToRoot != null)
+                {
+                    throw new PropertyConstraintException("This property allraedy have a value");
+                }
+
+                _fullpathToRoot = value;
+            }
+        }
+
 
         public PackageMetaData GetMetaData(string packageFilePath)
         {
-            var rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
+            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
             return GetMetaData(rootElement);
         }
 
         public PackageImportIssues FindPackageImportIssues(string packageFilePath)
         {
-            var rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
+            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
             return FindImportIssues(rootElement);
         }
 
+        public PackageInstallationSummary InstallPackageFile(string packageFile, int userId)
+        {
+            ValidateFilesExistsInPackage(packageFile);
 
-        private FileInfo GetPackageFileInfo(string packageFilePath)
+
+            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFile);
+
+            XElement dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
+            XElement languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
+            XElement dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryItemsNodeName);
+            XElement macroes = rootElement.Element(Constants.Packaging.MacrosNodeName);
+            XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
+            XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
+            XElement documentTypes = rootElement.Element(Constants.Packaging.DocumentTypesNodeName);
+            XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
+            XElement documentSet = rootElement.Element(Constants.Packaging.DocumentSetNodeName);
+            XElement actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
+
+            return new PackageInstallationSummary
+            {
+                MetaData = GetMetaData(rootElement),
+                DataTypesInstalled =
+                    dataTypes == null ? new IDataTypeDefinition[0] : InstallDataTypes(dataTypes, userId),
+                LanguagesInstalled = languages == null ? new ILanguage[0] : InstallLanguages(languages, userId),
+                DictionaryItemsInstalled =
+                    dictionaryItems == null ? new IDictionaryItem[0] : InstallDictionaryItems(dictionaryItems),
+                MacrosInstalled = macroes == null ? new IMacro[0] : InstallMacros(macroes, userId),
+                FilesInstalled =
+                    packageFile == null
+                        ? Enumerable.Empty<KeyValuePair<string, bool>>()
+                        : InstallFiles(packageFile, files),
+                TemplatesInstalled = templates == null ? new ITemplate[0] : InstallTemplats(templates, userId),
+                DocumentTypesInstalled =
+                    documentTypes == null ? new IContentType[0] : InstallDocumentTypes(documentTypes, userId),
+                StylesheetsInstalled =
+                    styleSheets == null ? new IStylesheet[0] : InstallStylesheets(styleSheets, userId),
+                DocumentsInstalled = documentSet == null ? new IContent[0] : InstallDocuments(documentSet, userId),
+                PackageInstallActions =
+                    actions == null ? Enumerable.Empty<KeyValuePair<string, XElement>>() : GetInstallActions(actions),
+                PackageUninstallActions = actions == null ? string.Empty : GetUninstallActions(actions)
+            };
+        }
+
+
+        private void ValidatePackageFileExists(string packageFilePath)
         {
             if (string.IsNullOrEmpty(packageFilePath))
             {
                 throw new ArgumentNullException("packageFilePath");
             }
 
-            var fi = new FileInfo(packageFilePath);
-
-            if (fi.Exists == false)
+            if (System.IO.File.Exists(packageFilePath) == false)
             {
                 throw new Exception("Error - file not found. Could find file named '" + packageFilePath + "'");
             }
 
-
             // Check if the file is a valid package
-            if (fi.Extension.Equals(Constants.Packaging.UmbracoPackageExtention, StringComparison.InvariantCultureIgnoreCase) == false)
+            if (Path.GetExtension(packageFilePath).Equals(".umb", StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
+                throw new Exception(
+                    "Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
             }
-
-            return fi;
         }
 
 
         private XDocument GetConfigXmlDocFromPackageFile(string packageFilePath)
         {
-            FileInfo packageFileInfo = GetPackageFileInfo(packageFilePath);
+            ValidatePackageFileExists(packageFilePath);
 
-            string configXmlContent = _unpackHelper.ReadTextFileFromArchive(packageFileInfo.FullName, Constants.Packaging.PackageXmlFileName);
+            string configXmlContent = UnpackHelper.ReadTextFileFromArchive(packageFilePath,
+                Constants.Packaging.PackageXmlFileName);
 
             return XDocument.Parse(configXmlContent);
         }
@@ -96,293 +170,356 @@ namespace Umbraco.Core.Services
 
         private XElement GetConfigXmlRootElementFromPackageFile(string packageFilePath)
         {
-            var document = GetConfigXmlDocFromPackageFile(packageFilePath);
-            if (document.Root == null || document.Root.Name.LocalName.Equals(Constants.Packaging.UmbPackageNodeName) == false) { throw new ArgumentException("xml does not have a root node called \"umbPackage\"", packageFilePath); }
+            XDocument document = GetConfigXmlDocFromPackageFile(packageFilePath);
+            if (document.Root == null ||
+                document.Root.Name.LocalName.Equals(Constants.Packaging.UmbPackageNodeName) == false)
+            {
+                throw new ArgumentException("xml does not have a root node called \"umbPackage\"", packageFilePath);
+            }
             return document.Root;
         }
 
-
-        private PackageInstallationSummary InstallFromDirectory(string packageDir, int userId)
+        private void ValidateFilesExistsInPackage(string packageFilePath)
         {
-            var configXml = GetConfigXmlDocFromPackageDirectory(packageDir);
-            var rootElement = configXml.XPathSelectElement(Constants.Packaging.UmbPackageNodeName);
-            if (rootElement == null) { throw new ArgumentException("File does not have a root node called \"" + Constants.Packaging.UmbPackageNodeName + "\"", packageDir); }
-
-            var dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
-            var languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
-            var dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryitemsNodeName);
-            var macroes = rootElement.Element(Constants.Packaging.MacrosNodeName);
-            var files = rootElement.Element(Constants.Packaging.FilesNodeName);
-            var templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
-            var documentTypes = rootElement.Element(Constants.Packaging.DocumentTypesNodeName);
-            var styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
-            var documentSet = rootElement.Element(Constants.Packaging.DocumentSetNodeName);
-            var actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
-
-            return new PackageInstallationSummary
+            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
+            XElement filesElement = rootElement.Element(Constants.Packaging.FilesNodeName);
+            if (filesElement != null)
             {
-                MetaData = GetMetaData(rootElement),
-                DataTypesInstalled = dataTypes == null ? Enumerable.Empty<int>() : InstallDataTypes(dataTypes, userId),
-                LanguagesInstalled = languages == null ? Enumerable.Empty<int>() : InstallLanguages(languages, userId),
-                DictionaryItemsInstalled = dictionaryItems == null ? Enumerable.Empty<int>() : InstallDictionaryItems(dictionaryItems, userId),
-                MacrosInstalled = macroes == null ? Enumerable.Empty<int>() : InstallMacros(macroes, userId),
-                FilesInstalled = packageDir == null ? Enumerable.Empty<KeyValuePair<string, bool>>() : InstallFiles(packageDir, files),
-                TemplatesInstalled = templates == null ? Enumerable.Empty<int>() : InstallTemplats(templates, userId),
-                DocumentTypesInstalled = documentTypes == null ? Enumerable.Empty<int>() : InstallDocumentTypes(documentTypes, userId),
-                StylesheetsInstalled = styleSheets == null ? Enumerable.Empty<int>() : InstallStylesheets(styleSheets, userId),
-                DocumentsInstalled = documentSet == null ? Enumerable.Empty<int>() : InstallDocuments(documentSet, userId),
-                PackageInstallActions = actions == null ? Enumerable.Empty<KeyValuePair<string, XElement>>() : GetInstallActions(actions),
-                PackageUninstallActions = actions == null ? string.Empty : GetUninstallActions(actions)
-            };
+                IEnumerable<FileInPackageInfo> extractFileInPackageInfos =
+                    ExtractFileInPackageInfos(filesElement).ToArray();
+
+                IEnumerable<string> missingFiles =
+                    _unpackHelper.FindMissingFiles(packageFilePath,
+                        extractFileInPackageInfos.Select(i => i.FileNameInPackage)).ToArray();
+
+                if (missingFiles.Any())
+                {
+                    throw new Exception("The following file(s) are missing in the package: " +
+                                        string.Join(", ", missingFiles.Select(
+                                            mf =>
+                                            {
+                                                FileInPackageInfo fileInPackageInfo =
+                                                    extractFileInPackageInfos.Single(fi => fi.FileNameInPackage == mf);
+                                                return string.Format("Guid: \"{0}\" Original File: \"{1}\"",
+                                                    fileInPackageInfo.FileNameInPackage, fileInPackageInfo.RelativePath);
+                                            })));
+                }
+            }
         }
+
 
         private static string GetUninstallActions(XElement actionsElement)
         {
             //saving the uninstall actions untill the package is uninstalled.
             return actionsElement.Elements(Constants.Packaging.ActionNodeName)
-                .Where(e => e.HasAttributes && e.Attribute(Constants.Packaging.UndoNodeAttribute) != null && e.Attribute(Constants.Packaging.UndoNodeAttribute)
-                    .Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false)  // SelectNodes("Actions/Action [@undo != false()]");
-                    .Select(m => m.Value).Aggregate((workingSentence, next) => next + workingSentence);
+                .Where(
+                    e =>
+                        e.HasAttributes && e.Attribute(Constants.Packaging.UndoNodeAttribute) != null &&
+                        e.Attribute(Constants.Packaging.UndoNodeAttribute)
+                            .Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false)
+                // SelectNodes("Actions/Action [@undo != false()]");
+                .Select(m => m.Value).Aggregate((workingSentence, next) => next + workingSentence);
         }
 
         private static IEnumerable<KeyValuePair<string, XElement>> GetInstallActions(XElement actionsElement)
         {
-            if (actionsElement == null) { return Enumerable.Empty<KeyValuePair<string, XElement>>(); }
+            if (actionsElement == null)
+            {
+                return Enumerable.Empty<KeyValuePair<string, XElement>>();
+            }
 
-            if (string.Equals(Constants.Packaging.ActionsNodeName, actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.ActionsNodeName + "\" as root", "actionsElement"); }
+            if (string.Equals(Constants.Packaging.ActionsNodeName, actionsElement.Name.LocalName) == false)
+            {
+                throw new ArgumentException("Must be \"" + Constants.Packaging.ActionsNodeName + "\" as root",
+                    "actionsElement");
+            }
 
             return actionsElement.Elements(Constants.Packaging.ActionNodeName)
                 .Where(
                     e =>
                         e.HasAttributes &&
                         (e.Attribute(Constants.Packaging.RunatNodeAttribute) == null ||
-                         e.Attribute(Constants.Packaging.RunatNodeAttribute).Value.Equals("uninstall", StringComparison.InvariantCultureIgnoreCase) ==
+                         e.Attribute(Constants.Packaging.RunatNodeAttribute)
+                             .Value.Equals("uninstall", StringComparison.InvariantCultureIgnoreCase) ==
                          false)) // .SelectNodes("Actions/Action [@runat != 'uninstall']")
                 .Select(elemet =>
                 {
-                    var aliasAttr = elemet.Attribute(Constants.Packaging.AliasNodeName);
+                    XAttribute aliasAttr = elemet.Attribute(Constants.Packaging.AliasNodeName);
                     if (aliasAttr == null)
-                        throw new ArgumentException("missing \"" + Constants.Packaging.AliasNodeName + "\" atribute in alias element", "actionsElement");
+                        throw new ArgumentException(
+                            "missing \"" + Constants.Packaging.AliasNodeName + "\" atribute in alias element",
+                            "actionsElement");
                     return new {elemet, alias = aliasAttr.Value};
                 }).ToDictionary(x => x.alias, x => x.elemet);
         }
 
-        private IEnumerable<int> InstallDocuments(XElement documentsElement, int userId = 0)
+        private IContent[] InstallDocuments(XElement documentsElement, int userId = 0)
         {
-            if (string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.DocumentSetNodeName + "\" as root", "documentsElement"); }
-            return _packagingService.ImportContent(documentsElement, -1, userId).Select(c => c.Id);
-        }
-
-        private IEnumerable<int> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
-        {
-            if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.StylesheetsNodeName + "\" as root", "styleSheetsElement"); }
-            return _packagingService.ImportStylesheets(styleSheetsElement, userId).Select(f => f.Id);
-        }
-
-        private IEnumerable<int> InstallDocumentTypes(XElement documentTypes, int userId = 0)
-        {
-            if (string.Equals(Constants.Packaging.DocumentTypesNodeName, documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+            if (string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName) == false)
             {
-                if (string.Equals(Constants.Packaging.DocumentTypeNodeName, documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
-                    throw new ArgumentException("Must be \"" + Constants.Packaging.DocumentTypesNodeName + "\" as root", "documentTypes");
+                throw new ArgumentException("Must be \"" + Constants.Packaging.DocumentSetNodeName + "\" as root",
+                    "documentsElement");
+            }
+            return _packagingService.ImportContent(documentsElement, -1, userId).ToArray();
+        }
+
+        private IStylesheet[] InstallStylesheets(XElement styleSheetsElement, int userId = 0)
+        {
+            if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName) == false)
+            {
+                throw new ArgumentException("Must be \"" + Constants.Packaging.StylesheetsNodeName + "\" as root",
+                    "styleSheetsElement");
+            }
+            return _packagingService.ImportStylesheets(styleSheetsElement, userId).ToArray();
+        }
+
+        private IContentType[] InstallDocumentTypes(XElement documentTypes, int userId = 0)
+        {
+            if (string.Equals(Constants.Packaging.DocumentTypesNodeName, documentTypes.Name.LocalName) == false)
+            {
+                if (string.Equals(Constants.Packaging.DocumentTypeNodeName, documentTypes.Name.LocalName) == false)
+                    throw new ArgumentException(
+                        "Must be \"" + Constants.Packaging.DocumentTypesNodeName + "\" as root", "documentTypes");
 
                 documentTypes = new XElement(Constants.Packaging.DocumentTypesNodeName, documentTypes);
             }
 
-            return _packagingService.ImportContentTypes(documentTypes, userId).Select(ct => ct.Id);
+            return _packagingService.ImportContentTypes(documentTypes, userId).ToArray();
         }
 
-        private IEnumerable<int> InstallTemplats(XElement templateElement, int userId = 0)
+        private ITemplate[] InstallTemplats(XElement templateElement, int userId = 0)
         {
-            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.TemplatesNodeName + "\" as root", "templateElement"); }
-            return _packagingService.ImportTemplates(templateElement, userId).Select(t => t.Id);
-        }
-
-
-        private static IEnumerable<KeyValuePair<string, bool>> InstallFiles(string packageDir, XElement filesElement)
-        {
-            if (string.Equals(Constants.Packaging.FilesNodeName, filesElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("root element must be \"" + Constants.Packaging.FilesNodeName + "\"", "filesElement"); }
-
-            string basePath = HostingEnvironment.ApplicationPhysicalPath;
-
-            var xmlNodeList = filesElement.Elements(Constants.Packaging.FileNodeName);
-
-            return xmlNodeList.Select(e =>
+            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateElement.Name.LocalName) == false)
             {
-                var orgPathElement = e.Element(Constants.Packaging.OrgPathNodeName);
-                if (orgPathElement == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgPathNodeName + "\"", "filesElement"); }
-
-                var guidElement = e.Element(Constants.Packaging.GuidNodeName);
-                if (guidElement == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.GuidNodeName + "\"", "filesElement"); }
-
-                var orgNameElement = e.Element(Constants.Packaging.OrgnameNodeName);
-                if (orgNameElement == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgnameNodeName + "\"", "filesElement"); }
-
-
-                var destPath = GetFileName(basePath, orgPathElement.Value);
-                var sourceFile = GetFileName(packageDir, guidElement.Value);
-                var destFile = GetFileName(destPath, orgNameElement.Value);
-
-                if (Directory.Exists(destPath) == false) Directory.CreateDirectory(destPath);
-
-                var existingOverrided = File.Exists(destFile);
-
-                File.Copy(sourceFile, destFile, true);
-                
-                return new KeyValuePair<string, bool>(orgPathElement.Value + "/" + orgNameElement.Value, existingOverrided);
-            });
+                throw new ArgumentException("Must be \"" + Constants.Packaging.TemplatesNodeName + "\" as root",
+                    "templateElement");
+            }
+            return _packagingService.ImportTemplates(templateElement, userId).ToArray();
         }
 
-        private IEnumerable<int> InstallMacros(XElement macroElements, int userId = 0)
-        {
-            if (string.Equals(Constants.Packaging.MacrosNodeName, macroElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.MacrosNodeName + "\" as root", "macroElements"); }
-            return _packagingService.ImportMacros(macroElements, userId).Select(m => m.Id);
-        }
 
-        private IEnumerable<int> InstallDictionaryItems(XElement dictionaryItemsElement, int userId = 0)
+        private IEnumerable<KeyValuePair<string, bool>> InstallFiles(string packageFilePath, XElement filesElement)
         {
-            if (string.Equals(Constants.Packaging.DictionaryitemsNodeName, dictionaryItemsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.DictionaryitemsNodeName + "\" as root", "dictionaryItemsElement"); }
-            return _packagingService.ImportDictionaryItems(dictionaryItemsElement, userId).Select(di => di.Id);
-        }
-
-        private IEnumerable<int> InstallLanguages(XElement languageElement, int userId = 0)
-        {
-            if (string.Equals(Constants.Packaging.LanguagesNodeName, languageElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "languageElement"); }
-            return _packagingService.ImportLanguage(languageElement, userId).Select(l => l.Id);
-        }
-
-        private IEnumerable<int> InstallDataTypes(XElement dataTypeElements, int userId = 0)
-        {
-            if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+            return ExtractFileInPackageInfos(filesElement).Select(fpi =>
             {
+                bool existingOverrided = _unpackHelper.CopyFileFromArchive(packageFilePath, fpi.FileNameInPackage,
+                    fpi.FullPath);
 
-                if (string.Equals(Constants.Packaging.DataTypeNodeName, dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+                return new KeyValuePair<string, bool>(fpi.FullPath, existingOverrided);
+            }).ToArray();
+        }
+
+        private IMacro[] InstallMacros(XElement macroElements, int userId = 0)
+        {
+            if (string.Equals(Constants.Packaging.MacrosNodeName, macroElements.Name.LocalName) == false)
+            {
+                throw new ArgumentException("Must be \"" + Constants.Packaging.MacrosNodeName + "\" as root",
+                    "macroElements");
+            }
+            return _packagingService.ImportMacros(macroElements, userId).ToArray();
+        }
+
+        private IDictionaryItem[] InstallDictionaryItems(XElement dictionaryItemsElement)
+        {
+            if (string.Equals(Constants.Packaging.DictionaryItemsNodeName, dictionaryItemsElement.Name.LocalName) ==
+                false)
+            {
+                throw new ArgumentException("Must be \"" + Constants.Packaging.DictionaryItemsNodeName + "\" as root",
+                    "dictionaryItemsElement");
+            }
+            return _packagingService.ImportDictionaryItems(dictionaryItemsElement).ToArray();
+        }
+
+        private ILanguage[] InstallLanguages(XElement languageElement, int userId = 0)
+        {
+            if (string.Equals(Constants.Packaging.LanguagesNodeName, languageElement.Name.LocalName) == false)
+            {
+                throw new ArgumentException("Must be \"Templates\" as root", "languageElement");
+            }
+            return _packagingService.ImportLanguages(languageElement, userId).ToArray();
+        }
+
+        private IDataTypeDefinition[] InstallDataTypes(XElement dataTypeElements, int userId = 0)
+        {
+            if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName) == false)
+            {
+                if (string.Equals(Constants.Packaging.DataTypeNodeName, dataTypeElements.Name.LocalName) == false)
                 {
                     throw new ArgumentException("Must be \"Templates\" as root", "dataTypeElements");
                 }
             }
-            return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId).Select(e => e.Id);
+            return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId).ToArray();
         }
-
-        private static XDocument GetConfigXmlDocFromPackageDirectory(string packageDir)
-        {
-            string packageXmlPath = Path.Combine(packageDir, Constants.Packaging.PackageXmlFileName);
-            if (File.Exists(packageXmlPath) == false) { throw new FileNotFoundException("Could not find " + Constants.Packaging.PackageXmlFileName + " in package"); }
-            return XDocument.Load(packageXmlPath);
-        }
-
 
         private PackageImportIssues FindImportIssues(XElement rootElement)
         {
-            var files = rootElement.Element(Constants.Packaging.FilesNodeName);
-            var styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
-            var templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
-            var alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
+            XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
+            XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
+            XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
+            XElement alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
             var packageImportIssues = new PackageImportIssues
             {
-                UnsecureFiles = files == null ? Enumerable.Empty<string>() : FindUnsecureFiles(files),
-                ConflictingMacroAliases =  alias == null ? Enumerable.Empty<KeyValuePair<string, string>>() : FindConflictingMacroAliases(alias),
-                ConflictingTemplateAliases = templates == null ?  Enumerable.Empty<KeyValuePair<string, string>>() : FindConflictingTemplateAliases(templates),
-                ConflictingStylesheetNames = styleSheets == null ? Enumerable.Empty<KeyValuePair<string, string>>() : FindConflictingStylesheetNames(styleSheets)
+                UnsecureFiles = files == null ? new IFileInPackageInfo[0] : FindUnsecureFiles(files),
+                ConflictingMacroAliases = alias == null ? new IMacro[0] : FindConflictingMacroAliases(alias),
+                ConflictingTemplateAliases =
+                    templates == null ? new ITemplate[0] : FindConflictingTemplateAliases(templates),
+                ConflictingStylesheetNames =
+                    styleSheets == null ? new IStylesheet[0] : FindConflictingStylesheetNames(styleSheets)
             };
 
             return packageImportIssues;
         }
 
-        private IEnumerable<string> FindUnsecureFiles(XElement fileElement)
+        private IFileInPackageInfo[] FindUnsecureFiles(XElement fileElement)
         {
-            if (string.Equals(Constants.Packaging.FilesNodeName, fileElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Files\"", "fileElement"); }
-
-            return fileElement.Elements(Constants.Packaging.FileNodeName)
-                .Where(FileNodeIsUnsecure)
-                    .Select(n =>
-                    {
-                        var xElement = n.Element(Constants.Packaging.OrgnameNodeName);
-                        if (xElement == null) { throw new ArgumentException("missing a element: " + Constants.Packaging.OrgnameNodeName, "n"); }
-                        return xElement.Value;
-                    });
+            return ExtractFileInPackageInfos(fileElement)
+                .Where(IsFileNodeUnsecure).Cast<IFileInPackageInfo>().ToArray();
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FindConflictingStylesheetNames(XElement stylesheetNotes)
+        private IStylesheet[] FindConflictingStylesheetNames(XElement stylesheetNotes)
         {
-            if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Stylesheets\"", "stylesheetNotes"); }
+            if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName) == false)
+            {
+                throw new ArgumentException("the root element must be \"Stylesheets\"", "stylesheetNotes");
+            }
 
             return stylesheetNotes.Elements(Constants.Packaging.StylesheetNodeName)
-                    .Select(n =>
+                .Select(n =>
+                {
+                    XElement xElement = n.Element(Constants.Packaging.NameNodeName);
+                    if (xElement == null)
                     {
-                        var xElement = n.Element(Constants.Packaging.NameNodeName);
-                        if (xElement == null) { throw new ArgumentException("Missing \"" + Constants.Packaging.NameNodeName + "\" element", "stylesheetNotes"); }
+                        throw new ArgumentException("Missing \"" + Constants.Packaging.NameNodeName + "\" element",
+                            "stylesheetNotes");
+                    }
 
-                        string name = xElement.Value;
+                    string name = xElement.Value;
 
-                        Stylesheet existingStyleSheet;
-                        if (_packageValidationHelper.StylesheetExists(name, out existingStyleSheet))
-                        {
-                            // Don't know what to put in here... existing path was the best i could come up with
-                            return new KeyValuePair<string, string>(name, existingStyleSheet.Path);
-                        }
-                        return new KeyValuePair<string, string>(name, null);
-                    })
-                    .Where(kv => kv.Value != null);
+                    IStylesheet existingStyleSheet;
+                    if (PackageValidationHelper.StylesheetExists(name, out existingStyleSheet))
+                    {
+                        // Don't know what to put in here... existing path was the best i could come up with
+                        return existingStyleSheet;
+                    }
+                    return null;
+                })
+                .Where(v => v != null).ToArray();
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FindConflictingTemplateAliases(XElement templateNotes)
+        private ITemplate[] FindConflictingTemplateAliases(XElement templateNotes)
         {
-            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Node must be a \"" + Constants.Packaging.TemplatesNodeName + "\" node", "templateNotes"); }
+            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateNotes.Name.LocalName) == false)
+            {
+                throw new ArgumentException("Node must be a \"" + Constants.Packaging.TemplatesNodeName + "\" node",
+                    "templateNotes");
+            }
 
             return templateNotes.Elements(Constants.Packaging.TemplateNodeName)
-                    .Select(n =>
+                .Select(n =>
+                {
+                    XElement alias = n.Element(Constants.Packaging.AliasNodeName);
+                    if (alias == null)
                     {
-                        var alias = n.Element(Constants.Packaging.AliasNodeName);
-                        if (alias == null) { throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element", "templateNotes"); }
-                        string aliasStr = alias.Value;
+                        throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element",
+                            "templateNotes");
+                    }
+                    string aliasStr = alias.Value;
 
-                        ITemplate existingTemplate;
+                    ITemplate existingTemplate;
 
-                        if (_packageValidationHelper.TemplateExists(aliasStr, out existingTemplate))
-                        {
-                            return new KeyValuePair<string, string>(aliasStr, existingTemplate.Name);
-                        }
+                    if (PackageValidationHelper.TemplateExists(aliasStr, out existingTemplate))
+                    {
+                        return existingTemplate;
+                    }
 
-                        return new KeyValuePair<string, string>(aliasStr, null);
-                    })
-                    .Where(kv => kv.Value != null);
+                    return null;
+                })
+                .Where(v => v != null).ToArray();
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FindConflictingMacroAliases(XElement macroNodes)
+        private IMacro[] FindConflictingMacroAliases(XElement macroNodes)
         {
             return macroNodes.Elements(Constants.Packaging.MacroNodeName)
-                    .Select(n =>
+                .Select(n =>
+                {
+                    XElement xElement = n.Element(Constants.Packaging.AliasNodeName);
+                    if (xElement == null)
                     {
-                        var xElement = n.Element(Constants.Packaging.AliasNodeName);
-                        if (xElement == null) { throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element", "macroNodes"); }
-                        string alias = xElement.Value;
+                        throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element",
+                            "macroNodes");
+                    }
+                    string alias = xElement.Value;
 
-                        IMacro existingMacro;
-                        if (_packageValidationHelper.MacroExists(alias, out existingMacro))
-                        {
-                            return new KeyValuePair<string, string>(alias, existingMacro.Name);
-                        }
-                        
-                        return new KeyValuePair<string, string>(alias, null);
-                    })
-                    .Where(kv => kv.Key != null && kv.Value != null);
+                    IMacro existingMacro;
+                    if (PackageValidationHelper.MacroExists(alias, out existingMacro))
+                    {
+                        return existingMacro;
+                    }
+
+                    return null;
+                })
+                .Where(v => v != null).ToArray();
         }
 
 
-        private bool FileNodeIsUnsecure(XElement fileNode)
+        private bool IsFileNodeUnsecure(FileInPackageInfo fileInPackageInfo)
         {
-            string basePath = HostingEnvironment.ApplicationPhysicalPath;
-            var orgName = fileNode.Element(Constants.Packaging.OrgnameNodeName);
-            if (orgName == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgnameNodeName + "\"", "fileNode"); }
-
-            string destPath = GetFileName(basePath, orgName.Value);
-
             // Should be done with regex :)
-            if (destPath.ToLower().Contains(IOHelper.DirSepChar + "app_code")) return true;
-            if (destPath.ToLower().Contains(IOHelper.DirSepChar + "bin")) return true;
+            if (fileInPackageInfo.Directory.ToLower().Contains(IOHelper.DirSepChar + "app_code")) return true;
+            if (fileInPackageInfo.Directory.ToLower().Contains(IOHelper.DirSepChar + "bin")) return true;
 
-            return destPath.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase);
+            string extension = Path.GetExtension(fileInPackageInfo.Directory);
+
+            return extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+
+        private IEnumerable<FileInPackageInfo> ExtractFileInPackageInfos(XElement filesElement)
+        {
+            if (string.Equals(Constants.Packaging.FilesNodeName, filesElement.Name.LocalName) == false)
+            {
+                throw new ArgumentException("the root element must be \"Files\"", "filesElement");
+            }
+
+            return filesElement.Elements(Constants.Packaging.FileNodeName)
+                .Select(e =>
+                {
+                    XElement guidElement = e.Element(Constants.Packaging.GuidNodeName);
+                    if (guidElement == null)
+                    {
+                        throw new ArgumentException("Missing element \"" + Constants.Packaging.GuidNodeName + "\"",
+                            "filesElement");
+                    }
+
+                    XElement orgPathElement = e.Element(Constants.Packaging.OrgPathNodeName);
+                    if (orgPathElement == null)
+                    {
+                        throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgPathNodeName + "\"",
+                            "filesElement");
+                    }
+
+                    XElement orgNameElement = e.Element(Constants.Packaging.OrgNameNodeName);
+                    if (orgNameElement == null)
+                    {
+                        throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgNameNodeName + "\"",
+                            "filesElement");
+                    }
+
+
+                    return new FileInPackageInfo
+                    {
+                        FileNameInPackage = guidElement.Value,
+                        FileName = PrepareAsFilePathElement(orgNameElement.Value),
+                        RelativeDir = UpdatePathPlaceholders(
+                            PrepareAsFilePathElement(orgPathElement.Value)),
+                        DestinationRootDir = FullpathToRoot
+                    };
+                }).ToArray();
+        }
+
+        private static string PrepareAsFilePathElement(string pathElement)
+        {
+            return pathElement.TrimStart(new[] {'\\', '/', '~'}).Replace("/", "\\");
         }
 
 
@@ -390,20 +527,24 @@ namespace Umbraco.Core.Services
         {
             XElement infoElement = xRootElement.Element(Constants.Packaging.InfoNodeName);
 
-            if (infoElement == null) { throw new ArgumentException("Did not hold a \"" + Constants.Packaging.InfoNodeName + "\" element", "xRootElement"); }
+            if (infoElement == null)
+            {
+                throw new ArgumentException("Did not hold a \"" + Constants.Packaging.InfoNodeName + "\" element",
+                    "xRootElement");
+            }
 
-            var majorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMajorXpath);
-            var minorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMinorXpath);
-            var patchElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsPatchXpath);
-            var nameElement = infoElement.XPathSelectElement(Constants.Packaging.PackageNameXpath);
-            var versionElement = infoElement.XPathSelectElement(Constants.Packaging.PackageVersionXpath);
-            var urlElement = infoElement.XPathSelectElement(Constants.Packaging.PackageUrlXpath);
-            var licenseElement = infoElement.XPathSelectElement(Constants.Packaging.PackageLicenseXpath);
-            var authorNameElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorNameXpath);
-            var authorUrlElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorWebsiteXpath);
-            var readmeElement = infoElement.XPathSelectElement(Constants.Packaging.ReadmeXpath);
+            XElement majorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMajorXpath);
+            XElement minorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMinorXpath);
+            XElement patchElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsPatchXpath);
+            XElement nameElement = infoElement.XPathSelectElement(Constants.Packaging.PackageNameXpath);
+            XElement versionElement = infoElement.XPathSelectElement(Constants.Packaging.PackageVersionXpath);
+            XElement urlElement = infoElement.XPathSelectElement(Constants.Packaging.PackageUrlXpath);
+            XElement licenseElement = infoElement.XPathSelectElement(Constants.Packaging.PackageLicenseXpath);
+            XElement authorNameElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorNameXpath);
+            XElement authorUrlElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorWebsiteXpath);
+            XElement readmeElement = infoElement.XPathSelectElement(Constants.Packaging.ReadmeXpath);
 
-            var controlElement = xRootElement.Element(Constants.Packaging.ControlNodeName);
+            XElement controlElement = xRootElement.Element(Constants.Packaging.ControlNodeName);
 
             int val;
 
@@ -413,7 +554,10 @@ namespace Umbraco.Core.Services
                 Version = versionElement == null ? string.Empty : versionElement.Value,
                 Url = urlElement == null ? string.Empty : urlElement.Value,
                 License = licenseElement == null ? string.Empty : licenseElement.Value,
-                LicenseUrl = licenseElement == null ? string.Empty : licenseElement.HasAttributes ? licenseElement.AttributeValue<string>("url") : string.Empty,
+                LicenseUrl =
+                    licenseElement == null
+                        ? string.Empty
+                        : licenseElement.HasAttributes ? licenseElement.AttributeValue<string>("url") : string.Empty,
                 AuthorName = authorNameElement == null ? string.Empty : authorNameElement.Value,
                 AuthorUrl = authorUrlElement == null ? string.Empty : authorUrlElement.Value,
                 Readme = readmeElement == null ? string.Empty : readmeElement.Value,
@@ -424,20 +568,8 @@ namespace Umbraco.Core.Services
             };
         }
 
-
-        /// <summary>
-        ///     Gets the name of the file in the specified path.
-        ///     Corrects possible problems with slashes that would result from a simple concatenation.
-        ///     Can also be used to concatenate paths.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <param name="fileName">Name of the file.</param>
-        /// <returns>The name of the file in the specified path.</returns>
-        private static String GetFileName(string path, string fileName)
+        private static string UpdatePathPlaceholders(string path)
         {
-            // virtual dir support
-            fileName = IOHelper.FindFile(fileName);
-
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
@@ -446,32 +578,38 @@ namespace Umbraco.Core.Services
                 path = path.Replace("[$CONFIG]", SystemDirectories.Config);
                 path = path.Replace("[$DATA]", SystemDirectories.Data);
             }
-
-            //to support virtual dirs we try to lookup the file... 
-            path = IOHelper.FindFile(path);
-
-            Debug.Assert(path != null && path.Length >= 1);
-            Debug.Assert(fileName != null && fileName.Length >= 1);
-
-            path = path.Replace('/', '\\');
-            fileName = fileName.Replace('/', '\\');
-
-            // Does filename start with a slash? Does path end with one?
-            bool fileNameStartsWithSlash = (fileName[0] == Path.DirectorySeparatorChar);
-            bool pathEndsWithSlash = (path[path.Length - 1] == Path.DirectorySeparatorChar);
-
-            // Path ends with a slash
-            if (pathEndsWithSlash)
-            {
-                if (fileNameStartsWithSlash == false)
-                    // No double slash, just concatenate
-                    return path + fileName;
-                return path + fileName.Substring(1);
-            }
-            if (fileNameStartsWithSlash)
-                // Required slash specified, just concatenate
-                return path + fileName;
-            return path + Path.DirectorySeparatorChar + fileName;
+            return path;
         }
+    }
+
+    public class FileInPackageInfo : IFileInPackageInfo
+    {
+        public string RelativePath
+        {
+            get { return Path.Combine(RelativeDir, FileName); }
+        }
+
+        public string FileNameInPackage { get; set; }
+        public string RelativeDir { get; set; }
+        public string DestinationRootDir { private get; set; }
+
+        public string Directory
+        {
+            get { return Path.Combine(DestinationRootDir, RelativeDir); }
+        }
+
+        public string FullPath
+        {
+            get { return Path.Combine(DestinationRootDir, RelativePath); }
+        }
+
+        public string FileName { get; set; }
+    }
+
+    public interface IFileInPackageInfo
+    {
+        string RelativeDir { get; }
+        string RelativePath { get; }
+        string FileName { get; set; }
     }
 }
