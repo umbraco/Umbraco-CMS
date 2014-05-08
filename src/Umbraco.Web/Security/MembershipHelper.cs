@@ -86,8 +86,8 @@ namespace Umbraco.Web.Security
                 //This will occur if an email already exists!
                 return Attempt<MembershipUser>.Fail(ex);
             }
-            
-            var member = GetCurrentMember();
+
+            var member = GetCurrentPersistedMember();
 
             //NOTE: If changing the username is a requirement, than that needs to be done via the IMember directly since MembershipProvider's natively do 
             // not support changing a username! 
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Security
             {
                 return null;
             }
-            var result = GetCurrentMember();
+            var result = GetCurrentPersistedMember();
             var provider = MPE.GetMembersMembershipProvider();
             return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, true));
         }
@@ -313,7 +313,7 @@ namespace Umbraco.Web.Security
             if (provider.IsUmbracoMembershipProvider())
             {                
                 var membershipUser = provider.GetCurrentUser();
-                var member = GetCurrentMember();
+                var member = GetCurrentPersistedMember();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
                 // to use the front-end!
                 if (member == null)
@@ -460,7 +460,7 @@ namespace Umbraco.Web.Security
 
             if (provider.IsUmbracoMembershipProvider())
             {
-                var member = GetCurrentMember();
+                var member = GetCurrentPersistedMember();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
                 // to use the front-end!
                 if (member == null)
@@ -543,7 +543,7 @@ namespace Umbraco.Web.Security
                 string username;
                 if (provider.IsUmbracoMembershipProvider())
                 {
-                    var member = GetCurrentMember();
+                    var member = GetCurrentPersistedMember();
                     username = member.Username;
                     // If types defined, check member is of one of those types
                     var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
@@ -793,7 +793,7 @@ namespace Umbraco.Web.Security
         /// Returns the currently logged in IMember object - this should never be exposed to the front-end since it's returning a business logic entity!
         /// </summary>
         /// <returns></returns>
-        private IMember GetCurrentMember()
+        private IMember GetCurrentPersistedMember()
         {
             var provider = MPE.GetMembersMembershipProvider();
 
