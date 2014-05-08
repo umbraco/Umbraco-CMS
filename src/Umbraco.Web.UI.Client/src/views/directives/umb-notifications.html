@@ -1,7 +1,7 @@
 <div id='speechbubble' class='umb-notification' ng-cloak>
     <ul>
-        <li ng-repeat="notification in notifications" class="alert alert-block alert-{{notification.type}}" ng-click="removeNotification($index)">
-            <a class='close' prevent-default href>&times;</a>
+        <li ng-repeat="notification in notifications" class="alert alert-block alert-{{notification.type}}" >
+            <a class='close' ng-click="removeNotification($index)" prevent-default href>&times;</a>
 
             <div ng-if="notification.view">
                 <div ng-include="notification.view"></div>

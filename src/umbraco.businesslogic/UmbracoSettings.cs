@@ -15,7 +15,7 @@ namespace umbraco
     /// <summary>
     /// The UmbracoSettings Class contains general settings information for the entire Umbraco instance based on information from the /config/umbracoSettings.config file
     /// </summary>
-    [Obsolete("Use UmbracoConfiguration.Current.UmbracoSettings instead, it offers all settings in strongly typed formats. This class will be removed in future versions.")]
+    [Obsolete("Use UmbracoConfig.For.UmbracoSettings() instead, it offers all settings in strongly typed formats. This class will be removed in future versions.")]
     public class UmbracoSettings
     {
         [Obsolete("This hasn't been used since 4.1!")]

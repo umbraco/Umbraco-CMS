@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Dialogs.UserController", function ($scope, $location, $timeout, userService, historyService) {
+    .controller("Umbraco.Dialogs.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService) {
        
         $scope.user = userService.getCurrentUser();
         $scope.history = historyService.current;
@@ -7,10 +7,16 @@ angular.module("umbraco")
 
 
         $scope.logout = function () {
-            userService.logout().then(function () {
-                $scope.remainingAuthSeconds = 0;
-                $scope.hide();                
+
+            //Add event listener for when there are pending changes on an editor which means our route was not successful
+            var pendingChangeEvent = eventsService.on("valFormManager.pendingChanges", function (e, args) {
+                //one time listener, remove the event
+                pendingChangeEvent();
+                $scope.hide();
             });
+
+            //perform the path change, if it is successful then the promise will resolve otherwise it will fail
+            $location.path("/logout");            
     	};
 
 	    $scope.gotoHistory = function (link) {
