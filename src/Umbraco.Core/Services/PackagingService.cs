@@ -837,36 +837,6 @@ namespace Umbraco.Core.Services
             return list;
         }
 
-                                            
-        //public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement element, int userId = 0, bool raiseEvents = true)
-        //{
-
-        //    if (raiseEvents)
-        //    {
-        //        if (ImportingDictionaryItem.IsRaisedEventCancelled(new ImportEventArgs<IDictionaryItem>(element), this))
-        //            return Enumerable.Empty<IDictionaryItem>();
-        //    }
-
-        //    var name = element.Name.LocalName;
-        //    if (name.Equals(Constants.Packaging.DictionaryItemsNodeName) == false)
-        //    {
-        //        throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called '" + Constants.Packaging.DictionaryItemsNodeName + "' for import");
-        //    }
-
-        //    IEnumerable<IDataTypeDefinition> list = Enumerable.Empty<IDataTypeDefinition>();
-
-        //    //throw new NotImplementedException();
-
-
-        //    if (raiseEvents)
-        //    {
-                
-        //        ImportedDataType.RaiseEvent(new ImportEventArgs<IDataTypeDefinition>(list, element, false), this);
-        //    }
-
-        //    return list;
-        //}
-
         private void SavePrevaluesFromXml(List<IDataTypeDefinition> dataTypes, IEnumerable<XElement> dataTypeElements)
         {
             foreach (var dataTypeElement in dataTypeElements)
