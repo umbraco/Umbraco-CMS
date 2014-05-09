@@ -244,7 +244,10 @@ namespace Umbraco.Core.Models.Membership
 
         public void RemoveAllowedSection(string sectionAlias)
         {
-            _sectionCollection.Remove(sectionAlias);
+            if (_sectionCollection.Contains(sectionAlias))
+            {
+                _sectionCollection.Remove(sectionAlias);
+            }
         }
 
         public void AddAllowedSection(string sectionAlias)
@@ -425,23 +428,20 @@ namespace Umbraco.Core.Models.Membership
             {
                 var item = e.NewItems.Cast<string>().First();
 
-                //remove from the removed/added sections (since people could add/remove all they want in one request)
-                _removedSections.Remove(item);
-                _addedSections.Remove(item);
-
-                //add to the added sections
-                _addedSections.Add(item);
+                if (_addedSections.Contains(item) == false)
+                {
+                    _addedSections.Add(item);
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 var item = e.OldItems.Cast<string>().First();
 
-                //remove from the removed/added sections (since people could add/remove all they want in one request)
-                _removedSections.Remove(item);
-                _addedSections.Remove(item);
+                if (_removedSections.Contains(item) == false)
+                {
+                    _removedSections.Add(item);    
+                }
 
-                //add to the added sections
-                _removedSections.Add(item);
             }
         }
 

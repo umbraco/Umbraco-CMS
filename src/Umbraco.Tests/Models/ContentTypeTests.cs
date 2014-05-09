@@ -4,12 +4,13 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTypeTests
+    public class ContentTypeTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone_Content_Type_Sort()
@@ -140,19 +141,21 @@ namespace Umbraco.Tests.Models
                 Assert.AreNotSame(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
                 Assert.AreEqual(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
             }
+            Assert.AreNotSame(clone.PropertyGroups, contentType.PropertyGroups);
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
             {
                 Assert.AreNotSame(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
                 Assert.AreEqual(clone.PropertyGroups[index], contentType.PropertyGroups[index]);
             }
+            Assert.AreNotSame(clone.PropertyTypes, contentType.PropertyTypes);
             Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
             for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
             {
                 Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
                 Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
             }
-            
+
             Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
             Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
             Assert.AreEqual(clone.Key, contentType.Key);
@@ -167,13 +170,24 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
-
+            
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
             }
+
+            //need to ensure the event handlers are wired
+
+            var asDirty = (ICanBeDirty)clone;
+
+            Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
+            clone.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Nvarchar) { Alias = "blah" });
+            Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
+            Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
+            clone.AddPropertyGroup("hello");
+            Assert.IsTrue(asDirty.IsPropertyDirty("PropertyGroups"));
         }
 
         [Test]

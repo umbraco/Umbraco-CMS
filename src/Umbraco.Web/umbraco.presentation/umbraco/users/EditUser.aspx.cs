@@ -489,10 +489,10 @@ namespace umbraco.cms.presentation.user
                     }
                     u.StartMediaId = mstartNode;
 
-                    u.clearApplications();
+                    u.ClearApplications();
                     foreach (ListItem li in lapps.Items)
                     {
-                        if (li.Selected) u.addApplication(li.Value);
+                        if (li.Selected) u.AddApplication(li.Value);
                     }
 
                     u.Save();

@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Factories
                     {
                         AppAlias = app
                     };
-                if (entity.Id != null)
+                if (entity.HasIdentity)
                 {
                     appDto.UserId = (int) entity.Id;
                 }
