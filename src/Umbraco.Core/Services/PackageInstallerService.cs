@@ -9,7 +9,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Packaging.Models;
 
 namespace Umbraco.Core.Services
 {
@@ -124,7 +123,7 @@ namespace Umbraco.Core.Services
             try
             {
                 XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFile);
-                ValidateFilesExistsInPackage(packageFile);
+                PackageStructureSanetyCheck(packageFile);
                 dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
                 languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
                 dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryItemsNodeName);
@@ -177,33 +176,13 @@ namespace Umbraco.Core.Services
         }
 
 
-        private void ValidatePackageFileExists(string packageFilePath)
-        {
-            if (string.IsNullOrEmpty(packageFilePath))
-            {
-                throw new ArgumentNullException("packageFilePath");
-            }
-
-            if (System.IO.File.Exists(packageFilePath) == false)
-            {
-                throw new Exception("Error - file not found. Could find file named '" + packageFilePath + "'");
-            }
-
-            // Check if the file is a valid package
-            if (Path.GetExtension(packageFilePath).Equals(".umb", StringComparison.InvariantCultureIgnoreCase) == false)
-            {
-                throw new Exception(
-                    "Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
-            }
-        }
 
 
         private XDocument GetConfigXmlDocFromPackageFile(string packageFilePath)
         {
-            ValidatePackageFileExists(packageFilePath);
-
+            string filePathInPackage;
             string configXmlContent = UnpackHelper.ReadTextFileFromArchive(packageFilePath,
-                Constants.Packaging.PackageXmlFileName);
+                Constants.Packaging.PackageXmlFileName, out filePathInPackage);
 
             return XDocument.Parse(configXmlContent);
         }
@@ -220,7 +199,7 @@ namespace Umbraco.Core.Services
             return document.Root;
         }
 
-        private void ValidateFilesExistsInPackage(string packageFilePath)
+        private void PackageStructureSanetyCheck(string packageFilePath)
         {
             XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
             XElement filesElement = rootElement.Element(Constants.Packaging.FilesNodeName);
@@ -245,6 +224,16 @@ namespace Umbraco.Core.Services
                                                     fileInPackageInfo.FileNameInPackage, fileInPackageInfo.RelativePath);
                                             })));
                 }
+
+                IEnumerable<string> dubletFileNames = _unpackHelper.FindDubletFileNames(packageFilePath).ToArray();
+                if (dubletFileNames.Any())
+                {
+                    throw new Exception("The following filename(s) are found more than one time in the package, since the filename is used ad primary key, this is not allowed: " +
+                                        string.Join(", ", dubletFileNames));
+                }
+
+
+
             }
         }
 
@@ -375,7 +364,7 @@ namespace Umbraco.Core.Services
         {
             if (string.Equals(Constants.Packaging.LanguagesNodeName, languageElement.Name.LocalName) == false)
             {
-                throw new ArgumentException("Must be \"Templates\" as root", "languageElement");
+                throw new ArgumentException("Must be \"" + Constants.Packaging.LanguagesNodeName + "\" as root", "languageElement");
             }
             return _packagingService.ImportLanguages(languageElement, userId).ToArray();
         }
@@ -386,7 +375,7 @@ namespace Umbraco.Core.Services
             {
                 if (string.Equals(Constants.Packaging.DataTypeNodeName, dataTypeElements.Name.LocalName) == false)
                 {
-                    throw new ArgumentException("Must be \"Templates\" as root", "dataTypeElements");
+                    throw new ArgumentException("Must be \"" + Constants.Packaging.DataTypeNodeName + "\" as root", "dataTypeElements");
                 }
             }
             return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId).ToArray();
@@ -421,7 +410,7 @@ namespace Umbraco.Core.Services
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName) == false)
             {
-                throw new ArgumentException("the root element must be \"Stylesheets\"", "stylesheetNotes");
+                throw new ArgumentException("the root element must be \"" + Constants.Packaging.StylesheetsNodeName + "\"", "stylesheetNotes");
             }
 
             return stylesheetNotes.Elements(Constants.Packaging.StylesheetNodeName)
