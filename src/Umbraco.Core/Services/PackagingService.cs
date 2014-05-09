@@ -568,7 +568,7 @@ namespace Umbraco.Core.Services
                 if (dataTypeDefinition == null)
                 {
                     var dataTypeDefinitions = legacyPropertyEditorId != Guid.Empty
-                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId)
+                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId, false)
                                                   : _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {

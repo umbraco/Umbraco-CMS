@@ -19,7 +19,9 @@ namespace Umbraco.Core.Packaging
                     ZipEntry zipEntry;
                     while ((zipEntry = zipStream.GetNextEntry()) != null)
                     {
-                        if (zipEntry.Name.EndsWith(fileToRead, StringComparison.CurrentCultureIgnoreCase))
+                        string fileName = Path.GetFileName(zipEntry.Name);
+
+                        if (string.IsNullOrEmpty(fileName) == false && fileName.Equals(fileToRead, StringComparison.CurrentCultureIgnoreCase))
                         {
                             using (var reader = new StreamReader(zipStream))
                             {
@@ -58,7 +60,9 @@ namespace Umbraco.Core.Packaging
                     ZipEntry zipEntry;
                     while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                     {
-                        if(zipEntry.Name.Equals(fileInPackageName))
+                        string fileName = Path.GetFileName(zipEntry.Name);
+
+                        if (string.IsNullOrEmpty(fileName) == false && fileName.Equals(fileInPackageName, StringComparison.InvariantCultureIgnoreCase))
                         {
                             fileFoundInArchive = true;
 
@@ -94,7 +98,7 @@ namespace Umbraco.Core.Packaging
         {
             CheckPackageExists(packageFilePath);
 
-            var exp = expectedFiles.ToDictionary(k => k, v => true);
+            var retVal = expectedFiles.ToList();
 
             using (var fs = File.OpenRead(packageFilePath))
             {
@@ -103,10 +107,11 @@ namespace Umbraco.Core.Packaging
                     ZipEntry zipEntry;
                     while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                     {
-                        if (exp.ContainsKey(zipEntry.Name))
-                        {
-                            exp[zipEntry.Name] = false;
-                        }
+                        string fileName = Path.GetFileName(zipEntry.Name);
+
+                        int index = retVal.FindIndex(f => f.Equals(fileName, StringComparison.InvariantCultureIgnoreCase));
+
+                        if (index != -1) { retVal.RemoveAt(index); }
                     }
 
                     zipInputStream.Close();
@@ -115,7 +120,7 @@ namespace Umbraco.Core.Packaging
             }
 
 
-            return exp.Where(kv => kv.Value).Select(kv => kv.Key);
+            return retVal;
 
         }
     }
