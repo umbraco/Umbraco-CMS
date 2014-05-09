@@ -14,7 +14,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','bower','copy']);
+  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','copy']);
 
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -110,12 +110,13 @@ module.exports = function (grunt) {
 
     copy: {
 
-      // Copies over the files downloaded by bower
+      /* Copies over the files downloaded by bower
       bower: {
           files: [
               { dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', src: '<%= bowerfiles %>/typeahead.js/dist/typeahead.bundle.min.js' }
           ]
       },
+      */
 
       assets: {
         files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'src/assets/' }]
