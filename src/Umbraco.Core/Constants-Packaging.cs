@@ -20,7 +20,8 @@ namespace Umbraco.Core
             public const string TemplatesNodeName = "Templates";
             public const string NameNodeName = "Name";
             public const string TemplateNodeName = "Template";
-            public const string AliasNodeName = "Alias";
+            public const string AliasNodeNameSmall = "alias";
+            public const string AliasNodeNameCapital = "Alias";
             public const string DictionaryItemsNodeName = "DictionaryItems";
             public const string DictionaryItemNodeName = "DictionaryItem";
             public const string MacrosNodeName = "Macros";

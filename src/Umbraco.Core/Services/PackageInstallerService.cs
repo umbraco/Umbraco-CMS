@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
+using Umbraco.Core.Packaging.Models;
 
 namespace Umbraco.Core.Services
 {
@@ -82,57 +83,97 @@ namespace Umbraco.Core.Services
 
         public PackageMetaData GetMetaData(string packageFilePath)
         {
-            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
-            return GetMetaData(rootElement);
+            try
+            {
+                XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
+                return GetMetaData(rootElement);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error reading " + packageFilePath, e);
+            }
         }
 
         public PackageImportIssues FindPackageImportIssues(string packageFilePath)
         {
-            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
-            return FindImportIssues(rootElement);
+            try
+            {
+                XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
+                return FindImportIssues(rootElement);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error reading " + packageFilePath, e);
+            }
         }
 
         public PackageInstallationSummary InstallPackageFile(string packageFile, int userId)
         {
-            ValidateFilesExistsInPackage(packageFile);
-
-
-            XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFile);
-
-            XElement dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
-            XElement languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
-            XElement dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryItemsNodeName);
-            XElement macroes = rootElement.Element(Constants.Packaging.MacrosNodeName);
-            XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
-            XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
-            XElement documentTypes = rootElement.Element(Constants.Packaging.DocumentTypesNodeName);
-            XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
-            XElement documentSet = rootElement.Element(Constants.Packaging.DocumentSetNodeName);
-            XElement actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
-
-            return new PackageInstallationSummary
+            XElement dataTypes;
+            XElement languages;
+            XElement dictionaryItems;
+            XElement macroes;
+            XElement files;
+            XElement templates;
+            XElement documentTypes;
+            XElement styleSheets;
+            XElement documentSet;
+            XElement actions;
+            PackageMetaData metaData;
+            
+            try
             {
-                MetaData = GetMetaData(rootElement),
-                DataTypesInstalled =
-                    dataTypes == null ? new IDataTypeDefinition[0] : InstallDataTypes(dataTypes, userId),
-                LanguagesInstalled = languages == null ? new ILanguage[0] : InstallLanguages(languages, userId),
-                DictionaryItemsInstalled =
-                    dictionaryItems == null ? new IDictionaryItem[0] : InstallDictionaryItems(dictionaryItems),
-                MacrosInstalled = macroes == null ? new IMacro[0] : InstallMacros(macroes, userId),
-                FilesInstalled =
-                    packageFile == null
-                        ? Enumerable.Empty<KeyValuePair<string, bool>>()
-                        : InstallFiles(packageFile, files),
-                TemplatesInstalled = templates == null ? new ITemplate[0] : InstallTemplats(templates, userId),
-                DocumentTypesInstalled =
-                    documentTypes == null ? new IContentType[0] : InstallDocumentTypes(documentTypes, userId),
-                StylesheetsInstalled =
-                    styleSheets == null ? new IStylesheet[0] : InstallStylesheets(styleSheets, userId),
-                DocumentsInstalled = documentSet == null ? new IContent[0] : InstallDocuments(documentSet, userId),
-                PackageInstallActions =
-                    actions == null ? Enumerable.Empty<KeyValuePair<string, XElement>>() : GetInstallActions(actions),
-                PackageUninstallActions = actions == null ? string.Empty : GetUninstallActions(actions)
-            };
+                XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFile);
+                ValidateFilesExistsInPackage(packageFile);
+                dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
+                languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
+                dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryItemsNodeName);
+                macroes = rootElement.Element(Constants.Packaging.MacrosNodeName);
+                files = rootElement.Element(Constants.Packaging.FilesNodeName);
+                templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
+                documentTypes = rootElement.Element(Constants.Packaging.DocumentTypesNodeName);
+                styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
+                documentSet = rootElement.Element(Constants.Packaging.DocumentSetNodeName);
+                actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
+
+                metaData = GetMetaData(rootElement);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error reading " + packageFile, e);
+            }
+
+            try
+            {
+                
+                return new PackageInstallationSummary
+                {
+                    MetaData = metaData,
+                    DataTypesInstalled =
+                        dataTypes == null ? new IDataTypeDefinition[0] : InstallDataTypes(dataTypes, userId),
+                    LanguagesInstalled = languages == null ? new ILanguage[0] : InstallLanguages(languages, userId),
+                    DictionaryItemsInstalled =
+                        dictionaryItems == null ? new IDictionaryItem[0] : InstallDictionaryItems(dictionaryItems),
+                    MacrosInstalled = macroes == null ? new IMacro[0] : InstallMacros(macroes, userId),
+                    FilesInstalled =
+                        packageFile == null
+                            ? Enumerable.Empty<KeyValuePair<string, bool>>()
+                            : InstallFiles(packageFile, files),
+                    TemplatesInstalled = templates == null ? new ITemplate[0] : InstallTemplats(templates, userId),
+                    DocumentTypesInstalled =
+                        documentTypes == null ? new IContentType[0] : InstallDocumentTypes(documentTypes, userId),
+                    StylesheetsInstalled =
+                        styleSheets == null ? new IStylesheet[0] : InstallStylesheets(styleSheets, userId),
+                    DocumentsInstalled = documentSet == null ? new IContent[0] : InstallDocuments(documentSet, userId),
+                    PackageInstallActions =
+                        actions == null ? Enumerable.Empty<KeyValuePair<string, XElement>>() : GetInstallActions(actions),
+                    PackageUninstallActions = actions == null ? string.Empty : GetUninstallActions(actions)
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error installing package " + packageFile, e);
+            }
         }
 
 
@@ -244,10 +285,10 @@ namespace Umbraco.Core.Services
                          false)) // .SelectNodes("Actions/Action [@runat != 'uninstall']")
                 .Select(elemet =>
                 {
-                    XAttribute aliasAttr = elemet.Attribute(Constants.Packaging.AliasNodeName);
+                    XAttribute aliasAttr = elemet.Attribute(Constants.Packaging.AliasNodeNameSmall) ?? elemet.Attribute(Constants.Packaging.AliasNodeNameCapital);
                     if (aliasAttr == null)
                         throw new ArgumentException(
-                            "missing \"" + Constants.Packaging.AliasNodeName + "\" atribute in alias element",
+                            "missing \"" + Constants.Packaging.AliasNodeNameSmall + "\" atribute in alias element",
                             "actionsElement");
                     return new {elemet, alias = aliasAttr.Value};
                 }).ToDictionary(x => x.alias, x => x.elemet);
@@ -417,10 +458,10 @@ namespace Umbraco.Core.Services
             return templateNotes.Elements(Constants.Packaging.TemplateNodeName)
                 .Select(n =>
                 {
-                    XElement alias = n.Element(Constants.Packaging.AliasNodeName);
+                    XElement alias = n.Element(Constants.Packaging.AliasNodeNameCapital) ?? n.Element(Constants.Packaging.AliasNodeNameSmall);
                     if (alias == null)
                     {
-                        throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element",
+                        throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeNameCapital + "\" element",
                             "templateNotes");
                     }
                     string aliasStr = alias.Value;
@@ -442,10 +483,10 @@ namespace Umbraco.Core.Services
             return macroNodes.Elements(Constants.Packaging.MacroNodeName)
                 .Select(n =>
                 {
-                    XElement xElement = n.Element(Constants.Packaging.AliasNodeName);
+                    XElement xElement = n.Element(Constants.Packaging.AliasNodeNameSmall) ?? n.Element(Constants.Packaging.AliasNodeNameCapital);
                     if (xElement == null)
                     {
-                        throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element",
+                        throw new ArgumentException(string.Format("missing a \"{0}\" element in {0} element", Constants.Packaging.AliasNodeNameSmall),
                             "macroNodes");
                     }
                     string alias = xElement.Value;
