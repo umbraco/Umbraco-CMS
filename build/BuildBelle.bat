@@ -10,10 +10,12 @@ ECHO Current folder: %CD%
 for /f "delims=" %%A in ('dir %nuGetFolder%node.js.* /b') do set "nodePath=%nuGetFolder%%%A\"
 for /f "delims=" %%A in ('dir %nuGetFolder%npm.js.* /b') do set "npmPath=%nuGetFolder%%%A\tools\"
 
+set "gitPath=C:\Program Files (x86)\Git\bin\"
+
 ECHO Temporarily adding Npm and Node to path
 SET oldPath=%PATH%
 
-path=%npmPath%;%nodePath%;%PATH%
+path=%npmPath%;%nodePath%;%gitPath%;%PATH%
 
 SET buildFolder=%CD%
 
