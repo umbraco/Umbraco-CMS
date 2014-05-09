@@ -109,9 +109,9 @@ namespace Umbraco.Core.Models
         private string _scriptAssembly;
         private string _scriptPath;
         private string _xslt;
-        private readonly MacroPropertyCollection _properties;
-        private readonly List<string> _addedProperties;
-        private readonly List<string> _removedProperties;
+        private MacroPropertyCollection _properties;
+        private List<string> _addedProperties;
+        private List<string> _removedProperties;
 
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Alias);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Name);
@@ -397,7 +397,19 @@ namespace Umbraco.Core.Models
         {
             get { return _properties; }            
         }
-        
-        
+
+        public override object DeepClone()
+        {
+            var clone = (Macro)base.DeepClone();
+
+            clone._addedProperties = new List<string>();
+            clone._removedProperties = new List<string>();
+            clone._properties = new MacroPropertyCollection();
+            clone._properties.CollectionChanged += clone.PropertiesChanged;
+
+            clone.ResetDirtyProperties(false);
+
+            return clone;
+        }
     }
 }
