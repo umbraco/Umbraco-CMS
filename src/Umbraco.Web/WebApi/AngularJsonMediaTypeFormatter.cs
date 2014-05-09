@@ -36,54 +36,18 @@ namespace Umbraco.Web.WebApi
             if (type == null) throw new ArgumentNullException("type");
             if (writeStream == null) throw new ArgumentNullException("writeStream");
 
-            //Before we were calling the base method to do this however it was causing problems:
-            // http://issues.umbraco.org/issue/U4-4546
-            // though I can't seem to figure out why the null ref exception was being thrown, it is very strange.
-            
             var effectiveEncoding = SelectCharacterEncoding(content == null ? null : content.Headers);
 
-            using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding))            
+            using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding))
             {
                 //write the special encoding for angular json to the start
                 // (see: http://docs.angularjs.org/api/ng.$http)
                 streamWriter.Write(")]}',\n");
                 streamWriter.Flush();
-
                 return base.WriteToStreamAsync(type, value, writeStream, content, transportContext);
             }
 
-            //This is what the base method is doing for json, EXCEPT they have a handy TaskHelpers.RunSynchronously method
-            // that ensures that the code doesn't run async which avoids all sorts of thread sync issues like http context
-            // cultures, etc... but that is not public so we cannot use it. Instead I've modified our original version to be
-            // much simpler and we no longer create a separate memory stream so hopefully this solves the issue above, if it doesn't
-            // then we're kind of back to the drawing board.
-
-            //var task = Task.Factory.StartNew(() =>
-            //{
-            //    var effectiveEncoding = SelectCharacterEncoding(content == null ? null : content.Headers);
-
-            //    using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding))
-            //    using (var jsonTextWriter = new JsonTextWriter(streamWriter)
-            //    {
-            //        CloseOutput = false
-            //    })
-            //    {
-            //        //write the special encoding for angular json to the start
-            //        // (see: http://docs.angularjs.org/api/ng.$http)
-            //        streamWriter.Write(")]}',\n");
-
-            //        if (Indent)
-            //        {
-            //            jsonTextWriter.Formatting = Formatting.Indented;
-            //        }
-            //        var jsonSerializer = JsonSerializer.Create(SerializerSettings);
-            //        jsonSerializer.Serialize(jsonTextWriter, value);
-
-            //        jsonTextWriter.Flush();
-            //    }
-            //});
-            //return task;
-
+            
         }
 
     }
