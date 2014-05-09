@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
         private readonly IFileService _fileService;
         private readonly IMacroService _macroService;
         private readonly IPackagingService _packagingService;
-        private IPackageValidationHelper _packageValidationHelper;
+        private IConflictingPackageContentFinder _conflictingPackageContentFinder;
         private IUnpackHelper _unpackHelper;
 
         public PackageInstallerService(IPackagingService packagingService, IMacroService macroService,
@@ -32,20 +32,20 @@ namespace Umbraco.Core.Services
         }
 
 
-        public IPackageValidationHelper PackageValidationHelper
+        public IConflictingPackageContentFinder ConflictingPackageContentFinder
         {
             private get
             {
-                return _packageValidationHelper ??
-                       (_packageValidationHelper = new PackageValidationHelper(_macroService, _fileService));
+                return _conflictingPackageContentFinder ??
+                       (_conflictingPackageContentFinder = new ConflictingPackageContentFinder(_macroService, _fileService));
             }
             set
             {
-                if (_packageValidationHelper != null)
+                if (_conflictingPackageContentFinder != null)
                 {
-                    throw new PropertyConstraintException("This property allraedy have a value");
+                    throw new PropertyConstraintException("This property already have a value");
                 }
-                _packageValidationHelper = value;
+                _conflictingPackageContentFinder = value;
             }
         }
 
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services
             {
                 if (_unpackHelper != null)
                 {
-                    throw new PropertyConstraintException("This property allraedy have a value");
+                    throw new PropertyConstraintException("This property already have a value");
                 }
                 _unpackHelper = value;
             }
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Services
 
                 if (_fullpathToRoot != null)
                 {
-                    throw new PropertyConstraintException("This property allraedy have a value");
+                    throw new PropertyConstraintException("This property already have a value");
                 }
 
                 _fullpathToRoot = value;
@@ -426,7 +426,7 @@ namespace Umbraco.Core.Services
                     string name = xElement.Value;
 
                     IStylesheet existingStyleSheet;
-                    if (PackageValidationHelper.StylesheetExists(name, out existingStyleSheet))
+                    if (ConflictingPackageContentFinder.StylesheetExists(name, out existingStyleSheet))
                     {
                         // Don't know what to put in here... existing path was the best i could come up with
                         return existingStyleSheet;
@@ -457,7 +457,7 @@ namespace Umbraco.Core.Services
 
                     ITemplate existingTemplate;
 
-                    if (PackageValidationHelper.TemplateExists(aliasStr, out existingTemplate))
+                    if (ConflictingPackageContentFinder.TemplateExists(aliasStr, out existingTemplate))
                     {
                         return existingTemplate;
                     }
@@ -481,7 +481,7 @@ namespace Umbraco.Core.Services
                     string alias = xElement.Value;
 
                     IMacro existingMacro;
-                    if (PackageValidationHelper.MacroExists(alias, out existingMacro))
+                    if (ConflictingPackageContentFinder.MacroExists(alias, out existingMacro))
                     {
                         return existingMacro;
                     }
@@ -494,6 +494,7 @@ namespace Umbraco.Core.Services
 
         private bool IsFileNodeUnsecure(FileInPackageInfo fileInPackageInfo)
         {
+
             // Should be done with regex :)
             if (fileInPackageInfo.Directory.ToLower().Contains(IOHelper.DirSepChar + "app_code")) return true;
             if (fileInPackageInfo.Directory.ToLower().Contains(IOHelper.DirSepChar + "bin")) return true;

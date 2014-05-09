@@ -3,12 +3,12 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
-    public class PackageValidationHelper : IPackageValidationHelper
+    public class ConflictingPackageContentFinder : IConflictingPackageContentFinder
     {
         private readonly IMacroService _macroService;
         private readonly IFileService _fileService;
 
-        public PackageValidationHelper(IMacroService macroService,
+        public ConflictingPackageContentFinder(IMacroService macroService,
             IFileService fileService)
         {
             if (fileService != null) _fileService = fileService;

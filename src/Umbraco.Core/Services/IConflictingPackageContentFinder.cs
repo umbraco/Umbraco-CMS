@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Services
 {
-    public interface IPackageValidationHelper
+    public interface IConflictingPackageContentFinder
     {
         bool StylesheetExists(string styleSheetName, out IStylesheet existingStylesheet);
         bool TemplateExists(string templateAlias, out ITemplate existingTemplate);
