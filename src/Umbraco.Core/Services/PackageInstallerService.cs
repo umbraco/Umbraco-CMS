@@ -93,12 +93,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public PackageImportIssues FindPackageImportIssues(string packageFilePath)
+        public PreInstallWarnings GetPreInstallWarnings(string packageFilePath)
         {
             try
             {
                 XElement rootElement = GetConfigXmlRootElementFromPackageFile(packageFilePath);
-                return FindImportIssues(rootElement);
+                return GetPreInstallWarnings(rootElement);
             }
             catch (Exception e)
             {
@@ -381,23 +381,23 @@ namespace Umbraco.Core.Services
             return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId).ToArray();
         }
 
-        private PackageImportIssues FindImportIssues(XElement rootElement)
+        private PreInstallWarnings GetPreInstallWarnings(XElement rootElement)
         {
             XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
             XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
             XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
             XElement alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
-            var packageImportIssues = new PackageImportIssues
+            var conflictingPackageContent = new PreInstallWarnings
             {
                 UnsecureFiles = files == null ? new IFileInPackageInfo[0] : FindUnsecureFiles(files),
-                ConflictingMacroAliases = alias == null ? new IMacro[0] : FindConflictingMacroAliases(alias),
+                ConflictingMacroAliases = alias == null ? new IMacro[0] : ConflictingPackageContentFinder.FindConflictingMacros(alias),
                 ConflictingTemplateAliases =
-                    templates == null ? new ITemplate[0] : FindConflictingTemplateAliases(templates),
+                    templates == null ? new ITemplate[0] : ConflictingPackageContentFinder.FindConflictingTemplates(templates),
                 ConflictingStylesheetNames =
-                    styleSheets == null ? new IStylesheet[0] : FindConflictingStylesheetNames(styleSheets)
+                    styleSheets == null ? new IStylesheet[0] : ConflictingPackageContentFinder.FindConflictingStylesheets(styleSheets)
             };
 
-            return packageImportIssues;
+            return conflictingPackageContent;
         }
 
         private IFileInPackageInfo[] FindUnsecureFiles(XElement fileElement)
@@ -405,92 +405,6 @@ namespace Umbraco.Core.Services
             return ExtractFileInPackageInfos(fileElement)
                 .Where(IsFileNodeUnsecure).Cast<IFileInPackageInfo>().ToArray();
         }
-
-        private IStylesheet[] FindConflictingStylesheetNames(XElement stylesheetNotes)
-        {
-            if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName) == false)
-            {
-                throw new ArgumentException("the root element must be \"" + Constants.Packaging.StylesheetsNodeName + "\"", "stylesheetNotes");
-            }
-
-            return stylesheetNotes.Elements(Constants.Packaging.StylesheetNodeName)
-                .Select(n =>
-                {
-                    XElement xElement = n.Element(Constants.Packaging.NameNodeName);
-                    if (xElement == null)
-                    {
-                        throw new ArgumentException("Missing \"" + Constants.Packaging.NameNodeName + "\" element",
-                            "stylesheetNotes");
-                    }
-
-                    string name = xElement.Value;
-
-                    IStylesheet existingStyleSheet;
-                    if (ConflictingPackageContentFinder.StylesheetExists(name, out existingStyleSheet))
-                    {
-                        // Don't know what to put in here... existing path was the best i could come up with
-                        return existingStyleSheet;
-                    }
-                    return null;
-                })
-                .Where(v => v != null).ToArray();
-        }
-
-        private ITemplate[] FindConflictingTemplateAliases(XElement templateNotes)
-        {
-            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateNotes.Name.LocalName) == false)
-            {
-                throw new ArgumentException("Node must be a \"" + Constants.Packaging.TemplatesNodeName + "\" node",
-                    "templateNotes");
-            }
-
-            return templateNotes.Elements(Constants.Packaging.TemplateNodeName)
-                .Select(n =>
-                {
-                    XElement alias = n.Element(Constants.Packaging.AliasNodeNameCapital) ?? n.Element(Constants.Packaging.AliasNodeNameSmall);
-                    if (alias == null)
-                    {
-                        throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeNameCapital + "\" element",
-                            "templateNotes");
-                    }
-                    string aliasStr = alias.Value;
-
-                    ITemplate existingTemplate;
-
-                    if (ConflictingPackageContentFinder.TemplateExists(aliasStr, out existingTemplate))
-                    {
-                        return existingTemplate;
-                    }
-
-                    return null;
-                })
-                .Where(v => v != null).ToArray();
-        }
-
-        private IMacro[] FindConflictingMacroAliases(XElement macroNodes)
-        {
-            return macroNodes.Elements(Constants.Packaging.MacroNodeName)
-                .Select(n =>
-                {
-                    XElement xElement = n.Element(Constants.Packaging.AliasNodeNameSmall) ?? n.Element(Constants.Packaging.AliasNodeNameCapital);
-                    if (xElement == null)
-                    {
-                        throw new ArgumentException(string.Format("missing a \"{0}\" element in {0} element", Constants.Packaging.AliasNodeNameSmall),
-                            "macroNodes");
-                    }
-                    string alias = xElement.Value;
-
-                    IMacro existingMacro;
-                    if (ConflictingPackageContentFinder.MacroExists(alias, out existingMacro))
-                    {
-                        return existingMacro;
-                    }
-
-                    return null;
-                })
-                .Where(v => v != null).ToArray();
-        }
-
 
         private bool IsFileNodeUnsecure(FileInPackageInfo fileInPackageInfo)
         {

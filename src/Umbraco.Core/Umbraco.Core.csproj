@@ -370,7 +370,7 @@
     <Compile Include="Packaging\UnpackHelper.cs" />
     <Compile Include="Packaging\PackageInstallationSummary.cs" />
     <Compile Include="Packaging\PackageMetaData.cs" />
-    <Compile Include="Packaging\PackageImportIssues.cs" />
+    <Compile Include="Packaging\PreInstallWarnings.cs" />
     <Compile Include="Packaging\Models\InstallAction.cs" />
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
     <Compile Include="Packaging\Models\MetaData.cs" />

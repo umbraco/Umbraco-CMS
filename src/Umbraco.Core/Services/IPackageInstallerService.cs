@@ -6,6 +6,6 @@ namespace Umbraco.Core.Services
     {
         PackageInstallationSummary InstallPackageFile(string packageFilePath, int userId);
         PackageMetaData GetMetaData(string packageFilePath);
-        PackageImportIssues FindPackageImportIssues(string packageFilePath);
+        PreInstallWarnings GetPreInstallWarnings(string packageFilePath);
     }
 }
