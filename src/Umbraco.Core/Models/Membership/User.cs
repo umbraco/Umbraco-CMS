@@ -452,7 +452,7 @@ namespace Umbraco.Core.Models.Membership
             //need to create new collections otherwise they'll get copied by ref
             clone._addedSections = new List<string>();
             clone._removedSections = new List<string>();
-            clone._sectionCollection = new ObservableCollection<string>();
+            clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
             //re-create the event handler
             clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;
 

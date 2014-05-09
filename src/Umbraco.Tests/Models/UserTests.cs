@@ -40,6 +40,8 @@ namespace Umbraco.Tests.Models
                 Username = "username"                            
             };
           
+            item.AddAllowedSection("test");
+
             var clone = (User)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
@@ -47,6 +49,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(clone.UserType, item.UserType);
             Assert.AreEqual(clone.UserType, item.UserType);
+            Assert.AreEqual(clone.AllowedSections.Count(), item.AllowedSections.Count());
 
             //Verify normal properties with reflection
             var allProps = clone.GetType().GetProperties();
