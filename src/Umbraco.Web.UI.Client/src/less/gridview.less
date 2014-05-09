@@ -1,56 +1,591 @@
 // Gridview
 // -------------------------
 
-.editor {
-	border: 1px solid #cdcdcd;
-	text-align: center;
-	line-height: 100px;
-	position: relative;
-	-webkit-transition: all 500ms  ease-in-out;
-		-moz-transition: all 500ms  ease-in-out;
-        -ms-transition: all 500ms  ease-in-out;
-        -o-transition: all 500ms  ease-in-out;
-		transition: all 500ms  ease-in-out;
-	margin: 0 0 1.5% 0
+ .usky-grid  {
+     
+ }
+
+ .usky-grid .ui-sortable-helper  {
+     border: dashed 1px #000;
+     background: #ccc;
+     opacity: 0.4;
+     height: 50px !important;
+ }
+
+ .usky-grid .ui-sortable-helper *{
+     border: none !important;
+     background: none !important;
+     color: #999 !important;
+ }
+
+ .usky-grid .ui-sortable-helper .cell-tools{
+     display: none !important;
+ }
+
+ .usky-grid .ui-sortable-placeholder{
+     border-bottom: 2px solid #000;
+ }
+
+ .usky-grid-width {
+     margin: 0 auto;
+     width:100%;
+ }
+
+ .usky-grid  .right {
+     float:right;
+ }
+
+ .usky-grid  .tb {
+     display:table;
+     width: 100%;
+     table-layout: fixed;
+     margin-bottom: 10px;
+ }
+
+ .usky-grid  .td {
+     display:table-cell;
+     vertical-align:top;
+     border-right:1px dashed rgba(182, 182, 182, 0.0);
+ }
+
+ .usky-grid .tb:hover .td{
+     border-right:1px dashed rgba(182, 182, 182, 0.3);
+ }
+
+ .usky-grid  .td.last {
+     border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
+ }
+
+ .usky-grid  .tr {
+     display:table-row;
+ }
+
+ .usky-grid  .td2{
+     width: 50%;
+ }
+
+ .usky-grid  .td3{
+     width: 33.33%;
+ }
+
+ .usky-grid  .td4{
+     width: 25%;
+ }
+
+ .usky-grid  .td5{
+     width: 20%;
+ }
+
+ .usky-grid  .td6{
+     width: 16.6%;
+ }
+
+ .usky-grid  .middle {
+     text-align: center;
+ }
+
+ .usky-grid  .mainTb {    
+     border-collapse: separate;
+     margin-bottom: -1px;
+     cursor:move;
+ }
+
+ .usky-grid  .mainTd {    
+     margin:0px;
+     position:relative;
+ }
+
+ .usky-grid  .backColor {
+     
+ }
+
+ .usky-grid .usky-row{margin-bottom: 10px;}
+
+ .usky-grid  textarea{
+     display:none;
+ }
+
+ .usky-grid  .cellPanel {
+     min-height: 100px;
+     position: relative;
+     text-align: center;
+     text-align: -moz-center;
+     cursor: text;
+ }
+
+ .usky-grid  .cellPanel .placeholder{
+     font-size: 14px; opacity: 0.7; text-align: left;
+     padding: 10px;
+     border:1px solid rgba(182, 182, 182, 0.3);
+ }
+
+ .usky-grid  .cellPanel:hover .placeholder{
+     border:1px solid rgba(182, 182, 182, 0.8);
+ }
+
+ .usky-grid  .cellMacro {
+     min-height: 65px;
+     padding-top: 45px;
+     position: relative;
+     background-color: rgba(100, 100, 100, 0.35);
+     text-align: center;
+     text-align: -moz-center;
+ }
+
+ .usky-grid  .cellMacro .tools{
+     margin: auto;
+     font-size: 16px;
+ }
+
+
+ .usky-grid  .controlContainer {
+     transition: all .20s ease-in-out;
+     -moz-transition: all .20s ease-in-out;
+     -webkit-transition: all .20s ease-in-out;
+     position:relative;
+     display:block;
+     
+     padding: 20px;
+     margin-top: 10px;
+     border-bottom: 2px solid rgba(255, 0, 0, .0);
+     -webkit-background-clip: padding-box; /* for Safari */
+     background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+ }
+
+ .usky-grid  .controlContainer:hover{
+     border-bottom:2px solid rgba(182, 182, 182, 0.3);
+ }
+
+ .usky-grid .selectedControl {
+     
+ }
+
+ .usky-grid  .cellPanelRte {
+     min-height:60px;
+ }
+
+ .usky-grid  .cellPanelMacro {
+     padding: 90px 0 0 0;
+     height:96px;
+     background-color: rgba(233, 233, 233, 0.35);
+     text-align: center;
+ }
+
+ .usky-grid  .iconBoxBig {
+     display: inline-block;
+     cursor: pointer;
+ }
+
+ .usky-grid  .iconBoxBig i {
+     font-size:24px !important;
+     color: #5F5F5F;
+ }
+
+ .usky-grid  .iconBoxBig i:hover {
+     color: #000000;
+ }
+
+ .usky-grid  .iconBox {
+     padding: 2px 5px 2px 5px;
+     display: inline-block;
+     cursor: pointer;
+     border-radius: 200px;
+     background: rgba(255,255,255, 1);
+     border:1px solid rgb(182, 182, 182);
+ }
+
+ .usky-grid  .iconBox a:hover {
+     text-decoration:none;
+ }
+
+ .usky-grid  .iconBox.selected {
+     -webkit-appearance: none;
+     background-image: -moz-linear-gradient(top,#e6e6e6,#bfbfbf);
+     background-image: -webkit-gradient(linear,0 0,0 100%,from(#e6e6e6),to(#bfbfbf));
+     background-image: -webkit-linear-gradient(top,#e6e6e6,#bfbfbf);
+     background-image: -o-linear-gradient(top,#e6e6e6,#bfbfbf);
+     background-image: linear-gradient(to bottom,#e6e6e6,#bfbfbf);
+     background-repeat: repeat-x;
+     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe6e6e6',endColorstr='#ffbfbfbf',GradientType=0);
+     zoom: 1;
+     border-color: #bfbfbf #bfbfbf #999;
+     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+     -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+     border-radius: 3px;
+     background: transparent;
+ }
+
+ .usky-grid  .iconBox i {
+     font-size:14px !important;
+     color: #5F5F5F;
+ }
+
+ .usky-grid  .iconBox i:hover {
+     color: #000000;
+ }
+
+ /* Row tools */
+
+ .usky-grid  .row-tools {
+     width: 30px;
+     position: absolute;
+     border: 1px solid rgba(207, 207, 207, 0.7);
+     margin: 0px 0 0 -35px;
+     padding: 2px;
+     z-index: 100;
+     background-color: rgba(250, 250, 250, 1);
+     display: none;
 }
 
-.editor:hover {
-	border-color: #000
-}
+ .usky-grid  .row-tools.selected {
+     width: 65px;
+     margin: 0px 0 0 -35px;
+     z-index: 200;
+     z-index: 99999999;
+     -webkit-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     -moz-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     box-shadow: 2px 2px 10px 0px rgba(500, 50, 50, 0.14);
+ }
 
-.editor:hover i {
-	opacity: 1
-}
+ .usky-grid  .cell-tools {
+     transition: all .20s ease-in-out;
+     -moz-transition: all .20s ease-in-out;
+     -webkit-transition: all .20s ease-in-out;
+     position: absolute;
+     bottom: 0;
+     top: 0;
+     left: 0;
+     right: 0;
+ }
 
-.editor i {
-	position: absolute;
-	top: 0;
-	font-size: 20px;
-	color: @white;
-	background: @black;
-	padding: 10px;
-	-webkit-transition: all 500ms  ease-in-out;
-		-moz-transition: all 500ms  ease-in-out;
-        -ms-transition: all 500ms  ease-in-out;
-        -o-transition: all 500ms  ease-in-out;
-		transition: all 500ms  ease-in-out;
-	opacity: 0
-}
+ .usky-grid  .cell-tools-add {
+     position: absolute;
+     text-align: center;
+     bottom: -14px;
+     left: 0;
+     right: 0;
+     z-index: 500;
+ }
 
-.editor i:hover {
-}
+ .usky-grid  .cell-tools-remove {
+     display:inline-block;
+     position: absolute;
+     top: -13px;
+     right: -13px;
+     text-align: right;
+     z-index: 500;
+ }
+ .usky-grid  .cell-tools-remove:hover i:before{color: red; font-weight: normal }
 
-.editor i.icon-move {
-	left: 0;
-	cursor: move
-}	
+ .usky-grid  .div-macro {
+     display: inline-table;
+     width: 100%;
+ }
 
-.editor i.icon-edit {
-	right: 36px;
-	cursor: pointer
-}
+ .usky-grid  .div-media {
+     overflow:hidden;
+ }
 
-.editor i.icon-trash {
-	right: 0;
-	cursor: pointer
-}
+ .usky-grid  .div-macro .td {
+     padding-top: 40px;
+ }
+
+ .usky-grid  .iconoff {
+     color:rgb(186, 186, 192)
+ }
+
+ .usky-grid  ul {
+     display:inline-block;
+     list-style:none;
+     padding:0;
+     margin: 10px 0 0 0;
+     text-align:center;
+ }
+
+ .usky-grid  ul li {
+     display: inline-block;
+     width: 120px;
+     margin: 8px 8px 0px 8px;
+ }
+
+ .usky-grid  .mainTbpt:hover {    
+     border:2px solid #53a93f;
+ }
+
+ .usky-grid  .mainTbpt {
+     cursor:pointer;
+     border-spacing: 5px;
+     border-collapse: separate;
+     height: 35px;
+     border: 2px solid rgb(219, 219, 219);  
+     margin:0px;
+     background-color: rgba(228, 228, 228, 0.41);
+ }
+
+ .usky-grid .icon-color {
+     color: rgb(109, 109, 109);
+ }
+
+ .usky-grid  .mainTdpt {    
+     height: 35px;
+     border: 1px dashed rgba(102, 102, 102, 0.3);  
+     margin:0px;
+     background-color: rgba(228, 228, 228, 0.41);
+ }
+
+ .usky-grid .hideRTEToolbar .mce-toolbar {
+     /*display:none !important;*/
+     visibility:hidden !important;
+ }
+
+ .usky-grid .mce-panel {
+     border:none !important;
+     clear:both;
+ }
+
+ .usky-grid .mce-btn button {
+     padding: 8px 6px;
+     line-height: inherit;
+ }
+
+ .usky-grid .mce-toolbar {
+     border: 1px solid rgba(207, 207, 207, 0.7);
+     background-color: rgba(250, 250, 250, 1);
+     z-index: 100;
+     display: inline-block;
+     float: left;
+     padding: -1px;
+     position: absolute;
+     margin: -1px -1px 0 -1px;
+     -webkit-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     -moz-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     z-index: 9999999;
+ }
+
+
+ .mce-flow-layout-item {
+     margin: 0;
+ }
+
+ .usky-grid  .mce-panel {
+     background: transparent !important;
+ }
+
+ .usky-grid  .mce-floatpanel {
+     background-color: #F7F7F7 !important;
+ }
+
+ .usky-grid  .fullSizeImage {
+     width:100%
+ }
+
+ .usky-grid  .usky-column {
+     padding:20px  20px 20px 20px;
+     margin-left:-1px;
+ }
+
+ .usky-grid  .usky-column.last {
+     
+ }
+
+ /**************************************************************************************************/
+ /* Width */
+ /**************************************************************************************************/
+
+ .usky-grid  .boxWidth {
+     text-align:right;
+     margin-bottom: 10px;
+ }
+
+ .usky-grid  .boxWidth input {
+     text-align: center;
+     width: 40px;
+ }
+
+ .usky-grid  .boxWidth label {
+     font-size: 10px;
+     padding: 0;
+     margin: 5px 5px 0 0;
+     color: #808080;
+ }
+
+
+ /**************************************************************************************************/
+ /* Margin control */
+ /**************************************************************************************************/
+
+ /* Margin default */
+ .usky-grid  .mainContainer {
+     /*overflow:hidden;*/
+     
+     /*
+     padding-left:10px;
+     padding-right:10px;
+     padding-top:10px;
+     padding-bottom:10px;
+         */
+     /*background-color:#fff;*/
+ }
+
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.controlContainer,
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
+     /*overflow:hidden;*/
+     margin-top:20px;
+     margin-bottom:10px;
+     margin-left:10px;
+     margin-right:10px;
+ }
+
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.controlContainer.first,
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
+     margin-top:10px;
+ }
+
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.first > div.controlContainer,
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.first > div.cellPanel {
+     margin-left:10px;
+ }
+
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.last > div.controlContainer,
+ .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.last > div.cellPanel {
+     margin-right:10px;
+ }
+
+ /* Control margin less */
+
+ .usky-grid  .mainContainer.marginControlLess {
+     padding:0;
+ }
+
+ .usky-grid  .mainContainer.marginControlLess > .mainTb > .tb > .tr > .mainTd > div.controlContainer {
+     margin:-1px -1px 0 -1px;
+ }
+
+ .usky-grid  .mainContainer.marginControlLess > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
+     margin:-1px -1px 0 -1px;
+ }
+
+ .usky-grid  .mainContainer.marginControlLess > .mainTb > .tb > .tr > .mainTd > div > .aA4 {
+     margin: 8px 61px 0 0px;
+ }
+
+ /* Margin less */
+
+ .usky-grid  .mainContainer.marginLeftLess {
+     padding-left:0px;
+ }
+
+ .usky-grid  .mainContainer.marginLeftLess > .mainTb > .tb > .tr > .mainTd.first > div {
+     margin-left:-1px;
+ }
+
+ .usky-grid  .mainContainer.marginRightLess {
+     padding-right:0px;
+ }
+
+ .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div,
+ .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div.first,
+ .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div.last,
+ .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div.cellPanel {
+     margin-right:-1px;
+ }
+
+ .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div > .cell-tools {
+     margin: -1px -1px 0 0;
+ }
+
+ .usky-grid  .mainContainer.marginTopLess {
+     padding-top:0px;
+ }
+
+ .usky-grid  .mainContainer.marginTopLess > .mainTb > .tb > .tr > .mainTd > div.controlContainer.first,
+ .usky-grid  .mainContainer.marginTopLess > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
+     margin-top:-1px;
+ }
+
+ .usky-grid  .mainContainer.marginBottomLess {
+     padding-bottom:0px;
+ }
+
+ .usky-grid  .mainContainer.marginBottomLess > .mainTb > .tb > .tr > .mainTd > div.controlContainer.last,
+ .usky-grid  .mainContainer.marginBottomLess > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
+     margin-bottom:0px;
+ }
+
+ /**************************************************************************************************/
+ /* template */
+ /**************************************************************************************************/
+
+ .usky-grid .uSky-templates {
+     text-align:center;
+     overflow:hidden;
+     width:100%;
+ }
+ 
+ .usky-grid .uSky-templates-template {
+     display:inline-block;
+     margin:20px;
+     width:100px;
+ }
+
+ .usky-grid .uSky-templates-template .tb:hover {
+     border:5px solid #53a93f;
+ }
+
+ .usky-grid .uSky-templates-template .tb { 
+     width:100%; 
+     height:150px; 
+     padding:10px;
+     background-color:rgba(228, 228, 228, 0.41);
+     border: 5px solid rgb(219, 219, 219);
+     cursor:pointer;
+ }
+ 
+ .usky-grid .uSky-templates-template .tb .uSky-templates-column {
+     height:100%;
+     border-top: 2px dashed rgba(102, 102, 102, 0.3);
+     border-bottom: 2px dashed rgba(102, 102, 102, 0.3);
+     border-left: 2px dashed rgba(102, 102, 102, 0.3);
+     margin: 0px 10px 0 10px;
+     background-color: rgba(228, 228, 228, 0.41)
+
+ }
+
+ .usky-grid .uSky-templates-template .tb .uSky-templates-column.last {
+     border: 2px dashed rgba(102, 102, 102, 0.3);
+ }
+
+
+ /**************************************************************************************************/
+ /* jumbotron */
+ /**************************************************************************************************/
+
+ .usky-grid  .jumbotron {
+     border: 7px solid rgb(235, 235, 235);
+     border-radius: 5px;
+ }
+
+ /**************************************************************************************************/
+ /* Color picker dialog for grid */
+ /**************************************************************************************************/
+
+ .CssClassPickerBox{
+     border: 2px solid #F3F2F2;
+     display: inline-block;
+     cursor: pointer;
+     margin: 10px;
+ }
+
+ .CssClassPickerBox:hover, .CssClassPickerBox.select {
+     border: 2px solid #0F9746;
+ }
+
+ .CssClassPickerBox div{
+     height: 80px;
+     width: 196px;
+ }

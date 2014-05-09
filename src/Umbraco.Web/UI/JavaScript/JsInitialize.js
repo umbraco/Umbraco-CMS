@@ -1,5 +1,5 @@
 ﻿[
-    'lib/jquery/jquery-2.0.3.min.js',
+    'lib/jquery/dist/jquery.min.js',
     'lib/angular/1.1.5/angular.min.js',
     'lib/underscore/underscore.js',
 
@@ -10,7 +10,8 @@
     'lib/angular/1.1.5/angular-sanitize.min.js',
 
     'lib/angular/angular-ui-sortable.js',
-    
+    'lib/ace-builds/src-min-noconflict/ace.js',
+
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',
     'lib/jquery/jquery.upload/js/load-image.min.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
