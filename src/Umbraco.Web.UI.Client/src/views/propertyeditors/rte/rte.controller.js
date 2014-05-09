@@ -113,10 +113,23 @@ angular.module("umbraco")
                     //timer might end up using unwanted cpu and we'd still have to listen to our saving event in case they clicked
                     //save before the timeout elapsed.
 
-                    //this doesnt actually work... 
+                    //TODO: We need to re-enable something like this to ensure the track changes is working with tinymce
+                    // so we can detect if the form is dirty or not, Per has some better events to use as this one triggers
+                    // even if you just enter/exit with mouse cursuor which doesn't really mean it's changed.
+                    // see: http://issues.umbraco.org/issue/U4-4485
+                    //var alreadyDirty = false;
                     //editor.on('change', function (e) {
                     //    angularHelper.safeApply($scope, function () {
                     //        $scope.model.value = editor.getContent();
+
+                    //        if (!alreadyDirty) {
+                    //            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+                    //            // the angular bits because tinymce replaces the textarea.
+                    //            var currForm = angularHelper.getCurrentForm($scope);
+                    //            currForm.$setDirty();
+                    //            alreadyDirty = true;
+                    //        }
+                            
                     //    });
                     //});
 

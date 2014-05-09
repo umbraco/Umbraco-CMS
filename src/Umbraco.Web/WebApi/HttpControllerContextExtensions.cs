@@ -59,7 +59,7 @@ namespace Umbraco.Web.WebApi
             {
                 Func<HttpResponseMessage> nullResponse = () => null;
                 return (index + 1) == filters.Count
-                    ? Task.Run(nullResponse)
+                    ? Task.Run(nullResponse, token)
                     : FilterContinuation(actionContext, token, filters, ++index);
             });
         }
