@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "typeahead.js": "~0.10.2"
+    "typeahead.js": "~0.10.2",
+    "codemirror": "~4.1.0"
   }
 }

@@ -1,0 +1,7 @@
+<div ng-controller="Umbraco.Dialogs.ApprovedColorController">
+    <div class='CssClassPickerBox {{(class.mSelectorText.substring(1) == cssClass)? "select" : "" }}'
+         ng-click="submit(class.mSelectorText.substring(1))" ng-repeat='class in classes'>
+        <div class='{{class.mSelectorText.substring(1)}}'>
+        </div>
+    </div>
+</div>

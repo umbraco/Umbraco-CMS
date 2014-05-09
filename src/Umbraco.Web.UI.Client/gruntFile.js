@@ -109,14 +109,6 @@ module.exports = function (grunt) {
     clean: ['<%= distdir %>/*'],
 
     copy: {
-
-      // Copies over the files downloaded by bower
-      bower: {
-          files: [
-              { dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', src: '<%= bowerfiles %>/typeahead.js/dist/typeahead.bundle.min.js' }
-          ]
-      },
-
       assets: {
         files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'src/assets/' }]
       },
