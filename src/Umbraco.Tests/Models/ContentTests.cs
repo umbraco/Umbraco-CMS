@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
-            clone.Properties.Add(new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Ntext) {Alias = "blah"}, "blah"));
+            clone.Properties.Add(new Property(1, Guid.NewGuid(), new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Ntext) { Alias = "blah" }, "blah"));
             Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
         }
 

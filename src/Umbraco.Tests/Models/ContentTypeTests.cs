@@ -10,8 +10,20 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTypeTests : BaseUmbracoConfigurationTest
+    public class ContentTypeTests
     {
+        [SetUp]
+        public void Init()
+        {
+            TestHelper.EnsureUmbracoSettingsConfig();
+        }
+
+        [TearDown]
+        public void Dispose()
+        {
+            TestHelper.CleanUmbracoSettingsConfig();
+        }
+
         [Test]
         public void Can_Deep_Clone_Content_Type_Sort()
         {
@@ -183,7 +195,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
-            clone.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Nvarchar) { Alias = "blah" });
+            clone.AddPropertyType(new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar) { Alias = "blah" });
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
             clone.AddPropertyGroup("hello");
