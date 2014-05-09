@@ -1,0 +1,175 @@
+﻿<div class="uskytuning">
+
+    <div ng-controller="Umbraco.uSkyTuningController">
+
+        <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
+
+            <div class="tunning-tools">
+
+                <div ng-click="togglePanel()">
+                    <i ng-if="isOpen" class="icon icon-left-double-arrow"></i>
+                    <i ng-if="!isOpen" class="icon icon-right-double-arrow"></i>
+                </div>
+
+                <div ng-if="isOpen" ng-click="settingOpen(true)" ng-class="{selected:settingIsOpen}">
+                    <i class="icon icon-paint-roller"></i>
+                </div>
+
+                <div ng-if="isOpen" ng-click="settingOpen(false)" ng-class="{selected:!settingIsOpen}">
+                    <i class="icon icon-palette"></i>
+                </div>
+
+            </div>
+
+            <div class="tuning-wrapper">
+
+                <div ng-show="settingIsOpen">
+
+                    <tabset vertical="false">
+
+                        <tab ng-repeat="category in tunningModel.categories" heading="{{category.name}}">
+
+                            <div ng-repeat="section in category.sections">
+
+                                <accordion close-others="true">
+                                    <accordion-group ng-repeat="subSection in section.subSections" is-open="$index == 0" heading="{{subSection.name}}">
+
+                                        <div class="div-field" ng-repeat="field in subSection.fields">
+
+                                            <span class="field-title">{{field.name}}:</span>
+
+                                            <div ng-if="field.type == 'colorPicker'">
+                                                <spectrum colorselected="field.value"></spectrum>
+                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="fa fa-times colorPickerDelete"></i>
+                                            </div>
+
+                                            <div ng-if="field.type == 'bgImagePicker'" class="imagePickerPreviewContainer">
+                                                <div class="imagePickerPreview" ng-click="open(field)" style="background-image:{{ field.value }}">
+                                                    <i class="fa fa-plus"></i>
+                                                </div>
+                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="fa fa-times colorPickerDelete"></i>
+                                            </div>
+
+                                            <div ng-if="field.type == 'bgPositionPicker'">
+                                                <select ng-options="BackgroundPosition for BackgroundPosition in BackgroundPositions" ng-model="field.value"></select>
+                                            </div>
+
+                                            <div ng-if="field.type == 'bgRepeatPicker'">
+                                                <select ng-options="BackgroundRepeat for BackgroundRepeat in BackgroundRepeats" ng-model="field.value"></select>
+                                            </div>
+
+                                            <div ng-if="field.type == 'bgAttachmentPicker'">
+                                                <select ng-options="BackgroundAttachment for BackgroundAttachment in BackgroundAttachments" ng-model="field.value"></select>
+                                            </div>
+
+                                            <div ng-if="field.type == 'layoutPicker'">
+                                                <select ng-options="Layout for Layout in Layouts" ng-model="field.value"></select>
+                                            </div>
+
+                                            <div class="box-slider" ng-if="field.type == 'slider'">
+                                                <div ui-slider min="{{field.min}}" max="{{field.max}}" step="1" ng-model="field.value"></div>
+                                                <span class="slider-span">px</span><input class="slider-input" ng-model="field.value">
+                                            </div>
+
+                                            <div ng-if="field.type == 'checkbox'">
+                                                <input type="checkbox" ng-checked="field.value == 'true'" ng-model="field.value">
+                                            </div>
+
+                                            <div ng-if="field.type == 'displayPicker'">
+                                                <select ng-options="display for display in displays" ng-model="field.value"></select>
+                                            </div>
+
+                                            <div ng-if="field.type == 'optionHomePicker'">
+                                                <select ng-options="optionHome for optionHome in optionHomes" ng-model="field.value"></select>
+                                            </div>
+
+                                            <div ng-if="field.type == 'fontFamilyPicker'">
+                                                <div class="fontFamilyPickerPreview" ng-click="openFontFamilyPickerModal(field)" style="font-family:{{ field.value }}">
+                                                    <span>Aa</span>
+                                                    {{ field.value }}
+                                                </div>
+                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="fa fa-times colorPickerDelete"></i>
+                                            </div>
+
+                                        </div>
+
+                                    </accordion-group>
+                                </accordion>
+
+                            </div>
+
+                        </tab>
+
+                    </tabset>
+
+                </div>
+
+                <div ng-show="!settingIsOpen">
+
+                    <tabset vertical="false">
+
+                        <tab heading="Preset colors">
+
+                            <ul class="palette">
+                                <li ng-click="refreshTunningByPalette(palette.colors)" ng-repeat="palette in tunningPalette">
+                                    <div>
+                                        <span style="background-color: {{ palette.mainColor }}"></span>
+                                    </div>
+                                    <p>{{ palette.name }}</p>
+                                </li>
+                            </ul>
+
+                        </tab>
+
+                    </tabset>
+
+                </div>
+                 
+                <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
+
+            </div>
+
+            <script type="text/ng-template" id="myModalContent.html">
+                <div class="modal-body bodyuSkyTunningImagePicker">
+                    <ul class="uSkyTunningImagePicker">
+                        <li ng-repeat="background in items.backgrounds">
+                            <h3>{{background.name}}</h3>
+                            <ul>
+                                <li ng-repeat="item in background.files">
+                                    <div class="image-preview" ng-class="{selected:selected.item==item}" ng-click="selected.item = item;" style="background-image:{{ item }}"></div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" ng-click="ok()">OK</button>
+                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+                </div>
+            </script>
+
+            <script type="text/ng-template" id="fontFamilyPickerModel.html">
+
+                <div class="modal-header uskytunning-fontfamilypicker">
+                    <select ng-model="selectedFont" ng-change="showFontPreview(selectedFont)" ng-options="font as font.fontFamily group by font.fontType for font in fonts"></select>
+                    <select ng-model="selectedFont.variant" ng-change="showFontPreview(selectedFont)" ng-options="variant for variant in selectedFont.variants" />
+                </div>
+
+                <div class="modal-body uskytunning-fontfamilypicker">
+                    <span class="show" ng-style="setStyleVariant()">Aa Bb Cc 1 2 3 4 ... <br />The quick brown fox jumps over the lazy dog....</span>
+                </div>
+
+
+                <div class="modal-footer uskytunning-fontfamilypicker">
+                    <button class="btn btn-primary" ng-click="ok()">OK</button>
+                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+                </div>
+
+            </script>
+
+        </div>
+ 
+
+    </div>
+
+</div>

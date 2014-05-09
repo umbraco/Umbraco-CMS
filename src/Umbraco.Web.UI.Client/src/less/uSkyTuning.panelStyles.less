@@ -1,0 +1,525 @@
+
+    .uskytuning #TuningBg {
+        background: rgba(29, 29, 29, 0.91);
+        left: 0;
+        top: 0;
+        /*min-height: 100%;*/
+        width: 275px;
+        position: fixed;
+        z-index: 999;
+        height: 100%;
+        padding:10px 5px 10px 10px; 
+        -webkit-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+        -moz-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+        box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+        margin-left: -275px;
+        transition: all .20s ease-in-out;
+        -moz-transition: all .20s ease-in-out;
+        -webkit-transition: all .20s ease-in-out;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-size: 13px;
+        line-height: 16px;
+    }
+
+    .uskytuning .tuning-wrapper {
+        padding:0px 5px 0 0;
+        overflow-y:auto;
+        height:100%;
+
+    }
+
+    .uskytuning #TuningBg.open {
+        -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+        -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+        margin-left: -0px;
+    }
+
+    .uskytuning .colpick {
+        z-index: 99999999;
+    }
+
+    .uskytuning .nav {
+        margin-bottom: 10px;
+        border-bottom: 1px solid #f57020;
+        color: #ffffff;
+
+    }
+
+    .uskytuning .nav-tabs>li.active>a, 
+    .uskytuning .nav-tabs>li.active>a:hover, 
+    .uskytuning .nav-tabs>li.active>a:focus {
+        color: #d9d9d9;
+        cursor: default;
+        background-color: #f57020;
+        border: 1px solid #f57020;
+        border-bottom-color: transparent;
+    }
+
+    .uskytuning .nav-tabs>li>a:hover {
+       border: 1px solid rgba(245, 112, 32, 0.53);
+    }
+    .uskytuning .nav>li>a:hover, 
+    .uskytuning .nav>li>a:focus {
+        text-decoration: none;
+        background-color: rgba(245, 112, 32, 0.53);
+        border: 1px solid rgba(245, 112, 32, 0.53);
+    }
+
+    .uskytuning .nav-tabs>li>a {
+        border-radius: 2px 2px 0 0;
+    }
+
+    .uskytuning .nav-tabs > li > a {
+        cursor:pointer;
+        color: #ffffff;
+    }
+
+    .uskytuning .nav>li>a {
+        padding: 5px 10px;
+    }
+
+    .uskytuning .panel-title>a {
+        display:block;
+        cursor:pointer;
+        font-size:13px;
+        line-height: 22px;
+        color: #d9d9d9;
+    }
+
+    .uskytuning .panel-title>a:hover {
+        color: #ffffff;
+        text-decoration:none;
+    }
+
+    .uskytuning .panel-heading {
+        padding: 0px 10px;
+    }
+
+    .uskytuning .panel-group .panel {
+        border-radius: 1px;
+    }
+
+    .uskytuning .panel {
+        margin-bottom: 5px;
+        background-color: rgba(85, 85, 85, 0.76);
+        border: 1px solid rgba(217, 217, 217, 0.5);
+        border-radius: 1px;
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    }
+
+    .uskytuning .panel-default>.panel-heading {
+        color: #333;
+        background-color: rgba(85, 85, 85, 0.76);
+        border-color: rgba(217, 217, 217, 0.5);
+        border-radius: 2px;
+    }
+
+    .uskytuning .panel-default > .panel-heading:hover {
+        background-color:  rgba(255, 255, 255, 0.41);
+        color:#ffffff;
+        text-decoration:none;
+    }
+
+    .uskytuning .btn-default-save, 
+    .uskytuning .btn-default-save:focus {
+        float: right;
+        margin-top: 5px;
+        color: #fff;
+        background-color: #f57020;
+        border-color: #ccc;
+        border-radius: 2px;
+    }
+
+    .uskytuning .btn-default-save:hover {
+        background-color: rgba(245, 112, 32, 0.53);
+        color: #fff;
+    }
+
+    .uskytuning .field-title {
+        color:#d9d9d9;
+        float: left;
+        margin-right:10px;
+        font-size:11px;
+    }
+
+    .uskytuning .div-field {
+        margin-bottom:10px;
+        clear:both;
+        overflow:hidden;
+    }
+
+    .uskytuning .sp-replacer {
+        padding: 0px;
+        border: solid 1px #d9d9d9;
+        background: none;
+        margin-top: 0px;
+        float: left;
+    }
+
+    .uskytuning .panel-body {
+        border-top-color: rgba(217, 217, 217, 0.5) !important;
+        border-top: 1px solid rgba(217, 217, 217, 0.5) !important;
+    }
+
+    .uskytuning select {
+        font-size:11px;
+    }   
+
+    .uskytuning .sp-dd {
+        display:none;
+    }
+
+    .uskytuning .sp-preview {
+        margin-right: 0px;
+        width: 17px;
+        height: 17px;
+        border:none;
+    }
+
+    .uskytuning .box-slider {
+        clear: both;
+        padding: 7px 2px 12px 2px;
+    }
+
+    .uskytuning .ui-widget-content {
+        border: 0px solid #fff !important; 
+        background: rgba(255, 255, 255, 0.09) !important;
+        border-radius: 2px !important;
+    }
+
+    .uskytuning .ui-slider-horizontal {
+        height: .3em  !important;
+        width: 155px;
+        float: left;
+    }
+
+    .uskytuning .ui-slider .ui-slider-handle {
+        width: 0.3em  !important;
+        height: 0.9em  !important;
+        top: -.3em;
+        margin-left: -.0em;
+        border-bottom-right-radius: 1px;
+        border-bottom-left-radius: 1px;
+        border-top-right-radius: 1px;
+        border-top-left-radius: 1px;
+        color: #d9d9d9 !important;
+        cursor:pointer;
+    }
+
+    .uskytuning .ui-slider .ui-slider-handle:hover,
+    .uskytuning .ui-slider .ui-slider-handle:focus {
+        color: #d9d9d9 !important;
+    }
+
+    .uskytuning .slider-input {
+        width: 25px;
+        float: right;
+        background-color: transparent;
+        color: #d9d9d9;
+        font-size: 11px;
+        border: none;
+        padding: 0;
+        margin-top: -9px;
+        margin-right: 1px;
+        text-align: right;
+    }
+
+    .uskytuning .slider-span {
+        float:right;
+        float: right;
+        margin: -9px 0 0 0;
+        color: #d9d9d9;
+        font-size: 11px;
+    }
+
+    @-moz-document url-prefix() {
+        .uskytuning .slider-input {
+            margin-top: -6px;
+        }
+    }
+
+    .uskytuning .imagePickerPreviewContainer {
+        float:left
+    }
+
+    .uskytuning .imagePickerPreview {
+        float: left;
+        border: 1px solid rgba(217, 217, 217, 0.5);
+        width: 50px;
+        height: 30px;
+        cursor:pointer;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        clear:both;
+        text-align: center;
+        color: rgba(217, 217, 217, 0.5);
+    }
+
+    .uskytuning .imagePickerPreview:hover {
+        border: 1px solid #d9d9d9;
+        color: #d9d9d9;
+    }
+
+    .uskytuning .imagePickerPreview i {
+        font-size: 14px;
+        line-height: 30px;
+        cursor: pointer;
+    }
+
+    .uskytuning .colorPickerDelete {
+        float: left;
+        font-size: 10px;
+        cursor: pointer;
+        color: rgba(217, 217, 217, 0.5);
+        margin-left: 3px;
+        margin-top: 5px;
+    }
+
+    .uskytuning .colorPickerDelete:hover {
+        color:#d9d9d9;
+    }
+
+    .uskytuning .tunning-tools {
+        position: absolute;
+        right: -28px;
+        margin: 120px 0 0 0;
+    }
+
+    .uskytuning #TuningBg.open .tunning-tools {
+        right: -33px;
+    }
+
+    .uskytuning .tunning-tools div {
+        color: rgba(255, 255, 255, 0.4);
+        background: rgba(41, 41, 41, 0.84);
+        display: block;
+        margin: 5px 0 0 0;
+        padding: 8px 10px 8px 10px;
+        font-size: 14px;
+        -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+        -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+        cursor: pointer;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+    .uskytuning .tunning-tools div:hover,
+    .uskytuning .tunning-tools div.selected {
+        color: rgba(255, 255, 255, 1);
+        background: rgba(29, 29, 29, 0.91);
+    }
+
+    .uSkyTunningImagePicker {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0 0 -16px;
+        height: 500px;
+        overflow: auto;
+    }   
+
+    .uSkyTunningImagePicker ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }   
+
+    .uSkyTunningImagePicker li {
+        display: inline-block;
+        margin: 0 0px 10px 17px;
+    }
+
+    .uSkyTunningImagePicker .image-preview {
+        border: 2px solid #F3F2F2;
+        display: inline-block;
+        cursor: pointer;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        width: 110px;
+        height: 60px;
+    }
+
+    .uSkyTunningImagePicker .image-preview:hover, .image-preview.selected {
+        border: 2px solid #53a93f;
+    }
+
+    .bodyuSkyTunningImagePicker {
+        padding: 10px 20px 0px 15px;
+    }
+
+    
+    .uSkyTunningImagePicker .modal-dialog {
+        width: 618px;
+        font-weight:normal
+    }
+
+
+    .uSkyTunningImagePicker  h3 {
+        color: rgba(85, 85, 85, 1);
+        font-size: 18px;
+        line-height: 25px;
+        font-style: normal;
+        font-weight: normal;
+        font-family: sans-serif;
+        margin: 0 0 10px 17px;
+    }
+
+    .uskytunning-fontfamilypicker .show {
+        font-size: 32px;
+        line-height: 34px;
+        color: #242424;
+        margin-top: 10px;
+    }
+
+    .uskytuning h4 {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+    }
+
+    .uskytuning .fontFamilyPickerPreview {
+        border: 1px solid rgba(217, 217, 217, 0.5);
+        width: 90%;
+        min-height: 50px;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        clear: both;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 4px;
+        background-color: rgba(0, 0, 0, 0.28);
+        float: left;
+    }
+
+    .uskytuning .fontFamilyPickerPreview span {
+        font-size: 32px;
+        line-height: 32px;
+    }
+
+    .uskytuning .fontFamilyPickerPreview:hover {
+        border: 1px solid #d9d9d9;
+        color: #d9d9d9;
+    }
+
+    .uskytunning-fontfamilypicker {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-size:14px;
+        line-height:14px;
+    }
+
+    .uskytuning .palette {
+        list-style:none;
+        margin:20px 0 20px 0;
+        padding:0;
+    }
+
+    .uskytuning .palette li {
+        margin: 10px 0px 0 0px;
+        clear: both;
+        overflow: hidden;
+        cursor:pointer;
+        background-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .uskytuning .palette div {
+        border:1px solid rgba(255, 255, 255, 0.61);
+        display: inline-block;
+        float:left;
+    }
+
+    .uskytuning .palette li:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .uskytuning .palette li:hover div {
+        border:1px solid #ffffff;
+    }
+
+    .uskytuning .palette li:hover p {
+        color:#ffffff;
+    }
+
+    .uskytuning .palette div span {
+        width: 30px;
+        height: 30px;
+        display: table-cell;
+        margin: 0;
+        padding: 0 0 0 0;
+        border: 1px solid rgba(0, 0, 0, 0.55);
+    }
+
+    .uskytuning .palette p {
+        color: rgba(255, 255, 255, 0.57);
+        margin: 7px 0 0 10px;
+        float: left;
+    }
+
+
+    @font-face {
+	    font-family: 'icomoon';
+	    src:url('/Umbraco/assets/fonts/helveticons/helveticons.eot');
+	    src:url('/Umbraco/assets/fonts/helveticons/helveticons.eot?#iefix') format('embedded-opentype'),
+		    url('/Umbraco/assets/fonts/helveticons/helveticons.ttf') format('truetype'),
+		    url('/Umbraco/assets/fonts/helveticons/helveticons.svg#icomoon') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+    }
+
+[class^="icon-"],
+[class*=" icon-"] {
+  font-family: icomoon;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  *margin-right: .3em;
+}
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  text-decoration: inherit;
+  display: inline-block;
+  speak: none;
+}
+/*
+[class^="icon-"]:before, [class*=" icon-"]:before {
+	font-family: 'icomoon';
+	speak: none;
+	font-weight: normal;
+  	font-style: normal;
+  	display: inline-block;
+  	text-decoration: inherit;
+  	font-size: 14px;
+  	-webkit-font-smoothing: antialiased;
+}*/
+
+i.large{
+	font-size: 32px;
+}
+
+i.medium{
+	font-size: 24px;
+}
+i.small{
+	font-size: 14px;
+}
+
+.icon-right-double-arrow:before {
+	content: "\e094";
+}
+
+.icon-left-double-arrow:before {
+	content: "\e141";
+}
+
+.icon-paint-roller:before {
+	content: "\e120";
+}
+.icon-palette:before {
+	content: "\e121";
+}
+
+

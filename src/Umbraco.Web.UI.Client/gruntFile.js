@@ -7,14 +7,15 @@ module.exports = function (grunt) {
 
   //run by the watch task
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build','recess:installer','copy:assets','copy:vs']);
+  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:uSkyTuning', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
-  grunt.registerTask('watch-installer', ['concat:install','concat:installJs','copy:installer', 'copy:vs']);
+  grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
+  grunt.registerTask('watch-usky', ['copy:uSky', 'concat:uSkyJs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','bower','copy']);
+  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','recess:uSkyTuning','bower','copy']);
 
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -125,6 +126,15 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
 
+      uSky: {
+          files: [
+              { dest: '<%= distdir %>/views/uSky', src: '**/*.html', expand: true, cwd: 'src/usky' },
+              { dest: '<%= distdir %>/assets/uSky', src: 'uSkyTuning.lessParameters.less', expand: true, cwd: 'src/usky' },
+              { dest: '<%= distdir %>/assets/uSky', src: 'uSkyTuning.dynamicStyles.less', expand: true, cwd: 'src/usky' },
+              { dest: '<%= distdir %>/assets/uSky', src: 'uSkyTuning.baseStyles.css', expand: true, cwd: 'src/usky' }
+          ]
+      },
+
       vendor: {
         files: [{ dest: '<%= distdir %>/lib', src : '**', expand: true, cwd: 'lib/' }]
       },
@@ -184,6 +194,14 @@ module.exports = function (grunt) {
               banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.install', []); \n",
               footer: "\n\n})();"
           }
+        },
+        uSkyJs: {
+            src: ['src/uSky/**/*.js'],
+            dest: '<%= distdir %>/js/umbraco.uSkyTuning.js',
+            options: {
+                banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.uSkyTuning', []); \n",
+                footer: "\n\n})();"
+            }
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
@@ -271,6 +289,15 @@ module.exports = function (grunt) {
           compile: true
         }
       },
+      uSkyTuning: {
+          files: {
+              '<%= distdir %>/assets/uSky/uSkyTuning.panelStyles.css':
+              ['src/less/uSkyTuning.panelStyles.less']
+          },
+          options: {
+              compile: true
+          }
+      },
       min: {
         files: {
           '<%= distdir %>/assets/css/<%= pkg.name %>.css': ['<%= src.less %>']
@@ -302,6 +329,10 @@ module.exports = function (grunt) {
       installer: {
           files: ['src/installer/**/*.*'],
           tasks: ['watch-installer', 'timestamp'],
+      },
+      usky: {
+          files: ['src/uSky/**/*.*'],
+          tasks: ['watch-usky', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
