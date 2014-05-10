@@ -19,12 +19,10 @@ namespace Umbraco.Web.Editors
     public class uSkyTuningController : UmbracoApiController
     {
 
-        static string basePath = HttpContext.Current.Server.MapPath(@"\Umbraco\assets\uSky\");
-        static string resultCssPath = HttpContext.Current.Server.MapPath(@"\Css\uSkyTunning.style.css");
-        static string baseStylePath = basePath + @"uSkyTuning.baseStyles.css";
-        static string dynamicLessPath = basePath + @"uSkyTuning.dynamicStyles.less";
-        static string tuningParametersPath = basePath + @"uSkyTuning.lessParameters.less";
-        static string tuningGoogleFontPath = basePath + @"uSkyTuning.googleFont.css";
+        static string basePath = HttpContext.Current.Server.MapPath(@"\Umbraco\assets\less\");
+        static string resultCssPath = HttpContext.Current.Server.MapPath(@"\Css\uSkyTuning.style.css");
+        static string uSkyTuningStylePath = basePath + @"uSkyTuning.style.less";
+        static string uSkyTuningParametersPath = basePath + @"uSkyTuning.lessParameters.less";
 
         [HttpGet]
         public HttpResponseMessage GetGoogleFont()
@@ -58,11 +56,11 @@ namespace Umbraco.Web.Editors
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            if (!File.Exists(tuningParametersPath))
-                File.Create(tuningParametersPath);
+            if (!File.Exists(uSkyTuningParametersPath))
+                File.Create(uSkyTuningParametersPath);
 
             IList<string> parameters = new List<string>();
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(tuningParametersPath))
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(uSkyTuningParametersPath))
             {
                 String line;
                 while ((line = sr.ReadLine()) != null)
@@ -87,11 +85,8 @@ namespace Umbraco.Web.Editors
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            if (!File.Exists(tuningParametersPath))
-                File.Create(tuningParametersPath);
-
-            if (!File.Exists(tuningGoogleFontPath))
-                File.Create(tuningGoogleFontPath);
+            if (!File.Exists(uSkyTuningParametersPath))
+                File.Create(uSkyTuningParametersPath);
 
             if (!File.Exists(resultCssPath))
                 File.Create(resultCssPath);
@@ -100,7 +95,7 @@ namespace Umbraco.Web.Editors
 
             // Update less parameter file
             string gaImportList = string.Empty;
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(tuningParametersPath))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(uSkyTuningParametersPath))
             {
                 foreach (string parameters in result.Trim().Split(';'))
                 {
@@ -116,22 +111,15 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            // Read base style file
-            string baseStyleString = string.Empty;
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(baseStylePath))
+            // Read uSkyTuning style file
+            string uSkyTuningStyleString = string.Empty;
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(uSkyTuningStylePath))
             {
-                baseStyleString = sr.ReadToEnd();
-            }
-
-            // Read the Less file
-            string dynamicLessString = string.Empty;
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(dynamicLessPath))
-            {
-                dynamicLessString = sr.ReadToEnd();
+                uSkyTuningStyleString = sr.ReadToEnd();
             }
 
             // Compile the Less file
-            string compiledStyle = GetCssFromLessString(baseStyleString + dynamicLessString, false, true, true);
+            string compiledStyle = GetCssFromLessString(uSkyTuningStyleString, false, true, true);
 
             // Save compiled file
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(resultCssPath))

@@ -121,9 +121,7 @@ module.exports = function (grunt) {
       uSky: {
           files: [
               { dest: '<%= distdir %>/views/uSky', src: '**/*.html', expand: true, cwd: 'src/usky' },
-              { dest: '<%= distdir %>/assets/uSky', src: 'uSkyTuning.lessParameters.less', expand: true, cwd: 'src/usky' },
-              { dest: '<%= distdir %>/assets/uSky', src: 'uSkyTuning.dynamicStyles.less', expand: true, cwd: 'src/usky' },
-              { dest: '<%= distdir %>/assets/uSky', src: 'uSkyTuning.baseStyles.css', expand: true, cwd: 'src/usky' }
+              { dest: '<%= distdir %>/assets/less', src: 'uSkyTuning.lessParameters.less', expand: true, cwd: 'src/usky' },
           ]
       },
 
@@ -194,6 +192,10 @@ module.exports = function (grunt) {
                 banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.uSkyTuning', []); \n",
                 footer: "\n\n})();"
             }
+        },
+        uSkyLess: {
+            src: ['src/uSky/uSkyTuning.lessParameters.less', 'src/uSky/uSkyTuning.baseStyles.less', 'src/uSky/uSkyTuning.dynamicStyles.less'],
+            dest: '<%= distdir %>/assets/less/uSkyTuning.style.less',
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
@@ -283,7 +285,7 @@ module.exports = function (grunt) {
       },
       uSkyTuning: {
           files: {
-              '<%= distdir %>/assets/uSky/uSkyTuning.panelStyles.css':
+              '<%= distdir %>/assets/css/uSkyTuning.panelStyles.css':
               ['src/less/uSkyTuning.panelStyles.less']
           },
           options: {
