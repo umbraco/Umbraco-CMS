@@ -17,6 +17,6 @@
   ],
   "dependencies": {
     "typeahead.js": "~0.10.2",
-    "codemirror": "~4.1.0"
+    "ace-builds": "~1.1.3"
   }
 }

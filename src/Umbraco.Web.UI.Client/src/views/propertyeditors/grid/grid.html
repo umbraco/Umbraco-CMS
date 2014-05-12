@@ -15,117 +15,130 @@
         </div>
     </div>
 
+
     <!-- Grids -->
     <div class="usky-grid-width" style="width:{{ model.value.gridWidth }}px">
-        <div ng-if="model.config.items.enableGridWidth" class="boxWidth">
-            <label for="">width (px):</label><input type="text" ng-model="model.value.gridWidth" />
-        </div>
+    <div class="tb">
 
+    <div class="usky-column td" ng-class="{last:$index==model.value.columns.length-1}" ng-repeat="column in model.value.columns" style="width:{{column .percentage}}%">
+
+    <div ui-sortable="sortableOptions" ng-model="column.rows">
+
+    <div 
+        ng-repeat="row in column.rows" 
+        class="usky-row"
+        ng-mouseover="setCurrentRow(row)" 
+        ng-mouseleave="disableCurrentRow()"
+        ng-class="{removingControl:currentRemoveControl == row}">
+
+    <div class="row-tools" ng-if="currentRow == row">
+        <div class="cell-tools-remove">
+            <div class="iconBox"
+                ng-click="removeRow(column, $index)"
+                ng-mouseover="setCurrentRemoveControl(row)" 
+                ng-mouseleave="disableCurrentRemoveControl(row)">
+                <i class="icon icon-trash"></i>
+            </div>
+        </div>
+    </div>
+
+    <div ng-class="{last:$index==model.value.length-1,first:$index==0}" 
+        class="{{row.cssClass}} mainContainer">
+
+    <div class="mainTb">
         <div class="tb">
 
-            <div class="usky-column td" ng-class="{last:$index==model.value.columns.length-1}" ng-repeat="column in model.value.columns" style="width:{{column .percentage}}%">
+    <div class="tr">
+        <div style="width:{{ cell.model.percentage }}%"
+             ng-class="{last:$index==row.cells.length-1,first:$index==0}"
+             class="td mainTd"
 
-                <div ui-sortable="sortableOptions" ng-model="column.rows">
+             ng-repeat="cell in row.cells">
 
-                    <div ng-repeat="row in column.rows" class="usky-row">
+    <div ng-repeat="control in cell.controls"
+         ng-class="{backColor:!control.tinyMCE,
+                    last:$index==cell.controls.length-1,
+                    removingControl:currentRemoveControl == control,
+                    toolsControl:currentToolsControl == control,
+                    selectedControl:currentControl == control || isOpenRTEToolbar(control),
+                    jumbotron:row.boxed}"
+         ng-mouseover="setCurrentControl(control)" ng-mouseleave="disableCurrentControl(control)"
+         class="controlContainer">
 
-                        <div ng-class="{selected:row == currentRow}" class="row-tools" ng-mouseover="setCurrentRow(row)" ng-mouseleave="disableCurrentRow()">
-                            <div class="iconBox"><a title="row setting"><i class="icon icon-settings"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableBackground" class="iconBox" ng-click="setBackGroundRow(row)"><a title="background color/image"><i class="icon icon-paint-roller"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableSkipTopMargin" ng-class="{iconBox:1==1,selected:row.skipTopMargin}" ng-click="skipTopMargin(row)"><a title="remove top margin"><i class="icon icon-navigation-top"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableSkipBottomMargin" ng-class="{iconBox:1==1,selected:row.skipBottomMargin}" ng-click="skipBottomMargin(row)"><a title="remove bottom margin"><i class="icon icon-navigation-bottom"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableSkipLeftMargin" ng-class="{iconBox:1==1,selected:row.skipLeftMargin}" ng-click="skipLeftMargin(row)"><a title="remove left margin"><i class="icon icon-navigation-first"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableSkipRightMargin" ng-class="{iconBox:1==1,selected:row.skipRightMargin}" ng-click="skipRightMargin(row)"><a title="remove right margin"><i class="icon icon-navigation-last"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableSkipControlMargin" ng-class="{iconBox:1==1,selected:row.skipControlMargin}" ng-click="skipControlMargin(row)"><a title="remove cell margins"><i class="icon icon-exit-fullscreen"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableFullScreen" ng-class="{iconBox:1==1,selected:row.fullScreen}" ng-click="fullScreen(row)"><a title="full width/height"><i class="icon icon-width"></i></a></div>
-                            <div ng-if="row == currentRow && model.config.items.enableBoxed" ng-class="{iconBox:1==1,selected:row.boxed}" ng-click="boxed(row)"><a title="cells boxed"><i class="icon icon-frame"></i></a></div>
-                            <div ng-if="row == currentRow" class="iconBox" ng-click="removeRow(column, $index)"><a title="remove row"><i class="icon icon-trash"></i></a></div>
-                        </div>
+    <!-- Empty cell tools -->
+    <div class="cell-tools" 
+        ng-if="control && ( currentControl == control || isOpenRTEToolbar(control) )">
 
-                        <div ng-class="{last:$index==model.value.length-1,first:$index==0,
-                            marginTopLess:row.skipTopMargin || row.fullScreen,
-                            marginBottomLess:row.skipBottomMargin || row.fullScreen,
-                            marginLeftLess:row.skipLeftMargin || row.fullScreen,
-                            marginRightLess:row.skipRightMargin || row.fullScreen,
-                            marginControlLess:row.skipControlMargin}" class="{{row.cssClass}} mainContainer">
+        <div class="cell-tools-add" 
+            ng-if="model.config.items.enableMultiCells" 
+            ng-mouseover="setCurrentToolsControl(control)" 
+            ng-mouseleave="disableCurrentToolsControl(control)">
+                                                        
+            <div class="iconBox" 
+                ng-click="addTinyMce(cell, $index)" 
+                ng-if="(currentToolsControl == control) && model.config.items.enableRte">
+                    <i class="icon icon-edit"></i>
+            </div>
+            
+            <div class="iconBox" 
+                ng-click="addMedia(cell, $index)" 
+                ng-if="(currentToolsControl == control) && model.config.items.enableMedia">
+                    <i class="icon icon-picture"></i>
+            </div>
 
-                            <div class="mainTb">
+            <div class="iconBox" 
+                ng-click="addMacro(cell, $index)" 
+                ng-if="(currentToolsControl == control) && model.config.items.enableMacro">
+                <i class="icon icon-settings-alt"></i>
+            </div>
 
-                                <div class="tb">
+            <div class="iconBox" 
+                ng-if="currentToolsControl != control">
+                <i class=" icon icon-add"></i>
+            </div>
+        </div>
 
-                                    <div class="tr">
-                                        <div style="width:{{ cell.model.percentage }}%"
-                                             ng-class="{last:$index==row.cells.length-1,first:$index==0}"
-                                             class="td mainTd"
+        <div class="cell-tools-remove">    
+            <div class="iconBox"
+                ng-click="removeControl(cell, $index)"
+                ng-mouseover="setCurrentRemoveControl(control)" 
+                ng-mouseleave="disableCurrentRemoveControl(control)">
+                <i class="icon icon-trash"></i>
+            </div>
+        </div>
+    </div>
 
-                                             ng-repeat="cell in row.cells">
+    <!-- Tiny cell -->
+    <div ng-if="control && control.tinyMCE"
+         ng-class="{cellPanelRte:1==1,hideRTEToolbar:!isOpenRTEToolbar(control)}">
 
-                                            <div ng-repeat="control in cell.controls"
-                                                 ng-class="{backColor:!control.tinyMCE,
-                                                            last:$index==cell.controls.length-1,
-                                                            first:$index==0,
-                                                            selectedControl:currentControl == control || isOpenRTEToolbar(control),
-                                                            jumbotron:row.boxed}"
-                                                 ng-mouseover="setCurrentControl(control)" ng-mouseleave="disableCurrentControl(control)"
-                                                 class="controlContainer">
+        <!--<div ng-controller="uSky.Grid.Rte.controler">
+            <textarea ng-model="control.tinyMCE" rows="10" id="{{control.tinyMCE.uniqueId}}"></textarea>
+        </div>-->
 
+        <div ng-if="control.tinyMCE"
+             unique-id="control.tinyMCE.uniqueId"
+             value="control.tinyMCE.value"
+             ctrl-op="openRTEToolbar(control)"
+             ctrl-cl="closeRTEToolbar(control)"
+             grid-rte configuration="model.config.rte"></div>
 
-                                                <!-- Empty cell tools -->
-                                                <div class="cell-tools" ng-if="control && ( currentControl == control || isOpenRTEToolbar(control) )">
+    </div>
 
-                                                    <div class="cell-tools-add" ng-if="model.config.items.enableMultiCells" ng-mouseover="setCurrentToolsControl(control)" ng-mouseleave="disableCurrentToolsControl(control)">
-                                                        <div class="iconBox" ng-click="addTinyMce(cell, $index)" ng-if="(currentToolsControl == control) && model.config.items.enableRte">
-                                                            <i class="icon icon-edit"></i>
-                                                        </div>
-                                                        <div class="iconBox" ng-click="addMedia(cell, $index)" ng-if="(currentToolsControl == control) && model.config.items.enableMedia">
-                                                            <i class="icon icon-picture"></i>
-                                                        </div>
-                                                        <div class="iconBox" ng-click="addMacro(cell, $index)" ng-if="(currentToolsControl == control) && model.config.items.enableMacro">
-                                                            <i class="icon icon-settings-alt"></i>
-                                                        </div>
-                                                        <div class="iconBox" ng-if="currentToolsControl != control">
-                                                            <i class=" icon icon-add"></i>
-                                                        </div>
-                                                    </div>
+    <!-- Media cell -->
+    <div ng-if="control && control.media" class="cellMedia">
+        <img ng-src="{{control.media.src}}" class="fullSizeImage" />
+    </div>
 
-                                                    <div class="cell-tools-remove">    
-                                                        <div class="iconBox">
-                                                            <i class="icon icon-trash" ng-click="removeControl(cell, $index)"></i>
-                                                        </div>
-                                                    </div>
-                                                </div>
+    <!-- Macro cell -->
+    <div ng-if="control && control.macro" class="cellMacro">
+        <div class="tools">
+            <i class="icon icon-settings-alt"></i>
+            {{control.macro.macroAlias}}
+        </div>
+    </div>
 
-                                                <!-- Tiny cell -->
-                                                <div ng-if="control && control.tinyMCE"
-                                                     ng-class="{cellPanelRte:1==1,hideRTEToolbar:!isOpenRTEToolbar(control)}">
-
-                                                    <!--<div ng-controller="uSky.Grid.Rte.controler">
-                                                        <textarea ng-model="control.tinyMCE" rows="10" id="{{control.tinyMCE.uniqueId}}"></textarea>
-                                                    </div>-->
-
-                                                    <div ng-if="control.tinyMCE"
-                                                         unique-id="control.tinyMCE.uniqueId"
-                                                         value="control.tinyMCE.value"
-                                                         ctrl-op="openRTEToolbar(control)"
-                                                         ctrl-cl="closeRTEToolbar(control)"
-                                                         grid-rte></div>
-
-                                                </div>
-
-                                                <!-- Macro cell -->
-                                                <div ng-if="control && control.media" class="cellMedia">
-                                                    <img ng-src="{{control.media.src}}" class="fullSizeImage" />
-                                                </div>
-
-                                                <!-- Macro cell -->
-                                                <div ng-if="control && control.macro" class="cellMacro">
-                                                    <div class="tools">
-                                                        <i class="icon icon-settings-alt"></i>
-                                                        {{control.macro.macroAlias}}
-                                                    </div>
-                                                </div>
-
-                                            </div>
+    </div>
 
                                             <!-- Empty cell tools -->
                                             <div class="cellPanel"
