@@ -49,6 +49,7 @@ namespace Umbraco.Core.ObjectResolution
         /// Initializes a new instance of the <see cref="LazyManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list
         /// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
         /// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
+        /// </summary>
         protected LazyManyObjectsResolverBase(IEnumerable<Lazy<Type>> lazyTypeList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
 			: this(scope)
 		{			
@@ -108,7 +109,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// Gets a value indicating whether the resolver has resolved types to create instances from.
 		/// </summary>
         /// <remarks>To be used in unit tests.</remarks>
-		internal bool HasResolvedTypes
+		public bool HasResolvedTypes
 		{
 			get
             {
