@@ -240,52 +240,6 @@ namespace Umbraco.Core.Models.EntityBase
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
             clone.ResetDirtyProperties(false);
             return clone;
-
-            //Using data contract serializer - has issues
-
-            //var s = Serialize(this);
-            //var d = Deserialize(s, this.GetType());
-            //return d;
-
-            //Using binary serializer - has issues
-
-            //using (var memoryStream = new MemoryStream(10))
-            //{
-            //IFormatter formatter = new BinaryFormatter();
-            //formatter.Serialize(memoryStream, this);
-            //memoryStream.Seek(0, SeekOrigin.Begin);
-            //return formatter.Deserialize(memoryStream);
-            //}
         }
-
-        // serialize/deserialize with data contracts: 
-
-        //public static string Serialize(object obj)
-        //{
-        //    using (var memoryStream = new MemoryStream())
-        //    using (var reader = new StreamReader(memoryStream))
-        //    {
-        //        var serializer = new DataContractSerializer(obj.GetType());
-        //        serializer.WriteObject(memoryStream, obj);
-        //        memoryStream.Position = 0;
-        //        return reader.ReadToEnd();
-        //    }
-        //}
-
-        //public static object Deserialize(string xml, Type toType)
-        //{
-        //    using (Stream stream = new MemoryStream())
-        //    {
-        //        using (var writer = new StreamWriter(stream, Encoding.UTF8))
-        //        {
-        //            writer.Write(xml);
-        //            //byte[] data = Encoding.UTF8.GetBytes(xml);
-        //            //stream.Write(data, 0, data.Length);
-        //            stream.Position = 0;
-        //            var deserializer = new DataContractSerializer(toType);
-        //            return deserializer.ReadObject(stream);
-        //        }
-        //    }
-        //}
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a Property for a Macro
     /// </summary>
-    public interface IMacroProperty : IValueObject
+    public interface IMacroProperty : IValueObject, IDeepCloneable
     {
         [DataMember]
         int Id { get; set; }

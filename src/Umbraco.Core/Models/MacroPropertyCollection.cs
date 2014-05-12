@@ -8,13 +8,22 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// A macro's property collection
     /// </summary>
-    public class MacroPropertyCollection : ObservableDictionary<string, IMacroProperty>
+    public class MacroPropertyCollection : ObservableDictionary<string, IMacroProperty>, IDeepCloneable
     {
         public MacroPropertyCollection() 
             : base(property => property.Alias)
         {
         }
 
+        public object DeepClone()
+        {
+            var clone = new MacroPropertyCollection();
+            foreach (var item in this)
+            {
+                clone.Add((IMacroProperty)item.DeepClone());
+            }
+            return clone;
+        }
     }
 
 }

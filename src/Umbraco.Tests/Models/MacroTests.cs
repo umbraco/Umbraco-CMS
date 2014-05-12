@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -19,12 +20,21 @@ namespace Umbraco.Tests.Models
         public void Can_Deep_Clone()
         {
             var macro = new Macro(1, true, 3, "test", "Test", "blah", "blah", "xslt", false, true, true, "script");
+            macro.Properties.Add(new MacroProperty(6, "rewq", "REWQ", 1, "asdfasdf"));
 
             var clone = (Macro)macro.DeepClone();
 
             Assert.AreNotSame(clone, macro);
             Assert.AreEqual(clone, macro);
             Assert.AreEqual(clone.Id, macro.Id);
+
+            Assert.AreEqual(clone.Properties.Count, macro.Properties.Count);
+
+            for (int i = 0; i < clone.Properties.Count; i++)
+            {
+                Assert.AreEqual(clone.Properties[i], macro.Properties[i]);
+                Assert.AreNotSame(clone.Properties[i], macro.Properties[i]);
+            }
 
             Assert.AreNotSame(clone.Properties, macro.Properties);
             Assert.AreNotSame(clone.AddedProperties, macro.AddedProperties);
@@ -44,6 +54,9 @@ namespace Umbraco.Tests.Models
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
             clone.Properties.Add(new MacroProperty(3, "asdf", "SDF", 3, "asdfasdf"));
             Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
+            Assert.AreEqual(1, clone.AddedProperties.Count());
+            clone.Properties.Remove("rewq");
+            Assert.AreEqual(1, clone.RemovedProperties.Count());
 
         }
 

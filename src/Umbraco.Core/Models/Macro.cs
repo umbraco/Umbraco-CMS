@@ -138,12 +138,11 @@ namespace Umbraco.Core.Models
 
                 var alias = prop.Alias;
 
-                //remove from the removed/added props (since people could add/remove all they want in one request)
-                _removedProperties.RemoveAll(s => s == alias);
-                _addedProperties.RemoveAll(s => s == alias);
-
-                //add to the added props
-                _addedProperties.Add(alias);
+                if (_addedProperties.Contains(alias) == false)
+                {
+                    //add to the added props
+                    _addedProperties.Add(alias);
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -153,12 +152,10 @@ namespace Umbraco.Core.Models
 
                 var alias = prop.Alias;
 
-                //remove from the removed/added props (since people could add/remove all they want in one request)
-                _removedProperties.RemoveAll(s => s == alias);
-                _addedProperties.RemoveAll(s => s == alias);
-
-                //add to the added props
-                _removedProperties.Add(alias);
+                if (_removedProperties.Contains(alias) == false)
+                {
+                    _removedProperties.Add(alias);
+                }
             }
         }
 
@@ -404,7 +401,8 @@ namespace Umbraco.Core.Models
 
             clone._addedProperties = new List<string>();
             clone._removedProperties = new List<string>();
-            clone._properties = new MacroPropertyCollection();
+            clone._properties = (MacroPropertyCollection)Properties.DeepClone();
+            //re-assign the event handler
             clone._properties.CollectionChanged += clone.PropertiesChanged;
 
             clone.ResetDirtyProperties(false);
