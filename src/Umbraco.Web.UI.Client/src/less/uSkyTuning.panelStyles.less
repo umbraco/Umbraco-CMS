@@ -1,489 +1,495 @@
-
-    .uskytuning #TuningBg {
-        background: rgba(29, 29, 29, 0.91);
-        left: 0;
-        top: 0;
-        /*min-height: 100%;*/
-        width: 275px;
-        position: fixed;
-        z-index: 999;
-        height: 100%;
-        padding:10px 5px 10px 10px; 
-        -webkit-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
-        -moz-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
-        box-shadow: 0 0 14px rgba(0, 0, 0, 0);
-        margin-left: -275px;
-        transition: all .20s ease-in-out;
-        -moz-transition: all .20s ease-in-out;
-        -webkit-transition: all .20s ease-in-out;
-        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-        font-size: 13px;
-        line-height: 16px;
-    }
-
-    .uskytuning .tuning-wrapper {
-        padding:0px 5px 0 0;
-        overflow-y:auto;
-        height:100%;
-
-    }
-
-    .uskytuning #TuningBg.open {
-        -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-        -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-        margin-left: -0px;
-    }
-
-    .uskytuning .colpick {
-        z-index: 99999999;
-    }
-
-    .uskytuning .nav {
-        margin-bottom: 10px;
-        border-bottom: 1px solid #f57020;
-        color: #ffffff;
-
-    }
-
-    .uskytuning .nav-tabs>li.active>a, 
-    .uskytuning .nav-tabs>li.active>a:hover, 
-    .uskytuning .nav-tabs>li.active>a:focus {
-        color: #d9d9d9;
-        cursor: default;
-        background-color: #f57020;
-        border: 1px solid #f57020;
-        border-bottom-color: transparent;
-    }
-
-    .uskytuning .nav-tabs>li>a:hover {
-       border: 1px solid rgba(245, 112, 32, 0.53);
-    }
-    .uskytuning .nav>li>a:hover, 
-    .uskytuning .nav>li>a:focus {
-        text-decoration: none;
-        background-color: rgba(245, 112, 32, 0.53);
-        border: 1px solid rgba(245, 112, 32, 0.53);
-    }
-
-    .uskytuning .nav-tabs>li>a {
-        border-radius: 2px 2px 0 0;
-    }
-
-    .uskytuning .nav-tabs > li > a {
-        cursor:pointer;
-        color: #ffffff;
-    }
-
-    .uskytuning .nav>li>a {
-        padding: 5px 10px;
-    }
-
-    .uskytuning .panel-title>a {
-        display:block;
-        cursor:pointer;
-        font-size:13px;
-        line-height: 22px;
-        color: #d9d9d9;
-    }
-
-    .uskytuning .panel-title>a:hover {
-        color: #ffffff;
-        text-decoration:none;
-    }
-
-    .uskytuning .panel-heading {
-        padding: 0px 10px;
-    }
-
-    .uskytuning .panel-group .panel {
-        border-radius: 1px;
-    }
-
-    .uskytuning .panel {
-        margin-bottom: 5px;
-        background-color: rgba(85, 85, 85, 0.76);
-        border: 1px solid rgba(217, 217, 217, 0.5);
-        border-radius: 1px;
-        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.05);
-        box-shadow: 0 1px 1px rgba(0,0,0,0.05);
-    }
-
-    .uskytuning .panel-default>.panel-heading {
-        color: #333;
-        background-color: rgba(85, 85, 85, 0.76);
-        border-color: rgba(217, 217, 217, 0.5);
-        border-radius: 2px;
-    }
-
-    .uskytuning .panel-default > .panel-heading:hover {
-        background-color:  rgba(255, 255, 255, 0.41);
-        color:#ffffff;
-        text-decoration:none;
-    }
-
-    .uskytuning .btn-default-save, 
-    .uskytuning .btn-default-save:focus {
-        float: right;
-        margin-top: 5px;
-        color: #fff;
-        background-color: #f57020;
-        border-color: #ccc;
-        border-radius: 2px;
-    }
-
-    .uskytuning .btn-default-save:hover {
-        background-color: rgba(245, 112, 32, 0.53);
-        color: #fff;
-    }
-
-    .uskytuning .field-title {
-        color:#d9d9d9;
-        float: left;
-        margin-right:10px;
-        font-size:11px;
-    }
-
-    .uskytuning .div-field {
-        margin-bottom:10px;
-        clear:both;
-        overflow:hidden;
-    }
-
-    .uskytuning .sp-replacer {
-        padding: 0px;
-        border: solid 1px #d9d9d9;
-        background: none;
-        margin-top: 0px;
-        float: left;
-    }
-
-    .uskytuning .panel-body {
-        border-top-color: rgba(217, 217, 217, 0.5) !important;
-        border-top: 1px solid rgba(217, 217, 217, 0.5) !important;
-    }
-
-    .uskytuning select {
-        font-size:11px;
-    }   
-
-    .uskytuning .sp-dd {
-        display:none;
-    }
-
-    .uskytuning .sp-preview {
-        margin-right: 0px;
-        width: 17px;
-        height: 17px;
-        border:none;
-    }
-
-    .uskytuning .box-slider {
-        clear: both;
-        padding: 7px 2px 12px 2px;
-    }
-
-    .uskytuning .ui-widget-content {
-        border: 0px solid #fff !important; 
-        background: rgba(255, 255, 255, 0.09) !important;
-        border-radius: 2px !important;
-    }
-
-    .uskytuning .ui-slider-horizontal {
-        height: .3em  !important;
-        width: 155px;
-        float: left;
-    }
-
-    .uskytuning .ui-slider .ui-slider-handle {
-        width: 0.3em  !important;
-        height: 0.9em  !important;
-        top: -.3em;
-        margin-left: -.0em;
-        border-bottom-right-radius: 1px;
-        border-bottom-left-radius: 1px;
-        border-top-right-radius: 1px;
-        border-top-left-radius: 1px;
-        color: #d9d9d9 !important;
-        cursor:pointer;
-    }
-
-    .uskytuning .ui-slider .ui-slider-handle:hover,
-    .uskytuning .ui-slider .ui-slider-handle:focus {
-        color: #d9d9d9 !important;
-    }
-
-    .uskytuning .slider-input {
-        width: 25px;
-        float: right;
-        background-color: transparent;
-        color: #d9d9d9;
-        font-size: 11px;
-        border: none;
-        padding: 0;
-        margin-top: -9px;
-        margin-right: 1px;
-        text-align: right;
-    }
-
-    .uskytuning .slider-span {
-        float:right;
-        float: right;
-        margin: -9px 0 0 0;
-        color: #d9d9d9;
-        font-size: 11px;
-    }
-
-    @-moz-document url-prefix() {
-        .uskytuning .slider-input {
-            margin-top: -6px;
-        }
-    }
-
-    .uskytuning .imagePickerPreviewContainer {
-        float:left
-    }
-
-    .uskytuning .imagePickerPreview {
-        float: left;
-        border: 1px solid rgba(217, 217, 217, 0.5);
-        width: 50px;
-        height: 30px;
-        cursor:pointer;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-        clear:both;
-        text-align: center;
-        color: rgba(217, 217, 217, 0.5);
-    }
-
-    .uskytuning .imagePickerPreview:hover {
-        border: 1px solid #d9d9d9;
-        color: #d9d9d9;
-    }
-
-    .uskytuning .imagePickerPreview i {
-        font-size: 14px;
-        line-height: 30px;
-        cursor: pointer;
-    }
-
-    .uskytuning .colorPickerDelete {
-        float: left;
-        font-size: 10px;
-        cursor: pointer;
-        color: rgba(217, 217, 217, 0.5);
-        margin-left: 3px;
-        margin-top: 5px;
-    }
-
-    .uskytuning .colorPickerDelete:hover {
-        color:#d9d9d9;
-    }
-
-    .uskytuning .tunning-tools {
-        position: absolute;
-        right: -28px;
-        margin: 120px 0 0 0;
-    }
-
-    .uskytuning #TuningBg.open .tunning-tools {
-        right: -33px;
-    }
-
-    .uskytuning .tunning-tools div {
-        color: rgba(255, 255, 255, 0.4);
-        background: rgba(41, 41, 41, 0.84);
-        display: block;
-        margin: 5px 0 0 0;
-        padding: 8px 10px 8px 10px;
-        font-size: 14px;
-        -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-        -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-        cursor: pointer;
-        border-bottom-right-radius: 5px;
-        border-top-right-radius: 5px;
-    }
-
-    .uskytuning .tunning-tools div:hover,
-    .uskytuning .tunning-tools div.selected {
-        color: rgba(255, 255, 255, 1);
-        background: rgba(29, 29, 29, 0.91);
-    }
-
-    .uSkyTunningImagePicker {
-        list-style: none;
-        padding: 0;
-        margin: 10px 0 0 -16px;
-        height: 500px;
-        overflow: auto;
-    }   
-
-    .uSkyTunningImagePicker ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }   
-
-    .uSkyTunningImagePicker li {
-        display: inline-block;
-        margin: 0 0px 10px 17px;
-    }
-
-    .uSkyTunningImagePicker .image-preview {
-        border: 2px solid #F3F2F2;
-        display: inline-block;
-        cursor: pointer;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-        width: 110px;
-        height: 60px;
-    }
-
-    .uSkyTunningImagePicker .image-preview:hover, .image-preview.selected {
-        border: 2px solid #53a93f;
-    }
-
-    .bodyuSkyTunningImagePicker {
-        padding: 10px 20px 0px 15px;
-    }
-
-    
-    .uSkyTunningImagePicker .modal-dialog {
-        width: 618px;
-        font-weight:normal
-    }
-
-
-    .uSkyTunningImagePicker  h3 {
-        color: rgba(85, 85, 85, 1);
-        font-size: 18px;
-        line-height: 25px;
-        font-style: normal;
-        font-weight: normal;
-        font-family: sans-serif;
-        margin: 0 0 10px 17px;
-    }
-
-    .uskytunning-fontfamilypicker .show {
-        font-size: 32px;
-        line-height: 34px;
-        color: #242424;
-        margin-top: 10px;
-    }
-
-    .uskytuning h4 {
-        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
-    }
-
-    .uskytuning .fontFamilyPickerPreview {
-        border: 1px solid rgba(217, 217, 217, 0.5);
-        width: 90%;
-        min-height: 50px;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 8px;
-        clear: both;
-        color: rgba(255, 255, 255, 0.8);
-        margin-top: 4px;
-        background-color: rgba(0, 0, 0, 0.28);
-        float: left;
-    }
-
-    .uskytuning .fontFamilyPickerPreview span {
-        font-size: 32px;
-        line-height: 32px;
-    }
-
-    .uskytuning .fontFamilyPickerPreview:hover {
-        border: 1px solid #d9d9d9;
-        color: #d9d9d9;
-    }
-
-    .uskytunning-fontfamilypicker {
-        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-        font-size:14px;
-        line-height:14px;
-    }
-
-    .uskytuning .palette {
-        list-style:none;
-        margin:20px 0 20px 0;
-        padding:0;
-    }
-
-    .uskytuning .palette li {
-        margin: 10px 0px 0 0px;
-        clear: both;
-        overflow: hidden;
-        cursor:pointer;
-        background-color: rgba(0, 0, 0, 0.12);
-    }
-
-    .uskytuning .palette div {
-        border:1px solid rgba(255, 255, 255, 0.61);
-        display: inline-block;
-        float:left;
-    }
-
-    .uskytuning .palette li:hover {
-        background-color: rgba(0, 0, 0, 0.4);
-    }
-
-    .uskytuning .palette li:hover div {
-        border:1px solid #ffffff;
-    }
-
-    .uskytuning .palette li:hover p {
-        color:#ffffff;
-    }
-
-    .uskytuning .palette div span {
-        width: 30px;
-        height: 30px;
-        display: table-cell;
-        margin: 0;
-        padding: 0 0 0 0;
-        border: 1px solid rgba(0, 0, 0, 0.55);
-    }
-
-    .uskytuning .palette p {
-        color: rgba(255, 255, 255, 0.57);
-        margin: 7px 0 0 10px;
-        float: left;
-    }
-
-
-    @font-face {
-	    font-family: 'icomoon';
-	    src:url('/Umbraco/assets/fonts/helveticons/helveticons.eot');
-	    src:url('/Umbraco/assets/fonts/helveticons/helveticons.eot?#iefix') format('embedded-opentype'),
-		    url('/Umbraco/assets/fonts/helveticons/helveticons.ttf') format('truetype'),
-		    url('/Umbraco/assets/fonts/helveticons/helveticons.svg#icomoon') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-    }
+body {
+        margin:0px;
+        padding:0px;
+	    text-align:center;
+        background-color:#fafbfd;
+	}
+
+.uskytuning #TuningBg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 275px;
+  height: 100%;
+  padding: 10px 5px 10px 10px;
+  margin-left: -275px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 16px;
+  background: rgba(29, 29, 29, 0.91);
+  -webkit-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+     -moz-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+          box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+  -webkit-transition: all 0.2s ease-in-out;
+     -moz-transition: all 0.2s ease-in-out;
+          transition: all 0.2s ease-in-out;
+}
+
+.uskytuning .tuning-wrapper {
+  height: 100%;
+  padding: 0 5px 0 0;
+  overflow-y: auto;
+  text-align:left;
+}
+
+.uskytuning #TuningBg.open {
+  margin-left: 0;
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+     -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+          box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.uskytuning .colpick {
+  z-index: 99999999;
+}
+
+.uskytuning .nav {
+  margin-bottom: 10px;
+  color: #ffffff;
+  border-bottom: 1px solid #f57020;
+}
+
+.uskytuning .nav-tabs > li.active > a,
+.uskytuning .nav-tabs > li.active > a:hover,
+.uskytuning .nav-tabs > li.active > a:focus {
+  color: #d9d9d9;
+  cursor: default;
+  background-color: #f57020;
+  border: 1px solid #f57020;
+  border-bottom-color: transparent;
+}
+
+.uskytuning .nav-tabs > li > a:hover {
+  border: 1px solid rgba(245, 112, 32, 0.53);
+}
+
+.uskytuning .nav > li > a:hover,
+.uskytuning .nav > li > a:focus {
+  text-decoration: none;
+  background-color: rgba(245, 112, 32, 0.53);
+  border: 1px solid rgba(245, 112, 32, 0.53);
+}
+
+.uskytuning .nav-tabs > li > a {
+  border-radius: 2px 2px 0 0;
+}
+
+.uskytuning .nav-tabs > li > a {
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.uskytuning .nav > li > a {
+  padding: 5px 10px;
+}
+
+.uskytuning .panel-title > a {
+  display: block;
+  font-size: 13px;
+  line-height: 22px;
+  color: #d9d9d9;
+  cursor: pointer;
+}
+
+.uskytuning .panel-title > a span {
+    display:block;
+}
+
+.uskytuning .panel-title > a:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.uskytuning .panel-heading {
+  padding: 0 10px;
+}
+
+.uskytuning .panel-group .panel {
+  border-radius: 1px;
+}
+
+.uskytuning .panel {
+  margin-bottom: 5px;
+  background-color: rgba(85, 85, 85, 0.76);
+  border: 1px solid rgba(217, 217, 217, 0.5);
+  border-radius: 1px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.uskytuning .panel-default > .panel-heading {
+  color: #333;
+  background-color: rgba(85, 85, 85, 0.76);
+  border-color: rgba(217, 217, 217, 0.5);
+  border-radius: 2px;
+}
+
+.uskytuning .panel-default > .panel-heading:hover {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.41);
+}
+
+.uskytuning .btn-default-save,
+.uskytuning .btn-default-save:focus {
+  float: right;
+  margin-top: 5px;
+  color: #fff;
+  background-color: #f57020;
+  border-color: #ccc;
+  border-radius: 2px;
+}
+
+.uskytuning .btn-default-save:hover {
+  color: #fff;
+  background-color: rgba(245, 112, 32, 0.53);
+}
+
+.uskytuning .field-title {
+  float: left;
+  margin-right: 10px;
+  font-size: 11px;
+  color: #d9d9d9;
+}
+
+.uskytuning .div-field {
+  margin-bottom: 10px;
+  overflow: hidden;
+  clear: both;
+}
+
+.uskytuning .sp-replacer {
+  float: left;
+  padding: 0;
+  margin-top: 0;
+  background: none;
+  border: solid 1px #d9d9d9;
+}
+
+.uskytuning .panel-body {
+  border-top: 1px solid rgba(217, 217, 217, 0.5) !important;
+  border-top-color: rgba(217, 217, 217, 0.5) !important;
+}
+
+.uskytuning select {
+  font-size: 11px;
+}
+
+.uskytuning .sp-dd {
+  display: none;
+}
+
+.uskytuning .sp-preview {
+  width: 17px;
+  height: 17px;
+  margin-right: 0;
+  border: none;
+}
+
+.uskytuning .box-slider {
+  padding: 7px 2px 12px 2px;
+  clear: both;
+}
+
+.uskytuning .ui-widget-content {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border: 0px solid #fff !important;
+  border-radius: 2px !important;
+}
+
+.uskytuning .ui-slider-horizontal {
+  float: left;
+  width: 155px;
+  height: .3em  !important;
+}
+
+.uskytuning .ui-slider .ui-slider-handle {
+  top: -0.3em;
+  width: 0.3em  !important;
+  height: 0.9em  !important;
+  margin-left: 0;
+  color: #d9d9d9 !important;
+  cursor: pointer;
+  border-top-right-radius: 1px;
+  border-bottom-right-radius: 1px;
+  border-bottom-left-radius: 1px;
+  border-top-left-radius: 1px;
+}
+
+.uskytuning .ui-slider .ui-slider-handle:hover,
+.uskytuning .ui-slider .ui-slider-handle:focus {
+  color: #d9d9d9 !important;
+}
+
+.uskytuning .slider-input {
+  float: right;
+  width: 25px;
+  padding: 0;
+  margin-top: -9px;
+  margin-right: 1px;
+  font-size: 11px;
+  color: #d9d9d9;
+  text-align: right;
+  background-color: transparent;
+  border: none;
+}
+
+.uskytuning .slider-span {
+  float: right;
+  margin: -9px 0 0 0;
+  font-size: 11px;
+  color: #d9d9d9;
+}
+
+@-moz-document url-prefix() {
+  .uskytuning .slider-input {
+    margin-top: -6px;
+  }
+}
+
+.uskytuning .imagePickerPreviewContainer {
+  float: left;
+}
+
+.uskytuning .imagePickerPreview {
+  float: left;
+  width: 50px;
+  height: 30px;
+  clear: both;
+  color: rgba(217, 217, 217, 0.5);
+  text-align: center;
+  cursor: pointer;
+  -webkit-background-size: cover;
+     -moz-background-size: cover;
+       -o-background-size: cover;
+          background-size: cover;
+  border: 1px solid rgba(217, 217, 217, 0.5);
+}
+
+.uskytuning .imagePickerPreview:hover {
+  color: #d9d9d9;
+  border: 1px solid #d9d9d9;
+}
+
+.uskytuning .imagePickerPreview i {
+  font-size: 14px;
+  line-height: 30px;
+  cursor: pointer;
+}
+
+.uskytuning .colorPickerDelete {
+  float: left;
+  margin-top: 5px;
+  margin-left: 3px;
+  font-size: 10px;
+  color: rgba(217, 217, 217, 0.5);
+  cursor: pointer;
+}
+
+.uskytuning .colorPickerDelete:hover {
+  color: #d9d9d9;
+}
+
+.uskytuning .tuning-tools {
+  position: absolute;
+  right: -28px;
+  margin: 120px 0 0 0;
+}
+
+.uskytuning #TuningBg.open .tuning-tools {
+  right: -33px;
+}
+
+.uskytuning .tuning-tools div {
+  display: block;
+  padding: 8px 10px 8px 10px;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  background: rgba(41, 41, 41, 0.84);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+     -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+          box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.uskytuning .tuning-tools div:hover,
+.uskytuning .tuning-tools div.selected {
+  color: #ffffff;
+  background: rgba(29, 29, 29, 0.91);
+}
+
+.uSkytuningImagePicker {
+  height: 500px;
+  padding: 0;
+  margin: 10px 0 0 -16px;
+  overflow: auto;
+  list-style: none;
+}
+
+.uSkytuningImagePicker ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.uSkytuningImagePicker li {
+  display: inline-block;
+  margin: 0 0 10px 17px;
+}
+
+.uSkytuningImagePicker .image-preview {
+  display: inline-block;
+  width: 110px;
+  height: 60px;
+  cursor: pointer;
+  -webkit-background-size: cover;
+     -moz-background-size: cover;
+       -o-background-size: cover;
+          background-size: cover;
+  border: 2px solid #F3F2F2;
+}
+
+.uSkytuningImagePicker .image-preview:hover,
+.image-preview.selected {
+  border: 2px solid #53a93f;
+}
+
+.bodyuSkytuningImagePicker {
+  padding: 10px 20px 0 15px;
+}
+
+.uSkytuningImagePicker .modal-dialog {
+  width: 618px;
+  font-weight: normal;
+}
+
+.uSkytuningImagePicker h3 {
+  margin: 0 0 10px 17px;
+  font-family: sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 25px;
+  color: #555555;
+}
+
+.uskytuning-fontfamilypicker .show {
+  margin-top: 10px;
+  font-size: 32px;
+  line-height: 34px;
+  color: #242424;
+}
+
+.uskytuning h4 {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.uskytuning .fontFamilyPickerPreview {
+  float: left;
+  width: 90%;
+  min-height: 50px;
+  padding: 8px;
+  margin-top: 4px;
+  clear: both;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(217, 217, 217, 0.5);
+}
+
+.uskytuning .fontFamilyPickerPreview span {
+  font-size: 32px;
+  line-height: 32px;
+}
+
+.uskytuning .fontFamilyPickerPreview:hover {
+  color: #d9d9d9;
+  border: 1px solid #d9d9d9;
+}
+
+.uskytuning-fontfamilypicker {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 14px;
+}
+
+.uskytuning .palette {
+  padding: 0;
+  margin: 20px 0 20px 0;
+  list-style: none;
+}
+
+.uskytuning .palette li {
+  margin: 10px 0 0 0px;
+  overflow: hidden;
+  clear: both;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.uskytuning .palette div {
+  display: inline-block;
+  float: left;
+  border: 1px solid rgba(255, 255, 255, 0.61);
+}
+
+.uskytuning .palette li:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.uskytuning .palette li:hover div {
+  border: 1px solid #ffffff;
+}
+
+.uskytuning .palette li:hover p {
+  color: #ffffff;
+}
+
+.uskytuning .palette div span {
+  display: table-cell;
+  width: 30px;
+  height: 30px;
+  padding: 0 0 0 0;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+}
+
+.uskytuning .palette p {
+  float: left;
+  margin: 7px 0 0 10px;
+  color: rgba(255, 255, 255, 0.57);
+}
+
+@font-face {
+  font-family: 'icomoon';
+  font-style: normal;
+  font-weight: normal;
+  src: url('/Umbraco/assets/fonts/helveticons/helveticons.eot');
+  src: url('/Umbraco/assets/fonts/helveticons/helveticons.eot?#iefix') format('embedded-opentype'), url('/Umbraco/assets/fonts/helveticons/helveticons.ttf') format('truetype'), url('/Umbraco/assets/fonts/helveticons/helveticons.svg#icomoon') format('svg');
+}
 
 [class^="icon-"],
 [class*=" icon-"] {
-  font-family: icomoon;
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: inherit;
-  -webkit-font-smoothing: antialiased;
   *margin-right: .3em;
+  font-family: icomoon;
+  -webkit-font-smoothing: antialiased;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
 }
+
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
-  text-decoration: inherit;
   display: inline-block;
+  text-decoration: inherit;
   speak: none;
 }
+
 /*
 [class^="icon-"]:before, [class*=" icon-"]:before {
 	font-family: 'icomoon';
@@ -496,30 +502,75 @@
   	-webkit-font-smoothing: antialiased;
 }*/
 
-i.large{
-	font-size: 32px;
+i.large {
+  font-size: 32px;
 }
 
-i.medium{
-	font-size: 24px;
+i.medium {
+  font-size: 24px;
 }
-i.small{
-	font-size: 14px;
+
+i.small {
+  font-size: 14px;
 }
 
 .icon-right-double-arrow:before {
-	content: "\e094";
+  content: "\e094";
 }
 
 .icon-left-double-arrow:before {
-	content: "\e141";
+  content: "\e141";
 }
 
 .icon-paint-roller:before {
-	content: "\e120";
+  content: "\e120";
 }
+
 .icon-palette:before {
-	content: "\e121";
+  content: "\e121";
+}
+
+.icon-iphone:before{content:"\e0f1"}
+
+/******* IFRAME *******/
+
+.desktop {
+    margin:0px auto;
+    width: 100%; 
+    height: 100%;
+}
+
+.tablet {
+    width: 1040px; 
+    height: 757px;
+    margin:75px auto;
+    opacity: 1.0;
+    border-radius: 10px;
+    transition: all 0.5s ease-in-out;
+    box-shadow: 0 0 0 29px #fff, 0 0 0 30px #dee0e3;
+    background-color:#ffffff;
 }
 
 
+.mobile {
+    width: 350px; 
+    height: 568px;
+    margin:75px auto;
+    opacity: 1.0;
+    border-radius: 10px;
+    transition: all 0.5s ease-in-out;
+    box-shadow: 0 0 0 29px #fff, 0 0 0 30px #dee0e3;
+    background-color:#ffffff;
+}
+
+iframe {
+    overflow:hidden;
+    overflow-x:hidden;
+    overflow-y:hidden;
+    height:100%;
+    width:100%;
+    top:0px;
+    left:0px;
+    right:0px;
+    bottom:0px
+}

@@ -11,7 +11,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
-  grunt.registerTask('watch-usky', ['copy:uSky', 'concat:uSkyJs']);
+  grunt.registerTask('watch-usky', ['copy:uSky', 'concat:uSkyJs','concat:uSkyLess']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
@@ -122,6 +122,9 @@ module.exports = function (grunt) {
           files: [
               { dest: '<%= distdir %>/views/uSky', src: '**/*.html', expand: true, cwd: 'src/usky' },
               { dest: '<%= distdir %>/assets/less', src: 'uSkyTuning.lessParameters.less', expand: true, cwd: 'src/usky' },
+              { dest: '<%= distdir %>/js', src: 'uSkyTuning.config.js', expand: true, cwd: 'src/usky/config' },
+              { dest: '<%= distdir %>/js', src: 'uSkyTuning.palettes.js', expand: true, cwd: 'src/usky/config' },
+              { dest: '<%= distdir %>/js', src: 'uSkyTuning.front.js', expand: true, cwd: 'src/usky' }
           ]
       },
 
@@ -186,12 +189,8 @@ module.exports = function (grunt) {
           }
         },
         uSkyJs: {
-            src: ['src/uSky/**/*.js'],
-            dest: '<%= distdir %>/js/umbraco.uSkyTuning.js',
-            options: {
-                banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.uSkyTuning', []); \n",
-                footer: "\n\n})();"
-            }
+            src: ['src/uSky/uSkyTuning.global.js', 'src/uSky/uSkyTuning.controller.js', 'src/uSky/lib/slider.directive.js', 'src/uSky/lib/spectrum.directive.js'],
+            dest: '<%= distdir %>/js/uSkyTuning.panel.js'
         },
         uSkyLess: {
             src: ['src/uSky/uSkyTuning.lessParameters.less', 'src/uSky/uSkyTuning.baseStyles.less', 'src/uSky/uSkyTuning.dynamicStyles.less'],

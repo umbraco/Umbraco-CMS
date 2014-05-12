@@ -1,11 +1,16 @@
 
-var tunningConfig = {
+/*********************************************************************************************************/
+/* uSkyTuning setting panel config */
+/*********************************************************************************************************/
+
+var tuningConfig = {
     categories: [{
         name: "Background",
         sections: [{
             name: "Main",
             subSections: [{
                 name: "Body",
+                schema: "body",
                 fields: [
                     {
                         name: "Color",
@@ -61,6 +66,7 @@ var tunningConfig = {
             },
             {
                 name: "Main",
+                schema: ".content",
                 fields: [
                     {
                         name: "Color",
@@ -116,6 +122,7 @@ var tunningConfig = {
             },
             {
                 name: "Header",
+                schema: "header",
                 fields: [
                     {
                         name: "Color",
@@ -171,6 +178,7 @@ var tunningConfig = {
             },
             {
                 name: "Footer",
+                schema: ".footer",
                 fields: [
                     {
                         name: "Color",
@@ -351,6 +359,7 @@ var tunningConfig = {
             },
             {
                 name: "Navigation",
+                schema: ".navbar-collapse",
                 fields: [{
                     name: "Display",
                     alias: "stylingNavDisplay",
@@ -598,6 +607,7 @@ var tunningConfig = {
             name: "Main",
             subSections: [{
                 name: "Body",
+                schema: "p",
                 fields: [{
                     name: "Color",
                     alias: "FontBodyColor",
@@ -732,6 +742,7 @@ var tunningConfig = {
             },
             {
                 name: "H1",
+                schema: "h1",
                 fields: [{
                     name: "Color",
                     alias: "FontH1Color",
@@ -788,6 +799,7 @@ var tunningConfig = {
                 }]
             }, {
                 name: "H2",
+                schema: "h2",
                 fields: [{
                     name: "Color",
                     alias: "FontH2Color",
@@ -844,6 +856,7 @@ var tunningConfig = {
                 }]
             }, {
                 name: "H3",
+                schema: "h3",
                 fields: [{
                     name: "Color",
                     alias: "FontH3Color",
@@ -900,6 +913,7 @@ var tunningConfig = {
                 }]
             }, {
                 name: "H4",
+                schema: "h4",
                 fields: [{
                     name: "Color",
                     alias: "FontH4Color",
@@ -956,6 +970,7 @@ var tunningConfig = {
                 }]
             }, {
                 name: "H5",
+                schema: "h5",
                 fields: [{
                     name: "Color",
                     alias: "FontH5Color",
@@ -1012,6 +1027,7 @@ var tunningConfig = {
                 }]
             }, {
                 name: "H6",
+                schema: "h6",
                 fields: [{
                     name: "Color",
                     alias: "FontH6Color",

@@ -1,38 +1,62 @@
-﻿<div class="uskytuning">
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-    <div ng-controller="Umbraco.uSkyTuningController">
+    <link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/assets/css/uSkyTuning.panelStyles.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body id="uSkyTuningPanel" ng-controller="Umbraco.uSkyTuningController">
+
+    <div class="uskytuning">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
-            <div class="tunning-tools">
+            <div class="tuning-tools">
 
                 <div ng-click="togglePanel()">
                     <i ng-if="isOpen" class="icon icon-left-double-arrow"></i>
                     <i ng-if="!isOpen" class="icon icon-right-double-arrow"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen(true)" ng-class="{selected:settingIsOpen}">
+                <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting'}">
                     <i class="icon icon-paint-roller"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen(false)" ng-class="{selected:!settingIsOpen}">
+                <div ng-if="isOpen" ng-click="settingOpen('presetColors')" ng-class="{selected:settingIsOpen=='presetColors'}">
                     <i class="icon icon-palette"></i>
+                </div>
+
+                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice'}">
+                    <i class="icon icon-iphone"></i>
                 </div>
 
             </div>
 
             <div class="tuning-wrapper">
 
-                <div ng-show="settingIsOpen">
+                <div ng-show="settingIsOpen == 'setting'">
 
                     <tabset vertical="false">
 
-                        <tab ng-repeat="category in tunningModel.categories" heading="{{category.name}}">
+                        <tab ng-repeat="category in tuningModel.categories" active="category.active">
+
+                            <tab-heading>
+                                <span>{{category.name}}</span>
+                            </tab-heading>
 
                             <div ng-repeat="section in category.sections">
 
                                 <accordion close-others="true">
-                                    <accordion-group ng-repeat="subSection in section.subSections" is-open="$index == 0" heading="{{subSection.name}}">
+                                    <accordion-group ng-repeat="subSection in section.subSections" is-open="(schemaFocus != '' && schemaFocus == subSection.schema.toLowerCase())">
+
+                                        <accordion-heading>
+                                            <span ng-click="accordionOpened(subSection.name)" ng-mouseover="accordionWillBeOpened(subSection.name)">{{subSection.name}}</span>
+                                        </accordion-heading>
 
                                         <div class="div-field" ng-repeat="field in subSection.fields">
 
@@ -104,14 +128,14 @@
 
                 </div>
 
-                <div ng-show="!settingIsOpen">
+                <div ng-show="settingIsOpen == 'presetColors'">
 
                     <tabset vertical="false">
 
                         <tab heading="Preset colors">
 
                             <ul class="palette">
-                                <li ng-click="refreshTunningByPalette(palette.colors)" ng-repeat="palette in tunningPalette">
+                                <li ng-click="refreshtuningByPalette(palette.colors)" ng-repeat="palette in tuningPalette">
                                     <div>
                                         <span style="background-color: {{ palette.mainColor }}"></span>
                                     </div>
@@ -124,14 +148,32 @@
                     </tabset>
 
                 </div>
-                 
+
+                <div ng-show="settingIsOpen == 'previewDevice'">
+
+                    <tabset vertical="false">
+
+                        <tab heading="Preview device">
+
+                            <ul>
+                                <li style="color:white" ng-click="updatePreviewDevice('desktop')">desktop  {{previewDevice}}</li>
+                                <li style="color:white" ng-click="updatePreviewDevice('tablet')">tablet</li>
+                                <li style="color:white" ng-click="updatePreviewDevice('mobile')">mobile</li>
+                            </ul>
+
+                        </tab>
+
+                    </tabset>
+
+                </div>
+
                 <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
 
             </div>
 
             <script type="text/ng-template" id="myModalContent.html">
-                <div class="modal-body bodyuSkyTunningImagePicker">
-                    <ul class="uSkyTunningImagePicker">
+                <div class="modal-body bodyuSkytuningImagePicker">
+                    <ul class="uSkytuningImagePicker">
                         <li ng-repeat="background in items.backgrounds">
                             <h3>{{background.name}}</h3>
                             <ul>
@@ -150,17 +192,17 @@
 
             <script type="text/ng-template" id="fontFamilyPickerModel.html">
 
-                <div class="modal-header uskytunning-fontfamilypicker">
+                <div class="modal-header uskytuning-fontfamilypicker">
                     <select ng-model="selectedFont" ng-change="showFontPreview(selectedFont)" ng-options="font as font.fontFamily group by font.fontType for font in fonts"></select>
                     <select ng-model="selectedFont.variant" ng-change="showFontPreview(selectedFont)" ng-options="variant for variant in selectedFont.variants" />
                 </div>
 
-                <div class="modal-body uskytunning-fontfamilypicker">
+                <div class="modal-body uskytuning-fontfamilypicker">
                     <span class="show" ng-style="setStyleVariant()">Aa Bb Cc 1 2 3 4 ... <br />The quick brown fox jumps over the lazy dog....</span>
                 </div>
 
 
-                <div class="modal-footer uskytunning-fontfamilypicker">
+                <div class="modal-footer uskytuning-fontfamilypicker">
                     <button class="btn btn-primary" ng-click="ok()">OK</button>
                     <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
                 </div>
@@ -168,8 +210,17 @@
             </script>
 
         </div>
- 
 
     </div>
 
-</div>
+
+    <div id="demo-iframe-wrapper" class="{{previewDevice}}">
+        <iframe id="resultFrame" src="/" frameborder="0"></iframe>
+    </div>
+
+    <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
+    <script src="/umbraco/js/uSkyTuning.loader.js"></script>
+
+</body>
+
+</html>

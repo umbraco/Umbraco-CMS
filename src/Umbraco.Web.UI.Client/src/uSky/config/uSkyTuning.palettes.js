@@ -1,5 +1,9 @@
 
-var tunningPalette = [{
+/*********************************************************************************************************/
+/* uSkyTuning palette tab config */
+/*********************************************************************************************************/
+
+var tuningPalette = [{
     name: "orange",
     mainColor: 'rgb(230, 126, 34)',
     colors: [
@@ -194,7 +198,7 @@ var tunningPalette = [{
         { alias: "FontHighlightedBackgroundColor", value: "rgb(24, 94, 101)" },
         { alias: "FontBigColor", value: "rgb(24, 94, 101)" },
         { alias: "FontButtonColor", value: "rgba(255, 255, 255, 0.92)" },
-        { alias: "FontButtonBackgroundColor", value: "rgb(24, 94, 101)" }, 
+        { alias: "FontButtonBackgroundColor", value: "rgb(24, 94, 101)" },
         { alias: "FontButtonColorHover", value: "rgba(255, 255, 255, 0.55)" },
         { alias: "FontButtonBackgroundColorHover", value: "rgba(24, 94, 101, 0.74)" },
         { alias: "FontColor2Color", value: "rgb(24, 94, 101)" },
