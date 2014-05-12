@@ -12,17 +12,7 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTypeTests : BaseUmbracoConfigurationTest
     {
-        [SetUp]
-        public void Init()
-        {
-            TestHelper.EnsureUmbracoSettingsConfig();
-        }
-
-        [TearDown]
-        public void Dispose()
-        {
-            TestHelper.CleanUmbracoSettingsConfig();
-        }
+       
 
         [Test]
         public void Can_Deep_Clone_Content_Type_Sort()
