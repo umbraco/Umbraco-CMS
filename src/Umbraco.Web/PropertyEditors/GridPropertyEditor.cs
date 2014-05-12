@@ -30,7 +30,10 @@ namespace Umbraco.Web.PropertyEditors
 
     internal class gridPreValueEditor : PreValueEditor
     {
-        [PreValueField("items", "Grid Configuration", "views/propertyeditors/grid/grid.prevalues.html", Description = "General grid configuration")]
+        [PreValueField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
         public string Items { get; set; }
+
+        [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
+        public string Rte { get; set; }
     }
 }

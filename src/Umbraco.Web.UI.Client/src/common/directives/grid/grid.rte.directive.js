@@ -5,7 +5,8 @@ angular.module("umbraco")
                 uniqueId: '=',
                 value: '=',
                 ctrlOp: '&',
-                ctrlCl: '&'
+                ctrlCl: '&',
+                configuration:"="
             },
             template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
@@ -13,11 +14,13 @@ angular.module("umbraco")
 
                 var initTiny = function () {
 
+                    //we always fetch the default one, and then override parts with our own
                     tinyMceService.configuration().then(function (tinyMceConfig) {
 
                         //config value from general tinymce.config file
                         var validElements = tinyMceConfig.validElements;
                         var fallbackStyles = [{title: "Page header", block: "h2"}, {title: "Section header", block: "h3"}, {title: "Paragraph header", block: "h4"}, {title: "Normal", block: "p"}, {title: "Quote", block: "blockquote"}, {title: "Code", block: "code"}];
+                        
                         //These are absolutely required in order for the macros to render inline
                         //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
                         var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align]";

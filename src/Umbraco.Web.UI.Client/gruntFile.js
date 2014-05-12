@@ -114,6 +114,23 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'src/assets/' }]
       },
 
+
+      bower: {
+        files: [
+                {
+                  dest: 'lib/typeahead/typeahead.bundle.min.js', 
+                  src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js' 
+                },
+                {
+                  dest: 'lib/ace/',
+                  src: '**',
+                  expand: true,
+                  cwd: 'bower_components/ace-builds/src-min-noconflict/' 
+                }
+              ]
+      },
+
+
       installer: {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
