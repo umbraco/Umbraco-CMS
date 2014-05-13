@@ -267,6 +267,15 @@ angular.module("umbraco")
                     $scope.currentToolsControl = null;
                 }
 
+                $scope.setCurrentRemoveControl = function (Control) {
+                    $scope.currentRemoveControl = Control;
+                }
+
+                $scope.disableCurrentRemoveControl = function (Control) {
+                    $scope.currentRemoveControl = null;
+                }
+
+
                 $scope.setUniqueId = function (cell, index) {
 
                     var date = new Date();

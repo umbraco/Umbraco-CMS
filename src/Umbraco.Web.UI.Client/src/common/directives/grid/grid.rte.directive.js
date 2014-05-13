@@ -17,6 +17,8 @@ angular.module("umbraco")
                     //we always fetch the default one, and then override parts with our own
                     tinyMceService.configuration().then(function (tinyMceConfig) {
 
+                        
+
                         //config value from general tinymce.config file
                         var validElements = tinyMceConfig.validElements;
                         var fallbackStyles = [{title: "Page header", block: "h2"}, {title: "Section header", block: "h3"}, {title: "Paragraph header", block: "h4"}, {title: "Normal", block: "p"}, {title: "Quote", block: "blockquote"}, {title: "Code", block: "code"}];
@@ -44,10 +46,10 @@ angular.module("umbraco")
                         }
 
                         //queue rules loading
-                        stylesheets.push("/views/propertyeditors/grid/config/grid.default.rtestyles.css?" + new Date().getTime());
+                        stylesheets.push("views/propertyeditors/grid/config/grid.default.rtestyles.css?" + new Date().getTime());
                         angular.forEach(["umbraco.grid.rte"], function (val, key) {
-                            stylesheets.push("/css/" + val + ".css?" + new Date().getTime());
 
+                            stylesheets.push("/css/" + val + ".css");
                             await.push(stylesheetResource.getRulesByName(val).then(function (rules) {
                                 
                                 if(rules.length > 0){

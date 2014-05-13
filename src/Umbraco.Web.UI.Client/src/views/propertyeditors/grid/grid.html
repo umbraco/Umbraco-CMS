@@ -62,7 +62,8 @@
                     toolsControl:currentToolsControl == control,
                     selectedControl:currentControl == control || isOpenRTEToolbar(control),
                     jumbotron:row.boxed}"
-         ng-mouseover="setCurrentControl(control)" ng-mouseleave="disableCurrentControl(control)"
+         ng-mouseover="setCurrentControl(control)" 
+         ng-mouseleave="disableCurrentControl(control)"
          class="controlContainer">
 
     <!-- Empty cell tools -->
@@ -140,29 +141,29 @@
 
     </div>
 
-                                            <!-- Empty cell tools -->
-                                            <div class="cellPanel"
-                                                ng-if="cell.controls.length == 0">
-                                                
+    <!-- Empty cell tools -->
+    <div class="cellPanel"
+        ng-if="cell.controls.length == 0">
+        
 
-                                                <p class="placeholder" 
-                                                ng-click="addTinyMce(cell)"> 
-                                                    Start writing here...
-                                                </p>
+        <p class="placeholder" 
+        ng-click="addTinyMce(cell)"> 
+            Start writing here...
+        </p>
 
-                                                <div class="iconBox" ng-click="addTinyMce(cell)" ng-if="(cell.controls.length == 0 || currentCell == cell) && model.config.items.enableRte">
-                                                    <i class="icon icon-edit"></i>
-                                                </div>
+        <div class="iconBox" ng-click="addTinyMce(cell)" ng-if="(cell.controls.length == 0 || currentCell == cell) && model.config.items.enableRte">
+            <i class="icon icon-edit"></i>
+        </div>
 
-                                                <div class="iconBox" ng-click="addMedia(cell)" ng-if="(cell.controls.length == 0 || currentCell == cell) && model.config.items.enableMedia">
-                                                    <i class="icon icon-picture"></i>
-                                                </div>
-                                                
-                                                <div class="iconBox" ng-click="addMacro(cell)" ng-if="(cell.controls.length == 0 || currentCell == cell) && model.config.items.enableMacro">
-                                                    <i class="icon icon-settings-alt"></i>
-                                                </div>
+        <div class="iconBox" ng-click="addMedia(cell)" ng-if="(cell.controls.length == 0 || currentCell == cell) && model.config.items.enableMedia">
+            <i class="icon icon-picture"></i>
+        </div>
+        
+        <div class="iconBox" ng-click="addMacro(cell)" ng-if="(cell.controls.length == 0 || currentCell == cell) && model.config.items.enableMacro">
+            <i class="icon icon-settings-alt"></i>
+        </div>
 
-                                            </div>
+    </div>
 
 
 
