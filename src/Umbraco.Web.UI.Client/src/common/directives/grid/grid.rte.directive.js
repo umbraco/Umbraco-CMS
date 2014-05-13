@@ -37,6 +37,7 @@ angular.module("umbraco")
                         //config value on the data type
                         var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"].join(" | ");
                         var stylesheets = [];
+                        
                         var styleFormats = [];
                         var await = []; 
 
@@ -45,41 +46,40 @@ angular.module("umbraco")
                                 await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
                         }
 
-                        //queue rules loading
-                        stylesheets.push("views/propertyeditors/grid/config/grid.default.rtestyles.css?" + new Date().getTime());
-                        angular.forEach(["umbraco.grid.rte"], function (val, key) {
 
-                            stylesheets.push("/css/" + val + ".css");
-                            await.push(stylesheetResource.getRulesByName(val).then(function (rules) {
-                                
-                                if(rules.length > 0){
-                                angular.forEach(rules, function (rule) {
-                                    var r = {};
-                                    r.title = rule.name;
-                                    if (rule.selector[0] === ".") {
-                                        r.inline = "span";
-                                        r.classes = rule.selector.substring(1);
-                                    }
-                                    else if (rule.selector[0] === "#") {
-                                        r.inline = "span";
-                                        r.attributes = { id: rule.selector.substring(1) };
-                                    }
-                                    else {
-                                        r.block = rule.selector;
-                                    }
+                        if(scope.configuration && scope.configuration.toolbar){
+                            toolbar = scope.configuration.toolbar.join(' | ');
+                        }
 
-                                    styleFormats.push(r);
-                                });
-                                }else{
-                                    styleFormats = fallbackStyles;
-                                }
 
-                            }));
-                        });
+                        if(scope.configuration && scope.configuration.stylesheets){
+                            angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
+                                    
+                                    stylesheets.push("/css/" + stylesheet + ".css");
+                                    await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
+                                        angular.forEach(rules, function (rule) {
+                                          var r = {};
+                                          r.title = rule.name;
+                                          if (rule.selector[0] === ".") {
+                                              r.inline = "span";
+                                              r.classes = rule.selector.substring(1);
+                                          }else if (rule.selector[0] === "#") {
+                                              r.inline = "span";
+                                              r.attributes = { id: rule.selector.substring(1) };
+                                          }else {
+                                              r.block = rule.selector;
+                                          }
+                                          styleFormats.push(r);
+                                        });
+                                    }));
+                            });
+                        }else{
+                            stylesheets.push("views/propertyeditors/grid/config/grid.default.rtestyles.css");
+                            styleFormats = fallbackStyles;
+                        }
 
                         //stores a reference to the editor
                         var tinyMceEditor = null;
-
                         $q.all(await).then(function () {
 
                             var uniqueId = scope.uniqueId;
