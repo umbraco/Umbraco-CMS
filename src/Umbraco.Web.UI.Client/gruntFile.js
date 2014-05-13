@@ -122,6 +122,10 @@ module.exports = function (grunt) {
                   src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js' 
                 },
                 {
+                  dest: 'lib/lazyload/lazyload.min.js', 
+                  src: 'bower_components/rgrove-lazyload/lazyload.js'
+                },
+                {
                   dest: 'lib/ace/',
                   src: '**',
                   expand: true,
