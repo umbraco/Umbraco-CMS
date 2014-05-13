@@ -34,6 +34,7 @@ angular.module("umbraco")
                         e.preventDefault();
                         //we need to use jquery because typeahead duplicates the text box
                         addTag($scope.tagToAdd);
+                        $scope.tagToAdd = "";
                     }
 
                 }
@@ -111,15 +112,17 @@ angular.module("umbraco")
                 }).bind("typeahead:selected", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
+                        $scope.tagToAdd = "";
                     });
 
                 }).bind("typeahead:autocompleted", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
+                        $scope.tagToAdd = "";
                     });
 
                 }).bind("typeahead:opened", function (obj) {
-                    console.log("opened ");
+                    //console.log("opened ");
                 });
             });
 
