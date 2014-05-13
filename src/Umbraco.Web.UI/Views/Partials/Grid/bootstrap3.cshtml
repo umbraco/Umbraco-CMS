@@ -1,0 +1,66 @@
+﻿@inherits UmbracoViewPage<dynamic>
+@using Umbraco.Web.Templates
+
+
+@if (Model != null)
+{
+    var onlyOneColumn = Model.columns != null ? ((System.Collections.ICollection)Model.columns).Count : 0;
+    <div class="@(onlyOneColumn > 1 ? "container" : "")">
+        <div class="row clearfix">
+            @foreach (var column in Model.columns)
+            {
+                <div class="col-md-@column.grid column usky-grid-column">
+                    @foreach (var row in column.rows)
+                    {
+                        <div class="@row.cssClass @(row.fullScreen == "True" ? "usky-grid-full-size" : "")">
+                            <div>
+                                <div class="row clearfix usky-grid-row">
+
+                                    @foreach (var cell in row.cells)
+                                    {
+                                        <div class="col-md-@cell.model.grid column">
+                                            <div class="usky-grid-cell @(row.skipTopMargin == "True" ? "usky-grid-skip-top-margin" : "") @(row.skipBottomMargin == "True" ? "usky-grid-skip-bottom-margin" : "")">
+
+                                                @foreach (var control in cell.controls)
+                                                {
+                                                    if (control != null && control.macro != null)
+                                                    {
+                                                        string macroAlias = control.macro.macroAlias.ToString();
+                                                        ViewDataDictionary parameters = new ViewDataDictionary();
+                                                        foreach (dynamic mpd in control.macro.marcoParamsDictionary)
+                                                        {
+                                                            parameters.Add(mpd.Name, mpd.Value);
+                                                        }
+
+                                                    @Umbraco.RenderMacro(macroAlias, parameters)
+                                                    }
+
+                                                    if (control != null && control.tinyMCE != null)
+                                                    {
+                                                    <div class="@(row.boxed == "True" ? "jumbotron" : "")">
+                                                        @Html.Raw(TemplateUtilities.ParseInternalLinks(control.tinyMCE.value.ToString()))
+                                                    </div>
+                                                    }
+
+                                                    if (control != null && control.media != null)
+                                                    {
+                                                    <img src="@control.media.src">
+                                                    }
+
+                                                    if (control != null && control.embed != null)
+                                                    {
+                                                    @Html.Raw(control.embed.content)
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
