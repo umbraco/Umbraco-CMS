@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.interfaces;
 using System.Linq;
 
@@ -155,6 +156,7 @@ namespace Umbraco.Web.Cache
 
             payloads.ForEach(payload =>
                 {
+
                     //if there's no path, then just use id (this will occur on permanent deletion like emptying recycle bin)
                     if (payload.Path.IsNullOrWhiteSpace())
                     {
@@ -165,6 +167,12 @@ namespace Umbraco.Web.Cache
                     {
                         foreach (var idPart in payload.Path.Split(','))
                         {
+                            int idPartAsInt;
+                            if (int.TryParse(idPart, out idPartAsInt))
+                            {
+                                RuntimeCacheProvider.Current.Delete(typeof(IMedia), idPartAsInt);    
+                            }
+
                             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
                                 string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
 
