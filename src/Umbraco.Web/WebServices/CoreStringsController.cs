@@ -18,6 +18,7 @@ namespace Umbraco.Web.WebServices
     public class CoreStringsController : UmbracoAuthorizedController
     {
         [HttpGet]
+        [ValidateInput(false)]
         public JsonResult ToSafeAlias(string value, bool camelCase = true)
         {
             // always return a proper camel-cased alias
