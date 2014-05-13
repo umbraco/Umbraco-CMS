@@ -3,9 +3,10 @@ body {
         padding:0px;
 	    text-align:center;
         background-color:#fafbfd;
+        display:none;
 	}
 
-.uskytuning #TuningBg {
+.tuning #TuningBg {
   position: fixed;
   top: 0;
   left: 0;
@@ -26,33 +27,33 @@ body {
           transition: all 0.2s ease-in-out;
 }
 
-.uskytuning .tuning-wrapper {
+.tuning .tuning-wrapper {
   height: 100%;
   padding: 0 5px 0 0;
   overflow-y: auto;
   text-align:left;
 }
 
-.uskytuning #TuningBg.open {
+.tuning #TuningBg.open {
   margin-left: 0;
   -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
      -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
           box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
-.uskytuning .colpick {
+.tuning .colpick {
   z-index: 99999999;
 }
 
-.uskytuning .nav {
+.tuning .nav {
   margin-bottom: 10px;
   color: #ffffff;
   border-bottom: 1px solid #f57020;
 }
 
-.uskytuning .nav-tabs > li.active > a,
-.uskytuning .nav-tabs > li.active > a:hover,
-.uskytuning .nav-tabs > li.active > a:focus {
+.tuning .nav-tabs > li.active > a,
+.tuning .nav-tabs > li.active > a:hover,
+.tuning .nav-tabs > li.active > a:focus {
   color: #d9d9d9;
   cursor: default;
   background-color: #f57020;
@@ -60,31 +61,31 @@ body {
   border-bottom-color: transparent;
 }
 
-.uskytuning .nav-tabs > li > a:hover {
+.tuning .nav-tabs > li > a:hover {
   border: 1px solid rgba(245, 112, 32, 0.53);
 }
 
-.uskytuning .nav > li > a:hover,
-.uskytuning .nav > li > a:focus {
+.tuning .nav > li > a:hover,
+.tuning .nav > li > a:focus {
   text-decoration: none;
   background-color: rgba(245, 112, 32, 0.53);
   border: 1px solid rgba(245, 112, 32, 0.53);
 }
 
-.uskytuning .nav-tabs > li > a {
+.tuning .nav-tabs > li > a {
   border-radius: 2px 2px 0 0;
 }
 
-.uskytuning .nav-tabs > li > a {
+.tuning .nav-tabs > li > a {
   color: #ffffff;
   cursor: pointer;
 }
 
-.uskytuning .nav > li > a {
+.tuning .nav > li > a {
   padding: 5px 10px;
 }
 
-.uskytuning .panel-title > a {
+.tuning .panel-title > a {
   display: block;
   font-size: 13px;
   line-height: 22px;
@@ -92,24 +93,24 @@ body {
   cursor: pointer;
 }
 
-.uskytuning .panel-title > a span {
+.tuning .panel-title > a span {
     display:block;
 }
 
-.uskytuning .panel-title > a:hover {
+.tuning .panel-title > a:hover {
   color: #ffffff;
   text-decoration: none;
 }
 
-.uskytuning .panel-heading {
+.tuning .panel-heading {
   padding: 0 10px;
 }
 
-.uskytuning .panel-group .panel {
+.tuning .panel-group .panel {
   border-radius: 1px;
 }
 
-.uskytuning .panel {
+.tuning .panel {
   margin-bottom: 5px;
   background-color: rgba(85, 85, 85, 0.76);
   border: 1px solid rgba(217, 217, 217, 0.5);
@@ -118,21 +119,21 @@ body {
           box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-.uskytuning .panel-default > .panel-heading {
+.tuning .panel-default > .panel-heading {
   color: #333;
   background-color: rgba(85, 85, 85, 0.76);
   border-color: rgba(217, 217, 217, 0.5);
   border-radius: 2px;
 }
 
-.uskytuning .panel-default > .panel-heading:hover {
+.tuning .panel-default > .panel-heading:hover {
   color: #ffffff;
   text-decoration: none;
   background-color: rgba(255, 255, 255, 0.41);
 }
 
-.uskytuning .btn-default-save,
-.uskytuning .btn-default-save:focus {
+.tuning .btn-default-save,
+.tuning .btn-default-save:focus {
   float: right;
   margin-top: 5px;
   color: #fff;
@@ -141,25 +142,25 @@ body {
   border-radius: 2px;
 }
 
-.uskytuning .btn-default-save:hover {
+.tuning .btn-default-save:hover {
   color: #fff;
   background-color: rgba(245, 112, 32, 0.53);
 }
 
-.uskytuning .field-title {
+.tuning .field-title {
   float: left;
   margin-right: 10px;
   font-size: 11px;
   color: #d9d9d9;
 }
 
-.uskytuning .div-field {
+.tuning .div-field {
   margin-bottom: 10px;
   overflow: hidden;
   clear: both;
 }
 
-.uskytuning .sp-replacer {
+.tuning .sp-replacer {
   float: left;
   padding: 0;
   margin-top: 0;
@@ -167,44 +168,44 @@ body {
   border: solid 1px #d9d9d9;
 }
 
-.uskytuning .panel-body {
+.tuning .panel-body {
   border-top: 1px solid rgba(217, 217, 217, 0.5) !important;
   border-top-color: rgba(217, 217, 217, 0.5) !important;
 }
 
-.uskytuning select {
+.tuning select {
   font-size: 11px;
 }
 
-.uskytuning .sp-dd {
+.tuning .sp-dd {
   display: none;
 }
 
-.uskytuning .sp-preview {
+.tuning .sp-preview {
   width: 17px;
   height: 17px;
   margin-right: 0;
   border: none;
 }
 
-.uskytuning .box-slider {
+.tuning .box-slider {
   padding: 7px 2px 12px 2px;
   clear: both;
 }
 
-.uskytuning .ui-widget-content {
+.tuning .ui-widget-content {
   background: rgba(255, 255, 255, 0.09) !important;
   border: 0px solid #fff !important;
   border-radius: 2px !important;
 }
 
-.uskytuning .ui-slider-horizontal {
+.tuning .ui-slider-horizontal {
   float: left;
   width: 155px;
   height: .3em  !important;
 }
 
-.uskytuning .ui-slider .ui-slider-handle {
+.tuning .ui-slider .ui-slider-handle {
   top: -0.3em;
   width: 0.3em  !important;
   height: 0.9em  !important;
@@ -217,12 +218,12 @@ body {
   border-top-left-radius: 1px;
 }
 
-.uskytuning .ui-slider .ui-slider-handle:hover,
-.uskytuning .ui-slider .ui-slider-handle:focus {
+.tuning .ui-slider .ui-slider-handle:hover,
+.tuning .ui-slider .ui-slider-handle:focus {
   color: #d9d9d9 !important;
 }
 
-.uskytuning .slider-input {
+.tuning .slider-input {
   float: right;
   width: 25px;
   padding: 0;
@@ -235,7 +236,7 @@ body {
   border: none;
 }
 
-.uskytuning .slider-span {
+.tuning .slider-span {
   float: right;
   margin: -9px 0 0 0;
   font-size: 11px;
@@ -243,16 +244,16 @@ body {
 }
 
 @-moz-document url-prefix() {
-  .uskytuning .slider-input {
+  .tuning .slider-input {
     margin-top: -6px;
   }
 }
 
-.uskytuning .imagePickerPreviewContainer {
+.tuning .imagePickerPreviewContainer {
   float: left;
 }
 
-.uskytuning .imagePickerPreview {
+.tuning .imagePickerPreview {
   float: left;
   width: 50px;
   height: 30px;
@@ -267,18 +268,18 @@ body {
   border: 1px solid rgba(217, 217, 217, 0.5);
 }
 
-.uskytuning .imagePickerPreview:hover {
+.tuning .imagePickerPreview:hover {
   color: #d9d9d9;
   border: 1px solid #d9d9d9;
 }
 
-.uskytuning .imagePickerPreview i {
+.tuning .imagePickerPreview i {
   font-size: 14px;
   line-height: 30px;
   cursor: pointer;
 }
 
-.uskytuning .colorPickerDelete {
+.tuning .colorPickerDelete {
   float: left;
   margin-top: 5px;
   margin-left: 3px;
@@ -287,21 +288,21 @@ body {
   cursor: pointer;
 }
 
-.uskytuning .colorPickerDelete:hover {
+.tuning .colorPickerDelete:hover {
   color: #d9d9d9;
 }
 
-.uskytuning .tuning-tools {
+.tuning .tuning-tools {
   position: absolute;
   right: -28px;
   margin: 120px 0 0 0;
 }
 
-.uskytuning #TuningBg.open .tuning-tools {
+.tuning #TuningBg.open .tuning-tools {
   right: -33px;
 }
 
-.uskytuning .tuning-tools div {
+.tuning .tuning-tools div {
   display: block;
   padding: 8px 10px 8px 10px;
   margin: 5px 0 0 0;
@@ -316,13 +317,13 @@ body {
           box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
-.uskytuning .tuning-tools div:hover,
-.uskytuning .tuning-tools div.selected {
+.tuning .tuning-tools div:hover,
+.tuning .tuning-tools div.selected {
   color: #ffffff;
   background: rgba(29, 29, 29, 0.91);
 }
 
-.uSkytuningImagePicker {
+.tuningImagePicker {
   height: 500px;
   padding: 0;
   margin: 10px 0 0 -16px;
@@ -330,18 +331,18 @@ body {
   list-style: none;
 }
 
-.uSkytuningImagePicker ul {
+.tuningImagePicker ul {
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
-.uSkytuningImagePicker li {
+.tuningImagePicker li {
   display: inline-block;
   margin: 0 0 10px 17px;
 }
 
-.uSkytuningImagePicker .image-preview {
+.tuningImagePicker .image-preview {
   display: inline-block;
   width: 110px;
   height: 60px;
@@ -353,21 +354,21 @@ body {
   border: 2px solid #F3F2F2;
 }
 
-.uSkytuningImagePicker .image-preview:hover,
+.tuningImagePicker .image-preview:hover,
 .image-preview.selected {
   border: 2px solid #53a93f;
 }
 
-.bodyuSkytuningImagePicker {
+.bodyTuningImagePicker {
   padding: 10px 20px 0 15px;
 }
 
-.uSkytuningImagePicker .modal-dialog {
+.tuningImagePicker .modal-dialog {
   width: 618px;
   font-weight: normal;
 }
 
-.uSkytuningImagePicker h3 {
+.tuningImagePicker h3 {
   margin: 0 0 10px 17px;
   font-family: sans-serif;
   font-size: 18px;
@@ -377,18 +378,18 @@ body {
   color: #555555;
 }
 
-.uskytuning-fontfamilypicker .show {
+.tuning-fontfamilypicker .show {
   margin-top: 10px;
   font-size: 32px;
   line-height: 34px;
   color: #242424;
 }
 
-.uskytuning h4 {
+.tuning h4 {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 }
 
-.uskytuning .fontFamilyPickerPreview {
+.tuning .fontFamilyPickerPreview {
   float: left;
   width: 90%;
   min-height: 50px;
@@ -402,29 +403,29 @@ body {
   border: 1px solid rgba(217, 217, 217, 0.5);
 }
 
-.uskytuning .fontFamilyPickerPreview span {
+.tuning .fontFamilyPickerPreview span {
   font-size: 32px;
   line-height: 32px;
 }
 
-.uskytuning .fontFamilyPickerPreview:hover {
+.tuning .fontFamilyPickerPreview:hover {
   color: #d9d9d9;
   border: 1px solid #d9d9d9;
 }
 
-.uskytuning-fontfamilypicker {
+.tuning-fontfamilypicker {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 14px;
 }
 
-.uskytuning .palette {
+.tuning .palette {
   padding: 0;
   margin: 20px 0 20px 0;
   list-style: none;
 }
 
-.uskytuning .palette li {
+.tuning .palette li {
   margin: 10px 0 0 0px;
   overflow: hidden;
   clear: both;
@@ -432,25 +433,25 @@ body {
   background-color: rgba(0, 0, 0, 0.12);
 }
 
-.uskytuning .palette div {
+.tuning .palette div {
   display: inline-block;
   float: left;
   border: 1px solid rgba(255, 255, 255, 0.61);
 }
 
-.uskytuning .palette li:hover {
+.tuning .palette li:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.uskytuning .palette li:hover div {
+.tuning .palette li:hover div {
   border: 1px solid #ffffff;
 }
 
-.uskytuning .palette li:hover p {
+.tuning .palette li:hover p {
   color: #ffffff;
 }
 
-.uskytuning .palette div span {
+.tuning .palette div span {
   display: table-cell;
   width: 30px;
   height: 30px;
@@ -459,7 +460,7 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.55);
 }
 
-.uskytuning .palette p {
+.tuning .palette p {
   float: left;
   margin: 7px 0 0 10px;
   color: rgba(255, 255, 255, 0.57);

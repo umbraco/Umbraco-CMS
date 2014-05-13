@@ -4,15 +4,15 @@
 <head>
 
     <link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />
-    <link href="/Umbraco/assets/css/uSkyTuning.panelStyles.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/assets/css/tuning.panelStyles.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
 
 </head>
 
-<body id="uSkyTuningPanel" ng-controller="Umbraco.uSkyTuningController">
+<body id="tuningPanel" style="display:none" ng-controller="Umbraco.tuningController">
 
-    <div class="uskytuning">
+    <div class="tuning">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
@@ -172,8 +172,8 @@
             </div>
 
             <script type="text/ng-template" id="myModalContent.html">
-                <div class="modal-body bodyuSkytuningImagePicker">
-                    <ul class="uSkytuningImagePicker">
+                <div class="modal-body bodyTuningImagePicker">
+                    <ul class="tuningImagePicker">
                         <li ng-repeat="background in items.backgrounds">
                             <h3>{{background.name}}</h3>
                             <ul>
@@ -192,17 +192,17 @@
 
             <script type="text/ng-template" id="fontFamilyPickerModel.html">
 
-                <div class="modal-header uskytuning-fontfamilypicker">
+                <div class="modal-header tuning-fontfamilypicker">
                     <select ng-model="selectedFont" ng-change="showFontPreview(selectedFont)" ng-options="font as font.fontFamily group by font.fontType for font in fonts"></select>
                     <select ng-model="selectedFont.variant" ng-change="showFontPreview(selectedFont)" ng-options="variant for variant in selectedFont.variants" />
                 </div>
 
-                <div class="modal-body uskytuning-fontfamilypicker">
+                <div class="modal-body tuning-fontfamilypicker">
                     <span class="show" ng-style="setStyleVariant()">Aa Bb Cc 1 2 3 4 ... <br />The quick brown fox jumps over the lazy dog....</span>
                 </div>
 
 
-                <div class="modal-footer uskytuning-fontfamilypicker">
+                <div class="modal-footer tuning-fontfamilypicker">
                     <button class="btn btn-primary" ng-click="ok()">OK</button>
                     <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
                 </div>
@@ -219,7 +219,7 @@
     </div>
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
-    <script src="/umbraco/js/uSkyTuning.loader.js"></script>
+    <script src="/umbraco/js/tuning.loader.js"></script>
 
 </body>
 

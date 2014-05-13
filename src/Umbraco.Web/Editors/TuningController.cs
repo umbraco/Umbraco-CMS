@@ -16,13 +16,13 @@ using System.IO;
 namespace Umbraco.Web.Editors
 {
     
-    public class uSkyTuningController : UmbracoApiController
+    public class TuningController : UmbracoApiController
     {
 
         static string basePath = HttpContext.Current.Server.MapPath(@"\Umbraco\assets\less\");
-        static string resultCssPath = HttpContext.Current.Server.MapPath(@"\Css\uSkyTuning.style.css");
-        static string uSkyTuningStylePath = basePath + @"uSkyTuning.style.less";
-        static string uSkyTuningParametersPath = basePath + @"uSkyTuning.lessParameters.less";
+        static string resultCssPath = HttpContext.Current.Server.MapPath(@"\Css\tuning.style.css");
+        static string tuningStylePath = basePath + @"tuning.style.less";
+        static string tuningParametersPath = basePath + @"tuning.lessParameters.less";
 
         [HttpGet]
         public HttpResponseMessage GetGoogleFont()
@@ -56,11 +56,11 @@ namespace Umbraco.Web.Editors
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            if (!File.Exists(uSkyTuningParametersPath))
-                File.Create(uSkyTuningParametersPath);
+            if (!File.Exists(tuningParametersPath))
+                File.Create(tuningParametersPath);
 
             IList<string> parameters = new List<string>();
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(uSkyTuningParametersPath))
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(tuningParametersPath))
             {
                 String line;
                 while ((line = sr.ReadLine()) != null)
@@ -85,8 +85,8 @@ namespace Umbraco.Web.Editors
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            if (!File.Exists(uSkyTuningParametersPath))
-                File.Create(uSkyTuningParametersPath);
+            if (!File.Exists(tuningParametersPath))
+                File.Create(tuningParametersPath);
 
             if (!File.Exists(resultCssPath))
                 File.Create(resultCssPath);
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Editors
 
             // Update less parameter file
             string gaImportList = string.Empty;
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(uSkyTuningParametersPath))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(tuningParametersPath))
             {
                 foreach (string parameters in result.Trim().Split(';'))
                 {
@@ -111,15 +111,15 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            // Read uSkyTuning style file
-            string uSkyTuningStyleString = string.Empty;
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(uSkyTuningStylePath))
+            // Read Tuning style file
+            string tuningStyleString = string.Empty;
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(tuningStylePath))
             {
-                uSkyTuningStyleString = sr.ReadToEnd();
+                tuningStyleString = sr.ReadToEnd();
             }
 
             // Compile the Less file
-            string compiledStyle = GetCssFromLessString(uSkyTuningStyleString, false, true, true);
+            string compiledStyle = GetCssFromLessString(tuningStyleString, false, true, true);
 
             // Save compiled file
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(resultCssPath))

@@ -4,9 +4,9 @@
 /*********************************************************************************************************/
 
 /* Refresh tuning panel with selected fieds */
-var uSkyRefrechIntelTuning = function (schema) {
+var refrechIntelTuning = function (schema) {
 
-    var scope = angular.element($("#uSkyTuningPanel")).scope();
+    var scope = angular.element($("#tuningPanel")).scope();
 
     var notFound = true;
     angular.forEach(scope.tuningModel.categories, function (category, key) {

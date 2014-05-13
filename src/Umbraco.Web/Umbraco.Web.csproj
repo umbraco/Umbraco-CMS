@@ -310,7 +310,7 @@
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
-    <Compile Include="Editors\uSkyTuningController.cs" />
+    <Compile Include="Editors\TuningController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
@@ -502,6 +502,13 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\Installer.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\tuning.aspx.cs">
+      <DependentUpon>tuning.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\tuning.aspx.designer.cs">
+      <DependentUpon>tuning.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1855,6 +1862,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\tuning.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

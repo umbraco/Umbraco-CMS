@@ -266,6 +266,12 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             $window.open('dialogs/preview.aspx?id=' + data.id, 'umbpreview');
         });
     };
+
+    $scope.tuning = function (content) {
+        $scope.save().then(function (data) {
+            $window.open('Views/tuning/tuning.html?id=' + data.id, 'umbtuning');
+        });
+    };
     
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {

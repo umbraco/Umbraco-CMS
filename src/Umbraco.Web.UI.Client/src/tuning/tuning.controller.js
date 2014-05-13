@@ -1,13 +1,13 @@
 
 /*********************************************************************************************************/
-/* uSkyTuning panel app and controller */
+/* tuning panel app and controller */
 /*********************************************************************************************************/
 
-// uSkyTuning main app
-angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.slider'])
+// tuning main app
+angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.slider'])
 
 // panel main controller
-.controller("Umbraco.uSkyTuningController", function ($scope, $modal, $http, $window) {
+.controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout) {
 
     $scope.isOpen = false;
     $scope.schemaFocus = "body";
@@ -23,7 +23,7 @@ angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui
 
     // Load parameters from GetLessParameters and init data of the tuning config
     var initTuning = function () {
-        $http.get('/Umbraco/Api/uSkyTuning/GetLessParameters')
+        $http.get('/Umbraco/Api/tuning/GetLessParameters')
             .success(function (data) {
 
                 $.each(tuningConfig.categories, function (indexCategory, category) {
@@ -161,7 +161,7 @@ angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui
         }
 
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-        $http.post('/Umbraco/Api/uSkyTuning/PostLessParameters', resultParameters, {
+        $http.post('/Umbraco/Api/tuning/PostLessParameters', resultParameters, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
             transformRequest: transform
         })
@@ -206,7 +206,7 @@ angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui
     $scope.open = function (field) {
         var modalInstance = $modal.open({
             templateUrl: 'myModalContent.html',
-            controller: 'uskytuning.mediapickercontroller',
+            controller: 'tuning.mediapickercontroller',
             resolve: {
                 items: function () {
                     return field.value;
@@ -222,7 +222,7 @@ angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui
     $scope.openFontFamilyPickerModal = function (field) {
         var modalInstance = $modal.open({
             templateUrl: 'fontFamilyPickerModel.html',
-            controller: 'uskytuning.fontfamilypickercontroller',
+            controller: 'tuning.fontfamilypickercontroller',
             resolve: {
                 googleFontFamilies: function () {
                     return $scope.googleFontFamilies;
@@ -256,21 +256,29 @@ angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui
     }
 
     // Preload of the google font
-    $http.get('/Umbraco/Api/uSkyTuning/GetGoogleFont').success(function (data) {
+    $http.get('/Umbraco/Api/tuning/GetGoogleFont').success(function (data) {
         $scope.googleFontFamilies = data;
     })
 
     // Inicial tuning loading
     initTuning();
 
+    // Wait a while until show the panel
+    $timeout(function () {
+        $("#tuningPanel").show();
+    }, 0);
+    $timeout(function () {
+        $scope.togglePanel();
+    }, 100);
+
 })
 
 // Image picker controller
-.controller('uskytuning.mediapickercontroller', function ($scope, $modalInstance, items, $http) {
+.controller('tuning.mediapickercontroller', function ($scope, $modalInstance, items, $http) {
 
     $scope.items = [];
 
-    $http.get('/Umbraco/Api/uSkyTuning/GetBackGroundImage')
+    $http.get('/Umbraco/Api/tuning/GetBackGroundImage')
             .success(function (data) {
                 $scope.items = data;
             });
@@ -290,7 +298,7 @@ angular.module("umbraco.uSkyTuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui
 })
 
 // Font picker controller
-.controller('uskytuning.fontfamilypickercontroller', function ($scope, $modalInstance, item, googleFontFamilies, $http) {
+.controller('tuning.fontfamilypickercontroller', function ($scope, $modalInstance, item, googleFontFamilies, $http) {
 
     $scope.safeFonts = ["Arial, Helvetica", "Impact", "Lucida Sans Unicode", "Tahoma", "Trebuchet MS", "Verdana", "Georgia", "Times New Roman", "Courier New, Courier"];
     $scope.fonts = [];

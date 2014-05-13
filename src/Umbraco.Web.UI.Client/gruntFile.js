@@ -7,15 +7,15 @@ module.exports = function (grunt) {
 
   //run by the watch task
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:uSkyTuning', 'copy:assets', 'copy:vs']);
+  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
-  grunt.registerTask('watch-usky', ['copy:uSky', 'concat:uSkyJs','concat:uSkyLess']);
+  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'concat:tuningLess']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','recess:uSkyTuning','bower','copy']);
+  grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:tuning', 'bower', 'copy']);
 
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -135,13 +135,13 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
 
-      uSky: {
+      tuning: {
           files: [
-              { dest: '<%= distdir %>/views/uSky', src: '**/*.html', expand: true, cwd: 'src/usky' },
-              { dest: '<%= distdir %>/assets/less', src: 'uSkyTuning.lessParameters.less', expand: true, cwd: 'src/usky' },
-              { dest: '<%= distdir %>/js', src: 'uSkyTuning.config.js', expand: true, cwd: 'src/usky/config' },
-              { dest: '<%= distdir %>/js', src: 'uSkyTuning.palettes.js', expand: true, cwd: 'src/usky/config' },
-              { dest: '<%= distdir %>/js', src: 'uSkyTuning.front.js', expand: true, cwd: 'src/usky' }
+              { dest: '<%= distdir %>/views/tuning', src: '**/*.html', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/assets/less', src: 'tuning.lessParameters.less', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
+              { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
+              { dest: '<%= distdir %>/js', src: 'tuning.front.js', expand: true, cwd: 'src/tuning' }
           ]
       },
 
@@ -205,13 +205,13 @@ module.exports = function (grunt) {
               footer: "\n\n})();"
           }
         },
-        uSkyJs: {
-            src: ['src/uSky/uSkyTuning.global.js', 'src/uSky/uSkyTuning.controller.js', 'src/uSky/lib/slider.directive.js', 'src/uSky/lib/spectrum.directive.js'],
-            dest: '<%= distdir %>/js/uSkyTuning.panel.js'
+        tuningJs: {
+            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
+            dest: '<%= distdir %>/js/tuning.panel.js'
         },
-        uSkyLess: {
-            src: ['src/uSky/uSkyTuning.lessParameters.less', 'src/uSky/uSkyTuning.baseStyles.less', 'src/uSky/uSkyTuning.dynamicStyles.less'],
-            dest: '<%= distdir %>/assets/less/uSkyTuning.style.less',
+        tuningLess: {
+            src: ['src/tuning/tuning.lessParameters.less', 'src/tuning/tuning.baseStyles.less', 'src/tuning/tuning.dynamicStyles.less'],
+            dest: '<%= distdir %>/assets/less/tuning.style.less',
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
@@ -299,10 +299,10 @@ module.exports = function (grunt) {
           compile: true
         }
       },
-      uSkyTuning: {
+      tuning: {
           files: {
-              '<%= distdir %>/assets/css/uSkyTuning.panelStyles.css':
-              ['src/less/uSkyTuning.panelStyles.less']
+              '<%= distdir %>/assets/css/tuning.panelStyles.css':
+              ['src/less/tuning.panelStyles.less']
           },
           options: {
               compile: true
@@ -340,9 +340,9 @@ module.exports = function (grunt) {
           files: ['src/installer/**/*.*'],
           tasks: ['watch-installer', 'timestamp'],
       },
-      usky: {
-          files: ['src/uSky/**/*.*'],
-          tasks: ['watch-usky', 'timestamp'],
+      tuning: {
+          files: ['src/tuning/**/*.*'],
+          tasks: ['watch-tuning', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
