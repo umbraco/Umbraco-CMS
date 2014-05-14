@@ -14,6 +14,7 @@ h2 {
     color: #d9d9d9;
     text-align: center;
     font-size: 14px;
+    margin-left:10px;
 }
 
 .tuning #TuningBg {
@@ -23,7 +24,7 @@ h2 {
     z-index: 999;
     width: 275px;
     height: 100%;
-    padding: 10px 0 10px 0;
+    padding: 0;
     margin-left: -275px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 13px;
@@ -37,10 +38,22 @@ h2 {
     transition: all 0.2s ease-in-out;
 }
 
+.show {
+    display:block !important;
+}
+
+.wait {
+    margin:10px 0 0 0;
+}
+
 .tuning .tuning-wrapper {
     height: 100%;
     overflow-y: auto;
     text-align: left;
+}
+
+.tuning .wrapper-pading {
+    padding:10px
 }
 
 .tuning #TuningBg.open {
@@ -57,32 +70,45 @@ h2 {
 .tuning .nav {
     margin-bottom: 10px;
     color: #ffffff;
-    border-bottom: 1px solid #f57020;
+    border-bottom: none;
+}
+
+.tuning .nav-tabs > li > a {
+    color: #d9d9d9 !important;
+    background-color: #1D1D1D !important;
+    border: none;
+    border-bottom: 3px solid transparent;
 }
 
 .tuning .nav-tabs > li.active > a,
 .tuning .nav-tabs > li.active > a:hover,
 .tuning .nav-tabs > li.active > a:focus {
-  color: #d9d9d9;
-  cursor: default;
-  background-color: #f57020;
-  border: 1px solid #f57020;
-  border-bottom-color: transparent;
+    color: #d9d9d9;
+    cursor: default;
+    background-color: #1D1D1D !important;
+    border: none;
+    border-bottom: 3px solid #f57020;
 }
 
 .tuning .nav-tabs > li > a:hover {
-  border: 1px solid rgba(245, 112, 32, 0.53);
+    color: #d9d9d9 !important;
+    background-color: #1D1D1D !important;
+    border: none !important;
+    border-bottom: 3px solid #f57020 !important;
 }
 
 .tuning .nav > li > a:hover,
 .tuning .nav > li > a:focus {
-  text-decoration: none;
-  background-color: rgba(245, 112, 32, 0.53);
-  border: 1px solid rgba(245, 112, 32, 0.53);
+    text-decoration: none !important;
+    color: #d9d9d9 !important;
+    background-color: #1D1D1D !important;
+    border: none !important;
+    border-bottom: 3px solid #f57020 !important;
 }
 
 .tuning .nav-tabs > li > a {
-  border-radius: 2px 2px 0 0;
+    border-bottom: 3px solid transparent;
+    /*border-radius: 2px 2px 0 0;*/
 }
 
 .tuning .nav-tabs > li > a {
