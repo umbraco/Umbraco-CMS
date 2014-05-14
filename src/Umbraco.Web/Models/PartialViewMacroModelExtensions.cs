@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models
             return attempt.Success ? (T) attempt.Result : defaultValue;
         }
 
-        /// <summary>
+        /// <summary> 
         /// Attempt to get a Marco parameter from a PartialViewMacroModel
         /// </summary>
         /// <param name="partialViewMacroModel"></param>
