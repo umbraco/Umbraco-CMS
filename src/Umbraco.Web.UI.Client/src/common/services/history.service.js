@@ -39,7 +39,7 @@ angular.module('umbraco.services')
 	    }
 
 	    var listWithoutThisItem = _.reject(nArray, function(i) {
-	        return i.link == item.link;
+	        return i.link === item.link;
 	    });
 
         //put it at the top and reassign
