@@ -185,6 +185,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null)
         {
+            //ensure that we html encode any comma's so they are found!
+            // http://issues.umbraco.org/issue/U4-4741
+            var replaced = tag.Replace(",", "&#44;");
+
             var nodeObjectType = GetNodeObjectType(objectType);
 
             var sql = new Sql()
@@ -199,7 +203,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType)
-                .Where<TagDto>(dto => dto.Tag == tag);
+                .Where<TagDto>(dto => dto.Tag == replaced);
 
             if (tagGroup.IsNullOrWhiteSpace() == false)
             {
