@@ -353,6 +353,7 @@
     <Compile Include="Models\ImageCropData.cs" />
     <Compile Include="Models\ImageCropRatioMode.cs" />
     <Compile Include="Models\IRenderModel.cs" />
+    <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\PublishedProperty.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
