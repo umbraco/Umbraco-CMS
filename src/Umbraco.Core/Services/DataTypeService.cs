@@ -126,10 +126,6 @@ namespace Umbraco.Core.Services
                 //now convert the collection to a string list
                 var list = collection.FormatAsDictionary()
                     .Select(x => x.Value.Value)
-                    //It is definitely possible to have duplicate values but previously people were probably not expecting that,
-                    // i.e. http://issues.umbraco.org/issue/U4-4880
-                    // besides, if we are just returning the values without their keys it should probably be the distinct values.
-                    .Distinct()
                     .ToList();
                 return list;
             }
