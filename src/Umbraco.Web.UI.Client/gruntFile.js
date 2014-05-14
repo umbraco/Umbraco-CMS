@@ -141,7 +141,10 @@ module.exports = function (grunt) {
 
       tuning: {
           files: [
-              { dest: '<%= distdir %>/views/tuning', src: '**/*.html', expand: true, cwd: 'src/tuning' },
+              {
+                  dest: 'preview/index.html',
+                  src: 'src/tuning/index.html'
+              },
               { dest: '<%= distdir %>/assets/less', src: 'tuning.lessParameters.less', expand: true, cwd: 'src/tuning' },
               { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
               { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
@@ -306,7 +309,7 @@ module.exports = function (grunt) {
       tuning: {
           files: {
               '<%= distdir %>/assets/css/tuning.panelStyles.css':
-              ['src/less/tuning.panelStyles.less']
+              ['src/less/tuning.panelStyles.less', 'src/less/helveticons.less']
           },
           options: {
               compile: true

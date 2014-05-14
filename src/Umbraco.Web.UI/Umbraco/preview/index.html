@@ -1,18 +1,18 @@
-﻿
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/assets/css/tuning.panelStyles.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
-
 </head>
 
-<body id="tuningPanel" style="display:none" ng-controller="Umbraco.tuningController">
+<body id="tuningPanel" ng-controller="Umbraco.tuningController">
 
-    <div class="tuning">
+    <div class="loading" ng-show="!frameLoaded">Loading ...</div>
+
+    <div class="tuning" ng-show="frameLoaded">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
@@ -155,10 +155,16 @@
 
                         <tab heading="Preview device">
 
-                            <ul>
-                                <li style="color:white" ng-click="updatePreviewDevice('desktop')">desktop  {{previewDevice}}</li>
-                                <li style="color:white" ng-click="updatePreviewDevice('tablet')">tablet</li>
-                                <li style="color:white" ng-click="updatePreviewDevice('mobile')">mobile</li>
+                            <ul class="preview-device">
+                                <li style=" color:white" ng-click="updatePreviewDevice('desktop')">
+                                    <i class="icon icon-display"></i><span>desktop</span>
+                                </li>
+                                <li style="color:white" ng-click="updatePreviewDevice('tablet')">
+                                    <i class="icon icon-ipad"></i><span>tablet</span>
+                                </li>
+                                <li style="color:white" ng-click="updatePreviewDevice('mobile')">
+                                    <i class="icon icon-iphone"></i><span>mobile</span>
+                                </li>
                             </ul>
 
                         </tab>
@@ -213,9 +219,8 @@
 
     </div>
 
-
     <div id="demo-iframe-wrapper" class="{{previewDevice}}">
-        <iframe id="resultFrame" src="/" frameborder="0"></iframe>
+        <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>

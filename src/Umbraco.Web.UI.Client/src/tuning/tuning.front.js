@@ -1,4 +1,3 @@
-
 /*********************************************************************************************************/
 /* Global function and variable for panel/page com  */
 /*********************************************************************************************************/
@@ -72,3 +71,17 @@ var initIntelTuning = function (tuningModel) {
     }
 
 }
+
+var initTuningPanel = function () {
+    var styleSheets = document.styleSheets;
+    var href = 'tuning.style.css';
+    for (var i = 0; i < styleSheets.length; i++) {
+        if (styleSheets[i].href.indexOf(href) > -1) {
+            styleSheets[i].disabled = true;
+            break;
+        }
+    }
+    parent.setFrameIsLoaded();
+}
+
+initTuningPanel();

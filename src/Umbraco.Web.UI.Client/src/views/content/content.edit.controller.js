@@ -263,13 +263,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
     $scope.preview = function(content){
         $scope.save().then(function (data) {
-            $window.open('dialogs/preview.aspx?id=' + data.id, 'umbpreview');
-        });
-    };
-
-    $scope.tuning = function (content) {
-        $scope.save().then(function (data) {
-            $window.open('Views/tuning/tuning.html?id=' + data.id, 'umbtuning');
+            $window.open('preview/?id=' + data.id, 'umbpreview');
         });
     };
     

@@ -542,6 +542,7 @@
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
+    <Content Include="Umbraco\preview\index.html" />
     <Content Include="Umbraco\umbraco.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">

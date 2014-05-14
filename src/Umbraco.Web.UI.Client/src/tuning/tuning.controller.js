@@ -7,9 +7,10 @@
 angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.slider'])
 
 // panel main controller
-.controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout) {
+.controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout, $location) {
 
     $scope.isOpen = false;
+    $scope.frameLoaded = false;
     $scope.schemaFocus = "body";
     $scope.settingIsOpen = 'setting';
     $scope.previewDevice = 'desktop';
@@ -19,7 +20,8 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.Layouts = ['boxed', 'wide', 'full'];
     $scope.displays = ['float-left', 'float-right', 'block-left', 'block-right', 'none'];
     $scope.optionHomes = ['icon', 'text', 'none'];
-    $scope.googleFontFamilies = {}
+    $scope.googleFontFamilies = {};
+    $scope.pageId = "../dialogs/Preview.aspx?id=" + $location.search().id;
 
     // Load parameters from GetLessParameters and init data of the tuning config
     var initTuning = function () {
@@ -52,12 +54,6 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
                 $scope.tuningModel = tuningConfig;
                 $scope.tuningPalette = tuningPalette;
-
-                refreshtuning();
-
-                $scope.$watch('tuningModel', function () {
-                    refreshtuning();
-                }, true);
 
             });
     }
@@ -260,16 +256,18 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $scope.googleFontFamilies = data;
     })
 
-    // Inicial tuning loading
-    initTuning();
+    $scope.$watch("frameLoaded", function () {
+        if ($scope.frameLoaded) {
+            console.info("init tuning");
+            $scope.$watch('tuningModel', function () {
+                refreshtuning();
+            }, true);
+            $scope.togglePanel();
+        }
+    }, true)
 
-    // Wait a while until show the panel
-    $timeout(function () {
-        $("#tuningPanel").show();
-    }, 0);
-    $timeout(function () {
-        $scope.togglePanel();
-    }, 100);
+    initTuning();
+    $("#tuningPanel").show();
 
 })
 

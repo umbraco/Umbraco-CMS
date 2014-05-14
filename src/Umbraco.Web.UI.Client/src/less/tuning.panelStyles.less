@@ -1,14 +1,13 @@
 html {
-    height:100%;
+  height: 100%;
 }
 
 body {
-  display: none;
+  height: 100%;
   padding: 0;
   margin: 0;
   text-align: center;
   background-color: #fafbfd;
-  height:100%;
 }
 
 .tuning #TuningBg {
@@ -471,75 +470,6 @@ body {
   color: rgba(255, 255, 255, 0.57);
 }
 
-@font-face {
-  font-family: 'icomoon';
-  font-style: normal;
-  font-weight: normal;
-  src: url('/Umbraco/assets/fonts/helveticons/helveticons.eot');
-  src: url('/Umbraco/assets/fonts/helveticons/helveticons.eot?#iefix') format('embedded-opentype'), url('/Umbraco/assets/fonts/helveticons/helveticons.ttf') format('truetype'), url('/Umbraco/assets/fonts/helveticons/helveticons.svg#icomoon') format('svg');
-}
-
-[class^="icon-"],
-[class*=" icon-"] {
-  *margin-right: .3em;
-  font-family: icomoon;
-  -webkit-font-smoothing: antialiased;
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-}
-
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
-  display: inline-block;
-  text-decoration: inherit;
-  speak: none;
-}
-
-/*
-[class^="icon-"]:before, [class*=" icon-"]:before {
-	font-family: 'icomoon';
-	speak: none;
-	font-weight: normal;
-  	font-style: normal;
-  	display: inline-block;
-  	text-decoration: inherit;
-  	font-size: 14px;
-  	-webkit-font-smoothing: antialiased;
-}*/
-
-i.large {
-  font-size: 32px;
-}
-
-i.medium {
-  font-size: 24px;
-}
-
-i.small {
-  font-size: 14px;
-}
-
-.icon-right-double-arrow:before {
-  content: "\e094";
-}
-
-.icon-left-double-arrow:before {
-  content: "\e141";
-}
-
-.icon-paint-roller:before {
-  content: "\e120";
-}
-
-.icon-palette:before {
-  content: "\e121";
-}
-
-.icon-iphone:before {
-  content: "\e0f1";
-}
-
 /******* IFRAME *******/
 
 .desktop {
@@ -580,4 +510,46 @@ iframe {
   overflow: hidden;
   overflow-x: hidden;
   overflow-y: hidden;
+}
+
+/******* preview-device *******/
+
+ul.preview-device {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+ul.preview-device li {
+  display: block;
+  margin: 20px 0 0 20px;
+  clear: both;
+  color: rgba(255, 255, 255, 0.8);
+  color: white;
+  cursor: pointer;
+}
+
+ul.preview-device li:hover,
+ul.preview-device li.selected {
+  margin: 20px 0 0 20px;
+  color: #ffffff;
+}
+
+ul.preview-device li i {
+  float: left;
+  margin: 20px 0 0 20px;
+  font-size: 40px;
+}
+
+ul.preview-device li span {
+  display: inline-block;
+  float: left;
+  margin: 17px 0 0 10px;
+}
+
+/******* font-face *******/
+
+@font-face {
+  src: url('/Umbraco/assets/fonts/helveticons/helveticons.eot') !important;
+  src: url('/Umbraco/assets/fonts/helveticons/helveticons.eot?#iefix') format('embedded-opentype'), url('/Umbraco/assets/fonts/helveticons/helveticons.ttf') format('truetype'), url('/Umbraco/assets/fonts/helveticons/helveticons.svg#icomoon') format('svg') !important;
 }

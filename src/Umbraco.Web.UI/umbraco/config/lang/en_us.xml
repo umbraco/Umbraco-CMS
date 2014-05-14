@@ -827,7 +827,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="editstylesheet">Edit stylesheet</key>
     <key alias="editstylesheetproperty">Edit stylesheet property</key>
     <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
-    <key alias="tuningPage">Tuning</key>
     <key alias="preview">Preview</key>
     <key alias="styles">Styles</key>
   </area>
