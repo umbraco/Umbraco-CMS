@@ -20,7 +20,7 @@ angular.module("umbraco")
                 if (tagToAdd.length > 0) {
                     if ($scope.currentTags.indexOf(tagToAdd) < 0) {
                         //we need to html encode any tag containing commas: http://issues.umbraco.org/issue/U4-4741
-                        tagToAdd = tagToAdd.replace(",", "&#44;");
+                        tagToAdd = tagToAdd.replace(/\,/g, "&#44;");
                         $scope.currentTags.push(tagToAdd);
                     }
                 }
