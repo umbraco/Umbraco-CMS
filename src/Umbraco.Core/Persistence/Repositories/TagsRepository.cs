@@ -439,7 +439,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         private static string GetTagSet(IEnumerable<ITag> tagsToInsert)
         {
-            var array = tagsToInsert.Select(tag => string.Format("select '{0}' as Tag, '{1}' as [Group]", tag.Text.Replace("'", "''"), tag.Group)).ToArray();
+            var array = tagsToInsert
+                .Select(tag =>
+                    string.Format("select '{0}' as Tag, '{1}' as [Group]",
+                        PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")),
+                        tag.Group))
+                .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
         }
 
