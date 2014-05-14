@@ -60,8 +60,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.isOpen = false;
     $scope.frameLoaded = false;
     $scope.schemaFocus = "body";
-    $scope.settingIsOpen = 'setting';
-    $scope.previewDevice = 'desktop';
+    $scope.settingIsOpen = 'previewDevice';
     $scope.BackgroundPositions = ['center', 'left', 'right', 'bottom center', 'bottom left', 'bottom right', 'top center', 'top left', 'top right'];
     $scope.BackgroundRepeats = ['no-repeat', 'repeat', 'repeat-x', 'repeat-y'];
     $scope.BackgroundAttachments = ['scroll', 'fixed'];
@@ -70,6 +69,15 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.optionHomes = ['icon', 'text', 'none'];
     $scope.googleFontFamilies = {};
     $scope.pageId = "../dialogs/Preview.aspx?id=" + $location.search().id;
+    $scope.devices = [
+        { name: "desktop", css: "desktop", icon: "icon-display" },
+        { name: "laptop - 1024px", css: "laptop border", icon: "icon-laptop" },
+        { name: "iPad portrait - 768px", css: "iPad-portrait border", icon: "icon-ipad" },
+        { name: "iPad landscape - 1024px", css: "iPad-landscape border", icon: "icon-ipad flip" },
+        { name: "smartphone portrait - 480px", css: "smartphone-portrait border", icon: "icon-iphone" },
+        { name: "smartphone landscape  - 320px", css: "smartphone-landscape border", icon: "icon-iphone flip" }
+    ];
+    $scope.previewDevice = $scope.devices[0];
 
     // Load parameters from GetLessParameters and init data of the tuning config
     var initTuning = function () {

@@ -73,16 +73,18 @@ var initIntelTuning = function (tuningModel) {
 }
 
 var initTuningPanel = function () {
+
+    // Disable tuning.style.css
     var styleSheets = document.styleSheets;
     var href = 'tuning.style.css';
-    console.info("disable css style");
     for (var i = 0; i < styleSheets.length; i++) {
         if (styleSheets[i].href.indexOf(href) > -1) {
             styleSheets[i].disabled = true;
-            console.info("disable css style");
             break;
         }
     }
+
+    // Init panel 
     parent.setFrameIsLoaded();
 }
 

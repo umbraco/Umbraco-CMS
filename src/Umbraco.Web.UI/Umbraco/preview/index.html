@@ -23,6 +23,10 @@
                     <i ng-if="!isOpen" class="icon icon-right-double-arrow"></i>
                 </div>
 
+                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice'}">
+                    <i class="icon icon-display"></i>
+                </div>
+
                 <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting'}">
                     <i class="icon icon-paint-roller"></i>
                 </div>
@@ -31,13 +35,20 @@
                     <i class="icon icon-palette"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice'}">
-                    <i class="icon icon-iphone"></i>
-                </div>
-
             </div>
 
             <div class="tuning-wrapper">
+
+                <div ng-show="settingIsOpen == 'previewDevice'">
+
+                    <h2>DEVICES</h2>
+                    <ul class="preview-device">
+                        <li ng-repeat="device in devices" ng-class=" { selected:previewDevice==device }" ng-click="updatePreviewDevice(device)">
+                            <div><i class="icon {{device.icon}}"></i><span>{{device.name}}</span></div>
+                        </li>
+                    </ul>
+
+                </div>
 
                 <div ng-show="settingIsOpen == 'setting'">
 
@@ -126,6 +137,8 @@
 
                     </tabset>
 
+                    <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
+
                 </div>
 
                 <div ng-show="settingIsOpen == 'presetColors'">
@@ -147,33 +160,9 @@
 
                     </tabset>
 
-                </div>
-
-                <div ng-show="settingIsOpen == 'previewDevice'">
-
-                    <tabset vertical="false">
-
-                        <tab heading="Preview device">
-
-                            <ul class="preview-device">
-                                <li style=" color:white" ng-click="updatePreviewDevice('desktop')">
-                                    <i class="icon icon-display"></i><span>desktop</span>
-                                </li>
-                                <li style="color:white" ng-click="updatePreviewDevice('tablet')">
-                                    <i class="icon icon-ipad"></i><span>tablet</span>
-                                </li>
-                                <li style="color:white" ng-click="updatePreviewDevice('mobile')">
-                                    <i class="icon icon-iphone"></i><span>mobile</span>
-                                </li>
-                            </ul>
-
-                        </tab>
-
-                    </tabset>
+                    <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
 
                 </div>
-
-                <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
 
             </div>
 
@@ -219,7 +208,7 @@
 
     </div>
 
-    <div id="demo-iframe-wrapper" class="{{previewDevice}}">
+    <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
         <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 

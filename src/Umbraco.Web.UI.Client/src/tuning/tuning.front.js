@@ -73,6 +73,8 @@ var initIntelTuning = function (tuningModel) {
 }
 
 var initTuningPanel = function () {
+
+    // Disable tuning.style.css
     var styleSheets = document.styleSheets;
     var href = 'tuning.style.css';
     for (var i = 0; i < styleSheets.length; i++) {
@@ -81,6 +83,8 @@ var initTuningPanel = function () {
             break;
         }
     }
+
+    // Init panel 
     parent.setFrameIsLoaded();
 }
 

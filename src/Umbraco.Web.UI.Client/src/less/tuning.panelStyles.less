@@ -3,56 +3,61 @@ html {
 }
 
 body {
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  text-align: center;
-  background-color: #fafbfd;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    background-color: #fafbfd;
+}
+
+h2 {
+    color: #d9d9d9;
+    text-align: center;
+    font-size: 14px;
 }
 
 .tuning #TuningBg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  width: 275px;
-  height: 100%;
-  padding: 10px 5px 10px 10px;
-  margin-left: -275px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  line-height: 16px;
-  background: rgba(29, 29, 29, 0.91);
-  -webkit-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
-     -moz-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
-          box-shadow: 0 0 14px rgba(0, 0, 0, 0);
-  -webkit-transition: all 0.2s ease-in-out;
-     -moz-transition: all 0.2s ease-in-out;
-          transition: all 0.2s ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    width: 275px;
+    height: 100%;
+    padding: 10px 0 10px 0;
+    margin-left: -275px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 16px;
+    background: #1D1D1D;
+    -webkit-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+    -moz-box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0);
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
 }
 
 .tuning .tuning-wrapper {
-  height: 100%;
-  padding: 0 5px 0 0;
-  overflow-y: auto;
-  text-align: left;
+    height: 100%;
+    overflow-y: auto;
+    text-align: left;
 }
 
 .tuning #TuningBg.open {
-  margin-left: 0;
-  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-     -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-          box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    margin-left: 0;
+    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
 .tuning .colpick {
-  z-index: 99999999;
+    z-index: 99999999;
 }
 
 .tuning .nav {
-  margin-bottom: 10px;
-  color: #ffffff;
-  border-bottom: 1px solid #f57020;
+    margin-bottom: 10px;
+    color: #ffffff;
+    border-bottom: 1px solid #f57020;
 }
 
 .tuning .nav-tabs > li.active > a,
@@ -307,24 +312,24 @@ body {
 }
 
 .tuning .tuning-tools div {
-  display: block;
-  padding: 8px 10px 8px 10px;
-  margin: 5px 0 0 0;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  background: rgba(41, 41, 41, 0.84);
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-     -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-          box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    display: block;
+    padding: 8px 8px 8px 9px;
+    margin: 5px 0 0 0;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    background: #353535;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
 .tuning .tuning-tools div:hover,
 .tuning .tuning-tools div.selected {
-  color: #ffffff;
-  background: rgba(29, 29, 29, 0.91);
+    color: rgba(255, 255, 255, 0.8);
+    background: #1D1D1D;
 }
 
 .tuningImagePicker {
@@ -473,78 +478,105 @@ body {
 /******* IFRAME *******/
 
 .desktop {
-  width: 100%;
-  height: 100%;
-  margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
-.tablet {
-  width: 1040px;
-  height: 757px;
-  margin: 75px auto;
-  background-color: #ffffff;
-  border-radius: 10px;
-  opacity: 1.0;
-  box-shadow: 0 0 0 29px #fff, 0 0 0 30px #dee0e3;
-  transition: all 0.5s ease-in-out;
+.laptop {
+    width: 1024px;
+    height: 740px;
 }
 
-.mobile {
-  width: 350px;
-  height: 568px;
-  margin: 75px auto;
-  background-color: #ffffff;
-  border-radius: 10px;
-  opacity: 1.0;
-  box-shadow: 0 0 0 29px #fff, 0 0 0 30px #dee0e3;
-  transition: all 0.5s ease-in-out;
+.iPad-portrait {
+    width: 769px;
+    height: 929px;
+}
+
+.iPad-landscape {
+    width: 1024px;
+    height: 675px;
+}
+
+.smartphone-portrait {
+    width: 320px;
+    height: 504px;
+}
+
+.smartphone-landscape {
+    width: 480px;
+    height: 256px;
+}
+
+.border {
+    margin: 75px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    opacity: 1.0;
+    box-shadow: 0 0 0 29px #fff, 0 0 0 30px #dee0e3;
+    transition: all 0.5s ease-in-out;
 }
 
 iframe {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  overflow-x: hidden;
-  overflow-y: hidden;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.flip:before {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
 }
 
 /******* preview-device *******/
 
 ul.preview-device {
-  padding: 0;
-  margin: 0;
-  list-style: none;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    border-top: 1px solid #343434;
 }
 
 ul.preview-device li {
-  display: block;
-  margin: 20px 0 0 20px;
-  clear: both;
-  color: rgba(255, 255, 255, 0.8);
-  color: white;
-  cursor: pointer;
+    display: block;
+    overflow: hidden;
+    clear: both;
+    text-align: center;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    -webkit-transition: all .3s linear;
+    -moz-transition: all .3s linear;
+    transition: all .3s linear;
+}
+
+ul.preview-device li div {
+    border-bottom: 1px solid #343434;
+    padding: 10px;
 }
 
 ul.preview-device li:hover,
 ul.preview-device li.selected {
-  margin: 20px 0 0 20px;
-  color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.09);
+    border-left: 4px #f57020 solid;
 }
 
 ul.preview-device li i {
-  float: left;
-  margin: 20px 0 0 20px;
-  font-size: 40px;
+    color:#d9d9d9;
+    font-size: 80px;
+    line-height: 80px;
 }
 
 ul.preview-device li span {
-  display: inline-block;
-  float: left;
-  margin: 17px 0 0 10px;
+    color:#d9d9d9;
+    display: block;
 }
 
 /******* font-face *******/
