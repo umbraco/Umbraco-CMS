@@ -43,23 +43,8 @@
 
                     <h2>DEVICES</h2>
                     <ul class="preview-device">
-                        <li ng-class="{selected:previewDevice=='desktop'}" ng-click="updatePreviewDevice('desktop')">
-                            <div><i class="icon icon-display"></i><span>desktop</span></div>
-                        </li>
-                        <li ng-class="{selected:previewDevice=='laptop border'}" ng-click="updatePreviewDevice('laptop border')">
-                            <div><i class="icon icon-laptop"></i><span>laptop - 1024px</span></div> <!--height: 144px; width: 1024px-->
-                        </li>
-                        <li ng-class="{selected:previewDevice=='iPad-portrait border'}" ng-click="updatePreviewDevice('iPad-portrait border')">
-                            <div><i class="icon icon-ipad"></i><span>iPad portrait - 768px</span></div> <!--width: 768px; height: 929px;-->
-                        </li>
-                        <li ng-class="{selected:previewDevice=='iPad-landscape border'}" ng-click="updatePreviewDevice('iPad-landscape border')">
-                            <div><i class="icon icon-ipad flip"></i><span>iPad landscape - 1024px</span></div> <!--height: 675px; width: 1024px;-->
-                        </li>
-                        <li ng-class="{selected:previewDevice=='smartphone-portrait border'}" ng-click="updatePreviewDevice('smartphone-portrait border')">
-                            <div><i class="icon icon-iphone"></i><span>smartphone portrait - 480px</span></div> <!--width: 320px; height: 504px;-->
-                        </li>
-                        <li ng-class="{selected:previewDevice=='smartphone-landscape border'}" ng-click="updatePreviewDevice('smartphone-landscape border')">
-                            <div><i class="icon icon-iphone flip"></i><span>smartphone landscape  - 320px</span></div> <!--width: 480px; height: 256px;-->
+                        <li ng-repeat="device in devices" ng-class=" { selected:previewDevice==device }" ng-click="updatePreviewDevice(device)">
+                            <div><i class="icon {{device.icon}}"></i><span>{{device.name}}</span></div>
                         </li>
                     </ul>
 
@@ -223,7 +208,7 @@
 
     </div>
 
-    <div id="demo-iframe-wrapper" class="{{previewDevice}}">
+    <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
         <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
