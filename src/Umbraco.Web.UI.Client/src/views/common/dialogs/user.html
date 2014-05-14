@@ -34,7 +34,7 @@
 			<div class="umb-pane">
 				<h5><localize key="user_yourHistory" /></h5>
 				<ul class="umb-tree">
-						<li ng-repeat="item in history | orderBy:'time'">
+						<li ng-repeat="item in history | orderBy:'time':true">
 							<a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
 								<i class="{{item.icon}}"></i> {{item.name}}</a>
 						</li>
