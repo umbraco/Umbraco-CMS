@@ -442,7 +442,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var array = tagsToInsert
                 .Select(tag =>
                     string.Format("select '{0}' as Tag, '{1}' as [Group]",
-                        PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")),
+                        PetaPocoExtensions.EscapeAtSymbols(
+                            tag.Text
+                                .Replace("'", "''")         //NOTE: I'm not sure about this apostrophe replacement but it's been like that for a long time
+                                .Replace(",", "&#44;")),    //NOTE: We need to replace commas with html encoded ones: http://issues.umbraco.org/issue/U4-4741
                         tag.Group))
                 .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
