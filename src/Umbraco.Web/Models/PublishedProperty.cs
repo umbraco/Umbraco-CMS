@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models
         /// <param name="value">The property data raw value.</param>
         /// <param name="isPreviewing">A value indicating whether to evaluate the property value in previewing context.</param>
         /// <returns>A detached published property holding the value.</returns>
-        internal static IPublishedProperty GetDetached(PublishedPropertyType propertyType, object value, bool isPreviewing = false)
+        public static IPublishedProperty GetDetached(PublishedPropertyType propertyType, object value, bool isPreviewing = false)
         {
             if (propertyType.IsDetachedOrNested == false)
                 throw new ArgumentException("Property type is neither detached nor nested.", "propertyType");
