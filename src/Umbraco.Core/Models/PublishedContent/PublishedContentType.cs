@@ -44,6 +44,11 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
+        // create detached content type - ie does not match anything in the DB
+        internal PublishedContentType(string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+            : this (0, alias, propertyTypes)
+        { }
+
         private void InitializeIndexes()
         {
             for (var i = 0; i < _propertyTypes.Length; i++)
