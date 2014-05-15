@@ -341,6 +341,11 @@ namespace umbraco.cms.presentation
                 case PublishStatusType.FailedHasExpired:
                 case PublishStatusType.FailedAwaitingRelease:
                 case PublishStatusType.FailedIsTrashed:
+                    ClientTools.ShowSpeechBubble(
+                        speechBubbleIcon.warning,
+                        ui.Text("publish"),
+                        "Cannot publish document with a status of " + status.StatusType);
+                    break;
                 case PublishStatusType.FailedContentInvalid:
                     ClientTools.ShowSpeechBubble(
                         speechBubbleIcon.warning,

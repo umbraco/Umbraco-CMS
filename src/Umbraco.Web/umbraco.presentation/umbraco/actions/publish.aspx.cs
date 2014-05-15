@@ -70,6 +70,7 @@ namespace umbraco.presentation.actions
                 case PublishStatusType.FailedHasExpired:
                 case PublishStatusType.FailedAwaitingRelease:
                 case PublishStatusType.FailedIsTrashed:
+                    return "Cannot publish document with a status of " + status.StatusType;
                 case PublishStatusType.FailedContentInvalid:
                     return ui.Text("publish", "contentPublishedFailedInvalid",
                                    new[]
