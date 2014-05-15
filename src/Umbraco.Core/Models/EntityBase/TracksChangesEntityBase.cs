@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
-        private readonly IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
+        private IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
 
         /// <summary>
         /// Tracks the properties that we're changed before the last commit (or last call to ResetDirtyProperties)
@@ -86,7 +86,9 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         public void ForgetPreviouslyDirtyProperties()
         {
-            _lastPropertyChangedInfo.Clear();
+            //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
+            // instance as the one on the clone, so we need to create a new instance.
+            _lastPropertyChangedInfo = new Dictionary<string, bool>();
         }
 
         /// <summary>
@@ -119,7 +121,9 @@ namespace Umbraco.Core.Models.EntityBase
                 _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
             }
 
-            _propertyChangedInfo.Clear();
+            //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
+            // instance as the one on the clone, so we need to create a new instance.
+            _propertyChangedInfo = new Dictionary<string, bool>();
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Web.Http.Controllers;
 using Umbraco.Web.WebApi;
 
@@ -10,12 +11,10 @@ namespace Umbraco.Web.Editors
     /// NOTE: It is SOOOO important to remember that you cannot just assign this in the 'initialize' method of a webapi
     /// controller as it will assign it GLOBALLY which is what you def do not want to do.
     /// </remarks>
-    internal class EntityControllerConfigurationAttribute : AngularJsonOnlyConfigurationAttribute, IControllerConfiguration
+    internal class EntityControllerConfigurationAttribute : Attribute, IControllerConfiguration
     {
-        public override void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+        public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
         {
-            base.Initialize(controllerSettings, controllerDescriptor);
-
             controllerSettings.Services.Replace(typeof(IHttpActionSelector), new EntityControllerActionSelector());
         }
     }

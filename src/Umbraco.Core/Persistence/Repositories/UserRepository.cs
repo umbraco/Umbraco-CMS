@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsTask WHERE parentUserId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
-                               "DELETE FROM umbracoUserLogins WHERE userId = @Id",
+                               "DELETE FROM umbracoUserLogins WHERE userID = @Id",
                                "DELETE FROM umbracoUser2app WHERE " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id"
                            };
@@ -210,9 +210,19 @@ namespace Umbraco.Core.Persistence.Repositories
             var user = (User)entity;
             if (user.IsPropertyDirty("AllowedSections"))
             {
+                //now we need to delete any applications that have been removed
+                foreach (var section in user.RemovedSections)
+                {
+                    //we need to manually delete thsi record because it has a composite key
+                    Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
+                        new { Section = section, UserId = (int)user.Id });
+                }
+
                 //for any that exist on the object, we need to determine if we need to update or insert
+                //NOTE: the User2AppDtos collection wil always be equal to the User.AllowedSections
                 foreach (var sectionDto in userDto.User2AppDtos)
                 {
+                    //if something has been added then insert it
                     if (user.AddedSections.Contains(sectionDto.AppAlias))
                     {
                         //we need to insert since this was added  
@@ -226,13 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                //now we need to delete any applications that have been removed
-                foreach (var section in user.RemovedSections)
-                {
-                    //we need to manually delete thsi record because it has a composite key
-                    Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
-                        new { Section = section, UserId = (int)user.Id });
-                }
+                
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();

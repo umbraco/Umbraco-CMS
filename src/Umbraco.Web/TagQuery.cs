@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 
@@ -12,12 +14,85 @@ namespace Umbraco.Web
     public class TagQuery
     {
         private readonly ITagService _tagService;
+        private readonly PublishedContentQuery _contentQuery;
 
+        [Obsolete("Use the alternate constructor specifying the contentQuery instead")]
         public TagQuery(ITagService tagService)
+            : this(tagService, new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache))
+        {
+        }
+
+        public TagQuery(ITagService tagService, PublishedContentQuery contentQuery)
         {
             if (tagService == null) throw new ArgumentNullException("tagService");
+            if (contentQuery == null) throw new ArgumentNullException("contentQuery");
             _tagService = tagService;
+            _contentQuery = contentQuery;
         }
+        
+        /// <summary>
+        /// Returns all content that is tagged with the specified tag value and optional tag group
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="tagGroup"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> GetContentByTag(string tag, string tagGroup = null)
+        {
+            var ids = _tagService.GetTaggedContentByTag(tag, tagGroup)
+                .Select(x => x.EntityId);
+            return _contentQuery.TypedContent(ids)
+                .Where(x => x != null);
+        }
+
+        /// <summary>
+        /// Returns all content that has been tagged with any tag in the specified group
+        /// </summary>
+        /// <param name="tagGroup"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> GetContentByTagGroup(string tagGroup)
+        {
+            var ids = _tagService.GetTaggedContentByTagGroup(tagGroup)
+                .Select(x => x.EntityId);
+            return _contentQuery.TypedContent(ids)
+                .Where(x => x != null);
+        }
+
+        /// <summary>
+        /// Returns all Media that is tagged with the specified tag value and optional tag group
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="tagGroup"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string tagGroup = null)
+        {
+            var ids = _tagService.GetTaggedMediaByTag(tag, tagGroup)
+                .Select(x => x.EntityId);
+            return _contentQuery.TypedMedia(ids)
+                .Where(x => x != null);
+        }
+
+        /// <summary>
+        /// Returns all Media that has been tagged with any tag in the specified group
+        /// </summary>
+        /// <param name="tagGroup"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> GetMediaByTagGroup(string tagGroup)
+        {
+            var ids = _tagService.GetTaggedMediaByTagGroup(tagGroup)
+                .Select(x => x.EntityId);
+            return _contentQuery.TypedMedia(ids)
+                .Where(x => x != null);
+        }
+
+        //TODO: Should prob implement these, requires a bit of work on the member service to do this,
+        // also not sure if its necessary ?
+        //public IEnumerable<IPublishedContent> GetMembersByTag(string tag, string tagGroup = null)
+        //{
+        //}
+
+        //public IEnumerable<IPublishedContent> GetMembersByTagGroup(string tagGroup)
+        //{
+        //}
 
         /// <summary>
         /// Get every tag stored in the database (with optional group)

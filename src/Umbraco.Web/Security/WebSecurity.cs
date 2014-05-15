@@ -70,7 +70,7 @@ namespace Umbraco.Web.Security
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        internal IUser CurrentUser
+        public IUser CurrentUser
         {
             get
             {
@@ -105,9 +105,9 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="user"></param>
         /// <returns>returns the number of seconds until their session times out</returns>
-        internal FormsAuthenticationTicket PerformLogin(IUser user)
+        public FormsAuthenticationTicket PerformLogin(IUser user)
         {
-            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
+            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData()
             {
                 Id = user.Id,
                 AllowedApplications = user.AllowedSections.ToArray(),
@@ -147,7 +147,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        internal bool ValidateBackOfficeCredentials(string username, string password)
+        public bool ValidateBackOfficeCredentials(string username, string password)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="setOnline"></param>
         /// <returns></returns>
-        internal MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
+        public MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;

@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
 using umbraco.DataLayer;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -205,7 +206,7 @@ namespace umbraco.cms.businesslogic.template
             {
                 FlushCache();
                 _oldAlias = _alias;
-                _alias = value;
+                _alias = value.ToCleanString(CleanStringType.UnderscoreAlias);
 
                 SqlHelper.ExecuteNonQuery("Update cmsTemplate set alias = @alias where NodeId = " + this.Id, SqlHelper.CreateParameter("@alias", _alias));
                 _templateAliasesInitialized = false;
@@ -403,13 +404,13 @@ namespace umbraco.cms.businesslogic.template
             var node = MakeNew(-1, ObjectType, u.Id, 1, name, Guid.NewGuid());
 
             //ensure unique alias 
-            name = helpers.Casing.SafeAlias(name);
+            name = name.ToCleanString(CleanStringType.UnderscoreAlias);
             if (GetByAlias(name) != null)
                 name = EnsureUniqueAlias(name, 1);
-            name = name.Replace("/", ".").Replace("\\", "");
+            //name = name.Replace("/", ".").Replace("\\", ""); //why? ToSafeAlias() already removes those chars
 
             if (name.Length > 100)
-                name = name.Substring(0, 95) + "...";
+                name = name.Substring(0, 95); // + "..."; // no, these are invalid alias chars
           
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", node.Id),

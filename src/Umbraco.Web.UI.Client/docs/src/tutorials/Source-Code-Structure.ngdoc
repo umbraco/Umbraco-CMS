@@ -70,7 +70,7 @@ Folder containing various sample projects on how to use the external api, good f
 The central application script, which handles what modules to inject, app.js is for production, app.dev.js is for testing
 
 ###loader.js
-yepnope.js based loader for async loading javascript files, this file specifies what files to load on application start
+lazyload.js based loader for async loading javascript files, this file specifies what files to load on application start
 
 ###routes.js
 Routing setup for /umbraco/ pages, by default it contains a mvc-like convention based pattern, which means that we not very often need to modify this.

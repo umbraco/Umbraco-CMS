@@ -4,7 +4,7 @@ namespace Umbraco.Web.Models
     {
         Crop,
         Max,
-        Strech,
+        Stretch,
         Pad
     }
 }

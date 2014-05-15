@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration.BaseRest;
 
 namespace Umbraco.Web.BaseRest
 {
+    [Obsolete("Umbraco /base is obsoleted, use WebApi (UmbracoApiController) instead for all REST based logic")]
 	internal class BaseRestHandler : IHttpHandler, IRequiresSessionState
 	{
 		static readonly string BaseUrl;

@@ -415,6 +415,32 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Import_Nested_DictionaryItems()
+        {
+            // Arrange
+            const string parentKey = "Parent";
+            const string childKey = "Child";
+
+            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
+            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+
+            AddLanguages();
+
+            // Act
+            var dictionaryItems = ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+
+            // Assert
+            Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(parentKey), "DictionaryItem parentKey does not exist");
+            Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(childKey), "DictionaryItem childKey does not exist");
+
+            var parentDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(parentKey);
+            var childDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(childKey);
+            
+            Assert.That(parentDictionaryItem.ParentId, Is.Not.EqualTo(childDictionaryItem.ParentId));
+            Assert.That(childDictionaryItem.ParentId, Is.EqualTo(parentDictionaryItem.Key));
+        }
+
+        [Test]
         public void PackagingService_WhenExistingDictionaryKey_ImportsNewChildren()
         {
             // Arrange

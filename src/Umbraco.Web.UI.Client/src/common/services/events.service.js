@@ -18,7 +18,8 @@ function eventsService($q, $rootScope) {
 
             //there are no listeners
             if (!$rootScope.$$listeners[name]) {
-                return [];
+                return;
+                //return [];
             }
 
             //send the event

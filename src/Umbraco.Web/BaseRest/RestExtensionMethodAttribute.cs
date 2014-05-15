@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Umbraco.Web.BaseRest
 {
+    [Obsolete("Umbraco /base is obsoleted, use WebApi (UmbracoApiController) instead for all REST based logic")]
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public sealed class RestExtensionMethodAttribute : Attribute
 	{

@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                     return new Version(4, 7, 0);
                 }
 
-                return new Version(4, 9, 0);
+                return new Version(4, 8, 0);
             }
 
             //if the error is for umbracoServer

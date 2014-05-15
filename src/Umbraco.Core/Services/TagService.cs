@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -36,6 +39,54 @@ namespace Umbraco.Core.Services
         {
             _repositoryFactory = repositoryFactory;
             _uowProvider = provider;
+        }
+
+        public IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string tagGroup)
+        {
+            using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
+            }         
+        }
+
+        public IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string tagGroup = null)
+        {
+            using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
+            }         
+        }
+
+        public IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string tagGroup)
+        {
+            using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
+            }    
+        }
+
+        public IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string tagGroup = null)
+        {
+            using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
+            }    
+        }
+
+        public IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string tagGroup)
+        {
+            using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
+            }    
+        }
+
+        public IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string tagGroup = null)
+        {
+            using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
+            }    
         }
 
         /// <summary>

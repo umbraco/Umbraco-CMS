@@ -17,7 +17,7 @@ namespace Umbraco.Web.WebApi.Filters
         {            
             if (context.Response == null) return;
             if (context.Response.IsSuccessStatusCode == false) return;
-            context.Response.UmbracoLogout();
+            context.Response.UmbracoLogoutWebApi();
         }
     }
 }

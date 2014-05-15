@@ -272,6 +272,14 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(content, null));
             }
+
+            //need to ensure the event handlers are wired
+
+            var asDirty = (ICanBeDirty)clone;
+
+            Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
+            clone.Properties.Add(new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Ntext) {Alias = "blah"}, "blah"));
+            Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
         }
 
         [Test]

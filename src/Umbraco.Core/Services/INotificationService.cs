@@ -13,7 +13,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
-    internal interface INotificationService : IService
+    public interface INotificationService : IService
     {
         /// <summary>
         /// Sends the notifications for the specified user regarding the specified node and action.

@@ -209,6 +209,10 @@ namespace Umbraco.Web.Editors
                                 {
                                     "contentTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
                                         controller => controller.GetNodes("-1", null))
+                                },
+                                {
+                                    "tagsDataBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsDataController>(
+                                        controller => controller.GetTags(""))
                                 }
                             }
                     },

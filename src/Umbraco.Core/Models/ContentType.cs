@@ -151,6 +151,9 @@ namespace Umbraco.Core.Models
             clone.PropertyTypes = PropertyTypeCollection
                 .Where(x => x.PropertyGroupId == null)
                 .Select(x => (PropertyType)x.DeepClone()).ToList();
+
+            clone.ResetDirtyProperties(false);
+
             return clone;
         }
 

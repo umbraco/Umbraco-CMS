@@ -472,6 +472,11 @@ namespace Umbraco.Core
                 string message;
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
+
+                // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
+                // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
+
+                /*                
                 var supportsCaseInsensitiveQueries = SqlSyntaxContext.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);
                 if (supportsCaseInsensitiveQueries  == false)
                 {
@@ -484,8 +489,9 @@ namespace Umbraco.Core
 
                     return new Result { Message = message, Success = false, Percentage = "15" };
                 }
+                */
 
-                message = GetResultMessageForMySql(supportsCaseInsensitiveQueries);
+                message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
@@ -536,9 +542,9 @@ namespace Umbraco.Core
                 LogHelper.Info<DatabaseContext>("Database upgrade started");
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
-                var supportsCaseInsensitiveQueries = SqlSyntaxContext.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);                
+                //var supportsCaseInsensitiveQueries = SqlSyntaxContext.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);                
 
-                var message = GetResultMessageForMySql(supportsCaseInsensitiveQueries);
+                var message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
@@ -565,6 +571,23 @@ namespace Umbraco.Core
             }
         }
 
+        private string GetResultMessageForMySql()
+        {
+            if (SqlSyntaxContext.SqlSyntaxProvider.GetType() == typeof(MySqlSyntaxProvider))
+            {
+                return "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
+                       "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
+                       "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
+                       "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                       "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
+                       "<pre>lower_case_table_names=1</pre><br />" +
+                       "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                       "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+            }
+            return string.Empty;
+        }
+
+        /*
         private string GetResultMessageForMySql(bool? supportsCaseInsensitiveQueries)
         {
             if (supportsCaseInsensitiveQueries == null)
@@ -588,7 +611,7 @@ namespace Umbraco.Core
                        "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
             }
             return string.Empty;
-        }
+        }*/
 
         private Attempt<Result> CheckReadyForInstall()
         {

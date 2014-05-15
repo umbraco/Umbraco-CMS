@@ -44,7 +44,6 @@ namespace Umbraco.Core.Persistence.Factories
                 ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty,
                 ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty,
                 ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty,
-                UmbracoProperties = new List<UmbracoEntity.UmbracoProperty>()
             };
 
             var publishedVersion = default(Guid);            
@@ -87,7 +86,6 @@ namespace Umbraco.Core.Persistence.Factories
                                  ContentTypeAlias = dto.Alias ?? string.Empty,
                                  ContentTypeIcon = dto.Icon ?? string.Empty,
                                  ContentTypeThumbnail = dto.Thumbnail ?? string.Empty,
-                                 UmbracoProperties = new List<UmbracoEntity.UmbracoProperty>()
                              };
 
             entity.IsPublished = dto.PublishedVersion != default(Guid) || (dto.NewestVersion != default(Guid) && dto.PublishedVersion == dto.NewestVersion);
@@ -98,12 +96,13 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 foreach (var propertyDto in dto.UmbracoPropertyDtos)
                 {
-                    entity.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty
-                                                      {
-                                                          PropertyEditorAlias =
-                                                              propertyDto.PropertyEditorAlias,
-                                                          Value = propertyDto.UmbracoFile
-                                                      });
+                    entity.AdditionalData[propertyDto.PropertyAlias] = new UmbracoEntity.EntityProperty
+                    {
+                        PropertyEditorAlias = propertyDto.PropertyEditorAlias,
+                        Value = propertyDto.NTextValue.IsNullOrWhiteSpace()
+                            ? propertyDto.NVarcharValue
+                            : propertyDto.NTextValue.ConvertToJsonIfPossible()
+                    };
                 }
             }
 

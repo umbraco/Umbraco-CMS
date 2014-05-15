@@ -55,7 +55,8 @@ namespace Umbraco.Tests
                 new Mock<IUserService>().Object,
             new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
-                new Mock<ITagService>().Object);
+                new Mock<ITagService>().Object,
+                new Mock<INotificationService>().Object);
             Assert.Pass();
         }
 
@@ -99,7 +100,8 @@ namespace Umbraco.Tests
                     new Mock<IUserService>().Object,
                     new Mock<ISectionService>().Object,
                     new Mock<IApplicationTreeService>().Object,
-                    new Mock<ITagService>().Object),
+                    new Mock<ITagService>().Object,
+                    new Mock<INotificationService>().Object),
                 CacheHelper.CreateDisabledCacheHelper());
             
             Assert.Pass();

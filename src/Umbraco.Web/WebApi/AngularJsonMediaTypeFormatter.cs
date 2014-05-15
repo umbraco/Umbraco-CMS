@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi
@@ -19,6 +20,7 @@ namespace Umbraco.Web.WebApi
     /// </remarks>
     public class AngularJsonMediaTypeFormatter : JsonMediaTypeFormatter
     {
+
         /// <summary>
         /// This will prepend the special chars to the stream output that angular will strip
         /// </summary>
@@ -28,42 +30,23 @@ namespace Umbraco.Web.WebApi
         /// <param name="content"></param>
         /// <param name="transportContext"></param>
         /// <returns></returns>
-        public async override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
+        public override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
         {
-            
-            using (var memStream = new MemoryStream())
+
+            if (type == null) throw new ArgumentNullException("type");
+            if (writeStream == null) throw new ArgumentNullException("writeStream");
+
+            var effectiveEncoding = SelectCharacterEncoding(content == null ? null : content.Headers);
+
+            using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding))
             {
-                try
-                {
-                    //Let the base class do all the processing using our custom stream
-                    await base.WriteToStreamAsync(type, value, memStream, content, transportContext);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<AngularJsonMediaTypeFormatter>("An error occurred writing to the output stream", ex);
-                    throw;
-                }
-
-                memStream.Flush();
-                memStream.Position = 0;
-
-                //read the result string from the stream
+                //write the special encoding for angular json to the start
                 // (see: http://docs.angularjs.org/api/ng.$http)
-                string output;
-                using (var reader = new StreamReader(memStream))
-                {
-                    output = reader.ReadToEnd();
-                }
-
-                //pre-pend the angular chars to the result
-                output = ")]}',\n" + output;
-
-                //write out the result to the original stream
-                using (var writer = new StreamWriter(writeStream))
-                {
-                    writer.Write(output);
-                }
+                streamWriter.Write(")]}',\n");
+                streamWriter.Flush();
+                return base.WriteToStreamAsync(type, value, writeStream, content, transportContext);
             }
+
             
         }
 

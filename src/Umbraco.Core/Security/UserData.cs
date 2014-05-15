@@ -8,7 +8,7 @@ namespace Umbraco.Core.Security
     /// </summary>
     [DataContract(Name = "userData", Namespace = "")]
     [Serializable]
-    internal class UserData
+    public class UserData
     {
         public UserData()
         {

@@ -691,6 +691,177 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         }
 
+        [Test]
+        public void Can_Get_Tagged_Entities_For_Tag_Group()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+
+                var content2 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
+
+                var mediaType = MockedContentTypes.CreateImageMediaType("image2");
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                unitOfWork.Commit();
+                var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
+                mediaRepository.AddOrUpdate(media1);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
+
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
+
+                    repository.AssignTagsToProperty(
+                        media1.Id,
+                        mediaType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"}
+                            }, false);
+
+                    var contentTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test").ToArray();
+                    //there are two content items tagged against the 'test' group
+                    Assert.AreEqual(2, contentTestIds.Count());
+                    //there are a total of two property types tagged against the 'test' group
+                    Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 2 tags tagged against the 'test' group
+                    Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+
+                    var contentTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test1").ToArray();
+                    //there are two content items tagged against the 'test1' group
+                    Assert.AreEqual(2, contentTest1Ids.Count());
+                    //there are a total of two property types tagged against the 'test1' group
+                    Assert.AreEqual(2, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 1 tags tagged against the 'test1' group
+                    Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+
+                    var mediaTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test");
+                    Assert.AreEqual(1, mediaTestIds.Count());
+
+                    var mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
+                    Assert.AreEqual(1, mediaTest1Ids.Count());
+                }
+            }
+
+        }
+
+        [Test]
+        public void Can_Get_Tagged_Entities_For_Tag()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+
+                var content2 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
+
+                var mediaType = MockedContentTypes.CreateImageMediaType("image2");
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                unitOfWork.Commit();
+                var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
+                mediaRepository.AddOrUpdate(media1);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
+
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                            }, false);
+
+                    repository.AssignTagsToProperty(
+                        media1.Id,
+                        mediaType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"}
+                            }, false);
+
+                    var contentTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").ToArray();
+                    //there are two content items tagged against the 'tag1' tag
+                    Assert.AreEqual(2, contentTestIds.Count());
+                    //there are a total of two property types tagged against the 'tag1' tag
+                    Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 1 tags since we're only looking against one tag
+                    Assert.AreEqual(1, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+
+                    var contentTest1Ids = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag3").ToArray();
+                    //there are 1 content items tagged against the 'tag3' tag
+                    Assert.AreEqual(1, contentTest1Ids.Count());
+                    //there are a total of two property types tagged against the 'tag3' tag
+                    Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 1 tags since we're only looking against one tag
+                    Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+
+                    var mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
+                    Assert.AreEqual(1, mediaTestIds.Count());
+                    
+                }
+            }
+
+        }
+
         private ContentRepository CreateContentRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);

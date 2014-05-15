@@ -1159,47 +1159,6 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, c));
                     uow.Commit();
 
-                    //Special case for the Upload DataType
-                    //TODO: Should we handle this with events?
-                    //TODO: This really shouldn't be here! What about the cropper in v7, we'll have the same issue.
-
-                    if (content.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
-                    {
-                        bool isUpdated = false;
-                        var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-
-                        //Loop through properties to check if the content contains media that should be deleted
-                        foreach (var property in content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
-                                                                               && string.IsNullOrEmpty(x.Value.ToString()) == false))
-                        {
-                            if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
-                            {
-                                var currentPath = fs.GetRelativePath(property.Value.ToString());
-                                var propertyId = copy.Properties.First(x => x.Alias == property.Alias).Id;
-                                var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
-
-                                fs.CopyFile(currentPath, newPath);
-                                copy.SetValue(property.Alias, fs.GetUrl(newPath));
-
-                                //Copy thumbnails
-                                foreach (var thumbPath in fs.GetThumbnails(currentPath))
-                                {
-                                    var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
-                                    fs.CopyFile(thumbPath, newThumbPath);
-                                }
-                                isUpdated = true;
-                            }
-                        }
-
-                        if (isUpdated)
-                        {
-                            repository.AddOrUpdate(copy);
-                            //add or update a preview
-                            repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, c));
-                            uow.Commit();
-                        }
-                    }
-
                     //TODO: Move this to the repository layer in a single transaction!
                     //Special case for the associated tags
                     var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
@@ -1210,7 +1169,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //NOTE This 'Relation' part should eventually be delegated to a RelationService
-                //TODO: This should be party of a single commit
+                //TODO: This should be part of a single commit
                 if (relateToOriginal)
                 {
                     IRelationType relationType = null;

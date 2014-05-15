@@ -1,8 +1,19 @@
 <div ng-controller="Umbraco.PropertyEditors.TagsController" class="umb-editor umb-tags">
-		<span ng-repeat="tag in currentTags" ng-click="removeTag(tag)" class="label label-primary tag">{{tag}} <i class="icon icon-delete"></i></span>
-		
-		<input type="text" 
-			ng-keydown="addTag($event)" 
-			placeholder="Type to add tags.." 
-			ng-model="tagToAdd"  />
+    
+    <div ng-if="isLoading">
+        Loading...
+    </div>
+
+    <ng-form>
+        <div ng-if="!isLoading">
+            <span ng-repeat="tag in currentTags" ng-click="removeTag(tag)" class="label label-primary tag">{{tag}} <i class="icon icon-delete"></i></span>
+
+            <input type="text"
+                   class="typeahead tags-{{model.alias}}"
+                   ng-keydown="addTag($event)"
+                   placeholder="Type to add tags.."
+                   ng-model="tagToAdd" />
+        </div>
+    </ng-form>    
+    
 </div>

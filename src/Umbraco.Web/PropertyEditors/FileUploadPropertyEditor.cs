@@ -31,8 +31,12 @@ namespace Umbraco.Web.PropertyEditors
         static FileUploadPropertyEditor()
         {
             MediaService.Saving += MediaServiceSaving;
-            MediaService.Creating += MediaServiceCreating;
+            MediaService.Created += MediaServiceCreating;
+
+            ContentService.Copied += ContentServiceCopied;
         }
+
+        
 
         /// <summary>
         /// Creates our custom value editor
@@ -48,6 +52,50 @@ namespace Umbraco.Web.PropertyEditors
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new FileUploadPreValueEditor();
+        }
+
+        /// <summary>
+        /// After the content is copied we need to check if there are files that also need to be copied
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        {
+            if (e.Original.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
+            {
+                bool isUpdated = false;
+                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
+                //Loop through properties to check if the content contains media that should be deleted
+                foreach (var property in e.Original.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
+                    && x.Value != null                                                   
+                    && string.IsNullOrEmpty(x.Value.ToString()) == false))
+                {
+                    if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                    {
+                        var currentPath = fs.GetRelativePath(property.Value.ToString());
+                        var propertyId = e.Copy.Properties.First(x => x.Alias == property.Alias).Id;
+                        var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
+
+                        fs.CopyFile(currentPath, newPath);
+                        e.Copy.SetValue(property.Alias, fs.GetUrl(newPath));
+
+                        //Copy thumbnails
+                        foreach (var thumbPath in fs.GetThumbnails(currentPath))
+                        {
+                            var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
+                            fs.CopyFile(thumbPath, newThumbPath);
+                        }
+                        isUpdated = true;
+                    }
+                }
+
+                if (isUpdated)
+                {
+                    //need to re-save the copy with the updated path value
+                    sender.Save(e.Copy);
+                }
+            }
         }
 
         static void MediaServiceCreating(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)

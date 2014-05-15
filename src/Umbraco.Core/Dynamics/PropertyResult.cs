@@ -6,12 +6,12 @@ namespace Umbraco.Core.Dynamics
 {
 	internal class PropertyResult : IPublishedProperty, IHtmlString
 	{
-	    private readonly IPublishedProperty _source;
+        private readonly IPublishedProperty _source;
 	    private readonly string _alias;
 	    private readonly object _value;
         private readonly PropertyResultType _type;
 
-		internal PropertyResult(IPublishedProperty source, PropertyResultType type)
+        internal PropertyResult(IPublishedProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
             
