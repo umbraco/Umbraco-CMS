@@ -185,10 +185,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null)
         {
-            //ensure that we html encode any comma's so they are found!
-            // http://issues.umbraco.org/issue/U4-4741
-            var replaced = tag.Replace(",", "&#44;");
-
             var nodeObjectType = GetNodeObjectType(objectType);
 
             var sql = new Sql()
@@ -203,7 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType)
-                .Where<TagDto>(dto => dto.Tag == replaced);
+                .Where<TagDto>(dto => dto.Tag == tag);
 
             if (tagGroup.IsNullOrWhiteSpace() == false)
             {
@@ -289,7 +285,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (group.IsNullOrWhiteSpace() == false)
             {
                 sql = sql.Where<TagDto>(dto => dto.Group == group);
-            }  
+            }
 
             var factory = new TagFactory();
 
@@ -333,7 +329,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: There's some very clever logic in the umbraco.cms.businesslogic.Tags.Tag to insert tags where they don't exist, 
             // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up 
             // with quite a few additional queries.
-            
+
             //do all this in one transaction
             using (var trans = Database.GetTransaction())
             {
@@ -401,7 +397,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags)
         {
             var tagSetSql = GetTagSet(tags);
-            
+
             var deleteSql = string.Concat("DELETE FROM cmsTagRelationship WHERE nodeId = ",
                                           contentId,
                                           " AND propertyTypeId = ",
@@ -446,11 +442,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var array = tagsToInsert
                 .Select(tag =>
                     string.Format("select '{0}' as Tag, '{1}' as [Group]",
-                        PetaPocoExtensions.EscapeAtSymbols(
-                            tag.Text
-                                .Replace("'", "''")         //NOTE: I'm not sure about this apostrophe replacement but it's been like that for a long time
-                                .Replace(",", "&#44;")),    //NOTE: We need to replace commas with html encoded ones: http://issues.umbraco.org/issue/U4-4741
-                        tag.Group))
+                        PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
                 .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
         }
