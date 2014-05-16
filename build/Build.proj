@@ -325,7 +325,7 @@
       Regex="CurrentComment { get { return &quot;([a-zA-Z]+)?&quot;"
       ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
 	
-	<XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.targets"
+	<XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"
              Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
 			 Query="//x:UmbracoVersion"
 			 Value="$(NewVersion)" />
