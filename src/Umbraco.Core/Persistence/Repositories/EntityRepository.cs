@@ -493,14 +493,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 // Is this the same UmbracoEntity as the current one we're processing
                 if (Current != null && Current.Key == a.uniqueID)
                 {
-                    // Add this UmbracoProperty to the current additional data
-                    Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
+                    if (p != null && p.PropertyAlias.IsNullOrWhiteSpace() == false)
                     {
-                        PropertyEditorAlias = p.PropertyEditorAlias,
-                        Value = p.NTextValue.IsNullOrWhiteSpace() 
-                            ? p.NVarcharValue 
-                            : p.NTextValue.ConvertToJsonIfPossible()
-                    };
+                        // Add this UmbracoProperty to the current additional data
+                        Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
+                        {
+                            PropertyEditorAlias = p.PropertyEditorAlias,
+                            Value = p.NTextValue.IsNullOrWhiteSpace()
+                                ? p.NVarcharValue
+                                : p.NTextValue.ConvertToJsonIfPossible()
+                        };    
+                    }
 
                     // Return null to indicate we're not done with this UmbracoEntity yet
                     return null;
@@ -516,14 +519,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 
                 Current = _factory.BuildEntityFromDynamic(a);
 
-                //add the property/create the prop list if null
-                Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
+                if (p != null && p.PropertyAlias.IsNullOrWhiteSpace() == false)
                 {
-                    PropertyEditorAlias = p.PropertyEditorAlias,
-                    Value = p.NTextValue.IsNullOrWhiteSpace()
-                        ? p.NVarcharValue
-                        : p.NTextValue.ConvertToJsonIfPossible()
-                };
+                    //add the property/create the prop list if null
+                    Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
+                    {
+                        PropertyEditorAlias = p.PropertyEditorAlias,
+                        Value = p.NTextValue.IsNullOrWhiteSpace()
+                            ? p.NVarcharValue
+                            : p.NTextValue.ConvertToJsonIfPossible()
+                    };
+                }
 
                 // Return the now populated previous UmbracoEntity (or null if first time through)
                 return prev;
