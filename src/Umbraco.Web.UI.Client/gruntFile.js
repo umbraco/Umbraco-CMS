@@ -141,10 +141,7 @@ module.exports = function (grunt) {
 
       tuning: {
           files: [
-              {
-                  dest: 'preview/index.html',
-                  src: 'src/tuning/index.html'
-              },
+              { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/tuning' },
               { dest: '<%= distdir %>/assets/less', src: 'tuning.lessParameters.less', expand: true, cwd: 'src/tuning' },
               { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
               { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
