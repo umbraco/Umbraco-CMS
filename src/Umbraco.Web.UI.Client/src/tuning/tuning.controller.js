@@ -131,6 +131,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Save all parameter in tuningParameters.less file
     $scope.saveLessParameters = function () {
+
         var parameters = [];
         $.each($scope.tuningModel.categories, function (indexCategory, category) {
             $.each(category.sections, function (indexSection, section) {
@@ -168,13 +169,15 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
             return $.param(result);
         }
 
+        $('.btn-default-save').attr("disabled", true); 
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
         $http.post('/Umbraco/Api/tuning/PostLessParameters', resultParameters, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
             transformRequest: transform
         })
         .success(function (data) {
-            alert("Change saved !");
+            $('.btn-default-save').attr("disabled", false);
+            $('#speechbubble').fadeIn('slow').delay(5000).fadeOut('slow');
         });
 
     }
