@@ -152,6 +152,7 @@ namespace Umbraco.Tests.Models
             }
             Assert.AreNotSame(clone.PropertyTypes, contentType.PropertyTypes);
             Assert.AreEqual(clone.PropertyTypes.Count(), contentType.PropertyTypes.Count());
+            Assert.AreEqual(0, ((ContentTypeBase)clone).NonGroupedPropertyTypes.Count());
             for (var index = 0; index < contentType.PropertyTypes.Count(); index++)
             {
                 Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));

@@ -128,9 +128,9 @@ namespace Umbraco.Core.Persistence.Caching
         public void Save(Type type, IEntity entity)
         {
             //IMPORTANT: we must clone to store, see: http://issues.umbraco.org/issue/U4-4259
-            entity = (IEntity)entity.DeepClone();
+            var clone = (IEntity)entity.DeepClone();
 
-            var key = GetCompositeId(type, entity.Id);
+            var key = GetCompositeId(type, clone.Id);
             
             _keyTracker.TryAdd(key);
 
@@ -139,11 +139,11 @@ namespace Umbraco.Core.Persistence.Caching
 
             if (_memoryCache != null)
             {
-                _memoryCache.Set(key, entity, new CacheItemPolicy { SlidingExpiration = TimeSpan.FromMinutes(5) });
+                _memoryCache.Set(key, clone, new CacheItemPolicy { SlidingExpiration = TimeSpan.FromMinutes(5) });
             }
             else
             {
-                HttpRuntime.Cache.Insert(key, entity, null, System.Web.Caching.Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(5));
+                HttpRuntime.Cache.Insert(key, clone, null, System.Web.Caching.Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(5));
             }
         }
 

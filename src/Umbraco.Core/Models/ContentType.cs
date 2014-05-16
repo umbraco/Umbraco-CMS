@@ -133,29 +133,6 @@ namespace Umbraco.Core.Models
                 Key = Guid.NewGuid();
         }
 
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
-        }
-
-        public override object DeepClone()
-        {
-            var clone = (ContentType)base.DeepClone();
-            var propertyGroups = PropertyGroups.Select(x => (PropertyGroup)x.DeepClone()).ToList();
-            clone.PropertyGroups = new PropertyGroupCollection(propertyGroups);
-            //set the property types that are not part of a group
-            clone.PropertyTypes = PropertyTypeCollection
-                .Where(x => x.PropertyGroupId == null)
-                .Select(x => (PropertyType)x.DeepClone()).ToList();
-
-            clone.ResetDirtyProperties(false);
-
-            return clone;
-        }
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
