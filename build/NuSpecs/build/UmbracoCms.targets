@@ -30,6 +30,9 @@
       <CustomFilesToInclude Include=".\Config\Splashes\**\*">
         <Dir>Config\Splashes</Dir>
       </CustomFilesToInclude>
+      <CustomFilesToInclude Include=".\data\**\*">
+        <Dir>data</Dir>
+      </CustomFilesToInclude>
       <CustomFilesToInclude Include=".\umbraco\**\*">
         <Dir>umbraco</Dir>
       </CustomFilesToInclude>
