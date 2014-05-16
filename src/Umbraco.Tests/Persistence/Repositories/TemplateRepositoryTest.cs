@@ -144,9 +144,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
             var contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var contentRepo = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+            var contentRepo = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, CacheHelper.CreateDisabledCacheHelper());
 
             using (contentRepo)
             {

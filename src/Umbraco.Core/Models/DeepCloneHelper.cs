@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models
             var refProperties = inputType.GetProperties()
                 .Where(x =>
                     //is not attributed with the ignore clone attribute
-                    x.GetCustomAttribute<DoNotCloneAttribute>() == null
+                    Attribute.GetCustomAttribute(x, typeof(DoNotCloneAttribute)) == null
                     //reference type but not string
                     && x.PropertyType.IsValueType == false && x.PropertyType != typeof (string)
                         //settable
