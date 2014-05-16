@@ -10,9 +10,13 @@
 
 <body id="tuningPanel" ng-controller="Umbraco.tuningController">
 
-    <div class="loading" ng-show="!frameLoaded">Loading ...</div>
+    <div class="wait" ng-show="!frameLoaded">Loading ...</div>
 
-    <div class="tuning" ng-show="frameLoaded">
+    <div id="demo-iframe-wrapper" ng-show="frameLoaded" class="{{previewDevice.css}}">
+        <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
+    </div>
+
+    <div class="tuning" style="display:none" ng-class="{show:frameLoaded}">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
@@ -63,10 +67,15 @@
                             <div ng-repeat="section in category.sections">
 
                                 <accordion close-others="true">
-                                    <accordion-group ng-repeat="subSection in section.subSections" is-open="(schemaFocus != '' && schemaFocus == subSection.schema.toLowerCase())">
+
+                                    <accordion-group ng-repeat="subSection in section.subSections"
+                                                     ng-class="{true:'selected', false:''}[isOpen]"
+                                                     is-open="(schemaFocus != '' && schemaFocus == subSection.schema.toLowerCase())">
 
                                         <accordion-heading>
-                                            <span ng-click="accordionOpened(subSection.name)" ng-mouseover="accordionWillBeOpened(subSection.name)">{{subSection.name}}</span>
+                                            <span ng-click="accordionOpened(subSection.name)" ng-mouseover="accordionWillBeOpened(subSection.name)">
+                                                {{subSection.name}}
+                                            </span>
                                         </accordion-heading>
 
                                         <div class="div-field" ng-repeat="field in subSection.fields">
@@ -143,22 +152,15 @@
 
                 <div ng-show="settingIsOpen == 'presetColors'">
 
-                    <tabset vertical="false">
-
-                        <tab heading="Preset colors">
-
-                            <ul class="palette">
-                                <li ng-click="refreshtuningByPalette(palette.colors)" ng-repeat="palette in tuningPalette">
-                                    <div>
-                                        <span style="background-color: {{ palette.mainColor }}"></span>
-                                    </div>
-                                    <p>{{ palette.name }}</p>
-                                </li>
-                            </ul>
-
-                        </tab>
-
-                    </tabset>
+                    <h2>PALETTE COLORS</h2>
+                    <ul class="palette">
+                        <li ng-click="refreshtuningByPalette(palette.colors)" ng-repeat="palette in tuningPalette">
+                            <div>
+                                <span style="background-color: {{ palette.mainColor }}"></span>
+                            </div>
+                            <p>{{ palette.name }}</p>
+                        </li>
+                    </ul>
 
                     <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
 
@@ -206,10 +208,6 @@
 
         </div>
 
-    </div>
-
-    <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
-        <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>

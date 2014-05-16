@@ -101,6 +101,10 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         document.getElementById("resultFrame").contentWindow.closeIntelTuning($scope.tuningModel);
     }
 
+    var setSelectedSchema = function (schema) {
+        document.getElementById("resultFrame").contentWindow.setSelectedSchema(schema);
+    }
+
     // Refresh with selected tuning palette
     $scope.refreshtuningByPalette = function (colors) {
 
@@ -254,9 +258,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $scope.schemaFocus = schema;
     }
 
-    // Accordion open event
+    // Focus schema in front
     $scope.accordionWillBeOpened = function (schema) {
-        $scope.futurSchemaFocus = schema;
+        setSelectedSchema(schema);
     }
 
     // Preload of the google font

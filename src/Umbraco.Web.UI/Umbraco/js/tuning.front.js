@@ -7,6 +7,11 @@ var refrechLayout = function (parameters) {
     eval(string);
 }
 
+var setSelectedSchema = function (schema) {
+    $("[tuning-over]").css('outline', 'none');
+    $(schema).css('outline', '2px solid blue');
+}
+
 var closeIntelTuning = function (tuningModel) {
 
     if (tuningModel) {
