@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     /// Most legacy property editors won't support the dictionary format but new property editors should always use the dictionary format.
     /// In order to get overrideable pre-values working we need a dictionary since we'll have to reference a pre-value by a key.
     /// </remarks>
-    public class PreValueCollection
+    public class PreValueCollection : IDeepCloneable
     {
         private IDictionary<string, PreValue> _preValuesAsDictionary;
         private IEnumerable<PreValue> _preValuesAsArray;
@@ -81,6 +81,22 @@ namespace Umbraco.Core.Models
                 result.Add(i.ToInvariantString(), asArray[i]);
             }
             return result;
+        }
+
+        public object DeepClone()
+        {
+            var clone = (PreValueCollection) MemberwiseClone();
+            if (_preValuesAsArray != null)
+            {
+                clone._preValuesAsArray = _preValuesAsArray.Select(x => (PreValue)x.DeepClone()).ToArray();    
+            }
+            if (_preValuesAsDictionary != null)
+            {
+                clone._preValuesAsDictionary = _preValuesAsDictionary.ToDictionary(x => x.Key, x => (PreValue)x.Value.DeepClone());    
+            }
+            
+
+            return clone;
         }
     }
 }

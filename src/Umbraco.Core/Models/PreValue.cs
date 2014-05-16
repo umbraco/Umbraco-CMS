@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a stored pre-value field value
     /// </summary>
-    public class PreValue
+    public class PreValue : IDeepCloneable
     {
         public PreValue(int id, string value, int sortOrder)
         {
@@ -37,5 +37,12 @@
         /// The sort order stored for the pre-value field value
         /// </summary>
         public int SortOrder { get; private set; }
+
+        public virtual object DeepClone()
+        {
+            //Memberwise clone on PreValue will work since it doesn't have any deep elements
+            var clone = (PreValue)MemberwiseClone();            
+            return clone;
+        }
     }
 }

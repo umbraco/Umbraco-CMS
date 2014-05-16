@@ -191,6 +191,7 @@
     <Compile Include="Models\LanguageTests.cs" />
     <Compile Include="Models\MemberGroupTests.cs" />
     <Compile Include="Models\MemberTests.cs" />
+    <Compile Include="Models\PreValueCollectionTests.cs" />
     <Compile Include="Models\PropertyGroupTests.cs" />
     <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
