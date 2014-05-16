@@ -146,7 +146,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetByIds",
                        query)),
-               'Failed to retreive entity data for ids ' + ids);
+               'Failed to retrieve entity data for ids ' + ids);
         },
 
         /**
@@ -192,7 +192,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetAll",
                        query)),
-               'Failed to retreive entity data for type ' + type);
+               'Failed to retrieve entity data for type ' + type);
         },
 
         /**
@@ -215,7 +215,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetAncestors",
                        [{id: id}, {type: type}])),
-               'Failed to retreive ancestor data for id ' + id);
+               'Failed to retrieve ancestor data for id ' + id);
         },
         
         /**
@@ -238,7 +238,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetChildren",
                        [{ id: id }, { type: type }])),
-               'Failed to retreive child data for id ' + id);
+               'Failed to retrieve child data for id ' + id);
         },
      
         /**
@@ -271,7 +271,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "Search",
                        [{ query: query }, {type: type}])),
-               'Failed to retreive entity data for query ' + query);
+               'Failed to retrieve entity data for query ' + query);
         },
         
 
@@ -304,7 +304,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "SearchAll",
                        [{ query: query }])),
-               'Failed to retreive entity data for query ' + query);
+               'Failed to retrieve entity data for query ' + query);
         }
             
     };

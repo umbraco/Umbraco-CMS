@@ -93,7 +93,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                        "stylesheetApiBaseUrl",
                        "GetRulesByName",
                        [{ name: name }])),
-               'Failed to retreive stylesheets ');
+               'Failed to retrieve stylesheets ');
         }
     };
 }

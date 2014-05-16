@@ -72,7 +72,7 @@ function treeResource($q, $http, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(getTreeNodesUrl(options.node)),
-                'Failed to retreive data for child nodes ' + options.node.nodeId);
+                'Failed to retrieve data for child nodes ' + options.node.nodeId);
         }
     };
 }
