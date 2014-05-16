@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a stored pre-value field value
     /// </summary>
-    public class PreValue
+    public class PreValue : IDeepCloneable
     {
         public PreValue(int id, string value)
         {
@@ -25,5 +25,12 @@
         /// The database id for the pre-value field value
         /// </summary>
         public int Id { get; private set; }
+
+        public virtual object DeepClone()
+        {
+            //Memberwise clone on PreValue will work since it doesn't have any deep elements
+            var clone = (PreValue)MemberwiseClone();            
+            return clone;
+        }
     }
 }
