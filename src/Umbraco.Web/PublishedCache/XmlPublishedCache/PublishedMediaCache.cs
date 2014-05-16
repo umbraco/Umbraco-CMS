@@ -328,7 +328,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             //lets check if the alias does not exist on the document.
             //NOTE: Examine will not index empty values and we do not output empty XML Elements to the cache - either of these situations
             // would mean that the property is missing from the collection whether we are getting the value from Examine or from the library media cache.
-            if (dd.Properties.All(x => x.PropertyTypeAlias != alias))
+            if (dd.Properties.All(x => x.PropertyTypeAlias.InvariantEquals(alias) == false))
             {
                 return null;
             }
