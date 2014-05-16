@@ -2,11 +2,12 @@ using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class PropertyGroupTests
+    public class PropertyGroupTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone()
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Models
                         Alias = "test2",
                         CreateDate = DateTime.Now,
                         DataTypeDefinitionId = 6,
-                        DataTypeId = Guid.NewGuid(),
+                        PropertyEditorAlias = "propTest",
                         Description = "testing2",
                         Key = Guid.NewGuid(),
                         Mandatory = true,
@@ -118,7 +119,7 @@ namespace Umbraco.Tests.Models
                         Alias = "test2",
                         CreateDate = DateTime.Now,
                         DataTypeDefinitionId = 6,
-                        DataTypeId = Guid.NewGuid(),
+                        PropertyEditorAlias = "propTest",
                         Description = "testing2",
                         Key = Guid.NewGuid(),
                         Mandatory = true,
