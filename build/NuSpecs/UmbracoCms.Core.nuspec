@@ -67,5 +67,6 @@
         <file src="..\_BuildOutput\WebApp\bin\umbraco.XmlSerializers.dll" target="lib\umbraco.XmlSerializers.dll" />
         <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
         <file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
+		<file src="tools\install.core.ps1" target="tools\install.ps1" />
     </files>
 </package>
