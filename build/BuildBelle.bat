@@ -1,4 +1,5 @@
 @ECHO OFF
+SET release=%1
 ECHO Installing Npm NuGet Package
 
 SET nuGetFolder=%CD%\..\src\packages\
@@ -26,7 +27,7 @@ ECHO Do npm install and the grunt build of Belle
 call npm install
 call npm install -g grunt-cli
 call npm install -g bower
-call grunt build --buildversion=7.1.2
+call grunt build --buildversion=%release%
 
 ECHO Reset path to what it was before
 path=%oldPath%

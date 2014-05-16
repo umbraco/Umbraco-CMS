@@ -1,5 +1,9 @@
 @ECHO OFF
-SET release=7.1.3
+IF NOT EXIST UmbracoVersion.txt (
+	ECHO UmbracoVersion.txt missing!
+	GOTO :showerror
+) 
+SET /p release=<UmbracoVersion.txt
 SET comment=
 SET version=%release%
 
@@ -14,6 +18,11 @@ SET nuGetFolder=%CD%\..\src\packages\
 
 ECHO Removing the belle build folder to make sure everything is clean as a whistle
 RD ..\src\Umbraco.Web.UI.Client\build /Q /S
+
+ECHO Removing existing built files to make sure everything is clean as a whistle
+DEL /F /Q UmbracoCms.*.zip
+DEL /F /Q UmbracoCms.*.nupkg
+DEL /F /Q webpihash.txt
 
 ECHO Performing MSBuild and producing Umbraco binaries zip files
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
