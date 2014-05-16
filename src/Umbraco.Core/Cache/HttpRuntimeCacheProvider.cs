@@ -81,25 +81,36 @@ namespace Umbraco.Core.Cache
         {
             cacheKey = GetCacheKey(cacheKey);
 
+            // NOTE - because we don't know what getCacheItem does, how long it will take and whether it will hang,
+            // getCacheItem should run OUTSIDE of the global application lock else we run into lock contention and
+            // nasty performance issues.
+
+            // So.... we insert a Lazy<object> in the cache while holding the global application lock, and then rely
+            // on the Lazy lock to ensure that getCacheItem runs once and everybody waits on it, while the global
+            // application lock has been released.
+
+            // Note that this means we'll end up storing null values in the cache, whereas in the past we made sure
+            // not to store them. There's code below, commented out, to make sure we do re-compute the value if it
+            // was previously computed as null - effectively reproducing the past behavior - but I'm not quite sure
+            // it is a good idea.
+
+            Lazy<object> result;
+
             using (var lck = new UpgradeableReadLock(Locker))
             {
-                var result = DictionaryCache.Get(cacheKey);
-                if (result == null)
+                result = DictionaryCache.Get(cacheKey) as Lazy<object>;
+                if (result == null /* || (result.IsValueCreated && result.Value == null) */)
                 {
                     lck.UpgradeToWriteLock();
 
-                    result = getCacheItem();
-                    if (result != null)
-                    {                        
-                        var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
-                        var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
-
-                        _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
-                    }
-
+                    result = new Lazy<object>(getCacheItem);
+                    var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
+                    var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
+                    _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
-                return result;
             }
+
+            return result.Value;
         }
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
@@ -124,8 +135,11 @@ namespace Umbraco.Core.Cache
         /// <param name="dependency"></param>
         internal void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
         {
-            var result = getCacheItem();
-            if (result == null) return;
+            // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
+            // and make sure we don't store a null value. Though I'm not sure it is a good idea.
+
+            var result = new Lazy<object>(getCacheItem);
+            //if (result.Value == null) return;
 
             cacheKey = GetCacheKey(cacheKey);           
 

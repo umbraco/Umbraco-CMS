@@ -141,32 +141,35 @@ namespace Umbraco.Core.Cache
             CacheItemRemovedCallback removedCallback = null, 
             string[] dependentFiles = null)
         {
+            // see notes in HttpRuntimeCacheProvider
+
+            Lazy<object> result;
+
             using (var lck = new UpgradeableReadLock(Locker))
             {
-                var result = MemoryCache.Get(cacheKey);
-                if (result == null)
+                result = MemoryCache.Get(cacheKey) as Lazy<object>;
+                if (result == null /* || (result.IsValueCreated && result.Value == null) */)
                 {
                     lck.UpgradeToWriteLock();
 
-                    result = getCacheItem();
-                    if (result != null)
-                    {
-                        var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
-                        MemoryCache.Set(cacheKey, result, policy);
-                    }
+                    result = new Lazy<object>(getCacheItem);
+                    var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+                    MemoryCache.Set(cacheKey, result, policy);
                 }
-                return result;
             }
+
+            return result.Value;
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            object result = getCacheItem();
-            if (result != null)
-            {
-                var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
-                MemoryCache.Set(cacheKey, result, policy);
-            }
+            // see notes in HttpRuntimeCacheProvider
+
+            var result = new Lazy<object>(getCacheItem);
+            //if (result.Value == null) return;
+
+            var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            MemoryCache.Set(cacheKey, result, policy);
         }
 
         private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
