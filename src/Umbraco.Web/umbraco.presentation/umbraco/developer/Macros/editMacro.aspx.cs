@@ -322,8 +322,6 @@ namespace umbraco.cms.presentation.developer
 
         void Save_Click(object sender, EventArgs e)
         {
-            //disable the add validators
-            macroProperties.
 
             Page.Validate();
 
@@ -351,10 +349,14 @@ namespace umbraco.cms.presentation.developer
                 var macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
                 var prop = _macro.Properties.Single(x => x.Id == int.Parse(macroPropertyId.Value));
-                prop.Alias = macroElementAlias.Text.Trim();
-                prop.Name = macroElementName.Text.Trim();
-                prop.EditorAlias = macroElementType.SelectedValue;
-                prop.SortOrder = sort;
+                
+                _macro.Properties.UpdateProperty(
+                    prop.Alias,
+                    macroElementName.Text.Trim(),
+                    sort,
+                    macroElementType.SelectedValue,                    
+                    macroElementAlias.Text.Trim());
+
                 sort++;
             }
 

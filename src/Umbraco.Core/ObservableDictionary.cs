@@ -135,6 +135,28 @@ namespace Umbraco.Core
 
         }
 
+        /// <summary>
+        /// Allows us to change the key of an item
+        /// </summary>
+        /// <param name="currentKey"></param>
+        /// <param name="newKey"></param>
+        public virtual void ChangeKey(TKey currentKey, TKey newKey)
+        {
+            if (!Indecies.ContainsKey(currentKey))
+            {
+                throw new InvalidOperationException("No item with the key " + currentKey + "was found in the collection");
+            }
+            if (ContainsKey(newKey))
+            {
+                throw new DuplicateKeyException(newKey.ToString());
+            }
+
+            var currentIndex = Indecies[currentKey];
+
+            Indecies.Remove(currentKey);
+            Indecies.Add(newKey, currentIndex);
+        }
+
         internal class DuplicateKeyException : Exception
         {
 
