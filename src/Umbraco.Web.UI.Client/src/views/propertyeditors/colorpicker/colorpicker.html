@@ -6,7 +6,7 @@
 
     <ul class="thumbnails color-picker">
         <li ng-repeat="(key, val) in model.config.items" ng-class="{active: model.value === val}">
-            <a ng-click="selectItem(val)" class="thumbnail" hex-bg-color="{{val}}">
+            <a ng-click="toggleItem(val)" class="thumbnail" hex-bg-color="{{val}}">
 
             </a>
         </li>
