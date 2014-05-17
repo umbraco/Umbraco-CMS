@@ -165,9 +165,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
-            //update the sections if they've changed
+            //update the properties if they've changed
             var macro = (Macro)entity;
-            if (macro.IsPropertyDirty("Properties"))
+            if (macro.IsPropertyDirty("Properties") || macro.Properties.Any(x => x.IsDirty()))
             {
                 //now we need to delete any props that have been removed
                 foreach (var propAlias in macro.RemovedProperties)
@@ -188,7 +188,11 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                     else
                     {
-                        Database.Update(propDto);
+                        //only update if it's dirty
+                        if (macro.Properties[propDto.Alias].IsDirty())
+                        {
+                            Database.Update(propDto);    
+                        }
                     }
                 }
 
