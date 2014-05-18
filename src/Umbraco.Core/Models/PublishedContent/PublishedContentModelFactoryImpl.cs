@@ -12,13 +12,13 @@ namespace Umbraco.Core.Models.PublishedContent
         //private readonly Dictionary<string, ConstructorInfo> _constructors
         //    = new Dictionary<string, ConstructorInfo>();
 
-        private readonly Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors
-             = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>();
+        private readonly Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
 
         public PublishedContentModelFactoryImpl()
         {
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             var ctorArgTypes = new[] { typeof(IPublishedContent) };
+            var constructors = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>();
 
             foreach (var type in types)
             {
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
                 typeName = typeName.ToLowerInvariant();
 
-                if (_constructors.ContainsKey(typeName))
+                if (constructors.ContainsKey(typeName))
                     throw new InvalidOperationException(string.Format("More that one type want to be a model for content type {0}.", typeName));
 
                 // should work everywhere, but slow
@@ -44,12 +44,18 @@ namespace Umbraco.Core.Models.PublishedContent
                 var exprNew = Expression.New(constructor, exprArg);
                 var expr = Expression.Lambda<Func<IPublishedContent, IPublishedContent>>(exprNew, exprArg);
                 var func = expr.Compile();
-                _constructors[typeName] = func;
+                constructors[typeName] = func;
             }
+
+            _constructors = constructors.Count > 0 ? constructors : null;
         }
 
         public IPublishedContent CreateModel(IPublishedContent content)
         {
+            // fail fast
+            if (_constructors == null)
+                return content;
+
             // be case-insensitive
             var contentTypeAlias = content.DocumentTypeAlias.ToLowerInvariant();
 
