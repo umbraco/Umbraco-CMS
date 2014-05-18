@@ -221,7 +221,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
 
             var items = doc.Children
-                .Select(PublishedContentModelFactory.CreateModel) // linq, returns IEnumerable<IPublishedContent>
+                .Select(x => x.CreateModel2()) // linq, returns IEnumerable<IPublishedContent>
 
                 // only way around this is to make sure every IEnumerable<T> extension
                 // explicitely returns a PublishedContentSet, not an IEnumerable<T>
