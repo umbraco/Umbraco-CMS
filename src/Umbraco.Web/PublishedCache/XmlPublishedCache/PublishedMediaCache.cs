@@ -255,7 +255,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			                                      d => GetChildrenMedia(d.Id),
 			                                      GetProperty,
 			                                      true);
-		    return content.CreateModel2();
+		    return content.CreateModel();
 		}
 
 		internal IPublishedContent ConvertFromXPathNavigator(XPathNavigator xpath)
@@ -314,7 +314,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				d => GetChildrenMedia(d.Id, xpath),
 				GetProperty,
 				false);
-		    return content.CreateModel2();
+		    return content.CreateModel();
 		}
 
 		/// <summary>

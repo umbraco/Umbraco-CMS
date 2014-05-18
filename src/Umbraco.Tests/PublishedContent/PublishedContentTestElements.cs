@@ -32,7 +32,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public void Add(SolidPublishedContent content)
         {
-            _content[content.Id] = content.CreateModel2();
+            _content[content.Id] = content.CreateModel();
         }
 
         public void Clear()
