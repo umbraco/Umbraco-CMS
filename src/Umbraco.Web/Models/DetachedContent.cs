@@ -18,10 +18,7 @@ namespace Umbraco.Web.Models
         /// Such a detached content can be part of a published property value.</remarks>
         public DetachedContent(IEnumerable<IPublishedProperty> properties)
         {
-            var propsa = properties.ToArray();
-            if (propsa.Any(x => x.PropertyType.IsDetachedOrNested == false))
-                throw new ArgumentException("At least one property type is neither detached nor nested.", "properties");
-            _properties = propsa.ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
+            _properties = properties.ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
         }
 
         // don't uncomment until you know what you are doing
