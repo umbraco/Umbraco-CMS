@@ -550,7 +550,7 @@ namespace Umbraco.Core
 
         public static bool InvariantContains(this string compare, string compareTo)
         {
-            return compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;
+            return compare.IndexOf(compareTo, StringComparison.InvariantCultureIgnoreCase) >= 0;
         }
 
         public static bool InvariantContains(this IEnumerable<string> compare, string compareTo)
