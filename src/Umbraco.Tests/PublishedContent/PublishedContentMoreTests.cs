@@ -45,7 +45,7 @@ namespace Umbraco.Tests.PublishedContent
             PropertyValueConvertersResolver.Current =
                 new PropertyValueConvertersResolver();
             PublishedContentModelFactoryResolver.Current =
-                new PublishedContentModelFactoryResolver(new PublishedContentModelFactoryImpl());
+                new PublishedContentModelFactoryResolver(new PublishedContentModelFactory());
 
             base.FreezeResolution();
         }
