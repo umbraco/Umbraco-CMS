@@ -14,9 +14,22 @@ namespace Umbraco.Core.Models.PublishedContent
 
         private readonly Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
 
-        public PublishedContentModelFactory()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedContentModelFactory"/> class with types.
+        /// </summary>
+        /// <param name="types">The model types.</param>
+        /// <remarks>
+        /// <para>Types must implement <c>IPublishedContent</c> and have a unique constructor that
+        /// accepts one IPublishedContent as a parameter.</para>
+        /// <para>To activate,</para>
+        /// <code>
+        /// var types = PluginManager.Current.ResolveTypes{PublishedContentModel}();
+        /// var factory = new PublishedContentModelFactoryImpl(types);
+        /// PublishedContentModelFactoryResolver.Current.SetFactory(factory);
+        /// </code>
+        /// </remarks>
+        public PublishedContentModelFactory(IEnumerable<Type> types)
         {
-            var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             var ctorArgTypes = new[] { typeof(IPublishedContent) };
             var constructors = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>();
 
