@@ -4,7 +4,7 @@
 /*********************************************************************************************************/
 
 // tuning main app
-angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.slider'])
+angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services'])
 
 // panel main controller
 .controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout, $location) {
@@ -169,7 +169,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
             return $.param(result);
         }
 
-        $('.btn-default-save').attr("disabled", true); 
+        $('.btn-default-save').attr("disabled", true);
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
         $http.post('/Umbraco/Api/tuning/PostLessParameters', resultParameters, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
@@ -215,7 +215,13 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Open image picker modal
     $scope.open = function (field) {
+        $scope.data = {
+            newFolder: "",
+            modalField: field
+        };
+
         var modalInstance = $modal.open({
+            scope: $scope,
             templateUrl: 'myModalContent.html',
             controller: 'tuning.mediapickercontroller',
             resolve: {
@@ -287,24 +293,133 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 })
 
 // Image picker controller
-.controller('tuning.mediapickercontroller', function ($scope, $modalInstance, items, $http) {
+.controller('tuning.mediapickercontroller', function ($scope, $modalInstance, items, $http, mediaResource, umbRequestHelper, entityResource, mediaHelper) {
 
-    $scope.items = [];
+    if (mediaHelper && mediaHelper.registerFileResolver) {
+        mediaHelper.registerFileResolver("Umbraco.UploadField", function (property, entity, thumbnail) {
+            if (thumbnail) {
 
-    $http.get('/Umbraco/Api/tuning/GetBackGroundImage')
-            .success(function (data) {
-                $scope.items = data;
-            });
+                if (mediaHelper.detectIfImageByExtension(property.value)) {
+                    var thumbnailUrl = umbRequestHelper.getApiUrl(
+                        "imagesApiBaseUrl",
+                        "GetBigThumbnail",
+                        [{ originalImagePath: property.value }]);
 
-    $scope.selected = {
-        item: $scope.items[0]
+                    return thumbnailUrl;
+                }
+                else {
+                    return null;
+                }
+
+            }
+            else {
+                return property.value;
+            }
+        });
+    }
+
+    var modalFieldvalue = $scope.data.modalField.value;
+
+    $scope.currentFolder = {};
+    $scope.currentFolder.children = [];
+    $scope.currentPath = [];
+    $scope.startNodeId = -1;
+
+    $scope.options = {
+        url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
+        formData: {
+            currentFolder: $scope.startNodeId
+        }
     };
 
+    //preload selected item
+    $scope.selectedMedia = undefined;
+
+    $scope.submitFolder = function (e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            $scope.$parent.data.showFolderInput = false;
+
+            if ($scope.$parent.data.newFolder && $scope.$parent.data.newFolder != "") {
+                mediaResource
+                    .addFolder($scope.$parent.data.newFolder, $scope.currentFolder.id)
+                    .then(function (data) {
+                        $scope.$parent.data.newFolder = undefined;
+                        $scope.gotoFolder(data);
+                    });
+            }
+        }
+    };
+
+    $scope.gotoFolder = function (folder) {
+
+        if (!folder) {
+            folder = { id: $scope.startNodeId, name: "Media", icon: "icon-folder" };
+        }
+
+        if (folder.id > 0) {
+            var matches = _.filter($scope.currentPath, function (value, index) {
+                if (value.id == folder.id) {
+                    value.indexInPath = index;
+                    return value;
+                }
+            });
+
+            if (matches && matches.length > 0) {
+                $scope.currentPath = $scope.currentPath.slice(0, matches[0].indexInPath + 1);
+            }
+            else {
+                $scope.currentPath.push(folder);
+            }
+        }
+        else {
+            $scope.currentPath = [];
+        }
+
+        //mediaResource.rootMedia()
+        mediaResource.getChildren(folder.id)
+            .then(function (data) {
+                folder.children = data.items ? data.items : [];
+
+                angular.forEach(folder.children, function (child) {
+                    child.isFolder = child.contentTypeAlias == "Folder" ? true : false;
+
+                    if (!child.isFolder) {
+                        child.thumbnail = mediaHelper.resolveFile(child, true);
+                        child.image = mediaHelper.resolveFile(child, false);
+                    }
+                });
+
+                $scope.options.formData.currentFolder = folder.id;
+                $scope.currentFolder = folder;
+            });
+    };
+
+    $scope.iconFolder = "glyphicons-icon folder-open"
+
+    $scope.selectMedia = function (media) {
+
+        if (!media.isFolder) {
+            //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
+            $scope.selectedMedia = media;
+            $scope.data.modalField.value = "url(" + $scope.selectedMedia.image + ")";
+        }
+        else {
+            $scope.gotoFolder(media);
+        }
+    };
+
+    //default root item
+    if (!$scope.selectedMedia) {
+        $scope.gotoFolder();
+    }
+
     $scope.ok = function () {
-        $modalInstance.close($scope.selected.item);
+        $modalInstance.close($scope.data.modalField.value);
     };
 
     $scope.cancel = function () {
+        $scope.data.modalField.value = modalFieldvalue;
         $modalInstance.dismiss('cancel');
     };
 

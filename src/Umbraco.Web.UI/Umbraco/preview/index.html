@@ -89,7 +89,7 @@
 
                                             <div ng-if="field.type == 'bgImagePicker'" class="imagePickerPreviewContainer">
                                                 <div class="imagePickerPreview" ng-click="open(field)" style="background-image:{{ field.value }}">
-                                                    <i class="fa fa-plus"></i>
+                                                    <i class="icon icon-add"></i>
                                                 </div>
                                                 <i ng-if="field.value != ''" ng-click="removeField(field)" class="fa fa-times colorPickerDelete"></i>
                                             </div>
@@ -169,13 +169,28 @@
             </div>
 
             <script type="text/ng-template" id="myModalContent.html">
+                <div class="modal-header bodyTuningImagePicker ng-scope">
+                    <ul class="breadcrumb">
+                        <li ng-if="startNodeId == -1">
+                            <a href="" ng-click="gotoFolder()">Media</a>
+                        </li>
+
+                        <!-- ngRepeat: item in path -->
+                        <li ng-repeat="item in currentPath" class="ng-scope">
+                            <a ng-if="currentFolder.id == item.id" href="" ng-class="{disabled:currentFolder.id == item.id}">{{ item.name }}</a>
+                            <a ng-if="currentFolder.id != item.id" ng-click="gotoFolder(item)">{{ item.name }}</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="modal-body bodyTuningImagePicker">
                     <ul class="tuningImagePicker">
-                        <li ng-repeat="background in items.backgrounds">
-                            <h3>{{background.name}}</h3>
-                            <ul>
-                                <li ng-repeat="item in background.files">
-                                    <div class="image-preview" ng-class="{selected:selected.item==item}" ng-click="selected.item = item;" style="background-image:{{ item }}"></div>
+                        <li>
+                            <ul class="media-items">
+                                <li ng-repeat="child in currentFolder.children | orderBy:'isFolder':true">
+                                    <div ng-if="!child.isFolder" class=" media-preview" ng-class="{selected:selectedMedia.id == child.id}" ng-click="selectMedia(child)" style="background-image: url({{ child.thumbnail }})"></div>
+                                    <div ng-if="child.isFolder" class=" media-preview" ng-click="selectMedia(child)">
+                                        <i class="icon icon-folder folder"><p class="folder-name">{{child.name}}</p></i>
+                                    </div>
                                 </li>
                             </ul>
                         </li>
@@ -186,17 +201,6 @@
                     <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
                 </div>
             </script>
-
-
-
-
-
-
-
-
-
-
-
 
             <script type="text/ng-template" id="fontFamilyPickerModel.html">
 
