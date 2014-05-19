@@ -11,7 +11,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
-  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'concat:tuningLess']);
+  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'concat:tuningLess', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
@@ -170,7 +170,8 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
               { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
               { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
-              { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' }
+              { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
+              { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
       },
 
