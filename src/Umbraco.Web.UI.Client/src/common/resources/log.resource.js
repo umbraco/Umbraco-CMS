@@ -99,7 +99,7 @@ function logResource($q, $http, umbRequestHelper) {
                        "logApiBaseUrl",
                        "GetLog",
                        [{ logtype: type, sinceDate: since }])),
-               'Failed to retreive user data for id ' + id);
+               'Failed to retrieve user data for id ' + id);
         }
     };
 }

@@ -342,6 +342,9 @@ namespace umbraco
                                 }
                                 catch (Exception e)
                                 {
+                                    LogHelper.WarnWithException<macro>(
+                                        "Error loading partial view macro (View: " + Model.ScriptName + ")", true, e);
+
                                     renderFailed = true;
                                     Exceptions.Add(e);
                                     macroControl = handleError(e);
@@ -1666,6 +1669,12 @@ namespace umbraco
 
         public static string MacroContentByHttp(int PageID, Guid PageVersion, Hashtable attributes)
         {
+
+            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted)
+            {
+                return "<span style='color: red'>Cannot render macro content in the rich text editor when the application is running in a Partial Trust environment</span>";
+            }
+            
             string tempAlias = (attributes["macroalias"] != null)
                                    ? attributes["macroalias"].ToString()
                                    : attributes["macroAlias"].ToString();

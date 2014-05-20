@@ -21,28 +21,28 @@ namespace umbraco.cms.presentation.Trees
 {
 
     [Obsolete("This is no longer used and will be removed from the codebase in the future")]
-	public abstract class BaseMediaTree : BaseTree
-	{
+    public abstract class BaseMediaTree : BaseTree
+    {
         private User _user;
 
-		public BaseMediaTree(string application)
-			: base(application)
-		{
-						
-		}
+        public BaseMediaTree(string application)
+            : base(application)
+        {
 
-		/// <summary>
-		/// Returns the current User. This ensures that we don't instantiate a new User object 
-		/// each time.
-		/// </summary>
-		protected User CurrentUser
-		{
-			get
-			{
-				return (_user == null ? (_user = UmbracoEnsuredPage.CurrentUser) : _user);
-			}
-		}
-      		
+        }
+
+        /// <summary>
+        /// Returns the current User. This ensures that we don't instantiate a new User object 
+        /// each time.
+        /// </summary>
+        protected User CurrentUser
+        {
+            get
+            {
+                return (_user == null ? (_user = UmbracoEnsuredPage.CurrentUser) : _user);
+            }
+        }
+
         public override void RenderJS(ref StringBuilder Javascript)
         {
             if (!string.IsNullOrEmpty(this.FunctionToCall))
@@ -54,7 +54,7 @@ namespace umbraco.cms.presentation.Trees
             else if (!this.IsDialog)
             {
                 Javascript.Append(
-					@"
+                    @"
 function openMedia(id) {
 	" + ClientTools.Scripts.GetContentFrame() + ".location.href = 'editMedia.aspx?id=' + id;" + @"
 }
@@ -98,12 +98,12 @@ function openMedia(id) {
                 // to call so that is fine.
 
                 var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Media).ToArray();
-                
+
                 foreach (UmbracoEntity entity in entities)
                 {
                     var e = entity;
                     var xNode = PerformNodeRender(e.Id, entity.Name, e.HasChildren, e.ContentTypeIcon, e.ContentTypeAlias, () => GetLinkValue(e));
-                    
+
                     OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     if (xNode != null)
                     {
@@ -111,7 +111,7 @@ function openMedia(id) {
                         OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     }
                 }
-            }            
+            }
         }
 
         private XmlTreeNode PerformNodeRender(int nodeId, string nodeName, bool hasChildren, string icon, string contentTypeAlias, Func<string> getLinkValue)
@@ -164,28 +164,28 @@ function openMedia(id) {
 
             return xNode;
         }
-        
+
 
         /// <summary>
-		/// Returns the value for a link in WYSIWYG mode, by default only media items that have a 
-		/// DataTypeUploadField are linkable, however, a custom tree can be created which overrides
-		/// this method, or another GUID for a custom data type can be added to the LinkableMediaDataTypes
-		/// list on application startup.
-		/// </summary>
-		/// <param name="dd"></param>
-		/// <param name="nodeLink"></param>
-		/// <returns></returns>
+        /// Returns the value for a link in WYSIWYG mode, by default only media items that have a 
+        /// DataTypeUploadField are linkable, however, a custom tree can be created which overrides
+        /// this method, or another GUID for a custom data type can be added to the LinkableMediaDataTypes
+        /// list on application startup.
+        /// </summary>
+        /// <param name="dd"></param>
+        /// <param name="nodeLink"></param>
+        /// <returns></returns>
         public virtual string GetLinkValue(Media dd, string nodeLink)
         {
             var props = dd.GenericProperties;
-			foreach (Property p in props)
-			{				
-				Guid currId = p.PropertyType.DataTypeDefinition.DataType.Id;
-				if (LinkableMediaDataTypes.Contains(currId) &&  string.IsNullOrEmpty(p.Value.ToString()) == false)
-				{
-					return p.Value.ToString();
-				}
-			}
+            foreach (Property p in props)
+            {
+                Guid currId = p.PropertyType.DataTypeDefinition.DataType.Id;
+                if (LinkableMediaDataTypes.Contains(currId) && string.IsNullOrEmpty(p.Value.ToString()) == false)
+                {
+                    return p.Value.ToString();
+                }
+            }
             return "";
         }
 
@@ -200,29 +200,34 @@ function openMedia(id) {
         /// <returns></returns>
         internal virtual string GetLinkValue(UmbracoEntity entity)
         {
-            foreach (var property in entity.UmbracoProperties)
+            foreach (var property in entity.AdditionalData
+                .Select(x => x.Value as UmbracoEntity.EntityProperty)
+                .Where(x => x != null))
             {
+
+
                 //required for backwards compatibility with v7 with changing the GUID -> alias
                 var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(property.PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
                 if (controlId != null)
                 {
-                    if (LinkableMediaDataTypes.Contains(controlId.Value) &&
-                       string.IsNullOrEmpty(property.Value) == false)
-                        return property.Value;   
-                }                
+                    if (LinkableMediaDataTypes.Contains(controlId.Value) 
+                        && string.IsNullOrEmpty((string)property.Value) == false)
+                        
+                        return property.Value.ToString();
+                }
             }
             return "";
         }
 
-		/// <summary>
-		/// By default, any media type that is to be "linkable" in the WYSIWYG editor must contain
-		/// a DataTypeUploadField data type which will ouput the value for the link, however, if 
-		/// a developer wants the WYSIWYG editor to link to a custom media type, they will either have
-		/// to create their own media tree and inherit from this one and override the GetLinkValue 
-		/// or add another GUID to the LinkableMediaDataType list on application startup that matches
-		/// the GUID of a custom data type. The order of property types on the media item definition will determine the output value.
-		/// </summary>
-		public static List<Guid> LinkableMediaDataTypes { get; protected set; }
+        /// <summary>
+        /// By default, any media type that is to be "linkable" in the WYSIWYG editor must contain
+        /// a DataTypeUploadField data type which will ouput the value for the link, however, if 
+        /// a developer wants the WYSIWYG editor to link to a custom media type, they will either have
+        /// to create their own media tree and inherit from this one and override the GetLinkValue 
+        /// or add another GUID to the LinkableMediaDataType list on application startup that matches
+        /// the GUID of a custom data type. The order of property types on the media item definition will determine the output value.
+        /// </summary>
+        public static List<Guid> LinkableMediaDataTypes { get; protected set; }
 
         /// <summary>
         /// Returns true if we can use the EntityService to render the tree or revert to the original way 
@@ -245,5 +250,5 @@ function openMedia(id) {
             }
         }
 
-	}
+    }
 }

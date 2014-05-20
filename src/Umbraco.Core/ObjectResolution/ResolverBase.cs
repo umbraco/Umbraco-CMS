@@ -85,10 +85,9 @@ namespace Umbraco.Core.ObjectResolution
 		}
 
         /// <summary>
-        /// Gets a value indicating whether a the singleton nstance has been set.
+        /// Gets a value indicating whether a the singleton instance has been set.
         /// </summary>
-        /// <remarks>To be used in unit tests.</remarks>
-        internal static bool HasCurrent
+        public static bool HasCurrent
         {
             get
             {
@@ -102,9 +101,13 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Resets the resolver singleton instance to null.
 		/// </summary>
-		/// <remarks>To be used in unit tests.</remarks>
-		/// <param name="resetResolution">By default this is true because we always need to reset resolution before we reset a resolver, however in some insanely rare cases like unit testing you might not want to do this.</param>
-		internal static void Reset(bool resetResolution = true)
+		/// <remarks>
+		/// To be used in unit tests. DO NOT USE THIS DURING PRODUCTION.
+		/// </remarks>
+		/// <param name="resetResolution">
+		/// By default this is true because we always need to reset resolution before we reset a resolver, however in some insanely rare cases like unit testing you might not want to do this.
+		/// </param>
+		protected internal static void Reset(bool resetResolution = true)
 		{
 
             //In order to reset a resolver, we always must reset the resolution

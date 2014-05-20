@@ -22,6 +22,10 @@ namespace Umbraco.Web.Strategies
         {
             base.ApplicationStarted(umbracoApplication, applicationContext);
 
+            ContentService.SentToPublish += (sender, args) =>
+                applicationContext.Services.NotificationService.SendNotification(
+                    args.Entity, ActionToPublish.Instance, applicationContext);
+
             //Send notifications for the published action
             ContentService.Published += (sender, args) =>
                                         args.PublishedEntities.ForEach(

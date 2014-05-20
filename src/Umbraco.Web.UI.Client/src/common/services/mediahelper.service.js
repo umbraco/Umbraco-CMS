@@ -129,30 +129,79 @@ function mediaHelper(umbRequestHelper) {
             _mediaFileResolvers[propertyEditorAlias] = func;
         },
 
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#resolveFileFromEntity
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Gets the media file url for a media entity returned with the entityResource
+         * 
+         * @param {object} mediaEntity A media Entity returned from the entityResource
+         * @param {boolean} thumbnail Whether to return the thumbnail url or normal url
+         */
+        resolveFileFromEntity : function(mediaEntity, thumbnail) {
+            
+            if (!angular.isObject(mediaEntity.metaData)) {
+                throw "Cannot resolve the file url from the mediaEntity, it does not contain the required metaData";
+            }
+
+            var values = _.values(mediaEntity.metaData);
+            for (var i = 0; i < values.length; i++) {
+                var val = values[i];
+                if (angular.isObject(val) && val.PropertyEditorAlias) {
+                    for (var resolver in _mediaFileResolvers) {
+                        if (val.PropertyEditorAlias === resolver) {
+                            //we need to format a property variable that coincides with how the property would be structured
+                            // if it came from the mediaResource just to keep things slightly easier for the file resolvers.
+                            var property = { value: val.Value };
+
+                            return _mediaFileResolvers[resolver](property, mediaEntity, thumbnail);
+                        }
+                    }
+                }
+            }
+
+            return "";
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#resolveFile
+         * @methodOf umbraco.services.mediaHelper
+         * @function    
+         *
+         * @description
+         * Gets the media file url for a media object returned with the mediaResource
+         * 
+         * @param {object} mediaEntity A media Entity returned from the entityResource
+         * @param {boolean} thumbnail Whether to return the thumbnail url or normal url
+         */
         /*jshint loopfunc: true */
         resolveFile : function(mediaItem, thumbnail){
-            var _props = [];
-            function _iterateProps(props){
-                var result = null;
+            
+            function iterateProps(props){
+                var res = null;
                 for(var resolver in _mediaFileResolvers) {
-                    var property = _.find(props, function(property){ return property.editor === resolver; });
+                    var property = _.find(props, function(prop){ return prop.editor === resolver; });
                     if(property){
-                        result = _mediaFileResolvers[resolver](property, mediaItem, thumbnail);
+                        res = _mediaFileResolvers[resolver](property, mediaItem, thumbnail);
                         break;
                     }
                 }
 
-                return result;    
+                return res;    
             }
 
             //we either have properties raw on the object, or spread out on tabs
             var result = "";
             if(mediaItem.properties){
-                result = _iterateProps(mediaItem.properties);
+                result = iterateProps(mediaItem.properties);
             }else if(mediaItem.tabs){
                 for(var tab in mediaItem.tabs) {
                     if(mediaItem.tabs[tab].properties){
-                        result = _iterateProps(mediaItem.tabs[tab].properties);
+                        result = iterateProps(mediaItem.tabs[tab].properties);
                         if(result){
                             break;
                         }
@@ -164,26 +213,26 @@ function mediaHelper(umbRequestHelper) {
 
         /*jshint loopfunc: true */
         hasFilePropertyType : function(mediaItem){
-           function _iterateProps(props){
-               var result = false;
+           function iterateProps(props){
+               var res = false;
                for(var resolver in _mediaFileResolvers) {
-                   var property = _.find(props, function(property){ return property.editor === resolver; });
+                   var property = _.find(props, function(prop){ return prop.editor === resolver; });
                    if(property){
-                       result = true;
+                       res = true;
                        break;
                    }
                }
-               return result;
+               return res;
            }
 
            //we either have properties raw on the object, or spread out on tabs
            var result = false;
            if(mediaItem.properties){
-               result = _iterateProps(mediaItem.properties);
+               result = iterateProps(mediaItem.properties);
            }else if(mediaItem.tabs){
                for(var tab in mediaItem.tabs) {
                    if(mediaItem.tabs[tab].properties){
-                       result = _iterateProps(mediaItem.tabs[tab].properties);
+                       result = iterateProps(mediaItem.tabs[tab].properties);
                        if(result){
                            break;
                        }

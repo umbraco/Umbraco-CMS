@@ -437,8 +437,9 @@ namespace Umbraco.Web
             //currently assigned node. The PublishedContentRequest will be null if:
             // * we are rendering a partial view or child action
             // * we are rendering a view from a custom route
-            if (UmbracoContext.PublishedContentRequest == null 
+            if ((UmbracoContext.PublishedContentRequest == null 
                 || UmbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+                && currentPage.Id > 0) // in case we're rendering a detached content (id == 0)
             {
                 item.NodeId = currentPage.Id.ToString();
             }

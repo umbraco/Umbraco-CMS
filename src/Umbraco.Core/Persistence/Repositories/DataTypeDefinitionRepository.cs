@@ -295,8 +295,8 @@ AND umbracoNode.id <> @id",
                 var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
                 if (cached != null && cached.Any())
                 {
-                    //return from the cache
-                    return cached.First();
+                    //return from the cache, ensure it's a cloned result
+                    return (PreValueCollection)cached.First().DeepClone();
                 }
 
                 l.UpgradeToWriteLock();

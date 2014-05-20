@@ -12,7 +12,8 @@ app.config(function ($routeProvider) {
                 var deferred = $q.defer();
 
                 //don't need to check if we've redirected to login and we've already checked auth
-                if (!$route.current.params.section && $route.current.params.check === false) {
+                if (!$route.current.params.section
+                    && ($route.current.params.check === false || $route.current.params.check === "false")) {
                     deferred.resolve(true);
                     return deferred.promise;
                 }
@@ -55,7 +56,7 @@ app.config(function ($routeProvider) {
                         if (isRequired) {
                             //the check=false is checked above so that we don't have to make another http call to check
                             //if they are logged in since we already know they are not.
-                            deferred.reject({ path: "/login", search: { check: false } });
+                            deferred.reject({ path: "/login/false" });
                         }
                         else {
                             //this will resolve successfully so the route will continue
@@ -67,12 +68,38 @@ app.config(function ($routeProvider) {
         };
     };
 
+    /** When this is used to resolve it will attempt to log the current user out */
+    var doLogout = function() {
+        return {
+            isLoggedOut: function ($q, userService) {
+                var deferred = $q.defer();
+                userService.logout().then(function () {
+                    //success so continue
+                    deferred.resolve(true);
+                }, function() {
+                    //logout failed somehow ? we'll reject with the login page i suppose
+                    deferred.reject({ path: "/login/false" });
+                });
+                return deferred.promise;
+            }
+        }
+    }
+
     $routeProvider
         .when('/login', {
             templateUrl: 'views/common/login.html',
             //ensure auth is *not* required so it will redirect to / 
             resolve: canRoute(false)
         })
+        .when('/login/:check', {
+            templateUrl: 'views/common/login.html',
+            //ensure auth is *not* required so it will redirect to / 
+            resolve: canRoute(false)
+        })
+         .when('/logout', {
+             redirectTo: '/login/false',             
+             resolve: doLogout()
+         })
         .when('/:section', {
             templateUrl: function (rp) {
                 if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")

@@ -104,6 +104,8 @@ namespace Umbraco.Web.Editors
             return GetResized(imagePath, width, Convert.ToString(width));
         }
 
+        //TODO: We should delegate this to ImageProcessing
+
         /// <summary>
         /// Gets a resized image - if the requested max width is greater than the original image, only the original image will be returned.
         /// </summary>

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty
+    public class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
     {
         public MacroProperty()
         {
@@ -174,6 +174,38 @@ namespace Umbraco.Core.Models
 
                     return _editorAlias;
                 }, _editorAlias, PropertyTypeSelector);
+            }
+        }
+
+        public object DeepClone()
+        {
+            //Memberwise clone on MacroProperty will work since it doesn't have any deep elements
+            // for any sub class this will work for standard properties as well that aren't complex object's themselves.
+            var clone = (MacroProperty)MemberwiseClone();
+            //Automatically deep clone ref properties that are IDeepCloneable
+            DeepCloneHelper.DeepCloneRefProperties(this, clone);
+            clone.ResetDirtyProperties(false);
+            return clone;
+        }
+
+        protected bool Equals(MacroProperty other)
+        {
+            return string.Equals(_alias, other._alias) && _id == other._id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((MacroProperty) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((_alias != null ? _alias.GetHashCode() : 0)*397) ^ _id;
             }
         }
     }

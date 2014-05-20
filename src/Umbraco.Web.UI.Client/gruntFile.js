@@ -115,6 +115,7 @@ module.exports = function (grunt) {
       },
 
 
+      // Copies over the files downloaded by bower
       bower: {
         files: [
                 {
@@ -133,6 +134,7 @@ module.exports = function (grunt) {
                 }
               ]
       },
+      */
 
 
       installer: {

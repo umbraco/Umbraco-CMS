@@ -55,7 +55,22 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "IsAuthenticated")),
-                'Server call failed for checking authentication');
+                {
+                    success: function (data, status, headers, config) {
+                        //if the response is false, they are not logged in so return a rejection
+                        if (data === false || data === "false") {
+                            return $q.reject('User is not logged in');
+                        }
+                        return data;
+                    },
+                    error: function (data, status, headers, config) {                     
+                        return {
+                            errorMsg: 'Server call failed for checking authentication',
+                            data: data,
+                            status: status
+                        };
+                    }
+                });
         },
         
         /** Gets the user's remaining seconds before their login times out */

@@ -165,10 +165,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
-            //update the sections if they've changed
+            //update the properties if they've changed
             var macro = (Macro)entity;
-            if (macro.IsPropertyDirty("Properties"))
+            if (macro.IsPropertyDirty("Properties") || macro.Properties.Any(x => x.IsDirty()))
             {
+                //now we need to delete any props that have been removed
+                foreach (var propAlias in macro.RemovedProperties)
+                {
+                    //delete the property
+                    Database.Delete<MacroPropertyDto>("WHERE macro=@macroId AND macroPropertyAlias=@propAlias",
+                        new { macroId = macro.Id, propAlias = propAlias });
+                }
+
                 //for any that exist on the object, we need to determine if we need to update or insert
                 foreach (var propDto in dto.MacroPropertyDtos)
                 {
@@ -180,17 +188,15 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                     else
                     {
-                        Database.Update(propDto);
+                        //only update if it's dirty
+                        if (macro.Properties[propDto.Alias].IsDirty())
+                        {
+                            Database.Update(propDto);    
+                        }
                     }
                 }
 
-                //now we need to delete any props that have been removed
-                foreach (var propAlias in macro.RemovedProperties)
-                {
-                    //delete the property
-                    Database.Delete<MacroPropertyDto>("WHERE macro=@macroId AND macroPropertyAlias=@propAlias",
-                        new { macroId = macro.Id, propAlias = propAlias });
-                }
+                
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();

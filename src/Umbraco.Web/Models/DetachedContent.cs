@@ -10,21 +10,33 @@ namespace Umbraco.Web.Models
     {
         private readonly Dictionary<string, IPublishedProperty> _properties;
 
+        /// <summary>
+        /// Initialized a new instance of the <see cref="DetachedContent"/> class with properties.
+        /// </summary>
+        /// <param name="properties">The properties</param>
+        /// <remarks>Properties must be detached or nested properties ie their property type must be detached or nested.
+        /// Such a detached content can be part of a published property value.</remarks>
         public DetachedContent(IEnumerable<IPublishedProperty> properties)
         {
             _properties = properties.ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
         }
 
+        // don't uncomment until you know what you are doing
+        /*
         public DetachedContent(IPublishedContent content)
         {
             _properties = content.Properties.ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
         }
+        */
 
+        // don't uncomment until you know what you are doing
+        // at the moment, I don't fully
+        /*
         public DetachedContent(IContent content, bool isPreviewing)
         {
             var publishedContentType = PublishedContentType.Get(PublishedItemType.Content, content.ContentType.Alias);
             _properties = PublishedProperty.MapProperties(publishedContentType.PropertyTypes, content.Properties,
-                (t, v) => PublishedProperty.GetDetached(t, v, isPreviewing))
+                (t, v) => PublishedProperty.GetDetached(t.Detached(), v, isPreviewing))
                 .ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
         }
 
@@ -32,7 +44,7 @@ namespace Umbraco.Web.Models
         {
             var publishedContentType = PublishedContentType.Get(PublishedItemType.Media, media.ContentType.Alias);
             _properties = PublishedProperty.MapProperties(publishedContentType.PropertyTypes, media.Properties,
-                (t, v) => PublishedProperty.GetDetached(t, v, isPreviewing))
+                (t, v) => PublishedProperty.GetDetached(t.Detached(), v, isPreviewing))
                 .ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
         }
 
@@ -40,9 +52,10 @@ namespace Umbraco.Web.Models
         {
             var publishedContentType = PublishedContentType.Get(PublishedItemType.Member, member.ContentType.Alias);
             _properties = PublishedProperty.MapProperties(publishedContentType.PropertyTypes, member.Properties,
-                (t, v) => PublishedProperty.GetDetached(t, v, isPreviewing))
+                (t, v) => PublishedProperty.GetDetached(t.Detached(), v, isPreviewing))
                 .ToDictionary(x => x.PropertyTypeAlias, x => x, StringComparer.InvariantCultureIgnoreCase);
         }
+        */
 
         public ICollection<IPublishedProperty> Properties
         {

@@ -1,10 +1,10 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function($rootScope, $scope, dialogService, mediaResource, mediaHelper, $timeout) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout) {
 
         //check the pre-values for multi-picker
-        var multiPicker = $scope.model.config.multiPicker !== '0' ? true : false;
+        var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
 
         if (!$scope.model.config.startNodeId)
              $scope.model.config.startNodeId = -1;
@@ -17,18 +17,24 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             if ($scope.model.value) {
                 var ids = $scope.model.value.split(',');
 
-                mediaResource.getByIds(ids).then(function (medias) {
-                    //img.media = media;
+                //NOTE: We need to use the entityResource NOT the mediaResource here because
+                // the mediaResource has server side auth configured for which the user must have
+                // access to the media section, if they don't they'll get auth errors. The entityResource
+                // acts differently in that it allows access if the user has access to any of the apps that
+                // might require it's use. Therefore we need to use the metatData property to get at the thumbnail
+                // value.
+
+                entityResource.getByIds(ids, "Media").then(function (medias) {
+
                     _.each(medias, function (media, i) {
                         
                         //only show non-trashed items
-                        if(media.parentId >= -1){
-                            if(!media.thumbnail){
-                                media.thumbnail = mediaHelper.resolveFile(media, true);
+                        if (media.parentId >= -1) {
+
+                            if (!media.thumbnail) { 
+                                media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                             }
 
-                            //media.src = mediaHelper.getImagePropertyValue({ imageModel: media });
-                            //media.thumbnail = mediaHelper.getThumbnailFromPath(media.src);
                             $scope.images.push(media);
                             $scope.ids.push(media.id);   
                         }
@@ -60,10 +66,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     
                     _.each(data, function(media, i) {
 
-                        if(!media.thumbnail){
-                            media.thumbnail = mediaHelper.resolveFile(media, true);
+                        if (!media.thumbnail) {
+                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                         }
-                        
+
                         $scope.images.push(media);
                         $scope.ids.push(media.id);
                     });

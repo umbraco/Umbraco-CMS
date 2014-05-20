@@ -59,9 +59,9 @@ namespace Umbraco.Core.Models.Membership
         private IUserType _userType;
         private string _name;
         private Type _userTypeKey;
-        private readonly List<string> _addedSections;
-        private readonly List<string> _removedSections;
-        private readonly ObservableCollection<string> _sectionCollection;
+        private List<string> _addedSections;
+        private List<string> _removedSections;
+        private ObservableCollection<string> _sectionCollection;
         private int _sessionTimeout;
         private int _startContentId;
         private int _startMediaId;
@@ -244,7 +244,10 @@ namespace Umbraco.Core.Models.Membership
 
         public void RemoveAllowedSection(string sectionAlias)
         {
-            _sectionCollection.Remove(sectionAlias);
+            if (_sectionCollection.Contains(sectionAlias))
+            {
+                _sectionCollection.Remove(sectionAlias);
+            }
         }
 
         public void AddAllowedSection(string sectionAlias)
@@ -423,24 +426,41 @@ namespace Umbraco.Core.Models.Membership
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                //remove from the removed/added sections (since people could add/remove all they want in one request)
-                _removedSections.RemoveAll(s => s == e.NewItems.Cast<string>().First());
-                _addedSections.RemoveAll(s => s == e.NewItems.Cast<string>().First());
+                var item = e.NewItems.Cast<string>().First();
 
-                //add to the added sections
-                _addedSections.Add(e.NewItems.Cast<string>().First());
+                if (_addedSections.Contains(item) == false)
+                {
+                    _addedSections.Add(item);
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                //remove from the removed/added sections (since people could add/remove all they want in one request)
-                _removedSections.RemoveAll(s => s == e.OldItems.Cast<string>().First());
-                _addedSections.RemoveAll(s => s == e.OldItems.Cast<string>().First());
+                var item = e.OldItems.Cast<string>().First();
 
-                //add to the added sections
-                _removedSections.Add(e.OldItems.Cast<string>().First());
+                if (_removedSections.Contains(item) == false)
+                {
+                    _removedSections.Add(item);    
+                }
+
             }
         }
-        
+
+        public override object DeepClone()
+        {
+            var clone = (User)base.DeepClone();
+
+            //need to create new collections otherwise they'll get copied by ref
+            clone._addedSections = new List<string>();
+            clone._removedSections = new List<string>();
+            clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
+            //re-create the event handler
+            clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;
+
+            clone.ResetDirtyProperties(false);
+
+            return clone;
+        }
+
         /// <summary>
         /// Internal class used to wrap the user in a profile
         /// </summary>

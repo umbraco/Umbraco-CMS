@@ -150,6 +150,40 @@ namespace Umbraco.Tests.Services
 
         }
 
+        [Test]
+        public void Can_Add_And_Remove_Properties()
+        {
+            var macroService = ServiceContext.MacroService;
+            var macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            
+            //adds some properties
+            macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
+            macro.Properties.Add(new MacroProperty("blah2", "Blah2", 0, "blah2"));
+            macro.Properties.Add(new MacroProperty("blah3", "Blah3", 0, "blah3"));
+            macro.Properties.Add(new MacroProperty("blah4", "Blah4", 0, "blah4"));
+            macroService.Save(macro);
+
+            var result1 = macroService.GetById(macro.Id);
+            Assert.AreEqual(4, result1.Properties.Count());
+
+            //simulate clearing the sections
+            foreach (var s in result1.Properties.ToArray())
+            {
+                result1.Properties.Remove(s.Alias);
+            }
+            //now just re-add a couple
+            result1.Properties.Add(new MacroProperty("blah3", "Blah3", 0, "blah3"));
+            result1.Properties.Add(new MacroProperty("blah4", "Blah4", 0, "blah4"));
+            macroService.Save(result1);
+
+            //assert
+
+            //re-get
+            result1 = macroService.GetById(result1.Id);
+            Assert.AreEqual(2, result1.Properties.Count());
+
+        }
+
         //[Test]
         //public void Can_Get_Many_By_Alias()
         //{

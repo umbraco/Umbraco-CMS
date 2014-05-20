@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Umbraco.Core.Models
 {
-    internal class Notification
+    public class Notification
     {
         public Notification(int entityId, int userId, string action, Guid entityType)
         {

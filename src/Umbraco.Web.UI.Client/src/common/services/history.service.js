@@ -28,18 +28,25 @@
  * </pre> 
  */
 angular.module('umbraco.services')
-.factory('historyService', function ($rootScope, $timeout, angularHelper) {
+.factory('historyService', function ($rootScope, $timeout, angularHelper, eventsService) {
 
 	var nArray = [];
 
 	function add(item) {
 
-		var any = _.where(nArray, {link: item.link});
+	    if (!item) {
+	        return null;
+	    }
 
-		if(any.length === 0){
-			nArray.splice(0,0,item);
-			return nArray[0];
-		}
+	    var listWithoutThisItem = _.reject(nArray, function(i) {
+	        return i.link === item.link;
+	    });
+
+        //put it at the top and reassign
+	    listWithoutThisItem.splice(0, 0, item);
+	    nArray = listWithoutThisItem;
+	    return nArray[0];
+
 	}
 
 	return {
@@ -60,7 +67,9 @@ angular.module('umbraco.services')
 		add: function (item) {
 			var icon = item.icon || "icon-file";
 			angularHelper.safeApply($rootScope, function () {
-				return add({name: item.name, icon: icon, link: item.link, time: new Date() });
+			    var result = add({ name: item.name, icon: icon, link: item.link, time: new Date() });
+			    eventsService.emit("historyService.add", {added: result, all: nArray});
+			    return result;
 			});
 		},
 		/**
@@ -75,7 +84,8 @@ angular.module('umbraco.services')
 		 */
 		remove: function (index) {
 			angularHelper.safeApply($rootScope, function() {
-				nArray.splice(index, 1);
+			    var result = nArray.splice(index, 1);
+			    eventsService.emit("historyService.remove", { removed: result, all: nArray });
 			});
 		},
 
@@ -89,20 +99,10 @@ angular.module('umbraco.services')
 		 */
 		removeAll: function () {
 			angularHelper.safeApply($rootScope, function() {
-				nArray = [];
+			    nArray = [];
+			    eventsService.emit("historyService.removeAll");
 			});
 		},
-
-		/**
-		 * @ngdoc property
-		 * @name umbraco.services.historyService#current
-		 * @propertyOf umbraco.services.historyService
-		 *
-		 * @description
-		 * 
-		 * @returns {Array} Array of history entries for the current user, newest items first
-		 */
-		current: nArray,
 
 		/**
 		 * @ngdoc method

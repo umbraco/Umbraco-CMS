@@ -19,7 +19,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
-    internal class NotificationService : INotificationService
+    public class NotificationService : INotificationService
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly IUserService _userService;

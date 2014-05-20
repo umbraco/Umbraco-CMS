@@ -114,11 +114,11 @@ function cropperHelper(umbRequestHelper, $http) {
 			crop.x2 = x2_px / image.width;
 			crop.y2 = y2_px / image.height;
 
-			_.forEach(crop, function(coord){
-				if(coord < 0){
-					coord = 0;
+			for(var coord in crop){
+				if(crop[coord] < 0){
+				    crop[coord] = 0;
 				}
-			});
+			} 
 
 			return crop;
 		},

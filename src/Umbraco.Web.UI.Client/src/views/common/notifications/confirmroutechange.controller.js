@@ -6,7 +6,18 @@ angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeCo
 			not.args.listener();
 			
 			$location.search("");
-			$location.path(not.args.path);
+
+		    //we need to break the path up into path and query
+		    var parts = not.args.path.split("?");
+		    var query = {};
+            if (parts.length > 1) {
+                _.each(parts[1].split("&"), function(q) {
+                    var keyVal = q.split("=");
+                    query[keyVal[0]] = keyVal[1];
+                });
+            }
+
+            $location.path(parts[0]).search(query);
 			notificationsService.remove(not);
 		};
 

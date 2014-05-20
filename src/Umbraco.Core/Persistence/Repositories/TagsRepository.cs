@@ -285,7 +285,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (group.IsNullOrWhiteSpace() == false)
             {
                 sql = sql.Where<TagDto>(dto => dto.Group == group);
-            }  
+            }
 
             var factory = new TagFactory();
 
@@ -329,7 +329,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: There's some very clever logic in the umbraco.cms.businesslogic.Tags.Tag to insert tags where they don't exist, 
             // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up 
             // with quite a few additional queries.
-            
+
             //do all this in one transaction
             using (var trans = Database.GetTransaction())
             {
@@ -397,7 +397,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags)
         {
             var tagSetSql = GetTagSet(tags);
-            
+
             var deleteSql = string.Concat("DELETE FROM cmsTagRelationship WHERE nodeId = ",
                                           contentId,
                                           " AND propertyTypeId = ",
@@ -439,7 +439,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         private static string GetTagSet(IEnumerable<ITag> tagsToInsert)
         {
-            var array = tagsToInsert.Select(tag => string.Format("select '{0}' as Tag, '{1}' as [Group]", tag.Text.Replace("'", "''"), tag.Group)).ToArray();
+            var array = tagsToInsert
+                .Select(tag =>
+                    string.Format("select '{0}' as Tag, '{1}' as [Group]",
+                        PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
+                .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
         }
 
