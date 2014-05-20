@@ -157,6 +157,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
             },
 
+            /** This is used to launch an angular based modal window instead of the legacy window */
+            rootScope: function () {
+
+                if (!this.mainWindow().UmbClientMgr) {
+                    throw "An angular modal window can only be launched when the modal is running within the main Umbraco application";
+                }
+                else {
+                    return this.mainWindow().UmbClientMgr.rootScope();
+                }
+
+            },
+
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
                 //need to create the modal on the top window if the top window has a client manager, if not, create it on the current window                
 
