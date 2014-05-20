@@ -13,7 +13,7 @@ var tuningConfig = {
                 schema: "body",
                 fields: [
                     {
-                        name: "Color",
+                        name: "Background color",
                         alias: "backgroundBodyColor",
                         description: "Background body color",
                         type: "colorPicker",
@@ -21,44 +21,44 @@ var tuningConfig = {
                         colorPaletteProperty: "colorBodyBackground"
                     },
                     {
-                        name: "Gradient Color",
+                        name: "Background gradient",
                         alias: "backgroundBodyGradientColor",
-                        description: "Background body gradient color",
+                        description: "Fade the background to this colour at the bottom",
                         type: "colorPicker",
                         value: ""
                     },
                     {
                         name: "Image/Pattern",
                         alias: "backgroundBodyImageOrPattern",
-                        description: "Background body image/pattern",
+                        description: "Use an image for the background instead of a solid colour/gradient",
                         type: "bgImagePicker",
                         value: ""
                     },
                     {
-                        name: "Position",
+                        name: "Image position",
                         alias: "backgroundBodyPosition",
                         description: "Background body position",
                         type: "bgPositionPicker",
                         value: ""
                     },
                     {
-                        name: "Cover",
+                        name: "Stretch background",
                         alias: "backgroundBodyCover",
-                        description: "Background body cover",
+                        description: "Checked: stretches the chosen image to fill the.\nUnchecked: the image is tiled according to the Repeat setting below",
                         type: "checkbox",
                         value: ""
                     },
                     {
-                        name: "Repeat",
+                        name: "Background tiling",
                         alias: "backgroundBodyRepeat",
-                        description: "Background body repeat",
+                        description: "How to tile the background image",
                         type: "bgRepeatPicker",
                         value: ""
                     },
                     {
-                        name: "Attachment",
+                        name: "Background scrolling behaviour",
                         alias: "backgroundBodyAttachment",
-                        description: "Background body attachment",
+                        description: "When fixed the background doesn't scroll with the content",
                         type: "bgAttachmentPicker",
                         value: ""
                     }
