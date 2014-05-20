@@ -338,7 +338,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (parent == null) return;
 
 		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
-		        _parent = PublishedContentModelFactory.CreateModel(new XmlPublishedContent(parent, _isPreviewing, true));
+		        _parent = (new XmlPublishedContent(parent, _isPreviewing, true)).CreateModel();
 		}
 
 		private void Initialize()
@@ -439,8 +439,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
             var iterator = nav.Select(expr);
             while (iterator.MoveNext())
-		        _children.Add(PublishedContentModelFactory.CreateModel(
-                    new XmlPublishedContent(((IHasXmlNode)iterator.Current).GetNode(), _isPreviewing, true)));
+		        _children.Add(
+                    (new XmlPublishedContent(((IHasXmlNode)iterator.Current).GetNode(), _isPreviewing, true)).CreateModel());
             
             // warn: this is not thread-safe
             _childrenInitialized = true;

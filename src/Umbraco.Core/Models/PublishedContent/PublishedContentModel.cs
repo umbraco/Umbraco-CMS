@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>Every strongly-typed published content class should inherit from <c>PublishedContentModel</c>
     /// (or inherit from a class that inherits from... etc.) so they are picked by the factory.</remarks>
-    internal abstract class PublishedContentModel : PublishedContentExtended
+    public abstract class PublishedContentModel : PublishedContentExtended
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentModel"/> class with

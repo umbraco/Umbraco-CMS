@@ -63,8 +63,9 @@ namespace Umbraco.Tests.PublishedContent
 
 	    protected override void FreezeResolution()
 	    {
+            var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(
-                new PublishedContentModelFactoryImpl());
+                new PublishedContentModelFactory(types));
 	        base.FreezeResolution();
 	    }
 
@@ -221,7 +222,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
 
             var items = doc.Children
-                .Select(PublishedContentModelFactory.CreateModel) // linq, returns IEnumerable<IPublishedContent>
+                .Select(x => x.CreateModel()) // linq, returns IEnumerable<IPublishedContent>
 
                 // only way around this is to make sure every IEnumerable<T> extension
                 // explicitely returns a PublishedContentSet, not an IEnumerable<T>

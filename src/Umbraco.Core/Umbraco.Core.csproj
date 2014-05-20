@@ -352,7 +352,7 @@
     <Compile Include="Models\PropertyTagBehavior.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentModelFactoryImpl.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
@@ -441,7 +441,7 @@
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelAttribute.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentModelFactory.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\MacroProperty.cs" />
     <Compile Include="Models\MacroPropertyCollection.cs" />
     <Compile Include="Models\MacroPropertyTypeBaseTypes.cs" />

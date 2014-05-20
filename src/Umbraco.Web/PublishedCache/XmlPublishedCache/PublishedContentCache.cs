@@ -242,13 +242,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 		    return xmlNode == null 
                 ? null 
-                : PublishedContentModelFactory.CreateModel(new XmlPublishedContent(xmlNode, isPreviewing));
+                : (new XmlPublishedContent(xmlNode, isPreviewing)).CreateModel();
 		}
 
         private static IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
             return xmlNodes.Cast<XmlNode>()
-                .Select(xmlNode => PublishedContentModelFactory.CreateModel(new XmlPublishedContent(xmlNode, isPreviewing)));
+                .Select(xmlNode => (new XmlPublishedContent(xmlNode, isPreviewing)).CreateModel());
         }
 
         #endregion

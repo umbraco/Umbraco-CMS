@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides the model creation service.
     /// </summary>
-    internal interface IPublishedContentModelFactory
+    public interface IPublishedContentModelFactory
     {
         /// <summary>
         /// Creates a strongly-typed model representing a published content.

@@ -329,9 +329,8 @@ namespace Umbraco.Core
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));
 
-            // keep it internal for now
+            // by default, no factory is activated
 		    PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
-		    //    new PublishedContentModelFactoryImpl());
 		}
 	}
 }

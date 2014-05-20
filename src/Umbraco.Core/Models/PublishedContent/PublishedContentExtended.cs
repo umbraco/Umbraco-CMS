@@ -51,7 +51,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // a model, and then that model has to inherit from PublishedContentExtended,
             // => implements the internal IPublishedContentExtended.
 
-            var model = PublishedContentModelFactory.CreateModel(content);
+            var model = content.CreateModel();
             var extended = model == content // == means the factory did not create a model
               ? new PublishedContentExtended(content) // so we have to extend
               : model; // else we can use what the factory returned
