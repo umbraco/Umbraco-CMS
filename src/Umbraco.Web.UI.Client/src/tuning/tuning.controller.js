@@ -482,18 +482,27 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     };
 
     $scope.showFontPreview = function (font) {
-        $scope.selectedFont = font;
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
-            $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
-            $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
             WebFont.load({
                 google: {
                     families: [font.fontFamily + ":" + font.variant]
                 },
                 loading: function () {
                     console.log('loading');
+                },
+                active: function () {
+                    // If $apply isn't called, the new font family isn't applied until the next user click.
+                    $scope.$apply(function () {
+                        $scope.selectedFont = font;
+                        $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
+                        $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
+                    });
                 }
             });
+        }
+        else {
+            // Font is available, apply it immediately in modal preview.
+            $scope.selectedFont = font;
         }
     }
 
