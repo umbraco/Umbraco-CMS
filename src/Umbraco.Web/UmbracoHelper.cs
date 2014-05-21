@@ -1308,13 +1308,16 @@ namespace Umbraco.Web
 
             string previewLink = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" + 
                                  @"<link href=""{0}"" rel=""stylesheet/less"" type=""text/css"" />" +
-                                 @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js""></script>" +
-                                 @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js""></script>" +
+                                 @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js"" type=""text/javascript""></script>" +
                                  @"<script type=""text/javascript"">var tuningParameterUrl='{0}';</script>" +
-                                 @"<script src=""/umbraco/js/tuning.front.js""></script>";
+                                 @"<script src=""/umbraco/js/tuning.front.js"" type=""text/javascript""></script>";
 
-            string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" + 
-                                    @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />";
+            string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"">" +
+                                    @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />" +
+                                    @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
+                                    @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>";
 
             string defaultLessStyle = @"/Umbraco/assets/less/tuning.defaultStyle.less";
             string defaultCssStyle = @"/Umbraco/assets/css/tuning.defaultStyle.css";

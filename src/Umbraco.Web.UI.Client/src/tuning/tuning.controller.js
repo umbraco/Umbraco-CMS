@@ -25,7 +25,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.pageId = "../dialogs/Preview.aspx?id=" + $location.search().id;
     $scope.devices = [
         { name: "desktop", css: "desktop", icon: "icon-display" },
-        { name: "laptop - 1024px", css: "laptop border", icon: "icon-laptop" },
+        { name: "laptop - 1366px", css: "laptop border", icon: "icon-laptop" },
         { name: "iPad portrait - 768px", css: "iPad-portrait border", icon: "icon-ipad" },
         { name: "iPad landscape - 1024px", css: "iPad-landscape border", icon: "icon-ipad flip" },
         { name: "smartphone portrait - 480px", css: "smartphone-portrait border", icon: "icon-iphone" },
