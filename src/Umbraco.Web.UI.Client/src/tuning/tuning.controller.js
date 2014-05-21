@@ -493,6 +493,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     $scope.showFontPreview = function (font) {
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
+            // Font needs to be independently loaded in the iframe for live preview to work.
+            document.getElementById("resultFrame").contentWindow.getFont(font);
+
             WebFont.load({
                 google: {
                     families: [font.fontFamily + ":" + font.variant]

@@ -541,6 +541,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     $scope.showFontPreview = function (font) {
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
+            // Font needs to be independently loaded in the iframe for live preview to work.
+            document.getElementById("resultFrame").contentWindow.getFont(font);
+
             WebFont.load({
                 google: {
                     families: [font.fontFamily + ":" + font.variant]
@@ -554,7 +557,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                         $scope.selectedFont = font;
                         $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
                         $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
-                        
+                        // Apply to the page content as a preview.
                         $scope.data.modalField.value = $scope.selectedFont.fontFamily;
                         $scope.data.modalField.fontType = $scope.selectedFont.fontType;
                         $scope.data.modalField.fontWeight = $scope.selectedFont.fontWeight;
@@ -584,6 +587,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     };
 
     $scope.cancel = function () {
+        // Discard font change.
         $modalInstance.close({
             fontFamily: originalFont.fontFamily,
             fontType: originalFont.fontType,
