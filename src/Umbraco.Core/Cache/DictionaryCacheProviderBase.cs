@@ -8,7 +8,11 @@ namespace Umbraco.Core.Cache
 {
     internal abstract class DictionaryCacheProviderBase : ICacheProvider
     {
-        protected static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        //Ensure this is not allowing recursion to prevent accidental deadlocks
+        //Ensure this is not static, we need a different lock per instance and since each instance is an application singleton
+        // the lock does not need to be static (global)
+        protected readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
         protected abstract DictionaryCacheWrapper DictionaryCache { get; }
 
         /// <summary>
@@ -123,16 +127,19 @@ namespace Umbraco.Core.Cache
         /// <param name="keyStartsWith">The start of the key</param>
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            var keysToRemove = DictionaryCache.Cast<object>()
+            using (new WriteLock(Locker))
+            {
+                var keysToRemove = DictionaryCache.Cast<object>()
                                               .Select(item => new DictionaryItemWrapper(item))
                                               .Where(c => c.Key is string && ((string)c.Key).InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith)))
                                               .Select(c => c.Key)
                                               .ToList();
 
-            foreach (var k in keysToRemove)
-            {
-                DictionaryCache.Remove(k);
-            }
+                foreach (var k in keysToRemove)
+                {
+                    DictionaryCache.Remove(k);
+                }
+            }            
         }
 
         /// <summary>
@@ -141,54 +148,63 @@ namespace Umbraco.Core.Cache
         /// <param name="regexString"></param>
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            var keysToRemove = new List<object>();
-            foreach (var item in DictionaryCache)
+            using (new WriteLock(Locker))
             {
-                var c = new DictionaryItemWrapper(item);
-                var s = c.Key as string;
-                if (s != null)
+                var keysToRemove = new List<object>();
+                foreach (var item in DictionaryCache)
                 {
-                    var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
-                    if (Regex.IsMatch(withoutPrefix, regexString))
+                    var c = new DictionaryItemWrapper(item);
+                    var s = c.Key as string;
+                    if (s != null)
                     {
-                        keysToRemove.Add(c.Key);
+                        var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
+                        if (Regex.IsMatch(withoutPrefix, regexString))
+                        {
+                            keysToRemove.Add(c.Key);
+                        }
                     }
                 }
-            }
 
-            foreach (var k in keysToRemove)
-            {
-                DictionaryCache.Remove(k);
+                foreach (var k in keysToRemove)
+                {
+                    DictionaryCache.Remove(k);
+                }
             }
         }
 
         public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
-            return (from object item in DictionaryCache
-                    select new DictionaryItemWrapper(item)
-                    into c
-                    where c.Key is string && ((string) c.Key).InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith))
-                    select c.Value).ToList();
+            using (new ReadLock(Locker))
+            {
+                return (from object item in DictionaryCache
+                        select new DictionaryItemWrapper(item)
+                            into c
+                            where c.Key is string && ((string)c.Key).InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith))
+                            select c.Value).ToList();
+            }            
         }
 
         public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
         {
-            var found = new List<object>();
-            foreach (var item in DictionaryCache)
+            using (new ReadLock(Locker))
             {
-                var c = new DictionaryItemWrapper(item);
-                var s = c.Key as string;
-                if (s != null)
+                var found = new List<object>();
+                foreach (var item in DictionaryCache)
                 {
-                    var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
-                    if (Regex.IsMatch(withoutPrefix, regexString))
+                    var c = new DictionaryItemWrapper(item);
+                    var s = c.Key as string;
+                    if (s != null)
                     {
-                        found.Add(c.Value);
+                        var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
+                        if (Regex.IsMatch(withoutPrefix, regexString))
+                        {
+                            found.Add(c.Value);
+                        }
                     }
                 }
-            }
 
-            return found;
+                return found;
+            }            
         }
 
         /// <summary>
@@ -198,8 +214,11 @@ namespace Umbraco.Core.Cache
         /// <returns></returns>
         public virtual object GetCacheItem(string cacheKey)
         {
-            var result = DictionaryCache.Get(GetCacheKey(cacheKey));
-            return result;
+            using (new ReadLock(Locker))
+            {
+                var result = DictionaryCache.Get(GetCacheKey(cacheKey));
+                return result;
+            }
         }
 
         public abstract object GetCacheItem(string cacheKey, Func<object> getCacheItem);        

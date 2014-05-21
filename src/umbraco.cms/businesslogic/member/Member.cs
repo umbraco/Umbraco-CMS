@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Web;
+using System.Web.Caching;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -812,19 +813,11 @@ namespace umbraco.cms.businesslogic.member
 
                     FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
-                    //cache the member
-                    var cachedMember = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    ApplicationContext.Current.ApplicationCache.InsertCacheItem(
                         GetCacheKey(m.Id),
+                        CacheItemPriority.Normal,
                         TimeSpan.FromMinutes(30),
-                        () =>
-                        {
-                            // Debug information
-                            HttpContext.Current.Trace.Write("member",
-                                                            string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                          m.Text, m.LoginName, m.Id));
-
-                            return m;
-                        });
+                        () => m);
 
                     m.FireAfterAddToCache(e);
                 }
@@ -862,18 +855,11 @@ namespace umbraco.cms.businesslogic.member
                     FormsAuthentication.SetAuthCookie(m.LoginName, !UseSession);
 
                     //cache the member
-                    var cachedMember = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    ApplicationContext.Current.ApplicationCache.InsertCacheItem(
                         GetCacheKey(m.Id),
+                        CacheItemPriority.Normal,
                         TimeSpan.FromMinutes(30),
-                        () =>
-                        {
-                            // Debug information
-                            HttpContext.Current.Trace.Write("member",
-                                                            string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                          m.Text, m.LoginName, m.Id));
-
-                            return m;
-                        });
+                        () => m);
 
                     m.FireAfterAddToCache(e);
                 }

@@ -571,6 +571,8 @@ namespace umbraco.cms.businesslogic
 
         //THIS SHOULD BE IENUMERABLE<PROPERTYTYPE> NOT LIST!
 
+        private List<PropertyType> _propertyTypes;
+
         /// <summary>
         /// The "datafield/column" definitions, a Content object of this type will have an equivalent
         /// list of Properties.
@@ -582,47 +584,48 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                var cacheKey = GetPropertiesCacheKey();
+                //check if we've already looked up the prop types for this instance
+                if (_propertyTypes == null)
+                {   
+                    //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
+                    //aren't added multiple times through the MasterContentType structure, because each level loads
+                    //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
+                    //this should no longer be a problem as the composition always contains a correct list of property types.
+                    var result = new Dictionary<int, PropertyType>();
 
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    cacheKey,
-                    TimeSpan.FromMinutes(15),
-                    () =>
+                    using (var dr = SqlHelper.ExecuteReader(
+                                    "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
+                                    SqlHelper.CreateParameter("@ctId", Id)))
                     {
-                        //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
-                        //aren't added multiple times through the MasterContentType structure, because each level loads
-                        //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
-                        //this should no longer be a problem as the composition always contains a correct list of property types.
-                        var result = new Dictionary<int, PropertyType>();
-                        using (IRecordsReader dr =
-                            SqlHelper.ExecuteReader(
-                                "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
-                                SqlHelper.CreateParameter("@ctId", Id)))
+                        while (dr.Read())
                         {
-                            while (dr.Read())
+                            var id = dr.GetInt("id");
+
+                            //NOTE: The return value of this is cached!
+                            var pt = PropertyType.GetPropertyType(id);
+                            if (pt != null)
+                                result.Add(pt.Id, pt);
+                        }
+                    }
+
+                    // Get Property Types from the master content type
+                    if (MasterContentTypes.Count > 0)
+                    {
+                        foreach (var mct in MasterContentTypes)
+                        {
+                            var pts = GetContentType(mct).PropertyTypes;
+                            foreach (var pt in pts)
                             {
-                                int id = dr.GetInt("id");
-                                PropertyType pt = PropertyType.GetPropertyType(id);
-                                if (pt != null)
+                                if (result.ContainsKey(pt.Id) == false)
                                     result.Add(pt.Id, pt);
                             }
                         }
+                    }
 
-                        // Get Property Types from the master content type
-                        if (MasterContentTypes.Count > 0)
-                        {
-                            foreach (var mct in MasterContentTypes)
-                            {
-                                var pts = GetContentType(mct).PropertyTypes;
-                                foreach (var pt in pts)
-                                {
-                                    if (result.ContainsKey(pt.Id) == false)
-                                        result.Add(pt.Id, pt);
-                                }
-                            }
-                        }
-                        return result.Select(x => x.Value).ToList();
-                    });
+                    _propertyTypes = result.Select(x => x.Value).ToList();
+                }
+
+                return _propertyTypes;
             }
         }
 
@@ -1186,7 +1189,7 @@ namespace umbraco.cms.businesslogic
 
             var ct = new ContentType(id);
             ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id));
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(ct.GetPropertiesCacheKey());
+            
             ct.ClearVirtualTabs();
 
             //clear the content type from the property datatype cache used by razor
@@ -1218,16 +1221,7 @@ namespace umbraco.cms.businesslogic
 
         #endregion
 
-        #region Private Methods
-        /// <summary>
-        /// The cache key used to cache the properties for the content type
-        /// </summary>
-        /// <returns></returns>
-        private string GetPropertiesCacheKey()
-        {
-            return CacheKeys.ContentTypePropertiesCacheKey + this.Id;
-        }
-
+        #region Private Methods      
 
         private readonly object _virtualTabLoadLock = new object();
         /// <summary>

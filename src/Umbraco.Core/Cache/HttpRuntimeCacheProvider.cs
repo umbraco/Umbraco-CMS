@@ -35,13 +35,12 @@ namespace Umbraco.Core.Cache
         {
             try
             {
-                lock (Locker)
+                using (new WriteLock(Locker))
                 {
                     foreach (DictionaryEntry c in _cache)
                     {
                         var key = c.Key.ToString();
-                        if (_cache[key] != null
-                            && _cache[key] is T
+                        if (_cache[key] is T
                             && predicate(key, (T)_cache[key]))
                         {
                             _cache.Remove(c.Key.ToString());
@@ -79,20 +78,23 @@ namespace Umbraco.Core.Cache
         /// <returns></returns>
         internal object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
         {
-            cacheKey = GetCacheKey(cacheKey);
-
             using (var lck = new UpgradeableReadLock(Locker))
             {
+                cacheKey = GetCacheKey(cacheKey);
+
                 var result = DictionaryCache.Get(cacheKey);
                 if (result == null)
                 {
-                    lck.UpgradeToWriteLock();
-
+                    //get the callback result
                     result = getCacheItem();
+
                     if (result != null)
-                    {                        
+                    {
                         var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
                         var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
+
+                        //Need to write to the cache so upgrade to write lock
+                        lck.UpgradeToWriteLock();
 
                         _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                     }
@@ -132,7 +134,10 @@ namespace Umbraco.Core.Cache
             var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
-            _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+            using (new WriteLock(Locker))
+            {
+                _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);   
+            }
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
