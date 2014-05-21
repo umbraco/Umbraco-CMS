@@ -16,7 +16,7 @@
         <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
-    <div class="tuning" style="display:none" ng-class="{show:frameLoaded}">
+    <div class="tuning" style="display:none" ng-class="{show:frameFirstLoaded}">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
@@ -147,6 +147,7 @@
                     </tabset>
 
                     <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
+                    <button class="btn btn-default btn-default-delete" ng-click="deleteTuning()">reset</button>
 
                 </div>
 

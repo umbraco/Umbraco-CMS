@@ -20,9 +20,10 @@ namespace Umbraco.Web.Editors
     {
 
         static string basePath = HttpContext.Current.Server.MapPath(@"\Umbraco\assets\less\");
-        static string resultCssPath = HttpContext.Current.Server.MapPath(@"\Css\tuning.style.css");
-        static string tuningStylePath = basePath + @"tuning.style.less";
-        static string tuningParametersPath = basePath + @"tuning.lessParameters.less";
+        static string frontBasePath = HttpContext.Current.Server.MapPath(@"\Css\tuning\");
+        static string resultCssPath = @"\Css\tuning\{0}.css";
+        static string resultLessPath = @"\Css\tuning\{0}.less";
+        static string tuningStylePath = basePath + @"tuning.defaultStyle.less";
 
         [HttpGet]
         public HttpResponseMessage GetGoogleFont()
@@ -50,24 +51,28 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public HttpResponseMessage GetLessParameters()
+        public HttpResponseMessage Load()
         {
 
-            if (!Directory.Exists(basePath))
-                Directory.CreateDirectory(basePath);
+            var tuningParametersPath = HttpContext.Current.Request["param"];
 
-            if (!File.Exists(tuningParametersPath))
-                File.Create(tuningParametersPath);
+            if (string.IsNullOrEmpty(tuningParametersPath))
+                tuningParametersPath = tuningStylePath;
+            else
+                tuningParametersPath = HttpContext.Current.Server.MapPath(tuningParametersPath);
 
-            IList<string> parameters = new List<string>();
+            string paramBlock = string.Empty;
             using (System.IO.StreamReader sr = new System.IO.StreamReader(tuningParametersPath))
             {
-                String line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (!line.Contains("@import"))
-                        parameters.Add("\"" + line.Replace(":", "\":\"").Replace(";", "\"").Replace("@", "").Replace(";", ""));
-                }
+                paramBlock = GetStyleBloque("lessParam", sr.ReadToEnd());
+            }
+            
+            string[] paramLines = paramBlock.Trim().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            IList<string> parameters = new List<string>();          
+            foreach (var line in paramLines)
+            {
+                if (!line.Contains("@import"))
+                    parameters.Add("\"" + line.Replace(":", "\":\"").Replace(";", "\"").Replace("@", "").Replace(";", ""));
             }
 
             var resp = new HttpResponseMessage()
@@ -79,52 +84,57 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpPost]
-        public HttpResponseMessage PostLessParameters()
+        public HttpResponseMessage Save()
         {
 
-            if (!Directory.Exists(basePath))
-                Directory.CreateDirectory(basePath);
-
-            if (!File.Exists(tuningParametersPath))
-                File.Create(tuningParametersPath);
-
-            if (!File.Exists(resultCssPath))
-                File.Create(resultCssPath);
-
             var result = HttpContext.Current.Request["result"];
+            var pageId = HttpContext.Current.Request["pageId"];
 
-            // Update less parameter file
-            string gaImportList = string.Empty;
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(tuningParametersPath))
-            {
-                foreach (string parameters in result.Trim().Split(';'))
-                {
-                    if (!string.IsNullOrEmpty(parameters))
-                    {
-                        file.WriteLine((parameters + ";").Replace(":;", ":'';"));
-                    }
-                    if (parameters.IndexOf("@import") >= 0)
-                    {
-                        // Hack for ClientDependency
-                        gaImportList = gaImportList + parameters.Replace("@import", "@IMPORT") + ";";
-                    }
-                }
-            }
+            // Path to the new less and css files
+            string newResultLessPath = HttpContext.Current.Server.MapPath(string.Format(resultLessPath, pageId));
+            string newResultCssPath = HttpContext.Current.Server.MapPath(string.Format(resultCssPath, pageId));
 
-            // Read Tuning style file
-            string tuningStyleString = string.Empty;
+            // Load default Less content
+            string lessContent = string.Empty;
             using (System.IO.StreamReader sr = new System.IO.StreamReader(tuningStylePath))
             {
-                tuningStyleString = sr.ReadToEnd();
+                lessContent = sr.ReadToEnd();
+            }
+
+            // Create font directory
+            if (!Directory.Exists(frontBasePath))
+                Directory.CreateDirectory(frontBasePath);
+
+            // Prepare parameters and gf block
+            string newParamBlock = string.Empty;
+            string newGfBlock = string.Empty;
+            foreach (string parameters in result.Trim().Split(new string[] {";"}, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (parameters.IndexOf("@import") < 0)
+                {
+                    newParamBlock += (parameters + ";").Replace(":;", ":'';") + Environment.NewLine;
+                }
+                else 
+                {
+                    newGfBlock += parameters + ";" + Environment.NewLine;
+                }
+            }
+            lessContent = lessContent.Replace(GetStyleBloque("lessParam", lessContent), Environment.NewLine + newParamBlock);
+            lessContent = lessContent.Replace(GetStyleBloque("gf", lessContent), Environment.NewLine + newGfBlock);
+
+            // Save less file
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(newResultLessPath))
+            {
+                file.Write(lessContent);
             }
 
             // Compile the Less file
-            string compiledStyle = GetCssFromLessString(tuningStyleString, false, true, true);
+            string compiledStyle = GetCssFromLessString(lessContent, false, true, true).Replace("@import", "@IMPORT");
 
             // Save compiled file
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(resultCssPath))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(newResultCssPath))
             {
-                file.Write(gaImportList + compiledStyle);
+                file.Write(compiledStyle);
             }
 
             var resp = new HttpResponseMessage()
@@ -135,6 +145,29 @@ namespace Umbraco.Web.Editors
             return resp;
         }
 
+        [HttpGet]
+        public HttpResponseMessage Delete()
+        {
+
+            var pageId = HttpContext.Current.Request["pageId"];
+
+            // Path to the less and css files
+            string newResultLessPath = HttpContext.Current.Server.MapPath(string.Format(resultLessPath, pageId));
+            string newResultCssPath = HttpContext.Current.Server.MapPath(string.Format(resultCssPath, pageId));
+
+            // Delete all style file for this page
+            System.IO.File.Delete(newResultLessPath);
+            System.IO.File.Delete(newResultCssPath);
+
+            var resp = new HttpResponseMessage()
+            {
+                Content = new StringContent("ok")
+            };
+            resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return resp;
+
+        } 
+
         private static string GetCssFromLessString(string css, Boolean cacheEnabled, Boolean minifyOutput, Boolean disableVariableRedefines)
         {
             var config = dotless.Core.configuration.DotlessConfiguration.GetDefaultWeb();
@@ -142,6 +175,20 @@ namespace Umbraco.Web.Editors
             config.CacheEnabled = cacheEnabled;
             config.MinifyOutput = minifyOutput;
             return dotless.Core.LessWeb.Parse(css, config);
+        }
+
+        private static string GetStyleBloque(string tag, string input)
+        {
+            string startTag = string.Format("/***start-{0}***/", tag);
+            string endTag = string.Format("/***end-{0}***/", tag);
+
+            int indexStartTag = input.IndexOf(startTag);
+            int indexEndTag = input.IndexOf(endTag);
+
+            if (indexStartTag >= 0 && indexEndTag >= 0)
+                return input.Substring(indexStartTag, indexEndTag - indexStartTag).Replace(startTag, "").Replace(endTag, "");
+            else
+                return "";
         }
 
     }

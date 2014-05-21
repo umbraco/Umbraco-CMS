@@ -3,6 +3,11 @@
 /*********************************************************************************************************/
 
 var refrechLayout = function (parameters) {
+
+    // Disable links
+    $('a').addClass("myDisable");
+    $('a').bind("click.myDisable", function () { return false; });
+
     var string = "less.modifyVars({" + parameters.join(",") + "})";
     eval(string);
 }
@@ -16,8 +21,8 @@ var closeIntelTuning = function (tuningModel) {
 
     if (tuningModel) {
 
-        $('a').removeClass("myDisable");
-        $('a').unbind("click.myDisable");
+        //$('a').removeClass("myDisable");
+        //$('a').unbind("click.myDisable");
 
         $("[tuning-over]").css('outline', 'none');
         $.each(tuningModel.categories, function (key, category) {
@@ -38,8 +43,8 @@ var initIntelTuning = function (tuningModel) {
 
     if (tuningModel) {
 
-        $('a').addClass("myDisable");
-        $('a').bind("click.myDisable", function () { return false; });
+        //$('a').addClass("myDisable");
+        //$('a').bind("click.myDisable", function () { return false; });
 
         $.each(tuningModel.categories, function (key, category) {
             $.each(category.sections, function (key, section) {
@@ -79,18 +84,11 @@ var initIntelTuning = function (tuningModel) {
 
 var initTuningPanel = function () {
 
-    // Disable tuning.style.css
-    var styleSheets = document.styleSheets;
-    var href = 'tuning.style.css';
-    for (var i = 0; i < styleSheets.length; i++) {
-        if (styleSheets[i].href.indexOf(href) > -1) {
-            styleSheets[i].disabled = true;
-            break;
-        }
+    // Init panel 
+    if (parent.setFrameIsLoaded) {
+        parent.setFrameIsLoaded(tuningParameterUrl);
     }
 
-    // Init panel 
-    parent.setFrameIsLoaded();
 }
 
 initTuningPanel();

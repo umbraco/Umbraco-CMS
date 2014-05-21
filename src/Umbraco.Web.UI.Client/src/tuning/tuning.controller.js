@@ -10,7 +10,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 .controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout, $location) {
 
     $scope.isOpen = false;
-    $scope.frameLoaded = false;
+    $scope.frameLoaded = 0;
+    $scope.frameFirstLoaded = false;
+    $scope.tuningParameterUrl = "";
     $scope.schemaFocus = "body";
     $scope.settingIsOpen = 'previewDevice';
     $scope.BackgroundPositions = ['center', 'left', 'right', 'bottom center', 'bottom left', 'bottom right', 'top center', 'top left', 'top right'];
@@ -23,7 +25,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.pageId = "../dialogs/Preview.aspx?id=" + $location.search().id;
     $scope.devices = [
         { name: "desktop", css: "desktop", icon: "icon-display" },
-        { name: "laptop - 1366px", css: "laptop border", icon: "icon-laptop" },
+        { name: "laptop - 1024px", css: "laptop border", icon: "icon-laptop" },
         { name: "iPad portrait - 768px", css: "iPad-portrait border", icon: "icon-ipad" },
         { name: "iPad landscape - 1024px", css: "iPad-landscape border", icon: "icon-ipad flip" },
         { name: "smartphone portrait - 480px", css: "smartphone-portrait border", icon: "icon-iphone" },
@@ -33,7 +35,10 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Load parameters from GetLessParameters and init data of the tuning config
     var initTuning = function () {
-        $http.get('/Umbraco/Api/tuning/GetLessParameters')
+
+        console.info("url " + $scope.tuningParameterUrl);
+
+        $http.get('/Umbraco/Api/tuning/Load', { params: { param: $scope.tuningParameterUrl } })
             .success(function (data) {
 
                 $.each(tuningConfig.categories, function (indexCategory, category) {
@@ -62,6 +67,10 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
                 $scope.tuningModel = tuningConfig;
                 $scope.tuningPalette = tuningPalette;
+
+                if ($scope.settingIsOpen == "setting") {
+                    openIntelTuning();
+                }
 
             });
     }
@@ -164,14 +173,14 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
             })
         });
 
-        var resultParameters = { result: parameters.join("") };
+        var resultParameters = { result: parameters.join(""), pageId: $location.search().id };
         var transform = function (result) {
             return $.param(result);
         }
 
         $('.btn-default-save').attr("disabled", true);
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-        $http.post('/Umbraco/Api/tuning/PostLessParameters', resultParameters, {
+        $http.post('/Umbraco/Api/tuning/Save', resultParameters, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
             transformRequest: transform
         })
@@ -179,6 +188,19 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
             $('.btn-default-save').attr("disabled", false);
             $('#speechbubble').fadeIn('slow').delay(5000).fadeOut('slow');
         });
+
+    }
+
+    // Delete current page tuning
+    $scope.deleteTuning = function () {
+
+        $('.btn-default-delete').attr("disabled", true);
+        $http.get('/Umbraco/Api/tuning/Delete', { params: { pageId: $location.search().id } })
+        .success(function (data) {
+            $scope.frameLoaded++;
+            $scope.pageId = $scope.pageId + "&n=123456";
+            $('.btn-default-delete').attr("disabled", false);
+        })
 
     }
 
@@ -277,18 +299,21 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $scope.googleFontFamilies = data;
     })
 
+    // watch framLoaded
     $scope.$watch("frameLoaded", function () {
-        if ($scope.frameLoaded) {
-            console.info("init tuning");
+        if ($scope.frameLoaded > 0) {
+            initTuning();
             $scope.$watch('tuningModel', function () {
                 refreshtuning();
             }, true);
-            $scope.togglePanel();
         }
     }, true)
 
+    // first panel init
     initTuning();
-    $("#tuningPanel").show();
+
+    // toggle panel
+    $scope.togglePanel();
 
 })
 

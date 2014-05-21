@@ -40,9 +40,11 @@ var refrechIntelTuning = function (schema) {
 
 }
 
-var setFrameIsLoaded = function () {
-    console.info("iframe id loaded");
+var setFrameIsLoaded = function (tuningParameterUrl) {
+    console.info("iframe id loaded " + tuningParameterUrl);
     var scope = angular.element($("#tuningPanel")).scope();
-    scope.frameLoaded = true;
+    scope.tuningParameterUrl = tuningParameterUrl;
+    scope.frameLoaded++;
+    scope.frameFirstLoaded = true;
     scope.$apply();
 }

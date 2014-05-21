@@ -1300,6 +1300,54 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region tuning
+
+        public HtmlString EnableTuning()
+        {
+
+            string previewLink = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" + 
+                                 @"<link href=""{0}"" rel=""stylesheet/less"" type=""text/css"" />" +
+                                 @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js""></script>" +
+                                 @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js""></script>" +
+                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';</script>" +
+                                 @"<script src=""/umbraco/js/tuning.front.js""></script>";
+
+            string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" + 
+                                    @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />";
+
+            string defaultLessStyle = @"/Umbraco/assets/less/tuning.defaultStyle.less";
+            string defaultCssStyle = @"/Umbraco/assets/css/tuning.defaultStyle.css";
+
+            string styleTuning = UmbracoContext.Current.InPreviewMode ? @"/Css/tuning/{0}.less" : "/Css/tuning/{0}.css";
+
+            int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
+            string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
+
+            // Looking for style folder
+            string linkResult = string.Empty;
+            foreach (var page in path.OrderByDescending(r => path.IndexOf(r)))
+            {
+                string stylePath = HttpContext.Current.Server.MapPath(string.Format(styleTuning, page));
+                if (System.IO.File.Exists(stylePath))
+                {
+                    linkResult = string.Format(styleTuning, page);
+                    break;
+                }
+            }
+
+            string result = string.Empty;
+            if (UmbracoContext.Current.InPreviewMode) {
+                result = string.IsNullOrEmpty(linkResult) ? string.Format(previewLink, defaultLessStyle) : string.Format(previewLink, linkResult);
+            }
+            else {
+                result = string.IsNullOrEmpty(linkResult) ? string.Format(noPreviewLinks, defaultCssStyle) : string.Format(noPreviewLinks, linkResult);
+            }
+            return new HtmlString(result);
+
+        }
+
+        #endregion
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
