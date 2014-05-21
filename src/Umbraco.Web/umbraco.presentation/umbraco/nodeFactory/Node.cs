@@ -551,7 +551,13 @@ namespace umbraco.NodeFactory
 		{
            if (HttpContext.Current.Items["pageID"] == null)
                 throw new InvalidOperationException("There is no current node.");
-		    return (int)HttpContext.Current.Items["pageID"];
+
+		    var intAttempt = HttpContext.Current.Items["pageID"].TryConvertTo<int>();
+		    if (intAttempt == false)
+		    {
+                throw new InvalidOperationException("The pageID value in the HttpContext.Items cannot be converted to an integer");
+		    }
+		    return intAttempt.Result;
 		}
 	}
 }

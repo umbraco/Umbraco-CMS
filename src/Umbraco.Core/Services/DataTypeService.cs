@@ -124,7 +124,9 @@ namespace Umbraco.Core.Services
             {
                 var collection = repository.GetPreValuesCollectionByDataTypeId(id);
                 //now convert the collection to a string list
-                var list = collection.FormatAsDictionary().Select(x => x.Value.Value).ToList();
+                var list = collection.FormatAsDictionary()
+                    .Select(x => x.Value.Value)
+                    .ToList();
                 return list;
             }
         }

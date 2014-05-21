@@ -133,7 +133,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         umbRequestHelper.getApiUrl(
                             "memberApiBaseUrl",
                             "GetEmpty")),
-                    'Failed to retreive data for empty member item type ' + alias);
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
 
         },

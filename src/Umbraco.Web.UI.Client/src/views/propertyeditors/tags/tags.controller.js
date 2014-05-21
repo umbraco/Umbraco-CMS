@@ -12,13 +12,21 @@ angular.module("umbraco")
             //load current value
             $scope.currentTags = [];
             if ($scope.model.value) {
-                $scope.currentTags = $scope.model.value.split(",");
+                if ($scope.model.config.storageType && $scope.model.config.storageType === "Json") {
+                    //it's a json array already
+                    $scope.currentTags = $scope.model.value;
+                }
+                else {
+                    //it is csv
+                    $scope.currentTags = $scope.model.value.split(",");
+                }
+                
             }
 
             //Helper method to add a tag on enter or on typeahead select
             function addTag(tagToAdd) {
                 if (tagToAdd.length > 0) {
-                    if ($scope.currentTags.indexOf(tagToAdd) < 0) {
+                    if ($scope.currentTags.indexOf(tagToAdd) < 0) {                       
                         $scope.currentTags.push(tagToAdd);
                     }
                 }
@@ -34,6 +42,7 @@ angular.module("umbraco")
                         e.preventDefault();
                         //we need to use jquery because typeahead duplicates the text box
                         addTag($scope.tagToAdd);
+                        $scope.tagToAdd = "";
                     }
 
                 }
@@ -46,16 +55,24 @@ angular.module("umbraco")
                 }
             };
 
-            //sync model on submit (needed since we convert an array to string)	
+            //sync model on submit, always push up a json array
             $scope.$on("formSubmitting", function (ev, args) {
-                $scope.model.value = $scope.currentTags.join();
+                $scope.model.value = $scope.currentTags;
             });
 
             //vice versa
             $scope.model.onValueChanged = function (newVal, oldVal) {
                 //update the display val again if it has changed from the server
-                $scope.model.val = newVal;
-                $scope.currentTags = $scope.model.value.split(",");
+                $scope.model.value = newVal;
+
+                if ($scope.model.config.storageType && $scope.model.config.storageType === "Json") {
+                    //it's a json array already
+                    $scope.currentTags = $scope.model.value;
+                }
+                else {
+                    //it is csv
+                    $scope.currentTags = $scope.model.value.split(",");
+                }
             };
 
             //configure the tags data source
@@ -111,15 +128,17 @@ angular.module("umbraco")
                 }).bind("typeahead:selected", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
+                        $scope.tagToAdd = "";
                     });
 
                 }).bind("typeahead:autocompleted", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
+                        $scope.tagToAdd = "";
                     });
 
                 }).bind("typeahead:opened", function (obj) {
-                    console.log("opened ");
+                    //console.log("opened ");
                 });
             });
 

@@ -55,61 +55,12 @@ namespace Umbraco.Web.WebApi
         /// <returns></returns>
         private static async Task<HttpResponseMessage> FilterContinuation(HttpActionContext actionContext, CancellationToken token, IList<IAuthorizationFilter> filters, int index)
         {
-            return await filters[index].ExecuteAuthorizationFilterAsync(actionContext, token, () =>
-            {
-                Func<HttpResponseMessage> nullResponse = () => null;
-                return (index + 1) == filters.Count
-                    ? Task.Run(nullResponse)
-                    : FilterContinuation(actionContext, token, filters, ++index);
-            });
+            return await filters[index].ExecuteAuthorizationFilterAsync(actionContext, token,
+                () => (index + 1) == filters.Count
+                    ? Task.FromResult<HttpResponseMessage>(null)
+                    : FilterContinuation(actionContext, token, filters, ++index));
         }
+  
 
-        /// <summary>
-        /// Sets the JSON GUID format to not have hyphens
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        internal static void SetOutgoingNoHyphenGuidFormat(this HttpControllerContext controllerContext)
-        {
-            var jsonFormatter = controllerContext.Configuration.Formatters.JsonFormatter;
-            jsonFormatter.SerializerSettings.Converters.Add(new GuidNoHyphenConverter());
-        }
-
-
-        /// <summary>
-        /// Sets the JSON datetime format to be a custom one
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        /// <param name="format"></param>
-        internal static void SetOutgoingDateTimeFormat(this HttpControllerContext controllerContext, string format)
-        {
-            var jsonFormatter = controllerContext.Configuration.Formatters.JsonFormatter;
-            jsonFormatter.SerializerSettings.Converters.Add(new CustomDateTimeConvertor(format));
-        }
-
-        /// <summary>
-        /// Sets the JSON datetime format to be our regular iso standard
-        /// </summary>
-        internal static void SetOutgoingDateTimeFormat(this HttpControllerContext controllerContext)
-        {
-            var jsonFormatter = controllerContext.Configuration.Formatters.JsonFormatter;
-            jsonFormatter.SerializerSettings.Converters.Add(new CustomDateTimeConvertor("yyyy-MM-dd HH:mm:ss"));
-        }
-
-        ///// <summary>
-        ///// Removes the xml formatter so it only outputs angularized json (with the json vulnerability prefix added)
-        ///// </summary>
-        ///// <param name="controllerContext"></param>
-        //internal static void EnsureJsonOutputOnly(this HttpControllerContext controllerContext)
-        //{
-        //    controllerContext.Configuration.Formatters = new MediaTypeFormatterCollection();
-
-        //    //remove all json/xml formatters then add our custom one
-        //    var toRemove = controllerContext.Configuration.Formatters.Where(t => (t is JsonMediaTypeFormatter) || (t is XmlMediaTypeFormatter)).ToList();
-        //    foreach (var r in toRemove)
-        //    {
-        //        controllerContext.Configuration.Formatters.Remove(r);
-        //    }
-        //    controllerContext.Configuration.Formatters.Add(new AngularJsonMediaTypeFormatter());
-        //}
     }
 }

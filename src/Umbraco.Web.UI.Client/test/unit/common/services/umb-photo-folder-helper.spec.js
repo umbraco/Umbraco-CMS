@@ -31,7 +31,7 @@ describe('umbPhotoFolderHelper tests', function () {
 
         });
 
-        it('Build a row by removing an item to scale up to fit', function () {
+        it('Builds a row by removing an item to scale up to fit', function () {
 
             var images = [
                 { "properties": [{ "id": 8737, "value": "/media/2173/Save-The-Date.jpg", "alias": "umbracoFile" }, { "id": 8738, "value": "443", "alias": "umbracoWidth" }, { "id": 8739, "value": "500", "alias": "umbracoHeight" }, { "id": 8740, "value": "30830", "alias": "umbracoBytes" }, { "id": 8741, "value": "jpg", "alias": "umbracoExtension" }], "updateDate": "2013-12-10 16:57:56", "createDate": "2013-12-10 14:21:26", "published": false, "owner": { "id": 0, "name": "admin" }, "updator": null, "contentTypeAlias": "Image", "sortOrder": 5, "name": "Save-The-Date.jpg", "id": 1349, "icon": "mediaPhoto.gif", "key": "8eb67ae3-49da-4a25-ab39-185667a9b412", "parentId": 1160, "alias": null, "path": "-1,1142,1160,1349", "metaData": {}, "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1349", "originalWidth": 443, "originalHeight": 500 },
@@ -51,6 +51,26 @@ describe('umbPhotoFolderHelper tests', function () {
 
             expect(result.images.length).toBe(4);
             
+        });
+
+        it('Builds a row by removing an item to scale up to fit, then attempts to upscale remaining 2 images, but that doesnt fit so drops another and we end up with one', function () {
+
+            var images = [
+                { "properties": [{ "id": 8737, "value": "/media/2173/Save-The-Date.jpg", "alias": "umbracoFile" }, { "id": 8738, "value": "198", "alias": "umbracoWidth" }, { "id": 8739, "value": "220", "alias": "umbracoHeight" }, { "id": 8740, "value": "30830", "alias": "umbracoBytes" }, { "id": 8741, "value": "jpg", "alias": "umbracoExtension" }], "updateDate": "2013-12-10 16:57:56", "createDate": "2013-12-10 14:21:26", "published": false, "owner": { "id": 0, "name": "admin" }, "updator": null, "contentTypeAlias": "Image", "sortOrder": 5, "name": "Save-The-Date.jpg", "id": 1349, "icon": "mediaPhoto.gif", "key": "8eb67ae3-49da-4a25-ab39-185667a9b412", "parentId": 1160, "alias": null, "path": "-1,1142,1160,1349", "metaData": {}, "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1349", "originalWidth": 198, "originalHeight": 220 },
+                { "properties": [{ "id": 8742, "value": "/media/2174/IMG_2980.JPG", "alias": "umbracoFile" }, { "id": 8743, "value": "211", "alias": "umbracoWidth" }, { "id": 8744, "value": "500", "alias": "umbracoHeight" }, { "id": 8745, "value": "113311", "alias": "umbracoBytes" }, { "id": 8746, "value": "jpg", "alias": "umbracoExtension" }], "updateDate": "2013-12-10 16:57:51", "createDate": "2013-12-10 14:22:33", "published": false, "owner": { "id": 0, "name": "admin" }, "updator": null, "contentTypeAlias": "Image", "sortOrder": 6, "name": "IMG_2980.JPG", "id": 1350, "icon": "mediaPhoto.gif", "key": "0a9618ea-9b4a-4d34-bf53-e76a0d252048", "parentId": 1160, "alias": null, "path": "-1,1142,1160,1350", "metaData": {}, "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1350", "originalWidth": 211, "originalHeight": 500 },
+                { "properties": [{ "id": 8747, "value": "/media/2175/IMG_3023.JPG", "alias": "umbracoFile" }, { "id": 8748, "value": "940", "alias": "umbracoWidth" }, { "id": 8749, "value": "317", "alias": "umbracoHeight" }, { "id": 8750, "value": "106365", "alias": "umbracoBytes" }, { "id": 8751, "value": "jpg", "alias": "umbracoExtension" }], "updateDate": "2013-12-10 16:57:46", "createDate": "2013-12-10 14:39:28", "published": false, "owner": { "id": 0, "name": "admin" }, "updator": null, "contentTypeAlias": "Image", "sortOrder": 7, "name": "IMG_3023.JPG", "id": 1351, "icon": "mediaPhoto.gif", "key": "44cb1ee0-e3d7-40f7-b27c-ae05fb1a8e0c", "parentId": 1160, "alias": null, "path": "-1,1142,1160,1351", "metaData": {}, "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1351", "originalWidth": 940, "originalHeight": 317 }
+            ];
+            var maxRowHeight = 250;
+            var minDisplayHeight = 105;
+            var maxRowWidth = 400;
+            var idealImgPerRow = 3;
+            var margin = 5;
+
+            var result = umbPhotoFolderHelper.buildRow(images, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
+
+
+            expect(result.images.length).toBe(1);
+
         });
         
         

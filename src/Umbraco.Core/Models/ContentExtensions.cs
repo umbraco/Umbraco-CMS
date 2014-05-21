@@ -9,6 +9,8 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -539,7 +541,7 @@ namespace Umbraco.Core.Models
 
             return ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
         }
-        
+
         #region Tag methods
 
         ///// <summary>
@@ -568,6 +570,21 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
         {
+            content.SetTags(TagCacheStorageType.Csv, propertyTypeAlias, tags, replaceTags, tagGroup);
+        }
+
+        /// <summary>
+        /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
+        /// </summary>
+        /// <param name="content">The content item to assign the tags to</param>
+        /// <param name="storageType">The tag storage type in cache (default is csv)</param>
+        /// <param name="propertyTypeAlias">The property alias to assign the tags to</param>
+        /// <param name="tags">The tags to assign</param>
+        /// <param name="replaceTags">True to replace the tags on the current property with the tags specified or false to merge them with the currently assigned ones</param>
+        /// <param name="tagGroup">The group/category to assign the tags, the default value is "default"</param>
+        /// <returns></returns>
+        public static void SetTags(this IContentBase content, TagCacheStorageType storageType, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        {
             var property = content.Properties[propertyTypeAlias];
             if (property == null)
             {
@@ -583,15 +600,39 @@ namespace Umbraco.Core.Models
             //ensure the property value is set to the same thing
             if (replaceTags)
             {
-                property.Value = string.Join(",", trimmedTags);
+                switch (storageType)
+                {
+                    case TagCacheStorageType.Csv:
+                        property.Value = string.Join(",", trimmedTags);
+                        break;
+                    case TagCacheStorageType.Json:
+                        //json array
+                        property.Value = JsonConvert.SerializeObject(trimmedTags);
+                        break;
+                }
+
             }
             else
             {
-                var currTags = property.Value.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                switch (storageType)
+                {
+                    case TagCacheStorageType.Csv:
+                        var currTags = property.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                        .Select(x => x.Trim());
-                property.Value = string.Join(",", trimmedTags.Union(currTags));
+                        property.Value = string.Join(",", trimmedTags.Union(currTags));
+                        break;
+                    case TagCacheStorageType.Json:
+                        var currJson = JsonConvert.DeserializeObject<JArray>(property.Value.ToString());
+                        //need to append the new ones
+                        foreach (var tag in trimmedTags)
+                        {
+                            currJson.Add(tag);
+                        }
+                        //json array
+                        property.Value = JsonConvert.SerializeObject(currJson);
+                        break;
+                }
             }
-            
         }
 
         /// <summary>
@@ -664,7 +705,7 @@ namespace Umbraco.Core.Models
         {
             return ApplicationContext.Current.Services.PackagingService.Export(media, true, raiseEvents: false);
         }
-       
+
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
@@ -687,10 +728,10 @@ namespace Umbraco.Core.Models
         {
             return ((PackagingService)(ApplicationContext.Current.Services.PackagingService)).Export(member);
         }
-        
+
         #endregion
     }
-        
+
 
 
 }

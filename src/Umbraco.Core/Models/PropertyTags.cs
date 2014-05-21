@@ -33,11 +33,4 @@ namespace Umbraco.Core.Models
         public IEnumerable<Tuple<string, string>> Tags { get; set; }
 
     }
-
-    internal enum PropertyTagBehavior
-    {
-        Replace,
-        Remove,
-        Merge
-    }
 }

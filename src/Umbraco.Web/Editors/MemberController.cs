@@ -37,6 +37,7 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Members)]
+    [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
         /// <summary>
@@ -58,17 +59,7 @@ namespace Umbraco.Web.Editors
             _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
         }
 
-        private MembershipProvider _provider;
-
-        /// <summary>
-        /// Ensure all GUIDs are formatted without hyphens
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        protected override void Initialize(System.Web.Http.Controllers.HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-            controllerContext.SetOutgoingNoHyphenGuidFormat();
-        }
+        private readonly MembershipProvider _provider;
 
         /// <summary>
         /// Returns the currently configured membership scenario for members in umbraco

@@ -43,15 +43,15 @@ namespace Umbraco.Web.Editors
                     LogHelper.Error<TagExtractor>("Could not create custom " + attribute.TagPropertyDefinitionType + " tag definition", ex);
                     throw;
                 }
-                SetPropertyTags(content, property, convertedPropertyValue, def.Delimiter, def.ReplaceTags, def.TagGroup, attribute.ValueType);
+                SetPropertyTags(content, property, convertedPropertyValue, def.Delimiter, def.ReplaceTags, def.TagGroup, attribute.ValueType, def.StorageType);
             }
             else
             {
-                SetPropertyTags(content, property, convertedPropertyValue, attribute.Delimiter, attribute.ReplaceTags, attribute.TagGroup, attribute.ValueType);
+                SetPropertyTags(content, property, convertedPropertyValue, attribute.Delimiter, attribute.ReplaceTags, attribute.TagGroup, attribute.ValueType, attribute.StorageType);
             }
         }
 
-        public static void SetPropertyTags(IContentBase content, Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType)
+        public static void SetPropertyTags(IContentBase content, Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType, TagCacheStorageType storageType)
         {
             if (convertedPropertyValue == null)
             {
@@ -62,14 +62,14 @@ namespace Umbraco.Web.Editors
             {
                 case TagValueType.FromDelimitedValue:
                     var tags = convertedPropertyValue.ToString().Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
-                    content.SetTags(property.Alias, tags, replaceTags, tagGroup);
+                    content.SetTags(storageType, property.Alias, tags, replaceTags, tagGroup);
                     break;
                 case TagValueType.CustomTagList:
                     //for this to work the object value must be IENumerable<string>
                     var stringList = convertedPropertyValue as IEnumerable<string>;
                     if (stringList != null)
                     {
-                        content.SetTags(property.Alias, stringList, replaceTags, tagGroup);
+                        content.SetTags(storageType, property.Alias, stringList, replaceTags, tagGroup);
                     }
                     break;
             }

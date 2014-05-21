@@ -15,43 +15,13 @@ namespace Umbraco.Core
         public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
         {
             if (source == null)
-                throw new NullReferenceException("source");
+                throw new ArgumentNullException("source");
+            if (groupSize <= 0)
+                throw new ArgumentException("Must be greater than zero.", "groupSize");
 
-            // enumerate the source only once!
-            return new InGroupsEnumerator<T>(source, groupSize).Groups();
-        }
-
-        // this class makes sure that the source is enumerated only ONCE
-        // which means that when it is enumerated, the actual groups content
-        // has to be evaluated at the same time, and stored in an array.
-        private class InGroupsEnumerator<T>
-        {
-            private readonly IEnumerator<T> _source;
-            private readonly int _count;
-            private bool _mightHaveNext;
-
-            public InGroupsEnumerator(IEnumerable<T> source, int count)
-            {
-                _source = source.GetEnumerator();
-                _count = count;
-                _mightHaveNext = true;
-            }
-
-            public IEnumerable<IEnumerable<T>> Groups()
-            {
-                while (_mightHaveNext && _source.MoveNext())
-                    yield return Group().ToArray(); // see note above
-            }
-
-            private IEnumerable<T> Group()
-            {
-                var c = 0;
-                do
-                {
-                    yield return _source.Current;
-                } while (++c < _count && _source.MoveNext());
-                _mightHaveNext = c == _count;
-            }
+            return source
+                .Select((x, i) => Tuple.Create(i / groupSize, x))
+                .GroupBy(t => t.Item1, t => t.Item2);
         }
 
         /// <summary>The distinct by.</summary>

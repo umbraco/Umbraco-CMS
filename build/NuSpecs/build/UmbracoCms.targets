@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <UmbracoVersion>7.1.2</UmbracoVersion>
-  </PropertyGroup>
   <Target Name="CopyUmbracoFilesToWebRoot" BeforeTargets="AfterBuild">
     <PropertyGroup>
-      <UmbracoFilesFolder>..\packages\UmbracoCms.$(UmbracoVersion)\UmbracoFiles\</UmbracoFilesFolder>
+      <UmbracoFilesFolder>$(MSBuildThisFileDirectory)..\UmbracoFiles\</UmbracoFilesFolder>
     </PropertyGroup>
     <ItemGroup>
       <UmbracoFiles Include="$(UmbracoFilesFolder)**\*" />
@@ -32,6 +29,9 @@
       </CustomFilesToInclude>
       <CustomFilesToInclude Include=".\Config\Splashes\**\*">
         <Dir>Config\Splashes</Dir>
+      </CustomFilesToInclude>
+      <CustomFilesToInclude Include=".\data\**\*">
+        <Dir>data</Dir>
       </CustomFilesToInclude>
       <CustomFilesToInclude Include=".\umbraco\**\*">
         <Dir>umbraco</Dir>

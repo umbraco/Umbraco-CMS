@@ -17,25 +17,30 @@ function duplicatePropertyNameAsSafeAlias(propertySelector) {
         var prop = $(this);
         var inputName = prop.find('.prop-name');
         var inputAlias = prop.find('.prop-alias');
-        inputName.on('input', function (event) {
+        inputName.on('input blur', function (event) {
             getSafeAlias(inputAlias, inputName.val(), false, function (alias) {
-                inputAlias.val(alias);
+                if (!inputAlias.data('dirty'))
+                    inputAlias.val(alias);
             });
-        }).on('blur', function (event) {
-            $(this).off('input');
+        });
+        inputAlias.on('input', function(event) {
+            inputName.off('input blur');
         });
     });
 }
 
 function checkAlias(aliasSelector) {
-    $(aliasSelector).keyup(function (event) {
+    $(aliasSelector).on('input', function (event) {
         var input = $(this);
+        input.data('dirty', true);
         var value = input.val();
         validateSafeAlias(input, value, false, function (isSafe) {
             input.toggleClass('highlight-error', !isSafe);
         });
-    }).blur(function(event) {
+    }).on('blur', function(event) {
         var input = $(this);
+        if (!input.data('dirty')) return;
+        input.removeData('dirty');
         var value = input.val();
         getSafeAlias(input, value, true, function (alias) {
             if (value.toLowerCase() != alias.toLowerCase())

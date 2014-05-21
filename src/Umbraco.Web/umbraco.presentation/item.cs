@@ -85,31 +85,32 @@ namespace umbraco
                         var rval = pval == null ? string.Empty : pval.ToString();
                         _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                     }
-                    else if (elements[_fieldName] != null && string.IsNullOrEmpty(elements[_fieldName].ToString()) == false)
-                    {                        
+                    else
+                    {
                         //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
-                        _fieldContent = elements[_fieldName].ToString().Trim();                           
+                        var elt = elements[_fieldName];
+                        if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
+                            _fieldContent = elt.ToString().Trim();
                     }
 
                     //now we check if the value is still empty and if so we'll check useIfEmpty
                     if (string.IsNullOrEmpty(_fieldContent))
                     {
-                        //if useIfEmpty is true
-                        if (string.IsNullOrEmpty(helper.FindAttribute(attributes, "useIfEmpty")) == false)
+                        var altFieldName = helper.FindAttribute(attributes, "useIfEmpty");
+                        if (string.IsNullOrEmpty(altFieldName) == false)
                         {
-                            var altFieldName = helper.FindAttribute(attributes, "useIfEmpty");
-
-                            //check for published content and get its value using that
                             if (publishedContent != null && publishedContent.HasProperty(altFieldName))
                             {
                                 var pval = publishedContent.GetPropertyValue(altFieldName);
                                 var rval = pval == null ? string.Empty : pval.ToString();
                                 _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                             }
-                            else if (elements[altFieldName] != null && string.IsNullOrEmpty(elements[altFieldName].ToString()) == false)
+                            else
                             {
                                 //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
-                                _fieldContent = elements[altFieldName].ToString().Trim();
+                                var elt = elements[altFieldName];
+                                if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
+                                    _fieldContent = elt.ToString().Trim();
                             }
                         }
                     }                    

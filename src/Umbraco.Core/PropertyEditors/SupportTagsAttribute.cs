@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -30,12 +31,18 @@ namespace Umbraco.Core.PropertyEditors
             Delimiter = ",";
             ReplaceTags = true;
             TagGroup = "default";
+            StorageType = TagCacheStorageType.Csv;
         }
 
         /// <summary>
         /// Defines how the tag values will be extracted, default is FromDelimitedValue
         /// </summary>
         public TagValueType ValueType { get; set; }
+
+        /// <summary>
+        /// Defines how to store the tags in cache (CSV or Json)
+        /// </summary>
+        public TagCacheStorageType StorageType { get; set; }
 
         /// <summary>
         /// Defines a custom delimiter, the default is a comma

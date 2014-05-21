@@ -44,9 +44,9 @@ namespace Umbraco.Core
         /// file is cached temporarily until app startup completes.
         /// </summary>
         /// <param name="appContext"></param>
-        /// <param name="detectBinChanges"></param>
-        internal PluginManager(ApplicationContext appContext, bool detectBinChanges = true)
-            : this(detectBinChanges)
+        /// <param name="detectChanges"></param>
+        internal PluginManager(ApplicationContext appContext, bool detectChanges = true)
+            : this(detectChanges)
         {
             if (appContext == null) throw new ArgumentNullException("appContext");
             _appContext = appContext;
@@ -55,11 +55,11 @@ namespace Umbraco.Core
         /// <summary>
         /// Creates a new PluginManager
         /// </summary>
-        /// <param name="detectCodeChanges">
-        /// If true will detect changes in the /bin folder and therefor load plugins from the 
+        /// <param name="detectChanges">
+        /// If true will detect changes in the /bin folder, app_code, etc... and therefor load plugins from the 
         /// cached plugins file if one is found. If false will never use the cache file for plugins
         /// </param>
-        internal PluginManager(bool detectCodeChanges = true)
+        internal PluginManager(bool detectChanges = true)
         {
             _tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
             //create the folder if it doesn't exist
@@ -68,29 +68,41 @@ namespace Umbraco.Core
                 Directory.CreateDirectory(_tempFolder);
             }
 
+            var pluginListFile = GetPluginListFilePath();
+
             //this is a check for legacy changes, before we didn't store the TypeResolutionKind in the file which was a mistake,
             //so we need to detect if the old file is there without this attribute, if it is then we delete it
             if (DetectLegacyPluginListFile())
             {
-                var filePath = GetPluginListFilePath();
-                File.Delete(filePath);
+                File.Delete(pluginListFile);
             }
 
-            if (detectCodeChanges)
+            if (detectChanges)
             {
                 //first check if the cached hash is 0, if it is then we ne
                 //do the check if they've changed
-                HaveAssembliesChanged = (CachedAssembliesHash != CurrentAssembliesHash) || CachedAssembliesHash == 0;
+                RequiresRescanning = (CachedAssembliesHash != CurrentAssembliesHash) || CachedAssembliesHash == 0;
                 //if they have changed, we need to write the new file
-                if (HaveAssembliesChanged)
+                if (RequiresRescanning)
                 {
+                    //if the hash has changed, clear out the persisted list no matter what, this will force
+                    // rescanning of all plugin types including lazy ones.
+                    // http://issues.umbraco.org/issue/U4-4789
+                    File.Delete(pluginListFile);
+
                     WriteCachePluginsHash();
                 }
             }
             else
             {
+
+                //if the hash has changed, clear out the persisted list no matter what, this will force
+                // rescanning of all plugin types including lazy ones.
+                // http://issues.umbraco.org/issue/U4-4789
+                File.Delete(pluginListFile);
+
                 //always set to true if we're not detecting (generally only for testing)
-                HaveAssembliesChanged = true;
+                RequiresRescanning = true;
             }
 
         }
@@ -130,9 +142,9 @@ namespace Umbraco.Core
 
 
         /// <summary>
-        /// Returns a bool if the assemblies in the /bin have changed since they were last hashed.
+        /// Returns a bool if the assemblies in the /bin, app_code, global.asax, etc... have changed since they were last hashed.
         /// </summary>
-        internal bool HaveAssembliesChanged { get; private set; }
+        internal bool RequiresRescanning { get; private set; }
 
         /// <summary>
         /// Returns the currently cached hash value of the scanned assemblies in the /bin folder. Returns 0 
@@ -328,7 +340,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// Generally only used for resetting cache, for example during the install process
         /// </remarks>
-        internal void ClearPluginCache()
+        public void ClearPluginCache()
         {
             var path = GetPluginListFilePath();
             if (File.Exists(path))
@@ -670,7 +682,7 @@ namespace Umbraco.Core
 
                         //we first need to look into our cache file (this has nothing to do with the 'cacheResult' parameter which caches in memory).
                         //if assemblies have not changed and the cache file actually exists, then proceed to try to lookup by the cache file.
-                        if (HaveAssembliesChanged == false && File.Exists(GetPluginListFilePath()))
+                        if (RequiresRescanning == false && File.Exists(GetPluginListFilePath()))
                         {
                             var fileCacheResult = TryGetCachedPluginsFromFile<T>(resolutionType);
 

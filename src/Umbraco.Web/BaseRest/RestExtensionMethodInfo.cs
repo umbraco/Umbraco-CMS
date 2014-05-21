@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.BaseRest
 {
+    [Obsolete("Umbraco /base is obsoleted, use WebApi (UmbracoApiController) instead for all REST based logic")]
 	class RestExtensionMethodInfo
 	{
 		#region Utilities

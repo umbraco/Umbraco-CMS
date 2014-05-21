@@ -178,9 +178,8 @@ angular.module('umbraco.services')
          * @methodOf umbraco.services.assetsService
          *
          * @description
-         * Injects a collection of files, this can be a mixed collection of css and js files, the loader will determine how to load them
+         * Injects a collection of files, this can be ONLY js files
          * 
-         * **Warning:** if the collection of files contains a .css file, you will in some cases not receive a resolved promise, it is therefore prefered to use the individual loadCss and loadJs methods
          *
          * @param {Array} pathArray string array of paths to the files to load
          * @param {Scope} scope optional scope to pass into the loader

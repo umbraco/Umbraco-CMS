@@ -81,7 +81,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
                        "GetAll")),
-               'Failed to retreive data');
+               'Failed to retrieve data');
         },
 
         /**
@@ -118,7 +118,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
                        "GetEmpty")),
-               'Failed to retreive data for empty datatype');
+               'Failed to retrieve data for empty datatype');
         },
         /**
          * @ngdoc method

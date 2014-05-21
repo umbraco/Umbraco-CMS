@@ -364,7 +364,58 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Update_Property_For_Macro()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
+            {
+                var macro = repository.Get(1);
+                macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
+                repository.AddOrUpdate(macro);
+                unitOfWork.Commit();
 
+                //Act 
+                macro = repository.Get(1);
+                macro.Properties["new1"].Name = "this is a new name";
+                repository.AddOrUpdate(macro);
+                unitOfWork.Commit();
+
+
+                // Assert
+                var result = repository.Get(1);                
+                Assert.AreEqual("new1", result.Properties.First().Alias);
+                Assert.AreEqual("this is a new name", result.Properties.First().Name);
+
+            }
+        }
+
+        [Test]
+        public void Can_Update_Macro_Property_Alias()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
+            {
+                var macro = repository.Get(1);
+                macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
+                repository.AddOrUpdate(macro);
+                unitOfWork.Commit();
+
+                //Act 
+                macro = repository.Get(1);
+                macro.Properties.UpdateProperty("new1", newAlias: "newAlias");
+                repository.AddOrUpdate(macro);
+                unitOfWork.Commit();
+                
+                // Assert
+                var result = repository.Get(1);
+                Assert.AreEqual("newAlias", result.Properties.First().Alias);
+            }
+        }
 
         [TearDown]
         public override void TearDown()

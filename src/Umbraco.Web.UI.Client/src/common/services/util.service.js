@@ -139,7 +139,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 return { height: minDisplayHeight, imgCount: 1 };
             }
             else if (idealImages.length === idealImgPerRow && targetHeight < maxRowHeight) {
-                //if we're already dealing with the ideal images per row and it's not quite there, we can scale up a little bit so 
+
+                //if we're already dealing with the ideal images per row and it's not quite wide enough, we can scale up a little bit so 
                 // long as the targetHeight is currently less than the maxRowHeight. The scale up will be half-way between our current
                 // target height and the maxRowHeight (we won't loop forever though - if there's a difference of 5 px we'll just quit)
                 
@@ -152,9 +153,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                     }
                 }
 
-                //Ok, we couldn't actually scale it up with the ideal row count (TBH I'm not sure that this would ever happen but we'll take it into account)
-                // we'll just recurse with another image count.
-                return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow + 1, margin);
+                //Ok, we couldn't actually scale it up with the ideal row count we'll just recurse with a lesser image count.
+                return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow - 1, margin);
             }
             else {
                 //we have additional images so we'll recurse and add 1 to the idealImgPerRow until it fits

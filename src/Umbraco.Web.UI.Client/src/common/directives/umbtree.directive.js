@@ -204,7 +204,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     }
                     else {
                         scope.eventhandler.one("treeLoaded", function(e, args) {
-                            doLoad(args.tree);
+                            doLoad(args.tree.root);
                         });
                     }
                 }
