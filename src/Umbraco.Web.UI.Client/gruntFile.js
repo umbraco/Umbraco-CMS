@@ -11,7 +11,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
-  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'concat:tuningLess', 'copy:vs']);
+  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
@@ -134,9 +134,7 @@ module.exports = function (grunt) {
                 }
               ]
       },
-      */
-
-
+      
       installer: {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
@@ -144,7 +142,8 @@ module.exports = function (grunt) {
       tuning: {
           files: [
               { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/less', src: 'tuning.lessParameters.less', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/assets/css', src: 'tuning.defaultStyle.css', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/assets/less', src: 'tuning.defaultStyle.less', expand: true, cwd: 'src/tuning' },
               { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
               { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
               { dest: '<%= distdir %>/js', src: 'tuning.front.js', expand: true, cwd: 'src/tuning' }
@@ -215,10 +214,6 @@ module.exports = function (grunt) {
         tuningJs: {
             src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
             dest: '<%= distdir %>/js/tuning.panel.js'
-        },
-        tuningLess: {
-            src: ['src/tuning/tuning.lessParameters.less', 'src/tuning/tuning.baseStyles.less', 'src/tuning/tuning.dynamicStyles.less'],
-            dest: '<%= distdir %>/assets/less/tuning.style.less',
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],

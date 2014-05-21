@@ -44,7 +44,7 @@ var setFrameIsLoaded = function (tuningParameterUrl) {
     console.info("iframe id loaded " + tuningParameterUrl);
     var scope = angular.element($("#tuningPanel")).scope();
     scope.tuningParameterUrl = tuningParameterUrl;
-    scope.frameLoaded ++;
+    scope.frameLoaded++;
     scope.frameFirstLoaded = true;
     scope.$apply();
 }
@@ -87,7 +87,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     var initTuning = function () {
 
         console.info("url " + $scope.tuningParameterUrl);
-        
+
         $http.get('/Umbraco/Api/tuning/Load', { params: { param: $scope.tuningParameterUrl } })
             .success(function (data) {
 
@@ -247,7 +247,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $('.btn-default-delete').attr("disabled", true);
         $http.get('/Umbraco/Api/tuning/Delete', { params: { pageId: $location.search().id } })
         .success(function (data) {
-            $scope.frameLoaded ++;
+            $scope.frameLoaded++;
             $scope.pageId = $scope.pageId + "&n=123456";
             $('.btn-default-delete').attr("disabled", false);
         })
