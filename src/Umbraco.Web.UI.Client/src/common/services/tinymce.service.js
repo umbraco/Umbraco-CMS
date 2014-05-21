@@ -61,7 +61,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 tooltip: 'Embed',
                 onclick: function () {
                     dialogService.embedDialog({
-                        scope: $scope, callback: function (data) {
+                        callback: function (data) {
                             editor.insertContent(data);
                         }
                     });
@@ -80,7 +80,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance        
         * @param {Object} $scope the current controller scope
         */
-        createMediaPicker: function (editor, $scope) {
+        createMediaPicker: function (editor) {
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
@@ -103,7 +103,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         currentTarget: currentTarget,
                         onlyImages: true,
                         showDetails: true,
-                        scope: $scope, callback: function (img) {
+                        callback: function (img) {
 
                             if (img) {
                                 
@@ -137,49 +137,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     });
                 }
             });
-        },
-
-        /**
-        * @ngdoc method
-        * @name umbraco.services.tinyMceService#createLinkPicker
-        * @methodOf umbraco.services.tinyMceService
-        *
-        * @description
-        * Creates the umbrco insert link tinymce plugin
-        *
-        * @param {Object} editor the TinyMCE editor instance        
-        * @param {Object} $scope the current controller scope
-        */
-        createLinkPicker: function (editor, $scope) {
-
-            /*
-            editor.addButton('link', {
-                icon: 'custom icon-link',
-                tooltip: 'Link Picker',
-                onclick: function () {
-                    dialogService.linkPicker({
-                        scope: $scope, callback: function (link) {
-                            if (link) {
-                                var data = {
-                                    title: "Some description",
-                                    href: "",
-                                    id: '__mcenew'
-                                };
-
-                                editor.execCommand("mceInsertLink", false, {
-                                                href: "wat",
-                                                title: "muh",
-                                                target: null,
-                                                "class": null
-                                            });
-
-
-                                //editor.insertContent(editor.dom.createHTML('a', data));
-                           }
-                        }
-                    });
-                }
-            });*/
         },
 
         /**
@@ -496,7 +453,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     }
 
                     dialogService.macroPicker({
-                        scope: $scope,
                         dialogData : dialogData,
                         callback: function(data) {
 

@@ -2,7 +2,7 @@ angular.module("umbraco")
 	.controller("Umbraco.Editors.Content.CopyController",
 	function ($scope, eventsService, contentResource, navigationService, appState, treeService) {
 
-	    var dialogOptions = $scope.$parent.dialogOptions;
+	    var dialogOptions = $scope.dialogOptions;
 
 	    $scope.relateToOriginal = false;
 	    $scope.dialogTreeEventHandler = $({});

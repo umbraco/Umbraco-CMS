@@ -4,7 +4,7 @@ function ContentEditDialogController($scope) {
     $scope.model.defaultButton = null;
     $scope.model.subButtons = [];
     
-    var dialogOptions = $scope.$parent.dialogOptions;
+    var dialogOptions = $scope.dialogOptions;
     if(dialogOptions.entity){
     	$scope.model.entity = dialogOptions.entity;
     	$scope.loaded = true;	

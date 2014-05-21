@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, $log) {
-	var dialogOptions = $scope.$parent.dialogOptions;
+	var dialogOptions = $scope.dialogOptions;
 	
 	$scope.dialogTreeEventHandler = $({});
 	$scope.target = {};

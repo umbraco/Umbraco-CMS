@@ -3,7 +3,7 @@ angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
         function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies) {
 
-            var dialogOptions = $scope.$parent.dialogOptions;
+            var dialogOptions = $scope.dialogOptions;
 
             $scope.onlyImages = dialogOptions.onlyImages;
             $scope.showDetails = dialogOptions.showDetails;

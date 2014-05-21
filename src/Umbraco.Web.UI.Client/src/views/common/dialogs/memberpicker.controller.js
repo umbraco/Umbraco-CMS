@@ -1,7 +1,7 @@
 //used for the member picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
     function($scope, eventsService, entityResource, searchService, $log) {
-        var dialogOptions = $scope.$parent.dialogOptions;
+        var dialogOptions = $scope.dialogOptions;
         $scope.dialogTreeEventHandler = $({});
         $scope.results = [];
 

@@ -33,7 +33,7 @@ angular.module("umbraco")
             google.maps.event.addListener(map, 'click', function (event) {
 
                 dialogService.mediaPicker({
-                    scope: $scope, callback: function (data) {
+                    callback: function (data) {
                         var image = data.selection[0].src;
 
                         var latLng = event.latLng;

@@ -29,7 +29,6 @@ angular.module('umbraco')
 			var d = dialogService.treePicker({
 				section: $scope.cfg.type,
 				treeAlias: $scope.cfg.type,
-				scope: $scope, 
 				multiPicker: $scope.cfg.multiPicker,
 				callback: populate});
 		};

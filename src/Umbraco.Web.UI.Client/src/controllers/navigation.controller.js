@@ -107,9 +107,6 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //this reacts to the options item in the tree
     //todo, migrate to nav service
     $scope.searchShowMenu = function (ev, args) {
-        $scope.currentNode = args.node;
-        args.scope = $scope;
-
         //always skip default
         args.skipDefault = true;
         navigationService.showMenu(ev, args);

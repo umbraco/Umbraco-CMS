@@ -400,7 +400,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                             }
 
                             var dialog = self.showDialog({
-                                scope: args.scope,
                                 node: args.node,
                                 action: found,
                                 section: appState.getSectionState("currentSection")
@@ -569,12 +568,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * into #dialog div.umb-panel-body
          * the path to the dialog view is determined by: 
          * "views/" + current tree + "/" + action alias + ".html"
-         * The dialog controller will get passed a scope object that is created here. This scope
-         * object may be injected as part of the args object, if one is not found then a new scope
-         * is created. Regardless of whether a scope is created or re-used, a few properties and methods 
-         * will be added to it so that they can be used in any dialog controller:
+         * The dialog controller will get passed a scope object that is created here with the properties:
          *  scope.currentNode = the selected tree node
          *  scope.currentAction = the selected menu item
+         *  so that the dialog controllers can use these properties
+         * 
          * @param {Object} args arguments passed to the function
          * @param {Scope} args.scope current scope passed to the dialog
          * @param {Object} args.action the clicked action containing `name` and `alias`
@@ -598,8 +596,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             setMode("dialog");
 
-            //set up the scope object and assign properties
-            var dialogScope = args.scope || $rootScope.$new();
+            //NOTE: Set up the scope object and assign properties, this is legacy functionality but we have to live with it now.
+            // we should be passing in currentNode and currentAction using 'dialogData' for the dialog, not attaching it to a scope.
+            // This scope instance will be destroyed by the dialog so it cannot be a scope that exists outside of the dialog.
+            // If a scope instance has been passed in, we'll have to create a child scope of it, otherwise a new root scope.
+            var dialogScope = args.scope ? args.scope.$new() : $rootScope.$new();
             dialogScope.currentNode = args.node;
             dialogScope.currentAction = args.action;
 
@@ -657,14 +658,19 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             var dialog = dialogService.open(
                 {
                     container: $("#dialog div.umb-modalcolumn-body"),
+                    //The ONLY reason we're passing in scope to the dialogService (which is legacy functionality) is 
+                    // for backwards compatibility since many dialogs require $scope.currentNode or $scope.currentAction
+                    // to exist
                     scope: dialogScope,
-                    currentNode: args.node,
-                    currentAction: args.action,
                     inline: true,
                     show: true,
                     iframe: iframe,
                     modalClass: "umb-dialog",
-                    template: templateUrl
+                    template: templateUrl,
+
+                    //These will show up on the dialog controller's $scope under dialogOptions
+                    currentNode: args.node,
+                    currentAction: args.action,
                 });
 
             //save the currently assigned dialog so it can be removed before a new one is created

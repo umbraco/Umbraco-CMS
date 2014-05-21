@@ -17,14 +17,14 @@
 
             $scope.internal = function ($event) {
                 $scope.currentEditLink = null;
-                var d = dialogService.contentPicker({ scope: $scope, multipicker: false, callback: select });
+                var d = dialogService.contentPicker({ multipicker: false, callback: select });
                 $event.preventDefault();
             };
             
             $scope.selectInternal = function ($event, link) {
 
                 $scope.currentEditLink = link;
-                var d = dialogService.contentPicker({ scope: $scope, multipicker: false, callback: select });
+                var d = dialogService.contentPicker({ multipicker: false, callback: select });
                 $event.preventDefault();
             };
 

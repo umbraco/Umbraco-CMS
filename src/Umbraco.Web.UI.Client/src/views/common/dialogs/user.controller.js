@@ -22,7 +22,7 @@ angular.module("umbraco")
             var pendingChangeEvent = eventsService.on("valFormManager.pendingChanges", function (e, args) {
                 //one time listener, remove the event
                 pendingChangeEvent();
-                $scope.hide();
+                $scope.close();
             });
 
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
@@ -31,7 +31,7 @@ angular.module("umbraco")
 
         $scope.gotoHistory = function (link) {
             $location.path(link);
-            $scope.hide();
+            $scope.close();
         };
 
         //Manually update the remaining timeout seconds

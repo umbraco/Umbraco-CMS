@@ -26,8 +26,10 @@ function SearchController($scope, searchService, $log, $location, navigationServ
                     iterateResults(false);
                 break;
             case 13:
-                $location.path($scope.selectedItem.editorPath);
-                navigationService.hideSearch();
+                if ($scope.selectedItem) {
+                    $location.path($scope.selectedItem.editorPath);
+                    navigationService.hideSearch();
+                }                
                 break;
         }
     };

@@ -43,7 +43,6 @@ angular.module('umbraco')
 			}
 			
 			dialogService.macroPicker({
-                scope: $scope,
                 dialogData : dialogData,
                     callback: function(data) {
 

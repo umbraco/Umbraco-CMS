@@ -28,7 +28,6 @@ angular.module('umbraco')
 		$scope.openMemberGroupPicker =function(){
 				var d = dialogService.memberGroupPicker(
 							{
-								scope: $scope, 
 								multiPicker: $scope.cfg.multiPicker,
 								filter: $scope.cfg.filter,
 								filterCssClass: "not-allowed", 

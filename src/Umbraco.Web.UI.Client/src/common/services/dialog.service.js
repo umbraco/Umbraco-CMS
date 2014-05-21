@@ -38,8 +38,40 @@ angular.module('umbraco.services')
         for (var i = 0; i < dialogs.length; i++) {
             var dialog = dialogs[i];
             dialog.close(args);
-            dialogs.splice(i, 1);
         }
+    }
+
+    /** Internal method that closes the dialog properly and cleans up resources */
+    function closeDialog(dialog) {
+
+        if (dialog.element) {
+            dialog.element.modal('hide');
+
+            //this is not entirely enough since the damn webforms scriploader still complains
+            if (dialog.iframe) {
+                dialog.element.find("iframe").attr("src", "about:blank");
+                $timeout(function () {
+                    //we need to do more than just remove the element, this will not destroy the 
+                    // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
+                    // take care of this ourselves we have memory leaks.
+                    dialog.element.remove();
+                    //SD: No idea why this is required but was there before - pretty sure it's not required
+                    $("#" + dialog.element.attr("id")).remove();
+                    dialog.scope.$destroy();
+                }, 1000);
+            } else {
+                //we need to do more than just remove the element, this will not destroy the 
+                // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
+                // take care of this ourselves we have memory leaks.
+                dialog.element.remove();
+                //SD: No idea why this is required but was there before - pretty sure it's not required
+                $("#" + dialog.element.attr("id")).remove();
+                dialog.scope.$destroy();
+            }
+        }
+
+        //remove 'this' dialog from the dialogs array
+        dialogs = _.reject(dialogs, function (i) { return i === dialog; });
     }
 
     /** Internal method that handles opening all dialogs */
@@ -55,13 +87,19 @@ angular.module('umbraco.services')
             template: "views/common/notfound.html",
             callback: undefined,
             closeCallback: undefined,
-            element: undefined,
-            //this allows us to pass in data to the dialog if required which can be used to configure the dialog
-            //and re-use it for different purposes. It will set on to the $scope.dialogData if it is defined.
+            element: undefined,          
+            // It will set this value as a property on the dialog controller's scope as dialogData,
+            // used to pass in custom data to the dialog controller's $scope. Though this is near identical to 
+            // the dialogOptions property that is also set the the dialog controller's $scope object. 
+            // So there's basically 2 ways of doing the same thing which we're now stuck with and in fact
+            // dialogData has another specially attached property called .selection which gets used.
             dialogData: undefined
         };
 
         var dialog = angular.extend(defaults, options);
+        
+        //NOTE: People should NOT pass in a scope object that is legacy functoinality and causes problems. We will ALWAYS
+        // destroy the scope when the dialog is closed regardless if it is in use elsewhere which is why it shouldn't be done.
         var scope = options.scope || $rootScope.$new();
 
         //Modal dom obj and unique id
@@ -94,28 +132,7 @@ angular.module('umbraco.services')
                 dialog.closeCallback(data);
             }
 
-            if (dialog.element) {
-                dialog.element.modal('hide');
-
-                //this is not entirely enough since the damn
-                //webforms scriploader still complains
-                if (dialog.iframe) {
-                    dialog.element.find("iframe").attr("src", "about:blank");
-                    $timeout(function () {
-                        //we need to do more than just remove the element, this will not destroy the 
-                        // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
-                        // take care of this ourselves we have memory leaks.
-                        dialog.element.remove();
-                        dialog.scope.$destroy();
-                    }, 1000);
-                } else {
-                    //we need to do more than just remove the element, this will not destroy the 
-                    // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
-                    // take care of this ourselves we have memory leaks.
-                    dialog.element.remove();
-                    dialog.scope.$destroy();
-                }
-            }
+            closeDialog(dialog);
         };
 
         //if iframe is enabled, inject that instead of a template
@@ -183,15 +200,9 @@ angular.module('umbraco.services')
                         }
                     };
 
+                    //NOTE: Same as 'close' without the callbacks
                     scope.hide = function () {
-                        dialog.element.modal('hide');
-
-                        dialog.element.remove();
-                        $("#" + dialog.element.attr("id")).remove();
-                        //we need to do more than just remove the element, this will not destroy the 
-                        // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
-                        // take care of this ourselves we have memory leaks.
-                        dialog.scope.$destroy();
+                        closeDialog(dialog);
                     };
 
                     //basic events for submitting and closing
@@ -200,19 +211,16 @@ angular.module('umbraco.services')
                             dialog.callback(data);
                         }
 
-                        dialog.element.modal('hide');
-                        dialog.element.remove();
-                        $("#" + dialog.element.attr("id")).remove();
-                        //we need to do more than just remove the element, this will not destroy the 
-                        // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
-                        // take care of this ourselves we have memory leaks.
-                        dialog.scope.$destroy();
+                        closeDialog(dialog);
                     };
 
                     scope.close = function (data) {
                         dialog.close(data);
                     };
-
+                    
+                    //NOTE: This can ONLY ever be used to show the dialog if dialog.show is false (autoshow). 
+                    // You CANNOT call show() after you call hide(). hide = close, they are the same thing and once
+                    // a dialog is closed it's resources are disposed of.
                     scope.show = function () {
                         dialog.element.modal('show');
                     };
@@ -226,6 +234,7 @@ angular.module('umbraco.services')
                         }
                     };
 
+                    //NOTE: Same as 'close' without the callbacks
                     scope.dismiss = scope.hide;
 
                     // Emit modal events
@@ -274,7 +283,6 @@ angular.module('umbraco.services')
          * @param {String} options.animation animation csss class, by default set to "fade"
          * @param {String} options.modalClass modal css class, by default "umb-modal"
          * @param {Bool} options.show show the modal instantly
-         * @param {Object} options.scope scope to attach the modal to, by default rootScope.new()
          * @param {Bool} options.iframe load template in an iframe, only needed for serverside templates
          * @param {Int} options.width set a width on the modal, only needed for iframes
          * @param {Bool} options.inline strips the modal from any animation and wrappers, used when you want to inject a dialog into an existing container
@@ -321,7 +329,6 @@ angular.module('umbraco.services')
          * @description
          * Opens a media picker in a modal, the callback returns an array of selected media items
          * @param {Object} options mediapicker dialog options object
-         * @param {$scope} options.scope dialog scope
          * @param {Boolean} options.onlyImages Only display files that have an image file-extension
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
@@ -341,8 +348,7 @@ angular.module('umbraco.services')
          * @description
          * Opens a content picker tree in a modal, the callback returns an array of selected documents
          * @param {Object} options content picker dialog options object
-         * @param {$scope} options.scope dialog scope
-         * @param {$scope} options.multipicker should the picker return one or multiple items
+         * @param {Boolean} options.multipicker should the picker return one or multiple items
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -360,7 +366,6 @@ angular.module('umbraco.services')
          * @description
          * Opens a link picker tree in a modal, the callback returns a single link
          * @param {Object} options content picker dialog options object
-         * @param {$scope} options.scope dialog scope
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -378,7 +383,6 @@ angular.module('umbraco.services')
          * @description
          * Opens a mcaro picker in a modal, the callback returns a object representing the macro and it's parameters
          * @param {Object} options macropicker dialog options object
-         * @param {$scope} options.scope dialog scope
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -397,8 +401,7 @@ angular.module('umbraco.services')
          * @description
          * Opens a member picker in a modal, the callback returns a object representing the selected member
          * @param {Object} options member picker dialog options object
-         * @param {$scope} options.scope dialog scope
-         * @param {$scope} options.multiPicker should the tree pick one or multiple members before returning
+         * @param {Boolean} options.multiPicker should the tree pick one or multiple members before returning
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -416,8 +419,7 @@ angular.module('umbraco.services')
          * @description
          * Opens a member group picker in a modal, the callback returns a object representing the selected member
          * @param {Object} options member group picker dialog options object
-         * @param {$scope} options.scope dialog scope
-         * @param {$scope} options.multiPicker should the tree pick one or multiple members before returning
+         * @param {Boolean} options.multiPicker should the tree pick one or multiple members before returning
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -435,7 +437,6 @@ angular.module('umbraco.services')
          * @description
          * Opens a icon picker in a modal, the callback returns a object representing the selected icon
          * @param {Object} options iconpicker dialog options object
-         * @param {$scope} options.scope dialog scope
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -453,10 +454,9 @@ angular.module('umbraco.services')
          * @description
          * Opens a tree picker in a modal, the callback returns a object representing the selected tree item
          * @param {Object} options iconpicker dialog options object
-         * @param {$scope} options.scope dialog scope
-         * @param {$scope} options.section tree section to display
-         * @param {$scope} options.treeAlias specific tree to display
-         * @param {$scope} options.multiPicker should the tree pick one or multiple items before returning
+         * @param {String} options.section tree section to display
+         * @param {String} options.treeAlias specific tree to display
+         * @param {Boolean} options.multiPicker should the tree pick one or multiple items before returning
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
@@ -474,7 +474,6 @@ angular.module('umbraco.services')
          * @description
          * Opens a dialog with a chosen property editor in, a value can be passed to the modal, and this value is returned in the callback
          * @param {Object} options mediapicker dialog options object
-         * @param {$scope} options.scope dialog scope
          * @param {Function} options.callback callback function
          * @param {String} editor editor to use to edit a given value and return on callback
          * @param {Object} value value sent to the property editor

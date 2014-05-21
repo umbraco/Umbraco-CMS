@@ -12,7 +12,7 @@ angular.module("umbraco")
 })
 .controller("Umbraco.PropertyEditors.FolderBrowserController",
     function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, $log, umbRequestHelper, mediaResource, imageHelper, navigationService, editorState) {
-        var dialogOptions = $scope.$parent.dialogOptions;
+        var dialogOptions = $scope.dialogOptions;
 
         $scope.creating = $routeParams.create;
 

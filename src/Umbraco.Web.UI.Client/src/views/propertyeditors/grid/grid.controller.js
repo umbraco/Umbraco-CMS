@@ -7,15 +7,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.GridController",
     
     //we most likely will need some iframe-motherpage interop here
        $scope.openMediaPicker =function(){
-               var d = dialogService.mediaPicker({scope: $scope, callback: renderImages});
+               var d = dialogService.mediaPicker({callback: renderImages});
        };
 
        $scope.openPropertyDialog =function(){
-               var d = dialogService.property({scope: $scope, callback: renderProperty});
+               var d = dialogService.property({callback: renderProperty});
        };
 
        $scope.openMacroDialog =function(){
-               var d = dialogService.macroPicker({scope: $scope, callback: renderMacro});
+               var d = dialogService.macroPicker({callback: renderMacro});
        };
 
        function renderProperty(data){
@@ -26,8 +26,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.GridController",
        //   $scope.currentElement.html( macroFactory.renderMacro(data.macro, -1) ); 
        }
       
-       function renderImages(data){
-           var list = $("<ul class='thumbnails'></ul>")
+       function renderImages(data) {
+           var list = $("<ul class='thumbnails'></ul>");
            $.each(data.selection, function(i, image) {
                list.append( $("<li class='span2'><img class='thumbnail' src='" + image.src + "'></li>") );
            });
