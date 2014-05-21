@@ -4,8 +4,9 @@ angular.module("umbraco")
             scope: {
                 uniqueId: '=',
                 value: '=',
-                ctrlOp: '&',
-                ctrlCl: '&',
+                onClick: '&',
+                onFocus: '&',
+                onBlur: '&',
                 configuration:"="
             },
             template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" id=\"{{uniqueId}}\"></textarea>",
@@ -112,12 +113,23 @@ angular.module("umbraco")
 
                                 //set the reference
                                 tinyMceEditor = editor;
+                                
 
                                 //enable browser based spell checking
                                 editor.on('init', function (e) {
                                     editor.getBody().setAttribute('spellcheck', true);
-                                    var toolbarHeight = -$(editor.editorContainer).find(".mce-toolbar").height() - 2;
-                                    $(editor.editorContainer).find(".mce-toolbar").css("margin-top", toolbarHeight + "px");
+
+                                    //hide toolbar by default
+                                    $(editor.editorContainer)
+                                        .find(".mce-toolbar")
+                                        .css("visibility", "hidden");
+
+                                    $timeout(function(){
+                                        if(scope.value === null){
+                                            editor.focus();
+                                        }
+                                    }, 500);
+                                    
                                 });
 
                                 //when we leave the editor (maybe)
@@ -125,25 +137,51 @@ angular.module("umbraco")
                                     editor.save();
                                     angularHelper.safeApply(scope, function () {
                                         scope.value = editor.getContent();
-                                        scope.ctrlCl();
+
+                                        var _toolbar = $(editor.editorContainer)
+                                             .find(".mce-toolbar");
+
+                                        if(scope.onBlur){
+                                            scope.onBlur();
+                                        }
+                                        
+                                        _toolbar.css("visibility", "hidden");
                                     });
                                 });
 
                                 // Focus on editor
                                 editor.on('focus', function (e) {
                                     angularHelper.safeApply(scope, function () {
-                                        scope.ctrlOp();
-                                        var toolbarHeight = -$(editor.editorContainer).find(".mce-toolbar").height() - 2;
-                                        $(editor.editorContainer).find(".mce-toolbar").css("margin-top", toolbarHeight + "px");
+                                        
+                                        var _toolbar = $(editor.editorContainer)
+                                             .find(".mce-toolbar");
+
+                                        if(scope.onFocus){
+                                            scope.onFocus();
+                                        }
+
+                                        var toolbarHeight = -_toolbar.height() - 2;
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("margin-top", toolbarHeight + "px");
                                     });
                                 });
 
                                 // Click on editor
                                 editor.on('click', function (e) {
                                     angularHelper.safeApply(scope, function () {
-                                        scope.ctrlOp();
-                                        var toolbarHeight = -$(editor.editorContainer).find(".mce-toolbar").height() - 2;
-                                        $(editor.editorContainer).find(".mce-toolbar").css("margin-top", toolbarHeight + "px");
+                                        
+                                        var _toolbar = $(editor.editorContainer)
+                                             .find(".mce-toolbar");
+
+                                        if(scope.onClick){
+                                            scope.onClick();
+                                        }
+
+                                        var toolbarHeight = -_toolbar.height() - 2;
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("margin-top", toolbarHeight + "px");
                                     });
                                 });
 

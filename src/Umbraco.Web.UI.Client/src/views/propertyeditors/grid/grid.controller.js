@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, imageHelper, $timeout) {
+    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout) {
 
         var gridConfigPath = $scope.model.config.items.gridConfigPath;
 
@@ -20,6 +20,10 @@ angular.module("umbraco")
                 $scope.currentControl = null;
                 $scope.openRTEToolbarId = null;
 
+                gridService.getGridEditors().then(function(response){
+                    $scope.availableEditors = response.data;
+                });
+                
                 // *********************************************
                 // Sortable options
                 // *********************************************
@@ -46,7 +50,6 @@ angular.module("umbraco")
                 // *********************************************
 
                 $scope.checkContent = function() {
-
                     var isEmpty = true;
                     if ($scope.model.value && 
                         $scope.model.value.columns) {
@@ -65,46 +68,18 @@ angular.module("umbraco")
                 }
 
                 $scope.addTemplate = function (template) {
-
                     $scope.model.value = {
                         gridWidth: "",
                         columns: []
-                    }
+                    };
 
                     angular.forEach(template.columns, function (value, key) {
-                        $scope.model.value.columns.splice($scope.model.value.columns.length + 1, 0, {
-                            id: value.name,
-                            grid: value.grid,
-                            percentage: value.percentage,
-                            cellModels: value.cellModels,
-                            rows: []
-                        });
+                        var newCol = angular.copy(value);
+                        newCol.rows = [];
+                        $scope.model.value.columns.splice($scope.model.value.columns.length + 1, 0, newCol);
                     });
-
                 }
 
-                // *********************************************
-                // RTE toolbar management functions
-                // *********************************************
-
-                $scope.openRTEToolbar = function (control) {
-                    $scope.openRTEToolbarId = control.tinyMCE.uniqueId;
-                }
-
-                $scope.closeRTEToolbar = function (control) {
-                    $scope.openRTEToolbarId = null;
-                }
-
-                $scope.isOpenRTEToolbar = function (control) {
-                    if (control != undefined && control.tinyMCE != undefined) {
-                        if ($scope.openRTEToolbarId == control.tinyMCE.uniqueId) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    }
-                }
 
                 // *********************************************
                 // Row management function
@@ -118,119 +93,33 @@ angular.module("umbraco")
                     $scope.currentRow = null;
                 }
 
-                $scope.setBackGroundRow = function (row) {
-                    var dialog = dialogService.open({
-                        template: '/views/common/dialogs//approvedcolorpicker.html',
-                        show: true,
-                        dialogData: {
-                            cssPath: $scope.model.config.items.approvedBackgroundCss,
-                            cssClass: row.cssClass
-                        },
-                        callback: function (data) {
-                            row.cssClass = data;
-                        }
-                    });
-                }
-
-                $scope.boxed = function (cell) {
-                    if (cell.boxed == true) {
-                        cell.boxed = false;
-                    }
-                    else {
-                        cell.boxed = true;
-                    }
-                }
-
-                $scope.skipTopMargin = function (row) {
-                    if (row.skipTopMargin == true) {
-                        row.skipTopMargin = false;
-                    }
-                    else {
-                        row.skipTopMargin = true;
-                    }
-                }
-
-                $scope.skipBottomMargin = function (row) {
-                    if (row.skipBottomMargin == true) {
-                        row.skipBottomMargin = false;
-                    }
-                    else {
-                        row.skipBottomMargin = true;
-                    }
-                }
-
-                $scope.skipLeftMargin = function (row) {
-                    if (row.skipLeftMargin == true) {
-                        row.skipLeftMargin = false;
-                    }
-                    else {
-                        row.skipLeftMargin = true;
-                    }
-                }
-
-                $scope.skipRightMargin = function (row) {
-                    if (row.skipRightMargin == true) {
-                        row.skipRightMargin = false;
-                    }
-                    else {
-                        row.skipRightMargin = true;
-                    }
-                }
-
-                $scope.skipControlMargin = function (row) {
-                    if (row.skipControlMargin == true) {
-                        row.skipControlMargin = false;
-                    }
-                    else {
-                        row.skipControlMargin = true;
-                    }
-                }
-
-                $scope.fullScreen = function (row) {
-                    if (row.fullScreen == true) {
-                        row.fullScreen = false;
-                    }
-                    else {
-                        row.fullScreen = true;
-                    }
-                }
-
+                
                 $scope.addRow = function (column, cellModel) {
 
                     column.rows.splice(column.rows.length + 1, 0,
                     {
                         cells: [],
-                        cssClass: '',
-                        boxed: $scope.model.config.items.defaultBoxed,
-                        skipTopMargin: $scope.model.config.items.defaultSkipTopMargin,
-                        skipBottomMargin: $scope.model.config.items.defaultSkipBottomMargin,
-                        skipLeftMargin: $scope.model.config.items.defaultSkipLeftMargin,
-                        skipRightMargin: $scope.model.config.items.defaultSkipRightMargin,
-                        skipControlMargin: $scope.model.config.items.defaultSkipControlMargin,
-                        fullScreen: $scope.model.config.items.defaultFullScreen
+                        cssClass: ''
                     });
 
                     for (var i = 0; i < cellModel.models.length; i++) {
 
-                        var cells = column.rows[column.rows.length - 1].cells
+                        var cells = column.rows[column.rows.length - 1].cells;
+                        var model = angular.copy(cellModel.models[i]);
 
                         cells.splice(
                             cells.length + 1, 0,
                             {
-                                model: {
-                                    grid: cellModel.models[i].grid,
-                                    percentage: cellModel.models[i].percentage,
-                                },
-                                boxed: false,
+                                model: model,
                                 controls: []
                             });
                     }
-                }
+                };
 
                 $scope.removeRow = function (column, $index) {
                     if (column.rows.length > 0) {
                         column.rows.splice($index, 1);
-                        $scope.openRTEToolbarId = null
+                        $scope.openRTEToolbarId = null;
                         $scope.checkContent();
                     }
                 }
@@ -247,37 +136,36 @@ angular.module("umbraco")
                     $scope.currentCell = null;
                 }
 
+
                 // *********************************************
                 // Control management functions
                 // *********************************************
-
                 $scope.setCurrentControl = function (Control) {
                     $scope.currentControl = Control;
-                }
+                };
 
                 $scope.disableCurrentControl = function (Control) {
                     $scope.currentControl = null;
-                }
+                };
 
                 $scope.setCurrentToolsControl = function (Control) {
                     $scope.currentToolsControl = Control;
-                }
+                };
 
                 $scope.disableCurrentToolsControl = function (Control) {
                     $scope.currentToolsControl = null;
-                }
+                };
 
                 $scope.setCurrentRemoveControl = function (Control) {
                     $scope.currentRemoveControl = Control;
-                }
+                };
 
                 $scope.disableCurrentRemoveControl = function (Control) {
                     $scope.currentRemoveControl = null;
-                }
+                };
 
 
                 $scope.setUniqueId = function (cell, index) {
-
                     var date = new Date();
                     var components = [
                         date.getYear(),
@@ -288,122 +176,49 @@ angular.module("umbraco")
                         date.getSeconds(),
                         date.getMilliseconds()
                     ];
-
                     return components.join("");
+                };
 
-                }
+                $scope.setEditorPath = function(control){
+                    control.editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
+                };
 
-                $scope.addTinyMce = function (cell, index) {
-
+                $scope.addControl = function (editor, cell, index){
                     var newId = $scope.setUniqueId();
                     var newControl = {
                         uniqueId: newId,
-                        tinyMCE: {
-                            uniqueId: newId,
-                            value: "",
-                            label: 'cellText',
-                            description: 'Load some stuff here',
-                            view: 'rte',
-                            config: {
-                                editor: {
-                                    toolbar: [], //TODO
-                                    stylesheets: [], //TODO
-                                    dimensions: { height: 0, width: 0 } //TODO
-                                }
-                            }
-                        }
-                    }
+                        value: null,
+                        editor: editor
+                    };
 
-                    if (index == undefined) {
-                        index = cell.controls.length
+                    if (index === undefined) {
+                        index = cell.controls.length;
                     }
 
                     cell.controls.splice(index + 1, 0, newControl);
+                };
 
-                    $scope.openRTEToolbar(newControl);
-                    
-                    $timeout(function(){
-                        tinymce.get(newId).focus();
-                    }, 500);
-                }
+                $scope.addTinyMce = function(cell){
+                    var rte = _.find($scope.availableEditors, function(editor){return editor.alias === "rte";});
+                    $scope.addControl(rte, cell);
+                };
 
-                $scope.addMedia = function (cell, index) {
-
-                    dialogService.mediaPicker({
-                        multiPicker: false,
-                        callback: function (data) {
-
-                            if (!false) {
-                                data = [data];
-                            }
-
-                            _.each(data, function (media, i) {
-                                media.src = imageHelper.getImagePropertyValue({ imageModel: media });
-                                media.thumbnail = imageHelper.getThumbnailFromPath(media.src);
-                                var newControl = {
-                                    uniqueId: $scope.setUniqueId(),
-                                    media: {
-                                        id: media.id,
-                                        src: media.src,
-                                        thumbnail: media.thumbnail
-                                    }
-                                }
-                                if (index == undefined) {
-                                    index = cell.controls.length
-                                }
-
-                                cell.controls.splice(index + 1, 0, newControl);
-                            });
-                        }
-                    });
-
-                }
-
-                $scope.addEmbed = function (cell, index) {
-                    dialogService.embedDialog({
-                        callback: function (data) {
-                            var newControl = {
-                                uniqueId: $scope.setUniqueId(),
-                                embed: {
-                                    content: data
-                                }
-                            }
-                            if (index == undefined) {
-                                index = cell.controls.length
-                            }
-
-                            cell.controls.splice(index + 1, 0, newControl);
-                        }
-                    });
-
-                }
-
-                $scope.addMacro = function (cell, index) {
-                    var dialogData = {};
-                    dialogService.macroPicker({
-                        dialogData: dialogData,
-                        callback: function (data) {
-                            var newControl = {
-                                uniqueId: $scope.setUniqueId(),
-                                macro: {
-                                    syntax: data.syntax,
-                                    macroAlias: data.macroAlias,
-                                    marcoParamsDictionary: data.macroParamsDictionary
-                                }
-                            }
-                            if (index == undefined) {
-                                index = cell.controls.length
-                            }
-
-                            cell.controls.splice(index + 1, 0, newControl);
-                        }
-                    });
-
-                }
+                $scope.getEditor = function(alias){
+                    return  _.find($scope.availableEditors, function(editor){return editor.alias === alias});
+                };
 
                 $scope.removeControl = function (cell, $index) {
                     cell.controls.splice($index, 1);
                 };
+
+                $scope.allowedControl = function (editor, cell){
+                    if(cell.model.allowed && angular.isArray(cell.model.allowed)){
+                        return _.contains(cell.model.allowed, editor.alias);
+                    }else{
+                        return true;
+                    }
+                };
+
 
                 // *********************************************
                 // Init grid

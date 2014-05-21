@@ -13,74 +13,28 @@ var uSkyGridConfig =
                         }]
                     }, {
                         models: [{
-                            grid: 6,
-                            percentage: 50
-                        }, {
-                            grid: 6,
-                            percentage: 50
-                        }]
-                    }, {
-                        models: [{
                             grid: 4,
-                            percentage: 33.3
-                        }, {
-                            grid: 4,
-                            percentage: 33.3
-                        }, {
-                            grid: 4,
-                            percentage: 33.3
-                        }]
-                    }, {
-                        models: [{
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, ]
-                    }, {
-                        models: [{
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }]
-                    }, {
-                        models: [{
-                            grid: 8,
-                            percentage: 60
-                        }, {
-                            grid: 4,
-                            percentage: 40
-                        }]
-                    }, {
-                        models: [{
-                            grid: 4,
-                            percentage: 40
+                            percentage: 33.3,
+                            allowed: ["media","quote","embed"]
                         }, {
                             grid: 8,
-                            percentage: 60
+                            percentage: 66.6,
+                            allowed: ["rte","macro"]
                         }]
-                    }
+                    },
+                    {
+                       models: [
+                       {
+                          grid: 8,
+                          percentage: 66.6,
+                          allowed: ["rte","macro"]
+                        }, 
+                        {
+                           grid: 4,
+                           percentage: 33.3,
+                           allowed: ["media","quote","embed"]
+                       }]
+                   }
                 ]
             }
         ]
