@@ -259,7 +259,11 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Open font family picker modal
     $scope.openFontFamilyPickerModal = function (field) {
+        $scope.data = {
+            modalField: field
+        };
         var modalInstance = $modal.open({
+            scope: $scope,
             templateUrl: 'fontFamilyPickerModel.html',
             controller: 'tuning.fontfamilypickercontroller',
             resolve: {
@@ -456,6 +460,12 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.safeFonts = ["Arial, Helvetica", "Impact", "Lucida Sans Unicode", "Tahoma", "Trebuchet MS", "Verdana", "Georgia", "Times New Roman", "Courier New, Courier"];
     $scope.fonts = [];
     $scope.selectedFont = {};
+    
+    var originalFont = {}; 
+    originalFont.fontFamily = $scope.data.modalField.value;
+    originalFont.fontType = $scope.data.modalField.fontType;
+    originalFont.fontWeight = $scope.data.modalField.fontWeight;
+    originalFont.fontStyle = $scope.data.modalField.fontStyle;
 
     var googleGetWeight = function (googleVariant) {
         return (googleVariant != undefined && googleVariant != "") ? googleVariant.replace("italic", "") : "";
@@ -507,18 +517,40 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     };
 
     $scope.showFontPreview = function (font) {
-        $scope.selectedFont = font;
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
-            $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
-            $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
+            // Font needs to be independently loaded in the iframe for live preview to work.
+            document.getElementById("resultFrame").contentWindow.getFont(font);
+
             WebFont.load({
                 google: {
                     families: [font.fontFamily + ":" + font.variant]
                 },
                 loading: function () {
                     console.log('loading');
+                },
+                active: function () {
+                    // If $apply isn't called, the new font family isn't applied until the next user click.
+                    $scope.$apply(function () {
+                        $scope.selectedFont = font;
+                        $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
+                        $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
+                        // Apply to the page content as a preview.
+                        $scope.data.modalField.value = $scope.selectedFont.fontFamily;
+                        $scope.data.modalField.fontType = $scope.selectedFont.fontType;
+                        $scope.data.modalField.fontWeight = $scope.selectedFont.fontWeight;
+                        $scope.data.modalField.fontStyle = $scope.selectedFont.fontStyle;
+                    });
                 }
             });
+        }
+        else {
+            // Font is available, apply it immediately in modal preview.
+            $scope.selectedFont = font;
+            // And to page content.
+            $scope.data.modalField.value = $scope.selectedFont.fontFamily;
+            $scope.data.modalField.fontType = $scope.selectedFont.fontType;
+            $scope.data.modalField.fontWeight = $scope.selectedFont.fontWeight;
+            $scope.data.modalField.fontStyle = $scope.selectedFont.fontStyle;
         }
     }
 
@@ -532,7 +564,13 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     };
 
     $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
+        // Discard font change.
+        $modalInstance.close({
+            fontFamily: originalFont.fontFamily,
+            fontType: originalFont.fontType,
+            fontWeight: originalFont.fontWeight,
+            fontStyle: originalFont.fontStyle,
+        });
     };
 
     if (item != undefined) {
