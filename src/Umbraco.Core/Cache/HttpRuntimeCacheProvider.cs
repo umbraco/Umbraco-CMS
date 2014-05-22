@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Caching;
@@ -28,31 +30,127 @@ namespace Umbraco.Core.Cache
             get { return _wrapper; }
         }
 
-        /// <summary>
-        /// Clears all objects in the System.Web.Cache with the System.Type specified that satisfy the predicate
-        /// </summary>
+        private IEnumerable<KeyValuePair<string, object>> EnumerateDictionaryCache()
+        {
+            // DictionaryCache just wraps _cache which has a special enumerator
+            var enumerator = _cache.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var key = enumerator.Key as string;
+                if (key == null) continue;
+                yield return new KeyValuePair<string, object>(key, enumerator.Value);
+            }
+        }
+
+        public override void ClearAllCache()
+        {
+            using (new WriteLock(Locker))
+            {
+                foreach (var kvp in EnumerateDictionaryCache()
+                    .Where(x => x.Key.StartsWith(CacheItemPrefix) && x.Value != null))
+                    _cache.Remove(kvp.Key);
+            }
+        }
+
+        public override void ClearCacheItem(string key)
+        {
+            using (new WriteLock(Locker))
+            {
+                var cacheKey = GetCacheKey(key);
+                _cache.Remove(cacheKey);
+            }
+        }
+
+        public override void ClearCacheObjectTypes(string typeName)
+        {
+            var typeName2 = typeName;
+            using (new WriteLock(Locker))
+            {
+                foreach (var kvp in EnumerateDictionaryCache()
+                    .Where(x => x.Key.StartsWith(CacheItemPrefix) 
+                        && x.Value != null
+                        && x.Value.GetType().ToString().InvariantEquals(typeName2)))
+                    _cache.Remove(kvp.Key);
+            }
+        }
+
+        public override void ClearCacheObjectTypes<T>()
+        {
+            // should we use "is" or compare types?
+
+            //var typeOfT = typeof(T);
+            using (new WriteLock(Locker))
+            {
+                foreach (var kvp in EnumerateDictionaryCache()
+                    .Where(x => x.Key.StartsWith(CacheItemPrefix)
+                        //&& x.Value != null
+                        //&& x.Value.GetType() == typeOfT))
+                        && x.Value is T))
+                    _cache.Remove(kvp.Key);
+            }
+        }
+
         public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
+            // see note above
+            // should we use "is" or compare types?
+
             try
             {
-                lock (Locker)
+                using (new WriteLock(Locker))
                 {
-                    foreach (DictionaryEntry c in _cache)
-                    {
-                        var key = c.Key.ToString();
-                        if (_cache[key] != null
-                            && _cache[key] is T
-                            && predicate(key, (T)_cache[key]))
-                        {
-                            _cache.Remove(c.Key.ToString());
-                        }
-                    }
+                    foreach (var kvp in EnumerateDictionaryCache()
+                        .Where(x => x.Key.StartsWith(CacheItemPrefix) 
+                            && x.Value is T 
+                            && predicate(x.Key, (T) x.Value)))
+                        _cache.Remove(kvp.Key);
                 }
             }
             catch (Exception e)
             {
+                // oops, what is this?!
                 LogHelper.Error<CacheHelper>("Cache clearing error", e);
             }
+        }
+
+        public override void ClearCacheByKeySearch(string keyStartsWith)
+        {
+            using (new WriteLock(Locker))
+            {
+                foreach (var kvp in EnumerateDictionaryCache()
+                    .Where(x => x.Key.InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith))))
+                    _cache.Remove(kvp.Key);
+            }
+        }
+
+        public override void ClearCacheByKeyExpression(string regexString)
+        {
+            var plen = CacheItemPrefix.Length + 1; // string.Format("{0}-", CacheItemPrefix)
+            using (new WriteLock(Locker))
+            {
+                foreach (var kvp in EnumerateDictionaryCache()
+                    .Where(x => x.Key.StartsWith(CacheItemPrefix)
+                        && Regex.IsMatch(x.Key.Substring(plen), regexString)))
+                    _cache.Remove(kvp.Key);
+            }
+        }
+
+        public override IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        {
+            return EnumerateDictionaryCache()
+                .Where(x => x.Key.InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith)))
+                .Select(x => ((Lazy<object>)x.Value).Value)
+                .ToList();
+        }
+
+        public override IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        {
+            var plen = CacheItemPrefix.Length + 1; // string.Format("{0}-", CacheItemPrefix)
+            return EnumerateDictionaryCache()
+                .Where(x => x.Key.StartsWith(CacheItemPrefix)
+                    && Regex.IsMatch(x.Key.Substring(plen), regexString))
+                .Select(x => ((Lazy<object>)x.Value).Value)
+                .ToList();
         }
 
         /// <summary>
@@ -139,7 +237,8 @@ namespace Umbraco.Core.Cache
             // and make sure we don't store a null value. Though I'm not sure it is a good idea.
 
             var result = new Lazy<object>(getCacheItem);
-            //if (result.Value == null) return;
+            var value = result.Value; // force evaluation now
+            //if (value == null) return;
 
             cacheKey = GetCacheKey(cacheKey);           
 

@@ -16,7 +16,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
     {
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
 
         public ObjectCacheRuntimeCacheProvider()
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearAllCache()
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 MemoryCache.DisposeIfDisposable();
                 MemoryCache = new MemoryCache("in-memory");
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheItem(string key)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 if (MemoryCache[key] == null) return;
                 MemoryCache.Remove(key);
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var keysToRemove = MemoryCache
                     .Where(c => c.Value != null && c.Value.GetType().ToString().InvariantEquals(typeName))
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes<T>()
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var typeOfT = typeof (T);
                 var keysToRemove = MemoryCache
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var typeOfT = typeof(T);
                 var keysToRemove = MemoryCache
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var keysToRemove = (from c in MemoryCache where c.Key.InvariantStartsWith(keyStartsWith) select c.Key).ToList();
                 foreach (var k in keysToRemove)
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var keysToRemove = (from c in MemoryCache where Regex.IsMatch(c.Key, regexString) select c.Key).ToList();
                 foreach (var k in keysToRemove)
@@ -109,22 +109,33 @@ namespace Umbraco.Core.Cache
 
         public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
-            return (from c in MemoryCache
-                    where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value).ToList();
+            using (new ReadLock(_locker))
+            {
+                return MemoryCache
+                    .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
+                    .Select(x => ((Lazy<object>) x.Value).Value)
+                    .ToList();
+            }
         }
 
         public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
         {
-            return (from c in MemoryCache
-                    where Regex.IsMatch(c.Key, regexString)
-                    select c.Value).ToList();
+            using (new ReadLock(_locker))
+            {
+                return MemoryCache
+                    .Where(x => Regex.IsMatch(x.Key, regexString))
+                    .Select(x => ((Lazy<object>) x.Value).Value)
+                    .ToList();
+            }
         }
 
         public virtual object GetCacheItem(string cacheKey)
         {
-            var result = MemoryCache.Get(cacheKey);
-            return result;
+            using (new ReadLock(_locker))
+            {
+                var result = MemoryCache.Get(cacheKey);
+                return result;
+            }
         }
 
         public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
@@ -145,7 +156,7 @@ namespace Umbraco.Core.Cache
 
             Lazy<object> result;
 
-            using (var lck = new UpgradeableReadLock(Locker))
+            using (var lck = new UpgradeableReadLock(_locker))
             {
                 result = MemoryCache.Get(cacheKey) as Lazy<object>;
                 if (result == null /* || (result.IsValueCreated && result.Value == null) */)
@@ -166,7 +177,8 @@ namespace Umbraco.Core.Cache
             // see notes in HttpRuntimeCacheProvider
 
             var result = new Lazy<object>(getCacheItem);
-            //if (result.Value == null) return;
+            var value = result.Value; // force evaluation now
+            //if (value == null) return;
 
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
             MemoryCache.Set(cacheKey, result, policy);
