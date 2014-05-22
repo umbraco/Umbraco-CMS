@@ -4,6 +4,7 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using Umbraco.Core;
 using Umbraco.Web.UI.Bundles;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
@@ -138,10 +139,11 @@ namespace Umbraco.Web.UI.Controls
 
             Page.ClientScript.RegisterStartupScript(typeof(FolderBrowser),
                 "RegisterFolderBrowsers",
-                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}' }}); " +
+                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}', reqver : '{2}' }}); " +
                  "$(\".umbFolderBrowser #filterTerm\").keypress(function(event) {{ return event.keyCode != 13; }});}});",
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                IOHelper.ResolveUrl(SystemDirectories.Base)),
+                IOHelper.ResolveUrl(SystemDirectories.Base),
+                UmbracoEnsuredPage.umbracoUserContextID.EncryptWithMachineKey() ),
                 true);
         }
 
