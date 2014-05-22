@@ -117,13 +117,12 @@ namespace Umbraco.Core.Dynamics
 						}
 						catch (Exception ex)
 						{
-							var sb = new StringBuilder("An error occurred finding an executing an extension method for type ");
-							sb.Append(typeof (T));
-							sb.Append("Types searched for extension methods were ");
-							foreach(var t in findExtensionMethodsOnTypes)
-							{
-								sb.Append(t + ",");
-							}
+                            var sb = new StringBuilder();
+                            sb.AppendFormat("An error occurred finding and executing extension method \"{0}\" ", binder.Name);
+                            sb.AppendFormat("for type \"{0}\". ", typeof (T));
+                            sb.Append("Types searched for extension methods were ");
+                            sb.Append(string.Join(", ", findExtensionMethodsOnTypes));
+                            sb.Append(".");
 							LogHelper.Error<DynamicInstanceHelper>(sb.ToString(), ex);
                             var mresult = new TryInvokeMemberResult(null, TryInvokeMemberSuccessReason.FoundExtensionMethod);
                             return Attempt<TryInvokeMemberResult>.Fail(mresult, ex);
@@ -171,7 +170,7 @@ namespace Umbraco.Core.Dynamics
 			}
 			else
 			{
-				throw new MissingMethodException();
+				throw new MissingMethodException(typeof(T).FullName, name);
 			}			
 			return result;
 		}
