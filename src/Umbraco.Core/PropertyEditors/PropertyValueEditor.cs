@@ -315,8 +315,15 @@ namespace Umbraco.Core.PropertyEditors
                     return new XText(ConvertDbToString(property, propertyType, dataTypeService));                    
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
-                    //put text in cdata
-                    return new XCData(ConvertDbToString(property, propertyType, dataTypeService));
+                    try
+                    {
+                        return XElement.Parse(ConvertDbToString(property, propertyType, dataTypeService));
+                    }
+                    catch
+                    {
+                        return new XCData(ConvertDbToString(property, propertyType, dataTypeService));
+                    }
+                    
                 default:
                     throw new ArgumentOutOfRangeException();
             }
