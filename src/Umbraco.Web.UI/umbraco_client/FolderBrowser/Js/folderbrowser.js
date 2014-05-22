@@ -179,6 +179,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 instructions +
                 "<form action=\"" + self._opts.umbracoPath + "/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
+                "<input type='hidden' name='__reqver' value='" + self._opts.reqver + "' />" +
                 "<input type='hidden' name='name' />" +
                 "<input type='hidden' name='replaceExisting' />" +
                 "</form>" +

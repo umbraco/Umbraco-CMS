@@ -1,5 +1,7 @@
 ﻿using System.Data;
+using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
 {
@@ -18,9 +20,18 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
             }
             else
             {
-                //These are the old aliases
-                Delete.ForeignKey("FK_umbracoUser2app_umbracoApp").OnTable("umbracoUser2app");
-                Delete.ForeignKey("FK_umbracoUser2app_umbracoUser").OnTable("umbracoUser2app");
+                //These are the old aliases, before removing them, check they exist
+                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser2app") && x.Item3.InvariantEquals("FK_umbracoUser2app_umbracoApp")))
+                {
+                    Delete.ForeignKey("FK_umbracoUser2app_umbracoApp").OnTable("umbracoUser2app");    
+                }
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser2app") && x.Item3.InvariantEquals("FK_umbracoUser2app_umbracoUser")))
+                {
+                    Delete.ForeignKey("FK_umbracoUser2app_umbracoUser").OnTable("umbracoUser2app");
+                }
+                
             }
             
         }
