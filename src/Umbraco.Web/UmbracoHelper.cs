@@ -1308,10 +1308,11 @@ namespace Umbraco.Web
 
             string previewLink = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" + 
                                  @"<link href=""{0}"" rel=""stylesheet/less"" type=""text/css"" />" +
+                                 @"<link href=""/Umbraco/Api/Tuning/GridStyle?pageId={1}"" rel=""stylesheet/less"" type=""text/css"" />" +
                                  @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
                                  @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>" +
                                  @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js"" type=""text/javascript""></script>" +
-                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';</script>" +
+                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';var tuningGridStyleUrl='/Css/tuning/grid_{1}.less'</script>" +
                                  @"<script src=""/umbraco/js/tuning.front.js"" type=""text/javascript""></script>";
 
             string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"">" +
@@ -1327,6 +1328,8 @@ namespace Umbraco.Web
             int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
             string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
 
+
+
             // Looking for style folder
             string linkResult = string.Empty;
             foreach (var page in path.OrderByDescending(r => path.IndexOf(r)))
@@ -1339,13 +1342,33 @@ namespace Umbraco.Web
                 }
             }
 
+
+
             string result = string.Empty;
             if (UmbracoContext.Current.InPreviewMode) {
-                result = string.IsNullOrEmpty(linkResult) ? string.Format(previewLink, defaultLessStyle) : string.Format(previewLink, linkResult);
+                result = string.IsNullOrEmpty(linkResult) ? string.Format(previewLink, defaultLessStyle, pageId) : string.Format(previewLink, linkResult, pageId);
             }
             else {
-                result = string.IsNullOrEmpty(linkResult) ? string.Format(noPreviewLinks, defaultCssStyle) : string.Format(noPreviewLinks, linkResult);
+                result = string.IsNullOrEmpty(linkResult) ? string.Format(noPreviewLinks, defaultCssStyle, pageId) : string.Format(noPreviewLinks, linkResult, pageId);
             }
+
+
+            //// Grid Styles
+            //var previewGridStyleLink = "/Umbraco/Api/Tuning/GridStyle?pageId={0}";
+
+            //if 
+
+            //var gridStyleLink = string.Empty;
+            //string styleGridPath = HttpContext.Current.Server.MapPath(string.Format(gridStyleLink, pageId));
+            //if (System.IO.File.Exists(styleGridPath))
+            //{
+            //    gridStyleLink = UmbracoContext.Current.InPreviewMode ? @"<link href=""/Css/tuning/grid{0}.less"" rel=""stylesheet/less"" type=""text/css"" />" : 
+            //                                           @"<link href=""/Css/tuning/grid{0}.css"" type=""text/css"" rel=""stylesheet"" />";
+            //    gridStyleLink = string.Format(gridStyleLink, pageId);                           
+            //}
+
+
+
             return new HtmlString(result);
 
         }

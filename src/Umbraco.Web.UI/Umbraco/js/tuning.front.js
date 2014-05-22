@@ -121,7 +121,7 @@ var initTuningPanel = function () {
 
     // Init panel 
     if (parent.setFrameIsLoaded) {
-        parent.setFrameIsLoaded(tuningParameterUrl);
+        parent.setFrameIsLoaded(tuningParameterUrl, tuningGridStyleUrl);
     }
 
 }
