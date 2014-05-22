@@ -67,14 +67,21 @@ namespace umbraco.settings
 
 			if (!IsPostBack)
 			{
+			    var path = BuildPath(currentItem);
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDictionary>().Tree.Alias)
-					.SyncTree(helper.Request("id"), false);
+					.SyncTree(path, false);
 			}
 
 
             Panel1.Controls.Add(p);
 		}
+
+	    private string BuildPath(cms.businesslogic.Dictionary.DictionaryItem current)
+	    {
+	        var parentPath = current.IsTopMostItem() ? "" : BuildPath(current.Parent) + ",";
+	        return parentPath + current.id;
+	    }
 
         void save_Click(object sender, EventArgs e)
         {
