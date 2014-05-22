@@ -107,7 +107,7 @@ namespace Umbraco.Web.Security
         /// <returns>returns the number of seconds until their session times out</returns>
         public FormsAuthenticationTicket PerformLogin(IUser user)
         {
-            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData()
+            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
             {
                 Id = user.Id,
                 AllowedApplications = user.AllowedSections.ToArray(),
