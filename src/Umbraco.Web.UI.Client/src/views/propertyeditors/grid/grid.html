@@ -90,7 +90,6 @@
                                             class="td mainTd usky-cell"
                                             ng-repeat="cell in row.cells">                    
 
-                                         
                                             <!-- if cell is empty tools -->
                                             <div 
                                                 class="usky-control usky-control-placeholder"
@@ -142,13 +141,15 @@
                                                 ng-init="setEditorPath(control); controlIndex = $index;"
                                                 class="usky-control">
 
+                                               
                                                 <!-- Filled cell tools -->
                                                 <div class="cell-tools"
                                                     ng-animate="'fade'" 
                                                     ng-if="control && ( currentControl == control)">
 
+                                                    
                                                     <div class="cell-tools-add" 
-                                                        ng-if="model.config.items.enableMultiCells" 
+                                                        ng-if="cell.model.max === undefined || cell.model.max < cell.controls.length" 
                                                         ng-mouseover="setCurrentToolsControl(control)" 
                                                         ng-mouseleave="disableCurrentToolsControl(control)">
 

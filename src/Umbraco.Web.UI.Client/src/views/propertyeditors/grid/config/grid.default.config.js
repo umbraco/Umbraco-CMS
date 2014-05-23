@@ -59,6 +59,7 @@ var uSkyGridConfig = [
  {
      grid: 12,
      percentage: 100,
+     max: 1,
      allowed: ["headline"]
  }
  ]
