@@ -1,20 +1,26 @@
 // Gridview
 // -------------------------
 
+ 
+
+
+ // Sortabel
+ // -------------------------
  .usky-grid .ui-sortable-helper  {
      border: dashed 1px #000;
      background: #ccc;
      opacity: 0.4;
      height: 50px !important;
+     overflow: hidden;
+     padding: 5px;
  }
 
-
- // Sortabel
- // -------------------------
  .usky-grid .ui-sortable-helper *{
      border: none !important;
      background: none !important;
      color: #999 !important;
+     padding: 0 !important;
+     margin: 0 !important;    
  }
 
  .usky-grid .ui-sortable-helper .cell-tools{
@@ -22,7 +28,22 @@
  }
 
  .usky-grid .ui-sortable-placeholder{
-     border-bottom: 2px solid #000;
+     border: 2px dashed @grayLight;
+     padding: 20px;
+     font-family: icomoon;
+     text-align: center;
+     font-size: 85px;
+     line-height: 65px;
+     color: @grayLighter;
+     vertical-align: middle;
+ }
+
+ .usky-grid .ui-sortable-placeholder:hover{
+     border-color: @gray;
+ }
+
+ .usky-grid .ui-sortable-placeholder:before{
+     content: "\e1bd";
  }
 
 
@@ -79,7 +100,6 @@
 
  .usky-grid  .mainTb {    
      border-collapse: separate;
-     cursor:move;
  }
  .usky-grid  .mainTd {    
      position:relative;
@@ -171,6 +191,14 @@
     border-color: @red !important;
 }
 
+.usky-grid  .cell-tools-move {
+    display:inline-block;
+    position: absolute;
+    top: 20px;
+    right: -20px;
+    z-index: 500;
+    cursor: move
+}
 
 
 
@@ -191,15 +219,19 @@
 }
 
 .usky-grid  .usky-control:hover{
-    border-bottom:2px solid rgba(182, 182, 182, 0.3);
+     border-bottom:2px solid rgba(182, 182, 182, 0.3);
 }
 
 .usky-grid  .usky-control-placeholder:hover{
-    border-bottom:2px solid rgba(182, 182, 182, 0.0) !important;
+     border-bottom:2px solid rgba(182, 182, 182, 0.0) !important;
 }
 
 .usky-grid .removingControl{
-    border: 1px dashed @red !important;
+     border: 1px dashed @red !important;
+}
+
+.usky-grid .movingControl{
+     border: 1px dashed @blue !important;
 }
 
 
@@ -235,7 +267,7 @@
 // -------------------------
 .usky-grid .usky-editor-placeholder{
     min-height: 65px;
-    padding-top: 20px;
+    padding: 20px;
     padding-bottom: 30px;
     position: relative;
     background-color: white;
@@ -261,12 +293,25 @@
      border: none;
      background: #fff;
      outline: none;
-     width: 100%;
+     width: 99%;
      resize: none;
      color: @gray;
  }
 
+.usky-grid .usky-cell-rte textarea{
+     display: none !important
+}
 
+.usky-grid .usky-cell-media .caption{
+     display: block;
+     overflow: hidden;
+     border: none;
+     background: #fff;
+     outline: none;
+     width: 99%;
+     resize: none;
+     font-style: italic;
+}
 
 
  
@@ -510,7 +555,14 @@
 
  .usky-grid .usky-templates-columns .td{
      border: none !important;
+     vertical-align: middle;
  }
+
+ .usky-grid .usky-templates-columns .td i{
+     color: @gray;
+     opacity: 0.8
+ }
+
 
  .usky-grid  .mainTbpt:hover {    
      border-color:@blue;

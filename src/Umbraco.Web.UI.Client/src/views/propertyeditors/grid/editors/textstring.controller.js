@@ -8,4 +8,10 @@ angular.module("umbraco")
             }
         };
 
+        if($scope.control.value === null){
+            $timeout(function(){
+                $("#" + $scope.control.uniqueId +"_text").focus();
+            }, 200);
+        }
+
     });

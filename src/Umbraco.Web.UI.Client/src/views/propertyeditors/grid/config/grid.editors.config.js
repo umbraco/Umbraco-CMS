@@ -5,7 +5,8 @@
 		"view": "textstring",
 		"icon": "icon-coin",
 		"config": {
-			"style": "font-size: 36px; font-weight: bold"
+			"style": "font-size: 36px; font-weight: bold",
+			"markup" : "<h1 style='#style#'>#value#</h1>"
 		}
 	},
 	{
@@ -21,7 +22,7 @@
 		"name": "Rich text editor",
 		"alias": "rte",
 		"view": "rte",
-		"icon": "icon-edit"
+		"icon": "icon-article"
 	},
 	{
 		"name": "Media",

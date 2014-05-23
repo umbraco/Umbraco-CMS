@@ -1,276 +1,305 @@
-var uSkyGridConfig = 
-[
+var uSkyGridConfig = [
+{
+    columns: [
     {
-        columns: [
-            {
+        grid: 12,
+        percentage: 100,
+
+        cellModels: [
+        {
+            name: "Single column",
+            models: [{
                 grid: 12,
-                percentage: 100,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }, {
-                        models: [{
-                            grid: 4,
-                            percentage: 33.3,
-                            allowed: ["media","quote","embed"]
-                        }, {
-                            grid: 8,
-                            percentage: 66.6,
-                            allowed: ["rte","macro"]
-                        }]
-                    },
-                    {
-                       models: [
-                       {
-                          grid: 8,
-                          percentage: 66.6,
-                          allowed: ["rte","macro"]
-                        }, 
-                        {
-                           grid: 4,
-                           percentage: 33.3,
-                           allowed: ["media","quote","embed"]
-                       }]
-                   }
-                ]
-            }
-        ]
-    },
+                percentage: 100
+            }]
+        }, {
+            name: "Article",
+            models: [{
+                grid: 4,
+                percentage: 33.3,
+                allowed: ["media","quote"]
+            }, {
+                grid: 8,
+                percentage: 66.6,
+                allowed: ["rte"]
+            }]
+        },
+        {
+         name: "Article, reverse",
+         models: [
+         {
+          grid: 8,
+          percentage: 66.6,
+          allowed: ["rte","macro"]
+      },
+      {
+         grid: 4,
+         percentage: 33.3,
+         allowed: ["media","quote","embed"]
+     }]
+ },
+ {
+     name: "Profile page",
+     models: [
+     {
+         grid: 4,
+         percentage: 33.3,
+         allowed: ["media"]
+     },
+     {
+      grid: 8,
+      percentage: 66.6,
+      allowed: ["rte"]
+  }
+  ]
+},
+{
+ name: "Headline",
+ models: [
+ {
+     grid: 12,
+     percentage: 100,
+     allowed: ["headline"]
+ }
+ ]
+}
+]
+
+}
+]
+},
+{
+    columns: [
     {
-        columns: [
-            {
-                grid: 9,
-                percentage: 70,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }, {
-                        models: [{
-                            grid: 6,
-                            percentage: 50
-                        }, {
-                            grid: 6,
-                            percentage: 50
-                        }]
-                    }, {
-                        models: [{
-                            grid: 4,
-                            percentage: 33.3
-                        }, {
-                            grid: 4,
-                            percentage: 33.3
-                        }, {
-                            grid: 4,
-                            percentage: 33.3
-                        }]
-                    }, {
-                        models: [{
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, ]
-                    }, {
-                        models: [{
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }]
-                    }, {
-                        models: [{
-                            grid: 8,
-                            percentage: 60
-                        }, {
-                            grid: 4,
-                            percentage: 40
-                        }]
-                    }, {
-                        models: [{
-                            grid: 4,
-                            percentage: 40
-                        }, {
-                            grid: 8,
-                            percentage: 60
-                        }]
-                    }
-                ]
-            },
-            {
+        grid: 9,
+        percentage: 70,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }, {
+            models: [{
+                grid: 6,
+                percentage: 50
+            }, {
+                grid: 6,
+                percentage: 50
+            }]
+        }, {
+            models: [{
+                grid: 4,
+                percentage: 33.3
+            }, {
+                grid: 4,
+                percentage: 33.3
+            }, {
+                grid: 4,
+                percentage: 33.3
+            }]
+        }, {
+            models: [{
                 grid: 3,
-                percentage: 30,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        columns: [
-            {
+                percentage: 25
+            }, {
                 grid: 3,
-                percentage: 30,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }
-                ]
-            },
-            {
-                grid: 9,
-                percentage: 70,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }, {
-                        models: [{
-                            grid: 6,
-                            percentage: 50
-                        }, {
-                            grid: 6,
-                            percentage: 50
-                        }]
-                    }, {
-                        models: [{
-                            grid: 4,
-                            percentage: 33.3
-                        }, {
-                            grid: 4,
-                            percentage: 33.3
-                        }, {
-                            grid: 4,
-                            percentage: 33.3
-                        }]
-                    }, {
-                        models: [{
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, {
-                            grid: 3,
-                            percentage: 25
-                        }, ]
-                    }, {
-                        models: [{
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }, {
-                            grid: 2,
-                            percentage: 16.6
-                        }]
-                    }, {
-                        models: [{
-                            grid: 8,
-                            percentage: 60
-                        }, {
-                            grid: 4,
-                            percentage: 40
-                        }]
-                    }, {
-                        models: [{
-                            grid: 4,
-                            percentage: 40
-                        }, {
-                            grid: 8,
-                            percentage: 60
-                        }]
-                    }
-                ]
-            }
+                percentage: 25
+            }, {
+                grid: 3,
+                percentage: 25
+            }, {
+                grid: 3,
+                percentage: 25
+            }, ]
+        }, {
+            models: [{
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }]
+        }, {
+            models: [{
+                grid: 8,
+                percentage: 60
+            }, {
+                grid: 4,
+                percentage: 40
+            }]
+        }, {
+            models: [{
+                grid: 4,
+                percentage: 40
+            }, {
+                grid: 8,
+                percentage: 60
+            }]
+        }
         ]
     },
     {
-        columns: [
-            {
-                grid: 4,
-                percentage: 33.3,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }
-                ]
-            },
-            {
-                grid: 4,
-                percentage: 33.3,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }
-                ]
-            },
-            {
-                grid: 4,
-                percentage: 33.3,
-                cellModels: [
-                    {
-                        models: [{
-                            grid: 12,
-                            percentage: 100
-                        }]
-                    }
-                ]
-            }
+        grid: 3,
+        percentage: 30,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }
         ]
     }
+    ]
+},
+{
+    columns: [
+    {
+        grid: 3,
+        percentage: 30,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }
+        ]
+    },
+    {
+        grid: 9,
+        percentage: 70,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }, {
+            models: [{
+                grid: 6,
+                percentage: 50
+            }, {
+                grid: 6,
+                percentage: 50
+            }]
+        }, {
+            models: [{
+                grid: 4,
+                percentage: 33.3
+            }, {
+                grid: 4,
+                percentage: 33.3
+            }, {
+                grid: 4,
+                percentage: 33.3
+            }]
+        }, {
+            models: [{
+                grid: 3,
+                percentage: 25
+            }, {
+                grid: 3,
+                percentage: 25
+            }, {
+                grid: 3,
+                percentage: 25
+            }, {
+                grid: 3,
+                percentage: 25
+            }, ]
+        }, {
+            models: [{
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }, {
+                grid: 2,
+                percentage: 16.6
+            }]
+        }, {
+            models: [{
+                grid: 8,
+                percentage: 60
+            }, {
+                grid: 4,
+                percentage: 40
+            }]
+        }, {
+            models: [{
+                grid: 4,
+                percentage: 40
+            }, {
+                grid: 8,
+                percentage: 60
+            }]
+        }
+        ]
+    }
+    ]
+},
+{
+    columns: [
+    {
+        grid: 4,
+        percentage: 33.3,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }
+        ]
+    },
+    {
+        grid: 4,
+        percentage: 33.3,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }
+        ]
+    },
+    {
+        grid: 4,
+        percentage: 33.3,
+        cellModels: [
+        {
+            models: [{
+                grid: 12,
+                percentage: 100
+            }]
+        }
+        ]
+    }
+    ]
+}
 ];

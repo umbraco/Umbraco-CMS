@@ -32,6 +32,7 @@ angular.module("umbraco")
                     distance: 10,
                     cursor: "move",
                     placeholder: 'ui-sortable-placeholder',
+                    handle: '.cell-tools-move',
                     start: function (e, ui) {
                         ui.item.find('.mceNoEditor').each(function () {
                             tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
@@ -136,6 +137,14 @@ angular.module("umbraco")
                     $scope.currentCell = null;
                 }
 
+                $scope.cellPreview = function(cell){
+                    if($scope.availableEditors && cell && cell.allowed && angular.isArray(cell.allowed)){
+                        var editor = $scope.getEditor(cell.allowed[0]);
+                        return editor.icon;
+                    }else{
+                        return "icon-layout";
+                    }
+                }
 
                 // *********************************************
                 // Control management functions
@@ -164,6 +173,13 @@ angular.module("umbraco")
                     $scope.currentRemoveControl = null;
                 };
 
+                $scope.setCurrentMoveControl = function (Control) {
+                    $scope.currentMoveControl = Control;
+                };
+
+                $scope.disableCurrentMoveControl = function (Control) {
+                    $scope.currentMoveControl = null;
+                };
 
                 $scope.setUniqueId = function (cell, index) {
                     var date = new Date();
