@@ -119,22 +119,23 @@ module.exports = function (grunt) {
       bower: {
         files: [
                 {
-                  dest: 'lib/typeahead/typeahead.bundle.min.js', 
+                  dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', 
                   src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js' 
                 },
                 {
-                  dest: 'lib/lazyload/lazyload.min.js', 
+                  dest: '<%= distdir %>/lib/lazyload/lazyload.min.js', 
                   src: 'bower_components/rgrove-lazyload/lazyload.js'
                 },
                 {
-                  dest: 'lib/ace/',
+                  dest: '<%= distdir %>/lib/ace/',
                   src: '**',
                   expand: true,
-                  cwd: 'bower_components/ace-builds/src-min-noconflict/' 
+                  cwd: 'bower_components/ace-builds/src-min-noconflict/'
                 }
               ]
       },
       
+
       installer: {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },

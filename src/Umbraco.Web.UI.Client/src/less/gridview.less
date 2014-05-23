@@ -1,21 +1,26 @@
 // Gridview
 // -------------------------
 
- .usky-grid  {
-     
- }
+ 
 
+
+ // Sortabel
+ // -------------------------
  .usky-grid .ui-sortable-helper  {
      border: dashed 1px #000;
      background: #ccc;
      opacity: 0.4;
      height: 50px !important;
+     overflow: hidden;
+     padding: 5px;
  }
 
  .usky-grid .ui-sortable-helper *{
      border: none !important;
      background: none !important;
      color: #999 !important;
+     padding: 0 !important;
+     margin: 0 !important;    
  }
 
  .usky-grid .ui-sortable-helper .cell-tools{
@@ -23,195 +28,323 @@
  }
 
  .usky-grid .ui-sortable-placeholder{
-     border-bottom: 2px solid #000;
+     border: 2px dashed @grayLight;
+     padding: 20px;
+     font-family: icomoon;
+     text-align: center;
+     font-size: 85px;
+     line-height: 65px;
+     color: @grayLighter;
+     vertical-align: middle;
  }
 
+ .usky-grid .ui-sortable-placeholder:hover{
+     border-color: @gray;
+ }
+
+ .usky-grid .ui-sortable-placeholder:before{
+     content: "\e1bd";
+ }
+
+
+
+ // utils
+ // -------------------------
  .usky-grid-width {
      margin: 0 auto;
      width:100%;
  }
-
  .usky-grid  .right {
      float:right;
  }
-
+ 
+ // general layout components
+ // -------------------------
  .usky-grid  .tb {
      display:table;
      width: 100%;
      table-layout: fixed;
-     margin-bottom: 10px;
  }
-
  .usky-grid  .td {
      display:table-cell;
      vertical-align:top;
      border-right:1px dashed rgba(182, 182, 182, 0.0);
  }
-
  .usky-grid .tb:hover .td{
      border-right:1px dashed rgba(182, 182, 182, 0.3);
  }
-
  .usky-grid  .td.last {
      border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
  }
-
  .usky-grid  .tr {
      display:table-row;
  }
-
  .usky-grid  .td2{
      width: 50%;
  }
-
  .usky-grid  .td3{
      width: 33.33%;
  }
-
  .usky-grid  .td4{
      width: 25%;
  }
-
  .usky-grid  .td5{
      width: 20%;
  }
-
  .usky-grid  .td6{
      width: 16.6%;
  }
-
  .usky-grid  .middle {
      text-align: center;
  }
 
  .usky-grid  .mainTb {    
      border-collapse: separate;
-     margin-bottom: -1px;
-     cursor:move;
  }
-
  .usky-grid  .mainTd {    
-     margin:0px;
      position:relative;
  }
 
- .usky-grid  .backColor {
+
+
+ // COLUMN
+ // -------------------------
+ .usky-grid  .usky-column {
+     
+ }
+ .usky-grid  .usky-column.last {
      
  }
 
+
+ // ROW
+ // -------------------------
 .usky-grid .usky-row{
      position: relative;
-     padding: 20px;
      border: 1px dashed rgba(0,0,0,0);
 }
 
- .usky-grid  textarea{
-     display:none;
- }
 
 
- .usky-grid  .cellPanel {
-     min-height: 100px;
+
+// CELL
+// -------------------------
+.usky-grid .usky-cell{
      position: relative;
-     text-align: center;
-     text-align: -moz-center;
-     cursor: text;
-     margin: 10px;
- }
+     border: 1px dashed rgba(0,0,0,0);
+}
 
- .usky-grid  .cellPanel .placeholder{
-     font-size: 14px; opacity: 0.7; text-align: left;
-     padding: 5px;
-     border:1px solid rgba(182, 182, 182, 0.3);
- }
+.usky-grid  .cell-tools {
+    transition: all .20s ease-in-out;
+    -moz-transition: all .20s ease-in-out;
+    -webkit-transition: all .20s ease-in-out;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+}
 
- .usky-grid  .cellPanel:hover .placeholder{
-     border:1px solid rgba(182, 182, 182, 0.8);
- }
+.usky-grid  .cell-tools-add {
+    position: absolute;
+    text-align: center;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    z-index: 500;
+}
 
- .usky-grid  .cellMacro {
-     min-height: 65px;
-     padding-top: 20px;
-     padding-bottom: 30px;
-     position: relative;
-     background-color: white;
-     border: 2px dashed @grayLight;
-     text-align: center;
-     text-align: -moz-center;
- }
+.usky-grid .cell-tools-add-single i{
+     font-size: 85px;
+     color: @grayLight;
+     display: block;
+     line-height: 55px;
+     margin-bottom: 10px;
+}
 
- .usky-grid  .cellMacro .tools{
-     margin: auto;
-     font-size: 12px;
+.usky-grid .cell-tools-add-single a:hover i{color: @gray;}
+
+.usky-grid .cell-tools-add-single a{text-decoration:  none;}
+
+.usky-grid .cell-tools-add-single p{
+     display: none;
+}
+
+.usky-grid .single-editor-rte p{
+     display: block;
+}
+.usky-grid .single-editor-rte i, .usky-grid .single-editor-rte div{
+     display: none;
+}
+
+.usky-grid  .cell-tools-remove {
+    display:inline-block;
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    text-align: right;
+    z-index: 500;
+}
+
+.usky-grid .cell-tools-remove .iconBox:hover, .usky-grid .cell-tools-remove .iconBox:hover *{
+    background: @red !important;
+    border-color: @red !important;
+}
+
+.usky-grid  .cell-tools-move {
+    display:inline-block;
+    position: absolute;
+    top: 20px;
+    right: -20px;
+    z-index: 500;
+    cursor: move
+}
+
+
+
+// CONTROL
+// -------------------------
+.usky-grid .usky-control {
+    transition: all .20s ease-in-out;
+    -moz-transition: all .20s ease-in-out;
+    -webkit-transition: all .20s ease-in-out;
+    position:relative;
+    display:block;
+    
+    border: 1px dashed rgba(255, 0, 0, .0);     
+    border-bottom-width: 2px;
+
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+.usky-grid  .usky-control:hover{
+     border-bottom:2px solid rgba(182, 182, 182, 0.3);
+}
+
+.usky-grid  .usky-control-placeholder:hover{
+     border-bottom:2px solid rgba(182, 182, 182, 0.0) !important;
+}
+
+.usky-grid .removingControl{
+     border: 1px dashed @red !important;
+}
+
+.usky-grid .movingControl{
+     border: 1px dashed @blue !important;
+}
+
+
+
+
+
+// CONTROL PLACEHOLDER
+// -------------------------
+.usky-grid  .usky-control-placeholder {
+    min-height: 100px;
+    position: relative;
+    text-align: center;
+    text-align: -moz-center;
+    cursor: text;
+}
+
+.usky-grid  .usky-control-placeholder .placeholder{
+    font-size: 14px; opacity: 0.7; text-align: left;
+    padding: 5px;
+    border:1px solid rgba(182, 182, 182, 0.3);
+    height: 50px;
+}
+.usky-grid  .usky-control-placeholder:hover .placeholder{
+    border:1px solid rgba(182, 182, 182, 0.8);
+}
+
+
+
+
+
+
+// EDITOR PLACEHOLDER
+// -------------------------
+.usky-grid .usky-editor-placeholder{
+    min-height: 65px;
+    padding: 20px;
+    padding-bottom: 30px;
+    position: relative;
+    background-color: white;
+    border: 4px dashed @grayLight;
+    text-align: center;
+    text-align: -moz-center;
+}
+.usky-grid .usky-editor-placeholder i{
+    color: @grayLight;
+    font-size: 85px;
+    line-height: 85px;  
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+
+// Form elements
+// -------------------------
+ .usky-grid  textarea.textstring{
+     display: block;
+     overflow: hidden;
+     border: none;
+     background: #fff;
+     outline: none;
+     width: 99%;
+     resize: none;
      color: @gray;
  }
 
- .usky-grid  .cellMacro .tools i{
-     color: @grayLight;
-     font-size: 65px;
+.usky-grid .usky-cell-rte textarea{
+     display: none !important
+}
+
+.usky-grid .usky-cell-media .caption{
      display: block;
-     margin-bottom: 10px;
- }
+     overflow: hidden;
+     border: none;
+     background: #fff;
+     outline: none;
+     width: 99%;
+     resize: none;
+     font-style: italic;
+}
 
- .usky-grid  .controlContainer {
-     transition: all .20s ease-in-out;
-     -moz-transition: all .20s ease-in-out;
-     -webkit-transition: all .20s ease-in-out;
-     position:relative;
-     display:block;
-     
-     padding: 10px;
-     margin: 10px;
-     
-     border: 1px solid rgba(255, 0, 0, .0);     
-     border-bottom-width: 2px;
 
-     -webkit-background-clip: padding-box; /* for Safari */
-     background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
- }
-
- .usky-grid  .controlContainer:hover{
-     border-bottom:2px solid rgba(182, 182, 182, 0.3);
- }
  
 
- .usky-grid .removingControl{
-     border: 1px dashed @red !important;
- }
+ 
+ 
+ 
+
+ 
+
+
  
  .usky-grid  .cellPanelRte {
      min-height:60px;
  }
 
- .usky-grid  .cellPanelMacro {
-     padding: 90px 0 0 0;
-     height:96px;
-     background-color: rgba(233, 233, 233, 0.35);
-     text-align: center;
- }
 
- .usky-grid  .iconBoxBig {
-     display: inline-block;
-     cursor: pointer;
- }
 
- .usky-grid  .iconBoxBig i {
-     font-size:24px !important;
-     color: #5F5F5F;
- }
-
+// ICONS
+// -------------------------
  .usky-grid  .iconBox {
-     padding: 2px 5px 2px 5px;
+     padding: 4px 7px 4px 7px;
      display: inline-block;
      cursor: pointer;
      border-radius: 200px;
      background: rgba(255,255,255, 1);
      border:1px solid rgb(182, 182, 182);
+     margin: 2px;
  }
-
  .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
           background: @blue !important;
           color: white !important;
+          border-color: @blue !important;
  }
 
  .usky-grid  .iconBox a:hover {
@@ -241,79 +374,13 @@
  }
 
  .usky-grid  .iconBox i {
-     font-size:14px !important;
+     font-size:16px !important;
      color: #5F5F5F;
  }
 
- .usky-grid  .iconBox i:hover {
-     color: #000000;
- }
 
- /* Row tools */
+ 
 
- .usky-grid  .row-tools {
-    
-}
-
- .usky-grid  .row-tools.selected {
-     width: 65px;
-     margin: 0px 0 0 -35px;
-     z-index: 200;
-     z-index: 99999999;
-     -webkit-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
-     -moz-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
-     box-shadow: 2px 2px 10px 0px rgba(500, 50, 50, 0.14);
- }
-
- .usky-grid  .cell-tools {
-     transition: all .20s ease-in-out;
-     -moz-transition: all .20s ease-in-out;
-     -webkit-transition: all .20s ease-in-out;
-     position: absolute;
-     bottom: 0;
-     top: 0;
-     left: 0;
-     right: 0;
- }
-
- .usky-grid  .cell-tools-add {
-     position: absolute;
-     text-align: center;
-     bottom: -14px;
-     left: 0;
-     right: 0;
-     z-index: 500;
- }
-
- .usky-grid  .cell-tools-remove {
-     display:inline-block;
-     position: absolute;
-     top: -13px;
-     right: -13px;
-     text-align: right;
-     z-index: 500;
- }
-
- .usky-grid .cell-tools-remove .iconBox:hover, .usky-grid .cell-tools-remove .iconBox:hover *{
-          background: @red !important;
- }
-
- .usky-grid  .div-macro {
-     display: inline-table;
-     width: 100%;
- }
-
- .usky-grid  .div-media {
-     overflow:hidden;
- }
-
- .usky-grid  .div-macro .td {
-     padding-top: 40px;
- }
-
- .usky-grid  .iconoff {
-     color:rgb(186, 186, 192)
- }
 
  .usky-grid  ul {
      display:inline-block;
@@ -323,42 +390,27 @@
      text-align:center;
  }
 
+ .usky-grid  .help-text {
+     background: @grayLighter;
+     color: @gray;
+     font-size: 14px;
+     padding: 10px 20px 10px 20px;
+     border-radius: 15px;
+     display: inline-block;
+     clear: both;
+ }
+
  .usky-grid  ul li {
      display: inline-block;
      width: 120px;
      margin: 8px 8px 0px 8px;
  }
 
- .usky-grid  .mainTbpt:hover {    
-     border:2px solid #53a93f;
- }
 
- .usky-grid  .mainTbpt {
-     cursor:pointer;
-     border-spacing: 5px;
-     border-collapse: separate;
-     height: 35px;
-     border: 2px solid rgb(219, 219, 219);  
-     margin:0px;
-     background-color: rgba(228, 228, 228, 0.41);
- }
 
- .usky-grid .icon-color {
-     color: rgb(109, 109, 109);
- }
 
- .usky-grid  .mainTdpt {    
-     height: 35px;
-     border: 1px dashed rgba(102, 102, 102, 0.3);  
-     margin:0px;
-     background-color: rgba(228, 228, 228, 0.41);
- }
-
- .usky-grid .hideRTEToolbar .mce-toolbar {
-     /*display:none !important;*/
-     visibility:hidden !important;
- }
-
+ // TINYMCE EDITOR
+ // -------------------------
  .usky-grid .mce-panel {
      border:none !important;
      clear:both;
@@ -384,7 +436,6 @@
      z-index: 9999999;
  }
 
-
  .mce-flow-layout-item {
      margin: 0;
  }
@@ -392,23 +443,19 @@
  .usky-grid  .mce-panel {
      background: transparent !important;
  }
-
  .usky-grid  .mce-floatpanel {
      background-color: #F7F7F7 !important;
  }
 
+ 
+ // MEDIA EDITOR
+ // -------------------------
  .usky-grid  .fullSizeImage {
      width:100%
  }
 
- .usky-grid  .usky-column {
-     padding:10px;
-     margin-left:-1px;
- }
 
- .usky-grid  .usky-column.last {
-     
- }
+
 
  /**************************************************************************************************/
  /* Width */
@@ -432,107 +479,28 @@
  }
 
 
+
  /**************************************************************************************************/
  /* Margin control */
  /**************************************************************************************************/
 
- /* Margin default */
- .usky-grid  .mainContainer {
-     /*overflow:hidden;*/
+ .usky-grid .usky-cell{
      
-     /*
-     padding-left:10px;
-     padding-right:10px;
-     padding-top:10px;
-     padding-bottom:10px;
-         */
-     /*background-color:#fff;*/
  }
 
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.controlContainer,
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
-     /*overflow:hidden;*/
-     margin-top:20px;
-     margin-bottom:10px;
-     margin-left:10px;
-     margin-right:10px;
+ .usky-grid .usky-row{
+     
  }
 
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.controlContainer.first,
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
-     margin-top:10px;
+ .usky-grid .usky-control{
+     margin: 30px;
+     padding: 5px;
+ }
+ 
+ .usky-grid .usky-templates-columns{
+     margin-top: 30px;
  }
 
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.first > div.controlContainer,
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.first > div.cellPanel {
-     margin-left:10px;
- }
-
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.last > div.controlContainer,
- .usky-grid  .mainContainer > .mainTb > .tb > .tr > .mainTd.last > div.cellPanel {
-     margin-right:10px;
- }
-
- /* Control margin less */
-
- .usky-grid  .mainContainer.marginControlLess {
-     padding:0;
- }
-
- .usky-grid  .mainContainer.marginControlLess > .mainTb > .tb > .tr > .mainTd > div.controlContainer {
-     margin:-1px -1px 0 -1px;
- }
-
- .usky-grid  .mainContainer.marginControlLess > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
-     margin:-1px -1px 0 -1px;
- }
-
- .usky-grid  .mainContainer.marginControlLess > .mainTb > .tb > .tr > .mainTd > div > .aA4 {
-     margin: 8px 61px 0 0px;
- }
-
- /* Margin less */
-
- .usky-grid  .mainContainer.marginLeftLess {
-     padding-left:0px;
- }
-
- .usky-grid  .mainContainer.marginLeftLess > .mainTb > .tb > .tr > .mainTd.first > div {
-     margin-left:-1px;
- }
-
- .usky-grid  .mainContainer.marginRightLess {
-     padding-right:0px;
- }
-
- .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div,
- .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div.first,
- .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div.last,
- .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div.cellPanel {
-     margin-right:-1px;
- }
-
- .usky-grid  .mainContainer.marginRightLess > .mainTb > .tb > .tr > .mainTd.last > div > .cell-tools {
-     margin: -1px -1px 0 0;
- }
-
- .usky-grid  .mainContainer.marginTopLess {
-     padding-top:0px;
- }
-
- .usky-grid  .mainContainer.marginTopLess > .mainTb > .tb > .tr > .mainTd > div.controlContainer.first,
- .usky-grid  .mainContainer.marginTopLess > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
-     margin-top:-1px;
- }
-
- .usky-grid  .mainContainer.marginBottomLess {
-     padding-bottom:0px;
- }
-
- .usky-grid  .mainContainer.marginBottomLess > .mainTb > .tb > .tr > .mainTd > div.controlContainer.last,
- .usky-grid  .mainContainer.marginBottomLess > .mainTb > .tb > .tr > .mainTd > div.cellPanel {
-     margin-bottom:0px;
- }
 
  /**************************************************************************************************/
  /* template */
@@ -546,63 +514,72 @@
  
  .usky-grid .uSky-templates-template {
      display:inline-block;
-     margin:20px;
      width:100px;
+     padding-right: 30px;
+     margin: 20px;
  }
 
  .usky-grid .uSky-templates-template .tb:hover {
-     border:5px solid #53a93f;
+     border:5px solid @blue;
  }
 
  .usky-grid .uSky-templates-template .tb { 
      width:100%; 
      height:150px; 
      padding:10px;
-     background-color:rgba(228, 228, 228, 0.41);
-     border: 5px solid rgb(219, 219, 219);
+     background-color: @grayLighter;
+     border: 5px solid @grayLight;
      cursor:pointer;
+     position: relative;
+ }
+ 
+ .usky-grid .uSky-templates-template .tr { 
+     height: 100%;
+     position: relative;
  }
  
  .usky-grid .uSky-templates-template .tb .uSky-templates-column {
      height:100%;
-     border-top: 2px dashed rgba(102, 102, 102, 0.3);
-     border-bottom: 2px dashed rgba(102, 102, 102, 0.3);
-     border-left: 2px dashed rgba(102, 102, 102, 0.3);
-     margin: 0px 10px 0 10px;
-     background-color: rgba(228, 228, 228, 0.41)
-
+     border: 1px dashed @grayLight;
+     border-right: none;
  }
 
  .usky-grid .uSky-templates-template .tb .uSky-templates-column.last {
-     border: 2px dashed rgba(102, 102, 102, 0.3);
+     border-right: 1px dashed @grayLight !important;
  }
 
 
  /**************************************************************************************************/
- /* jumbotron */
+ /* template column */
  /**************************************************************************************************/
 
- .usky-grid  .jumbotron {
-     border: 7px solid rgb(235, 235, 235);
-     border-radius: 5px;
+ .usky-grid .usky-templates-columns .td{
+     border: none !important;
+     vertical-align: middle;
  }
 
- /**************************************************************************************************/
- /* Color picker dialog for grid */
- /**************************************************************************************************/
-
- .CssClassPickerBox{
-     border: 2px solid #F3F2F2;
-     display: inline-block;
-     cursor: pointer;
-     margin: 10px;
+ .usky-grid .usky-templates-columns .td i{
+     color: @gray;
+     opacity: 0.8
  }
 
- .CssClassPickerBox:hover, .CssClassPickerBox.select {
-     border: 2px solid #0F9746;
+
+ .usky-grid  .mainTbpt:hover {    
+     border-color:@blue;
  }
 
- .CssClassPickerBox div{
-     height: 80px;
-     width: 196px;
+ .usky-grid  .mainTbpt {
+     cursor:pointer;
+     border-spacing: 5px;
+     border-collapse: separate;
+     height: 35px;
+     border: 2px solid @grayLight;  
+     margin:0px;
+     background-color: @grayLighter;
+ }
+ .usky-grid  .mainTdpt {    
+     height: 35px;
+     border: 1px dashed @grayLight;  
+     margin:0px;
+     background-color: rgba(228, 228, 228, 0.41);
  }
