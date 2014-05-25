@@ -99,6 +99,7 @@ angular.module("umbraco")
 
                     column.rows.splice(column.rows.length + 1, 0,
                     {
+                        uniqueId: $scope.setUniqueId(),
                         cells: [],
                         cssClass: ''
                     });

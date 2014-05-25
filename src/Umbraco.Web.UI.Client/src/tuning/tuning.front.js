@@ -119,11 +119,19 @@ var initIntelTuning = function (tuningModel) {
 
 var initTuningPanel = function () {
 
+    // Looking for grid row
+    var tuningGridList = []
+    $("div[class^='grid-row-']").each(function (index, value) {
+        tuningGridList.splice(tuningGridList.length + 1, 0, $(value).attr("class"))
+    });
+
     // Init panel 
     if (parent.setFrameIsLoaded) {
-        parent.setFrameIsLoaded(tuningParameterUrl);
+        parent.setFrameIsLoaded(tuningParameterUrl, tuningGridStyleUrl, tuningGridList);
     }
-
 }
 
-initTuningPanel();
+$(function () {
+    initTuningPanel();
+});
+

@@ -237,21 +237,26 @@ namespace Umbraco.Web.Editors
             var contentService = Services.ContentService;
             IContent content = contentService.GetById(pageId);
 
+            string lessParam = string.Empty;
+            string gridStyle = string.Empty;
             // Path to the new grid less
             string newResultGridLessPath = HttpContext.Current.Server.MapPath(string.Format(resultGridLessPath, pageId));
-
-            // Load current grid Less
-            string gridLessContent = string.Empty;
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(newResultGridLessPath))
+            if (System.IO.File.Exists(newResultGridLessPath))
             {
-                gridLessContent = sr.ReadToEnd();
+
+                // Load current grid Less
+                string gridLessContent = string.Empty;
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(newResultGridLessPath))
+                {
+                    gridLessContent = sr.ReadToEnd();
+                }
+
+                //Get parameter block
+                lessParam = GetStyleBloque("lessParam", gridLessContent);
+
+                //Get style block
+                gridStyle = GetStyleBloque("gridStyle", gridLessContent);
             }
-
-            //Get parameter block
-            string lessParam = GetStyleBloque("lessParam", gridLessContent);
-
-            //Get style block
-            string gridStyle = GetStyleBloque("gridStyle", gridLessContent);
 
             // Look after grid properies
             foreach (var property in content.Properties)
@@ -265,7 +270,7 @@ namespace Umbraco.Web.Editors
                         foreach (var row in column.rows)
                         {
 
-                            string newTag = "grid-row-" + column.rows.IndexOf(row);
+                            string newTag = "grid-row-" + row.uniqueId;
 
                             if (gridStyle.IndexOf(newTag + " ") < 0)
                             {
@@ -312,7 +317,6 @@ namespace Umbraco.Web.Editors
                 file.Write(result);
             }
 
-            
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(result, Encoding.UTF8, "text/css")

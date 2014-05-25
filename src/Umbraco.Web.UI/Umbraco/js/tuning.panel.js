@@ -40,16 +40,16 @@ var refrechIntelTuning = function (schema) {
 
 }
 
-var setFrameIsLoaded = function (tuningParameterUrl, tuningGridStyleUrl) {
+var setFrameIsLoaded = function (tuningParameterUrl, tuningGridStyleUrl, tuningGridList) {
     console.info("iframe id loaded " + tuningParameterUrl + " " + tuningGridStyleUrl);
     var scope = angular.element($("#tuningPanel")).scope();
     scope.tuningParameterUrl = tuningParameterUrl;
     scope.tuningGridStyleUrl = tuningGridStyleUrl;
+    scope.tuningGridList = tuningGridList
     scope.frameLoaded++;
     scope.frameFirstLoaded = true;
     scope.$apply();
 }
-
 /*********************************************************************************************************/
 /* tuning panel app and controller */
 /*********************************************************************************************************/
@@ -65,6 +65,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.frameFirstLoaded = false;
     $scope.tuningParameterUrl = "";
     $scope.tuningGridStyleUrl = "";
+    $scope.tuningGridList = "";
     $scope.schemaFocus = "body";
     $scope.settingIsOpen = 'previewDevice';
     $scope.BackgroundPositions = ['center', 'left', 'right', 'bottom center', 'bottom left', 'bottom right', 'top center', 'top left', 'top right'];
@@ -85,106 +86,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     ];
     $scope.previewDevice = $scope.devices[0];
 
-
-
-
-
-
-
-
-
-
-    //*****************************************************************************
-    // Grid row model
-    //*****************************************************************************
-
-    var rows = ['grid-row-0', 'grid-row-1'];
-
-    var rowModel = {
-        name: "Grid",
-        sections: [{
-            name: "Main",
-            subSections: []
-        }]
-    };
-
-    $.each(rows, function (index, row) {
-        var newIndex = rowModel.sections[0].subSections.length + 1;
-
-        var rowFieldModel = {
-            name: "Row",
-            schema: "",
-            fields: [
-                {
-                    name: "Background color",
-                    alias: "backgroundRowColor",
-                    description: "Background body color",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorBodyBackground"
-                },
-                {
-                    name: "Image/Pattern",
-                    alias: "backgroundRowImageOrPattern",
-                    description: "Use an image for the background instead of a solid colour/gradient",
-                    type: "bgImagePicker",
-                    value: ""
-                },
-                {
-                    name: "Image position",
-                    alias: "backgroundRowPosition",
-                    description: "Background body position",
-                    type: "bgPositionPicker",
-                    value: ""
-                },
-                {
-                    name: "Stretch background",
-                    alias: "backgroundRowCover",
-                    description: "Checked: stretches the chosen image to fill the.\nUnchecked: the image is tiled according to the Repeat setting below",
-                    type: "checkbox",
-                    value: ""
-                },
-                {
-                    name: "Background tiling",
-                    alias: "backgroundRowRepeat",
-                    description: "How to tile the background image",
-                    type: "bgRepeatPicker",
-                    value: ""
-                },
-                {
-                    name: "Background scrolling behaviour",
-                    alias: "backgroundRowAttachment",
-                    description: "When fixed the background doesn't scroll with the content",
-                    type: "bgAttachmentPicker",
-                    value: ""
-                }
-            ]
-        };
-
-        rowModel.sections[0].subSections.splice(newIndex, 0, rowFieldModel);
-        rowModel.sections[0].subSections[newIndex - 1].schema = "." + row;
-        $.each(rowModel.sections[0].subSections[newIndex - 1].fields, function (indexField, field) {
-            field.alias = field.alias + "__" + row;
-        });
-
-    })
-
-    tuningConfig.categories.splice(tuningConfig.categories.length + 1, 0, rowModel);
-
-    //*****************************************************************************
-
-
-
-
-
-
-
-
-
-
     // Load parameters from GetLessParameters and init data of the tuning config
     var initTuning = function () {
-        
+
         $http.get('/Umbraco/Api/tuning/Load', { params: { tuningStyleUrl: $scope.tuningParameterUrl, tuningGridStyleUrl: $scope.tuningGridStyleUrl } })
             .success(function (data) {
 
@@ -226,7 +130,91 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                 }
 
             });
-        
+
+    }
+
+    // Add Less parameters for each grid row
+    var initGridConfig = function () {
+
+        var rowModel = {
+            name: "Grid",
+            sections: [{
+                name: "Main",
+                subSections: []
+            }]
+        };
+
+        $.each($scope.tuningGridList, function (index, row) {
+
+            var newIndex = rowModel.sections[0].subSections.length + 1;
+
+            var rowFieldModel = {
+                name: "Row",
+                schema: "",
+                fields: [
+                    {
+                        name: "Background color",
+                        alias: "backgroundRowColor",
+                        description: "Background body color",
+                        type: "colorPicker",
+                        value: "",
+                        colorPaletteProperty: "colorBodyBackground"
+                    },
+                    {
+                        name: "Background gradient",
+                        alias: "backgroundRowGradientColor",
+                        description: "Fade the background to this colour at the bottom",
+                        type: "colorPicker",
+                        value: ""
+                    },
+                    {
+                        name: "Image/Pattern",
+                        alias: "backgroundRowImageOrPattern",
+                        description: "Use an image for the background instead of a solid colour/gradient",
+                        type: "bgImagePicker",
+                        value: ""
+                    },
+                    {
+                        name: "Image position",
+                        alias: "backgroundRowPosition",
+                        description: "Background body position",
+                        type: "bgPositionPicker",
+                        value: ""
+                    },
+                    {
+                        name: "Stretch background",
+                        alias: "backgroundRowCover",
+                        description: "Checked: stretches the chosen image to fill the.\nUnchecked: the image is tiled according to the Repeat setting below",
+                        type: "checkbox",
+                        value: ""
+                    },
+                    {
+                        name: "Background tiling",
+                        alias: "backgroundRowRepeat",
+                        description: "How to tile the background image",
+                        type: "bgRepeatPicker",
+                        value: ""
+                    },
+                    {
+                        name: "Background scrolling behaviour",
+                        alias: "backgroundRowAttachment",
+                        description: "When fixed the background doesn't scroll with the content",
+                        type: "bgAttachmentPicker",
+                        value: ""
+                    }
+                ]
+            };
+
+            rowModel.sections[0].subSections.splice(newIndex, 0, rowFieldModel);
+            rowModel.sections[0].subSections[newIndex - 1].schema = "." + row;
+            $.each(rowModel.sections[0].subSections[newIndex - 1].fields, function (indexField, field) {
+                field.alias = field.alias + "__" + row;
+            });
+
+        })
+
+        tuningConfig.categories.splice(tuningConfig.categories.length + 1, 0, rowModel);
+
     }
 
     // Refresh all less parameters for every changes watching tuningModel 
@@ -303,13 +291,11 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                 $.each(section.subSections, function (indexSubSection, subSection) {
                     $.each(subSection.fields, function (indexField, field) {
 
-                        if (subSection.schema && subSection.schema.indexOf("grid-row-") >= 0)
-                        {
+                        if (subSection.schema && subSection.schema.indexOf("grid-row-") >= 0) {
                             var value = (field.value != 0 && (field.value == undefined || field.value == "")) ? "''" : field.value;
                             parametersGrid.splice(parametersGrid.length + 1, 0, "@" + field.alias + ":" + value + ";");
                         }
-                        else
-                        {
+                        else {
                             // value
                             var value = (field.value != 0 && (field.value == undefined || field.value == "")) ? "''" : field.value;
                             parameters.splice(parameters.length + 1, 0, "@" + field.alias + ":" + value + ";");
@@ -470,6 +456,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     // watch framLoaded
     $scope.$watch("frameLoaded", function () {
         if ($scope.frameLoaded > 0) {
+            initGridConfig();
             initTuning();
             $scope.$watch('tuningModel', function () {
                 refreshtuning();
@@ -624,8 +611,8 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.safeFonts = ["Arial, Helvetica", "Impact", "Lucida Sans Unicode", "Tahoma", "Trebuchet MS", "Verdana", "Georgia", "Times New Roman", "Courier New, Courier"];
     $scope.fonts = [];
     $scope.selectedFont = {};
-    
-    var originalFont = {}; 
+
+    var originalFont = {};
     originalFont.fontFamily = $scope.data.modalField.value;
     originalFont.fontType = $scope.data.modalField.fontType;
     originalFont.fontWeight = $scope.data.modalField.fontWeight;

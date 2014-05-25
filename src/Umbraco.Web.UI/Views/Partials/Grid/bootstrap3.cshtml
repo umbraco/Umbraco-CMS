@@ -12,7 +12,7 @@
                 <div class="col-md-@column.grid column usky-grid-column">
                     @foreach (var row in column.rows)
                     {
-                        <div class="@row.cssClass @(row.fullScreen == "True" ? "usky-grid-full-size" : "")">
+                        <div class="grid-row-@row.uniqueId @row.cssClass @(row.fullScreen == "True" ? "usky-grid-full-size" : "")">
                             <div>
                                 <div class="row clearfix usky-grid-row">
 
@@ -23,17 +23,18 @@
 
                                                 @foreach (var control in cell.controls)
                                                 {
-                                                    if (control != null && control.editor != null && control.editor.view != null) { 
-                                                    
+                                                    if (control != null && control.editor != null && control.editor.view != null)
+                                                    {
+
                                                         string editor = control.editor.view.ToString();
-                                                    
+
                                                         switch (editor)
                                                         {
                                                             case "rte":
-                                                                 <text>
-                                                                    @Html.Raw(TemplateUtilities.ParseInternalLinks(control.value.ToString()));
-                                                                 </text>    
-                                                            break;
+                                                                <text>
+                                                                    @Html.Raw(TemplateUtilities.ParseInternalLinks(control.value.ToString()))
+                                                                </text>
+                                                                break;
                                                             case "macro":
 
                                                                 string macroAlias = control.macro.macroAlias.ToString();
@@ -43,49 +44,51 @@
                                                                     parameters.Add(mpd.Name, mpd.Value);
                                                                 }
 
-                                                                 <text>
-                                                                    @Umbraco.RenderMacro(macroAlias, parameters);
-                                                                 </text>
+                                                                <text>
+                                                                    @Umbraco.RenderMacro(macroAlias, parameters)
+                                                                </text>
                                                                 break;
                                                             case "textstring":
 
                                                                 if (control.editor.config.markup != null)
                                                                 {
                                                                     string markup = control.editor.config.markup.ToString();
-                                                                    
+
                                                                     markup = markup.Replace("#value#", control.value.ToString());
                                                                     markup = markup.Replace("#style#", control.editor.config.style.ToString());
-                                                                    
+
                                                                     <text>
-                                                                       @Html.Raw(markup)
+                                                                        @Html.Raw(markup)
                                                                     </text>
                                                                 }
-                                                                else { 
+                                                                else
+                                                                {
                                                                     <text>
                                                                         <div style="@control.editor.config.style">@control.value</div>
                                                                     </text>
                                                                 }
-                                                                    
+
                                                                 break;
                                                             case "media":
-                                                                <text>
-                                                                    <div class="thumbnail">
-                                                                        <img src="@control.value.image">
-                                                                    </div>
-                                                                    @if(control.value.caption != null){
+                                                            <text>
+                                                                <div class="thumbnail">
+                                                                    <img src="@control.value.image">
+                                                                </div>
+                                                                @if (control.value.caption != null)
+                                                                {
                                                                     <p class="caption">@control.value.caption</p>
-                                                                    }
-                                                                </text>
+                                                                }
+                                                            </text>
                                                                 break;
                                                             case "embed":
-                                                                     <text>
-                                                                        @Html.Raw(control.value);
-                                                                     </text>
+                                                            <text>
+                                                                @Html.Raw(control.value);
+                                                            </text>
                                                                 break;
                                                             default:
                                                                 break;
                                                         }
-                                                        
+
                                                     }
 
                                                 }

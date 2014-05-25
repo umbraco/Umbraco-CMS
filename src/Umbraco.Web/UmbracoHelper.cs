@@ -1308,11 +1308,11 @@ namespace Umbraco.Web
 
             string previewLink = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" + 
                                  @"<link href=""{0}"" rel=""stylesheet/less"" type=""text/css"" />" +
-                                 @"<link href=""/Umbraco/Api/Tuning/GridStyle?pageId={1}"" rel=""stylesheet/less"" type=""text/css"" />" +
+                                 @"<link href=""{1}"" rel=""stylesheet/less"" type=""text/css"" />" +
                                  @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
                                  @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>" +
                                  @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js"" type=""text/javascript""></script>" +
-                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';var tuningGridStyleUrl='/Css/tuning/grid_{1}.less'</script>" +
+                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';var tuningGridStyleUrl='{2}'</script>" +
                                  @"<script src=""/umbraco/js/tuning.front.js"" type=""text/javascript""></script>";
 
             string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"">" +
@@ -1346,7 +1346,15 @@ namespace Umbraco.Web
 
             string result = string.Empty;
             if (UmbracoContext.Current.InPreviewMode) {
-                result = string.IsNullOrEmpty(linkResult) ? string.Format(previewLink, defaultLessStyle, pageId) : string.Format(previewLink, linkResult, pageId);
+
+                string gridLessLink = string.Format("/Umbraco/Api/Tuning/GridStyle?pageId={0}", pageId);
+                string gridLessPath = string.Format("/Css/tuning/grid_{0}.less", pageId);
+                if (System.IO.File.Exists(HttpContext.Current.Server.MapPath(gridLessPath)))
+                {
+                    gridLessLink = gridLessPath;
+                }
+                result = string.IsNullOrEmpty(linkResult) ? string.Format(previewLink, defaultLessStyle, gridLessLink, gridLessPath) : string.Format(previewLink, linkResult, gridLessLink, gridLessPath);
+
             }
             else {
                 result = string.IsNullOrEmpty(linkResult) ? string.Format(noPreviewLinks, defaultCssStyle, pageId) : string.Format(noPreviewLinks, linkResult, pageId);

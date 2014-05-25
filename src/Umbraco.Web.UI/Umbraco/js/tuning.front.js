@@ -119,6 +119,14 @@ var initIntelTuning = function (tuningModel) {
 
 var initTuningPanel = function () {
 
+
+
+    $.each("div[class^='grid-row-']", function (index, value) {
+        alert("work");
+    });
+
+
+
     // Init panel 
     if (parent.setFrameIsLoaded) {
         parent.setFrameIsLoaded(tuningParameterUrl, tuningGridStyleUrl);
