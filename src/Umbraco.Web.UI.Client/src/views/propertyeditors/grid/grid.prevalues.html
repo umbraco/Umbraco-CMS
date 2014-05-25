@@ -9,23 +9,7 @@
         </tr>
     </table>
 
-    <p><strong>Grid width:</strong></p>
-    <table cellpadding="20" style="margin-bottom:20px">
-        <tr>
-            <td>
-                <p>
-                    <input ng-model="model.value.enableGridWidth" type="checkbox">
-                    <label for="">Enable editing</label>
-                </p>
-                <p>
-                    Default grid width in pixels:
-                    <input ng-model="model.value.defaultGridWith" type="text" style="width:50px"><br />
-                    (if empty: grid's width is 100% of his container)
-                </p>
-            </td>
-        </tr>
-    </table>
-
+   
     <p><strong>Allowed row settings:</strong></p>
     <table cellpadding="20" style="margin-bottom:20px">
         <tr>
@@ -98,13 +82,16 @@
         </tr>
     </table>
 
-    <p><strong>Allowed controls:</strong></p>
+    <p><strong>Allowed editors:</strong></p>
     <table cellpadding="20" style="margin-bottom:20px">
         <tr>
             <td>
-                <p><input ng-model="model.value.enableRte" type="checkbox">&nbsp;<i class="icon icon-edit"></i>&nbsp;Ritchtext (html)</p>
-                <p><input ng-model="model.value.enableMedia" type="checkbox">&nbsp;<i class="icon icon-picture"></i>&nbsp;Media</p>
-                <p><input ng-model="model.value.enableMacro" type="checkbox">&nbsp;<i class="icon icon-settings-alt"></i>&nbsp;Macro</p>
+                <p ng-repeat="editor in editors">
+                    <input type="checkbox" 
+                        checklist-model="model.value.enabledEditors" 
+                        checklist-value="editor.alias">
+                        &nbsp;<i class="icon {{editor.icon}}"></i>&nbsp; {{editor.name}}
+                </p>
             </td>
         </tr>
     </table>
