@@ -46,12 +46,16 @@ namespace Umbraco.Core.Cache
         {
             using (new WriteLock(_locker))
             {
-                var keysToRemove = MemoryCache
-                    .Where(c => c.Value != null && c.Value.GetType().ToString().InvariantEquals(typeName))
-                    .Select(c => c.Key)
-                    .ToArray();
-                foreach (var k in keysToRemove)
-                    MemoryCache.Remove(k);
+                foreach (var key in MemoryCache
+                    .Where(x =>
+                    {
+                        // x.Value is Lazy<object> and not null, its value may be null
+                        var value = ((Lazy<object>) x.Value).Value;
+                        return value == null || value.GetType().ToString().InvariantEquals(typeName); // remove null values as well
+                    })
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }
         }
 
@@ -60,12 +64,16 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 var typeOfT = typeof (T);
-                var keysToRemove = MemoryCache
-                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT)
-                    .Select(c => c.Key)
-                    .ToArray();
-                foreach (var k in keysToRemove)
-                    MemoryCache.Remove(k);
+                foreach (var key in MemoryCache
+                    .Where(x =>
+                    {
+                        // x.Value is Lazy<object> and not null, its value may be null
+                        var value = ((Lazy<object>) x.Value).Value;
+                        return value == null || value.GetType() == typeOfT; // remove null values as well
+                    })
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }
         }
 
@@ -74,12 +82,18 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 var typeOfT = typeof(T);
-                var keysToRemove = MemoryCache
-                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT && predicate(c.Key, (T)c.Value))
-                    .Select(c => c.Key)
-                    .ToArray();
-                foreach (var k in keysToRemove)
-                    MemoryCache.Remove(k);
+                foreach (var key in MemoryCache
+                    .Where(x =>
+                    {
+                        // x.Value is Lazy<object> and not null, its value may be null
+                        var value = ((Lazy<object>) x.Value).Value;
+                        if (value == null) return true; // remove null values as well
+                        return value.GetType() == typeOfT
+                            && predicate(x.Key, (T) value);
+                    })
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }
         }
 
@@ -87,11 +101,11 @@ namespace Umbraco.Core.Cache
         {
             using (new WriteLock(_locker))
             {
-                var keysToRemove = (from c in MemoryCache where c.Key.InvariantStartsWith(keyStartsWith) select c.Key).ToList();
-                foreach (var k in keysToRemove)
-                {
-                    MemoryCache.Remove(k);
-                }
+                foreach (var key in MemoryCache
+                    .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }            
         }
 
@@ -99,11 +113,11 @@ namespace Umbraco.Core.Cache
         {
             using (new WriteLock(_locker))
             {
-                var keysToRemove = (from c in MemoryCache where Regex.IsMatch(c.Key, regexString) select c.Key).ToList();
-                foreach (var k in keysToRemove)
-                {
-                    MemoryCache.Remove(k);
-                }
+                foreach (var key in MemoryCache
+                    .Where(x => Regex.IsMatch(x.Key, regexString))
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }     
         }
 
@@ -114,6 +128,7 @@ namespace Umbraco.Core.Cache
                 return MemoryCache
                     .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
                     .Select(x => ((Lazy<object>) x.Value).Value)
+                    .Where(x => x != null) // backward compat, don't store null values in the cache
                     .ToList();
             }
         }
@@ -125,6 +140,7 @@ namespace Umbraco.Core.Cache
                 return MemoryCache
                     .Where(x => Regex.IsMatch(x.Key, regexString))
                     .Select(x => ((Lazy<object>) x.Value).Value)
+                    .Where(x => x != null) // backward compat, don't store null values in the cache
                     .ToList();
             }
         }
@@ -133,8 +149,8 @@ namespace Umbraco.Core.Cache
         {
             using (new ReadLock(_locker))
             {
-                var result = MemoryCache.Get(cacheKey);
-                return result;
+                var result = MemoryCache.Get(cacheKey) as Lazy<object>;
+                return result == null ? null : result.Value;
             }
         }
 
@@ -159,7 +175,7 @@ namespace Umbraco.Core.Cache
             using (var lck = new UpgradeableReadLock(_locker))
             {
                 result = MemoryCache.Get(cacheKey) as Lazy<object>;
-                if (result == null /* || (result.IsValueCreated && result.Value == null) */)
+                if (result == null || (result.IsValueCreated && result.Value == null))
                 {
                     lck.UpgradeToWriteLock();
 
@@ -174,11 +190,12 @@ namespace Umbraco.Core.Cache
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            // see notes in HttpRuntimeCacheProvider
+            // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
+            // and make sure we don't store a null value.
 
             var result = new Lazy<object>(getCacheItem);
             var value = result.Value; // force evaluation now
-            //if (value == null) return;
+            if (value == null) return; // do not store null values (backward compat)
 
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
             MemoryCache.Set(cacheKey, result, policy);
