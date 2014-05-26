@@ -514,47 +514,36 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			    _contentType = PublishedContentType.Get(PublishedItemType.Media, _documentTypeAlias);
 				_properties = new Collection<IPublishedProperty>();
 
+                //handle content type properties
+                //make sure we create them even if there's no value
+			    foreach (var propertyType in _contentType.PropertyTypes)
+			    {
+			        var alias = propertyType.PropertyTypeAlias;
+                    _keysAdded.Add(alias);
+                    string value;
+                    const bool isPreviewing = false; // false :: never preview a media
+                    var property = valueDictionary.TryGetValue(alias, out value) == false
+                        ? new XmlPublishedProperty(propertyType, isPreviewing) 
+                        : new XmlPublishedProperty(propertyType, isPreviewing, value);
+                    _properties.Add(property);
+			    }
+
 				//loop through remaining values that haven't been applied
-				foreach (var i in valueDictionary.Where(x => !_keysAdded.Contains(x.Key)))
+				foreach (var i in valueDictionary.Where(x =>
+                    _keysAdded.Contains(x.Key) == false // not already processed
+                    && IgnoredKeys.Contains(x.Key) == false)) // not ignorable
 				{
-				    IPublishedProperty property = null;
-
-                    // must ignore those
-				    if (IgnoredKeys.Contains(i.Key)) continue;
-
                     if (i.Key.InvariantStartsWith("__"))
-				    {
+                    {
                         // no type for that one, dunno how to convert
-				        property = new PropertyResult(i.Key, i.Value, PropertyResultType.CustomProperty);
-				    }
+                        IPublishedProperty property = new PropertyResult(i.Key, i.Value, PropertyResultType.CustomProperty);
+                        _properties.Add(property);
+                    }
                     else
                     {
-                        // use property type to ensure proper conversion
-                        var propertyType = _contentType.GetPropertyType(i.Key);
-
-                        // note: this is where U4-4144 and -3665 were born
-                        //
-                        // because propertyType is null, the XmlPublishedProperty ctor will throw
-                        // it's null because i.Key is not a valid property alias for the type...
-                        // the alias is case insensitive (verified) so it means it really is not
-                        // a correct alias. 
-                        //
-                        // in every cases this is after a ConvertFromXPathNavigator, so it means
-                        // that we get some properties from the XML that are not valid properties.
-                        // no idea which property. could come from the cache in library, could come
-                        // from so many places really.
-
-                        // workaround: just ignore that property
-                        if (propertyType == null)
-                        {
-                            LogHelper.Warn<PublishedMediaCache>("Dropping property \"" + i.Key + "\" because it does not belong to the content type.");
-                            continue;
-                        }
-
-                        property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
+                        // this is a property that does not correspond to anything, ignore and log
+                        LogHelper.Warn<PublishedMediaCache>("Dropping property \"" + i.Key + "\" because it does not belong to the content type.");
                     }
-
-					_properties.Add(property);
 				}
 			}
 
