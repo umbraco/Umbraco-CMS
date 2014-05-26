@@ -47,7 +47,7 @@ namespace Umbraco.Web.Models
 						var prop = GetProperty(Constants.Conventions.Media.File);
 						if (prop == null)
 							throw new NotSupportedException("Cannot resolve a Url for a media item when there is no 'umbracoFile' property defined.");
-						_url = prop.Value.ToString();
+						_url = prop.Value == null ? "" : prop.Value.ToString();
 						break;
 					default:
 						throw new NotSupportedException();
