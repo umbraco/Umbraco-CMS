@@ -2,11 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Web;
 using System.Web.Caching;
-using Umbraco.Core.Logging;
 using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 
 namespace Umbraco.Core.Cache
@@ -17,147 +13,30 @@ namespace Umbraco.Core.Cache
     internal class HttpRuntimeCacheProvider : DictionaryCacheProviderBase, IRuntimeCacheProvider
     {
         private readonly System.Web.Caching.Cache _cache;
-        private readonly DictionaryCacheWrapper _wrapper;
-        
+
         public HttpRuntimeCacheProvider(System.Web.Caching.Cache cache)
         {
             _cache = cache;
-            _wrapper = new DictionaryCacheWrapper(_cache, s => _cache.Get(s.ToString()), o => _cache.Remove(o.ToString()));
         }
 
-        protected override DictionaryCacheWrapper DictionaryCache
-        {
-            get { return _wrapper; }
-        }
-
-        public override void ClearAllCache()
-        {
-            using (new WriteLock(Locker))
-            {
-                foreach (var entry in GetDictionaryEntries())
-                    _cache.Remove((string)entry.Key);
-            }
-        }
-
-        public override void ClearCacheItem(string key)
-        {
-            using (new WriteLock(Locker))
-            {
-                var cacheKey = GetCacheKey(key);
-                _cache.Remove(cacheKey);
-            }
-        }
-
-        public override void ClearCacheObjectTypes(string typeName)
-        {
-            using (new WriteLock(Locker))
-            {
-                foreach (var entry in GetDictionaryEntries()
-                    .Where(x =>
-                    {
-                        // entry.Value is Lazy<object> and not null, its value may be null
-                        var value = ((Lazy<object>) x.Value).Value;
-                        return value == null || value.GetType().ToString().InvariantEquals(typeName); // remove null values as well
-                    }))
-                    _cache.Remove((string)entry.Key);
-            }
-        }
-
-        public override void ClearCacheObjectTypes<T>()
-        {
-            // note: compare on exact type, don't use "is"
-
-            var typeOfT = typeof(T);
-            using (new WriteLock(Locker))
-            {
-                foreach (var entry in GetDictionaryEntries()
-                    .Where(x =>
-                    {
-                        // entry.Value is Lazy<object> and not null, its value may be null
-                        var value = ((Lazy<object>)x.Value).Value;
-                        return value == null || value.GetType() == typeOfT; // remove null values as well
-                    }))
-                    _cache.Remove((string)entry.Key);
-            }
-        }
-
-        public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
-        {
-            // note: compare on exact type, don't use "is"
-
-            var typeOfT = typeof(T);
-            var plen = CacheItemPrefix.Length + 1;
-            using (new WriteLock(Locker))
-            {
-                foreach (var entry in GetDictionaryEntries()
-                    .Where(x =>
-                    {
-                        // entry.Value is Lazy<object> and not null, its value may be null
-                        var value = ((Lazy<object>)x.Value).Value;
-                        if (value == null) return true; // remove null values as well
-                        return value.GetType() == typeOfT
-                            // run predicate on the 'public key' part only, ie without prefix
-                            && predicate(((string) x.Key).Substring(plen), (T) value);
-                    }))
-                    _cache.Remove((string)entry.Key);
-            }
-        }
-
-        public override void ClearCacheByKeySearch(string keyStartsWith)
-        {
-            var plen = CacheItemPrefix.Length + 1;
-            using (new WriteLock(Locker))
-            {
-                foreach (var entry in GetDictionaryEntries()
-                    .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith)))
-                    _cache.Remove((string)entry.Key);
-            }
-        }
-
-        public override void ClearCacheByKeyExpression(string regexString)
-        {
-            var plen = CacheItemPrefix.Length + 1;
-            using (new WriteLock(Locker))
-            {
-                foreach (var entry in GetDictionaryEntries()
-                    .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString)))
-                    _cache.Remove((string)entry.Key);
-            }
-        }
-
-        private IEnumerable<DictionaryEntry> GetDictionaryEntries()
+        protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
         {
             const string prefix = CacheItemPrefix + "-";
             return _cache.Cast<DictionaryEntry>()
                 .Where(x => x.Key is string && ((string) x.Key).StartsWith(prefix));
         }
 
-        public override IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        protected override void RemoveEntry(string key)
         {
-            var plen = CacheItemPrefix.Length + 1;
-            using (new ReadLock(Locker))
-            {
-                return GetDictionaryEntries()
-                    .Where(x => ((string) x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
-                    .Select(x => ((Lazy<object>)x.Value).Value)
-                    .Where(x => x != null) // backward compat, don't store null values in the cache
-                    .ToList();
-            }
+            _cache.Remove(key);
         }
 
-        public override IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        protected override object GetEntry(string key)
         {
-            const string prefix = CacheItemPrefix + "-";
-            var plen = prefix.Length;
-            using (new ReadLock(Locker))
-            {
-                return GetDictionaryEntries()
-                    .Where(x => Regex.IsMatch(((string) x.Key).Substring(plen), regexString))
-                    .Select(x => ((Lazy<object>)x.Value).Value)
-                    .Where(x => x != null) // backward compat, don't store null values in the cache
-                    .ToList();
-            }
+            return _cache.Get(key);
         }
+
+        #region Get
 
         /// <summary>
         /// Gets (and adds if necessary) an item from the cache with all of the default parameters
@@ -230,6 +109,10 @@ namespace Umbraco.Core.Cache
             return GetCacheItem(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback, dependency);
         }
 
+        #endregion
+
+        #region Insert
+
         /// <summary>
         /// This overload is here for legacy purposes
         /// </summary>
@@ -266,5 +149,7 @@ namespace Umbraco.Core.Cache
             }
             InsertCacheItem(cacheKey, getCacheItem, timeout, isSliding, priority, removedCallback, dependency);
         }
+
+        #endregion
     }
 }

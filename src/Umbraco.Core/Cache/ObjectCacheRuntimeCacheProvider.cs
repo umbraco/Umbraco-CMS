@@ -24,6 +24,8 @@ namespace Umbraco.Core.Cache
             MemoryCache = new MemoryCache("in-memory");
         }
 
+        #region Clear
+
         public virtual void ClearAllCache()
         {
             using (new WriteLock(_locker))
@@ -50,8 +52,9 @@ namespace Umbraco.Core.Cache
                     .Where(x =>
                     {
                         // x.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
                         var value = ((Lazy<object>) x.Value).Value;
-                        return value == null || value.GetType().ToString().InvariantEquals(typeName); // remove null values as well
+                        return value == null || value.GetType().ToString().InvariantEquals(typeName);
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -68,8 +71,9 @@ namespace Umbraco.Core.Cache
                     .Where(x =>
                     {
                         // x.Value is Lazy<object> and not null, its value may be null
-                        var value = ((Lazy<object>) x.Value).Value;
-                        return value == null || value.GetType() == typeOfT; // remove null values as well
+                        // remove null values as well, does not hurt
+                        var value = ((Lazy<object>)x.Value).Value;
+                        return value == null || value.GetType() == typeOfT;
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -86,8 +90,9 @@ namespace Umbraco.Core.Cache
                     .Where(x =>
                     {
                         // x.Value is Lazy<object> and not null, its value may be null
-                        var value = ((Lazy<object>) x.Value).Value;
-                        if (value == null) return true; // remove null values as well
+                        // remove null values as well, does not hurt
+                        var value = ((Lazy<object>)x.Value).Value;
+                        if (value == null) return true;
                         return value.GetType() == typeOfT
                             && predicate(x.Key, (T) value);
                     })
@@ -121,7 +126,11 @@ namespace Umbraco.Core.Cache
             }     
         }
 
-        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        #endregion
+
+        #region Get
+
+        public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             using (new ReadLock(_locker))
             {
@@ -145,7 +154,7 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual object GetCacheItem(string cacheKey)
+        public object GetCacheItem(string cacheKey)
         {
             using (new ReadLock(_locker))
             {
@@ -154,19 +163,12 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return GetCacheItem(cacheKey, getCacheItem, null);
         }
 
-        public object GetCacheItem(
-            string cacheKey, 
-            Func<object> getCacheItem, 
-            TimeSpan? timeout, 
-            bool isSliding = false, 
-            CacheItemPriority priority = CacheItemPriority.Normal,
-            CacheItemRemovedCallback removedCallback = null, 
-            string[] dependentFiles = null)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal,CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             // see notes in HttpRuntimeCacheProvider
 
@@ -188,6 +190,10 @@ namespace Umbraco.Core.Cache
             return result.Value;
         }
 
+        #endregion
+
+        #region Insert
+
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
@@ -200,6 +206,8 @@ namespace Umbraco.Core.Cache
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
             MemoryCache.Set(cacheKey, result, policy);
         }
+
+        #endregion
 
         private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
