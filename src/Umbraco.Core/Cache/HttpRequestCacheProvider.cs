@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web;
 
 namespace Umbraco.Core.Cache
@@ -16,7 +15,9 @@ namespace Umbraco.Core.Cache
 
         public HttpRequestCacheProvider(HttpContext context)
         {
-            _context = () => new HttpContextWrapper(context);
+            // create wrapper only once!
+            var wrapper = new HttpContextWrapper(context);
+            _context = () => wrapper;
         }
 
         public HttpRequestCacheProvider(Func<HttpContextBase> context)
@@ -24,24 +25,50 @@ namespace Umbraco.Core.Cache
             _context = context;
         }
 
-        protected override DictionaryCacheWrapper DictionaryCache
+        protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
         {
-            get
-            {
-                var ctx = _context();
-                return new DictionaryCacheWrapper(
-                    ctx.Items,
-                    o => ctx.Items[o],
-                    o => ctx.Items.Remove(o));
-            }
+            const string prefix = CacheItemPrefix + "-";
+            return _context().Items.Cast<DictionaryEntry>()
+                .Where(x => x.Key is string && ((string)x.Key).StartsWith(prefix));
         }
+
+        protected override void RemoveEntry(string key)
+        {
+            _context().Items.Remove(key);
+        }
+
+        protected override object GetEntry(string key)
+        {
+            return _context().Items[key];
+        }
+
+        #region Get
 
         public override object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            var ctx = _context();
-            var ck = GetCacheKey(cacheKey);
-            return ctx.Items[ck] ?? (ctx.Items[ck] = getCacheItem());
+            cacheKey = GetCacheKey(cacheKey);
+
+            Lazy<object> result;
+
+            using (var lck = new UpgradeableReadLock(Locker))
+            {
+                result = _context().Items[cacheKey] as Lazy<object>; // null if key not found
+                if (result == null || (result.IsValueCreated && result.Value == null))
+                {
+                    lck.UpgradeToWriteLock();
+
+                    result = new Lazy<object>(getCacheItem);
+                    _context().Items[cacheKey] = result;
+                }
+            }
+
+            return result.Value;
         }
+        
+        #endregion
+
+        #region Insert
+        #endregion
 
     }
 }
