@@ -22,6 +22,7 @@ using System.Security.Permissions;
 
 [assembly: InternalsVisibleTo("umbraco")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Extensions")]
 [assembly: InternalsVisibleTo("businesslogic")]
 [assembly: InternalsVisibleTo("cms")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
