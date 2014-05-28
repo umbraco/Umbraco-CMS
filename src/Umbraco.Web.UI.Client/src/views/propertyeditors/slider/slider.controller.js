@@ -71,6 +71,12 @@
 
         //initiate slider, add event handler and get the instance reference (stored in data)
         var slider = $element.find('.slider-item').slider({
+            max: $scope.model.config.maxVal,
+            min: $scope.model.config.minVal,
+            orientation: $scope.model.config.orientation,
+            selection: "after",
+            step: $scope.model.config.step,
+            tooltip: "show",
             //set the slider val - we cannot do this with data- attributes when using ranges
             value: sliderVal
         }).on('slideStop', function () {
