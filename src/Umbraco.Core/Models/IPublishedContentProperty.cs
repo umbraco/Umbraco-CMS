@@ -1,3 +1,5 @@
+using System;
+
 namespace Umbraco.Core.Models
 {
     /// <summary>
@@ -56,5 +58,8 @@ namespace Umbraco.Core.Models
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
         object XPathValue { get; }
+
+        string Alias { get; }
+        Guid Version { get; }
 	}
 }
