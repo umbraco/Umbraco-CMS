@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -50,11 +51,22 @@ namespace Umbraco.Web.PropertyEditors
             JObject oldJson = null;
 
             //get the old src path
-            if (currentValue != null)
+            if (currentValue != null && string.IsNullOrEmpty(currentValue.ToString()) == false)
             {
-                oldJson = currentValue as JObject;
+                try
+                {
+                    oldJson = JObject.Parse(currentValue.ToString());
+                }
+                catch (Exception ex)
+                {
+                    //for some reason the value is invalid so continue as if there was no value there
+                    LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not parse current db value to a JObject", ex);
+                }
+
                 if (oldJson != null && oldJson["src"] != null)
+                {
                     oldFile = oldJson["src"].Value<string>();
+                }
             }
 
             //get the new src path
@@ -62,7 +74,9 @@ namespace Umbraco.Web.PropertyEditors
             {
                 newJson = editorValue.Value as JObject;
                 if (newJson != null && newJson["src"] != null)
+                {
                     newFile = newJson["src"].Value<string>();
+                }
             }
 
             //compare old and new src path
@@ -72,7 +86,7 @@ namespace Umbraco.Web.PropertyEditors
                 var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
                 //if we have an existing file, delete it
-                if (!string.IsNullOrEmpty(oldFile))
+                if (string.IsNullOrEmpty(oldFile) == false)
                     fs.DeleteFile(fs.GetRelativePath(oldFile), true);
                 else
                     oldFile = string.Empty;

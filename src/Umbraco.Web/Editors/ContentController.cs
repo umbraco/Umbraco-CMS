@@ -269,16 +269,16 @@ namespace Umbraco.Web.Editors
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
-                Services.ContentService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+                Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
             {
-                Services.ContentService.SendToPublication(contentItem.PersistedContent, UmbracoUser.Id);
+                Services.ContentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
             }
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+                publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, Security.CurrentUser.Id);
             }
             
 

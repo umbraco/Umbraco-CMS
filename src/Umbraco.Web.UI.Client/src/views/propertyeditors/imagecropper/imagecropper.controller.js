@@ -88,6 +88,13 @@ angular.module('umbraco')
             }
         });
 
+
+        //here we declare a special method which will be called whenever the value has changed from the server
+        $scope.model.onValueChanged = function (newVal, oldVal) {
+            //clear current uploaded files
+            fileManager.setFiles($scope.model.alias, []);
+        };
+
         var unsubscribe = $scope.$on("formSubmitting", function () {
             $scope.done();
         });

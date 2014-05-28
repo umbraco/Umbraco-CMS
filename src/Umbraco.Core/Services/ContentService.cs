@@ -1224,8 +1224,8 @@ namespace Umbraco.Core.Services
             if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
                 return false;
 
-            //TODO: Do some stuff here.. ... what is it supposed to do ?
-            // pretty sure all that legacy stuff did was raise an event? and we no longer have IActionHandlers so no worries there.
+            //Save before raising event
+            Save(content, userId);
 
             SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
 

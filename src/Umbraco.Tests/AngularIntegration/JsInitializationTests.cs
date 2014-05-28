@@ -26,27 +26,13 @@ namespace Umbraco.Tests.AngularIntegration
         {
             var result = JsInitialization.ParseMain(new[] {"[World]", "Hello" });
 
-            Assert.AreEqual(@"
-yepnope({
-    load: [
-         'lib/jquery/jquery-2.0.3.min.js',
-         'lib/angular/1.1.5/angular.min.js',
-         'lib/underscore/underscore.js',
-    ],
-    complete: function () {
-        yepnope({
-            load: [World],
-            complete: function () {
+            Assert.AreEqual(@"LazyLoad.js([World], function () {
+    //we need to set the legacy UmbClientMgr path
+    UmbClientMgr.setUmbracoPath('Hello');
 
-                //we need to set the legacy UmbClientMgr path
-                UmbClientMgr.setUmbracoPath('Hello');
-
-                jQuery(document).ready(function () {
-                    angular.bootstrap(document, ['umbraco']);
-                });
-            }
-        });
-    }
+    jQuery(document).ready(function () {
+        angular.bootstrap(document, ['umbraco']);
+    });
 });", result);
         }
     }

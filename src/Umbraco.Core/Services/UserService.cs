@@ -207,10 +207,11 @@ namespace Umbraco.Core.Services
             if (user == null) throw new ArgumentNullException("user");
 
             var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
-            if (provider.IsUmbracoMembershipProvider())
-            {
-                provider.ChangePassword(user.Username, "", password);
-            }
+
+            if (provider.IsUmbracoMembershipProvider() == false)
+                throw new NotSupportedException("When using a non-Umbraco membership provider you must change the user password by using the MembershipProvider.ChangePassword method");
+
+            provider.ChangePassword(user.Username, "", password);
 
             //go re-fetch the member and update the properties that may have changed
             var result = GetByUsername(user.Username);
@@ -221,8 +222,6 @@ namespace Umbraco.Core.Services
                 user.LastPasswordChangeDate = result.LastPasswordChangeDate;
                 user.UpdateDate = user.UpdateDate;
             }
-
-            throw new NotSupportedException("When using a non-Umbraco membership provider you must change the user password by using the MembershipProvider.ChangePassword method");
         }
 
         /// <summary>
