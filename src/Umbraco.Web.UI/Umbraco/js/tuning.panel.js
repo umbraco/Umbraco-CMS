@@ -8,36 +8,38 @@ var refrechIntelTuning = function (schema) {
 
     var scope = angular.element($("#tuningPanel")).scope();
 
-    var notFound = true;
-    angular.forEach(scope.tuningModel.categories, function (category, key) {
-        var isContainer = false;
-        angular.forEach(category.sections, function (section, key) {
-            angular.forEach(section.subSections, function (subSection, key) {
-                if (subSection.schema && schema.toLowerCase() == subSection.schema.toLowerCase()) {
-                    isContainer = true;
-                    notFound = false
-                }
+    if (scope.schemaFocus != schema.toLowerCase()) {
 
+        var notFound = true;
+        angular.forEach(scope.tuningModel.categories, function (category, key) {
+            var isContainer = false;
+            angular.forEach(category.sections, function (section, key) {
+                angular.forEach(section.subSections, function (subSection, key) {
+                    if (subSection.schema && schema.toLowerCase() == subSection.schema.toLowerCase()) {
+                        isContainer = true;
+                        notFound = false
+                    }
+
+                });
             });
+            if (!category.active) {
+                category.active = isContainer;
+            }
         });
-        if (!category.active) {
-            category.active = isContainer;
+        if (notFound) {
+            scope.tuningModel.categories[0].active = true;
         }
-    });
-    if (notFound) {
-        scope.tuningModel.categories[0].active = true;
-    }
-    scope.$apply();
+        scope.$apply();
 
-    if (notFound) {
-        scope.schemaFocus = "body";
-    }
-    else {
-        scope.schemaFocus = schema.toLowerCase();
-    }
+        if (notFound) {
+            scope.schemaFocus = "body";
+        }
+        else {
+            scope.schemaFocus = schema.toLowerCase();
+        }
 
-    scope.$apply();
-
+        scope.$apply();
+    }
 }
 
 var setFrameIsLoaded = function (tuningParameterUrl) {
@@ -350,7 +352,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Focus schema in front
     $scope.accordionWillBeOpened = function (schema) {
-        setSelectedSchema(schema);
+        if (schema) {
+            setSelectedSchema(schema);
+        }
     }
 
     // Preload of the google font
@@ -516,8 +520,8 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.safeFonts = ["Arial, Helvetica", "Impact", "Lucida Sans Unicode", "Tahoma", "Trebuchet MS", "Verdana", "Georgia", "Times New Roman", "Courier New, Courier"];
     $scope.fonts = [];
     $scope.selectedFont = {};
-    
-    var originalFont = {}; 
+
+    var originalFont = {};
     originalFont.fontFamily = $scope.data.modalField.value;
     originalFont.fontType = $scope.data.modalField.fontType;
     originalFont.fontWeight = $scope.data.modalField.fontWeight;
@@ -641,9 +645,11 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     }
 
 });
-/*
- jQuery UI Slider plugin wrapper
-*/
+
+/*********************************************************************************************************/
+/* jQuery UI Slider plugin wrapper */
+/*********************************************************************************************************/
+
 angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider', ['uiSliderConfig', '$timeout', function (uiSliderConfig, $timeout) {
     uiSliderConfig = uiSliderConfig || {};
     return {
@@ -771,6 +777,11 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
         }
     };
 }]);
+
+
+/*********************************************************************************************************/
+/* spectrum color picker directive */
+/*********************************************************************************************************/
 
 angular.module('spectrumcolorpicker', [])
   .directive('spectrum', function () {

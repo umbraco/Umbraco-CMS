@@ -49,15 +49,12 @@ var getFont = function (font) {
 
 var setSelectedSchema = function (schema) {
     $("[tuning-over]").css('outline', 'none');
-    $(schema).css('outline', '2px solid blue');
+    $(schema).css('outline', '2px solid #a4c6fd');
 }
 
 var closeIntelTuning = function (tuningModel) {
 
     if (tuningModel) {
-
-        //$('a').removeClass("myDisable");
-        //$('a').unbind("click.myDisable");
 
         $("[tuning-over]").css('outline', 'none');
         $.each(tuningModel.categories, function (key, category) {
@@ -78,9 +75,7 @@ var initIntelTuning = function (tuningModel) {
 
     if (tuningModel) {
 
-        //$('a').addClass("myDisable");
-        //$('a').bind("click.myDisable", function () { return false; });
-
+        // Add tuning-over attr for each schema from config
         $.each(tuningModel.categories, function (key, category) {
             $.each(category.sections, function (key, section) {
                 $.each(section.subSections, function (key, subSection) {
@@ -91,6 +86,7 @@ var initIntelTuning = function (tuningModel) {
             });
         });
 
+        // Outline tuning-over
         $(document).mousemove(function (e) {
 
             e.stopPropagation();
@@ -104,7 +100,11 @@ var initIntelTuning = function (tuningModel) {
 
             if (target.attr('tuning-over') != undefined || target.attr('tuning-over') != '') {
                 target.unbind();
-                target.css('outline', '2px solid blue');
+
+
+                target.css('outline', '2px solid #a4c6fd');
+
+
                 target.click(function (e) {
                     e.stopPropagation();
                     console.info(target.attr('tuning-over'));

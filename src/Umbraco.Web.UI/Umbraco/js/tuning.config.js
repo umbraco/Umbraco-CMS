@@ -1084,6 +1084,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Medium",
+                schema: ".medium",
                 fields: [{
                     name: "Color",
                     alias: "FontMediumColor",
@@ -1139,6 +1140,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Highlighted",
+                schema: ".highlighted",
                 fields: [{
                     name: "Color",
                     alias: "FontHighlightedColor",
@@ -1167,6 +1169,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Big",
+                schema: ".big",
                 fields: [{
                     name: "Color",
                     alias: "FontBigColor",
@@ -1223,6 +1226,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Button",
+                schema: ".button",
                 fields: [{
                     name: "Color",
                     alias: "FontButtonColor",
@@ -1293,6 +1297,7 @@ var tuningConfig = {
             },
             {
                 name: "Color2",
+                schema: ".color2",
                 fields: [{
                     name: "Color",
                     alias: "FontColor2Color",
@@ -1304,6 +1309,7 @@ var tuningConfig = {
             },
             {
                 name: "Color3",
+                schema: ".color3",
                 fields: [{
                     name: "Color",
                     alias: "FontColor3Color",
@@ -1315,6 +1321,7 @@ var tuningConfig = {
             },
             {
                 name: "Color4",
+                schema: ".color4",
                 fields: [{
                     name: "Color",
                     alias: "FontColor4Color",
@@ -1325,6 +1332,7 @@ var tuningConfig = {
             },
             {
                 name: "Link",
+                name: "a",
                 fields: [{
                     name: "Color",
                     alias: "FontLinkColor",

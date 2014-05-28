@@ -10,8 +10,12 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 .controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout, $location) {
 
     $scope.isOpen = false;
-    $scope.frameLoaded = 0;
+
+    $scope.frameLoaded = false;
+    $scope.enableTuning = 0;
     $scope.frameFirstLoaded = false;
+
+
     $scope.tuningParameterUrl = "";
     $scope.schemaFocus = "body";
     $scope.settingIsOpen = 'previewDevice';
@@ -78,28 +82,31 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     // Refresh all less parameters for every changes watching tuningModel 
     var refreshtuning = function () {
         var parameters = [];
-        $.each($scope.tuningModel.categories, function (indexCategory, category) {
-            $.each(category.sections, function (indexSection, section) {
-                $.each(section.subSections, function (indexSubSection, subSection) {
-                    $.each(subSection.fields, function (indexField, field) {
 
-                        // value
-                        parameters.splice(parameters.length + 1, 0, "'@" + field.alias + "':'" + field.value + "'");
+        if ($scope.tuningModel) {
+            $.each($scope.tuningModel.categories, function (indexCategory, category) {
+                $.each(category.sections, function (indexSection, section) {
+                    $.each(section.subSections, function (indexSubSection, subSection) {
+                        $.each(subSection.fields, function (indexField, field) {
 
-                        // special init for font family picker
-                        if (field.type == "fontFamilyPicker") {
-                            parameters.splice(parameters.length + 1, 0, "'@" + field.alias + "_weight':'" + field.fontWeight + "'");
-                            parameters.splice(parameters.length + 1, 0, "'@" + field.alias + "_Style':'" + field.fontStyle + "'");
-                        }
+                            // value
+                            parameters.splice(parameters.length + 1, 0, "'@" + field.alias + "':'" + field.value + "'");
 
+                            // special init for font family picker
+                            if (field.type == "fontFamilyPicker") {
+                                parameters.splice(parameters.length + 1, 0, "'@" + field.alias + "_weight':'" + field.fontWeight + "'");
+                                parameters.splice(parameters.length + 1, 0, "'@" + field.alias + "_Style':'" + field.fontStyle + "'");
+                            }
+
+                        })
                     })
                 })
-            })
-        });
+            });
 
-        // Refrech page style
-        document.getElementById("resultFrame").contentWindow.refrechLayout(parameters);
-
+            // Refrech page style
+            if (document.getElementById("resultFrame").contentWindow.refrechLayout)
+                document.getElementById("resultFrame").contentWindow.refrechLayout(parameters);
+        }
     }
 
     var openIntelTuning = function () {
@@ -193,15 +200,13 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Delete current page tuning
     $scope.deleteTuning = function () {
-
         $('.btn-default-delete').attr("disabled", true);
         $http.get('/Umbraco/Api/tuning/Delete', { params: { pageId: $location.search().id } })
         .success(function (data) {
-            $scope.frameLoaded++;
+            $scope.enableTuning++;
             $scope.pageId = $scope.pageId + "&n=123456";
             $('.btn-default-delete').attr("disabled", false);
         })
-
     }
 
     // Toggle panel
@@ -295,7 +300,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Focus schema in front
     $scope.accordionWillBeOpened = function (schema) {
-        setSelectedSchema(schema);
+        if (schema) {
+            setSelectedSchema(schema);
+        }
     }
 
     // Preload of the google font
@@ -303,9 +310,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $scope.googleFontFamilies = data;
     })
 
-    // watch framLoaded
-    $scope.$watch("frameLoaded", function () {
-        if ($scope.frameLoaded > 0) {
+    // watch framLoaded, only if iframe page have EnableTuning()
+    $scope.$watch("enableTuning", function () {
+        if ($scope.enableTuning > 0) {
             initTuning();
             $scope.$watch('tuningModel', function () {
                 refreshtuning();
@@ -313,11 +320,12 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         }
     }, true)
 
-    // first panel init
-    initTuning();
-
-    // toggle panel
-    $scope.togglePanel();
+    // First default load
+    $timeout(function () {
+        // toggle panel
+        $scope.frameLoaded = true;
+        $timeout(function () { 1000, $scope.togglePanel(); });
+    }, 1000);
 
 })
 
@@ -460,8 +468,8 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.safeFonts = ["Arial, Helvetica", "Impact", "Lucida Sans Unicode", "Tahoma", "Trebuchet MS", "Verdana", "Georgia", "Times New Roman", "Courier New, Courier"];
     $scope.fonts = [];
     $scope.selectedFont = {};
-    
-    var originalFont = {}; 
+
+    var originalFont = {};
     originalFont.fontFamily = $scope.data.modalField.value;
     originalFont.fontType = $scope.data.modalField.fontType;
     originalFont.fontWeight = $scope.data.modalField.fontWeight;
