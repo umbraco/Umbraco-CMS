@@ -25,6 +25,9 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
     /** this method is used to initialize the data and to re-initialize it if the server value is changed */
     function initialize(index) {
+
+        clearFiles();
+
         if (!index) {
             index = 1;
         }
@@ -116,9 +119,6 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
                 initialize($scope.rebuildInput.index + 1);
             }
 
-            //if (newVal !== "{clearFiles: true}" && newVal !== $scope.originalValue && !newVal.startsWith("{selectedFiles:")) {
-            //    initialize($scope.rebuildInput.index + 1);
-            //}
         }
     });
 };
