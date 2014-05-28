@@ -6,7 +6,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models
 {
-    internal class DetachedContent
+    public class DetachedContent
     {
         private readonly Dictionary<string, IPublishedProperty> _properties;
 
