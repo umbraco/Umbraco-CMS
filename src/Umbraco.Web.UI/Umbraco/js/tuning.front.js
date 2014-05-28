@@ -6,7 +6,9 @@ var refrechLayout = function (parameters) {
 
     // Disable links
     $('a').addClass("myDisable");
-    $('a').bind("click.myDisable", function () { return false; });
+    $('a').bind("click.myDisable", function () {
+            return false;
+    });
 
     var string = "less.modifyVars({" + parameters.join(",") + "})";
     eval(string);
@@ -76,7 +78,7 @@ var initIntelTuning = function (tuningModel) {
     if (tuningModel) {
 
         // Add tuning-over attr for each schema from config
-        $.each(tuningModel.categories, function (key, category) {
+        $.each(tuningModel.categories, function (key, category) { 
             $.each(category.sections, function (key, section) {
                 $.each(section.subSections, function (key, subSection) {
                     if (subSection.schema) {
@@ -100,15 +102,13 @@ var initIntelTuning = function (tuningModel) {
 
             if (target.attr('tuning-over') != undefined || target.attr('tuning-over') != '') {
                 target.unbind();
-
-
                 target.css('outline', '2px solid #a4c6fd');
-
-
                 target.click(function (e) {
                     e.stopPropagation();
+                    e.preventDefault();
                     console.info(target.attr('tuning-over'));
                     parent.refrechIntelTuning(target.attr('tuning-over'));
+                    return false;
                 });
             }
         });

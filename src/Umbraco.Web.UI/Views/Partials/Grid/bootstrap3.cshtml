@@ -12,7 +12,7 @@
                 <div class="col-md-@column.grid column usky-grid-column">
                     @foreach (var row in column.rows)
                     {
-                        <div class="@row.cssClass @(row.fullScreen == "True" ? "usky-grid-full-size" : "")">
+                        <div class="@row.cssClass">
                             <div>
                                 <div class="row clearfix usky-grid-row">
 
@@ -31,7 +31,7 @@
                                                         {
                                                             case "rte":
                                                                  <text>
-                                                                    @Html.Raw(TemplateUtilities.ParseInternalLinks(control.value.ToString()));
+                                                                    @Html.Raw(TemplateUtilities.ParseInternalLinks(control.value.ToString()))
                                                                  </text>    
                                                             break;
                                                             case "macro":
@@ -79,7 +79,7 @@
                                                                 break;
                                                             case "embed":
                                                                      <text>
-                                                                        @Html.Raw(control.value);
+                                                                        @Html.Raw(control.value)
                                                                      </text>
                                                                 break;
                                                             default:
