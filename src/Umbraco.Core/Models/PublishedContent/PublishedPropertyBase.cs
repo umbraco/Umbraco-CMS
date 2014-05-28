@@ -27,5 +27,8 @@ namespace Umbraco.Core.Models.PublishedContent
         public abstract object DataValue { get; }
         public abstract object Value { get; }
         public abstract object XPathValue { get; }
+
+        public string Alias { get { return PropertyTypeAlias; } }
+        public Guid Version { get { return Guid.Empty; } }
     }
 }

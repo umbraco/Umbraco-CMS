@@ -231,6 +231,9 @@ namespace Umbraco.Tests.PublishedContent
         public object Value { get; set; }
         public bool HasValue { get; set; }
         public object XPathValue { get; set; }
+
+        public string Alias { get { return PropertyTypeAlias; } }
+        public Guid Version { get { return Guid.Empty; } }
     }
 
     [PublishedContentModel("ContentType2")]

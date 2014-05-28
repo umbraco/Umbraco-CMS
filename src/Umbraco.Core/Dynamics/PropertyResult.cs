@@ -37,6 +37,9 @@ namespace Umbraco.Core.Dynamics
         public object Value { get { return _source == null ? _value : _source.Value; } }
         public object XPathValue { get { return Value == null ? null : Value.ToString(); } }
 
+        public string Alias { get { return PropertyTypeAlias; }}
+        public Guid Version { get { return Guid.Empty; }}
+
         // implements IHtmlString.ToHtmlString
         public string ToHtmlString()
         {
