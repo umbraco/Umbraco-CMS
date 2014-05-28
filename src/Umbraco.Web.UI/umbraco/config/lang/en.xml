@@ -212,16 +212,16 @@
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
-    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Exemple: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code' 'url'</key>
     <key alias="removeMacro">Remove Macro</key>
     <key alias="requiredField">Required Field</key>
     <key alias="sitereindexed">Site is reindexed</key>
-    <key alias="siterepublished">The website cache has been refreshed. All publish content is now uptodate. While all unpublished content is still unpublished</key>
+    <key alias="siterepublished">The website cache has been refreshed. All publish content is now up to date. While all unpublished content is still unpublished</key>
     <key alias="siterepublishHelp">The website cache will be refreshed. All published content will be updated, while unpublished content will stay unpublished.</key>
     <key alias="tableColumns">Number of columns</key>
     <key alias="tableRows">Number of rows</key>
     <key alias="templateContentAreaHelp"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
+      by referring this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
     <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
       choose Id's from the current template's master.]]></key>
     <key alias="thumbnailimageclickfororiginal">Click on the image to see full size</key>
@@ -243,7 +243,7 @@
     <key alias="filter">Type to filter...</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowedchildnodetypes">Allowed child nodetypes</key>
+    <key alias="allowedchildnodetypes">Allowed child node types</key>
     <key alias="create">Create</key>
     <key alias="deletetab">Delete tab</key>
     <key alias="description">Description</key>
@@ -267,7 +267,7 @@
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Your data has been saved, but before you can publish this page there are some errors you need to fix first:</key>
-    <key alias="errorChangingProviderPassword">The current MemberShip Provider does not support changing password (EnablePasswordRetrieval need to be true)</key>
+    <key alias="errorChangingProviderPassword">The current membership provider does not support changing password (EnablePasswordRetrieval need to be true)</key>
     <key alias="errorExistsWithoutTab">%0% already exists</key>
     <key alias="errorHeader">There were errors:</key>
     <key alias="errorHeaderWithoutTab">There were errors:</key>
@@ -279,9 +279,9 @@
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
   </area>
   <area alias="errors">
-    <key alias="dissallowedMediaType">The specified file type has been dissallowed by the administrator</key>
+    <key alias="dissallowedMediaType">The specified file type has been disallowed by the administrator</key>
     <key alias="codemirroriewarning">NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.</key>
-    <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new propertytype!</key>
+    <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new property type!</key>
     <key alias="filePermissionsError">There is a problem with read/write access to a specific file or folder</key>
     <key alias="missingTitle">Please enter a title</key>
     <key alias="missingType">Please choose a type</key>
@@ -653,7 +653,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="paAdvancedNoGroups"><![CDATA[You need to create a membergroup before you can use <br />role-based authentication.]]></key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
-    <key alias="paHowWould">Choose how to restict access to this page</key>
+    <key alias="paHowWould">Choose how to restrict access to this page</key>
     <key alias="paIsProtected">%0% is now protected</key>
     <key alias="paIsRemoved">Protection removed from %0%</key>
     <key alias="paLoginPage">Login Page</key>
@@ -737,7 +737,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="dictionary editor egenskab">Dictionary Key</key>
     <key alias="importDocumentTypeHelp">To import a document type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
-    <key alias="nodetype">Nodetype</key>
+    <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Script</key>
@@ -835,8 +835,8 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="casing">Casing</key>
     <key alias="encoding">Encoding</key>
     <key alias="chooseField">Choose field</key>
-    <key alias="convertLineBreaks">Convert Linebreaks</key>
-    <key alias="convertLineBreaksHelp">Replaces linebreaks with html-tag &amp;lt;br&amp;gt;</key>
+    <key alias="convertLineBreaks">Convert line breaks</key>
+    <key alias="convertLineBreaksHelp">Replaces line breaks with html-tag &amp;lt;br&amp;gt;</key>
     <key alias="customFields">Custom Fields</key>
     <key alias="dateOnly">Yes, Date only</key>
     <key alias="formatAsDate">Format as date</key>
@@ -857,7 +857,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="urlEncodeHelp">Will format special characters in URLs</key>
     <key alias="usedIfAllEmpty">Will only be used when the field values above are empty</key>
     <key alias="usedIfEmpty">This field will only be used if the primary field is empty</key>
-    <key alias="withTime">Yes, with time. Seperator: </key>
+    <key alias="withTime">Yes, with time. Separator: </key>
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Tasks assigned to you</key>
@@ -971,7 +971,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="passwordInvalid">Invalid current password</key>
     <key alias="passwordIsDifferent">There was a difference between the new password and the confirmed password. Please try again!</key>
     <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
-    <key alias="permissionReplaceChildren">Replace child node permssions</key>
+    <key alias="permissionReplaceChildren">Replace child node permissions</key>
     <key alias="permissionSelectedPages">You are currently modifying permissions for the pages:</key>
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
     <key alias="searchAllChildren">Search all children</key>
