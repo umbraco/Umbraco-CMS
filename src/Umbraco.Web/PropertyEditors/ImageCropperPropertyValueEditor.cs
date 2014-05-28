@@ -51,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors
             JObject oldJson = null;
 
             //get the old src path
-            if (string.IsNullOrEmpty(currentValue.ToString()) == false)
+            if (currentValue != null && string.IsNullOrEmpty(currentValue.ToString()) == false)
             {
                 try
                 {
@@ -86,7 +86,7 @@ namespace Umbraco.Web.PropertyEditors
                 var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
                 //if we have an existing file, delete it
-                if (!string.IsNullOrEmpty(oldFile))
+                if (string.IsNullOrEmpty(oldFile) == false)
                     fs.DeleteFile(fs.GetRelativePath(oldFile), true);
                 else
                     oldFile = string.Empty;
