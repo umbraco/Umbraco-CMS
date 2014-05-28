@@ -16,7 +16,7 @@
         <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
-    <div class="tuning" style="display:none" ng-class="{show:frameFirstLoaded}">
+    <div class="tuning">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
@@ -27,15 +27,15 @@
                     <i ng-if="!isOpen" class="icon icon-right-double-arrow"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice'}">
+                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice', show:frameLoaded}" style="display:none">
                     <i class="icon icon-display"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting'}">
+                <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting',show:frameFirstLoaded}" style="display:none">
                     <i class="icon icon-paint-roller"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('presetColors')" ng-class="{selected:settingIsOpen=='presetColors'}">
+                <div ng-if="isOpen" ng-click="settingOpen('presetColors')" ng-class="{selected:settingIsOpen=='presetColors',show:frameFirstLoaded}" style="display:none">
                     <i class="icon icon-palette"></i>
                 </div>
 
