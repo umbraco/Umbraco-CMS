@@ -44,14 +44,18 @@ namespace Umbraco.Core.Media
 
             var result = new List<ResizedImage>();
 
-            var allSizes = new List<int> {100, 500};
+            var allSizesDictionary = new Dictionary<int,string> {{100,"thumb"}, {500,"big-thumb"}};
+            var allSizes = allSizesDictionary.Select(kv => kv.Key).ToList();
             allSizes.AddRange(additionalThumbSizes.Where(x => x > 0).Distinct());
+            var sizesDictionary = allSizes.ToDictionary(s => s, s => allSizesDictionary.ContainsKey(s) ? allSizesDictionary[s]: "");
 
-            foreach (var s in allSizes)
+            foreach (var s in sizesDictionary)
             {
-                if (originalImage.Width >= s && originalImage.Height >= s)
+                var size = s.Key;
+                var name = s.Value;
+                if (originalImage.Width >= size && originalImage.Height >= size)
                 {
-                    result.Add(Resize(fs, fileName, extension, s, "thumb", originalImage));
+                    result.Add(Resize(fs, fileName, extension, size, name, originalImage));
                 }
             }
 
