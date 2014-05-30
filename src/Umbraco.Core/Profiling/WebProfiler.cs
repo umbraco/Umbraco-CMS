@@ -82,9 +82,16 @@ namespace Umbraco.Core.Profiling
                 return false;
 
             var request = TryGetRequest(sender);
-            if (request.Success == false || request.Result.Url.IsClientSideRequest() || string.IsNullOrEmpty(request.Result["umbDebug"]))
+
+            if (request.Success == false || request.Result.Url.IsClientSideRequest())
                 return false;
-            
+
+            if (string.IsNullOrEmpty(request.Result["umbDebug"]))
+                return true;
+
+            if (request.Result.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
+                return true;
+
             return true;
         }
 
