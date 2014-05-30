@@ -9,10 +9,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 .controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout, $location) {
 
     $scope.isOpen = false;
-    $scope.frameLoaded = 0;
-    $scope.frameFirstLoaded = false;
+    $scope.frameLoaded = false;
+    $scope.enableTuning = 0;
     $scope.tuningParameterUrl = "";
-    $scope.tuningGridStyleUrl = "";
     $scope.tuningGridList = "";
     $scope.schemaFocus = "body";
     $scope.settingIsOpen = 'previewDevice';
@@ -37,7 +36,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     // Load parameters from GetLessParameters and init data of the tuning config
     var initTuning = function () {
 
-        $http.get('/Umbraco/Api/tuning/Load', { params: { tuningStyleUrl: $scope.tuningParameterUrl, tuningGridStyleUrl: $scope.tuningGridStyleUrl } })
+        $http.get('/Umbraco/Api/tuning/Load', { params: { tuningStyleUrl: $scope.tuningParameterUrl, pageId: $location.search().id } })
             .success(function (data) {
 
                 $.each(tuningConfig.categories, function (indexCategory, category) {
@@ -84,90 +83,33 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     // Add Less parameters for each grid row
     var initGridConfig = function () {
 
-        var rowModel = {
-            name: "Grid",
-            sections: [{
-                name: "Main",
-                subSections: []
-            }]
-        };
+        if ($scope.tuningGridList) {
 
-        $.each($scope.tuningGridList, function (index, row) {
+            $.each($scope.tuningGridList, function (index, row) {
 
-            var newIndex = rowModel.sections[0].subSections.length + 1;
+                //TODO: not very clear, maybe put all styling together
+                var stylingSubSection = tuningConfig.categories[1].sections[0].subSections
+                var newIndex = stylingSubSection.length + 1;
+                var rowFieldModel = angular.copy(rowModel);
 
-            var rowFieldModel = {
-                name: "Row",
-                schema: "",
-                fields: [
-                    {
-                        name: "Background color",
-                        alias: "backgroundRowColor",
-                        description: "Background body color",
-                        type: "colorPicker",
-                        value: "",
-                        colorPaletteProperty: "colorBodyBackground"
-                    },
-                    {
-                        name: "Background gradient",
-                        alias: "backgroundRowGradientColor",
-                        description: "Fade the background to this colour at the bottom",
-                        type: "colorPicker",
-                        value: ""
-                    },
-                    {
-                        name: "Image/Pattern",
-                        alias: "backgroundRowImageOrPattern",
-                        description: "Use an image for the background instead of a solid colour/gradient",
-                        type: "bgImagePicker",
-                        value: ""
-                    },
-                    {
-                        name: "Image position",
-                        alias: "backgroundRowPosition",
-                        description: "Background body position",
-                        type: "bgPositionPicker",
-                        value: ""
-                    },
-                    {
-                        name: "Stretch background",
-                        alias: "backgroundRowCover",
-                        description: "Checked: stretches the chosen image to fill the.\nUnchecked: the image is tiled according to the Repeat setting below",
-                        type: "checkbox",
-                        value: ""
-                    },
-                    {
-                        name: "Background tiling",
-                        alias: "backgroundRowRepeat",
-                        description: "How to tile the background image",
-                        type: "bgRepeatPicker",
-                        value: ""
-                    },
-                    {
-                        name: "Background scrolling behaviour",
-                        alias: "backgroundRowAttachment",
-                        description: "When fixed the background doesn't scroll with the content",
-                        type: "bgAttachmentPicker",
-                        value: ""
-                    }
-                ]
-            };
+                var rowNumber = index + 1;
+                rowFieldModel.name = "Grid Row " + rowNumber;
+                stylingSubSection.splice(newIndex + 1, 0, rowFieldModel);
+                stylingSubSection[newIndex - 1].schema = "." + row;
 
-            rowModel.sections[0].subSections.splice(newIndex, 0, rowFieldModel);
-            rowModel.sections[0].subSections[newIndex - 1].schema = "." + row;
-            $.each(rowModel.sections[0].subSections[newIndex - 1].fields, function (indexField, field) {
-                field.alias = field.alias + "__" + row;
-            });
+                $.each(stylingSubSection[newIndex - 1].fields, function (indexField, field) {
+                    field.alias = field.alias + "__" + row;
+                });
 
-        })
-
-        tuningConfig.categories.splice(tuningConfig.categories.length + 1, 0, rowModel);
+            })
+        }
 
     }
 
     // Refresh all less parameters for every changes watching tuningModel 
     var refreshtuning = function () {
         var parameters = [];
+
         if ($scope.tuningModel) {
             $.each($scope.tuningModel.categories, function (indexCategory, category) {
                 $.each(category.sections, function (indexSection, section) {
@@ -189,7 +131,8 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
             });
 
             // Refrech page style
-            document.getElementById("resultFrame").contentWindow.refrechLayout(parameters);
+            if (document.getElementById("resultFrame").contentWindow.refrechLayout)
+                document.getElementById("resultFrame").contentWindow.refrechLayout(parameters);
         }
     }
 
@@ -239,7 +182,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                 $.each(section.subSections, function (indexSubSection, subSection) {
                     $.each(subSection.fields, function (indexField, field) {
 
-                        if (subSection.schema && subSection.schema.indexOf("grid-row-") >= 0) {
+                        if (subSection.schema && subSection.schema.indexOf("gridrow_") >= 0) {
                             var value = (field.value != 0 && (field.value == undefined || field.value == "")) ? "''" : field.value;
                             parametersGrid.splice(parametersGrid.length + 1, 0, "@" + field.alias + ":" + value + ";");
                         }
@@ -291,15 +234,13 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Delete current page tuning
     $scope.deleteTuning = function () {
-
         $('.btn-default-delete').attr("disabled", true);
         $http.get('/Umbraco/Api/tuning/Delete', { params: { pageId: $location.search().id } })
         .success(function (data) {
-            $scope.frameLoaded++;
+            $scope.enableTuning++;
             $scope.pageId = $scope.pageId + "&n=123456";
             $('.btn-default-delete').attr("disabled", false);
         })
-
     }
 
     // Toggle panel
@@ -393,7 +334,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Focus schema in front
     $scope.accordionWillBeOpened = function (schema) {
-        setSelectedSchema(schema);
+        if (schema) {
+            setSelectedSchema(schema);
+        }
     }
 
     // Preload of the google font
@@ -401,10 +344,12 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $scope.googleFontFamilies = data;
     })
 
-    // watch framLoaded
-    $scope.$watch("frameLoaded", function () {
-        if ($scope.frameLoaded > 0) {
-            initGridConfig();
+    // watch framLoaded, only if iframe page have EnableTuning()
+    $scope.$watch("enableTuning", function () {
+        if ($scope.enableTuning > 0) {
+            if ($scope.enableTuning == 1) {
+                initGridConfig();
+            }
             initTuning();
             $scope.$watch('tuningModel', function () {
                 refreshtuning();
@@ -412,11 +357,12 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         }
     }, true)
 
-    // first panel init
-    initTuning();
-
-    // toggle panel
-    $scope.togglePanel();
+    // First default load
+    $timeout(function () {
+        // toggle panel
+        $scope.frameLoaded = true;
+        $timeout(function () { 1000, $scope.togglePanel(); });
+    }, 1000);
 
 })
 

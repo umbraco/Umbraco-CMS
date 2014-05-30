@@ -5,6 +5,7 @@
 @if (Model != null && !string.IsNullOrEmpty(Model.ToString()))
 {
     var onlyOneColumn = Model.columns != null ? ((System.Collections.ICollection)Model.columns).Count : 0;
+    
     <div class="@(onlyOneColumn > 1 ? "container" : "")">
         <div class="row clearfix">
             @foreach (var column in Model.columns)
@@ -12,8 +13,8 @@
                 <div class="col-md-@column.grid column usky-grid-column">
                     @foreach (var row in column.rows)
                     {
-                        <div class="grid-row-@row.uniqueId @row.cssClass @(row.fullScreen == "True" ? "usky-grid-full-size" : "")">
-                            <div>
+                        <div class="gridrow_@row.uniqueId" >
+                            <div class="container">
                                 <div class="row clearfix usky-grid-row">
 
                                     @foreach (var cell in row.cells)
@@ -37,9 +38,9 @@
                                                                 break;
                                                             case "macro":
 
-                                                                string macroAlias = control.macro.macroAlias.ToString();
+                                                                string macroAlias = control.value.macroAlias.ToString();
                                                                 ViewDataDictionary parameters = new ViewDataDictionary();
-                                                                foreach (dynamic mpd in control.macro.marcoParamsDictionary)
+                                                                foreach (dynamic mpd in control.value.marcoParamsDictionary)
                                                                 {
                                                                     parameters.Add(mpd.Name, mpd.Value);
                                                                 }
@@ -82,7 +83,7 @@
                                                                 break;
                                                             case "embed":
                                                             <text>
-                                                                @Html.Raw(control.value);
+                                                                @Html.Raw(control.value)
                                                             </text>
                                                                 break;
                                                             default:

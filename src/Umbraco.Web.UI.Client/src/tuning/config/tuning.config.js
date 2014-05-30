@@ -240,6 +240,7 @@ var tuningConfig = {
             name: "General",
             subSections: [{
                 name: "Main",
+                schema: ".content",
                 fields: [{
                     name: "Layout",
                     alias: "stylingMainColumnBoxed",
@@ -304,6 +305,7 @@ var tuningConfig = {
             },
             {
                 name: "Header",
+                schema: "header",
                 fields: [{
                     name: "Top Border Size",
                     alias: "stylingHeaderTopBorderSize",
@@ -453,6 +455,7 @@ var tuningConfig = {
             },
             {
                 name: "Social Links",
+                schema: ".social-row",
                 fields: [{
                     name: "Display",
                     alias: "stySocialDisplay",
@@ -557,6 +560,7 @@ var tuningConfig = {
             },
             {
                 name: "Thumbnails",
+                schema: ".thumbnail",
                 fields: [{
                     name: "Background Color",
                     alias: "stylingThumbnailsBackgroundColor",
@@ -647,6 +651,7 @@ var tuningConfig = {
             },
             {
                 name: "Navigation",
+                schema: ".nav",
                 fields: [{
                     name: "Font Color",
                     alias: "FontNavFontColor",
@@ -694,6 +699,7 @@ var tuningConfig = {
             },
             {
                 name: "Social Link",
+                schema: "social-row",
                 fields: [{
                     name: "Font Color",
                     alias: "FontSocialFontColor",
@@ -1084,6 +1090,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Medium",
+                schema: ".medium",
                 fields: [{
                     name: "Color",
                     alias: "FontMediumColor",
@@ -1139,6 +1146,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Highlighted",
+                schema: ".highlighted",
                 fields: [{
                     name: "Color",
                     alias: "FontHighlightedColor",
@@ -1167,6 +1175,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Big",
+                schema: ".big",
                 fields: [{
                     name: "Color",
                     alias: "FontBigColor",
@@ -1223,6 +1232,7 @@ var tuningConfig = {
                 }]
             }, {
                 name: "Button",
+                schema: ".button",
                 fields: [{
                     name: "Color",
                     alias: "FontButtonColor",
@@ -1293,6 +1303,7 @@ var tuningConfig = {
             },
             {
                 name: "Color2",
+                schema: ".color2",
                 fields: [{
                     name: "Color",
                     alias: "FontColor2Color",
@@ -1304,6 +1315,7 @@ var tuningConfig = {
             },
             {
                 name: "Color3",
+                schema: ".color3",
                 fields: [{
                     name: "Color",
                     alias: "FontColor3Color",
@@ -1315,6 +1327,7 @@ var tuningConfig = {
             },
             {
                 name: "Color4",
+                schema: ".color4",
                 fields: [{
                     name: "Color",
                     alias: "FontColor4Color",
@@ -1325,6 +1338,7 @@ var tuningConfig = {
             },
             {
                 name: "Link",
+                schema: "p a",
                 fields: [{
                     name: "Color",
                     alias: "FontLinkColor",
@@ -1343,3 +1357,67 @@ var tuningConfig = {
         }]
     }]
 }
+
+var rowModel = {
+    name: "Row",
+    schema: "",
+    fields: [
+        {
+            name: "Background color",
+            alias: "backgroundRowColor",
+            description: "Background body color",
+            type: "colorPicker",
+            value: "",
+            colorPaletteProperty: "colorBodyBackground"
+        },
+        {
+            name: "Background gradient",
+            alias: "backgroundRowGradientColor",
+            description: "Fade the background to this colour at the bottom",
+            type: "colorPicker",
+            value: ""
+        },
+        {
+            name: "Image/Pattern",
+            alias: "backgroundRowImageOrPattern",
+            description: "Use an image for the background instead of a solid colour/gradient",
+            type: "bgImagePicker",
+            value: ""
+        },
+        {
+            name: "Image position",
+            alias: "backgroundRowPosition",
+            description: "Background body position",
+            type: "bgPositionPicker",
+            value: ""
+        },
+        {
+            name: "Stretch background",
+            alias: "backgroundRowCover",
+            description: "Checked: stretches the chosen image to fill the.\nUnchecked: the image is tiled according to the Repeat setting below",
+            type: "checkbox",
+            value: ""
+        },
+        {
+            name: "Background tiling",
+            alias: "backgroundRowRepeat",
+            description: "How to tile the background image",
+            type: "bgRepeatPicker",
+            value: ""
+        },
+        {
+            name: "Background scrolling behaviour",
+            alias: "backgroundRowAttachment",
+            description: "When fixed the background doesn't scroll with the content",
+            type: "bgAttachmentPicker",
+            value: ""
+        },
+        {
+            name: "Full size",
+            alias: "rowFullSize",
+            description: "",
+            type: "checkbox",
+            value: ""
+        }
+    ]
+};

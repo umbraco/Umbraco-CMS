@@ -16,7 +16,7 @@
         <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
-    <div class="tuning" style="display:none" ng-class="{show:frameFirstLoaded}">
+    <div class="tuning">
 
         <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
 
@@ -27,15 +27,15 @@
                     <i ng-if="!isOpen" class="icon icon-right-double-arrow"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice'}">
+                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice', show:frameLoaded}" style="display:none">
                     <i class="icon icon-display"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting'}">
+                <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting', show:enableTuning > 0}" style="display:none">
                     <i class="icon icon-paint-roller"></i>
                 </div>
 
-                <div ng-if="isOpen" ng-click="settingOpen('presetColors')" ng-class="{selected:settingIsOpen=='presetColors'}">
+                <div ng-if="isOpen" ng-click="settingOpen('presetColors')" ng-class="{selected:settingIsOpen=='presetColors', show:enableTuning > 0}" style="display:none">
                     <i class="icon icon-palette"></i>
                 </div>
 
@@ -73,7 +73,7 @@
                                                      is-open="(schemaFocus != '' && schemaFocus == subSection.schema.toLowerCase())">
 
                                         <accordion-heading>
-                                            <span ng-click="accordionOpened(subSection.name)" ng-mouseover="accordionWillBeOpened(subSection.name)">
+                                            <span ng-click="accordionOpened(subSection.name)" ng-mouseover="accordionWillBeOpened(subSection.schema)">
                                                 {{subSection.name}}
                                             </span>
                                         </accordion-heading>
@@ -84,14 +84,14 @@
 
                                             <div ng-if="field.type == 'colorPicker'">
                                                 <spectrum colorselected="field.value"></spectrum>
-                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="fa fa-times colorPickerDelete"></i>
+                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="icon icon-delete colorPickerDelete"></i>
                                             </div>
 
                                             <div ng-if="field.type == 'bgImagePicker'" class="imagePickerPreviewContainer">
                                                 <div class="imagePickerPreview" ng-click="open(field)" style="background-image:{{ field.value }}">
                                                     <i class="icon icon-add"></i>
                                                 </div>
-                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="fa fa-times colorPickerDelete"></i>
+                                                <i ng-if="field.value != ''" ng-click="removeField(field)" class="icon icon-delete colorPickerDelete"></i>
                                             </div>
 
                                             <div ng-if="field.type == 'bgPositionPicker'">
