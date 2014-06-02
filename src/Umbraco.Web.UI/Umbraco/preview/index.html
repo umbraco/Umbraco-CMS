@@ -155,7 +155,7 @@
 
                     <h2>PALETTE COLORS</h2>
                     <ul class="palette">
-                        <li ng-click="refreshtuningByPalette(palette.colors)" ng-repeat="palette in tuningPalette">
+                        <li ng-click="refreshtuningByPalette(palette)" ng-repeat="palette in tuningPalette">
                             <div>
                                 <span style="background-color: {{ palette.mainColor }}"></span>
                             </div>
@@ -164,6 +164,8 @@
                     </ul>
 
                     <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
+
+                    <button class="btn btn-default btn-default-save" ng-click="makePreset()">make it !</button>
 
                 </div>
 

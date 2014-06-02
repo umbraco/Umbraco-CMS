@@ -1334,7 +1334,10 @@ namespace Umbraco.Web
             {
                 // Get css path for current page
                 string cssPath = TuningUtility.GetStylesheetPath(path, false);
-                result = string.Format(noPreviewLinks, cssPath);
+                if (!string.IsNullOrEmpty(cssPath))
+                    result = string.Format(noPreviewLinks, cssPath);
+                else
+                    result = string.Format(noPreviewLinks, "/Umbraco/assets/css/tuning.defaultStyle.css");
             }
 
             return new HtmlString(result);

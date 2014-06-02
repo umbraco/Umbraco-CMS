@@ -59,6 +59,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                                         if (field.fontStyle == "''") { field.fontStyle = ""; }
                                         if (field.fontType == "''") { field.fontType = ""; }
                                     }
+
                                 }
                                 catch (err) {
                                     console.info("Style parameter not found " + field.alias);
@@ -149,19 +150,34 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     }
 
     // Refresh with selected tuning palette
-    $scope.refreshtuningByPalette = function (colors) {
+    $scope.refreshtuningByPalette = function (palette) {
+
+        data = palette.colors;
+
+        if (palette.gf) {
+            $.each(palette.gf, function (indexFont, font) {
+                document.getElementById("resultFrame").contentWindow.getFont(font);
+            });
+        }
 
         $.each($scope.tuningModel.categories, function (indexCategory, category) {
             $.each(category.sections, function (indexSection, section) {
                 $.each(section.subSections, function (indexSubSection, subSection) {
                     $.each(subSection.fields, function (indexField, field) {
 
-                        if (field.type == "colorPicker") {
-                            $.each(colors, function (indexColor, color) {
-                                if (color.alias == field.alias) {
-                                    field.value = color.value;
-                                }
-                            });
+
+                        // value
+                        field.value = eval("data." + field.alias.replace("@", ""));
+                        if (field.value == "''") { field.value = ""; }
+
+                        // special init for font family picker
+                        if (field.type == "fontFamilyPicker") {
+                            field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
+                            field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
+                            field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
+                            if (field.fontWeight == "''") { field.fontWeight = ""; }
+                            if (field.fontStyle == "''") { field.fontStyle = ""; }
+                            if (field.fontType == "''") { field.fontType = ""; }
                         }
 
                     })
@@ -337,6 +353,53 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         if (schema) {
             setSelectedSchema(schema);
         }
+    }
+
+    // Hidden botton to make preset from the current settings
+    $scope.makePreset = function () {
+
+        var parameters = [];
+        var parametersGF = [];
+        $.each($scope.tuningModel.categories, function (indexCategory, category) {
+            $.each(category.sections, function (indexSection, section) {
+                $.each(section.subSections, function (indexSubSection, subSection) {
+                    $.each(subSection.fields, function (indexField, field) {
+
+                        if (!subSection.schema || subSection.schema.indexOf("gridrow_") < 0) {
+                            
+                            // value
+                            var value = (field.value != 0 && (field.value == undefined || field.value == "")) ? "''" : field.value;
+                                parameters.splice(parameters.length + 1, 0, "\"" + field.alias + "\":" + " \"" + value + "\"");
+
+                            // special init for font family picker
+                            if (field.type == "fontFamilyPicker") {
+
+                                if (field.fontType == "google" && value != "''") {
+                                    var variant = field.fontWeight != "" || field.fontStyle != "" ? ":" + field.fontWeight + field.fontStyle : "";
+                                    if ($.inArray(value + variant, parametersGF) < 0) {
+                                        parametersGF.splice(parametersGF.length + 1, 0, value + variant);
+                                    }
+                                }
+
+                                var fontWeight = (field.fontWeight != 0 && (field.fontWeight == undefined || field.fontWeight == "")) ? "''" : field.fontWeight;
+                                var fontStyle = (field.fontStyle != 0 && (field.fontStyle == undefined || field.fontStyle == "")) ? "''" : field.fontStyle;
+                                var fontType = (field.fontType != 0 && (field.fontType == undefined || field.fontType == "")) ? "''" : field.fontType;
+
+                                parameters.splice(parameters.length + 1, 0, "\"" + field.alias + "_weight" + "\":" + " \"" + fontWeight + "\"");
+                                parameters.splice(parameters.length + 1, 0, "\"" + field.alias + "_style" + "\":" + " \"" + fontStyle + "\"");
+                                parameters.splice(parameters.length + 1, 0, "\"" + field.alias + "_type" + "\":" + " \"" + fontType + "\"");
+
+                            }
+
+                        }
+
+                    })
+                })
+            })
+        });
+
+        $("body").append("<textarea>{name:\"\", mainColor:\"\", gf:" + JSON.stringify(parametersGF) + ", colors:{" + parameters.join(",") + "}}</textarea>");
+
     }
 
     // Preload of the google font
@@ -563,8 +626,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     $scope.showFontPreview = function (font) {
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
+
             // Font needs to be independently loaded in the iframe for live preview to work.
-            document.getElementById("resultFrame").contentWindow.getFont(font);
+            document.getElementById("resultFrame").contentWindow.getFont(font.fontFamily + ":" + font.variant);
 
             WebFont.load({
                 google: {

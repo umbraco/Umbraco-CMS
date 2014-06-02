@@ -1,5 +1,5 @@
 /*********************************************************************************************************/
-/* Global function and variable for panel/page com  */
+/* Global function and variable for panel/page com */
 /*********************************************************************************************************/
 
 var refrechLayout = function (parameters) {
@@ -9,6 +9,9 @@ var refrechLayout = function (parameters) {
     $('a').bind("click.myDisable", function () {
         return false;
     });
+
+    // hide preview badget
+    $("#umbracoPreviewBadge").hide();
 
     var string = "less.modifyVars({" + parameters.join(",") + "})";
     eval(string);
@@ -34,16 +37,16 @@ var getFont = function (font) {
     else {
         WebFont.load({
             google: {
-                families: [font.fontFamily + ":" + font.variant]
+                families: [font]
             },
             loading: function () {
-                console.log('loading font' + font.fontFamily + ' in iframe');
+                console.log('loading font' + font + ' in iframe');
             },
             active: function () {
-                console.log('loaded font ' + font.fontFamily + ' in iframe');
+                console.log('loaded font ' + font + ' in iframe');
             },
             inactive: function () {
-                console.log('error loading font ' + font.fontFamily + ' in iframe');
+                console.log('error loading font ' + font + ' in iframe');
             }
         });
     }
@@ -121,71 +124,80 @@ var initIntelTuning = function (tuningModel) {
 
 var outlinePosition = function (target) {
 
-    var localname = target[0].localName;
-    var height = $(target).height();
-    var width = $(target).width();
-    var position = $(target).offset();
+    if (target.length > 0) {
 
-    console.info("element select " + localname);
+        var localname = target[0].localName;
+        var height = $(target).height();
+        var width = $(target).width();
+        var position = $(target).offset();
+        var posY = position.top - $(window).scrollTop();
+        var posX = position.left - $(window).scrollLeft();
 
-    $("#outline-data").html(localname);
-    $("#outline-data").css('position', 'fixed');
-    $("#outline-data").css('top', position.top);
-    $("#outline-data").css('left', position.left);
-    $("#outline-data").css('display', 'block');
-    $("#outline-data").css('position', 'fixed');
-    $("#outline-data").css('background-color', 'rgb(164, 198, 253)');
-    $("#outline-data").css('color', '#000000');
-    $("#outline-data").css('padding', '0px 5px 0px 5px');
-    $("#outline-data").css('font-size', '11px');
-    $("#outline-data").css('transition', 'all .05s ease-in-out');
-    $("#outline-data").css('-moz-transition', 'all .05s ease-in-out');
-    $("#outline-data").css('-webkit-transition', 'all .05s ease-in-out');
+        console.info("element select " + localname);
 
-    $("#outline-sup").css('display', "block");
-    $("#outline-sup").css('height', "2px");
-    $("#outline-sup").css('width', width + "px");
-    $("#outline-sup").css('position', 'fixed');
-    $("#outline-sup").css('top', position.top);
-    $("#outline-sup").css('left', position.left);
-    $("#outline-sup").css('background-color', '#a4c6fd');
-    $("#outline-sup").css('transition', 'all .05s ease-in-out');
-    $("#outline-sup").css('-moz-transition', 'all .05s ease-in-out');
-    $("#outline-sup").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-data").html(localname);
+        $("#outline-data").css('position', 'fixed');
+        $("#outline-data").css('top', posY);
+        $("#outline-data").css('left', posX);
+        $("#outline-data").css('display', 'block');
+        $("#outline-data").css('position', 'fixed');
+        $("#outline-data").css('background-color', 'rgb(164, 198, 253)');
+        $("#outline-data").css('color', '#000000');
+        $("#outline-data").css('padding', '0px 5px 0px 5px');
+        $("#outline-data").css('font-size', '11px');
+        $("#outline-data").css('transition', 'all .05s ease-in-out');
+        $("#outline-data").css('-moz-transition', 'all .05s ease-in-out');
+        $("#outline-data").css('-webkit-transition', 'all .05s ease-in-out');
 
-    $("#outline-inf").css('display', "block");
-    $("#outline-inf").css('height', "2px");
-    $("#outline-inf").css('width', Number(width + 2) + "px");
-    $("#outline-inf").css('position', 'fixed');
-    $("#outline-inf").css('top', position.top + height);
-    $("#outline-inf").css('left', position.left);
-    $("#outline-inf").css('background-color', '#a4c6fd');
-    $("#outline-inf").css('transition', 'all .05s ease-in-out');
-    $("#outline-inf").css('-moz-transition', 'all .05s ease-in-out');
-    $("#outline-inf").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-sup").css('display', "block");
+        $("#outline-sup").css('height', "2px");
+        $("#outline-sup").css('width', width + "px");
+        $("#outline-sup").css('position', 'fixed');
+        $("#outline-sup").css('top', posY);
+        $("#outline-sup").css('left', posX);
+        $("#outline-sup").css('background-color', '#a4c6fd');
+        $("#outline-sup").css('transition', 'all .05s ease-in-out');
+        $("#outline-sup").css('-moz-transition', 'all .05s ease-in-out');
+        $("#outline-sup").css('-webkit-transition', 'all .05s ease-in-out');
 
-    $("#outline-left").css('display', "block");
-    $("#outline-left").css('height', height + "px");
-    $("#outline-left").css('width', "2px");
-    $("#outline-left").css('position', 'fixed');
-    $("#outline-left").css('top', position.top);
-    $("#outline-left").css('left', position.left);
-    $("#outline-left").css('background-color', '#a4c6fd');
-    $("#outline-left").css('transition', 'all .05s ease-in-out');
-    $("#outline-left").css('-moz-transition', 'all .05s ease-in-out');
-    $("#outline-left").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-inf").css('display', "block");
+        $("#outline-inf").css('height', "2px");
+        $("#outline-inf").css('width', Number(width + 2) + "px");
+        $("#outline-inf").css('position', 'fixed');
+        $("#outline-inf").css('top', posY + height);
+        $("#outline-inf").css('left', posX);
+        $("#outline-inf").css('background-color', '#a4c6fd');
+        $("#outline-inf").css('transition', 'all .05s ease-in-out');
+        $("#outline-inf").css('-moz-transition', 'all .05s ease-in-out');
+        $("#outline-inf").css('-webkit-transition', 'all .05s ease-in-out');
 
-    $("#outline-right").css('display', "block");
-    $("#outline-right").css('height', height + "px");
-    $("#outline-right").css('width', "2px");
-    $("#outline-right").css('position', 'fixed');
-    $("#outline-right").css('top', position.top);
-    $("#outline-right").css('left', position.left + width);
-    $("#outline-right").css('background-color', '#a4c6fd');
-    $("#outline-right").css('transition', 'all .05s ease-in-out');
-    $("#outline-right").css('-moz-transition', 'all .05s ease-in-out');
-    $("#outline-right").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-left").css('display', "block");
+        $("#outline-left").css('height', height + "px");
+        $("#outline-left").css('width', "2px");
+        $("#outline-left").css('position', 'fixed');
+        $("#outline-left").css('top', posY);
+        $("#outline-left").css('left', posX);
+        $("#outline-left").css('background-color', '#a4c6fd');
+        $("#outline-left").css('transition', 'all .05s ease-in-out');
+        $("#outline-left").css('-moz-transition', 'all .05s ease-in-out');
+        $("#outline-left").css('-webkit-transition', 'all .05s ease-in-out');
 
+        $("#outline-right").css('display', "block");
+        $("#outline-right").css('height', height + "px");
+        $("#outline-right").css('width', "2px");
+        $("#outline-right").css('position', 'fixed');
+        $("#outline-right").css('top', posY);
+        $("#outline-right").css('left', posX + width);
+        $("#outline-right").css('background-color', '#a4c6fd');
+        $("#outline-right").css('transition', 'all .05s ease-in-out');
+        $("#outline-right").css('-moz-transition', 'all .05s ease-in-out');
+        $("#outline-right").css('-webkit-transition', 'all .05s ease-in-out');
+
+    }
+    else {
+        outlineHide();
+        console.info("element not found select");
+    }
 }
 
 var outlineHide = function () {

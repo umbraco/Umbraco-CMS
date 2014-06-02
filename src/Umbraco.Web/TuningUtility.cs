@@ -44,7 +44,7 @@ namespace Umbraco.Web
             // Look after grid properies into the current page
             foreach (var property in content.Properties)
             {
-                if (property.PropertyType.PropertyEditorAlias == "Umbraco.Grid" && !string.IsNullOrEmpty(property.Value.ToString()))
+                if (property.PropertyType.PropertyEditorAlias == "Umbraco.Grid" && property.Value != null && !string.IsNullOrEmpty(property.Value.ToString()))
                 {
                     dynamic grid = Newtonsoft.Json.Linq.JObject.Parse(property.Value.ToString());
                     foreach (var column in grid.columns)
@@ -90,7 +90,6 @@ namespace Umbraco.Web
             }
 
             string newTag = "gridrow_" + name;
-
             return lessGridRowModel.Replace("-ID-", newTag);
 
         }
@@ -131,7 +130,10 @@ namespace Umbraco.Web
                 }
             }
 
-            return int.Parse(path[path.Length - 1]);
+            if (preview)
+                return int.Parse(path[path.Length - 1]);
+            else
+                return -1;
 
         }
 
@@ -139,7 +141,13 @@ namespace Umbraco.Web
         internal static string GetStylesheetPath(string[] path, bool preview)
         {
             string styleTuning = preview ? @"{0}{1}.less" : "{0}{1}.css";
-            return string.Format(styleTuning, tuningStylePath, GetParentOrSelfTunedPageId(path, preview));
+
+            int tunedPageId = GetParentOrSelfTunedPageId(path, preview);
+
+            if (tunedPageId >0)
+                return string.Format(styleTuning, tuningStylePath, tunedPageId);
+            else
+                return string.Empty;
         }
 
         // Create new less file
@@ -167,6 +175,10 @@ namespace Umbraco.Web
                     parametersToAdd += NewGridRowBlock(gridRow);
                 }
             }
+
+            // Create front directory if necesary
+            if (!Directory.Exists(frontBasePath))
+                Directory.CreateDirectory(frontBasePath);
 
             // Save less file
             if (string.IsNullOrEmpty(lessPath)) lessPath = string.Format("{0}{1}.less", tuningStylePath, pageId);
