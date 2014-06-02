@@ -199,6 +199,36 @@ namespace Umbraco.Tests.Services
 	        Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
 	    }
 
+        [Test]
+        public void Create_Content_Type_Ensures_Sort_Orders()
+        {
+            var service = ServiceContext.ContentTypeService;
+
+            var contentType = new ContentType(-1)
+            {
+                Alias = "test", 
+                Name = "Test", 
+                Description = "ContentType used for simple text pages", 
+                Icon = ".sprTreeDoc3", 
+                Thumbnail = "doc2.png", 
+                SortOrder = 1, 
+                CreatorId = 0, 
+                Trashed = false
+            };
+
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", Mandatory = false, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TinyMCEAlias, DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "", Mandatory = false, DataTypeDefinitionId = -87 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeDefinitionId = -88 });
+
+            service.Save(contentType);
+
+            var sortOrders = contentType.PropertyTypes.Select(x => x.SortOrder).ToArray();
+
+            Assert.AreEqual(1, sortOrders.Count(x => x == 0));
+            Assert.AreEqual(1, sortOrders.Count(x => x == 1));
+            Assert.AreEqual(1, sortOrders.Count(x => x == 2));
+        }
+
 	    [Test]
         public void Can_Create_And_Save_ContentType_Composition()
         {
