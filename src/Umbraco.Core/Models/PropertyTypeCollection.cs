@@ -84,8 +84,8 @@ namespace Umbraco.Core.Models
                     }
                 }
 
-                //check if the item's sort order is already in use
-                if (this.Select(x => x.SortOrder).Contains(item.SortOrder))
+                //check if the item's sort order is already in use				
+                if (this.Any(x => x.SortOrder == item.SortOrder))
                 {
                     //make it the next iteration
                     item.SortOrder = this.Max(x => x.SortOrder) + 1;
