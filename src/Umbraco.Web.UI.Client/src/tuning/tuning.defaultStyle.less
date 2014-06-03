@@ -62,13 +62,13 @@
 @stylingNavItemBottomBorderActiveSize:0;
 @stylingNavItemTopBorderActiveColor:rgb(230, 126, 34);
 @stylingNavItemBottomBorderActiveColor:rgb(230, 126, 34);
-@stySocialDisplay:block-right;
-@stySocialBackgroundColor:rgba(255, 255, 255, 0.08);
-@stySocialTopMargin:0;
-@stySocialBorderTopSize:0;
-@stySocialBorderBottomSize:0;
-@stySocialBorderTopColor:rgb(230, 126, 34);
-@stySocialBorderBottomColor:rgb(230, 126, 34);
+@styPreHeaderDisplay:block-right;
+@styPreHeaderBackgroundColor:rgba(255, 255, 255, 0.08);
+@styPreHeaderTopMargin:0;
+@styPreHeaderBorderTopSize:0;
+@styPreHeaderBorderBottomSize:0;
+@styPreHeaderBorderTopColor:rgb(230, 126, 34);
+@styPreHeaderBorderBottomColor:rgb(230, 126, 34);
 @stylingBoxesBackgroundColor:'';
 @stylingBoxesMinHeight:0;
 @stylingBoxesRadius:0;
@@ -94,14 +94,14 @@
 @FontNavFamily_weight:300;
 @FontNavFamily_style:'';
 @FontNavFamily_type:google;
-@FontSocialFontColor:rgba(255, 255, 255, 0.6);
-@FontSocialFontColorHover:rgb(255, 255, 255);
-@FontSocialFontSize:12;
-@FontSocialLineHeight:34;
-@FontSocialFamily:Arial, Helvetica;
-@FontSocialFamily_weight:normal;
-@FontSocialFamily_style:normal;
-@FontSocialFamily_type:safe;
+@FontPreHeaderFontColor:rgba(255, 255, 255, 0.6);
+@FontPreHeaderFontColorHover:rgb(255, 255, 255);
+@FontPreHeaderFontSize:12;
+@FontPreHeaderLineHeight:34;
+@FontPreHeaderFamily:Arial, Helvetica;
+@FontPreHeaderFamily_weight:normal;
+@FontPreHeaderFamily_style:normal;
+@FontPreHeaderFamily_type:safe;
 @FontH1Color:rgb(230, 126, 34);
 @FontH1Size:24;
 @FontH1LineHeight:26;
@@ -156,30 +156,39 @@
 @FontH6Family_weight:300;
 @FontH6Family_style:'';
 @FontH6Family_type:google;
-@FontMediumColor:'';
-@FontMediumSize:18;
-@FontMediumLineHeight:24;
-@FontMediumTopMargin:5;
-@FontMediumBottomMargin:10;
-@FontMediumFamily:Open Sans;
-@FontMediumFamily_weight:300;
-@FontMediumFamily_style:'';
-@FontMediumFamily_type:google;
+@FontSmallColor:'';
+@FontSmallSize:18;
+@FontSmallLineHeight:24;
+@FontSmallTopMargin:5;
+@FontSmallBottomMargin:10;
+@FontSmallFamily:Open Sans;
+@FontSmallFamily_weight:300;
+@FontSmallFamily_style:'';
+@FontSmallFamily_type:google;
+@FontBlockquoteColor:'';
+@FontBlockquoteSize:18;
+@FontBlockquoteLineHeight:24;
+@FontBlockquoteTopMargin:5;
+@FontBlockquoteBottomMargin:10;
+@FontBlockquoteFamily:Open Sans;
+@FontBlockquoteFamily_weight:300;
+@FontBlockquoteFamily_style:'';
+@FontBlockquoteFamily_type:google;
 @FontHighlightedColor:'';
 @FontHighlightedBackgroundColor:rgb(230, 126, 34);
 @FontHighlightedFamily:Open Sans;
 @FontHighlightedFamily_weight:300;
 @FontHighlightedFamily_style:'';
 @FontHighlightedFamily_type:google;
-@FontBigColor:rgb(230, 126, 34);
-@FontBigSize:26;
-@FontBigLineHeight:28;
-@FontBigTopMargin:5;
-@FontBigBottomMargin:15;
-@FontBigFamily:Open Sans;
-@FontBigFamily_weight:300;
-@FontBigFamily_style:'';
-@FontBigFamily_type:google;
+@FontLeadColor:rgb(230, 126, 34);
+@FontLeadSize:26;
+@FontLeadLineHeight:28;
+@FontLeadTopMargin:5;
+@FontLeadBottomMargin:15;
+@FontLeadFamily:Open Sans;
+@FontLeadFamily_weight:300;
+@FontLeadFamily_style:'';
+@FontLeadFamily_type:google;
 @FontButtonColor:rgba(255, 255, 255, 0.92);
 @FontButtonBackgroundColor:rgb(230, 126, 34);
 @FontButtonColorHover:rgba(255, 255, 255, 0.55);
@@ -191,51 +200,46 @@
 @FontButtonFamily_weight:300;
 @FontButtonFamily_style:'';
 @FontButtonFamily_type:google;
-@FontColor2Color:rgb(230, 126, 34);
-@FontColor3Color:rgba(253, 251, 251, 0.91);
-@FontColor4Color:rgb(170, 170, 170);
 @FontLinkColor:rgb(230, 126, 34);
 @FontLinkColorHover:rgba(230, 126, 34, 0.84);
 /***end-lessParam***/
 /************************************************************************/
 
 /************************************************************************/
-/* Base Style */
+/* Less Base Style */
 /************************************************************************/
 /***start-baseStyle***/
 
+/**********************************************************/
 /* General */
+/**********************************************************/
 
 h1, h2, h3, h4, h5, h6 {
     text-rendering: optimizelegibility;
 }
 
-h1 {
-    font-weight:300;
+.highlighted {
+    padding: 0 4px 2px;
 }
 
-.clear-container .container {
-    padding-right: 0px;
-    padding-left: 0px;
+.button {
+    border: 0;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 12px 15px 14px;
+    margin-top: 10px;
+    display: inline-block;
+    margin-bottom: 0;
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
 }
 
-.big, .medium {
-    display:block;
-}
-
-@media (max-width: 767px) {
-    .hidden-phone {
-        display: none !important;
-    }
-}
-
-@media (max-width: 979px) and (min-width: 768px) {
-    .hidden-tablet {
-        display: none !important;
-    }
-}
-
+/**********************************************************/
 /* Wrapper for wide or boxed view */
+/**********************************************************/
 
 .wrapper {
 
@@ -263,8 +267,13 @@ h1 {
     overflow:hidden;
 }
 
+.wrapper.content {
+    min-height: 40px;
+}
 
+/**********************************************************/
 /* logo */
+/**********************************************************/
 
 .logo {
     max-width:350px;
@@ -281,7 +290,9 @@ h1 {
     max-width:100%
 }
 
+/**********************************************************/
 /* navigation */
+/**********************************************************/
 
 .navbar-default .navbar-nav > li > a.fa,
 .navbar-default .navbar-nav > li > a.fa:focus {
@@ -408,7 +419,9 @@ h1 {
     }
 }
 
+/**********************************************************/
 /* social list */
+/**********************************************************/
 
 .social-bar {
     list-style:none;
@@ -437,7 +450,9 @@ h1 {
     display:none;
 }
 
+/**********************************************************/
 /* nav search */
+/**********************************************************/
 
 #nav-search-form {
     padding: 15px;
@@ -474,50 +489,20 @@ h1 {
     }
 }
 
+/**********************************************************/
 /* usky-grid */
+/**********************************************************/
 
-.usky-grid-cell{
-    margin-top: 30px;
-    margin-bottom: 30px;
-    overflow: hidden;
+.uSky-grid .container {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-right: 30px;
+    padding-left: 30px;
 }
 
-.usky-grid-row{
-    margin-left: 0px;
-    margin-right: 0px;
-} 
-
-.usky-grid-full-size .usky-grid-row:first-child{
-    margin-top: 0;
-} 
-
-.usky-grid-full-size .usky-grid-row:last-child{
-    margin-bottom: 0;
-} 
-
-.usky-grid-full-size .usky-grid-cell{
-    margin-top: 0px;
-    margin-bottom: 0px;
-}
-
-/*.usky-grid-full-size .usky-grid-row{
-    margin-left: -15px;
-    margin-right: -15px;
-}*/
-
-.usky-grid-skip-top-margin {
-    margin-top: 0px;
-}
-
-.usky-grid-skip-bottom-margin {
-    margin-bottom: 0px;
-}
-
-.usky-grid-column {
-    padding-right: 0px; padding-left: 0px;
-}
-
+/**********************************************************/
 /* jumbotron */
+/**********************************************************/
 
 .jumbotron {
     font-size: inherit; 
@@ -532,7 +517,9 @@ h1 {
     padding: 15px;
 }
 
+/**********************************************************/
 /* thumbnail */
+/**********************************************************/
 
 .thumbnail {
     margin-bottom:0px;
@@ -566,7 +553,9 @@ h1 {
     }
 }
 
+/**********************************************************/
 /* Search results list */
+/**********************************************************/
 
 .search-results-list {
     margin:0;
@@ -582,129 +571,6 @@ h1 {
     margin-right: 10px;
 }
 
-/* Blog list */
-
-.post-list img.post-image, .post-detail img.post-image
-    {
-    display: block;
-    height: auto;
-    max-width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.post-list .meta {
-    margin-bottom:10px
-}
-
-.post-list .meta .sep {
-    margin:0 3px 0 3px;
-}
-
-.post-list .meta .fn {
-    margin:0 0 0 3px;
-}
-
-.blog-list-widget {
-    margin:0;
-    padding:0;
-    list-style:none;
-}
-
-.blog-list-widget i {
-    margin-right: 10px;
-}
-
-.post-detail {
-    padding: 0 15px 0 15px;
-}   
-
-.post-detail .meta {
-    margin: 0 0 20px 0;
-}
-
-.blog-nav .fa-angle-double-left {
-    float:left;
-}
-
-.blog-nav .fa-angle-double-right {
-    float:right;
-}
-
-.blog-nav {
-    margin:-15px 0 30px 0 ;
-}
-
-.blog-nav a {
-    font-size:28px;
-}
-
-.blog-nav a:hover {
-    text-decoration:none;
-}
-
-/* TinyStyle */
-
-.highlighted {
-    padding: 0 4px 2px;
-}
-
-.button {
-    border: 0;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    padding: 12px 15px 14px;
-    margin-top: 10px;
-    display: inline-block;
-    margin-bottom: 0;
-    font-size: 14px;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-}
-
-/* Copyright */
-
-.copyright {
-    text-align: center;
-}
-
-/* maps */
-
-.google-maps {
-    height: 400px;
-    margin: 0 0 30px;
-}
-
-/* form */
-
-#contact-form .error {
-    border:1px solid red;
-}
-
-#contact-form .success {
-    display:none;
-}
-
-/* go up */
-
-.go-top {
-	position:fixed;
-	bottom:0.5em; right: 0.5em;
-	text-decoration: none;
-	color:white;
-	background-color: rgba(0, 0, 0, 0.3);
-	font-size:30px;
-	padding:0.1em 0.3em 0.1em;
-	display:none;
-	border-radius:3px; z-index:500;
-    transition: all .20s ease-in-out;
-    -moz-transition: all .20s ease-in-out;
-    -webkit-transition: all .20s ease-in-out;
-}
-    
-.go-top:hover { background-color:rgba(0, 0, 0, 0.6);}
 
 /***end-baseStyle***/
 /************************************************************************/
@@ -789,15 +655,29 @@ h6 {
     line-height:@FontH6LineHeight + 0px;
 }
 
-.medium {
-    font-family:@FontMediumFamily,Verdana,Arial,Helvetica,sans-serif;
-    font-weight:@FontMediumFamily_weight;
-    font-style:@FontMediumFamily_style;
-    font-size:@FontMediumSize + 0px;
-    color:@FontMediumColor;
-    margin-top:@FontMediumTopMargin + 0px;
-    margin-bottom:@FontMediumBottomMargin + 0px;
-    line-height:@FontMediumLineHeight + 0px;
+blockquote {
+    padding: 10px @FontBlockquoteLineHeight + 0px;
+    margin: 0 0 @FontBlockquoteLineHeight + 0px;
+    border-left: 5px solid @FontBlockquoteColor;
+    margin-top:@FontBlockquoteTopMargin + 0px;
+    margin-bottom:@FontBlockquoteBottomMargin + 0px;
+    font-family:@FontBlockquoteFamily,Verdana,Arial,Helvetica,sans-serif;
+    font-weight:@FontBlockquoteFamily_weight;
+    font-style:@FontBlockquoteFamily_style;
+    font-size:@FontBlockquoteSize + 0px;
+    color:@FontBlockquoteColor;
+    line-height:@FontBlockquoteLineHeight + 0px;
+}
+
+.Small {
+    font-family:@FontSmallFamily,Verdana,Arial,Helvetica,sans-serif;
+    font-weight:@FontSmallFamily_weight;
+    font-style:@FontSmallFamily_style;
+    font-size:@FontSmallSize + 0px;
+    color:@FontSmallColor;
+    margin-top:@FontSmallTopMargin + 0px;
+    margin-bottom:@FontSmallBottomMargin + 0px;
+    line-height:@FontSmallLineHeight + 0px;
 }
 
 .highlighted {
@@ -808,15 +688,15 @@ h6 {
     background-color:@FontHighlightedBackgroundColor;
 }
 
-.big {
-    font-family:@FontBigFamily,Verdana,Arial,Helvetica,sans-serif;
-    font-weight:@FontBigFamily_weight;
-    font-style:@FontBigFamily_style;
-    font-size:@FontBigSize + 0px;
-    color:@FontBigColor;
-    margin-top:@FontBigTopMargin + 0px;
-    margin-bottom:@FontBigBottomMargin + 0px;
-    line-height:@FontBigLineHeight + 0px;
+.lead {
+    font-family:@FontLeadFamily,Verdana,Arial,Helvetica,sans-serif;
+    font-weight:@FontLeadFamily_weight;
+    font-style:@FontLeadFamily_style;
+    font-size:@FontLeadSize + 0px;
+    color:@FontLeadColor;
+    margin-top:@FontLeadTopMargin + 0px;
+    margin-bottom:@FontLeadBottomMargin + 0px;
+    line-height:@FontLeadLineHeight + 0px;
 }
 
 .button {
@@ -833,18 +713,6 @@ h6 {
 .button:hover {
     color:@FontButtonColorHover;
     background-color:@FontButtonBackgroundColorHover;
-}
-
-.color2 {
-    color:@FontColor2Color;
-}
-
-.color3 {
-    color:@FontColor3Color;
-}
-
-.color4 {
-    color:@FontColor4Color;
 }
 
 .navbar-default .navbar-nav > li > a,
@@ -1091,71 +959,71 @@ body {
     .wrapper { .wide-wrapper-1200 }
 }
 
-/* SOCIAL */
+/*  */
 
-.social-row-none () when (@stySocialDisplay = none) {
+.preHeader-row-none () when (@styPreHeaderDisplay = none) {
     display:none;
 }
 
-.social-bar-block-left () when (@stySocialDisplay = block-left) {
+.social-bar-block-left () when (@styPreHeaderDisplay = block-left) {
     float: left;
 }
 
-.social-bar-block-right () when (@stySocialDisplay = block-right) {
+.social-bar-block-right () when (@styPreHeaderDisplay = block-right) {
     float: right;
 }
 
-.social-bar-block-left-text () when (@stySocialDisplay = block-left) {
+.social-bar-block-left-text () when (@styPreHeaderDisplay = block-left) {
     text-align: left;
 }
 
-.social-bar-block-right-text () when (@stySocialDisplay = block-right) {
+.social-bar-block-right-text () when (@styPreHeaderDisplay = block-right) {
     text-align: right;
 }
 
-.social-bar-block-left-rev () when (@stySocialDisplay = block-left) {
+.social-bar-block-left-rev () when (@styPreHeaderDisplay = block-left) {
     float: right;
 }
 
-.social-bar-block-right-rev () when (@stySocialDisplay = block-right) {
+.social-bar-block-right-rev () when (@styPreHeaderDisplay = block-right) {
     float: left;
 }
 
-.social-bar-float-left () when (@stySocialDisplay = float-left) {
-    border-top: @stySocialBorderTopSize + 0px solid @stySocialBorderTopColor;
-    border-bottom: @stySocialBorderBottomSize + 0px solid @stySocialBorderBottomColor;
+.social-bar-float-left () when (@styPreHeaderDisplay = float-left) {
+    border-top: @styPreHeaderBorderTopSize + 0px solid @styPreHeaderBorderTopColor;
+    border-bottom: @styPreHeaderBorderBottomSize + 0px solid @styPreHeaderBorderBottomColor;
     float: left;
 }
 
-.social-bar-float-right () when (@stySocialDisplay = float-right) {
-    border-top: @stySocialBorderTopSize + 0px solid @stySocialBorderTopColor;
-    border-bottom: @stySocialBorderBottomSize + 0px solid @stySocialBorderBottomColor;
+.social-bar-float-right () when (@styPreHeaderDisplay = float-right) {
+    border-top: @styPreHeaderBorderTopSize + 0px solid @styPreHeaderBorderTopColor;
+    border-bottom: @styPreHeaderBorderBottomSize + 0px solid @styPreHeaderBorderBottomColor;
     text-align: right;
 }
 
-.social-bar-float-left-text () when (@stySocialDisplay = float-left) {
+.social-bar-float-left-text () when (@styPreHeaderDisplay = float-left) {
     text-align: left;
 }
 
-.social-bar-float-right-text () when (@stySocialDisplay = float-right) {
+.social-bar-float-right-text () when (@styPreHeaderDisplay = float-right) {
     float: right;
 }
 
-.social-row-float-left () when (@stySocialDisplay = float-left) {
+.preHeader-row-float-left () when (@styPreHeaderDisplay = float-left) {
     background: none;
     border: none;
 }
 
-.social-row-float-right () when (@stySocialDisplay = float-right) {
+.preHeader-row-float-right () when (@styPreHeaderDisplay = float-right) {
     background: none;
     border: none;
 }
 
-.social-row {
-    .social-row-none;
-    background-color: @stySocialBackgroundColor;
-    border-top: @stySocialBorderTopSize + 0px solid @stySocialBorderTopColor;
-    border-bottom: @stySocialBorderBottomSize + 0px solid @stySocialBorderBottomColor;
+.preHeader-row {
+    .preHeader-row-none;
+    background-color: @styPreHeaderBackgroundColor;
+    border-top: @styPreHeaderBorderTopSize + 0px solid @styPreHeaderBorderTopColor;
+    border-bottom: @styPreHeaderBorderBottomSize + 0px solid @styPreHeaderBorderBottomColor;
 }
 
 .social-bar {
@@ -1164,40 +1032,40 @@ body {
 }
 
 .contact-text{
-    color: @FontSocialFontColor;
-    font-size: @FontSocialFontSize + 0px;
-    line-height: @FontSocialLineHeight + 0px;
+    color: @FontPreHeaderFontColor;
+    font-size: @FontPreHeaderFontSize + 0px;
+    line-height: @FontPreHeaderLineHeight + 0px;
     .social-bar-block-left-rev;
     .social-bar-block-right-rev;
-    font-family:@FontSocialFamily;
-    font-weight:@FontSocialFamily_weight;
-    font-style:@FontSocialFamily_style;
+    font-family:@FontPreHeaderFamily;
+    font-weight:@FontPreHeaderFamily_weight;
+    font-style:@FontPreHeaderFamily_style;
 }
 
 .social-bar li a {
-    color: @FontSocialFontColor;
-    font-size: @FontSocialFontSize + 0px;
-    line-height: @FontSocialLineHeight + 0px;
+    color: @FontPreHeaderFontColor;
+    font-size: @FontPreHeaderFontSize + 0px;
+    line-height: @FontPreHeaderLineHeight + 0px;
 }
 
 .social-bar li a:hover {
-    color: @FontSocialFontColorHover;
+    color: @FontPreHeaderFontColorHover;
 }
 
 @media (min-width: 768px) {
 
-    .social-row {
-        .social-row-float-left;
-        .social-row-float-right;
+    .preHeader-row {
+        .preHeader-row-float-left;
+        .preHeader-row-float-right;
     }
 
-    .social-container {
+    .preHeader-container {
         .social-bar-float-left;
         .social-bar-float-right;
         .social-bar-float-left-text;
         .social-bar-float-right-text;
-        background-color: @stySocialBackgroundColor;
-        margin-top:@stySocialTopMargin + 0px;
+        background-color: @styPreHeaderBackgroundColor;
+        margin-top:@styPreHeaderTopMargin + 0px;
     }
 
 }

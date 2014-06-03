@@ -47,17 +47,34 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                                 try {
 
                                     // value
-                                    field.value = eval("data." + field.alias.replace("@", ""));
-                                    if (field.value == "''") { field.value = ""; }
+                                    var newValue = eval("data." + field.alias.replace("@", ""));
+                                    if (newValue) {
+                                        field.value = newValue;
+                                        if (field.value == "''") { field.value = ""; }
+                                    }
 
                                     // special init for font family picker
                                     if (field.type == "fontFamilyPicker") {
-                                        field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
-                                        field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
-                                        field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
-                                        if (field.fontWeight == "''") { field.fontWeight = ""; }
-                                        if (field.fontStyle == "''") { field.fontStyle = ""; }
-                                        if (field.fontType == "''") { field.fontType = ""; }
+
+                                        var fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
+                                        var fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
+                                        var fontType = eval("data." + field.alias.replace("@", "") + "_type");
+
+                                        if (fontWeight) {
+                                            field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
+                                            if (field.fontWeight == "''") { field.fontWeight = ""; }
+                                        }
+
+                                        if (fontWeight) {
+                                            field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
+                                            if (field.fontStyle == "''") { field.fontStyle = ""; }
+                                        }
+
+                                        if (fontWeight) {
+                                            field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
+                                            if (field.fontType == "''") { field.fontType = ""; }
+                                        }
+
                                     }
 
                                 }
@@ -165,19 +182,42 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                 $.each(section.subSections, function (indexSubSection, subSection) {
                     $.each(subSection.fields, function (indexField, field) {
 
+                        try {
 
-                        // value
-                        field.value = eval("data." + field.alias.replace("@", ""));
-                        if (field.value == "''") { field.value = ""; }
+                            // value
+                            var newValue = eval("data." + field.alias.replace("@", ""));
+                            if (newValue) {
+                                field.value = newValue;
+                                if (field.value == "''") { field.value = ""; }
+                            }
 
-                        // special init for font family picker
-                        if (field.type == "fontFamilyPicker") {
-                            field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
-                            field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
-                            field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
-                            if (field.fontWeight == "''") { field.fontWeight = ""; }
-                            if (field.fontStyle == "''") { field.fontStyle = ""; }
-                            if (field.fontType == "''") { field.fontType = ""; }
+                            // special init for font family picker
+                            if (field.type == "fontFamilyPicker") {
+
+                                var fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
+                                var fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
+                                var fontType = eval("data." + field.alias.replace("@", "") + "_type");
+
+                                if (fontWeight) {
+                                    field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
+                                    if (field.fontWeight == "''") { field.fontWeight = ""; }
+                                }
+
+                                if (fontWeight) {
+                                    field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
+                                    if (field.fontStyle == "''") { field.fontStyle = ""; }
+                                }
+
+                                if (fontWeight) {
+                                    field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
+                                    if (field.fontType == "''") { field.fontType = ""; }
+                                }
+
+                            }
+
+                        }
+                        catch (err) {
+                            console.info("Style parameter not found " + field.alias);
                         }
 
                     })
@@ -424,7 +464,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $timeout(function () {
         // toggle panel
         $scope.frameLoaded = true;
-        $timeout(function () { 1000, $scope.togglePanel(); });
+        //$timeout(function () { 1000, $scope.togglePanel(); });
     }, 1000);
 
 })

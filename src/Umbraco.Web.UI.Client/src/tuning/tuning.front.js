@@ -84,7 +84,7 @@ var initIntelTuning = function (tuningModel) {
             $.each(category.sections, function (key, section) {
                 $.each(section.subSections, function (key, subSection) {
                     if (subSection.schema) {
-                        $(subSection.schema).attr("tuning-over", subSection.schema);
+                        $(subSection.schema).attr("tuning-over", subSection.name);
                     }
                 });
             });
@@ -124,18 +124,18 @@ var initIntelTuning = function (tuningModel) {
 
 var outlinePosition = function (target) {
 
-    if (target.length > 0) {
+    if (target.length > 0 && target.attr('tuning-over') != undefined && target.attr('tuning-over') != '') {
 
         var localname = target[0].localName;
-        var height = $(target).height();
-        var width = $(target).width();
+        var height = $(target).outerHeight();
+        var width = $(target).outerWidth();
         var position = $(target).offset();
         var posY = position.top - $(window).scrollTop();
         var posX = position.left - $(window).scrollLeft();
 
         console.info("element select " + localname);
 
-        $("#outline-data").html(localname);
+        $("#outline-data").html(target.attr('tuning-over'));
         $("#outline-data").css('position', 'fixed');
         $("#outline-data").css('top', posY);
         $("#outline-data").css('left', posX);

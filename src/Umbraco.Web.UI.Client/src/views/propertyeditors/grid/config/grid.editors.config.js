@@ -6,7 +6,7 @@
 		"icon": "icon-coin",
 		"config": {
 			"style": "font-size: 36px; font-weight: bold",
-			"markup" : "<h1 style='#style#'>#value#</h1>"
+			"markup" : "<h1>#value#</h1>"
 		}
 	},
 	{
@@ -15,7 +15,8 @@
 		"view": "textstring",
 		"icon": "icon-quote",
 		"config": {
-			"style": "border-left: 3px solid #ccc; padding: 10px; color: #ccc; font-family: serif; font-variant: italic; font-size: 18px"
+		    "style": "border-left: 3px solid #ccc; padding: 10px; color: #ccc; font-family: serif; font-variant: italic; font-size: 18px",
+		    "markup": "<blockquote>#value#</blockquote>"
 		}
 	},
 	{

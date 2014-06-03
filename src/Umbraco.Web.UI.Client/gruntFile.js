@@ -7,7 +7,7 @@ module.exports = function (grunt) {
 
   //run by the watch task
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs','karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning', 'copy:assets', 'copy:vs']);
+  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning','copy:tuning', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);

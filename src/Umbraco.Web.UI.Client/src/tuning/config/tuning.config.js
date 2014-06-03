@@ -239,7 +239,7 @@ var tuningConfig = {
         sections: [{
             name: "General",
             subSections: [{
-                name: "Main",
+                name: "Main Column Style",
                 schema: ".content",
                 fields: [{
                     name: "Layout",
@@ -304,7 +304,7 @@ var tuningConfig = {
                 }]
             },
             {
-                name: "Header",
+                name: "Header Style",
                 schema: "header",
                 fields: [{
                     name: "Top Border Size",
@@ -357,6 +357,67 @@ var tuningConfig = {
                     min: "-100",
                     max: "100",
                     value: "0"
+                }]
+            },
+            {
+                name: "Pre Header",
+                schema: ".preHeader-row",
+                fields: [{
+                    name: "Display",
+                    alias: "styPreHeaderDisplay",
+                    description: "PreHeader links list display",
+                    type: "displayPicker",
+                    value: ""
+                },
+                {
+                    name: "Background Color",
+                    alias: "styPreHeaderBackgroundColor",
+                    description: "PreHeader links list background color",
+                    type: "colorPicker",
+                    value: ""
+                },
+                {
+                    name: "Top Margin",
+                    alias: "styPreHeaderTopMargin",
+                    description: "PreHeader links list top margin",
+                    type: "slider",
+                    min: "0",
+                    max: "500",
+                    value: "0"
+                },
+                {
+                    name: "Border Top Size",
+                    alias: "styPreHeaderBorderTopSize",
+                    description: "PreHeader links list border top size",
+                    type: "slider",
+                    min: "0",
+                    max: "50",
+                    value: "0"
+                },
+                {
+                    name: "Border Bottom Size",
+                    alias: "styPreHeaderBorderBottomSize",
+                    description: "PreHeader links list border bottom size",
+                    type: "slider",
+                    min: "0",
+                    max: "50",
+                    value: "0"
+                },
+                {
+                    name: "Border Top Color",
+                    alias: "styPreHeaderBorderTopColor",
+                    description: "PreHeader links list border top color",
+                    type: "colorPicker",
+                    value: "",
+                    colorPaletteProperty: "colorBase"
+                },
+                {
+                    name: "Border Bottom Color",
+                    alias: "styPreHeaderBorderBottomColor",
+                    description: "PreHeader links list border bottom color",
+                    type: "colorPicker",
+                    value: "",
+                    colorPaletteProperty: "colorBase"
                 }]
             },
             {
@@ -448,67 +509,6 @@ var tuningConfig = {
                     name: "Active Bottom Border Color",
                     alias: "stylingNavItemBottomBorderActiveColor",
                     description: "Navigation active bottom border color",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorBase"
-                }]
-            },
-            {
-                name: "Social Links",
-                schema: ".social-row",
-                fields: [{
-                    name: "Display",
-                    alias: "stySocialDisplay",
-                    description: "Social links list display",
-                    type: "displayPicker",
-                    value: ""
-                },
-                {
-                    name: "Background Color",
-                    alias: "stySocialBackgroundColor",
-                    description: "Social links list background color",
-                    type: "colorPicker",
-                    value: ""
-                },
-                {
-                    name: "Top Margin",
-                    alias: "stySocialTopMargin",
-                    description: "Social links list top margin",
-                    type: "slider",
-                    min: "0",
-                    max: "500",
-                    value: "0"
-                },
-                {
-                    name: "Border Top Size",
-                    alias: "stySocialBorderTopSize",
-                    description: "Social links list border top size",
-                    type: "slider",
-                    min: "0",
-                    max: "50",
-                    value: "0"
-                },
-                {
-                    name: "Border Bottom Size",
-                    alias: "stySocialBorderBottomSize",
-                    description: "Social links list border bottom size",
-                    type: "slider",
-                    min: "0",
-                    max: "50",
-                    value: "0"
-                },
-                {
-                    name: "Border Top Color",
-                    alias: "stySocialBorderTopColor",
-                    description: "Social links list border top color",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorBase"
-                },
-                {
-                    name: "Border Bottom Color",
-                    alias: "stySocialBorderBottomColor",
-                    description: "Social links list border bottom color",
                     type: "colorPicker",
                     value: "",
                     colorPaletteProperty: "colorBase"
@@ -610,7 +610,7 @@ var tuningConfig = {
         sections: [{
             name: "Main",
             subSections: [{
-                name: "Body",
+                name: "Default font",
                 schema: "p",
                 fields: [{
                     name: "Color",
@@ -650,7 +650,57 @@ var tuningConfig = {
                 }]
             },
             {
-                name: "Navigation",
+                name: "Pre Header Font",
+                schema: ".preHeader-row",
+                fields: [{
+                    name: "Font Color",
+                    alias: "FontPreHeaderFontColor",
+                    description: "PreHeader links list font color",
+                    type: "colorPicker",
+                    value: "",
+                    colorPaletteProperty: "colorFontRev"
+                },
+                {
+                    name: "Font Color Hover",
+                    alias: "FontPreHeaderFontColorHover",
+                    description: "PreHeader links list font color hover",
+                    type: "colorPicker",
+                    value: "",
+                    colorPaletteProperty: "colorFontRevActive"
+                },
+                {
+                    name: "Font Size",
+                    alias: "FontPreHeaderFontSize",
+                    description: "PreHeader links list font size",
+                    type: "slider",
+                    min: "8",
+                    max: "36",
+                    value: "0"
+                },
+                {
+                    name: "Line Height",
+                    alias: "FontPreHeaderLineHeight",
+                    description: "PreHeader links list line height",
+                    type: "slider",
+                    min: "20",
+                    max: "200",
+                    value: "0"
+                },
+                {
+                    name: "Family",
+                    alias: "FontPreHeaderFamily",
+                    description: "",
+                    type: "fontFamilyPicker",
+                    fontType: "",
+                    fontWeight: "",
+                    fontStyle: "",
+                    value: ""
+                }
+                ]
+            },
+
+            {
+                name: "Navigation Font",
                 schema: ".nav",
                 fields: [{
                     name: "Font Color",
@@ -696,55 +746,6 @@ var tuningConfig = {
                     fontStyle: "",
                     value: ""
                 }]
-            },
-            {
-                name: "Social Link",
-                schema: "social-row",
-                fields: [{
-                    name: "Font Color",
-                    alias: "FontSocialFontColor",
-                    description: "Social links list font color",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorFontRev"
-                },
-                {
-                    name: "Font Color Hover",
-                    alias: "FontSocialFontColorHover",
-                    description: "Social links list font color hover",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorFontRevActive"
-                },
-                {
-                    name: "Font Size",
-                    alias: "FontSocialFontSize",
-                    description: "Social links list font size",
-                    type: "slider",
-                    min: "8",
-                    max: "36",
-                    value: "0"
-                },
-                {
-                    name: "Line Height",
-                    alias: "FontSocialLineHeight",
-                    description: "Social links list line height",
-                    type: "slider",
-                    min: "20",
-                    max: "200",
-                    value: "0"
-                },
-                {
-                    name: "Family",
-                    alias: "FontSocialFamily",
-                    description: "",
-                    type: "fontFamilyPicker",
-                    fontType: "",
-                    fontWeight: "",
-                    fontStyle: "",
-                    value: ""
-                }
-                ]
             },
             {
                 name: "H1",
@@ -1089,18 +1090,18 @@ var tuningConfig = {
                     value: ""
                 }]
             }, {
-                name: "Medium",
-                schema: ".medium",
+                name: "Small",
+                schema: ".small",
                 fields: [{
                     name: "Color",
-                    alias: "FontMediumColor",
+                    alias: "FontSmallColor",
                     description: "",
                     type: "colorPicker",
                     value: "",
                     colorPaletteProperty: "colorFontDefault"
                 }, {
                     name: "Size",
-                    alias: "FontMediumSize",
+                    alias: "FontSmallSize",
                     description: "",
                     type: "slider",
                     min: "8",
@@ -1109,7 +1110,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Line Height",
-                    alias: "FontMediumLineHeight",
+                    alias: "FontSmallLineHeight",
                     description: "",
                     type: "slider",
                     min: "8",
@@ -1118,7 +1119,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Top margin",
-                    alias: "FontMediumTopMargin",
+                    alias: "FontSmallTopMargin",
                     description: "",
                     type: "slider",
                     min: "0",
@@ -1127,7 +1128,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Bottom margin",
-                    alias: "FontMediumBottomMargin",
+                    alias: "FontSmallBottomMargin",
                     description: "",
                     type: "slider",
                     min: "0",
@@ -1136,7 +1137,64 @@ var tuningConfig = {
                 },
                 {
                     name: "Family",
-                    alias: "FontMediumFamily",
+                    alias: "FontSmallFamily",
+                    description: "",
+                    type: "fontFamilyPicker",
+                    fontType: "",
+                    fontWeight: "",
+                    fontStyle: "",
+                    value: ""
+                }]
+            },
+            {
+                name: "Blockquote",
+                schema: "blockquote",
+                fields: [{
+                    name: "Color",
+                    alias: "FontBlockquoteColor",
+                    description: "",
+                    type: "colorPicker",
+                    value: "",
+                    colorPaletteProperty: "colorFontDefault"
+                }, {
+                    name: "Size",
+                    alias: "FontBlockquoteSize",
+                    description: "",
+                    type: "slider",
+                    min: "8",
+                    max: "64",
+                    value: "0"
+                },
+                {
+                    name: "Line Height",
+                    alias: "FontBlockquoteLineHeight",
+                    description: "",
+                    type: "slider",
+                    min: "8",
+                    max: "64",
+                    value: "0"
+                },
+                {
+                    name: "Top margin",
+                    alias: "FontBlockquoteTopMargin",
+                    description: "",
+                    type: "slider",
+                    min: "0",
+                    max: "200",
+                    value: "0"
+                },
+                {
+                    name: "Bottom margin",
+                    alias: "FontBlockquoteBottomMargin",
+                    description: "",
+                    type: "slider",
+                    min: "0",
+                    max: "200",
+                    value: "0"
+                },
+                {
+                    name: "Family",
+                    alias: "FontBlockquoteFamily",
                     description: "",
                     type: "fontFamilyPicker",
                     fontType: "",
@@ -1174,11 +1232,11 @@ var tuningConfig = {
                     value: ""
                 }]
             }, {
-                name: "Big",
-                schema: ".big",
+                name: "Lead",
+                schema: ".lead",
                 fields: [{
                     name: "Color",
-                    alias: "FontBigColor",
+                    alias: "FontLeadColor",
                     description: "",
                     type: "colorPicker",
                     value: "",
@@ -1186,7 +1244,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Size",
-                    alias: "FontBigSize",
+                    alias: "FontLeadSize",
                     description: "",
                     type: "slider",
                     min: "8",
@@ -1195,7 +1253,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Line Height",
-                    alias: "FontBigLineHeight",
+                    alias: "FontLeadLineHeight",
                     description: "",
                     type: "slider",
                     min: "8",
@@ -1204,7 +1262,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Top margin",
-                    alias: "FontBigTopMargin",
+                    alias: "FontLeadTopMargin",
                     description: "",
                     type: "slider",
                     min: "0",
@@ -1213,7 +1271,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Bottom margin",
-                    alias: "FontBigBottomMargin",
+                    alias: "FontLeadBottomMargin",
                     description: "",
                     type: "slider",
                     min: "0",
@@ -1222,7 +1280,7 @@ var tuningConfig = {
                 },
                 {
                     name: "Family",
-                    alias: "FontBigFamily",
+                    alias: "FontLeadFamily",
                     description: "",
                     type: "fontFamilyPicker",
                     fontType: "",
@@ -1298,41 +1356,6 @@ var tuningConfig = {
                     fontType: "",
                     fontWeight: "",
                     fontStyle: "",
-                    value: ""
-                }]
-            },
-            {
-                name: "Color2",
-                schema: ".color2",
-                fields: [{
-                    name: "Color",
-                    alias: "FontColor2Color",
-                    description: "",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorBase"
-                }]
-            },
-            {
-                name: "Color3",
-                schema: ".color3",
-                fields: [{
-                    name: "Color",
-                    alias: "FontColor3Color",
-                    description: "",
-                    type: "colorPicker",
-                    value: "",
-                    colorPaletteProperty: "colorFontRev"
-                }]
-            },
-            {
-                name: "Color4",
-                schema: ".color4",
-                fields: [{
-                    name: "Color",
-                    alias: "FontColor4Color",
-                    description: "",
-                    type: "colorPicker",
                     value: ""
                 }]
             },

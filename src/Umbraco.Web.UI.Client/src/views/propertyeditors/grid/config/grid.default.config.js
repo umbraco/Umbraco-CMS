@@ -63,6 +63,24 @@ var uSkyGridConfig = [
      allowed: ["headline"]
  }
  ]
+},
+{
+    name: "Three columns",
+    models: [{
+        grid: 4,
+        percentage: 33.3,
+        allowed: ["rte"]
+    },
+    {
+         grid: 4,
+         percentage: 33.3,
+         allowed: ["rte"]
+    },
+    {
+        grid: 4,
+        percentage: 33.3,
+        allowed: ["rte"]
+    }]
 }
 ]
 

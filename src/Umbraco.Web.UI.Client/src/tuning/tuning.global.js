@@ -4,18 +4,18 @@
 /*********************************************************************************************************/
 
 /* Called for every tuning-over rollover */
-var refrechIntelTuning = function (schema) {
+var refrechIntelTuning = function (name) {
 
     var scope = angular.element($("#tuningPanel")).scope();
 
-    if (scope.schemaFocus != schema.toLowerCase()) {
+    if (scope.schemaFocus != name.toLowerCase()) {
 
         var notFound = true;
         angular.forEach(scope.tuningModel.categories, function (category, key) {
             var isContainer = false;
             angular.forEach(category.sections, function (section, key) {
                 angular.forEach(section.subSections, function (subSection, key) {
-                    if (subSection.schema && schema.toLowerCase() == subSection.schema.toLowerCase()) {
+                    if (subSection.name && name.toLowerCase() == subSection.name.toLowerCase()) {
                         isContainer = true;
                         notFound = false
                     }
@@ -35,7 +35,7 @@ var refrechIntelTuning = function (schema) {
             scope.schemaFocus = "body";
         }
         else {
-            scope.schemaFocus = schema.toLowerCase();
+            scope.schemaFocus = name.toLowerCase();
         }
 
         scope.$apply();
