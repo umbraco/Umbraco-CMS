@@ -48,7 +48,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
                                     // value
                                     var newValue = eval("data." + field.alias.replace("@", ""));
-                                    if (newValue) {
+                                    if (newValue != undefined) {
                                         field.value = newValue;
                                         if (field.value == "''") { field.value = ""; }
                                     }
@@ -60,17 +60,17 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                                         var fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
                                         var fontType = eval("data." + field.alias.replace("@", "") + "_type");
 
-                                        if (fontWeight) {
+                                        if (fontWeight != undefined) {
                                             field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
                                             if (field.fontWeight == "''") { field.fontWeight = ""; }
                                         }
 
-                                        if (fontWeight) {
+                                        if (fontWeight != undefined) {
                                             field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
                                             if (field.fontStyle == "''") { field.fontStyle = ""; }
                                         }
 
-                                        if (fontWeight) {
+                                        if (fontWeight != undefined) {
                                             field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
                                             if (field.fontType == "''") { field.fontType = ""; }
                                         }
@@ -186,7 +186,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
                             // value
                             var newValue = eval("data." + field.alias.replace("@", ""));
-                            if (newValue) {
+                            if (newValue != undefined) {
                                 field.value = newValue;
                                 if (field.value == "''") { field.value = ""; }
                             }
@@ -198,17 +198,17 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                                 var fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
                                 var fontType = eval("data." + field.alias.replace("@", "") + "_type");
 
-                                if (fontWeight) {
+                                if (fontWeight != undefined) {
                                     field.fontWeight = eval("data." + field.alias.replace("@", "") + "_weight");
                                     if (field.fontWeight == "''") { field.fontWeight = ""; }
                                 }
 
-                                if (fontWeight) {
+                                if (fontWeight != undefined) {
                                     field.fontStyle = eval("data." + field.alias.replace("@", "") + "_style");
                                     if (field.fontStyle == "''") { field.fontStyle = ""; }
                                 }
 
-                                if (fontWeight) {
+                                if (fontWeight != undefined) {
                                     field.fontType = eval("data." + field.alias.replace("@", "") + "_type");
                                     if (field.fontType == "''") { field.fontType = ""; }
                                 }
