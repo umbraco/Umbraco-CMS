@@ -11,6 +11,7 @@ namespace Umbraco.Tests.Services
     public class PackageInstallerServiceTest : BaseServiceTest
     {
         private const string DOCUMENT_TYPE_PICKER_UMB = "Document_Type_Picker_1.1.umb";
+        private const string NETMESTER_BEST_PRACTICE_BASE_UMB = "Netmester.BestPractice.Base_0.0.0.1.umb";
         private const string TEST_PACKAGES_DIR_NAME = "Packages";
 
         [SetUp]
@@ -45,13 +46,28 @@ namespace Umbraco.Tests.Services
             var path = GetTestPackagePath(DOCUMENT_TYPE_PICKER_UMB);
             
             // Act
-            var importIssues = ServiceContext.PackageInstallerService.FindPackageImportIssues(path);
+            var importIssues = ServiceContext.PackageInstallerService.GetPreInstallWarnings(path);
 
             // Assert
             Assert.IsNotNull(importIssues);
         }
 
 
+        [Test]
+        public void PackageInstallerService_TestSomethingnew()
+        {
+            // Arrange
+            var path = GetTestPackagePath(NETMESTER_BEST_PRACTICE_BASE_UMB);
+
+            // Act
+            var importIssues = ServiceContext.PackageInstallerService.GetPreInstallWarnings(path);
+
+            // Assert
+            Assert.IsNotNull(importIssues);
+        }
+
+
+        
         [Test]
         public void PackageInstallerService_TestSomethingthered()
         {

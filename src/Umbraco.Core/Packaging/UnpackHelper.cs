@@ -10,7 +10,6 @@ namespace Umbraco.Core.Packaging
     {
         public string ReadTextFileFromArchive(string packageFilePath, string fileToRead, out string directoryInPackage)
         {
-
             string retVal = null;
             bool fileFound = false;
             string foundDir = null;
@@ -56,11 +55,15 @@ namespace Umbraco.Core.Packaging
                     throw new ArgumentException(string.Format("Package file: {0} could not be found", packageFilePath));
             }
 
+            string extension = Path.GetExtension(packageFilePath).ToLower();
+
+            var alowedExtension = new[] {".umb", ".zip"};
+
             // Check if the file is a valid package
-            if (Path.GetExtension(packageFilePath).Equals(".umb", StringComparison.InvariantCultureIgnoreCase) == false)
+            if (alowedExtension.All(ae => ae.Equals(extension) == false))
             {
                 throw new ArgumentException(
-                    "Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
+                    string.Format("Error - file isn't a package. only extentions: \"{0}\" is allowed", string.Join(", ", alowedExtension)));
             }
         }
 
