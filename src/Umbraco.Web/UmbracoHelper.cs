@@ -948,7 +948,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
 		{
-            return ContentQuery.Search(term, useWildCards, searchProvider);
+            return ContentQuery.TypedSearch(term, useWildCards, searchProvider);
 		}
 
 		/// <summary>
@@ -959,7 +959,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-            return ContentQuery.Search(criteria, searchProvider);
+            return ContentQuery.TypedSearch(criteria, searchProvider);
 		}
 
 		#endregion
