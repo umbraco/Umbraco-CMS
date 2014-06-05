@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Services
         public void Can_Create_Content_Without_Explicitly_Set_User()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService as ContentService;
+            var contentService = ServiceContext.ContentService;
 
             // Act
             var content = contentService.CreateContent("Test", -1, "umbTextpage");
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetByLevel(2);
+            var contents = contentService.GetByLevel(2).ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetChildren(NodeDto.NodeIdSeed + 1);
+            var contents = contentService.GetChildren(NodeDto.NodeIdSeed + 1).ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -302,7 +302,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(hierarchy, 0);
 
             // Act
-            var contents = contentService.GetDescendants(NodeDto.NodeIdSeed + 1);
+            var contents = contentService.GetDescendants(NodeDto.NodeIdSeed + 1).ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -320,10 +320,10 @@ namespace Umbraco.Tests.Services
             var subpage2 = contentService.GetById(NodeDto.NodeIdSeed + 3);
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.SaveAndPublish(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
+            contentService.SaveAndPublishWithStatus(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
 
             // Act
-            var versions = contentService.GetVersions(NodeDto.NodeIdSeed + 3);
+            var versions = contentService.GetVersions(NodeDto.NodeIdSeed + 3).ToList();
 
             // Assert
             Assert.That(versions.Any(), Is.True);
@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetRootContent();
+            var contents = contentService.GetRootContent().ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -351,17 +351,16 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var root = contentService.GetById(NodeDto.NodeIdSeed + 1);
-            contentService.SaveAndPublish(root);
+            contentService.SaveAndPublishWithStatus(root);
             var content = contentService.GetById(NodeDto.NodeIdSeed + 3);
             content.ExpireDate = DateTime.Now.AddSeconds(1);
-            contentService.SaveAndPublish(content);
+            contentService.SaveAndPublishWithStatus(content);
 
             // Act
             Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-            var contents = contentService.GetContentForExpiration();
+            var contents = contentService.GetContentForExpiration().ToList();
 
             // Assert
-            Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(1));
@@ -374,7 +373,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetContentForRelease();
+            var contents = contentService.GetContentForRelease().ToList();
 
             // Assert
             Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
@@ -390,7 +389,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetContentInRecycleBin();
+            var contents = contentService.GetContentInRecycleBin().ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -446,7 +445,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             bool unpublished = contentService.UnPublish(content, 0);
-            var children = contentService.GetChildren(NodeDto.NodeIdSeed + 1);
+            var children = contentService.GetChildren(NodeDto.NodeIdSeed + 1).ToList();
 
             // Assert
             Assert.That(published, Is.True);//Verify that everything was published
@@ -467,7 +466,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = (ContentService)ServiceContext.ContentService;
-            var rootContent = contentService.GetRootContent();
+            var rootContent = contentService.GetRootContent().ToList();
             foreach (var c in rootContent)
             {
                 contentService.PublishWithChildren(c);
@@ -501,12 +500,12 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = (ContentService)ServiceContext.ContentService;
-            var rootContent = contentService.GetRootContent();
+            var rootContent = contentService.GetRootContent().ToList();
             foreach (var c in rootContent)
             {
                 contentService.PublishWithChildren(c);
             }
-            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
+            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants())).ToList();
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new PetaPocoUnitOfWorkProvider();
             var uow = provider.GetUnitOfWork();
@@ -517,7 +516,6 @@ namespace Umbraco.Tests.Services
             //for this test we are also going to save a revision for a content item that is not published, this is to ensure
             //that it's published version still makes it into the cmsContentXml table!
             contentService.Save(allContent.Last());
-
 
             // Act
             contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
@@ -698,7 +696,7 @@ namespace Umbraco.Tests.Services
             var savedVersion = content.Version;
 
             // Act
-            var publishedDescendants = ((ContentService) contentService).GetPublishedDescendants(root);
+            var publishedDescendants = ((ContentService) contentService).GetPublishedDescendants(root).ToList();
 
             // Assert
             Assert.That(rootPublished, Is.True);
@@ -762,7 +760,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var hierarchy = CreateContentHierarchy();
+            var hierarchy = CreateContentHierarchy().ToList();
 
             // Act
             contentService.Save(hierarchy, 0);
@@ -835,7 +833,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             contentService.MoveToRecycleBin(content, 0);
-            var descendants = contentService.GetDescendants(content);
+            var descendants = contentService.GetDescendants(content).ToList();
 
             // Assert
             Assert.That(content.ParentId, Is.EqualTo(-20));
@@ -940,7 +938,7 @@ namespace Umbraco.Tests.Services
             var nameBeforeRollback = subpage2.Name;
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.SaveAndPublish(subpage2, 0);//Saving and publishing, so a new version is created
+            contentService.SaveAndPublishWithStatus(subpage2, 0);//Saving and publishing, so a new version is created
 
             // Act
             var rollback = contentService.Rollback(NodeDto.NodeIdSeed + 3, version, 0);
@@ -1096,7 +1094,6 @@ namespace Umbraco.Tests.Services
             {
                 Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId AND versionId = @versionId", new{nodeId = content.Id, versionId = content.Version}) != null);
             }
-
         }
 
         private IEnumerable<IContent> CreateContentHierarchy()
