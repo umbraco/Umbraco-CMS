@@ -13,6 +13,8 @@ angular.module('spectrumcolorpicker', [])
           },
           link: function (scope, $element) {
 
+              var initColor;
+
               $element.find("input").spectrum({
                   color: scope.colorselected,
                   preferredFormat: "rgb",
@@ -23,7 +25,17 @@ angular.module('spectrumcolorpicker', [])
                       scope.$apply();
                   },
                   move: function (color) {
-                  }
+                      scope.colorselected = color.toRgbString();
+                      scope.$apply();
+                  },
+                  beforeShow: function (color) {
+                      initColor = angular.copy(scope.colorselected);
+                      $(this).spectrum("container").find(".sp-cancel").click(function (e) {
+                          scope.colorselected = initColor;
+                          scope.$apply();
+                      });
+                  },
+
               });
 
               scope.$watch('colorselected', function () {

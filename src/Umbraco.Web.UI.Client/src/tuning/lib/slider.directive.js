@@ -79,6 +79,16 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                     scope.$apply();
                 });
 
+                //elm.bind('slide', function (event, ui) {
+                //    event.stopPropagation();
+                //    $timeout(function () {
+
+                //        ngModel.$setViewValue(ui.values || ui.value);
+                //        scope.$apply();
+
+                //    }, 100, true);
+                //});
+
                 // Update slider from model value
                 ngModel.$render = function () {
                     init();

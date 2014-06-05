@@ -4,12 +4,6 @@
 
 var refrechLayout = function (parameters) {
 
-    // Disable links
-    $('a').addClass("myDisable");
-    $('a').bind("click.myDisable", function () {
-        return false;
-    });
-
     // hide preview badget
     $("#umbracoPreviewBadge").hide();
 

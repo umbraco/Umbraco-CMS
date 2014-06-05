@@ -13,7 +13,7 @@ var tuningConfig = {
                 schema: "body",
                 fields: [
                     {
-                        name: "Background color",
+                        name: "Color",
                         alias: "backgroundBodyColor",
                         description: "Background body color",
                         type: "colorPicker",
@@ -21,7 +21,7 @@ var tuningConfig = {
                         colorPaletteProperty: "colorBodyBackground"
                     },
                     {
-                        name: "Background gradient",
+                        name: "Gradient",
                         alias: "backgroundBodyGradientColor",
                         description: "Fade the background to this colour at the bottom",
                         type: "colorPicker",
@@ -35,28 +35,28 @@ var tuningConfig = {
                         value: ""
                     },
                     {
-                        name: "Image position",
+                        name: "Position",
                         alias: "backgroundBodyPosition",
                         description: "Background body position",
                         type: "bgPositionPicker",
                         value: ""
                     },
                     {
-                        name: "Stretch background",
+                        name: "Cover",
                         alias: "backgroundBodyCover",
                         description: "Checked: stretches the chosen image to fill the.\nUnchecked: the image is tiled according to the Repeat setting below",
                         type: "checkbox",
                         value: ""
                     },
                     {
-                        name: "Background tiling",
+                        name: "Repeat",
                         alias: "backgroundBodyRepeat",
                         description: "How to tile the background image",
                         type: "bgRepeatPicker",
                         value: ""
                     },
                     {
-                        name: "Background scrolling behaviour",
+                        name: "Attachment",
                         alias: "backgroundBodyAttachment",
                         description: "When fixed the background doesn't scroll with the content",
                         type: "bgAttachmentPicker",
@@ -239,8 +239,7 @@ var tuningConfig = {
         sections: [{
             name: "General",
             subSections: [{
-                name: "Main Column Style",
-                schema: ".content",
+                name: "Main Styles",
                 fields: [{
                     name: "Layout",
                     alias: "stylingMainColumnBoxed",
@@ -304,8 +303,7 @@ var tuningConfig = {
                 }]
             },
             {
-                name: "Header Style",
-                schema: "header",
+                name: "Header Styles",
                 fields: [{
                     name: "Top Border Size",
                     alias: "stylingHeaderTopBorderSize",
@@ -350,7 +348,7 @@ var tuningConfig = {
                     value: "0"
                 },
                 {
-                    name: "Logo Top Margin",
+                    name: "Logo Position",
                     alias: "stylingHeaderLogoTopMargin",
                     description: "Header logo top margin",
                     type: "slider",
@@ -455,7 +453,7 @@ var tuningConfig = {
                     colorPaletteProperty: "colorBase"
                 },
                 {
-                    name: "Margin Top",
+                    name: "Position",
                     alias: "stylingNavMarginTop",
                     description: "Navigation Margin Top",
                     type: "slider",
