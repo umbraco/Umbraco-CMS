@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -60,23 +59,6 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-
-
-        //// Temperary constructor while packaging service is not final
-        //internal PackagingService(IContentService contentService,
-        //    IContentTypeService contentTypeService,
-        //    IMediaService mediaService,
-        //    IMacroService macroService,
-        //    IDataTypeService dataTypeService,
-        //    IFileService fileService,
-        //    ILocalizationService localizationService,
-        //    RepositoryFactory repositoryFactory,
-        //    IDatabaseUnitOfWorkProvider uowProvider,
-        //    IPackageInstallation packageInstallation
-        //    ) : this(contentService, contentTypeService, mediaService, macroService, dataTypeService, fileService, localizationService, repositoryFactory, uowProvider)
-        //{
-        //    _packageInstallation = packageInstallation;
-        //}
 
         #region Content
 
