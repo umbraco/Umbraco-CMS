@@ -114,6 +114,7 @@ namespace Umbraco.Core.Packaging
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFile);
+                PackageSupportedCheck(rootElement);
                 PackageStructureSanetyCheck(packageFile, rootElement);
                 dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
                 languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
@@ -173,6 +174,18 @@ namespace Umbraco.Core.Packaging
             {
                 throw new Exception("Error installing package " + packageFile, e);
             }
+        }
+
+        /// <summary>
+        /// Temperary check to test that we support stylesheets
+        /// </summary>
+        /// <param name="rootElement"></param>
+        private void PackageSupportedCheck(XElement rootElement)
+        {
+            XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
+            if (styleSheets != null && styleSheets.Elements().Any())
+                throw new NotSupportedException("Stylesheets is not suported in this version of umbraco");
+
         }
 
         private static T[] EmptyArrayIfNull<T>(object obj)
