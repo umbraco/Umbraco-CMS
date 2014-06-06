@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
         private Lazy<IMemberTypeService> _memberTypeService;
         private Lazy<IMemberGroupService> _memberGroupService;
         private Lazy<INotificationService> _notificationService;
-        
+
         /// <summary>
         /// public ctor - will generally just be used for unit testing
         /// </summary>

@@ -2,8 +2,9 @@
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Core.Packaging
 {
     public class ConflictingPackageContentFinder : IConflictingPackageContentFinder
     {

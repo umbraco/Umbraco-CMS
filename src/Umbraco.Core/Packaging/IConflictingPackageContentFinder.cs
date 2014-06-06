@@ -1,7 +1,7 @@
 ﻿using System.Xml.Linq;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Core.Packaging
 {
     public interface IConflictingPackageContentFinder
     {

@@ -1575,14 +1575,16 @@ namespace Umbraco.Core.Services
 
         internal IPackageInstallation PackageInstallation
         {
+            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
+            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
+                // NOTE COMMENT: But is is not a service? and all other parced in constructor is services...
             private get { return _packageInstallation ?? new PackageInstallation(this, _macroService, _fileService, new PackageExtraction()); }
             set { _packageInstallation = value; }
-
-            
         }
 
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
         {
+            //TODO Add events ?
             return PackageInstallation.InstallPackage(packageFilePath, userId);
         }
 

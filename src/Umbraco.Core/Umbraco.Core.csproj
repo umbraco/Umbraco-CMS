@@ -1045,7 +1045,7 @@
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\INotificationService.cs" />
-    <Compile Include="Services\IConflictingPackageContentFinder.cs" />
+    <Compile Include="Packaging\IConflictingPackageContentFinder.cs" />
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
@@ -1060,7 +1060,7 @@
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="Services\ConflictingPackageContentFinder.cs" />
+    <Compile Include="Packaging\ConflictingPackageContentFinder.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
