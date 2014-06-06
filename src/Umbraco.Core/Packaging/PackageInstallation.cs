@@ -110,6 +110,7 @@ namespace Umbraco.Core.Packaging
             XElement documentSet;
             XElement actions;
             MetaData metaData;
+            InstallationSummary installationSummary;
             
             try
             {
@@ -128,6 +129,7 @@ namespace Umbraco.Core.Packaging
                 actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
 
                 metaData = GetMetaData(rootElement);
+                installationSummary = new InstallationSummary() { MetaData = metaData };
             }
             catch (Exception e)
             {
@@ -136,8 +138,6 @@ namespace Umbraco.Core.Packaging
 
             try
             {
-                var installationSummary = new InstallationSummary() { MetaData = metaData };
-
                 var dataTypeDefinitions = EmptyArrayIfNull<IDataTypeDefinition>(dataTypes) ?? InstallDataTypes(dataTypes, userId);
                 installationSummary.DataTypesInstalled = dataTypeDefinitions;
 
