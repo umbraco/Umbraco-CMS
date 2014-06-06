@@ -5,7 +5,6 @@ using System.Text;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
