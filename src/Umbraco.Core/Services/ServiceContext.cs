@@ -22,7 +22,6 @@ namespace Umbraco.Core.Services
         private Lazy<IFileService> _fileService;
         private Lazy<ILocalizationService> _localizationService;
         private Lazy<IPackagingService> _packagingService;
-        private Lazy<IPackageInstallerService> _packageInstallerService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<IEntityService> _entityService;
         private Lazy<IRelationService> _relationService;
@@ -43,7 +42,6 @@ namespace Umbraco.Core.Services
         /// <param name="fileService"></param>
         /// <param name="localizationService"></param>
         /// <param name="packagingService"></param>
-        /// <param name="packageInstallerService"></param>
         /// <param name="entityService"></param>
         /// <param name="relationService"></param>
         /// <param name="memberGroupService"></param>
@@ -62,7 +60,6 @@ namespace Umbraco.Core.Services
             IFileService fileService, 
             ILocalizationService localizationService, 
             IPackagingService packagingService,
-            IPackageInstallerService packageInstallerService, 
             IEntityService entityService,
             IRelationService relationService,
             IMemberGroupService memberGroupService,
@@ -82,7 +79,6 @@ namespace Umbraco.Core.Services
             _fileService = new Lazy<IFileService>(() => fileService);
             _localizationService = new Lazy<ILocalizationService>(() => localizationService);
             _packagingService = new Lazy<IPackagingService>(() => packagingService);
-            _packageInstallerService = new Lazy<IPackageInstallerService>(() => packageInstallerService);
             _entityService = new Lazy<IEntityService>(() => entityService);
             _relationService = new Lazy<IRelationService>(() => relationService);
             _sectionService = new Lazy<ISectionService>(() => sectionService);
@@ -92,7 +88,6 @@ namespace Umbraco.Core.Services
             _memberService = new Lazy<IMemberService>(() => memberService);
             _userService = new Lazy<IUserService>(() => userService);
             _notificationService = new Lazy<INotificationService>(() => notificationService);
-
         }
 
         /// <summary>
@@ -155,9 +150,6 @@ namespace Umbraco.Core.Services
 
             if (_packagingService == null)
                 _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
-
-            if (_packageInstallerService == null)
-                _packageInstallerService = new Lazy<IPackageInstallerService>(() => new PackageInstallerService(_packagingService.Value, _macroService.Value, _fileService.Value));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
@@ -334,11 +326,6 @@ namespace Umbraco.Core.Services
         public IMemberGroupService MemberGroupService
         {
             get { return _memberGroupService.Value; }
-        }
-
-        public IPackageInstallerService PackageInstallerService
-        {
-            get { return _packageInstallerService.Value; }
         }
     }
 }

@@ -366,15 +366,12 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
-    <Compile Include="Packaging\IUnpackHelper.cs" />
-    <Compile Include="Packaging\UnpackHelper.cs" />
-    <Compile Include="Packaging\PackageInstallationSummary.cs" />
-    <Compile Include="Packaging\PackageMetaData.cs" />
-    <Compile Include="Packaging\PreInstallWarnings.cs" />
-    <Compile Include="Packaging\Models\InstallAction.cs" />
+    <Compile Include="Packaging\IPackageExtraction.cs" />
+    <Compile Include="Packaging\IPackageInstallation.cs" />
+    <Compile Include="Packaging\Models\PreInstallWarnings.cs" />
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
     <Compile Include="Packaging\Models\MetaData.cs" />
-    <Compile Include="Packaging\Models\UninstallAction.cs" />
+    <Compile Include="Packaging\Models\PackageAction.cs" />
     <Compile Include="Packaging\PackageBuilding.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
@@ -1050,7 +1047,6 @@
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IConflictingPackageContentFinder.cs" />
     <Compile Include="Services\IRelationService.cs" />
-    <Compile Include="Services\IPackageInstallerService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\IService.cs" />
@@ -1064,7 +1060,6 @@
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="Services\PackageInstallerService.cs" />
     <Compile Include="Services\ConflictingPackageContentFinder.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\SectionService.cs" />

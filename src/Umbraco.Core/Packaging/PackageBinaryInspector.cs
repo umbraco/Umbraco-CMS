@@ -5,9 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Packaging

@@ -35,6 +35,7 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
+        private IPackageInstallation _packageInstallation;
 
 
         public PackagingService(IContentService contentService,
@@ -59,7 +60,24 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-        
+
+
+        //// Temperary constructor while packaging service is not final
+        //internal PackagingService(IContentService contentService,
+        //    IContentTypeService contentTypeService,
+        //    IMediaService mediaService,
+        //    IMacroService macroService,
+        //    IDataTypeService dataTypeService,
+        //    IFileService fileService,
+        //    ILocalizationService localizationService,
+        //    RepositoryFactory repositoryFactory,
+        //    IDatabaseUnitOfWorkProvider uowProvider,
+        //    IPackageInstallation packageInstallation
+        //    ) : this(contentService, contentTypeService, mediaService, macroService, dataTypeService, fileService, localizationService, repositoryFactory, uowProvider)
+        //{
+        //    _packageInstallation = packageInstallation;
+        //}
+
         #region Content
 
         /// <summary>
@@ -1573,13 +1591,27 @@ namespace Umbraco.Core.Services
 
         #region Installation
 
+        internal IPackageInstallation PackageInstallation
+        {
+            private get { return _packageInstallation ?? new PackageInstallation(this, _macroService, _fileService, new PackageExtraction()); }
+            set { _packageInstallation = value; }
+
+            
+        }
+
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
         {
-            //TODO Add events ?
-            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
-            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
-            var installer = new PackageInstallation(this, new PackageExtraction());
-            return installer.InstallPackage(packageFilePath, userId);
+            return PackageInstallation.InstallPackage(packageFilePath, userId);
+        }
+
+        internal PreInstallWarnings GetPackageWarnings(string packageFilePath)
+        {
+            return PackageInstallation.GetPreInstallWarnings(packageFilePath);
+        }
+
+        internal MetaData GetPackageMetaData(string packageFilePath)
+        {
+            return PackageInstallation.GetMetaData(packageFilePath);
         }
 
         #endregion

@@ -1,7 +1,6 @@
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Core.Packaging.Models
 {
     public class PreInstallWarnings
     {
