@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Services
 
         private static string GetTestPackagePath(string packageName)
         {
-            const string testPackagesDirName = "Packages";
+            const string testPackagesDirName = "Packaging\\Packages";
             string path = Path.Combine(Core.Configuration.GlobalSettings.FullpathToRoot, testPackagesDirName, packageName);
             return path;
         }
