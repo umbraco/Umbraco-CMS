@@ -5,7 +5,7 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Packaging
 {
     [TestFixture]
     public class PackageInstallationTest
@@ -56,8 +56,6 @@ namespace Umbraco.Tests.Services
             string test;
             packageExtraction.Setup(a => a.ReadTextFileFromArchive(pagePath, Constants.Packaging.PackageXmlFileName, out test)).Returns(Xml);
             
-
-            
             var fileService = new Mock<IFileService>();
             var macroService = new Mock<IMacroService>();
             var packagingService = new Mock<IPackagingService>();
@@ -69,7 +67,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsNotNull(installationSummary);
-            Assert.Inconclusive("Lots of more tests can be written");
+            //Assert.Inconclusive("Lots of more tests can be written");
         }
 
     }

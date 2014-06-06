@@ -135,29 +135,39 @@ namespace Umbraco.Core.Packaging
 
             try
             {
-                
-                return new InstallationSummary
-                {
-                    MetaData = metaData,
-                    DataTypesInstalled =
-                        dataTypes == null ? new IDataTypeDefinition[0] : InstallDataTypes(dataTypes, userId),
-                    LanguagesInstalled = languages == null ? new ILanguage[0] : InstallLanguages(languages, userId),
-                    DictionaryItemsInstalled =
-                        dictionaryItems == null ? new IDictionaryItem[0] : InstallDictionaryItems(dictionaryItems),
-                    MacrosInstalled = macroes == null ? new IMacro[0] : InstallMacros(macroes, userId),
-                    FilesInstalled =
-                        packageFile == null
-                            ? Enumerable.Empty<KeyValuePair<string, bool>>()
-                            : InstallFiles(packageFile, files),
-                    TemplatesInstalled = templates == null ? new ITemplate[0] : InstallTemplats(templates, userId),
-                    DocumentTypesInstalled =
-                        documentTypes == null ? new IContentType[0] : InstallDocumentTypes(documentTypes, userId),
-                    StylesheetsInstalled =
-                        styleSheets == null ? new IStylesheet[0] : InstallStylesheets(styleSheets, userId),
-                    DocumentsInstalled = documentSet == null ? new IContent[0] : InstallDocuments(documentSet, userId),
-                    Actions = actions == null ? new PackageAction[0] : GetPackageActions(actions, metaData.Name),
+                var installationSummary = new InstallationSummary() { MetaData = metaData };
 
-                };
+                var dataTypeDefinitions = EmptyArrayIfNull<IDataTypeDefinition>(dataTypes) ?? InstallDataTypes(dataTypes, userId);
+                installationSummary.DataTypesInstalled = dataTypeDefinitions;
+
+                var languagesInstalled = EmptyArrayIfNull<ILanguage>(languages) ?? InstallLanguages(languages, userId);
+                installationSummary.LanguagesInstalled = languagesInstalled;
+
+                var dictionaryInstalled = EmptyArrayIfNull<IDictionaryItem>(dictionaryItems) ?? InstallDictionaryItems(dictionaryItems);
+                installationSummary.DictionaryItemsInstalled = dictionaryInstalled;
+
+                var macros = EmptyArrayIfNull<IMacro>(macroes)?? InstallMacros(macroes, userId);
+                installationSummary.MacrosInstalled = macros;
+
+                var keyValuePairs = EmptyArrayIfNull<Details<string>>(packageFile) ?? InstallFiles(packageFile, files);
+                installationSummary.FilesInstalled = keyValuePairs;
+                
+                var templatesInstalled = EmptyArrayIfNull<ITemplate>(templates) ?? InstallTemplats(templates, userId);
+                installationSummary.TemplatesInstalled = templatesInstalled;
+
+                var documentTypesInstalled = EmptyArrayIfNull<IContentType>(documentTypes) ?? InstallDocumentTypes(documentTypes, userId);
+                installationSummary.DocumentTypesInstalled =documentTypesInstalled;
+
+                var stylesheetsInstalled = EmptyArrayIfNull<IStylesheet>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
+                installationSummary.StylesheetsInstalled = stylesheetsInstalled;
+
+                var documentsInstalled = EmptyArrayIfNull<IContent>(documentSet) ?? InstallDocuments(documentSet, userId);
+                installationSummary.DocumentsInstalled = documentsInstalled;
+
+                var packageActions = EmptyArrayIfNull<PackageAction>(actions) ?? GetPackageActions(actions, metaData.Name);
+                installationSummary.Actions = packageActions;
+
+                return installationSummary;
             }
             catch (Exception e)
             {
@@ -165,7 +175,10 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-
+        private static T[] EmptyArrayIfNull<T>(object obj)
+        {
+            return obj == null ? new T[0] : null;
+        }
 
 
         private XDocument GetConfigXmlDoc(string packageFilePath)
@@ -321,14 +334,20 @@ namespace Umbraco.Core.Packaging
         }
 
 
-        private IEnumerable<KeyValuePair<string, bool>> InstallFiles(string packageFilePath, XElement filesElement)
+        private Details<string>[] InstallFiles(string packageFilePath, XElement filesElement)
         {
             return ExtractFileInPackageInfos(filesElement).Select(fpi =>
             {
                 bool existingOverrided = _packageExtraction.CopyFileFromArchive(packageFilePath, fpi.FileNameInPackage,
                     fpi.FullPath);
 
-                return new KeyValuePair<string, bool>(fpi.FullPath, existingOverrided);
+                return new Details<string>()
+                {
+                    Source = fpi.FileNameInPackage,
+                    Destination = fpi.FullPath,
+                    Status = existingOverrided ? InstallStatus.Overwridden : InstallStatus.Inserted
+                };
+
             }).ToArray();
         }
 
@@ -471,40 +490,56 @@ namespace Umbraco.Core.Packaging
                     "xRootElement");
             }
 
-            XElement majorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMajorXpath);
-            XElement minorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMinorXpath);
-            XElement patchElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsPatchXpath);
-            XElement nameElement = infoElement.XPathSelectElement(Constants.Packaging.PackageNameXpath);
-            XElement versionElement = infoElement.XPathSelectElement(Constants.Packaging.PackageVersionXpath);
-            XElement urlElement = infoElement.XPathSelectElement(Constants.Packaging.PackageUrlXpath);
-            XElement licenseElement = infoElement.XPathSelectElement(Constants.Packaging.PackageLicenseXpath);
-            XElement authorNameElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorNameXpath);
-            XElement authorUrlElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorWebsiteXpath);
-            XElement readmeElement = infoElement.XPathSelectElement(Constants.Packaging.ReadmeXpath);
+            var majorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMajorXpath);
+            var minorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMinorXpath);
+            var patchElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsPatchXpath);
+            var nameElement = infoElement.XPathSelectElement(Constants.Packaging.PackageNameXpath);
+            var versionElement = infoElement.XPathSelectElement(Constants.Packaging.PackageVersionXpath);
+            var urlElement = infoElement.XPathSelectElement(Constants.Packaging.PackageUrlXpath);
+            var licenseElement = infoElement.XPathSelectElement(Constants.Packaging.PackageLicenseXpath);
+            var authorNameElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorNameXpath);
+            var authorUrlElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorWebsiteXpath);
+            var readmeElement = infoElement.XPathSelectElement(Constants.Packaging.ReadmeXpath);
 
             XElement controlElement = xRootElement.Element(Constants.Packaging.ControlNodeName);
 
-            int val;
-
             return new MetaData
             {
-                Name = nameElement == null ? string.Empty : nameElement.Value,
-                Version = versionElement == null ? string.Empty : versionElement.Value,
-                Url = urlElement == null ? string.Empty : urlElement.Value,
-                License = licenseElement == null ? string.Empty : licenseElement.Value,
-                LicenseUrl =
-                    licenseElement == null
-                        ? string.Empty
-                        : licenseElement.HasAttributes ? licenseElement.AttributeValue<string>("url") : string.Empty,
-                AuthorName = authorNameElement == null ? string.Empty : authorNameElement.Value,
-                AuthorUrl = authorUrlElement == null ? string.Empty : authorUrlElement.Value,
-                Readme = readmeElement == null ? string.Empty : readmeElement.Value,
-                ReqMajor = majorElement == null ? 0 : int.TryParse(majorElement.Value, out val) ? val : 0,
-                ReqMinor = minorElement == null ? 0 : int.TryParse(minorElement.Value, out val) ? val : 0,
-                ReqPatch = patchElement == null ? 0 : int.TryParse(patchElement.Value, out val) ? val : 0,
-                Control = controlElement == null ? string.Empty : controlElement.Value
+                Name = StringValue(nameElement),
+                Version = StringValue(versionElement),
+                Url = StringValue(urlElement),
+                License = StringValue(licenseElement),
+                LicenseUrl = StringAttribute(licenseElement, Constants.Packaging.PackageLicenseXpathUrlAttribute),
+                AuthorName = StringValue(authorNameElement),
+                AuthorUrl = StringValue(authorUrlElement),
+                Readme = StringValue(readmeElement),
+                Control = StringValue(controlElement),
+                ReqMajor = IntValue(majorElement),
+                ReqMinor = IntValue(minorElement),
+                ReqPatch = IntValue(patchElement),
+                
             };
         }
+
+        private static string StringValue(XElement xElement, string defaultValue = "")
+        {
+            return xElement == null ? defaultValue : xElement.Value;
+        }
+
+        private static string StringAttribute(XElement xElement, string attribute, string defaultValue = "")
+        {
+            return xElement == null
+                        ? defaultValue
+                        : xElement.HasAttributes ? xElement.AttributeValue<string>(attribute) : defaultValue;
+        }
+
+
+        private static int IntValue(XElement xElement, int defaultValue = 0)
+        {
+            int val;
+            return xElement == null ? defaultValue : int.TryParse(xElement.Value, out val) ? val : defaultValue;
+        }
+
 
         private static string UpdatePathPlaceholders(string path)
         {
