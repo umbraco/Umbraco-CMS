@@ -316,6 +316,7 @@
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ManifestValidatorConverter.cs" />
+    <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\ParameterEditorConverter.cs" />
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
