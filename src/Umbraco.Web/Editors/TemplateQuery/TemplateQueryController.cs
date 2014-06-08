@@ -7,6 +7,10 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
+    using System.Diagnostics;
+    using System.Threading;
+    using System.Web.Services.Description;
+
     /// <summary>
     /// The API controller used for building content queries within the template
     /// </summary>
@@ -59,14 +63,24 @@ namespace Umbraco.Web.Editors
             var sb = new StringBuilder();
             sb.Append(queryResult.QueryExpression);
 
+            var timer = new Stopwatch();
+            
+            timer.Start();
+
             var currentPage = umbraco.TypedContentAtRoot().FirstOrDefault();
+            
+            timer.Stop();
 
             // adjust the "FROM"
             if (model != null && model.Id > 0)
             {
                 var fromTypeAlias = umbraco.TypedContent(model.Id).DocumentTypeAlias;
 
+                timer.Start();
+
                 currentPage = currentPage.DescendantOrSelf(fromTypeAlias);
+                
+                timer.Stop();
 
                 sb.AppendFormat(".DescendantOrSelf(\"{0}\")", fromTypeAlias);
             }
@@ -75,17 +89,31 @@ namespace Umbraco.Web.Editors
             IEnumerable<IPublishedContent> contents;
             if (model != null && string.IsNullOrEmpty(model.ContentTypeAlias) == false)
             {
+                timer.Start();
+                
                 contents = currentPage.Descendants(model.ContentTypeAlias);
 
+                timer.Stop();
                 sb.AppendFormat(".Decendants(\"{0}\")", model.ContentTypeAlias);
             }
+            else
+            {
+                timer.Start();
+                contents = currentPage.Descendants();
+                timer.Stop();
+                sb.Append(".Decendants()");
+            }
+
+            var clause = string.Empty;
 
             // WHERE
             foreach (var condition in model.Wheres)
             {
                 if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
+
+                var operation = string.Empty;
                 
-                var operation = "";
+
                 switch (condition.Term.Operathor)
                 {
                     case Operathor.Equals:
@@ -123,10 +151,29 @@ namespace Umbraco.Web.Editors
                     break;
                 }
 
-                sb.AppendFormat(".Where(\"{0}\")", operation);
+                clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ", operation });
+
+            }
+
+            if(string.IsNullOrEmpty(clause) == false)
+            { 
+                timer.Start();
+                
+                contents = contents.Where(clause);
+                
+                timer.Stop();
+
+                sb.AppendFormat(".Where(\"{0}\")", clause);
             }
 
             queryResult.QueryExpression = sb.ToString();
+            queryResult.ExecutionTime = timer.ElapsedMilliseconds;
+            queryResult.ResultCount = contents.Count();
+            queryResult.SampleResults = contents.Take(20).Select(x => new TemplateQueryResult()
+                                                                 {
+                                                                     Icon = "icon-file",
+                                                                     Name = x.Name
+                                                                 });
 
             return queryResult;
         }

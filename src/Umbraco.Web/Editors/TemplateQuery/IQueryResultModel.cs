@@ -6,7 +6,7 @@ namespace Umbraco.Web.Editors
     {
         string QueryExpression { get; set; }
 
-        IEnumerable<IResult> SampleResults { get; set; }
+        IEnumerable<ITemplateQueryResult> SampleResults { get; set; }
 
         int ResultCount { get; set; }
 
