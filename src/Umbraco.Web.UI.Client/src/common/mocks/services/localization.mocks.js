@@ -682,7 +682,6 @@ angular.module('umbraco.mocks').
                   "translation_uploadTranslationXml": "Upload translation xml",
                   "treeHeaders_cacheBrowser": "Cache Browser",
                   "treeHeaders_contentRecycleBin": "Recycle Bin",
-                  "treeHeaders_mediaRecycleBin": "Recycle Bin",
                   "treeHeaders_createdPackages": "Created packages",
                   "treeHeaders_datatype": "Data Types",
                   "treeHeaders_dictionary": "Dictionary",
