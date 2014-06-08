@@ -138,6 +138,16 @@ namespace Umbraco.Tests.Services
                         && ((UmbracoEntity.EntityProperty)y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
+        [Test]
+        public void EntityService_Can_Get_ObjectType()
+        {
+            var service = ServiceContext.EntityService;
+            var mediaObjectType = service.GetObjectType(1031);
+
+            Assert.NotNull(mediaObjectType);
+            Assert.AreEqual(mediaObjectType, UmbracoObjectTypes.MediaType);
+        }
+
         private static bool _isSetup = false;
 
         public override void CreateTestData()
