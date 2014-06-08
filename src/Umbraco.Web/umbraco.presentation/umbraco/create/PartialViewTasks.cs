@@ -43,7 +43,11 @@ namespace umbraco
 	    {
             var pipesIndex = Alias.IndexOf("|||", System.StringComparison.Ordinal);
             var template = Alias.Substring(0, pipesIndex).Trim();
-            var fileName = Alias.Substring(pipesIndex + 3, Alias.Length - pipesIndex - 3) + ".cshtml";
+            var fileName = Alias.Substring(pipesIndex + 3, Alias.Length - pipesIndex - 3);
+            if (!fileName.ToLowerInvariant().EndsWith(".cshtml"))
+            {
+                fileName += ".cshtml";
+            }
 
             var fullFilePath = IOHelper.MapPath(BasePath + fileName);
 
