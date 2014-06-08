@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbSections
 * @restrict E
 **/
-function sectionsDirective($timeout, $window, navigationService, treeService, sectionResource, appState, eventsService) {
+function sectionsDirective($timeout, $window, navigationService, treeService, sectionResource, appState, eventsService, $location) {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -84,7 +84,8 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
 			scope.sectionClick = function (section) {
 			    navigationService.hideSearch();
-				navigationService.showTree(section.alias);
+			    navigationService.showTree(section.alias);
+			    $location.path("/" + section.alias);
 			};
 
 			scope.sectionDblClick = function(section){
