@@ -73,7 +73,7 @@
 
                         <input type="checkbox" ng-model="result.selected"></td>
                     <td>
-                        <a ng-class="{inactive: entityType === 'content' && !result.published}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a></td>
+                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a></td>
                     <td>{{result.updateDate|date:'medium'}} 
                         <!--<<span class="label label-success">Publish</span>-->
                     </td>
