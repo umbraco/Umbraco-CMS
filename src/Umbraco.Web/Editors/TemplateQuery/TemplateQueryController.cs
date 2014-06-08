@@ -45,7 +45,8 @@ namespace Umbraco.Web.Editors
             return GetTemplateQuery(new QueryModel()
                 {
                     ContentTypeAlias = "umbTextPage",
-                    Id = 1068
+                    Id = 1068,
+                    Wheres = new List<IQueryCondition>()
                 });
         }
         
@@ -61,7 +62,7 @@ namespace Umbraco.Web.Editors
             var currentPage = umbraco.TypedContentAtRoot().FirstOrDefault();
 
             // adjust the "FROM"
-            if (model.Id > 0)
+            if (model != null && model.Id > 0)
             {
                 var fromTypeAlias = umbraco.TypedContent(model.Id).DocumentTypeAlias;
 
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Editors
                 
             // TYPE to return if filtered by type            
             IEnumerable<IPublishedContent> contents;
-            if (string.IsNullOrEmpty(model.ContentTypeAlias) == false)
+            if (model != null && string.IsNullOrEmpty(model.ContentTypeAlias) == false)
             {
                 contents = currentPage.Descendants(model.ContentTypeAlias);
 
@@ -87,15 +88,13 @@ namespace Umbraco.Web.Editors
                 var operation = "";
                 switch (condition.Term.Operathor)
                 {
-                    case  Operathor.Equals:
-                        operation = condition.MakeBinaryOperation(" == ");
-                        
+                    case Operathor.Equals:
+                        operation = condition.MakeBinaryOperation(" == ");                        
                         break;
 
                     case Operathor.NotEquals:
                         operation = condition.MakeBinaryOperation(" != ");
                         break;
-
                     
                     case Operathor.GreaterThan:
                         operation = condition.MakeBinaryOperation(" > ");
@@ -115,7 +114,6 @@ namespace Umbraco.Web.Editors
 
                     case Operathor.Contains:
                         // .Where()
-
                         operation = string.Format("{0}.Contains(\"{1}\")", condition.FieldName, condition.ConstraintValue);
 
                     break;
@@ -123,7 +121,6 @@ namespace Umbraco.Web.Editors
                     case Operathor.NotContains:
                         operation = string.Format("!{0}.Contains(\"{1}\")", condition.FieldName, condition.ConstraintValue);
                     break;
-
                 }
 
                 sb.AppendFormat(".Where(\"{0}\")", operation);
@@ -133,8 +130,7 @@ namespace Umbraco.Web.Editors
 
             return queryResult;
         }
-
-        
+  
         /// <summary>
         /// Returns a collection of constraint conditions that can be used in the query
         /// </summary>
