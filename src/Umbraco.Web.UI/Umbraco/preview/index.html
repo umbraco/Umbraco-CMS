@@ -1,5 +1,4 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />
@@ -113,7 +112,6 @@
 
                                                 <div class="box-slider" ng-if="field.type == 'slider'">
                                                     <div ui-slider min="{{field.min}}" max="{{field.max}}" step="1" ng-model="field.value"></div>
-                                                    <span class="slider-span">px</span><input class="slider-input" ng-model="field.value">
                                                 </div>
 
                                                 <div ng-if="field.type == 'checkbox'">
@@ -165,8 +163,7 @@
                         </li>
                     </ul>
 
-                    <button class="btn btn-default btn-default-save" ng-click="saveLessParameters()">save</button>
-
+                    <button class="btn btn-default btn-default-save" style="display:none" ng-click="saveLessParameters()">save</button>
                     <button class="btn btn-default btn-default-save" ng-click="makePreset()">make it !</button>
 
                 </div>
@@ -217,7 +214,6 @@
                 <div class="modal-body tuning-fontfamilypicker">
                     <span class="show" ng-style="setStyleVariant()">Aa Bb Cc 1 2 3 4&hellip; <br />The quick brown fox jumps over the lazy dog&hellip;</span>
                 </div>
-
 
                 <div class="modal-footer tuning-fontfamilypicker">
                     <button class="btn btn-primary" ng-click="ok()">OK</button>

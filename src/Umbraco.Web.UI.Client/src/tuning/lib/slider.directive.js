@@ -7,8 +7,12 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
     uiSliderConfig = uiSliderConfig || {};
     return {
         require: 'ngModel',
+        template: '<div><div class="slider" /><span class="slider-span">px</span><input class="slider-input" ng-model="value"></div>',
+        replace: true,
         compile: function () {
             return function (scope, elm, attrs, ngModel) {
+
+                scope.value = ngModel.$viewValue;
 
                 function parseNumber(n, decimals) {
                     return (decimals) ? parseFloat(n) : parseInt(n);
@@ -43,7 +47,7 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                         }
                     });
 
-                    elm.slider(options);
+                    elm.find(".slider").slider(options);
                     init = angular.noop;
                 };
 
@@ -53,20 +57,20 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                     attrs.$observe(property, function (newVal) {
                         if (!!newVal) {
                             init();
-                            elm.slider('option', property, parseNumber(newVal, useDecimals));
+                            elm.find(".slider").slider('option', property, parseNumber(newVal, useDecimals));
                         }
                     });
                 });
                 attrs.$observe('disabled', function (newVal) {
                     init();
-                    elm.slider('option', 'disabled', !!newVal);
+                    elm.find(".slider").slider('option', 'disabled', !!newVal);
                 });
 
                 // Watch ui-slider (byVal) for changes and update
                 scope.$watch(attrs.uiSlider, function (newVal) {
                     init();
                     if (newVal != undefined) {
-                        elm.slider('option', newVal);
+                        elm.find(".slider").slider('option', newVal);
                     }
                 }, true);
 
@@ -74,20 +78,15 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                 $timeout(init, 0, true);
 
                 // Update model value from slider
-                elm.bind('slidestop', function (event, ui) {
+                elm.find(".slider").bind('slidestop', function (event, ui) {
                     ngModel.$setViewValue(ui.values || ui.value);
                     scope.$apply();
                 });
 
-                //elm.bind('slide', function (event, ui) {
-                //    event.stopPropagation();
-                //    $timeout(function () {
-
-                //        ngModel.$setViewValue(ui.values || ui.value);
-                //        scope.$apply();
-
-                //    }, 100, true);
-                //});
+                elm.bind('slide', function (event, ui) {
+                    event.stopPropagation();
+                    elm.find(".slider-input").val(ui.value);
+                });
 
                 // Update slider from model value
                 ngModel.$render = function () {
@@ -96,6 +95,8 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
 
                     if (isNaN(ngModel.$viewValue) && !(ngModel.$viewValue instanceof Array))
                         ngModel.$viewValue = 0;
+
+                    scope.value = ngModel.$viewValue;
 
                     // Do some sanity check of range values
                     if (options.range === true) {
@@ -123,8 +124,12 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                         prevRangeValues.max = ngModel.$viewValue[1];
 
                     }
-                    elm.slider(method, ngModel.$viewValue);
+                    elm.find(".slider").slider(method, ngModel.$viewValue);
                 };
+
+                scope.$watch("value", function () {
+                    ngModel.$setViewValue(scope.value);
+                }, true);
 
                 scope.$watch(attrs.ngModel, function () {
                     if (options.range === true) {
@@ -133,10 +138,11 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                 }, true);
 
                 function destroy() {
-                    elm.slider('destroy');
+                    elm.find(".slider").slider('destroy');
                 }
-                elm.bind('$destroy', destroy);
+                elm.find(".slider").bind('$destroy', destroy);
             };
         }
     };
 }]);
+
