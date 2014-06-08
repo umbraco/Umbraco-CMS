@@ -26,7 +26,8 @@ namespace Umbraco.Web
 	//  Request.RawUrl is still there
 	// response.Redirect does?! always remap to /vdir?!
 
-	public class UmbracoModule : IHttpModule
+	public class 
+        UmbracoModule : IHttpModule
 	{
 		#region HttpModule event handlers
 
@@ -527,6 +528,8 @@ namespace Umbraco.Web
 						LogHelper.Debug<UmbracoModule>("Total milliseconds for umbraco request to process: " + DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
 					}
 
+                    OnEndRequest(new EventArgs());
+
 					DisposeHttpContextItems(httpContext);
 				};
 
@@ -560,6 +563,13 @@ namespace Umbraco.Web
         {
             if (RouteAttempt != null)
                 RouteAttempt(this, args);
+        }
+
+        internal static event EventHandler<EventArgs> EndRequest;
+        private void OnEndRequest(EventArgs args)
+        {
+            if (EndRequest != null)
+                EndRequest(this, args);
         } 
         #endregion
 	}

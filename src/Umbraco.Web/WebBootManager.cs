@@ -275,7 +275,8 @@ namespace Umbraco.Web
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
             //Override the ServerMessengerResolver to set a username/password for the distributed calls
-            ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(() =>
+            //ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(() =>
+            ServerMessengerResolver.Current.SetServerMessenger(new BatchedServerMessenger(() =>
             {
                 //we should not proceed to change this if the app/database is not configured since there will 
                 // be no user, plus we don't need to have server messages sent if this is the case.
