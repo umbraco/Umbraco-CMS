@@ -51,6 +51,14 @@ namespace Umbraco.Web.Editors
                     ContentTypeAlias = "umbTextPage",
                     Id = 1068,
                     Wheres = new List<IQueryCondition>()
+                                 {
+                                     new QueryCondition()
+                                         {
+                                             ConstraintValue = "Getting",
+                                             FieldName = "Name",
+                                             Term = _terms.FirstOrDefault(x => x.Name == "contains")
+                                         }
+                                 }
                 });
         }
         
