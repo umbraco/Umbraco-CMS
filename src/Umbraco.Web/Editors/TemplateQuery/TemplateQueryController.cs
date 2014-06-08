@@ -39,6 +39,16 @@ namespace Umbraco.Web.Editors
                 new OperathorTerm("less than or equal to", Operathor.LessThanEqualTo, new [] {"int"})
             };
 
+
+        public IQueryResultModel GetTemplateQuery2()
+        {
+            return GetTemplateQuery(new QueryModel()
+                {
+                    ContentTypeAlias = "umbTextPage",
+                    Id = 1068
+                });
+        }
+        
         public IQueryResultModel GetTemplateQuery(IQueryModel model)
         {
             var umbraco = new UmbracoHelper(UmbracoContext);

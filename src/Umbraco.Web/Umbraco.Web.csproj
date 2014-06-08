@@ -320,6 +320,7 @@
     <Compile Include="Editors\TemplateQuery\Operathor.cs" />
     <Compile Include="Editors\TemplateQuery\OperathorTerm.cs" />
     <Compile Include="Editors\TemplateQuery\QueryCondition.cs" />
+    <Compile Include="Editors\TemplateQuery\QueryModel.cs" />
     <Compile Include="Editors\TemplateQuery\QueryResultModel.cs" />
     <Compile Include="Editors\TemplateQuery\TemplateQueryController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
