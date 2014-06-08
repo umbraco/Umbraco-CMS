@@ -9,8 +9,17 @@
  */
 
 function RecycleBinController($scope, $routeParams) {
-	$routeParams.id = "-20"; // media = "-21"
-	$scope.model = { config: { entityType: "content" } };
+	if ($routeParams.section) {
+
+		if ($routeParams.section === "content") {
+			$routeParams.id = "-20";
+		}
+		else if ($routeParams.section === "media") {
+			$routeParams.id = "-21";
+		}
+
+		$scope.model = { config: { entityType: $routeParams.section } };
+	}
 }
 
 angular.module('umbraco').controller("Umbraco.Dashboard.RecycleBinController", RecycleBinController);
