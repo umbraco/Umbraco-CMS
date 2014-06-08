@@ -26,6 +26,7 @@
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
+    
 
 </head>
 <body ng-class="{touch:touchDevice}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
@@ -61,6 +62,8 @@
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/lazyload/lazyload.min.js"></script>
     <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
+    
+    @Html.RenderProfiler()
 
 </body>
 </html>
