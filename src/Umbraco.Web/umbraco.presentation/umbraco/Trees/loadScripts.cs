@@ -34,16 +34,16 @@ namespace umbraco
 {
     [Tree(Constants.Applications.Settings, "scripts", "Scripts", "icon-folder", "icon-folder", sortOrder: 2)]
     public class loadScripts : FileSystemTree
-	{
+    {
         public loadScripts(string application) : base(application) { }
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {            
-			rootNode.NodeType = "init" + TreeAlias;
-			rootNode.NodeID = "init";
+        {
+            rootNode.NodeType = "init" + TreeAlias;
+            rootNode.NodeID = "init";
             rootNode.Text = ui.Text("treeHeaders", "scripts");
         }
 
-		public override void RenderJS(ref StringBuilder Javascript)
+        public override void RenderJS(ref StringBuilder Javascript)
         {
             Javascript.Append(
                 @"
@@ -63,13 +63,13 @@ namespace umbraco
 
         protected override string FileSearchPattern
         {
-            
+
             get { return UmbracoSettings.ScriptFileTypes; }
         }
 
         protected override void OnRenderFolderNode(ref XmlTreeNode xNode)
         {
-            
+
             xNode.Menu = new List<IAction>(new IAction[] { ActionDelete.Instance, ContextMenuSeperator.Instance, ActionNew.Instance, ContextMenuSeperator.Instance, ActionRefresh.Instance });
             xNode.NodeType = "scriptsFolder";
         }
@@ -77,11 +77,21 @@ namespace umbraco
         protected override void OnRenderFileNode(ref XmlTreeNode xNode)
         {
             xNode.Action = xNode.Action.Replace("openFile", "openScriptEditor");
-            xNode.Icon = "icon-code";
-            xNode.OpenIcon = "icon-code";
+
+            // add special icons for javascript files
+            if (xNode.Action.Contains(".js"))
+            {
+                xNode.Icon = "icon-script";
+                xNode.OpenIcon = "icon-script";
+            }
+            else
+            {
+                xNode.Icon = "icon-code";
+                xNode.OpenIcon = "icon-code";
+            }
         }
 
-        
+
     }
-    
+
 }
