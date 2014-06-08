@@ -22,7 +22,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.entityType = "content";
     }
 
-    $scope.isNew = false;    
+    $scope.isNew = false;
     $scope.actionInProgress = false;
     $scope.listViewResultSet = {
         totalPages: 0,
@@ -241,6 +241,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.reloadView($routeParams.id);
 
         $scope.contentId = $routeParams.id;
+        $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
 
     }
 

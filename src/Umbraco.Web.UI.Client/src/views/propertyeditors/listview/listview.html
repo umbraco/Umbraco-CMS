@@ -23,12 +23,12 @@
                 </ul>
             </div>
             
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content'">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed">
                 <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
                     <localize key="actions_publish">Publish</localize>
                 </a>
             </div>
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content'">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed">
                 <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
                     <localize key="actions_unpublish">Unpublish</localize>
                 </a>
