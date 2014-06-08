@@ -35,7 +35,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        protected UmbracoContext UmbracoContext { get; private set; }
+        public UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Returns the current ApplicationContext
