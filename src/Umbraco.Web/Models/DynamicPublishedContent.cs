@@ -1096,6 +1096,17 @@ namespace Umbraco.Web.Models
             return PublishedContent.AncestorOrSelf(level).AsDynamicOrNull();
         }
 
+        /// <summary>
+        /// A shortcut method for AncestorOrSelf(1)
+        /// </summary>
+        /// <returns>
+        /// The site homepage
+        /// </returns>
+	    public DynamicPublishedContent Site()
+	    {
+            return AncestorOrSelf(1);
+	    }
+
         public DynamicPublishedContent AncestorOrSelf(string contentTypeAlias)
         {
             return PublishedContent.AncestorOrSelf(contentTypeAlias).AsDynamicOrNull();
