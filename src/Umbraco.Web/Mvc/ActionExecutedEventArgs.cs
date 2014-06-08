@@ -1,13 +1,14 @@
 using System;
+using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
 {
     public class ActionExecutedEventArgs : EventArgs
     {
-        public UmbracoController Controller { get; set; }
+        public Controller Controller { get; set; }
         public object Model { get; set; }
-        
-        public ActionExecutedEventArgs(UmbracoController controller, object model)
+
+        public ActionExecutedEventArgs(Controller controller, object model)
         {
             Controller = controller;
             Model = model;            
