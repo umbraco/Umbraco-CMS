@@ -541,7 +541,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="greeting3">Happy wonderful Wednesday</key>
     <key alias="greeting4">Happy thunderous Thursday</key>
     <key alias="greeting5">Happy funky Friday</key>
-    <key alias="greeting6">Happy caturday</key>
+    <key alias="greeting6">Happy Caturday</key>
     <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
