@@ -104,7 +104,7 @@ namespace Umbraco.Core.Profiling
         /// </remarks>
         public string Render()
         {
-            return MiniProfiler.RenderIncludes(RenderPosition.BottomRight).ToString();
+            return MiniProfiler.RenderIncludes(RenderPosition.Right).ToString();
         }
 
         /// <summary>
