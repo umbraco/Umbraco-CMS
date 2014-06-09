@@ -766,6 +766,7 @@
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
+    <Compile Include="WebApi\JsonCamelCaseFormatter.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
