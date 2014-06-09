@@ -155,10 +155,7 @@ namespace Umbraco.Web.Trees
                         ui.GetText("general", "recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
-                        //TODO: This would be nice to enable so we can have a nice recyclebin view, see the NOTE: in the routes.js angular file
-                        // for the time being we'll just load the dashboard of the section.
-                        //queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));    
-                        queryStrings.GetValue<string>("application")));
+                        queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
 
                 }
 
