@@ -282,6 +282,22 @@ namespace Umbraco.Core
 			}
 
 			/// <summary>
+			/// Defines the alias identifiers for the built-in Umbraco relation types
+			/// </summary>
+			public static class Relations
+			{
+				/// <summary>
+				/// Relation type alias for relating a document on the copy event
+				/// </summary>
+				public const string RelateDocumentOnCopy = "relateDocumentOnCopy";
+
+				/// <summary>
+				/// Relation type alias for relating a document to its parent document on delete
+				/// </summary>
+				public const string RelateParentDocumentOnDelete = "relateParentDocumentOnDelete";
+			}
+
+			/// <summary>
 			/// Constants for Umbraco URLs/Querystrings.
 			/// </summary>
 			public static class Url

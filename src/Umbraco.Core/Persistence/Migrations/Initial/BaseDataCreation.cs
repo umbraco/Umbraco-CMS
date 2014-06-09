@@ -268,8 +268,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoRelationTypeData()
         {
-            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = "relateDocumentOnCopy", ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = true, Name = "Relate Document On Copy" });
-            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 2, Alias = "relateParentDocumentOnDelete", ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = false, Name = "Relate Parent Document On Delete" });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = Constants.Conventions.Relations.RelateDocumentOnCopy, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = true, Name = "Relate Document On Copy" });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 2, Alias = Constants.Conventions.Relations.RelateParentDocumentOnDelete, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = false, Name = "Relate Parent Document On Delete" });
         }
 
         private void CreateCmsTaskTypeData()
