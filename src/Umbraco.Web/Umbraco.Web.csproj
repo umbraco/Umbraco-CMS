@@ -311,12 +311,11 @@
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
-    <Compile Include="Editors\TemplateQuery\IOperathorTerm.cs" />
-    <Compile Include="Editors\TemplateQuery\IQueryCondition.cs" />
-    <Compile Include="Editors\TemplateQuery\IQueryModel.cs" />
-    <Compile Include="Editors\TemplateQuery\IQueryResultModel.cs" />
-    <Compile Include="Editors\TemplateQuery\IResult.cs" />
-    <Compile Include="Editors\TemplateQuery\ISortExpression.cs" />
+    <Compile Include="Editors\TemplateQuery\ContentTypeModel.cs" />
+    <Compile Include="Editors\TemplateQuery\PropertyModel.cs" />
+    <Compile Include="Editors\TemplateQuery\SourceModel.cs" />
+    <Compile Include="Editors\TemplateQuery\TemplateQueryResult.cs" />
+    <Compile Include="Editors\TemplateQuery\SortExpression.cs" />
     <Compile Include="Editors\TemplateQuery\Operathor.cs" />
     <Compile Include="Editors\TemplateQuery\OperathorTerm.cs" />
     <Compile Include="Editors\TemplateQuery\QueryCondition.cs" />
@@ -778,6 +777,7 @@
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
+    <Compile Include="WebApi\JsonCamelCaseFormatter.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />

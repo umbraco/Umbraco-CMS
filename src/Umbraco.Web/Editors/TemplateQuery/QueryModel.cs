@@ -2,12 +2,14 @@
 
 namespace Umbraco.Web.Editors
 {
-    public class QueryModel : IQueryModel
+    using Umbraco.Web.Editors.TemplateQuery;
+
+    public class QueryModel
     {
-        public string ContentTypeAlias { get; set; }
-        public int Id { get; set; }
-        public IEnumerable<IQueryCondition> Wheres { get; set; }
-        public ISortExpression SortExpression { get; set; }
+        public ContentTypeModel ContentType { get; set; }
+        public SourceModel Source { get; set; }
+        public IEnumerable<QueryCondition> Filters { get; set; }
+        public SortExpression SortExpression { get; set; }
         public int Take { get; set; }
     }
 }

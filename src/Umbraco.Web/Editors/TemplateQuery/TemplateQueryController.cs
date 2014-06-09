@@ -4,6 +4,7 @@ using System.Text;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
@@ -12,11 +13,14 @@ namespace Umbraco.Web.Editors
 
     using global::umbraco;
 
+    using Umbraco.Web.Editors.TemplateQuery;
+
     /// <summary>
     /// The API controller used for building content queries within the template
     /// </summary>
     [PluginController("UmbracoApi")]
     [DisableBrowserCache]
+    [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
         public TemplateQueryController()
@@ -25,6 +29,7 @@ namespace Umbraco.Web.Editors
         public TemplateQueryController(UmbracoContext umbracoContext)
             :base(umbracoContext)
         { }
+
 
         private static readonly IEnumerable<OperathorTerm> _terms = new List<OperathorTerm>()
             {
@@ -44,32 +49,19 @@ namespace Umbraco.Web.Editors
                 new OperathorTerm("less than or equal to", Operathor.LessThanEqualTo, new [] {"int"})
             };
 
+        private static readonly IEnumerable<PropertyModel> _properties = new List<PropertyModel>()
+            {
+                new PropertyModel() { Name = "Id", Alias = "id", Type = "int"  },
+                new PropertyModel() { Name = "Name", Alias = "name", Type = "string"  },
+                new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
+                new PropertyModel() { Name = "Creation Date", Alias = "createDate", Type = "datetime"  },
+                new PropertyModel() { Name = "Publishing Date", Alias = "publishDate", Type = "datetime"  }
 
-        public IQueryResultModel GetTemplateQuery2()
-        {
-            return GetTemplateQuery(new QueryModel()
-                {
-                    ContentTypeAlias = "umbNewsItem",
-                    Id = 1073,
-                    Wheres = new List<IQueryCondition>(),
-                    //SortExpression = new SortExpression()
-                    //                     {
-                    //                         FieldName = "nodeName",
-                    //                         SortDirection = "descending"
-                    //                     },
-                    Take = 3
-                                 //{
-                                 //    new QueryCondition()
-                                 //        {
-                                 //            ConstraintValue = "Getting",
-                                 //            FieldName = "Name",
-                                 //            Term = _terms.FirstOrDefault(x => x.Name == "contains")
-                                 //        }
-                                 //}
-                });
-        }
+            }; 
+
         
-        public IQueryResultModel GetTemplateQuery(IQueryModel model)
+        
+        public QueryResultModel PostTemplateQuery(QueryModel model)
         {
             var umbraco = new UmbracoHelper(UmbracoContext);
 
@@ -90,9 +82,9 @@ namespace Umbraco.Web.Editors
             var pointerNode = currentPage;
 
             // adjust the "FROM"
-            if (model != null && model.Id > 0)
+            if (model != null && model.Source.Id > 0)
             {
-                var targetNode = umbraco.TypedContent(model.Id);
+                var targetNode = umbraco.TypedContent(model.Source.Id);
 
                 var aliases = this.GetChildContentTypeAliases(targetNode, currentPage).Reverse();
                 
@@ -111,15 +103,15 @@ namespace Umbraco.Web.Editors
                 
             // TYPE to return if filtered by type            
             IEnumerable<IPublishedContent> contents;
-            if (model != null && string.IsNullOrEmpty(model.ContentTypeAlias) == false)
+            if (model != null && string.IsNullOrEmpty(model.ContentType.Alias) == false)
             {
                 timer.Start();
 
-                contents = pointerNode.Children.OfTypes(new[] { model.ContentTypeAlias });
+                contents = pointerNode.Children.OfTypes(new[] { model.ContentType.Alias });
 
                 timer.Stop();
                 // TODO change to .Children({0})
-                sb.AppendFormat(".Children(\"{0}\")", model.ContentTypeAlias);
+                sb.AppendFormat(".Children(\"{0}\")", model.ContentType.Alias);
             }
             else
             {
@@ -132,7 +124,7 @@ namespace Umbraco.Web.Editors
             var clause = string.Empty;
 
             // WHERE
-            foreach (var condition in model.Wheres)
+            foreach (var condition in model.Filters)
             {
                 if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
 
@@ -167,12 +159,12 @@ namespace Umbraco.Web.Editors
 
                     case Operathor.Contains:
                         // .Where()
-                        operation = string.Format("{0}.Contains(\"{1}\")", condition.FieldName, condition.ConstraintValue);
+                    operation = string.Format("{0}.Contains(\"{1}\")", condition.Property.Name.ToLowerInvariant(), condition.ConstraintValue.ToLowerInvariant());
 
                     break;
 
                     case Operathor.NotContains:
-                        operation = string.Format("!{0}.Contains(\"{1}\")", condition.FieldName, condition.ConstraintValue);
+                        operation = string.Format("!{0}.Contains(\"{1}\")", condition.Property.Name.ToLowerInvariant(), condition.ConstraintValue.ToLowerInvariant());
                     break;
                 }
 
@@ -191,20 +183,20 @@ namespace Umbraco.Web.Editors
                 sb.AppendFormat(".Where(\"{0}\")", clause);
             }
 
-            if (model.SortExpression != null && string.IsNullOrEmpty(model.SortExpression.FieldName) == false)
+            if (model.SortExpression != null && string.IsNullOrEmpty(model.SortExpression.Property.Alias) == false)
             {
                 timer.Start();
 
                 // TODO write extension to determine if built in property or not
                 contents = model.SortExpression.SortDirection == "ascending"
-                               ? contents.OrderBy(x => x.GetPropertyValue<string>(model.SortExpression.FieldName)).ToList()
-                               : contents.OrderByDescending(x => x.GetPropertyValue<string>(model.SortExpression.FieldName)).ToList();
+                               ? contents.OrderBy(x => x.GetPropertyValue<string>(model.SortExpression.Property.Alias)).ToList()
+                               : contents.OrderByDescending(x => x.GetPropertyValue<string>(model.SortExpression.Property.Alias)).ToList();
 
                 timer.Stop();
 
                 var direction = model.SortExpression.SortDirection == "ascending" ? string.Empty : " desc";
 
-                sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.SortExpression.FieldName, direction);
+                sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.SortExpression.Property.Alias, direction);
             }
 
             if (model.Take > 0)
@@ -246,14 +238,37 @@ namespace Umbraco.Web.Editors
 
             return aliases;
         }
-        
-        
+
+        /// <summary>
+        /// Gets a list of all content types
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ContentTypeModel> GetContentTypes()
+        {
+            return
+                ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
+                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name }).OrderBy(x => x.Name);
+        }
+
+        /// <summary>
+        /// Returns a collection of allowed properties.
+        /// </summary>
+        public IEnumerable<PropertyModel> GetAllowedProperties()
+        {
+            return _properties.OrderBy(x => x.Name);
+        }
 
         /// <summary>
         /// Returns a collection of constraint conditions that can be used in the query
         /// </summary>
-        public IEnumerable<OperathorTerm> GetFilterConditions()
+        public IEnumerable<object> GetFilterConditions()
         {
+            //return _terms.Select(x => new
+            //                              {
+            //                                 x.Name,
+            //                                 Operathor = x.Operathor.ToString(),
+            //                                 x.AppliesTo
+            //                              });
             return _terms;
         }
 

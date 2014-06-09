@@ -1,19 +1,21 @@
 ﻿namespace Umbraco.Web.Editors
 {
-    public class QueryCondition : IQueryCondition
+    using Umbraco.Web.Editors.TemplateQuery;
+
+    public class QueryCondition
     {
         
-        public string FieldName { get; set; }
-        public IOperathorTerm Term { get; set; }
+        public PropertyModel Property { get; set; }
+        public OperathorTerm Term { get; set; }
         public string ConstraintValue { get; set; }
     }
 
 
     internal static class QueryConditionExtensions
     {
-        public static string MakeBinaryOperation(this IQueryCondition condition, string operation)
+        public static string MakeBinaryOperation(this QueryCondition condition, string operation)
         {
-            return string.Format("{0}{1}{2}", condition.FieldName, operation, condition.ConstraintValue);
+            return string.Format("{0}{1}{2}", condition.Property.Name, operation, condition.ConstraintValue);
         }
 
     }

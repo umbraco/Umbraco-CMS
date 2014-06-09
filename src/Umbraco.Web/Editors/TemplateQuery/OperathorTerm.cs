@@ -2,7 +2,7 @@
 
 namespace Umbraco.Web.Editors
 {
-    public class OperathorTerm : IOperathorTerm
+    public class OperathorTerm
     {
         public OperathorTerm()
         {
