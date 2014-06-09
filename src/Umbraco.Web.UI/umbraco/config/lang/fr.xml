@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="fr" intName="French" localName="français" lcid="12" culture="fr-FR">
   <creator>
-    <name>The umbraco community</name>
-    <link>http://umbraco.org/documentation/language-files</link>
+    <name>The Umbraco community</name>
+    <link>http://Umbraco.org/documentation/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
@@ -128,7 +128,7 @@
   <area alias="dashboard">
     <key alias="browser">Parcourir votre site</key>
     <key alias="dontShowAgain">- Masquer</key>
-    <key alias="nothinghappens">Si umbraco ne s'ouvre pas, vous devez peut-être autoriser les popups pour ce site.</key>
+    <key alias="nothinghappens">Si Umbraco ne s'ouvre pas, vous devez peut-être autoriser les popups pour ce site.</key>
     <key alias="openinnew">a ouvert une nouvelle fenêtre</key>
     <key alias="restart">Redémarrer</key>
     <key alias="visit">Visitez</key>
@@ -363,11 +363,11 @@ Exemple: 'email', 'url']]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% vient de configurer votre base de données. Appuyer sur <strong>Suivant</strong> pour continuer.]]></key>
     <key alias="databaseNotFound">
 	<![CDATA[<p>Base de données non trouvée! Veuillez vérifier que les informations de connexion à la base de données situées dans le fichier "web.config" sont correctes.</p>
-              <p>Pour se faire, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre editeur texte préféré), ajouter la chaine de connexion à votre base dans la clé nommée "umbracoDbDSN" et enregister le fichier. </p>
+              <p>Pour se faire, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre editeur texte préféré), ajouter la chaine de connexion à votre base dans la clé nommée "UmbracoDbDSN" et enregister le fichier. </p>
               <p>
               Cliquez ensuite sur le bouton <strong>Réessayer</strong>.<br />
 		Plus d'information sur l'édition du web.config
-		<a href="http://umbraco.org/redir/installWebConfig" target="_blank"> ici </a>.</p>]]></key>
+		<a href="http://Umbraco.org/redir/installWebConfig" target="_blank"> ici </a>.</p>]]></key>
     <key alias="databaseText">
 	<![CDATA[Pour achever cette étape, vous devez être en possession d'informations relatives à votre serveur de base de données ("chaine de connexion").<br />
         Veuillez contacter votre hébergeur si necessaire.
@@ -389,9 +389,9 @@ Exemple: 'email', 'url']]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>L'utilisateur par défaut a été desactivé ou n'a pas l'autorisation d'accéder à Umbraco!</strong></p><p>Aucune action supplémentaire n'est nécessaire. Cliquer sur <b>Suivant</b> pour continuer.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Le mot de passe de l'utilisateur par défaut a été modifié avec succès depuis l'installation!</strong></p><p>Aucune action supplémentaire n'est nécessaire. Cliquer sur <b>Suivant</b> pour continuer.]]></key>
     <key alias="defaultUserPasswordChanged">Le mot de passe a été modifié!</key>
-    <key alias="defaultUserText"><![CDATA[<p> umbraco crée un utilisateur par défaut avec un login <strong>('admin')</strong> et un mot de passe <strong>('default')</strong>. Il est <strong>important</strong> que le mot de passe soit changé pour quelquechose d'unique.</p><p>Cette étape va vérifier le mot de passe utilisateur par défaut et suggérer s'il est nécessaire de le changer.</p>]]></key>
+    <key alias="defaultUserText"><![CDATA[<p> Umbraco crée un utilisateur par défaut avec un login <strong>('admin')</strong> et un mot de passe <strong>('default')</strong>. Il est <strong>important</strong> que le mot de passe soit changé pour quelquechose d'unique.</p><p>Cette étape va vérifier le mot de passe utilisateur par défaut et suggérer s'il est nécessaire de le changer.</p>]]></key>
     <key alias="greatStart">Prenez un bon départ, regardez nos vidéos d'introduction.</key>
-    <key alias="licenseText">En cliquant sur le bouton suivant (ou en modifiant le paramètre umbracoConfigurationStatus dans le web.config), vous acceptez la licence d'utilisation de ce logiciel comme décrite dans la boite suivante. Veuillez noter que cette distribution d'Umbraco inclue 2 licence différentes, la licence open source "MIT license" pour le framework et la licence "umbraco freeware" qui couvre l'interface utilisateur.</key>
+    <key alias="licenseText">En cliquant sur le bouton suivant (ou en modifiant le paramètre UmbracoConfigurationStatus dans le web.config), vous acceptez la licence d'utilisation de ce logiciel comme décrite dans la boite suivante. Veuillez noter que cette distribution d'Umbraco inclue 2 licence différentes, la licence open source "MIT license" pour le framework et la licence "Umbraco freeware" qui couvre l'interface utilisateur.</key>
     <key alias="None">Pas encore installé.</key>
     <key alias="permissionsAffectedFolders">Liste des fichiers et répertoires modifiés</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Plus d'information sur le paramétrage des permissions pour Umbraco ici</key>
@@ -431,7 +431,7 @@ Exemple: 'email', 'url']]></key>
     <key alias="runwayFromScratchText">
     <![CDATA[
         Votre site est complétement vide pour le moment, ce qui est une bonne chose si vous souhaitez démarrer depuis zéro et créer vos propres type de document et templates. 
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Voici comment procéder</a>)
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Voici comment procéder</a>)
         Vous pouvez aussi choisir d'installer Runway plus tard. Veuillez pour cela vous rendre dans la section Developer et choisir Packages.
       ]]>
     </key>
@@ -439,7 +439,7 @@ Exemple: 'email', 'url']]></key>
     <key alias="runwayInstalled">Runway a été installé avec succès</key>
     <key alias="runwayInstalledText">
     <![CDATA[
-      Vous avez la base d'umbraco en place. Sélectionnez quel modules vous souhaitez installer maintenant.<br />
+      Vous avez la base d'Umbraco en place. Sélectionnez quel modules vous souhaitez installer maintenant.<br />
       Voici une liste des modules que nous recommendons, vérifiez celui que vous souhcheck off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>
       ]]>
     </key>
@@ -477,7 +477,7 @@ Obtenez de l'aide de notre communauté, parcourez la documentation ou regarder q
     <key alias="theEndHeader">Umbraco %0% est installé et prêt à l'emploi</key>
     <key alias="theEndInstallFailed">
 	<![CDATA[Pour finaliser l'installation, vous aurez besoin de
-        d'éditer manuellement <strong>le fichier /web.config </strong> et mettre à jour l'entrée AppSetting <strong>umbracoConfigurationStatus</strong> en dessous de la valeur de <strong>'%0%'</strong>.]]>
+        d'éditer manuellement <strong>le fichier /web.config </strong> et mettre à jour l'entrée AppSetting <strong>UmbracoConfigurationStatus</strong> en dessous de la valeur de <strong>'%0%'</strong>.]]>
     </key>
     <key alias="theEndInstallSuccess"><![CDATA[Vous pouvez <strong>commencer dès maintenant</strong> en cliquant sur le bouton "Lancer Umbraco" ci-dessous. <br />si vous êtes <strong>un nouvel utilisateur d'Umbraco</strong>, 
 vous pourrez trouver des tonnes de ressources sur nos pages de tutoriaux.]]>
@@ -491,7 +491,7 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
     <key alias="Version4">Umbraco Version 4</key>
     <key alias="watch">Visionner</key>
     <key alias="welcomeIntro">
-	<![CDATA[Cet assistant vous guidera à travers le processus de configuration d'<strong>umbraco %0%</strong> pour une nouvelle installation ou une mise à jour depuis une version précédente.
+	<![CDATA[Cet assistant vous guidera à travers le processus de configuration d'<strong>Umbraco %0%</strong> pour une nouvelle installation ou une mise à jour depuis une version précédente.
                                 <br /><br />
                                 Cliquez sur le bouton <strong>"suivant"</strong> pour demarrer l'assistant.]]>
     </key>
@@ -505,7 +505,7 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
     <key alias="renewSession">Authentifier vous de nouveau pour enregistrer votre travail</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
     <key alias="topText">Bienvenue dans Umbraco, veuillez saisir votre nom d'utilisateur et votre mot de passe dans les champs ci-dessous:</key>
   </area>
   <area alias="main">
@@ -577,7 +577,7 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
     <key alias="chooseLocalPackageText">
 	<![CDATA[
 	Séléctionnez un package sur votre machine, en cliquant sur le bouton Parcourir.<br />
-         Lespackages umbraco ont une extension en ".umb" ou ".zip".
+         Lespackages Umbraco ont une extension en ".umb" ou ".zip".
       ]]>
     </key>
     <key alias="packageAuthor">Auteur</key>
@@ -838,11 +838,11 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 
       Ceci est un email automatique pour vous informer qu'une demande de traduction pour le document '%1%' dans '%5%' a été faite par %2%.
 
-      Cliquer sur le lien http://%3%/umbraco/translation/default.aspx?id=%4% pour la traiter.
+      Cliquer sur le lien http://%3%/Umbraco/translation/default.aspx?id=%4% pour la traiter.
 
       Ou authentifiez-vous dans Umbraco pour obtenir un aperçu des tâches de traduction.
 	
-	http://%3%/umbraco/
+	http://%3%/Umbraco/
 
       Bonne journée !
 
