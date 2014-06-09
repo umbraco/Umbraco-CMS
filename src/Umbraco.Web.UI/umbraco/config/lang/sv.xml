@@ -467,13 +467,13 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - {0} <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="greeting0">Happy super sunday</key>
-    <key alias="greeting1">Happy manic monday</key>
-    <key alias="greeting2">Happy tremendous tuesday</key>
-    <key alias="greeting3">Happy wonderfull wednesday</key>
-    <key alias="greeting4">Happy thunder thursday</key>
-    <key alias="greeting5">Happy friendly friday</key>
-    <key alias="greeting6">Happy shiny saturday</key>
+    <key alias="greeting0">Happy super Sunday</key>
+    <key alias="greeting1">Happy manic Monday</key>
+    <key alias="greeting2">Happy tremendous Tuesday</key>
+    <key alias="greeting3">Happy wonderful Wednesday</key>
+    <key alias="greeting4">Happy thunderous Thursday</key>
+    <key alias="greeting5">Happy friendly Friday</key>
+    <key alias="greeting6">Happy shiny Saturday</key>
     <key alias="instruction">Logga in nedan</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>
   </area>
