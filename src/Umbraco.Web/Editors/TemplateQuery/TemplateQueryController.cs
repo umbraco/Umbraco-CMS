@@ -102,14 +102,14 @@ namespace Umbraco.Web.Editors
                 contents = currentPage.Descendants(model.ContentTypeAlias);
 
                 timer.Stop();
-                sb.AppendFormat(".Decendants(\"{0}\")", model.ContentTypeAlias);
+                sb.AppendFormat(".Descendants(\"{0}\")", model.ContentTypeAlias);
             }
             else
             {
                 timer.Start();
                 contents = currentPage.Descendants();
                 timer.Stop();
-                sb.Append(".Decendants()");
+                sb.Append(".Descendants()");
             }
 
             var clause = string.Empty;
