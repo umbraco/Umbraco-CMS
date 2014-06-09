@@ -7,9 +7,10 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
+    using System;
     using System.Diagnostics;
-    using System.Threading;
-    using System.Web.Services.Description;
+
+    using global::umbraco;
 
     /// <summary>
     /// The API controller used for building content queries within the template
@@ -48,17 +49,23 @@ namespace Umbraco.Web.Editors
         {
             return GetTemplateQuery(new QueryModel()
                 {
-                    ContentTypeAlias = "umbTextPage",
-                    Id = 1068,
-                    Wheres = new List<IQueryCondition>()
-                                 {
-                                     new QueryCondition()
-                                         {
-                                             ConstraintValue = "Getting",
-                                             FieldName = "Name",
-                                             Term = _terms.FirstOrDefault(x => x.Name == "contains")
-                                         }
-                                 }
+                    ContentTypeAlias = "umbNewsItem",
+                    Id = 1073,
+                    Wheres = new List<IQueryCondition>(),
+                    //SortExpression = new SortExpression()
+                    //                     {
+                    //                         FieldName = "nodeName",
+                    //                         SortDirection = "descending"
+                    //                     },
+                    Take = 3
+                                 //{
+                                 //    new QueryCondition()
+                                 //        {
+                                 //            ConstraintValue = "Getting",
+                                 //            FieldName = "Name",
+                                 //            Term = _terms.FirstOrDefault(x => x.Name == "contains")
+                                 //        }
+                                 //}
                 });
         }
         
@@ -79,18 +86,27 @@ namespace Umbraco.Web.Editors
             
             timer.Stop();
 
+
+            var pointerNode = currentPage;
+
             // adjust the "FROM"
             if (model != null && model.Id > 0)
             {
-                var fromTypeAlias = umbraco.TypedContent(model.Id).DocumentTypeAlias;
+                var targetNode = umbraco.TypedContent(model.Id);
 
-                timer.Start();
+                var aliases = this.GetChildContentTypeAliases(targetNode, currentPage).Reverse();
+                
+                foreach (var contentTypeAlias in aliases)
+                {
+                    timer.Start();
 
-                currentPage = currentPage.DescendantsOrSelf(fromTypeAlias).FirstOrDefault();
-                
-                timer.Stop();
-                
-                sb.AppendFormat(".DescendantsOrSelf(\"{0}\").First()", fromTypeAlias);
+                    pointerNode = pointerNode.Children.OfTypes(contentTypeAlias).First();
+
+                    timer.Stop();
+
+                    sb.AppendFormat(".FirstChild(\"{0}\")", contentTypeAlias);
+                }
+
             }
                 
             // TYPE to return if filtered by type            
@@ -98,18 +114,19 @@ namespace Umbraco.Web.Editors
             if (model != null && string.IsNullOrEmpty(model.ContentTypeAlias) == false)
             {
                 timer.Start();
-                
-                contents = currentPage.Descendants(model.ContentTypeAlias);
+
+                contents = pointerNode.Children.OfTypes(new[] { model.ContentTypeAlias });
 
                 timer.Stop();
-                sb.AppendFormat(".Descendants(\"{0}\")", model.ContentTypeAlias);
+                // TODO change to .Children({0})
+                sb.AppendFormat(".Children(\"{0}\")", model.ContentTypeAlias);
             }
             else
             {
                 timer.Start();
-                contents = currentPage.Descendants();
+                contents = pointerNode.Children;
                 timer.Stop();
-                sb.Append(".Descendants()");
+                sb.Append(".Children");
             }
 
             var clause = string.Empty;
@@ -174,6 +191,33 @@ namespace Umbraco.Web.Editors
                 sb.AppendFormat(".Where(\"{0}\")", clause);
             }
 
+            if (model.SortExpression != null && string.IsNullOrEmpty(model.SortExpression.FieldName) == false)
+            {
+                timer.Start();
+
+                // TODO write extension to determine if built in property or not
+                contents = model.SortExpression.SortDirection == "ascending"
+                               ? contents.OrderBy(x => x.GetPropertyValue<string>(model.SortExpression.FieldName)).ToList()
+                               : contents.OrderByDescending(x => x.GetPropertyValue<string>(model.SortExpression.FieldName)).ToList();
+
+                timer.Stop();
+
+                var direction = model.SortExpression.SortDirection == "ascending" ? string.Empty : " desc";
+
+                sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.SortExpression.FieldName, direction);
+            }
+
+            if (model.Take > 0)
+            {
+                timer.Start();
+
+                contents = contents.Take(model.Take);
+
+                timer.Stop();
+
+                sb.AppendFormat(".Take({0})", model.Take);
+            }
+
             queryResult.QueryExpression = sb.ToString();
             queryResult.ExecutionTime = timer.ElapsedMilliseconds;
             queryResult.ResultCount = contents.Count();
@@ -183,9 +227,28 @@ namespace Umbraco.Web.Editors
                                                                      Name = x.Name
                                                                  });
 
+
             return queryResult;
         }
-  
+
+        private IEnumerable<string> GetChildContentTypeAliases(IPublishedContent targetNode, IPublishedContent current)
+        {
+            var aliases = new List<string>();
+    
+            if (targetNode.Id == current.Id) return aliases;
+            if (targetNode.Id != current.Id)
+            {
+                aliases.Add(targetNode.DocumentTypeAlias);
+
+            }
+
+            aliases.AddRange(this.GetChildContentTypeAliases(targetNode.Parent, current));
+
+            return aliases;
+        }
+        
+        
+
         /// <summary>
         /// Returns a collection of constraint conditions that can be used in the query
         /// </summary>

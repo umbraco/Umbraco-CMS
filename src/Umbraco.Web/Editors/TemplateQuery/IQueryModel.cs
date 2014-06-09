@@ -17,13 +17,11 @@ namespace Umbraco.Web.Editors
         /// </summary>
         IEnumerable<IQueryCondition> Wheres { get; set; }
 
-        /// <summary>
-        /// enum?
-        /// </summary>
-        string SortDirection { get; set; }
 
         //IEnumerable<string> Wheres { get; set; }
 
         ISortExpression SortExpression { get; set; }
+
+        int Take { get; set; }
     }
 }

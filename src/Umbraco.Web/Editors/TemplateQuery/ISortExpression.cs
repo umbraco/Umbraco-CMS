@@ -6,4 +6,11 @@
 
         string SortDirection { get; set; }
     }
+
+    public class SortExpression : ISortExpression
+    {
+        public string FieldName { get; set; }
+
+        public string SortDirection { get; set; }
+    }
 }
