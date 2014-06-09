@@ -16,7 +16,7 @@
     
     <cc1:Pane ID="pane_uploadFile" runat="server" Text="Upload translation file">
       <p>
-        When you have completed the translation. Upload the edited XML file here. The related translation tasks will automaticly be closed when a file is uploaded.
+        When you have completed the translation. Upload the edited XML file here. The related translation tasks will automatically be closed when a file is uploaded.
       </p>
       
       <cc1:PropertyPanel runat="server">
