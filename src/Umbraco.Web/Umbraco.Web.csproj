@@ -308,6 +308,7 @@
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
+    <Compile Include="Editors\RelationController.cs" />
     <Compile Include="Editors\CanvasDesignerController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
