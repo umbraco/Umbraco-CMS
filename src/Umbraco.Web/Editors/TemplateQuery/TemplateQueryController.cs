@@ -53,7 +53,7 @@ namespace Umbraco.Web.Editors
             {
                 new PropertyModel() { Name = "Id", Alias = "id", Type = "int"  },
                 new PropertyModel() { Name = "Name", Alias = "name", Type = "string"  },
-                new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
+                //new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
                 new PropertyModel() { Name = "Creation Date", Alias = "createDate", Type = "datetime"  },
                 new PropertyModel() { Name = "Publishing Date", Alias = "publishDate", Type = "datetime"  }
 
@@ -158,13 +158,13 @@ namespace Umbraco.Web.Editors
                     break;
 
                     case Operathor.Contains:
-                        // .Where()
-                    operation = string.Format("{0}.Contains(\"{1}\")", condition.Property.Name.ToLowerInvariant(), condition.ConstraintValue.ToLowerInvariant());
+
+                    operation = string.Format("{0}.ToLowerInvariant().Contains(\"{1}\")", condition.Property.Name, condition.ConstraintValue.ToLowerInvariant());
 
                     break;
 
                     case Operathor.NotContains:
-                        operation = string.Format("!{0}.Contains(\"{1}\")", condition.Property.Name.ToLowerInvariant(), condition.ConstraintValue.ToLowerInvariant());
+                    operation = string.Format("!{0}.ToLowerInvariant().Contains(\"{1}\")", condition.Property.Name, condition.ConstraintValue.ToLowerInvariant());
                     break;
                 }
 
@@ -189,8 +189,8 @@ namespace Umbraco.Web.Editors
 
                 // TODO write extension to determine if built in property or not
                 contents = model.SortExpression.SortDirection == "ascending"
-                               ? contents.OrderBy(x => x.GetPropertyValue<string>(model.SortExpression.Property.Alias)).ToList()
-                               : contents.OrderByDescending(x => x.GetPropertyValue<string>(model.SortExpression.Property.Alias)).ToList();
+                               ? contents.OrderBy(x => GetDefaultPropertyValue(x, model.SortExpression.Property)).ToList()
+                               : contents.OrderByDescending(x => GetDefaultPropertyValue(x, model.SortExpression.Property)).ToList();
 
                 timer.Stop();
 
@@ -223,6 +223,24 @@ namespace Umbraco.Web.Editors
             return queryResult;
         }
 
+        private object GetDefaultPropertyValue(IPublishedContent content, PropertyModel prop)
+        {
+            switch (prop.Alias)
+            {
+                case "id" :
+                    return content.Id;
+                case "createDate" :
+                    return content.CreateDate;
+                case "publishDate":
+                    return content.UpdateDate;
+                case "name":
+                    return content.Name;
+                default :
+                    return content.Name;
+
+            }
+        }
+        
         private IEnumerable<string> GetChildContentTypeAliases(IPublishedContent targetNode, IPublishedContent current)
         {
             var aliases = new List<string>();
