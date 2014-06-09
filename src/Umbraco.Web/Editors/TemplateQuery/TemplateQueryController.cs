@@ -86,11 +86,11 @@ namespace Umbraco.Web.Editors
 
                 timer.Start();
 
-                currentPage = currentPage.DescendantOrSelf(fromTypeAlias);
+                currentPage = currentPage.DescendantsOrSelf(fromTypeAlias).FirstOrDefault();
                 
                 timer.Stop();
-
-                sb.AppendFormat(".DescendantOrSelf(\"{0}\")", fromTypeAlias);
+                
+                sb.AppendFormat(".DescendantsOrSelf(\"{0}\").First()", fromTypeAlias);
             }
                 
             // TYPE to return if filtered by type            
