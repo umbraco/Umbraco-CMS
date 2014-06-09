@@ -374,8 +374,10 @@
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\PublishedProperty.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
+    <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
+    <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
     <Compile Include="PublishedCache\MemberPublishedContent.cs" />
     <Compile Include="PublishedCache\RawValueProperty.cs" />
@@ -483,6 +485,7 @@
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
+    <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />

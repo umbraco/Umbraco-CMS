@@ -38,18 +38,19 @@
 }
 
 .umb-panel-header .umb-headline, .umb-panel-header h1 {
-  font-size: 18px;
+  font-size: 16px;
   border: none;
   background: none;
-  margin: 25px 0 0 20px;
-  padding: 0;
+  margin: 15px 0 0 20px;
+  padding: 3px 5px;
   height: auto;
   width: 100%;
+  border: 1px solid @grayLighter;
 }
 
-.umb-panel-header .umb-headline:hover,.umb-panel-header .umb-headline:active  {
-  border-bottom: 1px dotted @grayLight;
-  color: @black
+.umb-panel-header .umb-headline:focus,.umb-panel-header .umb-headline:active  {
+  border: 1px solid @grayLight;
+  background-color: @white;
 }
 
 .umb-headline-editor-wrapper{
@@ -94,9 +95,9 @@
   color: @red;
 }
 
-.umb-headline-editor-wrapper input.ng-invalid::-webkit-input-placeholder {color: @red;}
-.umb-headline-editor-wrapper input.ng-invalid::-moz-placeholder {color: @red;}
-.umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder {color: @red;}
+.umb-headline-editor-wrapper input.ng-invalid::-webkit-input-placeholder {color: @red; line-height: 22px;}
+.umb-headline-editor-wrapper input.ng-invalid::-moz-placeholder {color: @red; line-height: 22px;}
+.umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder {color: @red; line-height: 22px;}
 
 .umb-panel-header i {
   font-size: 13px;
@@ -109,7 +110,7 @@
 
 .umb-panel-header .umb-btn-toolbar {
     float: right;
-    padding: 20px 20px 0 0;
+    padding: 5px 20px 0 0;
 }
 
 .umb-panel-footer {

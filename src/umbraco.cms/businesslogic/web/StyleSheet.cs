@@ -175,6 +175,12 @@ namespace umbraco.cms.businesslogic.web
         public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
         {
 
+            // validate if node ends with css, if it does we'll remove it as we append it later
+            if (Text.ToLowerInvariant().EndsWith(".css"))
+            {
+                Text = Text.Substring(0, Text.Length - 4);
+            }
+
             // Create the umbraco node
             var newNode = CMSNode.MakeNew(-1, ModuleObjectType, user.Id, 1, Text, Guid.NewGuid());
 

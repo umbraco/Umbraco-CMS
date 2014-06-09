@@ -23,12 +23,12 @@
                 </ul>
             </div>
             
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content'">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed">
                 <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
                     <localize key="actions_publish">Publish</localize>
                 </a>
             </div>
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content'">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed">
                 <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
                     <localize key="actions_unpublish">Unpublish</localize>
                 </a>
@@ -41,7 +41,11 @@
             <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
         </div>
 
-        <table class="table table-striped">
+        <p ng-show="listViewResultSet.totalItems === 0">
+            <localize key="content_listViewNoItems">There are no items show in the list.</localize>
+        </p>
+
+        <table class="table table-striped" ng-show="listViewResultSet.totalItems > 0">
             <thead>
                 <tr>
                     <td style="width: 35px">
@@ -73,7 +77,7 @@
 
                         <input type="checkbox" ng-model="result.selected"></td>
                     <td>
-                        <a ng-class="{inactive: entityType === 'content' && !result.published}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a></td>
+                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a></td>
                     <td>{{result.updateDate|date:'medium'}} 
                         <!--<<span class="label label-success">Publish</span>-->
                     </td>

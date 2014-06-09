@@ -7,7 +7,7 @@ namespace Umbraco.Web.Mvc
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            var umbController = filterContext.Controller as UmbracoController;
+            var umbController = filterContext.Controller as Controller;
             if (umbController == null)
             {
                 return;

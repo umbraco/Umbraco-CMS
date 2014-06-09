@@ -1641,6 +1641,22 @@ namespace Umbraco.Web
             return content.Children().OfType<T>();
         }
 
+        public static IPublishedContent FirstChild(this IPublishedContent content)
+        {
+            return content.Children().First();
+        }
+
+        public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        {
+            return content.Children(predicate).FirstOrDefault();
+        }
+
+        public static IPublishedContent FirstChild<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Children<T>().FirstOrDefault();
+        }
+
 		/// <summary>
 		/// Gets the children of the content in a DataTable.
 		/// </summary>

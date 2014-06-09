@@ -51,6 +51,9 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
+            if (contentId == Constants.System.RecycleBinContent)
+                return Enumerable.Empty<ContentTypeBasic>();
+
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
             {

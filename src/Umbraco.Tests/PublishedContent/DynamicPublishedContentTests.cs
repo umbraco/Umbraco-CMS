@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -31,7 +32,50 @@ namespace Umbraco.Tests.PublishedContent
 			return GetNode(id).AsDynamic();
 		}
 
-		[Test]
+        [Test]
+        public void FirstChild()
+        {
+            var content = GetDynamicNode(1173);
+
+            var x = content.FirstChild();
+            Assert.IsNotNull(x);
+            Assert.IsInstanceOf<DynamicPublishedContent>(x);
+            Assert.AreEqual(1174, x.Id);
+
+            x = content.FirstChild("CustomDocument");
+            Assert.IsNotNull(x);
+            Assert.IsInstanceOf<DynamicPublishedContent>(x);
+            Assert.AreEqual(1177, x.Id);
+        }
+
+        [Test]
+        public void Children()
+        {
+            var content = GetDynamicNode(1173);
+
+            var l = content.Children;
+            Assert.AreEqual(4, l.Count());
+
+            // works - but not by calling the extension method
+            // because the binder will in fact re-route to the property first
+            l = content.Children();
+            Assert.AreEqual(4, l.Count());
+        }
+
+        [Test]
+        public void ChildrenOfType()
+        {
+            var content = GetDynamicNode(1173);
+
+            var l = content.Children;
+            Assert.AreEqual(4, l.Count());
+
+            // fails - because it fails to find extension methods?
+            l = content.Children("CustomDocument");
+            Assert.AreEqual(2, l.Count());
+        }
+
+        [Test]
 		public void Custom_Extension_Methods()
 		{
 			var asDynamic = GetDynamicNode(1173);
