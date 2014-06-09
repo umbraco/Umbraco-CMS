@@ -1131,6 +1131,9 @@ namespace Umbraco.Core.Services
                     return;
                 }
 
+                // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
+                ApplicationContext.Current.Services.RelationService.Relate(content.Parent(), content, Constants.Conventions.Relations.RelateParentDocumentOnDelete);
+
                 var moveInfo = new List<MoveEventInfo<IContent>>
                 {
                     new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)
