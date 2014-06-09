@@ -126,15 +126,17 @@
 			          </li>
             </ul>  
 			
-		    <pre>{{result.queryExpression | json}}</pre>
+		    <pre>{{result.queryExpression}}</pre>
 		</div>	
 
 		<div class="umb-panel-footer" >
 			<div class="umb-el-wrap umb-panel-buttons">
 		        <div class="btn-toolbar umb-btn-toolbar pull-right">
-		        	<a href ng-click="close()" class="btn btn-link">
-		        		<localize key="general_close">Close</localize>
-					</a>
+		            <a href ng-click="close()" class="btn btn-link">
+		                <localize key="general_close">Close</localize>
+		            </a>
+                    
+                    <a href ng-click="submit(result.queryExpression)" class="btn btn-primary">Insert</a>
 		        </div>
 		      </div>
 			</div>

@@ -10,10 +10,16 @@ namespace Umbraco.Web.Editors
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.Eventing.Reader;
+    using System.Drawing;
 
     using global::umbraco;
+    using global::umbraco.cms.presentation;
 
+    using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+    using Umbraco.Web.Dynamics;
     using Umbraco.Web.Editors.TemplateQuery;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// The API controller used for building content queries within the template
@@ -57,10 +63,8 @@ namespace Umbraco.Web.Editors
                 new PropertyModel() { Name = "Creation Date", Alias = "createDate", Type = "datetime"  },
                 new PropertyModel() { Name = "Publishing Date", Alias = "publishDate", Type = "datetime"  }
 
-            }; 
+            };
 
-        
-        
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
             var umbraco = new UmbracoHelper(UmbracoContext);
@@ -68,8 +72,9 @@ namespace Umbraco.Web.Editors
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
-            sb.Append(queryResult.QueryExpression);
-
+            
+            sb.Append("CurrentPage.Site()");
+            
             var timer = new Stopwatch();
             
             timer.Start();
@@ -92,11 +97,21 @@ namespace Umbraco.Web.Editors
                 {
                     timer.Start();
 
-                    pointerNode = pointerNode.Children.OfTypes(contentTypeAlias).First();
+                    pointerNode = pointerNode.FirstChild(x => x.DocumentTypeAlias == contentTypeAlias);
+
+                    if (pointerNode == null) break;
 
                     timer.Stop();
-
+                    
                     sb.AppendFormat(".FirstChild(\"{0}\")", contentTypeAlias);
+                }
+
+                if (pointerNode == null || pointerNode.Id != model.Source.Id)
+                {
+                    // we did not find the path
+                    sb.Clear();
+                    sb.AppendFormat("Umbraco.Content({0})", model.Source.Id);
+                    pointerNode = targetNode;
                 }
 
             }
@@ -124,79 +139,46 @@ namespace Umbraco.Web.Editors
             var clause = string.Empty;
 
             // WHERE
+            var token = 0;
             foreach (var condition in model.Filters)
             {
                 if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
 
-                var operation = string.Empty;
                 
 
-                switch (condition.Term.Operathor)
-                {
-                    case Operathor.Equals:
-                        operation = condition.MakeBinaryOperation(" == ");                        
-                        break;
+                var operation = condition.BuildCondition(token);
 
-                    case Operathor.NotEquals:
-                        operation = condition.MakeBinaryOperation(" != ");
-                        break;
-                    
-                    case Operathor.GreaterThan:
-                        operation = condition.MakeBinaryOperation(" > ");
-                        break;
-                    
-                    case Operathor.GreaterThanEqualTo:
-                        operation = condition.MakeBinaryOperation(" >= ");
-                        break;
+                clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ",  operation });
 
-                    case Operathor.LessThan:
-                        operation = condition.MakeBinaryOperation(" < ");
-                    break;
-
-                    case Operathor.LessThanEqualTo:
-                        operation = condition.MakeBinaryOperation(" <= ");
-                    break;
-
-                    case Operathor.Contains:
-
-                    operation = string.Format("{0}.ToLowerInvariant().Contains(\"{1}\")", condition.Property.Name, condition.ConstraintValue.ToLowerInvariant());
-
-                    break;
-
-                    case Operathor.NotContains:
-                    operation = string.Format("!{0}.ToLowerInvariant().Contains(\"{1}\")", condition.Property.Name, condition.ConstraintValue.ToLowerInvariant());
-                    break;
-                }
-
-                clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ", operation });
-
+                token++;
             }
 
             if(string.IsNullOrEmpty(clause) == false)
-            { 
+            {
+
                 timer.Start();
-                
-                contents = contents.Where(clause);
+
+                contents = contents.AsQueryable().Where(clause, model.Filters.Select(GetConstraintValue).ToArray());
+               // contents = contents.Where(clause, values.ToArray());
                 
                 timer.Stop();
+                
+                clause = string.Format("\"{0}\",{1}", clause, string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
 
-                sb.AppendFormat(".Where(\"{0}\")", clause);
+                sb.AppendFormat(".Where({0})", clause);
             }
 
-            if (model.SortExpression != null && string.IsNullOrEmpty(model.SortExpression.Property.Alias) == false)
+            if (model.Sort != null && string.IsNullOrEmpty(model.Sort.Property.Alias) == false)
             {
                 timer.Start();
 
-                // TODO write extension to determine if built in property or not
-                contents = model.SortExpression.SortDirection == "ascending"
-                               ? contents.OrderBy(x => GetDefaultPropertyValue(x, model.SortExpression.Property)).ToList()
-                               : contents.OrderByDescending(x => GetDefaultPropertyValue(x, model.SortExpression.Property)).ToList();
+                contents = SortByDefaultPropertyValue(contents, model.Sort);
 
                 timer.Stop();
 
-                var direction = model.SortExpression.SortDirection == "ascending" ? string.Empty : " desc";
+                var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
 
-                sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.SortExpression.Property.Alias, direction);
+                sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Name, direction);
             }
 
             if (model.Take > 0)
@@ -223,20 +205,47 @@ namespace Umbraco.Web.Editors
             return queryResult;
         }
 
-        private object GetDefaultPropertyValue(IPublishedContent content, PropertyModel prop)
+        private object GetConstraintValue(QueryCondition condition)
         {
-            switch (prop.Alias)
+            switch (condition.Property.Type)
+            {
+                case "int" :
+                    return int.Parse(condition.ConstraintValue);
+                case "datetime":
+                    DateTime dt;
+                    return DateTime.TryParse(condition.ConstraintValue, out dt) ? dt : DateTime.Today;
+                default:
+                    return condition.ConstraintValue;
+            }
+        }
+
+        private IEnumerable<IPublishedContent> SortByDefaultPropertyValue(IEnumerable<IPublishedContent> contents,  SortExpression sortExpression)
+        {
+            switch (sortExpression.Property.Alias)
             {
                 case "id" :
-                    return content.Id;
+                    return sortExpression.Direction == "ascending"
+                               ? contents.OrderBy(x => x.Id)
+                               : contents.OrderByDescending(x => x.Id);
                 case "createDate" :
-                    return content.CreateDate;
+               
+                    return sortExpression.Direction == "ascending"
+                               ? contents.OrderBy(x => x.CreateDate)
+                               : contents.OrderByDescending(x => x.CreateDate);
                 case "publishDate":
-                    return content.UpdateDate;
+                   
+                    return sortExpression.Direction == "ascending"
+                               ? contents.OrderBy(x => x.UpdateDate)
+                               : contents.OrderByDescending(x => x.UpdateDate);
                 case "name":
-                    return content.Name;
+                    return sortExpression.Direction == "ascending"
+                               ? contents.OrderBy(x => x.Name)
+                               : contents.OrderByDescending(x => x.Name);
                 default :
-                    return content.Name;
+
+                    return sortExpression.Direction == "ascending"
+                               ? contents.OrderBy(x => x.Name)
+                               : contents.OrderByDescending(x => x.Name);
 
             }
         }
@@ -263,9 +272,13 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
-            return
+            var contentTypes =
                 ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
-                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name }).OrderBy(x => x.Name);
+                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = x.Name })
+                    .OrderBy(x => x.Name).ToList();
+            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = "Everything" });
+
+            return contentTypes;
         }
 
         /// <summary>
@@ -281,12 +294,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<object> GetFilterConditions()
         {
-            //return _terms.Select(x => new
-            //                              {
-            //                                 x.Name,
-            //                                 Operathor = x.Operathor.ToString(),
-            //                                 x.AppliesTo
-            //                              });
             return _terms;
         }
 

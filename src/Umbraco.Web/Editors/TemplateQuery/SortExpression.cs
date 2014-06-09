@@ -6,6 +6,6 @@
     {
         public PropertyModel Property { get; set; }
 
-        public string SortDirection { get; set; }
+        public string Direction { get; set; }
     }
 }

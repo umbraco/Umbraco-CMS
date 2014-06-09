@@ -9,7 +9,7 @@ namespace Umbraco.Web.Editors
         public ContentTypeModel ContentType { get; set; }
         public SourceModel Source { get; set; }
         public IEnumerable<QueryCondition> Filters { get; set; }
-        public SortExpression SortExpression { get; set; }
+        public SortExpression Sort { get; set; }
         public int Take { get; set; }
     }
 }
