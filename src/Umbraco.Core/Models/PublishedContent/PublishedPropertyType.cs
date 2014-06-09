@@ -222,19 +222,38 @@ namespace Umbraco.Core.Models.PublishedContent
                 }
                 
             }
-            
+
+            var converterMeta = _converter as IPropertyValueConverterMeta;
+
             // get the cache levels, quietely fixing the inconsistencies (no need to throw, really)
-            _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
-            _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
-            _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
+            if (converterMeta != null)
+            {
+                _sourceCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Source);
+                _objectCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Object);
+                _objectCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.XPath);
+            }
+            else
+            {
+                _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
+                _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
+                _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
+            }
             if (_objectCacheLevel < _sourceCacheLevel) _objectCacheLevel = _sourceCacheLevel;
             if (_xpathCacheLevel < _sourceCacheLevel) _xpathCacheLevel = _sourceCacheLevel;
 
+            // get the CLR type of the converted value
             if (_converter != null)
             {
-                var attr = _converter.GetType().GetCustomAttribute<PropertyValueTypeAttribute>(false);
-                if (attr != null)
-                    _clrType = attr.Type;
+                if (converterMeta != null)
+                {
+                    _clrType = converterMeta.GetPropertyValueType(this);
+                }
+                else
+                {
+                    var attr = _converter.GetType().GetCustomAttribute<PropertyValueTypeAttribute>(false);
+                    if (attr != null)
+                        _clrType = attr.Type;
+                }
             }
         }
 
