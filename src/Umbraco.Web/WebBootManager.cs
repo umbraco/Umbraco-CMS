@@ -9,7 +9,6 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
-using StackExchange.Profiling.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -95,8 +94,8 @@ namespace Umbraco.Web
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
-            //add the profiling action filter
-            GlobalFilters.Filters.Add(new ProfilingActionFilter());
+            ////add the profiling action filter
+            //GlobalFilters.Filters.Add(new ProfilingActionFilter());
 
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
