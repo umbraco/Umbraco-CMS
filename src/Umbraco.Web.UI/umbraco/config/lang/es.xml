@@ -658,7 +658,17 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="DownloadXmlDTD">Descargar xml DTD</key>
     <key alias="fields">Campos</key>
     <key alias="includeSubpages">Incluir subpáginas</key>
-    <key alias="mailBody">Hola %0%. Este email se ha generado automáticamente para informale que %2% ha solicitado que el documento '%1%' sea traducido en '%5%'. Para editarlo, vaya a la dirección http://%3%/umbraco/translation/details.aspx?id=%4% o inicie la sesión en umbraco y vaya a http://%3%/umbraco para ver las tareas pendientes de traducir. Espero que tenga un buen dia. Saludos de parte de el robot de umbraco</key>
+    <key alias="mailBody"><![CDATA[
+        Hola %0%. 
+
+        Este email se ha generado automáticamente para informale que %2% ha solicitado que el documento '%1%' sea traducido en '%5%'. 
+
+        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicie la sesión en umbraco y vaya a http://%3% para ver las tareas pendientes de traducir. 
+
+        Espero que tenga un buen dia. 
+
+        Saludos de parte de el robot de umbraco
+    ]]></key>
     <key alias="mailSubject">Tarea para tradudir [%0%] por %1%</key>
     <key alias="noTranslators">No se encontraron usuarios traductores. Por favor, crea un usuario traductor antes de empezar a mandar contenido para su traducción</key>
     <key alias="ownedTasks">Tareas creadas por ti</key>
