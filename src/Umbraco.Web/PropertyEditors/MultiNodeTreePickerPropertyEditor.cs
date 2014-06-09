@@ -37,7 +37,7 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("startNode", "Node type", "treesource")]
             public string StartNode { get; set; }
             
-            [PreValueField("filter", "Filter out items with type", "textstring", Description = "Seperate with comma")]
+            [PreValueField("filter", "Allow items of type", "textstring", Description = "Seperate with comma")]
             public string Filter { get; set; }
 
             [PreValueField("minNumber", "Minimum number of items", "number")]
