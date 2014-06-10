@@ -226,7 +226,7 @@ angular.module("umbraco")
                                 tinyMceService.createInsertEmbeddedMedia(editor, scope);
 
                                 //Create the insert link plugin
-                                tinyMceService.createLinkPicker(editor, scope);
+                                //tinyMceService.createLinkPicker(editor, scope);
 
                                 //Create the insert macro plugin
                                 tinyMceService.createInsertMacro(editor, scope);
