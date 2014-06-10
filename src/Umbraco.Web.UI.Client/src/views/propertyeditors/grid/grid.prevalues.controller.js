@@ -25,7 +25,7 @@ angular.module("umbraco")
             enableMacro: true,
             enabledEditors: [ "rte", "media", "macro" ],
             enableMultiCells: true,
-            approvedBackgroundCss: "views/propertyeditors/grid/config/grid.default.backgrounds.css",
+            approvedBackgroundCss: "",
             gridConfigPath: "views/propertyeditors/grid/config/grid.default.config.js"
         }
 

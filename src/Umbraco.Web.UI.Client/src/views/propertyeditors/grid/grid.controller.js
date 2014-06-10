@@ -257,6 +257,6 @@ angular.module("umbraco")
         // *********************************************
 
         //assetsService.loadCss("/App_Plugins/Lecoati.uSky.Grid/lib/jquery-ui-1.10.4.custom/css/ui-lightness/jquery-ui-1.10.4.custom.min.css");
-        assetsService.loadCss($scope.model.config.items.approvedBackgroundCss);
+        //assetsService.loadCss($scope.model.config.items.approvedBackgroundCss);
 
     });
