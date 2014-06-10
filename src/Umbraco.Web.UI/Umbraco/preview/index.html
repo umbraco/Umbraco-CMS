@@ -7,7 +7,7 @@
     <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
 </head>
 
-<body id="tuningPanel" ng-controller="Umbraco.tuningController">
+<body id="tuningPanel" ng-class="{open:isOpen}" ng-controller="Umbraco.tuningController">
 
     <div class="wait" ng-show="!frameLoaded">Loading ...</div>
 
