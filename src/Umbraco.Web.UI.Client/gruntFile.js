@@ -6,15 +6,16 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
 
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build','recess:installer','copy:assets','copy:vs']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs','karma:unit']);
+  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning','copy:tuning', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
-  grunt.registerTask('watch-installer', ['concat:install','concat:installJs','copy:installer', 'copy:vs']);
+  grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
+  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','copy']);
+  grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:tuning', 'bower', 'copy']);
 
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -109,21 +110,46 @@ module.exports = function (grunt) {
     clean: ['<%= distdir %>/*'],
 
     copy: {
-
-      /* Copies over the files downloaded by bower
-      bower: {
-          files: [
-              { dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', src: '<%= bowerfiles %>/typeahead.js/dist/typeahead.bundle.min.js' }
-          ]
-      },
-      */
-
       assets: {
         files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'src/assets/' }]
       },
 
+
+      // Copies over the files downloaded by bower
+      bower: {
+        files: [
+                {
+                  dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', 
+                  src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js' 
+                },
+                {
+                  dest: '<%= distdir %>/lib/lazyload/lazyload.min.js', 
+                  src: 'bower_components/rgrove-lazyload/lazyload.js'
+                },
+                {
+                  dest: '<%= distdir %>/lib/ace/',
+                  src: '**',
+                  expand: true,
+                  cwd: 'bower_components/ace-builds/src-min-noconflict/'
+                }
+              ]
+      },
+      
+
       installer: {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
+      },
+
+      tuning: {
+          files: [
+              { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/assets/css', src: 'tuning.defaultStyle.css', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/assets/less', src: 'tuning.defaultStyle.less', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/assets/less', src: 'tuning.gridRowStyle.less', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
+              { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
+              { dest: '<%= distdir %>/js', src: 'tuning.front.js', expand: true, cwd: 'src/tuning' }
+          ]
       },
 
       vendor: {
@@ -147,7 +173,8 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
               { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
               { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
-              { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' }
+              { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
+              { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
       },
 
@@ -185,6 +212,10 @@ module.exports = function (grunt) {
               banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.install', []); \n",
               footer: "\n\n})();"
           }
+        },
+        tuningJs: {
+            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
+            dest: '<%= distdir %>/js/tuning.panel.js'
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
@@ -272,6 +303,15 @@ module.exports = function (grunt) {
           compile: true
         }
       },
+      tuning: {
+          files: {
+              '<%= distdir %>/assets/css/tuning.panelStyles.css':
+              ['src/less/tuning.panelStyles.less', 'src/less/helveticons.less']
+          },
+          options: {
+              compile: true
+          }
+      },
       min: {
         files: {
           '<%= distdir %>/assets/css/<%= pkg.name %>.css': ['<%= src.less %>']
@@ -303,6 +343,10 @@ module.exports = function (grunt) {
       installer: {
           files: ['src/installer/**/*.*'],
           tasks: ['watch-installer', 'timestamp'],
+      },
+      tuning: {
+          files: ['src/tuning/**/*.*'],
+          tasks: ['watch-tuning', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],

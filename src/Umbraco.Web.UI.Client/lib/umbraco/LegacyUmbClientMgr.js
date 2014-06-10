@@ -335,6 +335,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 this._modal.push(dialog);
                 return dialog;
             },
+            rootScope : function(){
+                return getRootScope();
+            },
+            
             closeModalWindow: function(rVal) {
                 
                 //get our angular navigation service

@@ -186,6 +186,10 @@ namespace Umbraco.Web.Editors
                                     "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                                         controller => controller.GetAll())
                                 },
+                                 {
+                                    "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
+                                        controller => controller.GetById(0))
+                                },
                                 {
                                     "memberTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
                                         controller => controller.GetAllTypes())

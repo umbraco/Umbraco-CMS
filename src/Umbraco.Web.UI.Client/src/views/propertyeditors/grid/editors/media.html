@@ -1,0 +1,16 @@
+<div ng-controller="Umbraco.PropertyEditors.Grid.MediaController">
+
+	<div class="usky-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
+		<i class="icon icon-picture"></i>
+		<div class="help-text">Click to insert image</div>
+	</div>
+
+	<div ng-if="control.value">
+		<img
+			ng-if="control.value" 
+			ng-click="setImage()"
+			ng-src="{{control.value.image}}" 
+			class="fullSizeImage" />
+		<input type="text" class="caption" ng-model="control.value.caption" placeholder="Image caption..."/>
+ 	</div>
+</div>

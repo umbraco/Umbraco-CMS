@@ -371,7 +371,6 @@ namespace Umbraco.Core.Persistence.Repositories
             //template.CreateDate = _viewsFileSystem.GetCreated(path).UtcDateTime;
             //template.Key = new FileInfo(path).Name.EncodeAsGuid();
 
-            template.Path = path;
             template.Content = content;
         }
 

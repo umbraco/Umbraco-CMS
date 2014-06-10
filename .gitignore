@@ -78,6 +78,12 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
 
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.panel.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.palettes.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.loader.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.front.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.config.js
+
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.css

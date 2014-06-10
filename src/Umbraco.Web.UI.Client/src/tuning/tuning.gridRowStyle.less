@@ -1,0 +1,53 @@
+﻿
+/************************************************************************/
+/* Grid row -ID- */
+/************************************************************************/
+
+/***start-lessParam--ID-***/
+@backgroundRowColor__-ID-:'';
+@backgroundRowImageOrPattern__-ID-:'';
+@backgroundRowGradientColor__-ID-:'';
+@backgroundRowPosition__-ID-:'';
+@backgroundRowCover__-ID-:'';
+@backgroundRowRepeat__-ID-:'';
+@backgroundRowAttachment__-ID-:'';
+@rowFullSize__-ID-:false;
+/***end-lessParam--ID-***/
+
+/***start-gridStyle--ID-***/
+.Row-cover__-ID- () when (@backgroundRowCover__-ID- = true) { 
+-webkit-background-size: cover; 
+-moz-background-size: cover; 
+-o-background-size: cover; 
+background-size: cover; 
+} 
+
+.Row-full-size__-ID- () when (@rowFullSize__-ID- = true) {
+    width:100%;
+    padding-right: 0px;
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px
+}
+
+.-ID- { 
+background-color:@backgroundRowColor__-ID-; 
+background: -moz-linear-gradient(top, @backgroundRowColor__-ID- 41%,@backgroundRowGradientColor__-ID- 100%); 
+background: -webkit-gradient(linear, left top, left bottom, color-stop(41%,@backgroundRowColor__-ID-), color-stop(100%,@backgroundRowGradientColor__-ID-)); 
+background: -webkit-linear-gradient(top, @backgroundRowColor__-ID- 41%,@backgroundRowGradientColor__-ID- 100%); 
+background: -o-linear-gradient(top, @backgroundRowColor__-ID- 41%,@backgroundRowGradientColor__-ID- 100%); 
+background: -ms-linear-gradient(top, @backgroundRowColor__-ID- 41%,@backgroundRowGradientColor__-ID- 100%); 
+background: linear-gradient(to bottom, @backgroundRowColor__-ID- 41%,@backgroundRowGradientColor__-ID- 100%); 
+background-image: @backgroundRowImageOrPattern__-ID-; 
+background-position: @backgroundRowPosition__-ID-; 
+background-repeat: @backgroundRowRepeat__-ID-; 
+background-attachment: @backgroundRowAttachment__-ID-; 
+.Row-cover__-ID-;}
+
+.-ID- .container {
+    .Row-full-size__-ID-;
+}
+
+/***end-gridStyle--ID-***/ 
+
+

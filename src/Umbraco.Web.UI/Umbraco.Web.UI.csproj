@@ -2075,6 +2075,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\Partials\Grid\bootstrap3.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -2505,11 +2506,11 @@
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
     <Folder Include="Umbraco\PartialViews\Templates\" />
+    <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
-    <Folder Include="Views\Partials\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
