@@ -261,9 +261,15 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
         return performSave({ saveMethod: contentResource.save, statusMessage: "Saving..." });
     };
 
-    $scope.preview = function(content){
+    $scope.preview = function (content) {
+        // Chromes popup blocker will kick in if a window is opened 
+        // outwith the initial scoped request. This trick will fix that.
+        //  
+        var previewWindow = $window.open('preview/?id=' + content.id, 'umbpreview');
         $scope.save().then(function (data) {
-            $window.open('preview/?id=' + data.id, 'umbpreview');
+            // Build the correct path so both /#/ and #/ work.
+            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + data.id;
+            previewWindow.location.href = redirect;
         });
     };
     
