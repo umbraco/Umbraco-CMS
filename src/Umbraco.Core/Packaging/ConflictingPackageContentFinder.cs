@@ -21,7 +21,7 @@ namespace Umbraco.Core.Packaging
         }
 
 
-        public IStylesheet[] FindConflictingStylesheets(XElement stylesheetNotes)
+        public IFile[] FindConflictingStylesheets(XElement stylesheetNotes)
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName) == false)
             {
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Packaging
                             "stylesheetNotes");
                     }
 
-                    return _fileService.GetStylesheetByName(xElement.Value) as IStylesheet;
+                    return _fileService.GetStylesheetByName(xElement.Value) as IFile;
                 })
                 .Where(v => v != null).ToArray();
         }

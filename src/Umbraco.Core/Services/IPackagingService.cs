@@ -86,7 +86,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated stylesheets</returns>
-        IEnumerable<IStylesheet> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>

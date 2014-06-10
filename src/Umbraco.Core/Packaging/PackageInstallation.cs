@@ -159,7 +159,7 @@ namespace Umbraco.Core.Packaging
                 var documentTypesInstalled = EmptyArrayIfNull<IContentType>(documentTypes) ?? InstallDocumentTypes(documentTypes, userId);
                 installationSummary.DocumentTypesInstalled =documentTypesInstalled;
 
-                var stylesheetsInstalled = EmptyArrayIfNull<IStylesheet>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
+                var stylesheetsInstalled = EmptyArrayIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
                 installationSummary.StylesheetsInstalled = stylesheetsInstalled;
 
                 var documentsInstalled = EmptyArrayIfNull<IContent>(documentSet) ?? InstallDocuments(documentSet, userId);
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportContent(documentsElement, -1, userId).ToArray();
         }
 
-        private IStylesheet[] InstallStylesheets(XElement styleSheetsElement, int userId = 0)
+        private IFile[] InstallStylesheets(XElement styleSheetsElement, int userId = 0)
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName) == false)
             {
@@ -419,7 +419,7 @@ namespace Umbraco.Core.Packaging
                 ConflictingTemplateAliases =
                     templates == null ? new ITemplate[0] : ConflictingPackageContentFinder.FindConflictingTemplates(templates),
                 ConflictingStylesheetNames =
-                    styleSheets == null ? new IStylesheet[0] : ConflictingPackageContentFinder.FindConflictingStylesheets(styleSheets)
+                    styleSheets == null ? new IFile[0] : ConflictingPackageContentFinder.FindConflictingStylesheets(styleSheets)
             };
 
             return conflictingPackageContent;

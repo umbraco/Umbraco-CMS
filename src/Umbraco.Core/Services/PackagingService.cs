@@ -1475,23 +1475,23 @@ namespace Umbraco.Core.Services
         }
 
 
-        public IEnumerable<IStylesheet> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
         {
 
             if (raiseEvents)
             {
-                if (ImportingStylesheets.IsRaisedEventCancelled(new ImportEventArgs<IStylesheet>(element), this))
-                    return Enumerable.Empty<IStylesheet>();
+                if (ImportingStylesheets.IsRaisedEventCancelled(new ImportEventArgs<IFile>(element), this))
+                    return Enumerable.Empty<IFile>();
             }
 
-            IEnumerable<IStylesheet> styleSheets = Enumerable.Empty<IStylesheet>();
+            IEnumerable<IFile> styleSheets = Enumerable.Empty<IFile>();
 
             if(element.Elements().Any())
                 throw new NotImplementedException("This needs to be implimentet");
 
             
             if (raiseEvents)
-                ImportingStylesheets.RaiseEvent(new ImportEventArgs<IStylesheet>(styleSheets, element, false), this);
+                ImportingStylesheets.RaiseEvent(new ImportEventArgs<IFile>(styleSheets, element, false), this);
 
             return styleSheets;
 
@@ -1740,7 +1740,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Importing Stylesheets
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IStylesheet>> ImportingStylesheets;
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IFile>> ImportingStylesheets;
         
 
         /// <summary>

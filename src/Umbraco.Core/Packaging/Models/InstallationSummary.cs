@@ -18,7 +18,7 @@ namespace Umbraco.Core.Packaging.Models
         public Details<string>[] FilesInstalled { get; set; }
         public ITemplate[] TemplatesInstalled { get; set; }
         public IContentType[] DocumentTypesInstalled { get; set; }
-        public IStylesheet[] StylesheetsInstalled { get; set; }
+        public IFile[] StylesheetsInstalled { get; set; }
         public IContent[] DocumentsInstalled { get; set; }
         public PackageAction[] Actions { get; set; }
     }
