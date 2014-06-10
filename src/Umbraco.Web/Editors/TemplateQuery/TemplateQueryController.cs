@@ -59,11 +59,11 @@ namespace Umbraco.Web.Editors
 
         private static readonly IEnumerable<PropertyModel> _properties = new List<PropertyModel>()
             {
-                new PropertyModel() { Name = "Id", Alias = "id", Type = "int"  },
-                new PropertyModel() { Name = "Name", Alias = "name", Type = "string"  },
+                new PropertyModel() { Name = "Id", Alias = "Id", Type = "int"  },
+                new PropertyModel() { Name = "Name", Alias = "Name", Type = "string"  },
                 //new PropertyModel() { Name = "Url", Alias = "url", Type = "string"  },
-                new PropertyModel() { Name = "Creation Date", Alias = "createDate", Type = "datetime"  },
-                new PropertyModel() { Name = "Publishing Date", Alias = "publishDate", Type = "datetime"  }
+                new PropertyModel() { Name = "Created Date", Alias = "CreateDate", Type = "datetime"  },
+                new PropertyModel() { Name = "Last Updated Date", Alias = "UpdateDate", Type = "datetime"  }
 
             };
 
@@ -82,7 +82,6 @@ namespace Umbraco.Web.Editors
             timer.Start();
 
             var currentPage = umbraco.TypedContentAtRoot().FirstOrDefault();
-            
             timer.Stop();
 
 
@@ -201,7 +200,7 @@ namespace Umbraco.Web.Editors
 
                     var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
 
-                    sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Name, direction);
+                    sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Alias, direction);
                 }
 
                 if (model.Take > 0)
