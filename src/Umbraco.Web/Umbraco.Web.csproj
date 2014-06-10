@@ -307,6 +307,7 @@
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
+    <Compile Include="Editors\SegmentDashboardController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\DetachedContent.cs" />
@@ -357,6 +358,7 @@
     <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\PublishedProperty.cs" />
+    <Compile Include="Models\Segments\ContentVariableSegment.cs" />
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
@@ -470,7 +472,19 @@
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
+    <Compile Include="Routing\Segments\ConfigurableSegmentProvider.cs" />
+    <Compile Include="Routing\Segments\ContentSegmentProvidersStatus.cs" />
+    <Compile Include="Routing\Segments\ReferrerSegmentProvider.cs" />
+    <Compile Include="Routing\Segments\RequestSegments.cs" />
+    <Compile Include="Routing\Segments\BrowserCapabilitiesProvider.cs" />
+    <Compile Include="Routing\Segments\ContentVariantAttribute.cs" />
+    <Compile Include="Routing\Segments\ContentSegmentProvider.cs" />
+    <Compile Include="Routing\Segments\ContentSegmentProviderResolver.cs" />
+    <Compile Include="Models\Segments\Segment.cs" />
+    <Compile Include="Models\Segments\SegmentCollection.cs" />
+    <Compile Include="Models\Segments\SegmentProviderMatch.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
+    <Compile Include="Security\MemberSegments.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\NotificationsHandler.cs" />
