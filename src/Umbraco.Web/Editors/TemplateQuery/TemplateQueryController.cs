@@ -21,6 +21,8 @@ namespace Umbraco.Web.Editors
     using Umbraco.Web.Editors.TemplateQuery;
     using System.Linq.Expressions;
 
+    using Umbraco.Web.Models;
+
     /// <summary>
     /// The API controller used for building content queries within the template
     /// </summary>
@@ -153,19 +155,35 @@ namespace Umbraco.Web.Editors
                 token++;
             }
 
-            if(string.IsNullOrEmpty(clause) == false)
+            if (string.IsNullOrEmpty(clause) == false)
             {
 
                 timer.Start();
 
+                //clause = "Visible && " + clause;
+
                 contents = contents.AsQueryable().Where(clause, model.Filters.Select(GetConstraintValue).ToArray());
-               // contents = contents.Where(clause, values.ToArray());
-                
+                // contents = contents.Where(clause, values.ToArray());
+                contents = contents.Where(x => x.IsVisible());
+
                 timer.Stop();
-                
-                clause = string.Format("\"{0}\",{1}", clause, string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
+
+                clause = string.Format("\"Visible && {0}\",{1}", clause,
+                    string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? 
+                        string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
 
                 sb.AppendFormat(".Where({0})", clause);
+            }
+            else
+            {
+                timer.Start();
+
+                contents = contents.Where(x => x.IsVisible());
+
+                timer.Stop();
+
+                sb.Append(".Where(\"Visible\")");
+
             }
 
             if (model.Sort != null && string.IsNullOrEmpty(model.Sort.Property.Alias) == false)
