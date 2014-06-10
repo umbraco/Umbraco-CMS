@@ -79,9 +79,9 @@
                 template: "views/common/dialogs/template/queryBuilder.html",
                 callback: function (data) {
 
-                    var dataFormatted = data.replace(new RegExp('[' + "." + ']', 'g'), "\n\t\t\t\t\t.");
+                    //var dataFormatted = data.replace(new RegExp('[' + "." + ']', 'g'), "\n\t\t\t\t\t.");
 
-                    var code = "\n@{\n" + "\tvar selection = " + dataFormatted + ";\n}\n";
+                    var code = "\n@{\n" + "\tvar selection = " + data + ";\n}\n";
                     code += "<ul>\n" +
                                 "\t@foreach(var item in selection){\n" +
                                     "\t\t<li>\n" +
