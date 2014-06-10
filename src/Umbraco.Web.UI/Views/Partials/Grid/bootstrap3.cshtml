@@ -36,17 +36,19 @@
                                                             </text>
                                                             break;
                                                         case "macro":
+                                                            if (control.value != null)
+                                                                {
+                                                                string macroAlias = control.value.macroAlias.ToString();
+                                                                ViewDataDictionary parameters = new ViewDataDictionary();
+                                                                foreach (dynamic mpd in control.value.marcoParamsDictionary)
+                                                                {
+                                                                    parameters.Add(mpd.Name, mpd.Value);
+                                                                }
 
-                                                            string macroAlias = control.value.macroAlias.ToString();
-                                                            ViewDataDictionary parameters = new ViewDataDictionary();
-                                                            foreach (dynamic mpd in control.value.marcoParamsDictionary)
-                                                            {
-                                                                parameters.Add(mpd.Name, mpd.Value);
+                                                                <text>
+                                                                    @Umbraco.RenderMacro(macroAlias, parameters)
+                                                                </text>
                                                             }
-
-                                                            <text>
-                                                                @Umbraco.RenderMacro(macroAlias, parameters)
-                                                            </text>
                                                             break;
                                                         case "textstring":
 
@@ -71,12 +73,15 @@
                                                             break;
                                                         case "media":
                                                         <text>
-                                                            <div class="thumbnail">
-                                                                <img src="@control.value.image">
-                                                            </div>
-                                                            @if (control.value.caption != null)
-                                                            {
-                                                                <p class="caption">@control.value.caption</p>
+                                                            @if (control.value != null)
+                                                            { 
+                                                                <div class="thumbnail">
+                                                                    <img src="@control.value.image">
+                                                                </div>
+                                                                if (control.value.caption != null)
+                                                                {
+                                                                    <p class="caption">@control.value.caption</p>
+                                                                }
                                                             }
                                                         </text>
                                                             break;
