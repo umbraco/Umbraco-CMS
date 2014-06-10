@@ -142,72 +142,78 @@ namespace Umbraco.Web.Editors
 
             // WHERE
             var token = 0;
-            foreach (var condition in model.Filters)
+
+            if (model != null)
             {
-                if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
+                model.Filters = model.Filters.Where(x => x.ConstraintValue != null);
+
+                foreach (var condition in model.Filters)
+                {
+                    if(string.IsNullOrEmpty( condition.ConstraintValue)) continue;
 
                 
 
-                var operation = condition.BuildCondition(token);
+                    var operation = condition.BuildCondition(token);
 
-                clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ",  operation });
+                    clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ",  operation });
 
-                token++;
-            }
+                    token++;
+                }
 
-            if (string.IsNullOrEmpty(clause) == false)
-            {
+                if (string.IsNullOrEmpty(clause) == false)
+                {
 
-                timer.Start();
+                    timer.Start();
 
-                //clause = "Visible && " + clause;
+                    //clause = "Visible && " + clause;
 
-                contents = contents.AsQueryable().Where(clause, model.Filters.Select(GetConstraintValue).ToArray());
-                // contents = contents.Where(clause, values.ToArray());
-                contents = contents.Where(x => x.IsVisible());
+                    contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
+                    // contents = contents.Where(clause, values.ToArray());
+                    contents = contents.Where(x => x.IsVisible());
 
-                timer.Stop();
+                    timer.Stop();
 
-                clause = string.Format("\"Visible && {0}\",{1}", clause,
-                    string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? 
-                        string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
+                    clause = string.Format("\"Visible && {0}\",{1}", clause,
+                        string.Join(",", model.Filters.Select(x => x.Property.Type == "string" ? 
+                                                                       string.Format("\"{0}\"", x.ConstraintValue) : x.ConstraintValue).ToArray()));
 
-                sb.AppendFormat(".Where({0})", clause);
-            }
-            else
-            {
-                timer.Start();
+                    sb.AppendFormat(".Where({0})", clause);
+                }
+                else
+                {
+                    timer.Start();
 
-                contents = contents.Where(x => x.IsVisible());
+                    contents = contents.Where(x => x.IsVisible());
 
-                timer.Stop();
+                    timer.Stop();
 
-                sb.Append(".Where(\"Visible\")");
+                    sb.Append(".Where(\"Visible\")");
 
-            }
+                }
 
-            if (model.Sort != null && string.IsNullOrEmpty(model.Sort.Property.Alias) == false)
-            {
-                timer.Start();
+                if (model.Sort != null && string.IsNullOrEmpty(model.Sort.Property.Alias) == false)
+                {
+                    timer.Start();
 
-                contents = SortByDefaultPropertyValue(contents, model.Sort);
+                    contents = this.SortByDefaultPropertyValue(contents, model.Sort);
 
-                timer.Stop();
+                    timer.Stop();
 
-                var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
+                    var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
 
-                sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Name, direction);
-            }
+                    sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Name, direction);
+                }
 
-            if (model.Take > 0)
-            {
-                timer.Start();
+                if (model.Take > 0)
+                {
+                    timer.Start();
 
-                contents = contents.Take(model.Take);
+                    contents = contents.Take(model.Take);
 
-                timer.Stop();
+                    timer.Stop();
 
-                sb.AppendFormat(".Take({0})", model.Take);
+                    sb.AppendFormat(".Take({0})", model.Take);
+                }
             }
 
             queryResult.QueryExpression = sb.ToString();

@@ -50,46 +50,59 @@
   						</a>
   					</div>
 
-  					<div ng-repeat="filter in query.filters">
-						<span>Where</span>
+			      <div ng-repeat="filter in query.filters">
+			          
+			          <span ng-if="$first">Where</span>
+			          <span ng-if="!$first">And</span>
+
+			          <div class="btn-group">
+
+			              <a class="btn btn-link dropdown-toggle" 
+			                 data-toggle="dropdown" href="#">
+			                  {{filter.property.name}}
+			                  <span class="caret"></span>
+			              </a>
+
+			              <ul class="dropdown-menu">
+			                  <li ng-repeat="property in properties">
+			                      <a href ng-click="filter.property = property">
+			                          {{property.name}}
+			                      </a>
+			                  </li>
+			              </ul>
+
+			          </div>
 						
-						<div class="btn-group">
+			          <div class="btn-group" ng-if="filter.property">
+			              <a class="btn btn-link dropdown-toggle" 
+			                 data-toggle="dropdown" href="#">
+			                  {{filter.term.name}}
+			                  <span class="caret"></span>
+			              </a>
+			              <ul class="dropdown-menu">
+			                  <li ng-repeat="term in getPropertyOperators(filter.property)">
+			                      <a href ng-click="filter.term = term">
+			                          {{term.name}}
+			                      </a>
+			                  </li>
+			              </ul>
+			          </div>
 
-						  <a class="btn btn-link dropdown-toggle" 
-						  		data-toggle="dropdown" href="#">
-						    		{{filter.property.name}}
-						    <span class="caret"></span>
-						  </a>
+			          <input type="text" ng-if="filter.term" style="width:90px;" ng-model="filter.constraintValue" />
+                 
+			          <a href ng-click="addFilter(query)">
+			              <i class="icon-add"></i>
+			          </a>
+                      
+                    <a href ng-if="query.filters.length > 1" ng-click="trashFilter(query)">
+                        <i class="icon-trash"></i>
+                    </a>
+                         
+			      </div>	
 
-						  <ul class="dropdown-menu">
-						  	<li ng-repeat="property in properties">
-						  		<a href ng-click="filter.property = property">
-						  			{{property.name}}
-						  		</a>
-						  	</li>
-						  </ul>
 
-						</div>
-						
-  					    <div class="btn-group" ng-if="filter.property">
-  					        <a class="btn btn-link dropdown-toggle" 
-  					           data-toggle="dropdown" href="#">
-  					            {{filter.term.name}}
-  					            <span class="caret"></span>
-  					        </a>
-  					        <ul class="dropdown-menu">
-  					            <li ng-repeat="term in getPropertyOperators(filter.property)">
-  					                <a href ng-click="filter.term = term">
-  					                    {{term.name}}
-  					                </a>
-  					            </li>
-  					        </ul>
-  					    </div>
-
-                        <input type="text" ng-if="filter.term" style="width:100px;" ng-model="filter.constraintValue" />
-					</div>	
 					
-					<div>
+			      <div>
 						
 						Order by 
 

@@ -53,12 +53,16 @@ angular.module("umbraco").controller('Umbraco.Dialogs.Template.QueryBuilderContr
 				});
 			};
 
-		    $scope.$watch("query", function(value) {
-                 
+		    var throttledFunc = _.throttle(function() {
+
 		        $http.post("backoffice/UmbracoApi/TemplateQuery/PostTemplateQuery", $scope.query).then(function (response) {
 		            $scope.result = response.data;
 		        });
 
+		    }, 200);
+
+		    $scope.$watch("query", function(value) {
+		        throttledFunc();
 		    }, true);
 
 			$scope.getPropertyOperators = function (property) {
@@ -71,18 +75,12 @@ angular.module("umbraco").controller('Umbraco.Dialogs.Template.QueryBuilderContr
 			};
 
 			
-			$scope.addFilter = function(query){
+			$scope.addFilter = function(query){				
+			    query.filters.push({});
+			};
 
-				var f = {
-						property:{
-							alias: "meh",
-							name: "Meh"
-						},
-						operator: "IS",
-						value: "nothing"	
-					};
-				
-				query.filters.push(f);
+			$scope.trashFilter = function (query) {
+			    query.filters.splice(query,1);
 			};
 
 			$scope.changeSortOrder = function(query){
