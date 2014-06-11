@@ -251,6 +251,7 @@
 
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child nodetypes</key>
+    <key alias="contenttypecompositions">Document Type Compositions</key>
     <key alias="create">Create</key>
     <key alias="deletetab">Delete tab</key>
     <key alias="description">Description</key>

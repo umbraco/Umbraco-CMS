@@ -54,6 +54,9 @@ namespace umbraco.controls
         // "Structure" tab
         protected DualSelectbox DualAllowedContentTypes = new DualSelectbox();
 
+        // "Structure" tab - Compositions
+        protected DualSelectbox DualContentTypeCompositions = new DualSelectbox();
+
         // "Info" tab
         public uicontrols.TabPage InfoTabPage;
 
@@ -88,6 +91,7 @@ namespace umbraco.controls
             else
             {
                 SetupStructurePane();
+                SetupCompositionsPane();
             }
 
             SetupGenericPropertiesPane();
@@ -105,7 +109,7 @@ namespace umbraco.controls
             pp_alias.Text = ui.Text("alias", Security.CurrentUser);
             pp_name.Text = ui.Text("name", Security.CurrentUser);
             pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", Security.CurrentUser);
-            
+            pp_compositions.Text = ui.Text("contenttypecompositions", Security.CurrentUser);
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
 
@@ -291,19 +295,61 @@ namespace umbraco.controls
                     Trace.Write("ContentTypeControlNew", "executing task");
 
                     //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
-                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
+                    //global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
                     _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
                         _contentType.ContentTypeItem.Icon = tb_icon.Value;
                     _contentType.ContentTypeItem.Description = description.Text;
-                        //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
+                    //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
                     _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
                         _contentType.ContentTypeItem.IsContainer = cb_isContainer.Checked;
 
                     int i = 0;
                     var ids = SaveAllowedChildTypes();
                     _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
+
+                    //Saving ContentType Compositions
+                    var compositionIds = SaveCompositionContentTypes();
+                    var existingCompsitionIds = _contentType.ContentTypeItem.CompositionIds().ToList();
+                    if (compositionIds.Any())
+                    {
+                        //Iterate ContentType Ids from the save-collection
+                        foreach (var compositionId in compositionIds)
+                        {
+                            //If the compositionId is the Id of the current ContentType we skip it
+                            if(_contentType.Id.Equals(compositionId)) continue;
+
+                            //If the Id already exists we'll just skip it
+                            if (existingCompsitionIds.Any(x => x.Equals(compositionId))) continue;
+
+                            //New Ids will get added to the collection
+                            var compositionType = Services.ContentTypeService.GetContentType(compositionId);
+                            var added = _contentType.ContentTypeItem.AddContentType(compositionType);
+                            //TODO if added=false then return error message
+                        }
+
+                        //Iterate the set except of existing and new Ids
+                        var removeIds = existingCompsitionIds.Except(compositionIds);
+                        foreach (var removeId in removeIds)
+                        {
+                            //Remove ContentTypes that was deselected in the list
+                            var compositionType = Services.ContentTypeService.GetContentType(removeId);
+                            var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
+                        }
+                    }
+                    else if (existingCompsitionIds.Any())
+                    {
+                        //Iterate the set except of existing and new Ids
+                        var removeIds = existingCompsitionIds.Except(compositionIds);
+                        foreach (var removeId in removeIds)
+                        {
+                            //Remove ContentTypes that was deselected in the list
+                            var compositionType = Services.ContentTypeService.GetContentType(removeId);
+                            var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
+                        }
+                    }
+                    
 
                     var tabs = SaveTabs();
                     foreach (var tab in tabs)
@@ -319,6 +365,7 @@ namespace umbraco.controls
                     }
 
                     SavePropertyType(asyncState.SaveArgs, _contentType.ContentTypeItem);
+                    //SavePropertyType(state.SaveArgs, _contentType.ContentTypeItem);
                     UpdatePropertyTypes(_contentType.ContentTypeItem);
 
                     if (DocumentTypeCallback != null)
@@ -342,8 +389,10 @@ namespace umbraco.controls
                     catch (DuplicateNameException ex)
                     {
                         DuplicateAliasValidator.IsValid = false;
-                        asyncState.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
-                        asyncState.SaveArgs.Message = ex.Message;
+                        //asyncState.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                        state.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                        //asyncState.SaveArgs.Message = ex.Message;
+                        state.SaveArgs.Message = ex.Message;
                         return;
                     }
 
@@ -568,6 +617,56 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             var tmp = new ArrayList();
             foreach (ListItem li in lstAllowedContentTypes.Items)
+            {
+                if (li.Selected)
+                    tmp.Add(int.Parse(li.Value));
+            }
+            var ids = new int[tmp.Count];
+            for (int i = 0; i < tmp.Count; i++) ids[i] = (int)tmp[i];
+
+            return ids;
+        }
+
+        #endregion
+
+        #region Compositions Pane
+
+        private void SetupCompositionsPane()
+        {
+            DualContentTypeCompositions.ID = "compositionContentTypes";
+            DualContentTypeCompositions.Width = 175;
+
+            int[] compositionIds = _contentType.ContentTypeItem.CompositionIds().ToArray();
+            if (!Page.IsPostBack)
+            {
+                string chosenContentTypeIDs = "";
+                ContentType[] contentTypes = _contentType.GetAll();
+                foreach (ContentType ct in contentTypes.OrderBy(x => x.Text))
+                {
+                    ListItem li = new ListItem(ct.Text, ct.Id.ToString());
+                    if (ct.Id == _contentType.Id)
+                        li.Enabled = false;
+
+                    DualContentTypeCompositions.Items.Add(li);
+                    lstContentTypeCompositions.Items.Add(li);
+                    
+                    foreach (int i in compositionIds)
+                    {
+                        if (i == ct.Id)
+                        {
+                            li.Selected = true;
+                            chosenContentTypeIDs += ct.Id + ",";
+                        }
+                    }
+                }
+                DualContentTypeCompositions.Value = chosenContentTypeIDs;
+            }
+        }
+
+        private int[] SaveCompositionContentTypes()
+        {
+            var tmp = new ArrayList();
+            foreach (ListItem li in lstContentTypeCompositions.Items)
             {
                 if (li.Selected)
                     tmp.Add(int.Parse(li.Value));
@@ -1625,5 +1724,41 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CustomValidator DuplicateAliasValidator;
+
+        /// <summary>
+        /// Pane9 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane9;
+
+        /// <summary>
+        /// pp_compositions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_compositions;
+
+        /// <summary>
+        /// lstContentTypeCompositions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList lstContentTypeCompositions;
+
+        /// <summary>
+        /// PlaceHolderContentTypeCompositions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolderContentTypeCompositions;
     }
 }

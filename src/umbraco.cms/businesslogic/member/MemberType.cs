@@ -19,7 +19,11 @@ namespace umbraco.cms.businesslogic.member
         #region Private Members
 
         internal static readonly Guid ObjectType = new Guid(Constants.ObjectTypes.MemberType);
-        internal IMemberType MemberTypeItem;
+        internal IMemberType MemberTypeItem
+        {
+            get { return base.ContentTypeItem as IMemberType; }
+            set { base.ContentTypeItem = value; }
+        }
 
         #endregion
 

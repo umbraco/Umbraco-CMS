@@ -240,7 +240,7 @@ AND umbracoNode.id <> @id",
                         {
                             var nodeId = contentDto.NodeId;
                             var propertyTypeId = propertyType.Id;
-                            var propertySql = new Sql().Select("*")
+                            var propertySql = new Sql().Select("cmsPropertyData.id")
                                                        .From<PropertyDataDto>()
                                                        .InnerJoin<PropertyTypeDto>()
                                                        .On<PropertyDataDto, PropertyTypeDto>(
@@ -249,7 +249,7 @@ AND umbracoNode.id <> @id",
                                                        .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
 
                             //Finally delete the properties that match our criteria for removing a ContentType from the composition
-                            Database.Delete<PropertyDataDto>(propertySql);
+                            Database.Delete<PropertyDataDto>(new Sql("WHERE id IN (" + propertySql.SQL + ")", propertySql.Arguments));
                         }
                     }
                 }
@@ -285,7 +285,8 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            if (((ICanBeDirty) entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
+            if (((ICanBeDirty)entity).IsPropertyDirty("PropertyGroups") || 
+                entity.PropertyGroups.Any(x => x.IsDirty()))
             {
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
                 var dbPropertyGroups =
@@ -345,6 +346,25 @@ AND umbracoNode.id <> @id",
                                          : Convert.ToInt32(Database.Insert(propertyTypeDto));
                 if (propertyType.HasIdentity == false)
                     propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
+            }
+
+            //If a Composition is removed we need to update/reset references to the PropertyGroups on that ContentType
+            if (((ICanBeDirty)entity).IsPropertyDirty("ContentTypeComposition") &&
+                compositionBase != null &&
+                compositionBase.RemovedContentTypeKeyTracker != null &&
+                compositionBase.RemovedContentTypeKeyTracker.Any())
+            {
+                foreach (var compositionId in compositionBase.RemovedContentTypeKeyTracker)
+                {
+                    var dbPropertyGroups =
+                        Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new { Id = compositionId })
+                            .Select(x => x.Id);
+                    foreach (var propertyGroup in dbPropertyGroups)
+                    {
+                        Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId AND contenttypeNodeId = @ContentTypeNodeId",
+                                                              new { TabId = propertyGroup, ContentTypeNodeId = entity.Id });
+                    }
+                }
             }
         }
 

@@ -253,7 +253,11 @@ namespace umbraco.cms.businesslogic
         private List<int> _allowedChildContentTypeIDs;
         private List<TabI> _virtualTabs;
 
-        protected internal IContentTypeComposition ContentTypeItem;
+        protected internal IContentTypeComposition ContentTypeItem
+        {
+            get { return base.Entity as IContentTypeComposition; }
+            set { base.Entity = value; }
+        }
 
         #endregion
 
@@ -632,7 +636,10 @@ namespace umbraco.cms.businesslogic
             {
                 if (m_masterContentTypes == null)
                 {
-                    m_masterContentTypes = new List<int>();
+                    m_masterContentTypes = ContentTypeItem == null
+                        ? new List<int>()
+                        : ContentTypeItem.CompositionIds().ToList();
+
                     if (ContentTypeItem == null)
                     {
                         //TODO Make this recursive, so it looks up Masters of the Master ContentType
@@ -647,10 +654,6 @@ namespace umbraco.cms.businesslogic
                                 m_masterContentTypes.Add(dr.GetInt("parentContentTypeId"));
                             }
                         }
-                    }
-                    else
-                    {
-                        m_masterContentTypes = ContentTypeItem.CompositionIds().ToList();
                     }
 
                 }
@@ -1107,8 +1110,8 @@ namespace umbraco.cms.businesslogic
             _thumbnail = contentType.Thumbnail;
             _description = contentType.Description;
 
-            if (ContentTypeItem == null)
-                ContentTypeItem = contentType;
+            /*if (ContentTypeItem == null)
+                ContentTypeItem = contentType;*/
         }
 
         protected void PopulateContentTypeNodeFromReader(IRecordsReader dr)

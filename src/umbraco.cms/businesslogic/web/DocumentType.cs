@@ -58,7 +58,12 @@ namespace umbraco.cms.businesslogic.web
         private int _defaultTemplate;
         private bool _hasChildrenInitialized = false;
         private bool _hasChildren;
-        private IContentType _contentType;
+
+        private IContentType ContentType
+        {
+            get { return base.ContentTypeItem as IContentType; }
+            set { base.ContentTypeItem = value; }
+        }
 
         #endregion
 
@@ -203,7 +208,7 @@ namespace umbraco.cms.businesslogic.web
                 if (_defaultTemplate != 0)
                 {
                     var template = ApplicationContext.Current.Services.FileService.GetTemplate(_defaultTemplate);
-                    _contentType.SetDefaultTemplate(template);
+                    ContentType.SetDefaultTemplate(template);
                 }
             }
         }
@@ -238,7 +243,7 @@ namespace umbraco.cms.businesslogic.web
 
                     _templateIds.Add(t.Id);
                 }
-                _contentType.AllowedTemplates = templates;
+                ContentType.AllowedTemplates = templates;
             }
         }
 
@@ -428,9 +433,9 @@ namespace umbraco.cms.businesslogic.web
             // remove from list of document type templates
             if (_templateIds.Contains(templateId))
             {
-                var template = _contentType.AllowedTemplates.FirstOrDefault(x => x.Id == templateId);
+                var template = ContentType.AllowedTemplates.FirstOrDefault(x => x.Id == templateId);
                 if (template != null)
-                    _contentType.RemoveTemplate(template);
+                    ContentType.RemoveTemplate(template);
 
                 _templateIds.Remove(templateId);
             }
@@ -454,7 +459,7 @@ namespace umbraco.cms.businesslogic.web
                     throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
                 }
                 
-                ApplicationContext.Current.Services.ContentTypeService.Delete(_contentType);
+                ApplicationContext.Current.Services.ContentTypeService.Delete(ContentType);
 
                 clearTemplates();
 
@@ -464,7 +469,7 @@ namespace umbraco.cms.businesslogic.web
 
         public void clearTemplates()
         {
-            _contentType.AllowedTemplates = new List<ITemplate>();
+            ContentType.AllowedTemplates = new List<ITemplate>();
             _templateIds.Clear();
         }
 
@@ -558,7 +563,7 @@ namespace umbraco.cms.businesslogic.web
         public void RemoveDefaultTemplate()
         {
             _defaultTemplate = 0;
-            _contentType.SetDefaultTemplate(null);
+            ContentType.SetDefaultTemplate(null);
         }
 
         public bool HasTemplate()
@@ -578,17 +583,17 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 if (MasterContentType != 0)
-                    _contentType.ParentId = MasterContentType;
+                    ContentType.ParentId = MasterContentType;
 
-                foreach (var masterContentType in MasterContentTypes)
+                /*foreach (var masterContentType in MasterContentTypes)
                 {
                     var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(masterContentType);
-                    _contentType.AddContentType(contentType);
-                }
+                    ContentType.AddContentType(contentType);
+                }*/
 
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentTypeService.Save(_contentType, userId);
+                ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId);
 
                 base.Save();
                 FireAfterSave(e);
@@ -626,17 +631,17 @@ namespace umbraco.cms.businesslogic.web
         #region Private Methods
         private void SetupNode(IContentType contentType)
         {
-            _contentType = contentType;
-            foreach (var template in _contentType.AllowedTemplates.Where(t => t != null))
+            ContentType = contentType;
+            foreach (var template in ContentType.AllowedTemplates.Where(t => t != null))
             {
                 _templateIds.Add(template.Id);
             }
 
-            if (_contentType.DefaultTemplate != null)
-                _defaultTemplate = _contentType.DefaultTemplate.Id;
+            if (ContentType.DefaultTemplate != null)
+                _defaultTemplate = ContentType.DefaultTemplate.Id;
 
-            base.PopulateContentTypeFromContentTypeBase(_contentType);
-            base.PopulateCMSNodeFromUmbracoEntity(_contentType, _objectType);
+            base.PopulateContentTypeFromContentTypeBase(ContentType);
+            base.PopulateCMSNodeFromUmbracoEntity(ContentType, _objectType);
         }
         #endregion
 
@@ -680,9 +685,9 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterSave != null)
             {
-                var updated = this._contentType == null
+                var updated = this.ContentType == null
                                   ? new DocumentType(this.Id)
-                                  : new DocumentType(this._contentType);
+                                  : new DocumentType(this.ContentType);
                 AfterSave(updated, e);
             }
         }
