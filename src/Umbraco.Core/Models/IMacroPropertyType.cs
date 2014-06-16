@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a PropertyType (plugin) for a Macro
