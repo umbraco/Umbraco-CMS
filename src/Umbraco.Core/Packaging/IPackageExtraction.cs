@@ -27,7 +27,14 @@ namespace Umbraco.Core.Packaging
         /// <param name="fileInPackageName">filename of the file to copy</param>
         /// <param name="destinationfilePath">destination path (including destination filename)</param>
         /// <returns>True a file was overwritten</returns>
-        bool CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath);
+        void CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath);
+
+        /// <summary>
+        /// Copies a file from package to given destination
+        /// </summary>
+        /// <param name="packageFilePath">Full path to the ubraco package file</param>
+        /// <param name="sourceDestination">Key: Source file in package. Value: Destination path inclusive file name</param>
+        void CopyFilesFromArchive(string packageFilePath, IEnumerable<KeyValuePair<string, string>> sourceDestination);
 
         /// <summary>
         /// Check if given list of files can be found in the package
@@ -44,5 +51,13 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageFilePath">Full path to the umbraco package file</param>
         /// <returns>list of files that are found more than ones (accross directories) in the package</returns>
         IEnumerable<string> FindDubletFileNames(string packageFilePath);
+
+        /// <summary>
+        /// Reads the given files from archive and returns them as a collection of byte arrays
+        /// </summary>
+        /// <param name="packageFilePath"></param>
+        /// <param name="filesToGet"></param>
+        /// <returns></returns>
+        IEnumerable<byte[]> ReadFilesFromArchive(string packageFilePath, IEnumerable<string> filesToGet);
     }
 }

@@ -67,43 +67,41 @@ namespace Umbraco.Core.Packaging
             }
         }
 
+        
 
-        public bool CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath)
+        public void CopyFileFromArchive(string packageFilePath, string fileInPackageName, string destinationfilePath)
         {
-            bool fileFoundInArchive = false;
-            bool fileOverwritten = false;
+            CopyFilesFromArchive(packageFilePath, new[]{new KeyValuePair<string, string>(fileInPackageName, destinationfilePath) } );
+        }
+
+        public void CopyFilesFromArchive(string packageFilePath, IEnumerable<KeyValuePair<string, string>> sourceDestination)
+        {
+            var d = sourceDestination.ToDictionary(k => k.Key.ToLower(), v => v.Value);
+
 
             ReadZipfileEntries(packageFilePath, (entry, stream) =>
             {
-                string fileName = Path.GetFileName(entry.Name);
+                string fileName = (Path.GetFileName(entry.Name) ?? string.Empty).ToLower();
+                if (fileName == string.Empty) { return true; }
 
-                if (string.IsNullOrEmpty(fileName) == false &&
-                    fileName.Equals(fileInPackageName, StringComparison.InvariantCultureIgnoreCase))
+                string destination;
+                if (string.IsNullOrEmpty(fileName) == false && d.TryGetValue(fileName, out destination))
                 {
-                    fileFoundInArchive = true;
-
-                    fileOverwritten = File.Exists(destinationfilePath);
-
-                    using (var streamWriter = File.Open(destinationfilePath, FileMode.Create))
+                    using (var streamWriter = File.Open(destination, FileMode.Create))
                     {
-                        var data = new byte[2048];
-                        int size;
-                        while ((size = stream.Read(data, 0, data.Length)) > 0)
-                        {
-                            streamWriter.Write(data, 0, size);
-                        }
-
-                        streamWriter.Close();
+                        stream.CopyTo(streamWriter);
                     }
-                    return false;
+
+                    d.Remove(fileName);
+                    return d.Any();
                 }
                 return true;
             });
 
-
-            if (fileFoundInArchive == false) throw new ArgumentException(string.Format("Could not find file: {0} in package file: {1}", fileInPackageName, packageFilePath), "fileInPackageName");
-
-            return fileOverwritten;
+            if (d.Any())
+            {
+                throw new ArgumentException(string.Format("The following source file(s): \"{0}\" could not be found in archive: \"{1}\"", string.Join("\", \"",d.Keys), packageFilePath));
+            }
         }
 
         public IEnumerable<string> FindMissingFiles(string packageFilePath, IEnumerable<string> expectedFiles)
@@ -146,6 +144,39 @@ namespace Umbraco.Core.Packaging
             });
 
             return dictionary.Values.Where(v => v.Count > 1).SelectMany(v => v);
+        }
+
+        public IEnumerable<byte[]> ReadFilesFromArchive(string packageFilePath, IEnumerable<string> filesToGet)
+        {
+            CheckPackageExists(packageFilePath);
+
+            var files = new HashSet<string>(filesToGet.Select(f => f.ToLower()));
+
+            using (var fs = File.OpenRead(packageFilePath))
+            {
+                using (var zipInputStream = new ZipInputStream(fs))
+                {
+                    ZipEntry zipEntry;
+                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
+                    {
+                        
+                        if (zipEntry.IsDirectory) continue;
+
+                        if (files.Contains(zipEntry.Name))
+                        {
+                            using (var memStream = new MemoryStream())
+                            {
+                                zipInputStream.CopyTo(memStream);
+                                yield return memStream.ToArray();
+                                memStream.Close();
+                            }
+                        }
+                    }
+
+                    zipInputStream.Close();
+                }
+                fs.Close();
+            }
         }
 
         private void ReadZipfileEntries(string packageFilePath, Func<ZipEntry, ZipInputStream, bool> entryFunc, bool skipsDirectories = true)

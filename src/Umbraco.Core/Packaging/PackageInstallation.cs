@@ -10,6 +10,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
+using umbraco.interfaces;
+using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging
 {
@@ -89,7 +91,7 @@ namespace Umbraco.Core.Packaging
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFilePath);
-                return GetPreInstallWarnings(rootElement);
+                return GetPreInstallWarnings(packageFilePath, rootElement);
             }
             catch (Exception e)
             {
@@ -150,20 +152,20 @@ namespace Umbraco.Core.Packaging
                 var macros = EmptyArrayIfNull<IMacro>(macroes)?? InstallMacros(macroes, userId);
                 installationSummary.MacrosInstalled = macros;
 
-                var keyValuePairs = EmptyArrayIfNull<Details<string>>(packageFile) ?? InstallFiles(packageFile, files);
+                var keyValuePairs = EmptyArrayIfNull<string>(packageFile) ?? InstallFiles(packageFile, files);
                 installationSummary.FilesInstalled = keyValuePairs;
                 
                 var templatesInstalled = EmptyArrayIfNull<ITemplate>(templates) ?? InstallTemplats(templates, userId);
                 installationSummary.TemplatesInstalled = templatesInstalled;
 
                 var documentTypesInstalled = EmptyArrayIfNull<IContentType>(documentTypes) ?? InstallDocumentTypes(documentTypes, userId);
-                installationSummary.DocumentTypesInstalled =documentTypesInstalled;
+                installationSummary.ContentTypesInstalled =documentTypesInstalled;
 
                 var stylesheetsInstalled = EmptyArrayIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
                 installationSummary.StylesheetsInstalled = stylesheetsInstalled;
 
                 var documentsInstalled = EmptyArrayIfNull<IContent>(documentSet) ?? InstallDocuments(documentSet, userId);
-                installationSummary.DocumentsInstalled = documentsInstalled;
+                installationSummary.ContentInstalled = documentsInstalled;
 
                 var packageActions = EmptyArrayIfNull<PackageAction>(actions) ?? GetPackageActions(actions, metaData.Name);
                 installationSummary.Actions = packageActions;
@@ -228,12 +230,9 @@ namespace Umbraco.Core.Packaging
             XElement filesElement = rootElement.Element(Constants.Packaging.FilesNodeName);
             if (filesElement != null)
             {
-                IEnumerable<FileInPackageInfo> extractFileInPackageInfos =
-                    ExtractFileInPackageInfos(filesElement).ToArray();
+                var sourceDestination = ExtractSourceDestinationFileInformation(filesElement).ToArray();
 
-                IEnumerable<string> missingFiles =
-                    _packageExtraction.FindMissingFiles(packageFilePath,
-                        extractFileInPackageInfos.Select(i => i.FileNameInPackage)).ToArray();
+                var missingFiles = _packageExtraction.FindMissingFiles(packageFilePath, sourceDestination.Select(i => i.Key)).ToArray();
 
                 if (missingFiles.Any())
                 {
@@ -241,14 +240,14 @@ namespace Umbraco.Core.Packaging
                                         string.Join(", ", missingFiles.Select(
                                             mf =>
                                             {
-                                                FileInPackageInfo fileInPackageInfo =
-                                                    extractFileInPackageInfos.Single(fi => fi.FileNameInPackage == mf);
-                                                return string.Format("Guid: \"{0}\" Original File: \"{1}\"",
-                                                    fileInPackageInfo.FileNameInPackage, fileInPackageInfo.RelativePath);
+                                                var sd = sourceDestination.Single(fi => fi.Key == mf);
+                                                return string.Format("source: \"{0}\" destination: \"{1}\"",
+                                                    sd.Key, sd.Value);
                                             })));
                 }
 
                 IEnumerable<string> dubletFileNames = _packageExtraction.FindDubletFileNames(packageFilePath).ToArray();
+
                 if (dubletFileNames.Any())
                 {
                     throw new Exception("The following filename(s) are found more than one time in the package, since the filename is used ad primary key, this is not allowed: " +
@@ -347,21 +346,21 @@ namespace Umbraco.Core.Packaging
         }
 
 
-        private Details<string>[] InstallFiles(string packageFilePath, XElement filesElement)
+        private string[] InstallFiles(string packageFilePath, XElement filesElement)
         {
-            return ExtractFileInPackageInfos(filesElement).Select(fpi =>
-            {
-                bool existingOverrided = _packageExtraction.CopyFileFromArchive(packageFilePath, fpi.FileNameInPackage,
-                    fpi.FullPath);
+            var sourceDestination = ExtractSourceDestinationFileInformation(filesElement);
+            sourceDestination = AppendRootToDestination(FullpathToRoot, sourceDestination);
 
-                return new Details<string>()
-                {
-                    Source = fpi.FileNameInPackage,
-                    Destination = fpi.FullPath,
-                    Status = existingOverrided ? InstallStatus.Overwridden : InstallStatus.Inserted
-                };
+            _packageExtraction.CopyFilesFromArchive(packageFilePath, sourceDestination);
+            
+            return sourceDestination.Select(sd => sd.Value).ToArray();
+        }
 
-            }).ToArray();
+        private KeyValuePair<string, string>[] AppendRootToDestination(string fullpathToRoot, IEnumerable<KeyValuePair<string, string>> sourceDestination)
+        {
+            return
+                sourceDestination.Select(
+                    sd => new KeyValuePair<string, string>(sd.Key, Path.Combine(fullpathToRoot, sd.Value))).ToArray();
         }
 
         private IMacro[] InstallMacros(XElement macroElements, int userId = 0)
@@ -406,45 +405,70 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId).ToArray();
         }
 
-        private PreInstallWarnings GetPreInstallWarnings(XElement rootElement)
+        private PreInstallWarnings GetPreInstallWarnings(string packagePath, XElement rootElement)
         {
             XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
             XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
             XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
             XElement alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
-            var conflictingPackageContent = new PreInstallWarnings
-            {
-                UnsecureFiles = files == null ? new IFileInPackageInfo[0] : FindUnsecureFiles(files),
-                ConflictingMacroAliases = alias == null ? new IMacro[0] : ConflictingPackageContentFinder.FindConflictingMacros(alias),
-                ConflictingTemplateAliases =
-                    templates == null ? new ITemplate[0] : ConflictingPackageContentFinder.FindConflictingTemplates(templates),
-                ConflictingStylesheetNames =
-                    styleSheets == null ? new IFile[0] : ConflictingPackageContentFinder.FindConflictingStylesheets(styleSheets)
-            };
+            
+            var sourceDestination = EmptyArrayIfNull<KeyValuePair<string, string>>(files) ?? ExtractSourceDestinationFileInformation(files);
 
-            return conflictingPackageContent;
+            var installWarnings = new PreInstallWarnings();
+
+            var macroAliases = EmptyArrayIfNull<IMacro>(alias) ?? ConflictingPackageContentFinder.FindConflictingMacros(alias);
+            installWarnings.ConflictingMacroAliases = macroAliases;
+
+            var templateAliases = EmptyArrayIfNull<ITemplate>(templates) ?? ConflictingPackageContentFinder.FindConflictingTemplates(templates);
+            installWarnings.ConflictingTemplateAliases = templateAliases;
+
+            var stylesheetNames = EmptyArrayIfNull<IFile>(styleSheets) ?? ConflictingPackageContentFinder.FindConflictingStylesheets(styleSheets);
+            installWarnings.ConflictingStylesheetNames = stylesheetNames;
+            
+            installWarnings.UnsecureFiles = FindUnsecureFiles(sourceDestination);
+            installWarnings.FilesReplaced = FindFilesToBeReplaced(sourceDestination);
+            installWarnings.AssembliesWithLegacyPropertyEditors = FindLegacyPropertyEditors(packagePath, sourceDestination);
+            
+            return installWarnings;
         }
 
-        private IFileInPackageInfo[] FindUnsecureFiles(XElement fileElement)
+        private KeyValuePair<string, string>[] FindFilesToBeReplaced(IEnumerable<KeyValuePair<string, string>> sourceDestination)
         {
-            return ExtractFileInPackageInfos(fileElement)
-                .Where(IsFileNodeUnsecure).Cast<IFileInPackageInfo>().ToArray();
+            return sourceDestination.Where(sd => File.Exists(Path.Combine(FullpathToRoot, sd.Value))).ToArray();
         }
 
-        private bool IsFileNodeUnsecure(FileInPackageInfo fileInPackageInfo)
+        private string[] FindLegacyPropertyEditors(string packagePath, IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
         {
+            var dlls = sourceDestinationPair.Where(
+                sd => (Path.GetExtension(sd.Value) ?? string.Empty).Equals(".dll", StringComparison.InvariantCultureIgnoreCase)).Select(sd => sd.Key).ToArray();
 
-            // Should be done with regex :)
-            if (fileInPackageInfo.Directory.ToLower().Contains(IOHelper.DirSepChar + "app_code")) return true;
-            if (fileInPackageInfo.Directory.ToLower().Contains(IOHelper.DirSepChar + "bin")) return true;
+            if (dlls.Any() == false) { return new string[0]; }
+            
+            
+            // Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
+            string[] assemblyErrors;
+            IEnumerable<byte[]> assemblyesToScan =_packageExtraction.ReadFilesFromArchive(packagePath, dlls);
+            return PackageBinaryByteInspector.ScanAssembliesForTypeReference<IDataType>(assemblyesToScan, out assemblyErrors).ToArray();
+            
+        }
 
-            string extension = Path.GetExtension(fileInPackageInfo.Directory);
+        private KeyValuePair<string, string>[] FindUnsecureFiles(IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
+        {
+            return sourceDestinationPair.Where(sd => IsFileDestinationUnsecure(sd.Value)).ToArray();
+        }
 
-            return extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase);
+        private bool IsFileDestinationUnsecure(string destination)
+        {
+            var unsecureDirNames = new[] {"bin", "app_code"};
+            if(unsecureDirNames.Any(ud => destination.StartsWith(ud, StringComparison.InvariantCultureIgnoreCase)))
+                return true;
+
+            string extension = Path.GetExtension(destination);
+            return extension != null && extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase);
         }
 
 
-        private IEnumerable<FileInPackageInfo> ExtractFileInPackageInfos(XElement filesElement)
+        private KeyValuePair<string, string>[] ExtractSourceDestinationFileInformation(XElement filesElement)
         {
             if (string.Equals(Constants.Packaging.FilesNodeName, filesElement.Name.LocalName) == false)
             {
@@ -475,15 +499,13 @@ namespace Umbraco.Core.Packaging
                             "filesElement");
                     }
 
+                    var fileName = PrepareAsFilePathElement(orgNameElement.Value);
+                    var relativeDir = UpdatePathPlaceholders(PrepareAsFilePathElement(orgPathElement.Value));
 
-                    return new FileInPackageInfo
-                    {
-                        FileNameInPackage = guidElement.Value,
-                        FileName = PrepareAsFilePathElement(orgNameElement.Value),
-                        RelativeDir = UpdatePathPlaceholders(
-                            PrepareAsFilePathElement(orgPathElement.Value)),
-                        DestinationRootDir = FullpathToRoot
-                    };
+                    var relativePath = Path.Combine(relativeDir, fileName);
+                    
+
+                    return new KeyValuePair<string, string>(guidElement.Value, relativePath);
                 }).ToArray();
         }
 
