@@ -25,7 +25,9 @@ angular.module("umbraco")
                 $scope.close();
             });
 
+
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
+            $scope.close();
             $location.path("/logout");
         };
 
