@@ -59,7 +59,7 @@ namespace Umbraco.Core.Services
             IDataTypeService dataTypeService, 
             IFileService fileService, 
             ILocalizationService localizationService, 
-            IPackagingService packagingService,
+            IPackagingService packagingService, 
             IEntityService entityService,
             IRelationService relationService,
             IMemberGroupService memberGroupService,
@@ -88,6 +88,7 @@ namespace Umbraco.Core.Services
             _memberService = new Lazy<IMemberService>(() => memberService);
             _userService = new Lazy<IUserService>(() => userService);
             _notificationService = new Lazy<INotificationService>(() => notificationService);
+
         }
 
         /// <summary>
@@ -327,5 +328,6 @@ namespace Umbraco.Core.Services
         {
             get { return _memberGroupService.Value; }
         }
+        
     }
 }

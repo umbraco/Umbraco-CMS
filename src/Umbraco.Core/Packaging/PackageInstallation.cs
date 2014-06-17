@@ -321,7 +321,11 @@ namespace Umbraco.Core.Packaging
                 throw new ArgumentException("Must be \"" + Constants.Packaging.StylesheetsNodeName + "\" as root",
                     "styleSheetsElement");
             }
-            throw new NotImplementedException("The packaging service do not yes have a method for this");
+
+            // TODO: Call _packagingService when import stylesheets import has been implimentet
+            if (styleSheetsElement.HasElements == false) { return new IFile[0]; }
+
+            throw new NotImplementedException("The packaging service do not yes have a method for importing stylesheets");
         }
 
         private IContentType[] InstallDocumentTypes(XElement documentTypes, int userId = 0)
