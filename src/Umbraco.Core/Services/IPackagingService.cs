@@ -80,15 +80,6 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="IStylesheet"/>
-        /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumerable list of generated stylesheets</returns>
-        IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
         /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="contentType">ContentType to export</param>
