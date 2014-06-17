@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -568,7 +569,7 @@ namespace Umbraco.Core.Services
                 if (dataTypeDefinition == null)
                 {
                     var dataTypeDefinitions = legacyPropertyEditorId != Guid.Empty
-                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId, false)
+                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId)
                                                   : _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
@@ -1582,10 +1583,27 @@ namespace Umbraco.Core.Services
             set { _packageInstallation = value; }
         }
 
-        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
-            //TODO Add events ?
-            return PackageInstallation.InstallPackage(packageFilePath, userId);
+            if (raiseEvents)
+            {
+                var metaData = GetPackageMetaData(packageFilePath);
+                if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
+                {
+                    var initEmpty = new InstallationSummary().InitEmpty();
+                    initEmpty.MetaData = metaData;
+                    return initEmpty;
+                }
+            }
+            var installationSummary = PackageInstallation.InstallPackage(packageFilePath, userId);
+
+            if (raiseEvents)
+            {
+                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, false), this);
+            }
+
+
+            return installationSummary;
         }
 
         internal PreInstallWarnings GetPackageWarnings(string packageFilePath)
@@ -1757,6 +1775,18 @@ namespace Umbraco.Core.Services
         /// Occurs after Template is Exported to Xml
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportedTemplate;
+
+
+        /// <summary>
+        /// Occurs before Importing umbraco package
+        /// </summary>
+        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
+
+        /// <summary>
+        /// Occurs after a apckage is imported
+        /// </summary>
+        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+
         #endregion
     }
 }

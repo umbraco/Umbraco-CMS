@@ -99,6 +99,7 @@ namespace Umbraco.Core.Packaging
             }
         }
 
+
         public InstallationSummary InstallPackage(string packageFile, int userId)
         {
             XElement dataTypes;
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Packaging
                 actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
 
                 metaData = GetMetaData(rootElement);
-                installationSummary = new InstallationSummary() { MetaData = metaData };
+                installationSummary = new InstallationSummary {MetaData = metaData};
             }
             catch (Exception e)
             {
@@ -170,6 +171,8 @@ namespace Umbraco.Core.Packaging
                 var packageActions = EmptyArrayIfNull<PackageAction>(actions) ?? GetPackageActions(actions, metaData.Name);
                 installationSummary.Actions = packageActions;
 
+                installationSummary.PackageInstalled = true;
+
                 return installationSummary;
             }
             catch (Exception e)
@@ -206,7 +209,7 @@ namespace Umbraco.Core.Packaging
         }
 
 
-        private XElement GetConfigXmlElement(string packageFilePath)
+        public XElement GetConfigXmlElement(string packageFilePath)
         {
             XDocument document = GetConfigXmlDoc(packageFilePath);
             if (document.Root == null ||

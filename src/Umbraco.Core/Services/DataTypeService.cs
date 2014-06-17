@@ -76,12 +76,23 @@ namespace Umbraco.Core.Services
         /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
         /// </summary>
         /// <param name="id">Id of the DataType control</param>
+        /// <param name="throwIfNotFound"></param>
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
+        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the overload GetDataTypeDefinitionByPropertyEditorAlias instead")]
+        public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id, bool throwIfNotFound)
+        {
+            var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(id, throwIfNotFound);
+            if (alias == null)
+            {
+                return Enumerable.Empty<IDataTypeDefinition>();
+            }
+            return GetDataTypeDefinitionByPropertyEditorAlias(alias);
+        }
+
         [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the overload GetDataTypeDefinitionByPropertyEditorAlias instead")]
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id)
         {
-            var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(id, true);
-            return GetDataTypeDefinitionByPropertyEditorAlias(alias);
+            return GetDataTypeDefinitionByControlId(id, true);
         }
 
         /// <summary>
