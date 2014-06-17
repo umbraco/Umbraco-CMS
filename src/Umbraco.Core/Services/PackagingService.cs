@@ -773,6 +773,7 @@ namespace Umbraco.Core.Services
             var items = new List<IDictionaryItem>();
             foreach (var dictionaryItemElement in dictionaryItemElementList.Elements("DictionaryItem"))
                 items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, parentId));
+
             return items;
         }
 
@@ -788,6 +789,7 @@ namespace Umbraco.Core.Services
                 dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages, parentId);
             _localizationService.Save(dictionaryItem);
             items.Add(dictionaryItem);
+
             items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages, dictionaryItem.Key));
             return items;
         }
@@ -817,7 +819,8 @@ namespace Umbraco.Core.Services
         private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations, XElement valueElement)
         {
             return translations.All(t =>
-                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value, StringComparison.InvariantCultureIgnoreCase) != 0
+                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value,
+                    StringComparison.InvariantCultureIgnoreCase) != 0
                 );
         }
 
