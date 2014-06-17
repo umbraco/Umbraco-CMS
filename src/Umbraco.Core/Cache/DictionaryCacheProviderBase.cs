@@ -26,6 +26,18 @@ namespace Umbraco.Core.Cache
             return string.Format("{0}-{1}", CacheItemPrefix, key);
         }
 
+        protected object GetSafeLazyValue(Lazy<object> lazy)
+        {
+            try
+            {
+                return lazy.Value;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         #region Clear
 
         public virtual void ClearAllCache()
@@ -56,7 +68,7 @@ namespace Umbraco.Core.Cache
                     {
                         // entry.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
-                        var value = ((Lazy<object>) x.Value).Value;
+                        var value = GetSafeLazyValue((Lazy<object>) x.Value); // return exceptions as null
                         return value == null || value.GetType().ToString().InvariantEquals(typeName);
                     })
                     .ToArray())
@@ -75,7 +87,7 @@ namespace Umbraco.Core.Cache
                         // entry.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // compare on exact type, don't use "is"
-                        var value = ((Lazy<object>)x.Value).Value;
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value); // return exceptions as null
                         return value == null || value.GetType() == typeOfT;
                     })
                     .ToArray())
@@ -95,7 +107,7 @@ namespace Umbraco.Core.Cache
                         // entry.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // compare on exact type, don't use "is"
-                        var value = ((Lazy<object>)x.Value).Value;
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value); // return exceptions as null
                         if (value == null) return true;
                         return value.GetType() == typeOfT
                             // run predicate on the 'public key' part only, ie without prefix
@@ -140,7 +152,7 @@ namespace Umbraco.Core.Cache
             {
                 return GetDictionaryEntries()
                     .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
-                    .Select(x => ((Lazy<object>)x.Value).Value)
+                    .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                     .Where(x => x != null) // backward compat, don't store null values in the cache
                     .ToList();
             }
@@ -154,7 +166,7 @@ namespace Umbraco.Core.Cache
             {
                 return GetDictionaryEntries()
                     .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
-                    .Select(x => ((Lazy<object>)x.Value).Value)
+                    .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                     .Where(x => x != null) // backward compat, don't store null values in the cache
                     .ToList();
             }
@@ -166,7 +178,7 @@ namespace Umbraco.Core.Cache
             using (new ReadLock(Locker))
             {
                 var result = GetEntry(cacheKey) as Lazy<object>; // null if key not found
-                return result == null ? null : result.Value;
+                return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
             }
         }
 

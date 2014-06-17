@@ -85,7 +85,7 @@ namespace Umbraco.Core.Cache
             using (var lck = new UpgradeableReadLock(Locker))
             {
                 result = _cache.Get(cacheKey) as Lazy<object>; // null if key not found
-                if (result == null || (result.IsValueCreated && result.Value == null))
+                if (result == null || (result.IsValueCreated && GetSafeLazyValue(result) == null)) // get exceptions as null
                 {
                     lck.UpgradeToWriteLock();
 
@@ -96,6 +96,9 @@ namespace Umbraco.Core.Cache
                 }
             }
 
+            // this may throw if getCacheItem throws, but this is the only place where
+            // it would throw as everywhere else we use GetLazySaveValue() to hide exceptions
+            // and pretend exceptions were never inserted into cache to begin with.
             return result.Value;
         }
 
@@ -129,7 +132,7 @@ namespace Umbraco.Core.Cache
             // and make sure we don't store a null value.
 
             var result = new Lazy<object>(getCacheItem);
-            var value = result.Value; // force evaluation now
+            var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
             if (value == null) return; // do not store null values (backward compat)
 
             cacheKey = GetCacheKey(cacheKey);           
