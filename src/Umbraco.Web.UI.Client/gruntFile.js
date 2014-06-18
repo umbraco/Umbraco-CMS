@@ -4,6 +4,7 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
+  grunt.registerTask('vs', ['jshint:dev', 'build', 'watch']);
 
   //run by the watch task
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
