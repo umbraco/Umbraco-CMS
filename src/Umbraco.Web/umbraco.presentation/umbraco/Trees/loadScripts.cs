@@ -79,7 +79,7 @@ namespace umbraco
             xNode.Action = xNode.Action.Replace("openFile", "openScriptEditor");
 
             // add special icons for javascript files
-            if (xNode.Action.Contains(".js"))
+            if (xNode.Text.Contains(".js"))
             {
                 xNode.Icon = "icon-script";
                 xNode.OpenIcon = "icon-script";
@@ -89,6 +89,8 @@ namespace umbraco
                 xNode.Icon = "icon-code";
                 xNode.OpenIcon = "icon-code";
             }
+
+            xNode.Text = xNode.Text.StripFileExtension();
         }
 
 

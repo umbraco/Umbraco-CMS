@@ -103,8 +103,7 @@ namespace umbraco.cms.presentation.Trees
                     
                     XmlTreeNode xFileNode = XmlTreeNode.Create(this);
 					xFileNode.NodeID = orgPath + file.Name;
-                    xFileNode.Text =
-                        string.Format("{0}", file.Name.Substring(0, file.Name.IndexOf(file.Extension, StringComparison.Ordinal)));
+                    xFileNode.Text = file.Name;
                     if (!((orgPath == "")))
                         xFileNode.Action = "javascript:openFile('" + orgPath  + file.Name + "');";
                     else
