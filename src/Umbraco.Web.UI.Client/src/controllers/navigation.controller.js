@@ -40,7 +40,6 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     });
 
     //trigger dialods with a hotkey:
-    //TODO: Unfortunately this will also close the login dialog.
     keyboardService.bind("esc", function () {
         eventsService.emit("app.closeDialogs");
     });
