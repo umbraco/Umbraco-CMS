@@ -25,7 +25,7 @@ namespace Umbraco.Core.Sync
             if (status == CurrentServerEnvironmentStatus.Single)
             {
                 //if it's a single install, then the base url has to be the first url registered
-                return ApplicationContext.Current.OriginalRequestUrl;
+                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
             }
 
             var servers = UmbracoSettings.DistributionServers;
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Sync
             if (nodes == null)
             {
                 //cannot be determined, then the base url has to be the first url registered
-                return ApplicationContext.Current.OriginalRequestUrl;
+                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
             }
 
             var xmlNodes = nodes.Cast<XmlNode>().ToList();
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Sync
             }
 
             //cannot be determined, then the base url has to be the first url registered
-            return ApplicationContext.Current.OriginalRequestUrl;
+            return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
         }
 
         /// <summary>
