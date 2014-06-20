@@ -24,6 +24,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Scheduling;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.presentation.cache;
@@ -116,7 +117,7 @@ namespace Umbraco.Web
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
-            ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
+            ApplicationEventsResolver.Current.AddType<Scheduler>();
             //We need to remove these types because we've obsoleted them and we don't want them executing:
             ApplicationEventsResolver.Current.RemoveType<global::umbraco.LibraryCacheRefresher>();
         }

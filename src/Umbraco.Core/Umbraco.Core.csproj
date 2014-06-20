@@ -770,6 +770,7 @@
     <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="Publishing\PublishStatus.cs" />
     <Compile Include="Publishing\PublishStatusType.cs" />
+    <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\IUsersMembershipProvider.cs" />
@@ -830,7 +831,9 @@
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
+    <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />
+    <Compile Include="Sync\ServerEnvironmentHelper.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
