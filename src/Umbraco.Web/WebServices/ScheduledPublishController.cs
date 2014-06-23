@@ -7,11 +7,10 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.WebServices
 {
-    //TODO: How to authenticate?
-
     /// <summary>
     /// A REST controller used for running the scheduled publishing, this is called from the background worker timer
     /// </summary>
+    [AdminTokenAuthorize]
     public class ScheduledPublishController : UmbracoController
     {
         private static bool _isPublishingRunning = false;

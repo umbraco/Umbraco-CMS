@@ -1,10 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.Net;
+using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -28,7 +30,10 @@ namespace Umbraco.Web.Scheduling
                 var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
                 var url = string.Format("{0}/RestServices/ScheduledPublish/", umbracoBaseUrl);
                 using (var wc = new WebClient())
-                {                    
+                {
+                    //pass custom the authorization header
+                    wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(appContext));
+
                     var result = wc.UploadString(url, "");
                 }
             }
