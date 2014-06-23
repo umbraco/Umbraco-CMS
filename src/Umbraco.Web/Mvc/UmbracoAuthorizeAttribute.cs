@@ -7,7 +7,7 @@ using umbraco.BasePages;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>	
+    /// <summary>	
 	/// Ensures authorization is successful for a back office user
 	/// </summary>
 	public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
