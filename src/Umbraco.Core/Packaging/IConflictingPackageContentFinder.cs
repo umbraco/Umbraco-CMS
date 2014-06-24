@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Packaging
 {
-    public interface IConflictingPackageContentFinder
+    internal interface IConflictingPackageContentFinder
     {
         IFile[] FindConflictingStylesheets(XElement stylesheetNotes);
         ITemplate[] FindConflictingTemplates(XElement templateNotes);

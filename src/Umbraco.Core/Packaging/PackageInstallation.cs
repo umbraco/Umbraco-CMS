@@ -596,36 +596,4 @@ namespace Umbraco.Core.Packaging
             return path;
         }
     }
-
-    public class FileInPackageInfo : IFileInPackageInfo
-    {
-        public string RelativePath
-        {
-            get { return Path.Combine(RelativeDir, FileName); }
-        }
-
-        public string FileNameInPackage { get; set; }
-        public string RelativeDir { get; set; }
-        public string DestinationRootDir { private get; set; }
-
-        public string Directory
-        {
-            get { return Path.Combine(DestinationRootDir, RelativeDir); }
-        }
-
-        public string FullPath
-        {
-            get { return Path.Combine(DestinationRootDir, RelativePath); }
-        }
-
-        public string FileName { get; set; }
-    }
-
-    public interface IFileInPackageInfo
-    {
-        string RelativeDir { get; }
-        string RelativePath { get; }
-        string FileName { get; set; }
-    }
-    
 }

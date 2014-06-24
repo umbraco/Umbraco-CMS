@@ -7,7 +7,7 @@ namespace Umbraco.Core.Packaging.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PreInstallWarnings
+    internal class PreInstallWarnings
     {
         public KeyValuePair<string, string>[] UnsecureFiles { get; set; }
         public KeyValuePair<string, string>[] FilesReplaced { get; set; }
