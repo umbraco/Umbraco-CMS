@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Sync;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -19,24 +20,28 @@ namespace Umbraco.Web.Scheduling
 
         public void Start(object sender)
         {
-            //NOTE: sender will be the umbraco ApplicationContext
+            using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
+            {
+                //NOTE: sender will be the umbraco ApplicationContext
 
-            if (_isPublishingRunning) return;
+                if (_isPublishingRunning) return;
 
-            _isPublishingRunning = true;
+                _isPublishingRunning = true;
             
-            try
-            {
-                ProcessTasks();
+                try
+                {
+                    ProcessTasks();
+                }
+                catch (Exception ee)
+                {
+                    LogHelper.Error<ScheduledTasks>("Error executing scheduled task", ee);
+                }
+                finally
+                {
+                    _isPublishingRunning = false;
+                }
             }
-            catch (Exception ee)
-            {
-                LogHelper.Error<ScheduledTasks>("Error executing scheduled task", ee);
-            }
-            finally
-            {
-                _isPublishingRunning = false;
-            }
+            
         }
 
         private static void ProcessTasks()

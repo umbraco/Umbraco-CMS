@@ -16,35 +16,38 @@ namespace Umbraco.Web.Scheduling
         
         public void Start(object sender)
         {
-            //NOTE: sender will be the umbraco ApplicationContext
+            using (DisposableTimer.DebugDuration<ScheduledPublishing>(() => "Scheduled publishing executing", () => "Scheduled publishing complete"))
+            {
+                //NOTE: sender will be the umbraco ApplicationContext
 
-            var appContext = sender as ApplicationContext;
-            if (appContext == null) return;
+                var appContext = sender as ApplicationContext;
+                if (appContext == null) return;
 
-            if (_isPublishingRunning) return;
+                if (_isPublishingRunning) return;
 
-            _isPublishingRunning = true;
+                _isPublishingRunning = true;
             
-            try
-            {
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
-                var url = string.Format("{0}/RestServices/ScheduledPublish/", umbracoBaseUrl);
-                using (var wc = new WebClient())
+                try
                 {
-                    //pass custom the authorization header
-                    wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(appContext));
+                    var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
+                    var url = string.Format("{0}/RestServices/ScheduledPublish/", umbracoBaseUrl);
+                    using (var wc = new WebClient())
+                    {
+                        //pass custom the authorization header
+                        wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(appContext));
 
-                    var result = wc.UploadString(url, "");
+                        var result = wc.UploadString(url, "");
+                    }
                 }
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<ScheduledPublishing>("An error occurred with the scheduled publishing", ee);
-            }
-            finally
-            {
-                _isPublishingRunning = false;
-            }
+                catch (Exception ee)
+                {
+                    LogHelper.Error<ScheduledPublishing>("An error occurred with the scheduled publishing", ee);
+                }
+                finally
+                {
+                    _isPublishingRunning = false;
+                }
+            }            
         }
 
         
