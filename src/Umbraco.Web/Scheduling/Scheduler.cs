@@ -20,9 +20,9 @@ namespace Umbraco.Web.Scheduling
     /// </remarks>
     internal sealed class Scheduler : ApplicationEventHandler
     {
-        private Timer _pingTimer;
-        private Timer _schedulingTimer;
-        private LogScrubber _scrubber;
+        private static Timer _pingTimer;
+        private static Timer _schedulingTimer;
+        private static LogScrubber _scrubber;
 
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
@@ -37,12 +37,18 @@ namespace Umbraco.Web.Scheduling
             // just copied over here for backward compatibility
             // of course we should have a proper scheduler, see #U4-809
 
-            // ping/keepalive
-            _pingTimer = new Timer(KeepAlive.Start, applicationContext, 60000, 300000);
+            //NOTE: It is important to note that we need to use the ctor for a timer without the 'state' object specified, this is in order 
+            // to ensure that the timer itself is not GC'd since internally .net will pass itself in as the state object and that will keep it alive.
+            // There's references to this here: http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
+            // we also make these timers static to ensure further GC safety.
+
+            // ping/keepalive            
+            _pingTimer = new Timer(KeepAlive.Start);
+            _pingTimer.Change(60000, 300000);
 
             // scheduled publishing/unpublishing
-
-            _schedulingTimer = new Timer(PerformScheduling, applicationContext, 30000, 60000);
+            _schedulingTimer = new Timer(PerformScheduling);
+            _schedulingTimer.Change(30000, 60000);
 
             //log scrubbing
             _scrubber = new LogScrubber();
