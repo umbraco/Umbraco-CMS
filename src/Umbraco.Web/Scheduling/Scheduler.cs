@@ -13,6 +13,10 @@ namespace Umbraco.Web.Scheduling
     /// TODO: Much of this code is legacy and needs to be updated, there are a few new/better ways to do scheduling
     /// in a web project nowadays. 
     /// 
+    /// //TODO: We need a much more robust way of handing scheduled tasks and also need to take into account app shutdowns during 
+    /// a scheduled tasks operation
+    /// http://haacked.com/archive/2011/10/16/the-dangers-of-implementing-recurring-background-tasks-in-asp-net.aspx/
+    /// 
     /// </remarks>
     internal sealed class Scheduler : ApplicationEventHandler
     {
