@@ -29,6 +29,8 @@ namespace Umbraco.Web.Scheduling
             if (umbracoApplication.Context == null)
                 return;
 
+            LogHelper.Debug<Scheduler>(() => "Initializing the scheduler");
+
             // time to setup the tasks
 
             // these are the legacy tasks
