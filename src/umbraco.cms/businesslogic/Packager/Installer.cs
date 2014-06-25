@@ -437,7 +437,6 @@ namespace umbraco.cms.businesslogic.packager
         /// </summary>
         /// <param name="tempDir">The folder to which the contents of the package is extracted</param>
         public void LoadConfig(string tempDir)
-        [Obsolete("This method is no longer used and will be removed in the future.")]
         {
             Config = new XmlDocument();
             Config.Load(tempDir + Path.DirectorySeparatorChar + "package.xml");
