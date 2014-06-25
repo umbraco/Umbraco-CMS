@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
-using System.Runtime.CompilerServices;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
@@ -12,7 +11,6 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.BusinessLogic;
-using umbraco.DataLayer;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
@@ -391,6 +389,7 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
 
                 #region Package Actions
+
                 foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Actions/Action"))
                 {
                     if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
@@ -398,15 +397,15 @@ namespace umbraco.cms.businesslogic.packager
                         insPack.Data.Actions += n.OuterXml;
                     }
 
+                    //Run the actions tagged only for 'install'
+
                     if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
                     {
-                        try
-                        {
-                            PackageAction.RunPackageAction(insPack.Data.Name, n.Attributes["alias"].Value, n);
-                        }
-                        catch
-                        {
+                        var alias = n.Attributes["alias"] != null ? n.Attributes["alias"].Value : "";
 
+                        if (alias.IsNullOrWhiteSpace() == false)
+                        {
+                            PackageAction.RunPackageAction(insPack.Data.Name, alias, n);             
                         }
                     }
                 }
@@ -440,6 +439,7 @@ namespace umbraco.cms.businesslogic.packager
         /// <param name="tempDir">Temporary folder where the package's content are extracted to</param>
         /// <param name="guid"></param>
         /// <param name="repoGuid"></param>
+        [Obsolete("This method is no longer used and will be removed in the future.")]
         public void Install(string tempDir, string guid, string repoGuid)
         {
             //PPH added logging of installs, this adds all install info in the installedPackages config file.
@@ -669,13 +669,15 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install Actions
+
+            //Install package actions for anything that is NOT uninstall
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Actions/Action [@runat != 'uninstall']"))
             {
-                try
+                var alias = n.Attributes["alias"] != null ? n.Attributes["alias"].Value : "";
+                if (alias.IsNullOrWhiteSpace() == false)
                 {
-                    PackageAction.RunPackageAction(packName, n.Attributes["alias"].Value, n);
+                    PackageAction.RunPackageAction(packName, alias, n);
                 }
-                catch { }
             }
 
             //saving the uninstall actions untill the package is uninstalled.
@@ -817,9 +819,9 @@ namespace umbraco.cms.businesslogic.packager
 
             wc.DownloadFile(
                 "http://" + UmbracoSettings.PackageServer + "/fetch?package=" + Package.ToString(),
-                IOHelper.MapPath(SystemDirectories.Packages + "/" + Package.ToString() + ".umb"));
+                IOHelper.MapPath(SystemDirectories.Packages + "/" + Package + ".umb"));
 
-            return "packages\\" + Package.ToString() + ".umb";
+            return "packages\\" + Package + ".umb";
         }
         
         #endregion
@@ -900,19 +902,7 @@ namespace umbraco.cms.businesslogic.packager
                     return path + Path.DirectorySeparatorChar + fileName;
             }
         }
-
-        private static int FindDataTypeDefinitionFromType(ref Guid dtId)
-        {
-            int dfId = 0;
-            foreach (datatype.DataTypeDefinition df in datatype.DataTypeDefinition.GetAll())
-                if (df.DataType.Id == dtId)
-                {
-                    dfId = df.Id;
-                    break;
-                }
-            return dfId;
-        }
-
+        
         private static string UnPack(string zipName)
         {
             // Unzip
@@ -959,182 +949,5 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         #endregion
-    }
-
-    public class Package
-    {
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
-        public Package()
-        {
-        }
-
-        /// <summary>
-        /// Initialize package install status object by specifying the internal id of the installation. 
-        /// The id is specific to the local umbraco installation and cannot be used to identify the package in general. 
-        /// Use the Package(Guid) constructor to check whether a package has been installed
-        /// </summary>
-        /// <param name="Id">The internal id.</param>
-        public Package(int Id)
-        {
-            initialize(Id);
-        }
-
-        public Package(Guid Id)
-        {
-            int installStatusId = SqlHelper.ExecuteScalar<int>(
-                "select id from umbracoInstalledPackages where package = @package and upgradeId = 0",
-                SqlHelper.CreateParameter("@package", Id));
-
-            if (installStatusId > 0)
-                initialize(installStatusId);
-            else
-                throw new ArgumentException("Package with id '" + Id.ToString() + "' is not installed");
-        }
-
-        private void initialize(int id)
-        {
-
-            IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                "select id, uninstalled, upgradeId, installDate, userId, package, versionMajor, versionMinor, versionPatch from umbracoInstalledPackages where id = @id",
-                SqlHelper.CreateParameter("@id", id));
-
-            if (dr.Read())
-            {
-                Id = id;
-                Uninstalled = dr.GetBoolean("uninstalled");
-                UpgradeId = dr.GetInt("upgradeId");
-                InstallDate = dr.GetDateTime("installDate");
-                User = User.GetUser(dr.GetInt("userId"));
-                PackageId = dr.GetGuid("package");
-                VersionMajor = dr.GetInt("versionMajor");
-                VersionMinor = dr.GetInt("versionMinor");
-                VersionPatch = dr.GetInt("versionPatch");
-            }
-            dr.Close();
-        }
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Save()
-        {
-
-            IParameter[] values = {
-                SqlHelper.CreateParameter("@uninstalled", Uninstalled),
-                SqlHelper.CreateParameter("@upgradeId", UpgradeId),
-                SqlHelper.CreateParameter("@installDate", InstallDate),
-                SqlHelper.CreateParameter("@userId", User.Id),
-                SqlHelper.CreateParameter("@versionMajor", VersionMajor),
-                SqlHelper.CreateParameter("@versionMinor", VersionMinor),
-                SqlHelper.CreateParameter("@versionPatch", VersionPatch),
-                SqlHelper.CreateParameter("@id", Id)
-            };
-
-            // check if package status exists
-            if (Id == 0)
-            {
-                // The method is synchronized
-                SqlHelper.ExecuteNonQuery("INSERT INTO umbracoInstalledPackages (uninstalled, upgradeId, installDate, userId, versionMajor, versionMinor, versionPatch) VALUES (@uninstalled, @upgradeId, @installDate, @userId, @versionMajor, @versionMinor, @versionPatch)", values);
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoInstalledPackages");
-            }
-
-            SqlHelper.ExecuteNonQuery(
-                "update umbracoInstalledPackages set " +
-                "uninstalled = @uninstalled, " +
-                "upgradeId = @upgradeId, " +
-                "installDate = @installDate, " +
-                "userId = @userId, " +
-                "versionMajor = @versionMajor, " +
-                "versionMinor = @versionMinor, " +
-                "versionPatch = @versionPatch " +
-                "where id = @id",
-                values);
-        }
-
-        private bool _uninstalled;
-
-        public bool Uninstalled
-        {
-            get { return _uninstalled; }
-            set { _uninstalled = value; }
-        }
-
-
-        private User _user;
-
-        public User User
-        {
-            get { return _user; }
-            set { _user = value; }
-        }
-
-
-        private DateTime _installDate;
-
-        public DateTime InstallDate
-        {
-            get { return _installDate; }
-            set { _installDate = value; }
-        }
-
-
-        private int _id;
-
-        public int Id
-        {
-            get { return _id; }
-            set { _id = value; }
-        }
-
-
-        private int _upgradeId;
-
-        public int UpgradeId
-        {
-            get { return _upgradeId; }
-            set { _upgradeId = value; }
-        }
-
-
-        private Guid _packageId;
-
-        public Guid PackageId
-        {
-            get { return _packageId; }
-            set { _packageId = value; }
-        }
-
-
-        private int _versionPatch;
-
-        public int VersionPatch
-        {
-            get { return _versionPatch; }
-            set { _versionPatch = value; }
-        }
-
-
-        private int _versionMinor;
-
-        public int VersionMinor
-        {
-            get { return _versionMinor; }
-            set { _versionMinor = value; }
-        }
-
-
-        private int _versionMajor;
-
-        public int VersionMajor
-        {
-            get { return _versionMajor; }
-            set { _versionMajor = value; }
-        }
-
-
-
     }
 }
