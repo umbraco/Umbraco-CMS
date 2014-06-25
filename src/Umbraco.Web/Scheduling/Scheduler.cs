@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
@@ -13,10 +14,10 @@ namespace Umbraco.Web.Scheduling
     /// in a web project nowadays. 
     /// 
     /// </remarks>
-	internal sealed class Scheduler : ApplicationEventHandler
-	{
-		private Timer _pingTimer;
-		private Timer _schedulingTimer;
+    internal sealed class Scheduler : ApplicationEventHandler
+    {
+        private Timer _pingTimer;
+        private Timer _schedulingTimer;
         private LogScrubber _scrubber;
 
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
@@ -24,23 +25,23 @@ namespace Umbraco.Web.Scheduling
             if (umbracoApplication.Context == null)
                 return;
 
-			// time to setup the tasks
+            // time to setup the tasks
 
-			// these are the legacy tasks
-			// just copied over here for backward compatibility
-			// of course we should have a proper scheduler, see #U4-809
+            // these are the legacy tasks
+            // just copied over here for backward compatibility
+            // of course we should have a proper scheduler, see #U4-809
 
-			// ping/keepalive
+            // ping/keepalive
             _pingTimer = new Timer(KeepAlive.Start, applicationContext, 60000, 300000);
 
-			// scheduled publishing/unpublishing
-            
+            // scheduled publishing/unpublishing
+
             _schedulingTimer = new Timer(PerformScheduling, applicationContext, 30000, 60000);
-            
+
             //log scrubbing
             _scrubber = new LogScrubber();
             _scrubber.Start();
-		}
+        }
 
         /// <summary>
         /// This performs all of the scheduling on the one timer
@@ -51,32 +52,38 @@ namespace Umbraco.Web.Scheduling
         /// </remarks>
         private static void PerformScheduling(object sender)
         {
-
-            //get the current server status to see if this server should execute the scheduled publishing
-            var serverStatus = ServerEnvironmentHelper.GetStatus();
-
-            switch (serverStatus)
+            using (DisposableTimer.DebugDuration<Scheduler>(() => "Scheduling interval executing", () => "Scheduling interval complete"))
             {
-                case CurrentServerEnvironmentStatus.Single:
-                case CurrentServerEnvironmentStatus.Master:
-                case CurrentServerEnvironmentStatus.Unknown:
-                    //if it's a single server install, a master or it cannot be determined 
-                    // then we will process the scheduling
+                //get the current server status to see if this server should execute the scheduled publishing
+                var serverStatus = ServerEnvironmentHelper.GetStatus();
+
+                switch (serverStatus)
+                {
+                    case CurrentServerEnvironmentStatus.Single:
+                    case CurrentServerEnvironmentStatus.Master:
+                    case CurrentServerEnvironmentStatus.Unknown:
+                        //if it's a single server install, a master or it cannot be determined 
+                        // then we will process the scheduling
                     
-                    //do the scheduled publishing
-                    var scheduledPublishing = new ScheduledPublishing();
-                    scheduledPublishing.Start(sender);
+                        //do the scheduled publishing
+                        var scheduledPublishing = new ScheduledPublishing();
+                        scheduledPublishing.Start(sender);
 
-                    //do the scheduled tasks
-                    var scheduledTasks = new ScheduledTasks();
-                    scheduledTasks.Start(sender);
+                        //do the scheduled tasks
+                        var scheduledTasks = new ScheduledTasks();
+                        scheduledTasks.Start(sender);
 
-                    break;
-                case CurrentServerEnvironmentStatus.Slave:                
-                    //do not process
-                    break;
+                        break;
+                    case CurrentServerEnvironmentStatus.Slave:                
+                        //do not process
+                        
+                        LogHelper.Debug<Scheduler>(
+                            () => string.Format("Current server ({0}) detected as a slave, no scheduled processes will execute on this server", NetworkHelper.MachineName));
+
+                        break;
+                }            
             }            
         }
 
-	}
+    }
 }

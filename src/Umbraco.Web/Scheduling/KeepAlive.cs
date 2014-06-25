@@ -10,26 +10,30 @@ namespace Umbraco.Web.Scheduling
     {
         public static void Start(object sender)
         {
-            //NOTE: sender will be the umbraco ApplicationContext
-
-            var appContext = sender as ApplicationContext;
-            if (appContext == null) return;
-
-            var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
-
-            var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
-
-            try
+            using (DisposableTimer.DebugDuration<KeepAlive>(() => "Keep alive executing", () => "Keep alive complete"))
             {
-                using (var wc = new WebClient())
+                //NOTE: sender will be the umbraco ApplicationContext
+
+                var appContext = sender as ApplicationContext;
+                if (appContext == null) return;
+
+                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
+
+                var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
+
+                try
                 {
-                    wc.DownloadString(url);
+                    using (var wc = new WebClient())
+                    {
+                        wc.DownloadString(url);
+                    }
+                }
+                catch (Exception ee)
+                {
+                    LogHelper.Error<KeepAlive>("Error in ping", ee);
                 }
             }
-            catch (Exception ee)
-            {
-                LogHelper.Error<KeepAlive>("Error in ping", ee);
-            }
+            
         }
     }
 }
