@@ -12,18 +12,17 @@ namespace Umbraco.Web.Scheduling
 {
     //TODO: No scheduled task (i.e. URL) would be secured, so if people are actually using these each task
     // would need to be a publicly available task (URL) which isn't really very good :(
+    // We should really be using the AdminTokenAuthorizeAttribute for this stuff
 
     internal class ScheduledTasks
     {
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
         private static bool _isPublishingRunning = false;
 
-        public void Start(object sender)
+        public void Start(ApplicationContext appContext)
         {
             using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
             {
-                //NOTE: sender will be the umbraco ApplicationContext
-
                 if (_isPublishingRunning) return;
 
                 _isPublishingRunning = true;

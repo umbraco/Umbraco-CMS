@@ -79,11 +79,11 @@ namespace Umbraco.Web.Scheduling
                     
                         //do the scheduled publishing
                         var scheduledPublishing = new ScheduledPublishing();
-                        scheduledPublishing.Start(sender);
+                        scheduledPublishing.Start(ApplicationContext.Current);
 
                         //do the scheduled tasks
                         var scheduledTasks = new ScheduledTasks();
-                        scheduledTasks.Start(sender);
+                        scheduledTasks.Start(ApplicationContext.Current);
 
                         break;
                     case CurrentServerEnvironmentStatus.Slave:                

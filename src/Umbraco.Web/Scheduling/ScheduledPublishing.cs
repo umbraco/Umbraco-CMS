@@ -13,16 +13,13 @@ namespace Umbraco.Web.Scheduling
     internal class ScheduledPublishing
     {
         private static bool _isPublishingRunning = false;
-        
-        public void Start(object sender)
+
+        public void Start(ApplicationContext appContext)
         {
+            if (appContext == null) return;
+
             using (DisposableTimer.DebugDuration<ScheduledPublishing>(() => "Scheduled publishing executing", () => "Scheduled publishing complete"))
-            {
-                //NOTE: sender will be the umbraco ApplicationContext
-
-                var appContext = sender as ApplicationContext;
-                if (appContext == null) return;
-
+            {                                
                 if (_isPublishingRunning) return;
 
                 _isPublishingRunning = true;
