@@ -30,7 +30,7 @@ namespace Umbraco.Web.Scheduling
                 try
                 {
                     var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
-                    var url = string.Format("{0}/RestServices/ScheduledPublish/", umbracoBaseUrl);
+                    var url = string.Format("{0}/RestServices/ScheduledPublish/Index", umbracoBaseUrl);
                     using (var wc = new WebClient())
                     {
                         //pass custom the authorization header
