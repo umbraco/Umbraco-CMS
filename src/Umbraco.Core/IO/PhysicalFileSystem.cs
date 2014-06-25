@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO; 
 using System.Linq;
-using System.Web;
-using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.IO
 {
