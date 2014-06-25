@@ -207,7 +207,6 @@ namespace umbraco
                         FireAfterRefreshContent(new RefreshContentEventArgs());
 
                         // Only save new XML cache to disk if we just repopulated it
-                        // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
                         if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && !IsValidDiskCachePresent())
                         {
                             QueueXmlForPersistence();
@@ -216,7 +215,9 @@ namespace umbraco
                     }
                 }
             }
-            Trace.WriteLine("Content initialized (was already in context)");
+
+            LogHelper.Debug<content>(() => "Content initialized (was already in context)");
+
             return false;
         }
 
@@ -289,32 +290,33 @@ namespace umbraco
 
         #endregion
 
-        /// <summary>
-        /// Load content from database in a background thread
-        /// Replaces active content when done.
-        /// </summary>
+        [Obsolete("This is no longer used and will be removed in future versions, if you use this method it will not refresh 'async' it will perform the refresh on the current thread which is how it should be doing it")]
         public virtual void RefreshContentFromDatabaseAsync()
+        {
+            RefreshContentFromDatabase();
+        }
+
+        /// <summary>
+        /// Load content from database and replaces active content when done.
+        /// </summary>
+        public virtual void RefreshContentFromDatabase()
         {
             var e = new RefreshContentEventArgs();
             FireBeforeRefreshContent(e);
 
             if (!e.Cancel)
             {
-                ThreadPool.QueueUserWorkItem(
-                    delegate
-                    {
-                        XmlDocument xmlDoc = LoadContentFromDatabase();
-                        XmlContentInternal = xmlDoc;
+                XmlDocument xmlDoc = LoadContentFromDatabase();
+                XmlContentInternal = xmlDoc;
 
-                        // It is correct to manually call PersistXmlToFile here event though the setter of XmlContentInternal
-                        // queues this up, because this delegate is executing on a different thread and may complete
-                        // after the request which invoked it (which would normally persist the file on completion)
-                        // So we are responsible for ensuring the content is persisted in this case.
-                        if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
-                            PersistXmlToFile(xmlDoc);
-                    });
-
-                FireAfterRefreshContent(e);
+                // It is correct to manually call PersistXmlToFile here event though the setter of XmlContentInternal
+                // queues this up, because this delegate is executing on a different thread and may complete
+                // after the request which invoked it (which would normally persist the file on completion)
+                // So we are responsible for ensuring the content is persisted in this case.
+                if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
+                {
+                    PersistXmlToFile(xmlDoc);
+                }
             }
         }
 
@@ -552,33 +554,15 @@ namespace umbraco
             }
         }
         
-        /// <summary>
-        /// Updates the document cache async.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
         [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
         public virtual void UpdateDocumentCacheAsync(int documentId)
         {
-            //SD: WE've obsoleted this but then didn't make it call the method it should! So we've just 
-            // left a bug behind...???? ARGH. 
-            //.... changed now.
-            //ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
-
             UpdateDocumentCache(documentId);
         }
-
-        /// <summary>
-        /// Clears the document cache async.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
+        
         [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         public virtual void ClearDocumentCacheAsync(int documentId)
         {
-            //SD: WE've obsoleted this but then didn't make it call the method it should! So we've just 
-            // left a bug behind...???? ARGH.
-            //.... changed now.
-            //ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
-
             ClearDocumentCache(documentId);
         }
 
@@ -652,69 +636,6 @@ namespace umbraco
         {
             ClearDocumentCache(documentId);
         }
-
-        ///// <summary>
-        ///// Uns the publish node async.
-        ///// </summary>
-        ///// <param name="documentId">The document id.</param>
-        //[Obsolete("Please use: umbraco.content.ClearDocumentCacheAsync", true)]
-        //public virtual void UnPublishNodeAsync(int documentId)
-        //{
-
-        //    ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
-        //}
-
-
-        ///// <summary>
-        ///// Legacy method - you should use the overloaded publishnode(document d) method whenever possible
-        ///// </summary>
-        ///// <param name="documentId"></param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        //public virtual void PublishNode(int documentId)
-        //{
-
-        //    // Get the document
-        //    var d = new Document(documentId);
-        //    PublishNode(d);
-        //}
-
-
-        ///// <summary>
-        ///// Publishes the node async.
-        ///// </summary>
-        ///// <param name="documentId">The document id.</param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCacheAsync", true)]
-        //public virtual void PublishNodeAsync(int documentId)
-        //{
-
-        //    UpdateDocumentCacheAsync(documentId);
-        //}
-
-
-        ///// <summary>
-        ///// Publishes the node.
-        ///// </summary>
-        ///// <param name="Documents">The documents.</param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        //public virtual void PublishNode(List<Document> Documents)
-        //{
-
-        //    UpdateDocumentCache(Documents);
-        //}
-
-
-
-        ///// <summary>
-        ///// Publishes the node.
-        ///// </summary>
-        ///// <param name="d">The document.</param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        //public virtual void PublishNode(Document d)
-        //{
-
-        //    UpdateDocumentCache(d);
-        //}
-
 
         /// <summary>
         /// Occurs when [before document cache update].
@@ -933,9 +854,10 @@ namespace umbraco
                                 RemoveXmlFilePersistenceQueue();
                             }
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             // Nothing to catch here - we'll just persist
+                            LogHelper.Error<content>("An error occurred checking if xml file is queued for persistence", ex);
                         }
                     }
                 }
@@ -1037,22 +959,8 @@ namespace umbraco
         /// </summary>
         private XmlDocument LoadContentFromDatabase()
         {
-            // Alex N - 2010 06 - Very generic try-catch simply because at the moment, unfortunately, this method gets called inside a ThreadPool thread
-            // and we need to guarantee it won't tear down the app pool by throwing an unhandled exception
             try
             {
-                // Moved User to a local variable - why are we causing user 0 to load from the DB though?
-                // Alex N 20100212
-                User staticUser = null;
-                try
-                {
-                    staticUser = User.GetCurrent(); //User.GetUser(0);
-                }
-                catch
-                {
-                    /* We don't care later if the staticUser is null */
-                }
-
                 // Try to log to the DB
                 LogHelper.Info<content>("Loading content from database...");
 
@@ -1236,19 +1144,10 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             {
                 if (xmlDoc != null)
                 {
-                    Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})",
-                                              Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread));
-
-                    // Moved the user into a variable and avoided it throwing an error if one can't be loaded (e.g. empty / corrupt db on initial install)
-                    User staticUser = null;
-                    try
-                    {
-                        staticUser = User.GetCurrent();
-                    }
-                    catch
-                    {
-                    }
-
+                    LogHelper.Debug<content>("Saving content to disk on thread '{0}' (Threadpool? {1})",
+                        () => Thread.CurrentThread.Name,
+                        () => Thread.CurrentThread.IsThreadPoolThread);
+                    
                     try
                     {
                         Stopwatch stopWatch = Stopwatch.StartNew();
@@ -1264,23 +1163,20 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         }
 
                         xmlDoc.Save(UmbracoXmlDiskCacheFileName);
-
-                        Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})",
-                                                  Thread.CurrentThread.Name, stopWatch.Elapsed,
-                                                  Thread.CurrentThread.IsThreadPoolThread));
-
-						LogHelper.Debug<content>(string.Format("Xml saved in {0}", stopWatch.Elapsed));
+                        
+                        LogHelper.Debug<content>("Saved content on thread '{0}' in {1} (Threadpool? {2})",
+                            () => Thread.CurrentThread.Name,
+                            () => stopWatch.Elapsed,
+                            () => Thread.CurrentThread.IsThreadPoolThread);
                     }
                     catch (Exception ee)
                     {
                         // If for whatever reason something goes wrong here, invalidate disk cache
                         DeleteXmlCache();
-
-                        Trace.Write(string.Format(
+                        
+                        LogHelper.Error<content>(string.Format(
                             "Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})",
-                            Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread));
-
-                        LogHelper.Error<content>("Xml wasn't saved", ee);
+                            Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread), ee);
                     }
                 }
             }
@@ -1289,36 +1185,29 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// <summary>
         /// Marks a flag in the HttpContext so that, upon page execution completion, the Xml cache will
         /// get persisted to disk. Ensure this method is only called from a thread executing a page request
-        /// since umbraco.presentation.requestModule is the only monitor of this flag and is responsible
+        /// since UmbracoModule is the only monitor of this flag and is responsible
         /// for enacting the persistence at the PostRequestHandlerExecute stage of the page lifecycle.
         /// </summary>
         private void QueueXmlForPersistence()
         {
-            /* Alex Norcliffe 2010 06 03 - removing all launching of ThreadPool threads, instead we just 
-             * flag on the context that the Xml should be saved and an event in the requestModule
-             * will check for this and call PersistXmlToFile() if necessary */
+            //if this is called outside a web request we cannot queue it.
+            
             if (HttpContext.Current != null)
             {
                 HttpContext.Current.Application.Lock();
-                if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
-                    HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
-                HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
-                HttpContext.Current.Application.UnLock();
-            }
-            else
-            {
-                //// Save copy of content
-                if (UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent)
+                try
                 {
-                    XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
-
-                    ThreadPool.QueueUserWorkItem(
-                        delegate { PersistXmlToFile(xmlContentCopy); });
+                    if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
+                    {
+                        HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
+                    }
+                    HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
                 }
-                else
-                    ThreadPool.QueueUserWorkItem(
-                        delegate { PersistXmlToFile(); });
-            }
+                finally
+                {
+                    HttpContext.Current.Application.UnLock();    
+                }
+            }           
         }
 
         internal DateTime GetCacheFileUpdateTime()
