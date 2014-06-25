@@ -101,9 +101,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="Examine">
+    <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.57.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -269,6 +269,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
+    <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
     <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
@@ -301,6 +302,7 @@
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\PublishedProperty.cs" />
+    <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="PublishedCache\MemberPublishedContent.cs" />
     <Compile Include="PublishedCache\RawValueProperty.cs" />
@@ -324,6 +326,10 @@
     <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Scheduling\KeepAlive.cs" />
+    <Compile Include="Scheduling\LogScrubber.cs" />
+    <Compile Include="Scheduling\ScheduledPublishing.cs" />
+    <Compile Include="Scheduling\ScheduledTasks.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
@@ -498,7 +504,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="LegacyScheduledTasks.cs" />
+    <Compile Include="Scheduling\Scheduler.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
@@ -1781,6 +1787,7 @@
     <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
+    <Compile Include="WebServices\ScheduledPublishController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">

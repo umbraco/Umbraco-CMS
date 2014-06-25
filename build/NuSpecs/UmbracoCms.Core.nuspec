@@ -29,6 +29,7 @@
             <dependency id="ClientDependency" version="[1.7.1.2, 2.0.0)" />
             <dependency id="ClientDependency-Mvc" version="[1.7.0.4, 2.0.0)" />
             <dependency id="Newtonsoft.Json" version="[4.5.11, 6.0.0)" />
+            <dependency id="Examine" version="[0.1.57, 1.0.0)" />
         </dependencies>
     </metadata>
     <files>

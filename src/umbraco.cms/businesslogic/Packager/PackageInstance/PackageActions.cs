@@ -27,7 +27,7 @@ namespace umbraco.cms.businesslogic.packager
 		/// <param name="packageName">Name of the package.</param>
 		/// <param name="actionAlias">The action alias.</param>
 		/// <param name="actionXml">The action XML.</param>
-		public static void RunPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
+		public static void RunPackageAction(string packageName, string actionAlias, XmlNode actionXml)
 		{
 
 			foreach (var ipa in PackageActionsResolver.Current.PackageActions)

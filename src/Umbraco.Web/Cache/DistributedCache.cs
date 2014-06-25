@@ -60,23 +60,6 @@ namespace Umbraco.Web.Cache
 
         private static readonly DistributedCache InstanceObject = new DistributedCache();
 
-        ///// <summary>
-        ///// Fired when any cache refresher method has fired
-        ///// </summary>
-        ///// <remarks>
-        ///// This could be used by developers to know when a cache refresher has executed on the local server. 
-        ///// Similarly to the content.AfterUpdateDocumentCache which fires locally on each machine.
-        ///// </remarks>
-        //public event EventHandler<CacheUpdatedEventArgs> CacheChanged;
-
-        //private void OnCacheChanged(CacheUpdatedEventArgs args)
-        //{
-        //    if (CacheChanged != null)
-        //    {
-        //        CacheChanged(this, args);
-        //    }
-        //}
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -109,6 +92,8 @@ namespace Umbraco.Web.Cache
         /// </remarks>
         public void Refresh<T>(Guid factoryGuid, Func<T, int> getNumericId, params T[] instances)
         {
+            if (factoryGuid == Guid.Empty || instances.Length == 0 || getNumericId == null) return;
+
             ServerMessengerResolver.Current.Messenger.PerformRefresh<T>(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(factoryGuid),
@@ -124,6 +109,8 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id of the node.</param>
         public void Refresh(Guid factoryGuid, int id)
         {
+            if (factoryGuid == Guid.Empty || id == default(int)) return;
+
             ServerMessengerResolver.Current.Messenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations, 
                 GetRefresherById(factoryGuid), 
@@ -138,6 +125,8 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The guid of the node.</param>
         public void Refresh(Guid factoryGuid, Guid id)
         {
+            if (factoryGuid == Guid.Empty || id == Guid.Empty) return;
+
             ServerMessengerResolver.Current.Messenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(factoryGuid),
@@ -152,6 +141,8 @@ namespace Umbraco.Web.Cache
         /// <param name="jsonPayload"></param>
         public void RefreshByJson(Guid factoryGuid, string jsonPayload)
         {
+            if (factoryGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
+
             ServerMessengerResolver.Current.Messenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(factoryGuid),
@@ -165,6 +156,8 @@ namespace Umbraco.Web.Cache
         /// <param name="factoryGuid">The unique identifier.</param>
         public void RefreshAll(Guid factoryGuid)
         {
+            if (factoryGuid == Guid.Empty) return;
+
             RefreshAll(factoryGuid, true);
         }
 
@@ -178,6 +171,8 @@ namespace Umbraco.Web.Cache
         /// </param>
         public void RefreshAll(Guid factoryGuid, bool allServers)
         {
+            if (factoryGuid == Guid.Empty) return;
+
             ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
                 allServers 
                     ? ServerRegistrarResolver.Current.Registrar.Registrations
@@ -193,6 +188,8 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public void Remove(Guid factoryGuid, int id)
         {
+            if (factoryGuid == Guid.Empty || id == default(int)) return;
+
             ServerMessengerResolver.Current.Messenger.PerformRemove(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(factoryGuid),
