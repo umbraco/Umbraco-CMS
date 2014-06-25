@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Net;
 using System.Xml;
 using Umbraco.Core.Configuration;
@@ -43,35 +44,29 @@ namespace Umbraco.Web.Scheduling
         {
 
 
-            var scheduledTasks = UmbracoSettings.ScheduledTasks;
-            if (scheduledTasks != null)
+            var scheduledTasks = UmbracoConfig.For.UmbracoSettings().ScheduledTasks.Tasks;
+            foreach (var t in scheduledTasks)
             {
-                var tasks = scheduledTasks.SelectNodes("./task");
-                if (tasks == null) return;
-
-                foreach (XmlNode task in tasks)
+                var runTask = false;
+                if (!ScheduledTaskTimes.ContainsKey(t.Alias))
                 {
-                    var runTask = false;
-                    if (ScheduledTaskTimes.ContainsKey(task.Attributes.GetNamedItem("alias").Value) == false)
-                    {
-                        runTask = true;
-                        ScheduledTaskTimes.Add(task.Attributes.GetNamedItem("alias").Value, DateTime.Now);
-                    }
-                    // Add 1 second to timespan to compensate for differencies in timer
-                    else if (new TimeSpan(
-                        DateTime.Now.Ticks - ((DateTime)ScheduledTaskTimes[task.Attributes.GetNamedItem("alias").Value]).Ticks).TotalSeconds + 1
-                             >= int.Parse(task.Attributes.GetNamedItem("interval").Value))
-                    {
-                        runTask = true;
-                        ScheduledTaskTimes[task.Attributes.GetNamedItem("alias").Value] = DateTime.Now;
-                    }
+                    runTask = true;
+                    ScheduledTaskTimes.Add(t.Alias, DateTime.Now);
+                }
+                /// Add 1 second to timespan to compensate for differencies in timer
+                else if (
+                    new TimeSpan(
+                        DateTime.Now.Ticks - ((DateTime)ScheduledTaskTimes[t.Alias]).Ticks).TotalSeconds + 1 >= t.Interval)
+                {
+                    runTask = true;
+                    ScheduledTaskTimes[t.Alias] = DateTime.Now;
+                }
 
-                    if (runTask)
-                    {
-                        bool taskResult = GetTaskByHttp(task.Attributes.GetNamedItem("url").Value);
-                        if (bool.Parse(task.Attributes.GetNamedItem("log").Value))
-                            LogHelper.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", task.Attributes.GetNamedItem("alias").Value, taskResult));
-                    }
+                if (runTask)
+                {
+                    bool taskResult = GetTaskByHttp(t.Url);
+                    if (t.Log)
+                        LogHelper.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
                 }
             }
         }

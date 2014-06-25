@@ -28,21 +28,18 @@ namespace Umbraco.Core.Sync
                 return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
             }
 
-            var servers = UmbracoSettings.DistributionServers;
+            var servers = UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers.ToArray();
 
-            var nodes = servers.SelectNodes("./server");
-            if (nodes == null)
+            if (servers.Any() == false)
             {
                 //cannot be determined, then the base url has to be the first url registered
                 return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
             }
 
-            var xmlNodes = nodes.Cast<XmlNode>().ToList();
-
-            foreach (var xmlNode in xmlNodes)
+            foreach (var server in servers)
             {
-                var appId = xmlNode.AttributeValue<string>("appId");
-                var serverName = xmlNode.AttributeValue<string>("serverName");
+                var appId = server.AppId;
+                var serverName = server.ServerName;
 
                 if (appId.IsNullOrWhiteSpace() && serverName.IsNullOrWhiteSpace())
                 {
@@ -54,9 +51,9 @@ namespace Umbraco.Core.Sync
                 {
                     //match by appId or computer name! return the url configured
                     return string.Format("{0}://{1}:{2}/{3}",
-                        xmlNode.AttributeValue<string>("forceProtocol").IsNullOrWhiteSpace() ? "http" : xmlNode.AttributeValue<string>("forceProtocol"),
-                        xmlNode.InnerText,
-                        xmlNode.AttributeValue<string>("forcePortnumber").IsNullOrWhiteSpace() ? "80" : xmlNode.AttributeValue<string>("forcePortnumber"),
+                        server.ForceProtocol.IsNullOrWhiteSpace() ? "http" : server.ForceProtocol,
+                        server.ServerAddress,
+                        server.ForcePortnumber.IsNullOrWhiteSpace() ? "80" : server.ForcePortnumber,
                         IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimStart('/'));
                 }                
             }
@@ -71,20 +68,19 @@ namespace Umbraco.Core.Sync
         /// <returns></returns>
         public static CurrentServerEnvironmentStatus GetStatus()
         {
-            if (UmbracoSettings.UseDistributedCalls == false)
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
             {
                 return CurrentServerEnvironmentStatus.Single;
             }
 
-            var servers = UmbracoSettings.DistributionServers;
+            var servers = UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers.ToArray();
 
-            var nodes = servers.SelectNodes("./server");
-            if (nodes == null)
+            if (servers.Any() == false)
             {
                 return CurrentServerEnvironmentStatus.Unknown;
             }
 
-            var master = nodes.Cast<XmlNode>().FirstOrDefault();
+            var master = servers.FirstOrDefault();
             
             if (master == null)
             {
@@ -95,8 +91,8 @@ namespace Umbraco.Core.Sync
             //TODO: In v7 we have publicized ServerRegisterResolver - we won't be able to determine this based on that
             // but we'd need to change the IServerAddress interfaces which is breaking.
 
-            var appId = master.AttributeValue<string>("appId");
-            var serverName = master.AttributeValue<string>("serverName");
+            var appId = master.AppId;
+            var serverName = master.ServerName;
 
             if (appId.IsNullOrWhiteSpace() && serverName.IsNullOrWhiteSpace())
             {
