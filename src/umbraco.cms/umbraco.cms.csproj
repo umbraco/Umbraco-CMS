@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -243,6 +243,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
+    <Compile Include="businesslogic\Packager\Package.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\addApplication.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\addDashboardSection.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\addProxyFeedHost.cs" />
