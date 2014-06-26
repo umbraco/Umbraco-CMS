@@ -128,6 +128,81 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Exports an <see cref="IContentType"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="contentType">Content type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType)
+        {
+            var info = new XElement("Info",
+                                    new XElement("Name", contentType.Name),
+                                    new XElement("Alias", contentType.Alias),
+                                    new XElement("Icon", contentType.Icon),
+                                    new XElement("Thumbnail", contentType.Thumbnail),
+                                    new XElement("Description", contentType.Description),
+                                    new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
+                                    new XElement("IsListView", contentType.IsContainer.ToString()));
+
+            var masterContentType = contentType.CompositionAliases().FirstOrDefault();
+            if (masterContentType != null)
+                info.Add(new XElement("Master", masterContentType));
+
+            var allowedTemplates = new XElement("AllowedTemplates");
+            foreach (var template in contentType.AllowedTemplates)
+            {
+                allowedTemplates.Add(new XElement("Template", template.Alias));
+            }
+            info.Add(allowedTemplates);
+            if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+                info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
+            else
+                info.Add(new XElement("DefaultTemplate", ""));
+
+            var structure = new XElement("Structure");
+            foreach (var allowedType in contentType.AllowedContentTypes)
+            {
+                structure.Add(new XElement("DocumentType", allowedType.Alias));
+            }
+
+            var genericProperties = new XElement("GenericProperties");
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
+
+                var propertyGroup = propertyType.PropertyGroupId == null
+                                                ? null
+                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
+                var genericProperty = new XElement("GenericProperty",
+                                                   new XElement("Name", propertyType.Name),
+                                                   new XElement("Alias", propertyType.Alias),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
+                                                   new XElement("Definition", definition.Key),
+                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("Description", new XCData(propertyType.Description)));
+                genericProperties.Add(genericProperty);
+            }
+
+            var tabs = new XElement("Tabs");
+            foreach (var propertyGroup in contentType.PropertyGroups)
+            {
+                var tab = new XElement("Tab",
+                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
+                                       new XElement("Caption", propertyGroup.Name));
+                tabs.Add(tab);
+            }
+
+            return new XElement("DocumentType",
+                                   info,
+                                   structure,
+                                   genericProperties,
+                                   tabs);
+        }
+
+        /// <summary>
         /// Used by Media Export to recursively add children
         /// </summary>
         /// <param name="mediaService"></param>

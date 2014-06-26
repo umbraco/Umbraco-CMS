@@ -72,14 +72,16 @@ namespace Umbraco.Core.Services
         public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_contentService, _dataTypeService, content, deep);
-
+            
             if (raiseEvents)
             {
                 if (ExportingContent.IsRaisedEventCancelled(new ExportEventArgs<IContent>(content, nodeName), this))
                     return new XElement(nodeName);
             }
+
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(_contentService, _dataTypeService, content, deep);
+
             if(raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
 
@@ -272,70 +274,8 @@ namespace Umbraco.Core.Services
                     return new XElement("DocumentType");
             }
 
-            var info = new XElement("Info",
-                                    new XElement("Name", contentType.Name),
-                                    new XElement("Alias", contentType.Alias),
-                                    new XElement("Icon", contentType.Icon),
-                                    new XElement("Thumbnail", contentType.Thumbnail),
-                                    new XElement("Description", contentType.Description),
-                                    new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()));
-
-            var masterContentType = contentType.CompositionAliases().FirstOrDefault();
-            if (masterContentType != null)
-                info.Add(new XElement("Master", masterContentType));
-
-            var allowedTemplates = new XElement("AllowedTemplates");
-            foreach (var template in contentType.AllowedTemplates)
-            {
-                allowedTemplates.Add(new XElement("Template", template.Alias));
-            }
-            info.Add(allowedTemplates);
-            if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
-                info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
-            else
-                info.Add(new XElement("DefaultTemplate", ""));
-
-            var structure = new XElement("Structure");
-            foreach (var allowedType in contentType.AllowedContentTypes)
-            {
-                structure.Add(new XElement("DocumentType", allowedType.Alias));
-            }
-
-            var genericProperties = new XElement("GenericProperties");
-            foreach (var propertyType in contentType.PropertyTypes)
-            {
-                var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                
-                var propertyGroup = propertyType.PropertyGroupId == null 
-                                                ? null 
-                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
-                
-                var genericProperty = new XElement("GenericProperty",
-                                                   new XElement("Name", propertyType.Name),
-                                                   new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),
-                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
-                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("Validation", propertyType.ValidationRegExp),
-                                                   new XElement("Description", new XCData(propertyType.Description)));
-                genericProperties.Add(genericProperty);
-            }
-
-            var tabs = new XElement("Tabs");
-            foreach (var propertyGroup in contentType.PropertyGroups)
-            {
-                var tab = new XElement("Tab",
-                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name));
-                tabs.Add(tab);
-            }
-
-            var xml = new XElement("DocumentType",
-                                   info,
-                                   structure,
-                                   genericProperties,
-                                   tabs);
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(_dataTypeService, contentType);
 
             if (raiseEvents)
                 ExportedContentType.RaiseEvent(new ExportEventArgs<IContentType>(contentType, xml, false), this);
@@ -464,8 +404,13 @@ namespace Umbraco.Core.Services
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
             //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.
-            if (infoElement.Element("AllowAtRoot") != null)
-                contentType.AllowedAsRoot = infoElement.Element("AllowAtRoot").Value.ToLowerInvariant().Equals("true");
+            var allowAtRoot = infoElement.Element("AllowAtRoot");
+            if (allowAtRoot != null)
+                contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
+            //NOTE IsListView is a new property in the package xml so we need to verify it exists before using it.
+            var isListView = infoElement.Element("IsListView");
+            if (isListView != null)
+                contentType.IsContainer = isListView.Value.InvariantEquals("true");
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
