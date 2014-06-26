@@ -118,6 +118,8 @@ namespace umbraco.cms.businesslogic.packager {
 					int _contentNodeID = 0;
 					if (!String.IsNullOrEmpty(pack.ContentNodeId) && int.TryParse(pack.ContentNodeId, out _contentNodeID))
 					{
+                    if (contentNodeId > 0)
+                    {
 						XmlNode documents = _packageManifest.CreateElement("Documents");
 
 						XmlNode documentSet = _packageManifest.CreateElement("DocumentSet");
@@ -131,6 +133,7 @@ namespace umbraco.cms.businesslogic.packager {
 						documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
 
 						appendElement(documents);
+                    }
 					}
 
 					//Document types..
