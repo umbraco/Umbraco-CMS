@@ -26,7 +26,7 @@
 @green:                 #46a546;
 @red:                   #9d261d;
 @yellow:                #ffc40d;
-@orange:                #f57020;
+@orange:                #CE7846;
 @turquoise:				#04bfbf;
 @pink:                  #c3325f;
 @purple:                #7a43b6;
@@ -268,25 +268,25 @@
 @infoBackground:          @blue;
 @infoBorder:              transparent;
 
-// SD: Had to duplicate the above but prefix with 'form' with the bootstrap original colors
+// SD: Had to duplicate the above but prefix with 'form' inversed colors
 // because we cannot share the above alert colors with forms otherwise we end up with white
 // text and giant red backgrounds.
 
 // Form states
 // -------------------------
-@formWarningText:             @orange;
+@formWarningText:             @warningBackground;
 @formWarningBackground:       lighten(@warningBackground, 41%);
 @formWarningBorder:           darken(spin(@warningBackground, -10), 3%);
 
-@formErrorText:               @red;
+@formErrorText:               @errorBackground;
 @formErrorBackground:         lighten(@errorBackground, 55%);
 @formErrorBorder:             darken(spin(@errorBackground, -10), 3%);
 
-@formSuccessText:             @green;
+@formSuccessText:             @successBackground;
 @formSuccessBackground:       lighten(@successBackground, 48%);
 @formSuccessBorder:           darken(spin(@successBackground, -10), 5%);
 
-@formInfoText:                @blue;
+@formInfoText:                @infoBackground;
 @formInfoBackground:          lighten(@infoBackground, 41%);
 @formInfoBorder:              darken(spin(@infoBackground, -10), 7%);
 
