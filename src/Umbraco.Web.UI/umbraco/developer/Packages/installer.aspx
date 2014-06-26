@@ -74,9 +74,9 @@
             <cc1:PropertyPanel runat="server" Text="&nbsp;">
                 <asp:Button ID="ButtonLoadPackage" runat="server" Enabled="false" Text="Load Package"
                     OnClick="uploadFile"></asp:Button>
-                <span id="loadingbar" style="display: none;">
+                <div id="loadingbar" style="display: none; overflow: hidden; margin-left: -100%; margin-right: -20px;">
                     <cc1:ProgressBar ID="progbar1" runat="server" Title="Please wait..." />
-                </span>
+                </div>
             </cc1:PropertyPanel>
         </cc1:Pane>
         <cc1:Pane ID="pane_authenticate" runat="server" Visible="false" Text="Repository authentication">
@@ -251,7 +251,7 @@
 
                 <cc1:PropertyPanel runat="server" Text=" ">
                     <br />
-                    <div style="display: none;" id="installingMessage">
+                    <div id="installingMessage" style="display: none; overflow: hidden; margin-left: -100%; margin-right: -20px;">
                         <cc1:ProgressBar runat="server" ID="_progbar1" />
                         <br />
                         <em>&nbsp; &nbsp;Installing package, please wait...</em><br />
