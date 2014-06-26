@@ -39,7 +39,6 @@
         <file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
         <file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
         <file src="..\_BuildOutput\WebApp\bin\controls.xml" target="lib\controls.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\Examine.dll" target="lib\Examine.dll" />
         <file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
         <file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
         <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
