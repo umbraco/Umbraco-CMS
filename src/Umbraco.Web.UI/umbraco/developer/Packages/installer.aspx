@@ -98,16 +98,17 @@
         </cc1:Pane>
 
         <asp:Panel ID="pane_acceptLicense" runat="server" Visible="false">
-            <br />
-            <div class="alert alert-warning">
-                <p>
-                    <strong>Please note:</strong> Installing a package containing several items and
-                    files can take some time. Do not refresh the page or navigate away before, the installer
-                    notifies you the install is completed.
-                </p>
-            </div>
-
+            
             <cc1:Pane ID="pane_acceptLicenseInner" runat="server">
+                
+                <div class="alert alert-warning">
+                    <p>
+                        <strong>Please note:</strong> Installing a package containing several items and
+                        files can take some time. Do not refresh the page or navigate away before, the installer
+                        notifies you the install is completed.
+                    </p>
+                </div>
+
                 <cc1:PropertyPanel ID="PropertyPanel3" runat="server" Text="Name">
                     <asp:Label ID="LabelName" runat="server" /></cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="PropertyPanel5" runat="server" Text="Author">
