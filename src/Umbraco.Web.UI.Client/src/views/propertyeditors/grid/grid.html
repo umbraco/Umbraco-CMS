@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid">
 
-
+<div ng-if="contentReady">
     <!-- Template picker -->
     <div class="uSky-templates tb" ng-show="!model.value || model.value == ''">
         <div class="tr">
@@ -141,7 +141,6 @@
                                                             selectedControl:currentControl == control}"
                                                 ng-mouseover="setCurrentControl(control)" 
                                                 ng-mouseleave="disableCurrentControl(control)"
-                                                ng-init="initControl(control, $index)"
                                                 class="usky-control">
                                                
                                                 <!-- Filled cell tools -->
@@ -191,6 +190,7 @@
                                                     ng-include="control.$editorPath"
                                                     class="usky-cell usky-cell-{{control.editor.view}}">
                                                 </div>
+                                              
                                             </div>
                                             <!-- Controls repeat end -->
 
@@ -246,4 +246,6 @@
             <!-- column repeat end -->
         </div>
     </div>
+</div>
+
 </div>

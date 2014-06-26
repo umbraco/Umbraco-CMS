@@ -12,7 +12,6 @@ angular.module("umbraco")
                         }
                     ]
                 },
-
                 {
                     name: "2 column",
                     sections: [
@@ -24,7 +23,6 @@ angular.module("umbraco")
                         }
                     ]
                 },
-
                 {
                     name: "2 column reversed",
                     sections: [
@@ -45,7 +43,7 @@ angular.module("umbraco")
                     areas: [
                         {
                             grid: 12,
-                            editors: ["Headline","subHeadline"]
+                            editors: ["headline"]
                         }
                     ]
                 },
@@ -60,9 +58,7 @@ angular.module("umbraco")
                         }
                     ]
                 }
-            ],
-
-            gridConfigPath: "views/propertyeditors/grid/config/grid.default.config.js"
+            ]
         };
 
 

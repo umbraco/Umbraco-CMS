@@ -97,15 +97,38 @@
 
                             <div ng-if="currentSection.allowAll === false">
                                 <hr />
-                                <ul class="unstyled">
-                                    <li ng-repeat="layout in model.value.layouts">
-                                        <label>
-                                              <input type="checkbox" 
-                                                checklist-model="currentSection.allowed" 
-                                                checklist-value="layout.name"> {{layout.name}}  
-                                        </label>
-                                    </li>
-                                </ul>
+
+                                <div class="control-group uSky-templates-rows">
+                                    <ul class="unstyled"
+                                        ui-sortable
+                                        ng-model="model.value.templates">
+                                        
+                                        <li ng-repeat="layout in model.value.layouts">
+
+                                            <input type="checkbox" 
+                                              checklist-model="currentSection.allowed" 
+                                              checklist-value="layout.name" 
+                                              style="float: left; margin-right: 10px;">
+
+                                            <div class="uSky-templates-row"  style="float: left">
+                                                <a href class="tb mainTbpt">
+                                                    <div class="tr">
+                                                        <div style="width:{{ percentage(area.grid); }}%" class="middle mainTdpt td" ng-repeat="area in layout.areas">
+                                                            <i class="icon {{areaPreview(area)}}"></i>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+
+                                            <div>
+                                                {{layout.name}}<br/>
+                                                <small>{{layout.areas.length}} configurable areas</small><br/>
+                                            </div>
+
+                                            <br style="clear: both"/> 
+                                        </li>   
+                                    </ul> 
+                                </div>
                             </div>
                         </umb-control-group>
 
@@ -180,7 +203,7 @@
                 <input type="text" class="" ng-model="currentLayout.name" />
             </umb-control-group>
 
-            <umb-control-group label="Areas" hide-label="false" description="Choose an area from the layout to edit">
+            <umb-control-group label="Layout areas" hide-label="false" description="Choose an area from the layout to edit">
                  <div class="uSky-templates-template" 
                      style="margin: 0; width: 350px; position: relative;">
                      <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
@@ -226,7 +249,7 @@
                                         ng-model="currentArea.allowAll" 
                                         ng-checked="currentArea.allowed === undefined" 
                                         ng-change="toggleCollection(currentArea.allowed, currentArea.allowAll)" /> 
-                                        Allow all layouts
+                                        Allow all editors
                                 </label>
                             </li>
                         </ul>

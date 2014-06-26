@@ -8,20 +8,20 @@
     
     <div class="uSky-grid @(onlyOneColumn > 1 ? "container" : "")">
         <div class="row clearfix">
-            @foreach (var column in Model.columns)
+            @foreach (var section in Model.sections)
             {
-                <div class="col-md-@column.grid column">
-                    @foreach (var row in column.rows)
+                <div class="col-md-@section.grid column">
+                    @foreach (var row in section.rows)
                     {
                         <div class="gridrow_@row.uniqueId" >
                             <div class="container">
                                 <div class="row clearfix">
 
-                                    @foreach (var cell in row.cells)
+                                    @foreach (var area in row.areas)
                                     {
-                                        <div class="col-md-@cell.model.grid column">
+                                        <div class="col-md-@area.grid column">
 
-                                            @foreach (var control in cell.controls)
+                                            @foreach (var control in area.controls)
                                             {
                                                 if (control != null && control.editor != null && control.editor.view != null)
                                                 {
