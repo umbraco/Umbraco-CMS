@@ -124,19 +124,23 @@ namespace umbraco.cms.businesslogic.packager
                 var contentNodeId = 0;
                 if (string.IsNullOrEmpty(pack.ContentNodeId) == false && int.TryParse(pack.ContentNodeId, out contentNodeId))
                 {
-                    XmlNode documents = _packageManifest.CreateElement("Documents");
+                    if (contentNodeId > 0)
+                    {
+                        XmlNode documents = _packageManifest.CreateElement("Documents");
 
-                    XmlNode documentSet = _packageManifest.CreateElement("DocumentSet");
-                    XmlAttribute importMode = _packageManifest.CreateAttribute("importMode", "");
-                    importMode.Value = "root";
-                    documentSet.Attributes.Append(importMode);
-                    documents.AppendChild(documentSet);
+                        XmlNode documentSet = _packageManifest.CreateElement("DocumentSet");
+                        XmlAttribute importMode = _packageManifest.CreateAttribute("importMode", "");
+                        importMode.Value = "root";
+                        documentSet.Attributes.Append(importMode);
+                        documents.AppendChild(documentSet);
 
-                    //load content from umbraco.
-                    var umbDocument = new Document(contentNodeId);
-                    documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
+                        //load content from umbraco.
+                        var umbDocument = new Document(contentNodeId);
+                        
+                        documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
 
-                    AppendElement(documents);
+                        AppendElement(documents);   
+                    }
                 }
 
                 //Document types..
