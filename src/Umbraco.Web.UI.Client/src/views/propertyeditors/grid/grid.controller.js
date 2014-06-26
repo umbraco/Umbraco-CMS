@@ -53,8 +53,8 @@ angular.module("umbraco")
                 $scope.checkContent = function() {
                     var isEmpty = true;
                     if ($scope.model.value && 
-                        $scope.model.value.columns) {
-                        angular.forEach($scope.model.value.columns, function (value, key) {
+                        $scope.model.value.sections) {
+                        angular.forEach($scope.model.value.sections, function (value, key) {
                             if ( value.rows && value.rows.length > 0) {
                                 isEmpty = false;
                             }
@@ -65,21 +65,16 @@ angular.module("umbraco")
                     {
                         $scope.model.value = undefined;
                     }
-
-                }
+                };
 
                 $scope.addTemplate = function (template) {
-                    $scope.model.value = {
-                        gridWidth: "",
-                        columns: []
-                    };
-
-                    angular.forEach(template.columns, function (value, key) {
-                        var newCol = angular.copy(value);
-                        newCol.rows = [];
-                        $scope.model.value.columns.splice($scope.model.value.columns.length + 1, 0, newCol);
+                    $scope.model.value = angular.copy(template);
+                    
+                    //default row data
+                    _.forEach($scope.model.value.sections, function(section){
+                        section.rows = [];
                     });
-                }
+                };
 
 
                 // *********************************************
@@ -88,34 +83,29 @@ angular.module("umbraco")
 
                 $scope.setCurrentRow = function (row) {
                     $scope.currentRow = row;
-                }
+                };
 
                 $scope.disableCurrentRow = function () {
                     $scope.currentRow = null;
-                }
+                };
 
                 
-                $scope.addRow = function (column, cellModel) {
+                $scope.getAllowedLayouts = function(column){
+                    var layouts = $scope.model.config.items.layouts;
 
-                    column.rows.splice(column.rows.length + 1, 0,
-                    {
-                        uniqueId: $scope.setUniqueId(),
-                        cells: [],
-                        cssClass: ''
-                    });
+                    if(column.allowed && column.allowed.length > 0){
+                        return _.filter(layouts, function(layout){
+                            return _.indexOf(column.allowed, layout.name) >= 0;
+                        });
+                    }else{
+                        return layouts;
+                    } 
+                };
 
-                    for (var i = 0; i < cellModel.models.length; i++) {
-
-                        var cells = column.rows[column.rows.length - 1].cells;
-                        var model = angular.copy(cellModel.models[i]);
-
-                        cells.splice(
-                            cells.length + 1, 0,
-                            {
-                                model: model,
-                                controls: []
-                            });
-                    }
+                $scope.addRow = function (column, layout) {
+                    //copy the selected layout into the rows collection
+                    var row = angular.copy(layout);
+                    column.rows.push(row);
                 };
 
                 $scope.removeRow = function (column, $index) {
@@ -124,7 +114,8 @@ angular.module("umbraco")
                         $scope.openRTEToolbarId = null;
                         $scope.checkContent();
                     }
-                }
+                };
+
 
                 // *********************************************
                 // Cell management functions
@@ -132,20 +123,23 @@ angular.module("umbraco")
 
                 $scope.setCurrentCell = function (cell) {
                     $scope.currentCell = cell;
-                }
+                };
 
                 $scope.disableCurrentCell = function (cell) {
                     $scope.currentCell = null;
-                }
+                };
 
                 $scope.cellPreview = function(cell){
-                    if($scope.availableEditors && cell && cell.allowed && angular.isArray(cell.allowed)){
-                        var editor = $scope.getEditor(cell.allowed[0]);
+                    if(cell && cell.$allowedEditors){
+                        var editor = cell.$allowedEditors[0];
                         return editor.icon;
                     }else{
                         return "icon-layout";
                     }
-                }
+                };
+
+
+
 
                 // *********************************************
                 // Control management functions
@@ -196,14 +190,11 @@ angular.module("umbraco")
                     return components.join("");
                 };
 
-                $scope.setEditorPath = function(control){
-                    control.editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
-                };
 
                 $scope.addControl = function (editor, cell, index){
                     var newId = $scope.setUniqueId();
                     var newControl = {
-                        uniqueId: newId,
+                        $uniqueId: newId,
                         value: null,
                         editor: editor
                     };
@@ -212,11 +203,14 @@ angular.module("umbraco")
                         index = cell.controls.length;
                     }
 
+                    //populate control
+                    $scope.initControl(newControl, index+1);
+
                     cell.controls.splice(index + 1, 0, newControl);
                 };
 
                 $scope.addTinyMce = function(cell){
-                    var rte = _.find($scope.availableEditors, function(editor){return editor.alias === "rte";});
+                    var rte = $scope.getEditor("rte");
                     $scope.addControl(rte, cell);
                 };
 
@@ -228,28 +222,99 @@ angular.module("umbraco")
                     cell.controls.splice($index, 1);
                 };
 
-                $scope.allowedControl = function (editor, cell){
-                    if(cell.model.allowed && angular.isArray(cell.model.allowed)){
-                        return _.contains(cell.model.allowed, editor.alias);
-                    }else{
-                        return true;
-                    }
+                $scope.percentage = function(spans){
+                    return ((spans/12)*100).toFixed(1);
                 };
+
+
 
 
                 // *********************************************
                 // Init grid
                 // *********************************************
-
-                /* init grid data */
-                if ($scope.model.value && $scope.model.value != "") {
-                    if (!$scope.model.config.items.enableGridWidth) {
-                        $scope.model.value.gridWidth = $scope.model.config.items.defaultGridWith;
-                    }
-                }
-
                 $scope.checkContent();
 
+
+
+                // *********************************************
+                // INITIALISATION
+                // these methods are called from ng-init on the template
+                // so we can controll their first load data
+                // 
+                // intialisation sets non-saved data like percentage sizing, allowed editors and
+                // other data that should all be pre-fixed with $ to strip it out on save
+                // *********************************************                
+
+                // *********************************************
+                // Init template + sections
+                // *********************************************                
+                $scope.initSection = function(section){
+                    section.$percentage = $scope.percentage(section.grid);
+
+                    var layouts = $scope.model.config.items.layouts;
+
+                    if(section.allowed && sectionn.allowed.length > 0){
+                        return _.filter(layouts, function(layout){
+                            section.$allowedLayouts = _.indexOf(section.allowed, layout.name) >= 0;
+                        });
+                    }else{
+                        section.$allowedLayouts = layouts;
+                    } 
+                };
+
+
+                // *********************************************
+                // Init layout / row
+                // *********************************************                
+                $scope.initRow = function(row){
+                    
+                    if(!row.areas){
+                        row.areas = [];
+                    }
+
+                    //set a disposable unique ID
+                    row.$uniqueId = $scope.setUniqueId();
+                    
+                    //populate with data
+                    _.forEach(row.areas, function(area){
+                        if(!area.controls){
+                            area.controls = [];
+                        }
+                        
+                        area.$percentage = $scope.percentage(area.grid);
+
+                        if(!area.allowed){
+                            area.$allowedEditors = $scope.availableEditors;
+                            area.$allowsRTE = true;
+                        }else{
+                            area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
+                                return _.indexOf(area.allowed, editor.alias) >= 0;
+                            });
+
+                            if(_.indexOf(area.allowed,"rte")>=0){
+                                area.$allowsRTE = true;
+                            }
+                        }
+                    });
+                };
+
+
+
+                // *********************************************
+                // Init control
+                // *********************************************                
+
+                $scope.initControl = function(control, index){
+                    control.$index = index;
+
+                    //if its a path
+                    if(_.indexOf(control.editor.view, "/") >= 0){
+                        control.$editorPath = control.editor.view;
+                    }else{
+                        //use convention
+                        control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
+                    }
+                };
             });
 
         // *********************************************
