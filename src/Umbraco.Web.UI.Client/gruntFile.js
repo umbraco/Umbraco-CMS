@@ -6,7 +6,7 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
 
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs','karma:unit']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs']);
   grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning','copy:tuning', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
@@ -125,12 +125,6 @@ module.exports = function (grunt) {
                 {
                   dest: '<%= distdir %>/lib/lazyload/lazyload.min.js', 
                   src: 'bower_components/rgrove-lazyload/lazyload.js'
-                },
-                {
-                  dest: '<%= distdir %>/lib/ace/',
-                  src: '**',
-                  expand: true,
-                  cwd: 'bower_components/ace-builds/src-min-noconflict/'
                 }
               ]
       },
@@ -172,12 +166,15 @@ module.exports = function (grunt) {
               //then we need to figure out how to not copy all the test stuff either!?
               { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
               { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
-              { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
               { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
       },
-
+      vsLibs: {
+          files: [
+              { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' }
+          ]
+      },
       packages: {
         files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
