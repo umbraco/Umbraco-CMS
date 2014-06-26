@@ -669,28 +669,8 @@ namespace Umbraco.Core.Services
                     return new XElement("DataType");
             }
 
-            var prevalues = new XElement("PreValues");
-            var prevalueList = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
-                .FormatAsDictionary();
-
-            var sort = 0;
-            foreach (var pv in prevalueList)
-            {
-                var prevalue = new XElement("PreValue");
-                prevalue.Add(new XAttribute("Id", pv.Value.Id));
-                prevalue.Add(new XAttribute("Value", pv.Value.Value == null ? "" : pv.Value.Value));
-                prevalue.Add(new XAttribute("Alias", pv.Key));
-                prevalue.Add(new XAttribute("SortOrder", sort));
-                prevalues.Add(prevalue);
-                sort++;
-            }
-
-            var xml = new XElement("DataType", prevalues);
-            xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
-            //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
-            xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
-            xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
-            xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(_dataTypeService, dataTypeDefinition);
 
             if (raiseEvents)
                 ExportedDataType.RaiseEvent(new ExportEventArgs<IDataTypeDefinition>(dataTypeDefinition, xml, false), this);
@@ -846,15 +826,9 @@ namespace Umbraco.Core.Services
                     return new XElement("DictionaryItem");
             }
 
-            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
-            foreach (var translation in dictionaryItem.Translations)
-            {
-                xml.Add(new XElement("Value",
-                    new XAttribute("LanguageId", translation.Language.Id),
-                    new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
-                    new XCData(translation.Value)));
-            }
-
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(dictionaryItem);
+            
             if (includeChildren)
             {
                 var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
@@ -995,10 +969,8 @@ namespace Umbraco.Core.Services
                     return new XElement("Language");
             }
 
-            var xml = new XElement("Language",
-                new XAttribute("Id", language.Id),
-                new XAttribute("CultureAlias", language.IsoCode),
-                new XAttribute("FriendlyName", language.CultureName));
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(language);
 
             if (raiseEvents)
                 ExportedLanguage.RaiseEvent(new ExportEventArgs<ILanguage>(language, xml, false), this);
@@ -1187,29 +1159,8 @@ namespace Umbraco.Core.Services
                     return new XElement("macro");
             }
 
-            var xml = new XElement("macro");
-            xml.Add(new XElement("name", macro.Name));
-            xml.Add(new XElement("alias", macro.Alias));
-            xml.Add(new XElement("scriptType", macro.ControlType));
-            xml.Add(new XElement("scriptAssembly", macro.ControlAssembly));
-            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
-            xml.Add(new XElement("xslt", macro.XsltPath));
-            xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
-            xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
-            xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
-            xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));
-            xml.Add(new XElement("cacheByPage", macro.CacheByPage.ToString()));
-
-            var properties = new XElement("properties");
-            foreach (var property in macro.Properties)
-            {
-                properties.Add(new XElement("property", 
-                    new XAttribute("name", property.Name), 
-                    new XAttribute("alias", property.Alias),
-                    new XAttribute("sortOrder", property.SortOrder),
-                    new XAttribute("propertyType", property.EditorAlias)));
-            }
-            xml.Add(properties);
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(macro);
 
             if (raiseEvents)
                 ExportedMacro.RaiseEvent(new ExportEventArgs<IMacro>(macro, xml, false), this);
@@ -1246,14 +1197,16 @@ namespace Umbraco.Core.Services
         public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_mediaService, _dataTypeService, media, deep);
-
+            
             if (raiseEvents)
             {
                 if (ExportingMedia.IsRaisedEventCancelled(new ExportEventArgs<IMedia>(media, nodeName), this))
                     return new XElement(nodeName);
             }
+
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(_mediaService, _dataTypeService, media, deep);
+
             if(raiseEvents)
                 ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);
 
@@ -1272,55 +1225,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the MediaType item.</returns>
         internal XElement Export(IMediaType mediaType)
         {
-            var info = new XElement("Info",
-                                    new XElement("Name", mediaType.Name),
-                                    new XElement("Alias", mediaType.Alias),
-                                    new XElement("Icon", mediaType.Icon),
-                                    new XElement("Thumbnail", mediaType.Thumbnail),
-                                    new XElement("Description", mediaType.Description),
-                                    new XElement("AllowAtRoot", mediaType.AllowedAsRoot.ToString()));
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(_dataTypeService, mediaType);
 
-            var masterContentType = mediaType.CompositionAliases().FirstOrDefault();
-            if (masterContentType != null)
-                info.Add(new XElement("Master", masterContentType));
-
-            var structure = new XElement("Structure");
-            foreach (var allowedType in mediaType.AllowedContentTypes)
-            {
-                structure.Add(new XElement("MediaType", allowedType.Alias));
-            }
-
-            var genericProperties = new XElement("GenericProperties");
-            foreach (var propertyType in mediaType.PropertyTypes)
-            {
-                var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
-                var genericProperty = new XElement("GenericProperty",
-                                                   new XElement("Name", propertyType.Name),
-                                                   new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),
-                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
-                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("Validation", propertyType.ValidationRegExp),
-                                                   new XElement("Description", new XCData(propertyType.Description)));
-                genericProperties.Add(genericProperty);
-            }
-
-            var tabs = new XElement("Tabs");
-            foreach (var propertyGroup in mediaType.PropertyGroups)
-            {
-                var tab = new XElement("Tab",
-                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name));
-                tabs.Add(tab);
-            }
-
-            var xml = new XElement("MediaType",
-                                   info,
-                                   structure,
-                                   genericProperties,
-                                   tabs);
             return xml;
         }
 
@@ -1466,21 +1373,8 @@ namespace Umbraco.Core.Services
                     return new XElement("Template");
             }
 
-            var xml = new XElement("Template");
-            xml.Add(new XElement("Name", template.Name));
-            xml.Add(new XElement("Alias", template.Alias));
-            xml.Add(new XElement("Design", new XCData(template.Content)));
-
-            var concreteTemplate = template as Template;
-            if (concreteTemplate != null && concreteTemplate.MasterTemplateId != null)
-            {
-                if (concreteTemplate.MasterTemplateId.IsValueCreated &&
-                    concreteTemplate.MasterTemplateId.Value != default(int))
-                {
-                    xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
-                    xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
-                }
-            }
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(template);
 
             if (raiseEvents)
                 ExportedTemplate.RaiseEvent(new ExportEventArgs<ITemplate>(template, xml, false), this);
