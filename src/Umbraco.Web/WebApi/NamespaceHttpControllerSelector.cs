@@ -70,7 +70,8 @@ namespace Umbraco.Web.WebApi
 
             var duplicates = controllerTypes.GroupBy(x => x.Name)
                 .Where(x => x.Count() > 1)
-                .SelectMany(x => x);
+                .SelectMany(x => x)
+                .ToArray();
 
             return duplicates;
         }
