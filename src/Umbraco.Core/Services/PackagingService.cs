@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -1416,9 +1415,6 @@ namespace Umbraco.Core.Services
 
         internal IPackageInstallation PackageInstallation
         {
-            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
-            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
-                // NOTE COMMENT: But is is not a service? and all other parced in constructor is services...
             private get { return _packageInstallation ?? new PackageInstallation(this, _macroService, _fileService, new PackageExtraction()); }
             set { _packageInstallation = value; }
         }
@@ -1441,7 +1437,6 @@ namespace Umbraco.Core.Services
             {
                 ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, false), this);
             }
-
 
             return installationSummary;
         }
@@ -1600,7 +1595,6 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IFile>> ImportingStylesheets;
         
-
         /// <summary>
         /// Occurs after Template is Imported and Saved
         /// </summary>
@@ -1615,8 +1609,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Template is Exported to Xml
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportedTemplate;
-
-
+        
         /// <summary>
         /// Occurs before Importing umbraco package
         /// </summary>

@@ -7,7 +7,6 @@ namespace Umbraco.Core.Packaging
     /// Remeber that filenames must be unique
     /// use "FindDubletFileNames" for sanitycheck
     /// </summary>
-
     internal interface IPackageExtraction
     {
         /// <summary>

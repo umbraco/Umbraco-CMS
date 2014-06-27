@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Umbraco.Core.Packaging.Models
@@ -11,7 +10,6 @@ namespace Umbraco.Core.Packaging.Models
         Install,
         Uninstall
     }
-
 
     [Serializable]
     [DataContract(IsReference = true)]
@@ -34,7 +32,6 @@ namespace Umbraco.Core.Packaging.Models
             get { return _undo ?? true; }
             set { _undo = value; }
         }
-
         
         public XElement XmlData { get; set; }
     }
