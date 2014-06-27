@@ -74,6 +74,8 @@ angular.module("umbraco")
         $scope.addRow = function (column, layout) {
             //copy the selected layout into the rows collection
             var row = angular.copy(layout);
+            $scope.initRow(row);
+            
             column.rows.push(row);
         };
 
@@ -239,8 +241,8 @@ angular.module("umbraco")
             var layouts = $scope.model.config.items.layouts;
 
             if(section.allowed && section.allowed.length > 0){
-                return _.filter(layouts, function(layout){
-                    section.$allowedLayouts = _.indexOf(section.allowed, layout.name) >= 0;
+                section.$allowedLayouts = _.filter(layouts, function(layout){
+                    return _.indexOf(section.allowed, layout.name) >= 0;
                 });
             }else{
                 section.$allowedLayouts = layouts;

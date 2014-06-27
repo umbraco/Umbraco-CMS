@@ -4,14 +4,14 @@
 
 @if (Model != null && !string.IsNullOrEmpty(Model.ToString()))
 {
-    var onlyOneColumn = Model.columns != null ? ((System.Collections.ICollection)Model.columns).Count : 0;
+    var onlyOneColumn = Model.sections != null ? ((System.Collections.ICollection)Model.sections).Count : 0;
     
     <div class="uSky-grid @(onlyOneColumn > 1 ? "container" : "")">
         <div class="row clearfix">
-            @foreach (var section in Model.sections)
+            @foreach (var s in Model.sections)
             {
-                <div class="col-md-@section.grid column">
-                    @foreach (var row in section.rows)
+                <div class="col-md-@s.grid column">
+                    @foreach (var row in s.rows)
                     {
                         <div class="gridrow_@row.uniqueId" >
                             <div class="container">

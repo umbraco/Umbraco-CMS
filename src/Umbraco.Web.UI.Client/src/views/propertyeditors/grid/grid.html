@@ -12,7 +12,6 @@
                             <div class="td uSky-templates-column" 
                                 ng-class="{last:$last}" 
                                 ng-repeat="section in template.sections"
-                                ng-init="initSection(section)" 
                                 style="width:{{ section.$percentage }}%">
                             </div>
                         </div>
@@ -35,7 +34,7 @@
                 class="usky-column td" 
                 ng-class="{last:$last}" 
                 ng-repeat="section in model.value.sections"
-                ng-init="initSection(section)" 
+                ng-init="initSection(section)"
                 style="width:{{section.$percentage}}%">
 
                 <div ui-sortable="sortableOptions" ng-model="section.rows">
@@ -46,7 +45,6 @@
                         class="usky-row"
                         ng-mouseover="setCurrentRow(row)" 
                         ng-mouseleave="disableCurrentRow()"
-                        ng-init="initRow(row)"
                         ng-class="{removingControl:currentRemoveControl == row, movingControl:currentMoveControl == row}">
 
                         <!-- Row tool -->
@@ -93,6 +91,7 @@
                                             ng-class="{last:$last,first:$first}"
                                             class="td mainTd usky-cell"
                                             ng-repeat="area in row.areas">                    
+
 
                                             <!-- if area is empty tools -->
                                             <div 
@@ -208,13 +207,14 @@
                 </div>
                 <!-- row sortable end -->
 
+              
                 <!-- column tools -->
                 <div class="usky-templates-columns tb">
 
                     <div class="tr">
                         <div class="td middle">
                             <ul>
-                                <li ng-repeat="layout in  section.$allowedLayouts" ng-init="initRow(layout)" >
+                                <li ng-repeat="layout in  section.$allowedLayouts">
                                     <div class="tb mainTbpt" ng-click="addRow(section, layout)">
                                         <div class="tr">
                                             <div 
@@ -222,8 +222,6 @@
                                                 class="middle mainTdpt td" 
                                                 ng-repeat="area in layout.areas">
                                                 <i class="icon {{cellPreview(area)}}"></i>
-
-
                                             </div>
                                         </div>
                                     </div>
