@@ -119,6 +119,9 @@ namespace umbraco
                         {
                             xNode.Text = "";
                         }
+
+                        xNode.Action = "javascript:void(0);";
+
                         break;
 
 
@@ -161,6 +164,7 @@ namespace umbraco
                         xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
                         xNode.Text = ui.Text("treeHeaders", "createdPackages");
                         xNode.HasChildren = true;
+                        xNode.Action = "javascript:void(0);";
                         
                         break;
 
