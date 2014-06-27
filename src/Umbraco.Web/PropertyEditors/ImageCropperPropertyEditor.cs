@@ -89,7 +89,7 @@ namespace Umbraco.Web.PropertyEditors
 
                     if (json["src"] != null && json["src"].ToString().IsNullOrWhiteSpace() == false)
                     {
-                        if (fs.FileExists(IOHelper.MapPath(json["src"].ToString())))
+                        if (fs.FileExists(fs.GetRelativePath(json["src"].ToString())))
                         {
                             var currentPath = fs.GetRelativePath(json["src"].ToString());
                             var propertyId = e.Copy.Properties.First(x => x.Alias == property.Alias).Id;
