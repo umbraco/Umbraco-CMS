@@ -323,6 +323,7 @@
     <Compile Include="Services\MemberServiceTests.cs" />
     <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
+    <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\PreValueConverterTests.cs" />
@@ -559,6 +560,7 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="TreesAndSections\applications.config" />
     <EmbeddedResource Include="TreesAndSections\trees.config" />
+    <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
     <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
     <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
     <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
@@ -634,6 +636,7 @@
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TreesAndSections\ResourceFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>

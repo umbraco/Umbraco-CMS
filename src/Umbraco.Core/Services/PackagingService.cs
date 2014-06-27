@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -35,6 +35,7 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
+        private IPackageInstallation _packageInstallation;
 
 
         public PackagingService(IContentService contentService,
@@ -59,7 +60,7 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-        
+
         #region Content
 
         /// <summary>
@@ -1327,6 +1328,30 @@ namespace Umbraco.Core.Services
             return templates;
         }
 
+
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
+        {
+
+            if (raiseEvents)
+            {
+                if (ImportingStylesheets.IsRaisedEventCancelled(new ImportEventArgs<IFile>(element), this))
+                    return Enumerable.Empty<IFile>();
+            }
+
+            IEnumerable<IFile> styleSheets = Enumerable.Empty<IFile>();
+
+            if(element.Elements().Any())
+                throw new NotImplementedException("This needs to be implimentet");
+
+            
+            if (raiseEvents)
+                ImportingStylesheets.RaiseEvent(new ImportEventArgs<IFile>(styleSheets, element, false), this);
+
+            return styleSheets;
+
+        }
+
+
         private bool IsMasterPageSyntax(string code)
         {
             return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
@@ -1389,13 +1414,46 @@ namespace Umbraco.Core.Services
 
         #region Installation
 
-        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
+        internal IPackageInstallation PackageInstallation
         {
-            //TODO Add events ?
             //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
             //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
-            var installer = new PackageInstallation(this, new PackageExtraction());
-            return installer.InstallPackage(packageFilePath, userId);
+                // NOTE COMMENT: But is is not a service? and all other parced in constructor is services...
+            private get { return _packageInstallation ?? new PackageInstallation(this, _macroService, _fileService, new PackageExtraction()); }
+            set { _packageInstallation = value; }
+        }
+
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
+        {
+            if (raiseEvents)
+            {
+                var metaData = GetPackageMetaData(packageFilePath);
+                if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
+                {
+                    var initEmpty = new InstallationSummary().InitEmpty();
+                    initEmpty.MetaData = metaData;
+                    return initEmpty;
+                }
+            }
+            var installationSummary = PackageInstallation.InstallPackage(packageFilePath, userId);
+
+            if (raiseEvents)
+            {
+                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, false), this);
+            }
+
+
+            return installationSummary;
+        }
+
+        internal PreInstallWarnings GetPackageWarnings(string packageFilePath)
+        {
+            return PackageInstallation.GetPreInstallWarnings(packageFilePath);
+        }
+
+        internal MetaData GetPackageMetaData(string packageFilePath)
+        {
+            return PackageInstallation.GetMetaData(packageFilePath);
         }
 
         #endregion
@@ -1538,6 +1596,12 @@ namespace Umbraco.Core.Services
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<ITemplate>> ImportingTemplate;
 
         /// <summary>
+        /// Occurs before Importing Stylesheets
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IFile>> ImportingStylesheets;
+        
+
+        /// <summary>
         /// Occurs after Template is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<ITemplate>> ImportedTemplate;
@@ -1551,6 +1615,18 @@ namespace Umbraco.Core.Services
         /// Occurs after Template is Exported to Xml
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportedTemplate;
+
+
+        /// <summary>
+        /// Occurs before Importing umbraco package
+        /// </summary>
+        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
+
+        /// <summary>
+        /// Occurs after a apckage is imported
+        /// </summary>
+        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
+
         #endregion
     }
 }

@@ -47,6 +47,9 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
@@ -295,6 +298,7 @@
     <Compile Include="Events\EventExtensions.cs" />
     <Compile Include="Events\ExportEventArgs.cs" />
     <Compile Include="Events\ImportEventArgs.cs" />
+    <Compile Include="Events\ImportPackageEventArgs.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
@@ -362,15 +366,18 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
-    <Compile Include="Packaging\Models\InstallAction.cs" />
+    <Compile Include="Packaging\PackageBinaryByteInspector.cs" />
+    <Compile Include="Packaging\IPackageExtraction.cs" />
+    <Compile Include="Packaging\IPackageInstallation.cs" />
+    <Compile Include="Packaging\Models\PreInstallWarnings.cs" />
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
     <Compile Include="Packaging\Models\MetaData.cs" />
-    <Compile Include="Packaging\Models\UninstallAction.cs" />
+    <Compile Include="Packaging\Models\PackageAction.cs" />
     <Compile Include="Packaging\PackageBuilding.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
+    <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
@@ -1039,10 +1046,11 @@
     <Compile Include="Services\IMembershipRoleService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
-    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Packaging\IConflictingPackageContentFinder.cs" />
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\ISectionService.cs" />
+    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
@@ -1054,6 +1062,7 @@
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="Packaging\ConflictingPackageContentFinder.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
