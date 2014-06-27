@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
@@ -338,6 +339,9 @@ namespace Umbraco.Web
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
                 new PublishedCache.XmlPublishedCache.PublishedMediaCache()));
+
+            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector), 
+                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
                 // add all known factories, devs can then modify this list on application
