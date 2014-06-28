@@ -118,7 +118,7 @@ namespace umbraco.cms.businesslogic.packager {
 					int _contentNodeID = 0;
 					if (!String.IsNullOrEmpty(pack.ContentNodeId) && int.TryParse(pack.ContentNodeId, out _contentNodeID))
 					{
-                    if (contentNodeId > 0)
+                    if (_contentNodeID > 0)
                     {
 						XmlNode documents = _packageManifest.CreateElement("Documents");
 
