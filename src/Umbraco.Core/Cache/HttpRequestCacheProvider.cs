@@ -81,16 +81,7 @@ namespace Umbraco.Core.Cache
 
             get
             {
-                // FIXME
-                //   we still need something to lock though
-                //   some locker in the context items?
-
-                object locker;
-                lock (this)
-                {
-                    locker = ContextItems["locker"] ?? (ContextItems["locker"] = new object());
-                }
-                return new MonitorLock(locker);
+                return new MonitorLock(ContextItems.SyncRoot);
             }
         }
 
