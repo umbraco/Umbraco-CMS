@@ -4,15 +4,15 @@ using System.Diagnostics;
 using System.Net;
 using System.Web;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Publishing;
 
 namespace umbraco.presentation
 {
-	/// <summary>
-	/// Summary description for publishingService.
-	/// </summary>
+    [Obsolete("This is no longer used and will be removed in future versions")]
 	public class publishingService
 	{
 		private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
@@ -26,37 +26,10 @@ namespace umbraco.presentation
 			_isPublishingRunning = true;
 			try
 			{
-				// DO not run publishing if content is re-loading
-				if(!content.Instance.isInitializing)
-				{
-                   
-                    foreach (var d in Document.GetDocumentsForRelease())
-					{
-						try
-						{
-                            d.ReleaseDate = DateTime.MinValue; //new DateTime(1, 1, 1); // Causes release date to be null
-                            d.SaveAndPublish(d.User);
-						}
-						catch(Exception ee)
-						{
-						    LogHelper.Error<publishingService>(string.Format("Error publishing node {0}", d.Id), ee);
-						}
-					}
-					foreach(Document d in Document.GetDocumentsForExpiration())
-					{
-                        try
-                        {
-                            d.ExpireDate = DateTime.MinValue;
+                //run the scheduled publishing - we need to determine if this server 
 
-                            d.UnPublish();
-                        }
-                        catch (Exception ee)
-                        {
-                            LogHelper.Error<publishingService>(string.Format("Error unpublishing node {0}", d.Id), ee);
-                        }
-                       
-					}
-				}
+                var publisher = new ScheduledPublisher(ApplicationContext.Current.Services.ContentService);
+                publisher.CheckPendingAndProcess();
 
 				// run scheduled url tasks
 				try
@@ -70,7 +43,7 @@ namespace umbraco.presentation
 							foreach (XmlNode task in tasks)
 							{
 								bool runTask = false;
-								if (!ScheduledTaskTimes.ContainsKey(task.Attributes.GetNamedItem("alias").Value))
+								if (ScheduledTaskTimes.ContainsKey(task.Attributes.GetNamedItem("alias").Value) == false)
 								{
 									runTask = true;
 									ScheduledTaskTimes.Add(task.Attributes.GetNamedItem("alias").Value, DateTime.Now);
@@ -88,7 +61,7 @@ namespace umbraco.presentation
 
 								if (runTask)
 								{
-									bool taskResult = getTaskByHttp(task.Attributes.GetNamedItem("url").Value);
+									bool taskResult = GetTaskByHttp(task.Attributes.GetNamedItem("url").Value);
 									if (bool.Parse(task.Attributes.GetNamedItem("log").Value))
                                         LogHelper.Info<publishingService>(string.Format("{0} has been called with response: {1}", task.Attributes.GetNamedItem("alias").Value, taskResult));
 								}
@@ -111,26 +84,20 @@ namespace umbraco.presentation
 			}
 		}
 
-		private static bool getTaskByHttp(string url)
+		private static bool GetTaskByHttp(string url)
 		{
 			var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 			HttpWebResponse myHttpWebResponse = null;
 			try
 			{
-				myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-				if(myHttpWebResponse.StatusCode == HttpStatusCode.OK)
-				{
-					myHttpWebResponse.Close();
-					return true;
-				}
-				else
-				{
-					myHttpWebResponse.Close();
-					return false;
-				}
+			    using (myHttpWebResponse = (HttpWebResponse) myHttpWebRequest.GetResponse())
+			    {
+                    return myHttpWebResponse.StatusCode == HttpStatusCode.OK;
+			    }
 			}
-			catch
+			catch (Exception ex)
 			{
+                LogHelper.Error<publishingService>("An error occurred calling web task for url: " + url, ex);
 			}
 			finally
 			{

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms.Core</id>
-        <version>6.2.0</version>
+        <version>6.2.2</version>
         <title>Umbraco Cms Core Binaries</title>
         <authors>Umbraco HQ</authors>
         <owners>Umbraco HQ</owners>
@@ -29,6 +29,7 @@
             <dependency id="ClientDependency" version="[1.7.1.2, 2.0.0)" />
             <dependency id="ClientDependency-Mvc" version="[1.7.0.4, 2.0.0)" />
             <dependency id="Newtonsoft.Json" version="[4.5.11, 6.0.0)" />
+            <dependency id="Examine" version="[0.1.57, 1.0.0)" />
         </dependencies>
     </metadata>
     <files>
@@ -38,7 +39,6 @@
         <file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
         <file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
         <file src="..\_BuildOutput\WebApp\bin\controls.xml" target="lib\controls.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\Examine.dll" target="lib\Examine.dll" />
         <file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
         <file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
         <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />

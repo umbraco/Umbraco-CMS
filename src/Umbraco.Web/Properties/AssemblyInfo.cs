@@ -34,3 +34,5 @@ using System.Security;
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("Concorde.Sync")]
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
+
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
