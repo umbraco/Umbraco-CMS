@@ -382,6 +382,9 @@ namespace umbraco.cms.businesslogic.propertytype
             // Delete all properties of propertytype
             CleanPropertiesOnDeletion(_contenttypeid);
 
+            //delete tag refs
+            SqlHelper.ExecuteNonQuery("Delete from cmsTagRelationship where propertyTypeId = " + Id);
+
             // Delete PropertyType ..
             SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + Id);
 

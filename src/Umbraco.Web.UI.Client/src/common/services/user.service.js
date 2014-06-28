@@ -11,6 +11,10 @@ angular.module('umbraco.services')
         function openLoginDialog(isTimedOut) {
             if (!loginDialog) {
                 loginDialog = dialogService.open({
+
+                    //very special flag which means that global events cannot close this dialog
+                    manualClose: true,
+
                     template: 'views/common/dialogs/login.html',
                     modalClass: "login-overlay",
                     animation: "slide",

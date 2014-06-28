@@ -5,9 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Packaging
@@ -216,13 +213,5 @@ namespace Umbraco.Core.Packaging
                 domainSetup,
                 new PermissionSet(PermissionState.Unrestricted));
         }
-
-        private static string GetAssemblyPath(Assembly a)
-        {
-            var codeBase = a.CodeBase;
-            var uri = new Uri(codeBase);
-            return uri.LocalPath;
-        }
-
     }
 }

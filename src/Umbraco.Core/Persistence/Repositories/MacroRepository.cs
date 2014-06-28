@@ -188,10 +188,22 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                     else
                     {
-                        //only update if it's dirty
-                        if (macro.Properties[propDto.Alias].IsDirty())
+                        //This will only work if the Alias hasn't been changed
+                        if (macro.Properties.ContainsKey(propDto.Alias))
                         {
-                            Database.Update(propDto);    
+                            //only update if it's dirty
+                            if (macro.Properties[propDto.Alias].IsDirty())
+                            {
+                                Database.Update(propDto);
+                            }
+                        }
+                        else
+                        {
+                            var property = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
+                            if (property != null && property.IsDirty())
+                            {
+                                Database.Update(propDto);
+                            }
                         }
                     }
                 }

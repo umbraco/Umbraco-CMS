@@ -27,6 +27,13 @@ namespace umbraco
                 return true;
             }
 
+            // remove file extension
+            if (fileName.ToLowerInvariant().EndsWith(fileType.ToLowerInvariant()))
+            {
+                fileName = fileName.Substring(0,
+                                              fileName.ToLowerInvariant().LastIndexOf(fileType.ToLowerInvariant(), System.StringComparison.Ordinal) - 1);
+            }
+
             var found = ApplicationContext.Current.Services.FileService.GetScriptByName(relPath + fileName + "." + fileType);
             if (found != null)
             {

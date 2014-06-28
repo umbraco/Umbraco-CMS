@@ -26,5 +26,24 @@
         {
             get { return Value; }
         }
+
+        public string AppId
+        {
+            get
+            {
+                return RawXml.Attribute("appId") == null
+                           ? null
+                           : RawXml.Attribute("appId").Value;
+            }
+        }
+        public string ServerName
+        {
+            get
+            {
+                return RawXml.Attribute("serverName") == null
+                           ? null
+                           : RawXml.Attribute("serverName").Value;
+            }
+        }
     }
 }

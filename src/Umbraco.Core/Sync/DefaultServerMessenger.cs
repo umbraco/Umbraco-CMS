@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Web;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -520,7 +521,7 @@ namespace Umbraco.Core.Sync
             }
         }
 
-        private IEnumerable<IAsyncResult> GetAsyncResults(List<IAsyncResult> asyncResultsList, out List<WaitHandle> waitHandlesList)
+        internal IEnumerable<IAsyncResult> GetAsyncResults(List<IAsyncResult> asyncResultsList, out List<WaitHandle> waitHandlesList)
         {
             var asyncResults = asyncResultsList.ToArray();
             waitHandlesList = new List<WaitHandle>();

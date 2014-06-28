@@ -33,6 +33,10 @@ Umbraco.Sys.ServerVariables = {
             { alias: "myTree", packageFolder: "MyPackage" }
         ]
     },
+    security : {
+        startContentId: -1,
+        startMediaId: -1
+    },
     isDebuggingEnabled: true,
     application: {
         assemblyVersion: "1",

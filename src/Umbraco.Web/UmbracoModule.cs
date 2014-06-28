@@ -30,7 +30,8 @@ namespace Umbraco.Web
 	//  Request.RawUrl is still there
 	// response.Redirect does?! always remap to /vdir?!
 
-	public class UmbracoModule : IHttpModule
+	public class 
+        UmbracoModule : IHttpModule
 	{
 		#region HttpModule event handlers
 
@@ -583,7 +584,6 @@ namespace Umbraco.Web
 			app.BeginRequest += (sender, e) =>
 				{
 					var httpContext = ((HttpApplication)sender).Context;
-                    httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
@@ -608,10 +608,11 @@ namespace Umbraco.Web
 					var httpContext = ((HttpApplication)sender).Context;					
 					if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
 					{
-						//write the trace output for diagnostics at the end of the request
-						httpContext.Trace.Write("UmbracoModule", "Umbraco request completed");	
-						LogHelper.Debug<UmbracoModule>("Total milliseconds for umbraco request to process: " + DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+						LogHelper.Debug<UmbracoModule>(
+                            "Total milliseconds for umbraco request to process: {0}", () => DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
 					}
+
+                    OnEndRequest(new EventArgs());
 
 					DisposeHttpContextItems(httpContext);
 				};
@@ -646,6 +647,13 @@ namespace Umbraco.Web
         {
             if (RouteAttempt != null)
                 RouteAttempt(this, args);
+        }
+
+        internal static event EventHandler<EventArgs> EndRequest;
+        private void OnEndRequest(EventArgs args)
+        {
+            if (EndRequest != null)
+                EndRequest(this, args);
         } 
         #endregion
 	}

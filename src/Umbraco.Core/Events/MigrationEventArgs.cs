@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.Migrations;
 
 namespace Umbraco.Core.Events
 {
-    public class MigrationEventArgs : CancellableObjectEventArgs<IEnumerable<IMigration>>
+    public class MigrationEventArgs : CancellableObjectEventArgs<IList<IMigration>>
     {
         /// <summary>
         /// Constructor accepting multiple migrations that are used in the migration runner
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Events
         /// <param name="targetVersion"></param>
         /// <param name="canCancel"></param>
         /// <param name="configuredVersion"></param>
-        public MigrationEventArgs(IEnumerable<IMigration> eventObject, Version configuredVersion, Version targetVersion, bool canCancel)
+        public MigrationEventArgs(IList<IMigration> eventObject, Version configuredVersion, Version targetVersion, bool canCancel)
 			: base(eventObject, canCancel)
          {
              ConfiguredVersion = configuredVersion;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Events
         /// <param name="targetVersion"></param>
         /// <param name="canCancel"></param>
         /// <param name="configuredVersion"></param>
-        internal MigrationEventArgs(IEnumerable<IMigration> eventObject, MigrationContext migrationContext, Version configuredVersion, Version targetVersion, bool canCancel)
+        internal MigrationEventArgs(IList<IMigration> eventObject, MigrationContext migrationContext, Version configuredVersion, Version targetVersion, bool canCancel)
             : base(eventObject, canCancel)
         {
             MigrationContext = migrationContext;
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Events
         /// <param name="eventObject"></param>
         /// <param name="configuredVersion"></param>
         /// <param name="targetVersion"></param>
-        public MigrationEventArgs(IEnumerable<IMigration> eventObject, Version configuredVersion, Version targetVersion)
+        public MigrationEventArgs(IList<IMigration> eventObject, Version configuredVersion, Version targetVersion)
 			: base(eventObject)
 		{
             ConfiguredVersion = configuredVersion;
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Events
 		/// <summary>
 		/// Returns all migrations that were used in the migration runner
 		/// </summary>
-        public IEnumerable<IMigration> Migrations
+        public IList<IMigration> Migrations
 		{
 			get { return EventObject; }
 		}

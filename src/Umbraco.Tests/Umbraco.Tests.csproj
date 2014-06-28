@@ -58,9 +58,9 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.57.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -202,6 +202,7 @@
     <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Models\UserTests.cs" />
     <Compile Include="Models\UserTypeTests.cs" />
+    <Compile Include="Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
@@ -322,6 +323,7 @@
     <Compile Include="Services\MemberServiceTests.cs" />
     <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
+    <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\PreValueConverterTests.cs" />
@@ -491,6 +493,7 @@
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="TestHelpers\DisposableUmbracoTest.cs" />
     <Compile Include="Trees\BaseContentTreeTests.cs" />
     <Compile Include="Trees\BaseMediaTreeTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
@@ -557,6 +560,7 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="TreesAndSections\applications.config" />
     <EmbeddedResource Include="TreesAndSections\trees.config" />
+    <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
     <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
     <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
     <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
@@ -632,6 +636,7 @@
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TreesAndSections\ResourceFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -6,10 +6,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
-using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -32,6 +32,7 @@ using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
@@ -95,8 +96,8 @@ namespace Umbraco.Web
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
-            //add the profiling action filter
-            GlobalFilters.Filters.Add(new ProfilingActionFilter());
+            ////add the profiling action filter
+            //GlobalFilters.Filters.Add(new ProfilingActionFilter());
 
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
@@ -298,7 +299,7 @@ namespace Umbraco.Web
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
             //Override the ServerMessengerResolver to set a username/password for the distributed calls
-            ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(() =>
+            ServerMessengerResolver.Current.SetServerMessenger(new BatchedServerMessenger(() =>
             {
                 //we should not proceed to change this if the app/database is not configured since there will 
                 // be no user, plus we don't need to have server messages sent if this is the case.
@@ -338,6 +339,9 @@ namespace Umbraco.Web
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
                 new PublishedCache.XmlPublishedCache.PublishedMediaCache()));
+
+            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector), 
+                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
                 // add all known factories, devs can then modify this list on application

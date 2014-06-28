@@ -542,13 +542,13 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super sunday</key>
-    <key alias="greeting1">Happy manic monday </key>
-    <key alias="greeting2">Happy tubular tuesday</key>
-    <key alias="greeting3">Happy wonderful wednesday</key>
-    <key alias="greeting4">Happy thunder thursday</key>
-    <key alias="greeting5">Happy funky friday</key>
-    <key alias="greeting6">Happy caturday</key>
+    <key alias="greeting0">Happy super Sunday</key>
+    <key alias="greeting1">Happy manic Monday </key>
+    <key alias="greeting2">Happy tubular Tuesday</key>
+    <key alias="greeting3">Happy wonderful Wednesday</key>
+    <key alias="greeting4">Happy thunderous Thursday</key>
+    <key alias="greeting5">Happy funky Friday</key>
+    <key alias="greeting6">Happy Caturday</key>
     
     <key alias="instruction">log in below</key>
     <key alias="timeout">Session timed out</key>
@@ -697,8 +697,8 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="nodePublish">%0% has been published</key>
     <key alias="nodePublishAll">%0% and subpages have been published</key>
     <key alias="publishAll">Publish %0% and all its subpages</key>
-    <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making it's content publicly available.<br/><br />
-      You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
+    <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
+      You can publish this page and all its sub-pages by checking <em>publish all children</em> below.
       ]]></key>
   </area>
   <area alias="colorpicker">

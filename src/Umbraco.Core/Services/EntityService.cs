@@ -367,8 +367,8 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var sql = new Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
-                var nodeObjectTypeId = uow.Database.ExecuteScalar<string>(sql);
-                var objectTypeId = new Guid(nodeObjectTypeId);
+                var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
+                var objectTypeId = nodeObjectTypeId;
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
             }
         }
@@ -383,8 +383,8 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var sql = new Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
-                var nodeObjectTypeId = uow.Database.ExecuteScalar<string>(sql);
-                var objectTypeId = new Guid(nodeObjectTypeId);
+                var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
+                var objectTypeId = nodeObjectTypeId;
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
             }
         }

@@ -1254,6 +1254,16 @@ namespace Umbraco.Web.Models
         {
             get { return _children ?? (_children = new DynamicPublishedContentList(PublishedContent.Children)); }
         }
+
+	    public DynamicPublishedContent FirstChild()
+	    {
+	        return Children.FirstOrDefault<DynamicPublishedContent>();
+	    }
+
+	    public DynamicPublishedContent FirstChild(string alias)
+	    {
+	        return Children.FirstOrDefault<IPublishedContent>(x => x.DocumentTypeAlias == alias) as DynamicPublishedContent;
+	    }
         
         #endregion
 

@@ -7,9 +7,7 @@ using Umbraco.Core.Logging;
 
 namespace umbraco.presentation
 {
-	/// <summary>
-	/// Makes a call to /umbraco/ping.aspx which is used to keep the web app alive
-	/// </summary>
+	[Obsolete("This is no longer used and will be removed in future versions")]
 	public class keepAliveService
 	{
         //NOTE: sender will be the umbraco ApplicationContext
@@ -20,6 +18,8 @@ namespace umbraco.presentation
 
 		    var appContext = (ApplicationContext) sender;
 
+            //TODO: This won't always work, in load balanced scenarios ping will not work because 
+            // this original request url will be public and not internal to the server.
             var url = string.Format("http://{0}/ping.aspx", appContext.OriginalRequestUrl);
 			try
 			{

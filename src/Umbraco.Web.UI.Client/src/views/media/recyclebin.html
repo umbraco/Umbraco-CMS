@@ -1,0 +1,14 @@
+<umb-panel ng-controller="Umbraco.Dashboard.RecycleBinController">
+    <umb-header>
+        <div class="umb-headline-editor-wrapper span12">
+            <h1><localize key="general_recycleBin">Recycle Bin</localize></h1>
+        </div>
+    </umb-header>
+    <umb-tab-view>
+        <umb-tab id="tabRecycleBin" rel="RecycleBin">
+            <umb-pane>
+                <div ng-include="'views/propertyeditors/listview/listview.html'"></div>
+            </umb-pane>
+        </umb-tab>
+    </umb-tab-view>
+</umb-panel>

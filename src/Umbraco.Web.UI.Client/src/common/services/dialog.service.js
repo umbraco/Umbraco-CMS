@@ -37,7 +37,13 @@ angular.module('umbraco.services')
     function removeAllDialogs(args) {
         for (var i = 0; i < dialogs.length; i++) {
             var dialog = dialogs[i];
-            dialog.close(args);
+
+            //very special flag which means that global events cannot close this dialog - currently only used on the login 
+            // dialog since it's special and cannot be closed without logging in.
+            if (!dialog.manualClose) {
+                dialog.close(args);
+            }
+            
         }
     }
 
@@ -192,6 +198,7 @@ angular.module('umbraco.services')
                     };
 
                     scope.swipeHide = function (e) {
+
                         if (appState.getGlobalState("touchDevice")) {
                             var selection = window.getSelection();
                             if (selection.type !== "Range") {
@@ -222,7 +229,15 @@ angular.module('umbraco.services')
                     // You CANNOT call show() after you call hide(). hide = close, they are the same thing and once
                     // a dialog is closed it's resources are disposed of.
                     scope.show = function () {
-                        dialog.element.modal('show');
+                        if (dialog.manualClose === true) {
+                            //show and configure that the keyboard events are not enabled on this modal
+                            dialog.element.modal({ keyboard: false });
+                        }
+                        else {
+                            //just show normally
+                            dialog.element.modal('show');
+                        }
+                        
                     };
 
                     scope.select = function (item) {
@@ -249,12 +264,13 @@ angular.module('umbraco.services')
                         $('input[autofocus]', dialog.element).first().trigger('focus');
                     });
 
+                    dialog.scope = scope;
+
                     //Autoshow 
                     if (dialog.show) {
-                        dialog.element.modal('show');
+                        scope.show();
                     }
-
-                    dialog.scope = scope;
+                    
                 });
 
             //Return the modal object outside of the promise!

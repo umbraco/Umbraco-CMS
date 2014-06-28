@@ -27,6 +27,16 @@ namespace Umbraco.Tests.CoreStrings
             ShortStringHelperResolver.Reset();
         }
 
+        [TestCase("hello.txt", "hello")]
+        [TestCase("this.is.a.Txt", "this.is.a")]
+        [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]
+        [TestCase("not a file","not a file")]
+        public void Strip_File_Extension(string input, string result)
+        {
+            var stripped = input.StripFileExtension();
+            Assert.AreEqual(stripped, result);
+        }
+
 	    [TestCase("This is a string to encrypt")]
 		[TestCase("This is a string to encrypt\nThis is a second line")]
 		[TestCase("    White space is preserved    ")]

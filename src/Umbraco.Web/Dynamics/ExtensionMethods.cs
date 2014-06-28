@@ -27,5 +27,15 @@ namespace Umbraco.Web.Dynamics
         {
             return source.Items.OrderBy(x => Guid.NewGuid());
         }
+
+        public static DynamicPublishedContentList Children(this DynamicPublishedContent content)
+        {
+            return content.Children;
+        }
+
+        public static DynamicPublishedContentList Children(this DynamicPublishedContent content, string contentTypeAlias)
+        {
+            return new DynamicPublishedContentList(content.PublishedContent.Children().OfTypes(contentTypeAlias));
+        }
     }
 }

@@ -369,7 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
-                    && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                    && fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
                 {
                     var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
                     var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);

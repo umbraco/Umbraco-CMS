@@ -4,7 +4,6 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Sync
 {
-    
     /// <summary>
     /// The client Soap service for making distrubuted cache calls between servers
     /// </summary>
@@ -19,6 +18,31 @@ namespace Umbraco.Core.Sync
             if (System.Web.HttpContext.Current != null)
                 this.Url = "http://" + System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/cacheRefresher.asmx";
 
+        }
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/BulkRefresh", RequestNamespace = "http://umbraco.org/webservices/", ResponseNamespace = "http://umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void BulkRefresh(RefreshInstruction[] instructions, string login, string password)
+        {
+            this.Invoke("BulkRefresh", new object[] {
+													   instructions,
+													   login,
+													   password});
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginBulkRefresh(RefreshInstruction[] instructions, string login, string password, System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("BulkRefresh", new object[] {
+																   instructions,
+																   login,
+																   password}, callback, asyncState);
+        }
+
+        /// <remarks/>
+        public void EndBulkRefresh(System.IAsyncResult asyncResult)
+        {
+            this.EndInvoke(asyncResult);
         }
 
         /// <remarks/>

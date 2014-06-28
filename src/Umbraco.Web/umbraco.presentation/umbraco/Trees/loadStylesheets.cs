@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Web;
@@ -63,7 +64,7 @@ namespace umbraco
             foreach (StyleSheet n in StyleSheet.GetAll())
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = n.Id.ToString();
+                xNode.NodeID = n.Id.ToString(CultureInfo.InvariantCulture);
                 xNode.Text = n.Text;
                 xNode.Action = "javascript:openStylesheet(" + n.Id + ");";
                 loadStylesheetProperty styleSheetPropertyTree = new loadStylesheetProperty(this.app);

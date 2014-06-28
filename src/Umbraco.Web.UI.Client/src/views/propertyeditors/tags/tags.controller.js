@@ -2,6 +2,8 @@ angular.module("umbraco")
 .controller("Umbraco.PropertyEditors.TagsController",
     function ($rootScope, $scope, $log, assetsService, umbRequestHelper, angularHelper, $timeout, $element) {
 
+        var $typeahead;
+
         $scope.isLoading = true;
         $scope.tagToAdd = "";
 
@@ -18,9 +20,13 @@ angular.module("umbraco")
                 }
                 else {
                     //it is csv
-                    $scope.currentTags = $scope.model.value.split(",");
+                    if (!$scope.model.value) {
+                        $scope.currentTags = [];
+                    }
+                    else {
+                        $scope.currentTags = $scope.model.value.split(",");
+                    }
                 }
-                
             }
 
             //Helper method to add a tag on enter or on typeahead select
@@ -43,6 +49,9 @@ angular.module("umbraco")
                         //we need to use jquery because typeahead duplicates the text box
                         addTag($scope.tagToAdd);
                         $scope.tagToAdd = "";
+                        //this clears the value stored in typeahead so it doesn't try to add the text again
+                        // http://issues.umbraco.org/issue/U4-4947
+                        $typeahead.typeahead('val', '');
                     }
 
                 }
@@ -71,7 +80,12 @@ angular.module("umbraco")
                 }
                 else {
                     //it is csv
-                    $scope.currentTags = $scope.model.value.split(",");
+                    if (!$scope.model.value) {
+                        $scope.currentTags = [];
+                    }
+                    else {
+                        $scope.currentTags = $scope.model.value.split(",");
+                    }
                 }
             };
 
@@ -112,8 +126,9 @@ angular.module("umbraco")
             tagsHound.initialize();
 
             //configure the type ahead
-            $timeout(function() {
-                $element.find('.tags-' + $scope.model.alias).typeahead(
+            $timeout(function () {
+
+                $typeahead = $element.find('.tags-' + $scope.model.alias).typeahead(
                 {
                     //This causes some strangeness as it duplicates the textbox, best leave off for now.
                     hint: false,

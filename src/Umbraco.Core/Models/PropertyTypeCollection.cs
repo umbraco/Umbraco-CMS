@@ -83,6 +83,14 @@ namespace Umbraco.Core.Models
                         return;
                     }
                 }
+
+                //check if the item's sort order is already in use				
+                if (this.Any(x => x.SortOrder == item.SortOrder))
+                {
+                    //make it the next iteration
+                    item.SortOrder = this.Max(x => x.SortOrder) + 1;
+                }
+
                 base.Add(item);
                 OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
 

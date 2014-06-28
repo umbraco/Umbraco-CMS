@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Scheduling;
 using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco;
@@ -67,7 +68,7 @@ namespace Umbraco.Tests
             Assert.AreEqual(typeof(PropertyAliasDto), t5.Result);
 
             var t6 = TypeHelper.GetLowestBaseType(typeof (IApplicationEventHandler),
-                                                  typeof (LegacyScheduledTasks),
+                                                  typeof (Scheduler),
                                                   typeof(CacheRefresherEventHandler));
             Assert.IsTrue(t6.Success);
             Assert.AreEqual(typeof(IApplicationEventHandler), t6.Result);

@@ -110,9 +110,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="Examine">
+    <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.57.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -270,6 +270,7 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
     <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
@@ -356,7 +357,12 @@
     <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\PublishedProperty.cs" />
+    <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
+    <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
+    <Compile Include="Mvc\NotFoundHandler.cs" />
+    <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
+    <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
     <Compile Include="PublishedCache\MemberPublishedContent.cs" />
     <Compile Include="PublishedCache\RawValueProperty.cs" />
@@ -464,6 +470,7 @@
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
+    <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
@@ -534,6 +541,10 @@
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
+    <Compile Include="Scheduling\KeepAlive.cs" />
+    <Compile Include="Scheduling\LogScrubber.cs" />
+    <Compile Include="Scheduling\ScheduledPublishing.cs" />
+    <Compile Include="Scheduling\ScheduledTasks.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
@@ -757,6 +768,7 @@
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
+    <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
@@ -775,7 +787,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="LegacyScheduledTasks.cs" />
+    <Compile Include="Scheduling\Scheduler.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
@@ -1822,6 +1834,7 @@
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\TagsController.cs" />
+    <Compile Include="WebServices\ScheduledPublishController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">

@@ -47,6 +47,9 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
@@ -55,7 +58,8 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="MiniProfiler">
+    <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data">
@@ -294,6 +298,7 @@
     <Compile Include="Events\EventExtensions.cs" />
     <Compile Include="Events\ExportEventArgs.cs" />
     <Compile Include="Events\ImportEventArgs.cs" />
+    <Compile Include="Events\ImportPackageEventArgs.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
@@ -315,6 +320,7 @@
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ManifestValidatorConverter.cs" />
+    <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\ParameterEditorConverter.cs" />
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
@@ -360,15 +366,18 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
-    <Compile Include="Packaging\Models\InstallAction.cs" />
+    <Compile Include="Packaging\PackageBinaryByteInspector.cs" />
+    <Compile Include="Packaging\IPackageExtraction.cs" />
+    <Compile Include="Packaging\IPackageInstallation.cs" />
+    <Compile Include="Packaging\Models\PreInstallWarnings.cs" />
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
     <Compile Include="Packaging\Models\MetaData.cs" />
-    <Compile Include="Packaging\Models\UninstallAction.cs" />
+    <Compile Include="Packaging\Models\PackageAction.cs" />
     <Compile Include="Packaging\PackageBuilding.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
+    <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
@@ -405,6 +414,7 @@
     <Compile Include="PropertyEditors\TagPropertyDefinition.cs" />
     <Compile Include="PropertyEditors\TagValueType.cs" />
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
+    <Compile Include="PropertyEditors\IPropertyValueConverterMeta.cs" />
     <Compile Include="PropertyEditors\ValueConverters\JsonValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleTextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
@@ -991,6 +1001,7 @@
     <Compile Include="Publishing\PublishStatus.cs" />
     <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="Dynamics\QueryableExtensions.cs" />
+    <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
@@ -1035,10 +1046,11 @@
     <Compile Include="Services\IMembershipRoleService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
-    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Packaging\IConflictingPackageData.cs" />
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\ISectionService.cs" />
+    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
@@ -1050,6 +1062,7 @@
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
@@ -1063,6 +1076,9 @@
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
+    <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />
+    <Compile Include="Sync\RefreshInstruction.cs" />
+    <Compile Include="Sync\ServerEnvironmentHelper.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
@@ -1159,6 +1175,7 @@
     <Compile Include="Xml\XPathVariable.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

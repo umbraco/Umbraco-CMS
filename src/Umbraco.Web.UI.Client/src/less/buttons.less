@@ -64,8 +64,6 @@
 
 }
 
-
-
 .btn-group>.btn+.dropdown-toggle {
     box-shadow: none;
     -webkit-box-shadow:none;
@@ -163,7 +161,8 @@ input[type="button"] {
 .btn-danger.active,
 .btn-success.active,
 .btn-info.active,
-.btn-inverse.active {
+.btn-inverse.active,
+.btn-neutral.active {
   color: rgba(255,255,255,.75);
 }
 
@@ -192,7 +191,23 @@ input[type="button"] {
 .btn-inverse {
   .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);
 }
+// Neutral appears as lighter gray
+.btn-neutral {
+  .buttonBackground(@btnNeutralBackground, @btnNeutralBackgroundHighlight);
+  color: #656565;
+  // Hover/focus state
+  &:hover,
+  &:focus {
+    color: #656565;
+  }
 
+  &.disabled,
+  &[disabled] {
+    color:#656565;
+    .opacity(65);
+  }
+
+}
 
 // Cross-browser Jank
 // --------------------------------------------------
@@ -252,4 +267,13 @@ input[type="submit"].btn {
 .btn-link[disabled]:focus {
   color: @grayDark;
   text-decoration: none;
+}
+
+// Make a reverse type of a button link
+.btn-link-reverse{
+    text-decoration:underline;
+  &:hover,
+  &:focus{
+    text-decoration:none;
+  }
 }

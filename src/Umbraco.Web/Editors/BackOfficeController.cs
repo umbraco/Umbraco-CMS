@@ -235,6 +235,13 @@ namespace Umbraco.Web.Editors
                                 {"trees", GetTreePluginsMetaData()}
                             }
                     },
+                    {
+                        "security", new Dictionary<string, object>
+                            {
+                                {"startContentId", Security.CurrentUser.StartContentId},
+                                {"startMediaId", Security.CurrentUser.StartMediaId}
+                            }
+                    },
                     {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
                     {
                         "application", GetApplicationState()
