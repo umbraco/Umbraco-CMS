@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web.Caching;
 using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 
@@ -12,6 +13,11 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class HttpRuntimeCacheProvider : DictionaryCacheProviderBase, IRuntimeCacheProvider
     {
+        // locker object that supports upgradeable read locking
+        // does not need to support recursion if we implement the cache correctly and ensure
+        // that methods cannot be reentrant, ie we do NOT create values while holding a lock.
+        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
         private readonly System.Web.Caching.Cache _cache;
 
         public HttpRuntimeCacheProvider(System.Web.Caching.Cache cache)
@@ -35,6 +41,20 @@ namespace Umbraco.Core.Cache
         {
             return _cache.Get(key);
         }
+
+        #region Lock
+
+        protected override IDisposable ReadLock
+        {
+            get { return new ReadLock(_locker); }
+        }
+
+        protected override IDisposable WriteLock
+        {
+            get { return new WriteLock(_locker); }
+        }
+
+        #endregion
 
         #region Get
 
@@ -72,26 +92,48 @@ namespace Umbraco.Core.Cache
             // on the Lazy lock to ensure that getCacheItem runs once and everybody waits on it, while the global
             // application lock has been released.
 
-            // Note that the Lazy execution may produce a null value.
-            // Must make sure (for backward compatibility) that we pretend they are not in the cache.
-            // So if we find an entry in the cache that already has its value created and is null,
-            // pretend it was not there. If value is not already created, wait... and return null, that's
-            // what prior code did.
+            // NOTE 
+            //   The Lazy value creation may produce a null value.
+            //   Must make sure (for backward compatibility) that we pretend they are not in the cache.
+            //   So if we find an entry in the cache that already has its value created and is null,
+            //   pretend it was not there. If value is not already created, wait... and return null, that's
+            //   what prior code did.
+
+            // NOTE
+            //   The Lazy value creation may throw.
 
             // So... the null value _will_ be in the cache but never returned
 
             Lazy<object> result;
 
-            using (var lck = new UpgradeableReadLock(Locker))
+            // Fast!
+            // Only one thread can enter an UpgradeableReadLock at a time, but it does not prevent other
+            // threads to enter a ReadLock in the meantime -- only upgrading to WriteLock will prevent all
+            // reads. We first try with a normal ReadLock for maximum concurrency and take the penalty of
+            // having to re-lock in case there's no value. Would need to benchmark to figure out whether
+            // it's worth it, though...
+            using (new ReadLock(_locker))
             {
                 result = _cache.Get(cacheKey) as Lazy<object>; // null if key not found
-                if (result == null || (result.IsValueCreated && GetSafeLazyValue(result) == null)) // get exceptions as null
-                {
-                    lck.UpgradeToWriteLock();
+            }
+            var value = result == null ? null : GetSafeLazyValue(result);
+            if (value != null) return value;
 
+            using (var lck = new UpgradeableReadLock(_locker))
+            {
+                result = _cache.Get(cacheKey) as Lazy<object>; // null if key not found
+
+                // cannot create value within the lock, so if result.IsValueCreated is false, just
+                // do nothing here - means that if creation throws, a race condition could cause
+                // more than one thread to reach the return statement below and throw - accepted.
+
+                if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                {
                     result = new Lazy<object>(getCacheItem);
                     var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
+
+                    lck.UpgradeToWriteLock();
                     _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
             }
@@ -140,7 +182,10 @@ namespace Umbraco.Core.Cache
             var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
-            _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+            using (new WriteLock(_locker))
+            {
+                _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+            }
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)

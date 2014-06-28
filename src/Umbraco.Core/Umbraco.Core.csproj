@@ -366,6 +366,7 @@
     <Compile Include="Models\TaggedEntity.cs" />
     <Compile Include="Models\TaggedProperty.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="MonitorLock.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\PackageBinaryByteInspector.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
