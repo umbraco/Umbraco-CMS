@@ -270,17 +270,17 @@ namespace Umbraco.Core.Services
                             //set value as per normal
                             content.SetValue(propertyTypeAlias, propertyValue);    
                         }
-                        else
-                        {
-                            //check if this exists in tagProperties
-                            var hasTags = tagProperties.XPathSelectElement(string.Format("//TagProperty[@docId=\"{0}\" and @propertyAlias=\"{1}\"]", id, propertyType.Alias));
-                            if (hasTags != null)
-                            {
-                                var tags = JsonConvert.DeserializeObject<string[]>(hasTags.Value);                                
-                                content.SetTags(propertyTypeAlias, tags, true, hasTags.Attribute("group").Value);
-                            }
+                        //else
+                        //{
+                        //    //check if this exists in tagProperties
+                        //    var hasTags = tagProperties.XPathSelectElement(string.Format("//TagProperty[@docId=\"{0}\" and @propertyAlias=\"{1}\"]", id, propertyType.Alias));
+                        //    if (hasTags != null)
+                        //    {
+                        //        var tags = JsonConvert.DeserializeObject<string[]>(hasTags.Value);                                
+                        //        content.SetTags(propertyTypeAlias, tags, true, hasTags.Attribute("group").Value);
+                        //    }
                             
-                        }
+                        //}
 
                     }
                     else
