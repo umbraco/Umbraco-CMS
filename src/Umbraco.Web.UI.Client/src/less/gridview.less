@@ -7,7 +7,7 @@
  // Sortabel
  // -------------------------
  .usky-grid .ui-sortable-helper  {
-     border: dashed 1px #000;
+     border: dashed 1px #$000;
      background: #ccc;
      opacity: 0.4;
      height: 50px !important;
@@ -241,7 +241,7 @@
 // CONTROL PLACEHOLDER
 // -------------------------
 .usky-grid  .usky-control-placeholder {
-    min-height: 100px;
+    min-height: 50px;
     position: relative;
     text-align: center;
     text-align: -moz-center;
@@ -493,7 +493,7 @@
  }
 
  .usky-grid .usky-control{
-     margin: 30px;
+     margin: 15px 30px 0px 10px;
      padding: 5px;
  }
  
@@ -519,7 +519,7 @@
      margin: 20px;
  }
 
- .usky-grid .uSky-templates-template .tb:hover {
+ .usky-grid .uSky-templates-template a.tb:hover {
      border:5px solid @blue;
  }
 
@@ -532,7 +532,7 @@
      cursor:pointer;
      position: relative;
  }
- 
+
  .usky-grid .uSky-templates-template .tr { 
      height: 100%;
      position: relative;
@@ -546,6 +546,10 @@
 
  .usky-grid .uSky-templates-template .tb .uSky-templates-column.last {
      border-right: 1px dashed @grayLight !important;
+ }
+
+ .usky-grid a.uSky-templates-column:hover, .usky-grid a.uSky-templates-column.selected{
+    background-color: @blue;
  }
 
 
@@ -576,10 +580,82 @@
      border: 2px solid @grayLight;  
      margin:0px;
      background-color: @grayLighter;
- }
+ } 
  .usky-grid  .mainTdpt {    
      height: 35px;
      border: 1px dashed @grayLight;  
      margin:0px;
      background-color: rgba(228, 228, 228, 0.41);
  }
+
+
+
+ /**************************************************************************************************/
+ /* Configuration specific styles */
+ /**************************************************************************************************/
+.usky-grid-configuration .uSky-templates{
+    text-align: left;
+}   
+
+.usky-grid-configuration ul{
+    display: block;
+}
+
+.usky-grid-configuration ul li{
+    display: block;
+    width: auto;
+    text-align: left;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template{
+    margin: 0px 20px 20px 0px;
+    width: 60px;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
+    height: 50px;
+    border-width: 2px !important;
+    padding: 0px;
+    border-spacing:2px;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template .tb:hover{
+    border-width: 2px !important;
+}
+
+.usky-grid-configuration .uSky-templates-column{
+    display: block;
+    float: left;
+    margin-left: -1px;
+}
+
+.usky-grid-configuration .uSky-templates-column.last{
+    margin-right: -1px;
+}
+
+.usky-grid-configuration .uSky-templates-column.add{
+    text-align: center;
+    font-size: 20px;
+    line-height: 70px;
+    color: #ccc;
+    text-decoration: none
+}
+
+
+.usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
+    margin: 0px 50px 20px 0px;
+    width: 60px;
+}
+
+.usky-grid-configuration .uSky-templates-rows .uSky-templates-row .tb{
+    border-width: 2px !important;
+    padding: 0px;
+    border-spacing:2px;
+}
+
+.usky-grid-configuration .uSky-templates-rows .mainTdpt{
+    height: 10px !important;
+}
+
+.usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
+

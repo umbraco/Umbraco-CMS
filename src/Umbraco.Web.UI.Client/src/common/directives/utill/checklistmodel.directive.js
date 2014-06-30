@@ -1,3 +1,10 @@
+/*
+  
+  http://vitalets.github.io/checklist-model/
+  <label ng-repeat="role in roles">
+    <input type="checkbox" checklist-model="user.roles" checklist-value="role.id"> {{role.text}}
+  </label>
+*/
 angular.module('umbraco.directives')
 .directive('checklistModel', ['$parse', '$compile', function($parse, $compile) {
   // contains

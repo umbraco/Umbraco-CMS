@@ -1,7 +1,5 @@
-﻿namespace Umbraco.Web.Editors
+﻿namespace Umbraco.Web.Models.TemplateQuery
 {
-    using Umbraco.Web.Editors.TemplateQuery;
-
     public class QueryCondition
     {
         

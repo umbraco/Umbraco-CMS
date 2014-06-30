@@ -18,7 +18,7 @@ namespace Umbraco.Web.Editors
 
     using Umbraco.Core.Persistence.DatabaseModelDefinitions;
     using Umbraco.Web.Dynamics;
-    using Umbraco.Web.Editors.TemplateQuery;
+    using Umbraco.Web.Models.TemplateQuery;
     using System.Linq.Expressions;
 
     using Umbraco.Web.Models;
