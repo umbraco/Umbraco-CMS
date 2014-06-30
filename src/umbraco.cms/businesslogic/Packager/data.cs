@@ -262,8 +262,12 @@ namespace umbraco.cms.businesslogic.packager
             //p.Folder
 
 			XmlNode n = data.GetFromId(Id, dataSource, true);
-			data.Source.SelectSingleNode("/packages").RemoveChild(n);
-            data.Source.Save(dataSource);
+            if (n != null)
+            {
+                data.Source.SelectSingleNode("/packages").RemoveChild(n);
+                data.Source.Save(dataSource);    
+            }
+			
 		}
 
 		public static void UpdateValue(XmlNode n, string Value) 
