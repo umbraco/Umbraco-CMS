@@ -11,7 +11,6 @@ var refrechLayout = function (parameters) {
     eval(string);
 }
 
-
 /* Fonts loaded in the tuning panel need to be loaded independently in
  * the content iframe to allow live previewing.
  */
@@ -55,15 +54,11 @@ var closeIntelTuning = function (tuningModel) {
     if (tuningModel) {
 
         $("[tuning-over]").css('outline', 'none');
-        $.each(tuningModel.categories, function (key, category) {
-            $.each(category.sections, function (key, section) {
-                $.each(section.subSections, function (key, subSection) {
-                    if (subSection.schema) {
-                        $(subSection.schema).unbind();
-                        $(subSection.schema).removeAttr("tuning-over");
-                    }
-                });
-            });
+        $.each(tuningModel.configs, function (indexConfig, config) {
+            if (config.schema) {
+                $(config.schema).unbind();
+                $(config.schema).removeAttr("tuning-over");
+            }
         });
     }
 
@@ -74,14 +69,11 @@ var initIntelTuning = function (tuningModel) {
     if (tuningModel) {
 
         // Add tuning-over attr for each schema from config
-        $.each(tuningModel.categories, function (key, category) {
-            $.each(category.sections, function (key, section) {
-                $.each(section.subSections, function (key, subSection) {
-                    if (subSection.schema) {
-                        $(subSection.schema).attr("tuning-over", subSection.name);
-                    }
-                });
-            });
+        $.each(tuningModel.configs, function (indexConfig, config) {
+            var schema = config.selector ? config.selector : config.schema;
+            if (schema) {
+                $(schema).attr("tuning-over", config.name);
+            }
         });
 
         // Outline tuning-over
@@ -142,6 +134,7 @@ var outlinePosition = function (target) {
         $("#outline-data").css('transition', 'all .05s ease-in-out');
         $("#outline-data").css('-moz-transition', 'all .05s ease-in-out');
         $("#outline-data").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-data").css('z-index', '9999999999999999999999999');
 
         $("#outline-sup").css('display', "block");
         $("#outline-sup").css('height', "2px");
@@ -153,6 +146,7 @@ var outlinePosition = function (target) {
         $("#outline-sup").css('transition', 'all .05s ease-in-out');
         $("#outline-sup").css('-moz-transition', 'all .05s ease-in-out');
         $("#outline-sup").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-sup").css('z-index', '9999999999999999999999999');
 
         $("#outline-inf").css('display', "block");
         $("#outline-inf").css('height', "2px");
@@ -164,6 +158,7 @@ var outlinePosition = function (target) {
         $("#outline-inf").css('transition', 'all .05s ease-in-out');
         $("#outline-inf").css('-moz-transition', 'all .05s ease-in-out');
         $("#outline-inf").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-inf").css('z-index', '9999999999999999999999999');
 
         $("#outline-left").css('display', "block");
         $("#outline-left").css('height', height + "px");
@@ -175,6 +170,7 @@ var outlinePosition = function (target) {
         $("#outline-left").css('transition', 'all .05s ease-in-out');
         $("#outline-left").css('-moz-transition', 'all .05s ease-in-out');
         $("#outline-left").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-left").css('z-index', '9999999999999999999999999');
 
         $("#outline-right").css('display', "block");
         $("#outline-right").css('height', height + "px");
@@ -186,6 +182,7 @@ var outlinePosition = function (target) {
         $("#outline-right").css('transition', 'all .05s ease-in-out');
         $("#outline-right").css('-moz-transition', 'all .05s ease-in-out');
         $("#outline-right").css('-webkit-transition', 'all .05s ease-in-out');
+        $("#outline-right").css('z-index', '9999999999999999999999999');
 
     }
     else {
@@ -206,16 +203,75 @@ var outlineHide = function () {
 
 var initTuningPanel = function () {
 
-    // Looking for grid row
-    var tuningGridList = []
-    $("div[class^='gridrow_']").each(function (index, value) {
-        tuningGridList.splice(tuningGridList.length + 1, 0, $(value).attr("class"))
+    // First load the tuning config from file
+    if (tuningConfig) {
+        console.info("Tuning config from file is loaded");
+    }
+    else {
+        console.info("tuning config not found");
+    }
+
+    // Add tuning from HTML 5 data tags
+    $("[data-tuning]").each(function (index, value) {
+        var tagName = $(value).data("tuning") ? $(value).data("tuning") : $(value)[0].nodeName.toLowerCase();
+        var tagSchema = $(value).data("schema") ? $(value).data("schema") : $(value)[0].nodeName.toLowerCase();
+        var tagSelector = $(value).data("selector") ? $(value).data("selector") : tagSchema;
+        var tagEditors = $(value).data("editors"); //JSON.parse(...);
+
+        tuningConfig.configs.splice(tuningConfig.configs.length, 0, {
+            name: tagName,
+            schema: tagSchema,
+            selector: tagSelector,
+            editors: tagEditors
+        });
+    });
+    console.info("HTML5 tags");
+
+    // For each editor config create a composite alias
+    $.each(tuningConfig.configs, function (configIndex, config) {
+        $.each(config.editors, function (editorIndex, editor) {
+            var clearSchema = config.schema.replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+            var clearEditor = JSON.stringify(editor).replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+            editor.alias = clearSchema + clearEditor;
+        });
+    });
+    console.info("Alias tags");
+
+    // Create or update the less file
+    $.ajax({
+        url: "/Umbraco/Api/tuning/Init",
+        type: 'POST',
+        dataType: "json",
+        error: function (err) {
+            alert(err.responseText)
+        },
+        data: {
+            config: JSON.stringify(tuningConfig),
+            pageId: pageId
+        },
+        success: function (data) {
+
+            // Add Less link in head
+            $("head").append("<link>");
+            css = $("head").children(":last");
+            css.attr({
+                rel: "stylesheet/less",
+                type: "text/css",
+                href: data
+            });
+            console.info("Less styles are loaded");
+
+            // Init Less.js
+            $.getScript("/Umbraco/lib/Less/less-1.7.0.min.js", function (data, textStatus, jqxhr) {
+
+                // Init panel 
+                if (parent.setFrameIsLoaded) {
+                    parent.setFrameIsLoaded(tuningConfig, tuningPalette);
+                }
+            });
+        }
     });
 
-    // Init panel 
-    if (parent.setFrameIsLoaded) {
-        parent.setFrameIsLoaded(tuningParameterUrl, tuningGridList);
-    }
 }
 
 $(function () {

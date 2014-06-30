@@ -1302,22 +1302,27 @@ namespace Umbraco.Web
         #endregion
 
         #region tuning
-
+        
         public HtmlString EnableTuning()
         {
+            return EnableTuning(string.Empty, string.Empty);
+        }
 
-            string previewLink = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" +
-                                 @"<link href=""{0}"" rel=""stylesheet/less"" type=""text/css"" />" +
-                                 @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
-                                 @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>" +
-                                 @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js"" type=""text/javascript""></script>" +
-                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';</script>" +
+        public HtmlString EnableTuning(string tuningConfigPath)
+        {
+            return EnableTuning(tuningConfigPath, string.Empty);
+        }
+
+        public HtmlString EnableTuning(string tuningConfigPath, string tuningPalettesPath)
+        {
+
+            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""{0}"" type=""text/javascript""></script>" +
+                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
+                                 @"<script type=""text/javascript"">var pageId = '{2}'</script>" +
                                  @"<script src=""/umbraco/js/tuning.front.js"" type=""text/javascript""></script>";
 
-            string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"">" +
-                                    @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />" +
-                                    @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
-                                    @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>";
+            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />";
 
             // Get page value
             int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
@@ -1326,9 +1331,9 @@ namespace Umbraco.Web
 
             if (UmbracoContext.Current.InPreviewMode)
             {
-                // Create or update current less file
-                string lessPath = TuningUtility.CreateOrUpdateLessFile(path, pageId);
-                result = string.Format(previewLink, lessPath);
+                tuningConfigPath = !string.IsNullOrEmpty(tuningConfigPath) ? tuningConfigPath : "/umbraco/js/tuning.config.js";
+                tuningPalettesPath = !string.IsNullOrEmpty(tuningPalettesPath) ? tuningConfigPath : "/umbraco/js/tuning.palettes.js";
+                result = string.Format(previewLink, tuningConfigPath, tuningPalettesPath, pageId);
             }
             else
             {

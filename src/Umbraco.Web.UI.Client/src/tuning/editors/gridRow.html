@@ -1,0 +1,20 @@
+﻿
+<div ng-controller="Umbraco.tuning.gridRow">
+
+    <div style="display: block; clear: both; overflow: hidden; margin-bottom: 5px;">
+        <span class="field-title">Background color:</span>
+        <div style="float: left; margin-right: 5px; width: 100px;">
+            <spectrum colorselected="item.values.color"></spectrum>
+            <i ng-if="item.values.color != ''" ng-click="item.values.color = ''" class="icon icon-delete colorPickerDelete"></i>
+        </div>
+    </div>
+
+    <div style="display: block; clear: both; overflow: hidden; margin-bottom: 5px;">
+        <span class="field-title">Image or Pattern:</span>
+        <div class="imagePickerPreview" ng-click="open(item.values)" style="background-image:{{ item.values.imageorpattern }}">
+            <i class="icon icon-add"></i>
+        </div>
+        <i ng-if="item.values.imageorpattern != ''" ng-click="item.values.imageorpattern = ''" class="icon icon-delete colorPickerDelete"></i>
+    </div>
+
+</div>

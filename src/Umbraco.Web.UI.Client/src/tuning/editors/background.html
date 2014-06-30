@@ -1,0 +1,10 @@
+﻿
+<div ng-controller="Umbraco.tuning.background">
+    <span class="field-title">{{item.name}}</span>
+    <div class="box-slider">
+        <div class="imagePickerPreview" ng-click="open(item.values)" style="background-image:{{ item.values.imageorpattern }}">
+            <i class="icon icon-add"></i>
+            <i ng-if="item.values.imageorpattern != ''" ng-click="item.values.imageorpattern = ''" class="icon icon-delete colorPickerDelete"></i>
+        </div>
+    </div>
+</div>

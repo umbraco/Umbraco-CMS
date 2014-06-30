@@ -55,15 +55,9 @@ namespace Umbraco.Web.Editors
 
             // Get style less url 
             var pageId = int.Parse(HttpContext.Current.Request["pageId"]);
-            var tuningStyleUrl = HttpContext.Current.Request["tuningStyleUrl"];
-
-            if (string.IsNullOrEmpty(tuningStyleUrl))
-                tuningStyleUrl = TuningUtility.tuningStylePath;
-            else
-                tuningStyleUrl = HttpContext.Current.Server.MapPath(tuningStyleUrl);
 
             // Get all parameters
-            string paramBlock = TuningUtility.GetLessParameters(tuningStyleUrl, pageId);
+            string paramBlock = TuningUtility.GetLessParameters(pageId);
 
             // Prepare string parameter result
             string[] paramLines = paramBlock.Trim().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -91,9 +85,10 @@ namespace Umbraco.Web.Editors
             var parameters = HttpContext.Current.Request["parameters"];
             var parametersGrid = HttpContext.Current.Request["parametersGrid"];
             var pageId = int.Parse(HttpContext.Current.Request["pageId"]);
+            var inherited = Boolean.Parse(HttpContext.Current.Request["inherited"]);
 
             // Save and compile styles
-            TuningUtility.SaveAndPublishStyle(parameters, parametersGrid, pageId);
+            TuningUtility.SaveAndPublishStyle(parameters, pageId, inherited);
 
             var resp = new HttpResponseMessage()
             {
@@ -118,6 +113,18 @@ namespace Umbraco.Web.Editors
             };
             resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             return resp;
+
+        }
+
+        [HttpPost]
+        public string Init()
+        {
+
+            // Get parameters
+            var config = HttpContext.Current.Request["config"];
+            var pageId = int.Parse(HttpContext.Current.Request["pageId"]);
+
+            return TuningUtility.CreateOrUpdateLessFile(pageId, config);
 
         }
 

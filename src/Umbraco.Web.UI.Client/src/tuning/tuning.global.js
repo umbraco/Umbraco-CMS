@@ -11,25 +11,11 @@ var refrechIntelTuning = function (name) {
     if (scope.schemaFocus != name.toLowerCase()) {
 
         var notFound = true;
-        angular.forEach(scope.tuningModel.categories, function (category, key) {
-            var isContainer = false;
-            angular.forEach(category.sections, function (section, key) {
-                angular.forEach(section.subSections, function (subSection, key) {
-                    if (subSection.name && name.toLowerCase() == subSection.name.toLowerCase()) {
-                        isContainer = true;
-                        notFound = false
-                    }
-
-                });
-            });
-            if (!category.active) {
-                category.active = isContainer;
+        $.each(scope.tuningModel.configs, function (indexConfig, config) {
+            if (config.name && name.toLowerCase() == config.name.toLowerCase()) {
+                notFound = false
             }
         });
-        if (notFound) {
-            scope.tuningModel.categories[0].active = true;
-        }
-        scope.$apply();
 
         if (notFound) {
             scope.schemaFocus = "body";
@@ -43,10 +29,10 @@ var refrechIntelTuning = function (name) {
 }
 
 /* Called when the iframe is first loaded */
-var setFrameIsLoaded = function (tuningParameterUrl, tuningGridList) {
+var setFrameIsLoaded = function (tuningConfig, tuningPalette) {
     var scope = angular.element($("#tuningPanel")).scope();
-    scope.tuningParameterUrl = tuningParameterUrl;
-    scope.tuningGridList = tuningGridList
+    scope.tuningModel = tuningConfig;
+    scope.tuningPalette = tuningPalette;
     scope.enableTuning++;
     scope.$apply();
 }

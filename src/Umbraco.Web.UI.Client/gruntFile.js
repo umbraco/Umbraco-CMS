@@ -143,9 +143,8 @@ module.exports = function (grunt) {
       tuning: {
           files: [
               { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/css', src: 'tuning.defaultStyle.css', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/less', src: 'tuning.defaultStyle.less', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/less', src: 'tuning.gridRowStyle.less', expand: true, cwd: 'src/tuning' },
+              { dest: '<%= distdir %>/preview/editors', src: '**/*.html', expand: true, cwd: 'src/tuning/editors' },
+              { dest: '<%= distdir %>/assets/less', src: '**/*.less', expand: true, cwd: 'src/tuning/editors' },
               { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
               { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
               { dest: '<%= distdir %>/js', src: 'tuning.front.js', expand: true, cwd: 'src/tuning' }
@@ -214,7 +213,7 @@ module.exports = function (grunt) {
           }
         },
         tuningJs: {
-            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
+            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/editors/*.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
             dest: '<%= distdir %>/js/tuning.panel.js'
         },
         controllers: {
