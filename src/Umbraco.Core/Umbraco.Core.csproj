@@ -364,6 +364,8 @@
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TagCacheStorageType.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
+    <Compile Include="Models\TaggedEntity.cs" />
+    <Compile Include="Models\TaggedProperty.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\PackageBinaryByteInspector.cs" />
