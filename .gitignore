@@ -116,13 +116,3 @@ src/Umbraco.Web.UI/umbraco/js/init.js
 build/ApiDocs/*
 build/ApiDocs/Output/*
 src/Umbraco.Web.UI.Client/bower_components/*
-/src/Umbraco.Web.UI/uSync
-/src/Umbraco.Web.UI/uSync.Archive
-/src/Umbraco.Web.UI/rs-plugin
-/src/Umbraco.Web.UI/img
-/src/Umbraco.Web.UI/config/uSyncSettings.config
-/src/Umbraco.Web.UI/Umbraco/preview/editors/background.html
-/src/Umbraco.Web.UI/Umbraco/preview/editors/colorpicker.html
-/src/Umbraco.Web.UI/Umbraco/preview/editors/googlefontpicker.html
-/src/Umbraco.Web.UI/Umbraco/preview/editors/gridRow.html
-/src/Umbraco.Web.UI/Umbraco/preview/editors/slider.html
