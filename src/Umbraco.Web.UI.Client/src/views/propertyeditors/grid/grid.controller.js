@@ -149,19 +149,20 @@ angular.module("umbraco")
         };
 
         $scope.setUniqueId = function (cell, index) {
-            var date = new Date();
-            var components = [
-                date.getYear(),
-                date.getMonth(),
-                date.getDate(),
-                date.getHours(),
-                date.getMinutes(),
-                date.getSeconds(),
-                date.getMilliseconds()
-            ];
-            return components.join("");
+            return guid();
         };
 
+        var guid = (function () {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                           .toString(16)
+                           .substring(1);
+            }
+            return function () {
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                       s4() + '-' + s4() + s4() + s4();
+            };
+        })();
 
         $scope.addControl = function (editor, cell, index){
             var newControl = {
