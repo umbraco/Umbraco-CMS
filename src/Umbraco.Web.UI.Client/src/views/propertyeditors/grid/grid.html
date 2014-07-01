@@ -175,7 +175,7 @@
                                                             
                                                             <span ng-if="deletePrompt">
                                                                 Are you sure? 
-                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, control.$index)">Yes</a> 
+                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $parent.$index)">Yes</a> 
                                                             </span>
 
                                                             <i ng-if="!deletePrompt" class="icon icon-trash"></i>
