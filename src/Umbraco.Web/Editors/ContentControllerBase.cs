@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -117,7 +118,7 @@ namespace Umbraco.Web.Editors
                         var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
                         if (supportTagsAttribute != null)
                         {
-                            TagExtractor.SetPropertyTags(contentItem.PersistedContent, dboProperty, data, propVal, supportTagsAttribute);                            
+                            TagExtractor.SetPropertyTags(dboProperty, data, propVal, supportTagsAttribute);
                         }
                         else
                         {

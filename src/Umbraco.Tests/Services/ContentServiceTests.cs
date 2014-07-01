@@ -40,6 +40,60 @@ namespace Umbraco.Tests.Services
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         [Test]
+        public void Create_Tag_Data_Bulk_Publish_Operation()
+        {
+            //Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var dataTypeService = ServiceContext.DataTypeService;
+            //set the pre-values
+            dataTypeService.SavePreValues(1041, new Dictionary<string, PreValue>
+            {
+                {"group", new PreValue("test")},
+                {"storageType", new PreValue("Csv")}
+            });
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });            
+            contentTypeService.Save(contentType);
+            contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
+
+            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
+            content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Save(content);
+
+            var child1 = MockedContent.CreateSimpleContent(contentType, "child 1 content", content.Id);
+            child1.SetTags("tags", new[] { "hello1", "world1", "some1" }, true);
+            contentService.Save(child1);
+
+            var child2 = MockedContent.CreateSimpleContent(contentType, "child 2 content", content.Id);
+            child2.SetTags("tags", new[] { "hello2", "world2" }, true);
+            contentService.Save(child2);
+            
+            // Act
+            contentService.PublishWithChildrenWithStatus(content, includeUnpublished: true);
+
+            // Assert
+            var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
+
+            Assert.AreEqual(4, DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                new { nodeId = content.Id, propTypeId = propertyTypeId }));
+
+            Assert.AreEqual(3, DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                new { nodeId = child1.Id, propTypeId = propertyTypeId }));
+
+            Assert.AreEqual(2, DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                new { nodeId = child2.Id, propTypeId = propertyTypeId }));
+        }
+
+        [Test]
         public void Does_Not_Create_Tag_Data_For_Non_Published_Version()
         {
             //Arrange
