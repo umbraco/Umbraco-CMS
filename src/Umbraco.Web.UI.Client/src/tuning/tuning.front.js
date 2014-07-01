@@ -277,6 +277,7 @@ var initTuningPanel = function () {
 $(function () {
 
     if (parent.setFrameIsLoaded) {
+
         // Init ouline layer
         $("body").append("<div id=\"outline-data\"></div><div id=\"outline-sup\"></div><div id=\"outline-inf\"></div><div id=\"outline-left\"></div><div id=\"outline-right\"></div>");
 

@@ -286,10 +286,9 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     }
 
     // Focus schema in front
-    $scope.accordionWillBeOpened = function (schema) {
-        if (schema) {
-            setSelectedSchema(schema);
-        }
+    $scope.accordionWillBeOpened = function (editor) {
+        var selector = editor.selector ? editor.selector : editor.schema
+        setSelectedSchema(selector);
     }
 
     /*****************************************************************************/
@@ -374,7 +373,7 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
                     refreshtuning();
                 }, true);
             }
-        }, 250);
+        }, 200);
     }, true)
 
 })

@@ -781,6 +781,50 @@ ul.preview-device li span {
   border-radius: 5px;
 }
 
+/* New colapse style */
+
+.tuning .tuning-panel-property {
+    margin-top: 1px;
+}
+
+.tuning .tuning-panel-property .tuning-panel-property-heading {
+    border-left: 4px transparent solid;
+}
+
+.tuning .tuning-panel-property .tuning-panel-property-heading h4 {
+    border-bottom: 1px solid transparent;
+}
+
+.tuning .tuning-panel-property.selected .tuning-panel-property-heading,
+.tuning .tuning-panel-property .tuning-panel-property-heading:hover {
+    color: #d9d9d9;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 0.09);
+    border-left: 4px #f57020 solid;
+}
+
+.tuning .tuning-panel-property.selected .tuning-panel-property-heading h4 {
+    margin: 0 0 0 0;
+    color: #d9d9d9;
+    border-top: none;
+    border-bottom: 1px solid #6D6D6D;
+}
+
+.tuning .tuning-panel-property .tuning-property-collapse {
+    display:none;
+    overflow:hidden;
+    border-left-width: 4px;
+    border-left-color: transparent;
+    border-left-style: solid;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.0901961);
+}
+
+.tuning .tuning-panel-property.selected .tuning-property-collapse {
+    display:block;
+    border-left-color: rgb(245, 112, 32);
+}
+
 /******* font-face *******/
 
 @font-face {

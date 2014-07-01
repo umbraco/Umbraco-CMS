@@ -57,7 +57,33 @@
 
                     <h2>STYLING</h2>
 
-                    <accordion close-others="oneAtATime">
+                    <div class="tuning-panel-property"
+                         ng-repeat="configItem in tuningModel.configs"
+                         ng-class="{selected : ( schemaFocus != '' && schemaFocus.toLowerCase() == configItem.name.toLowerCase() )}">
+
+                        <div class="tuning-panel-property-heading">
+                            <h4 class="panel-title">
+                                <a>
+                                    <span ng-click="accordionOpened(configItem.name)" ng-mouseover="accordionWillBeOpened(configItem)">
+                                        {{configItem.name}}
+                                    </span>
+                                </a>
+                            </h4>
+                        </div>
+
+                        <div class="tuning-property-collapse">
+                            <div class="tuning-panel-body">
+                                <div ng-mouseover="accordionWillBeOpened(configItem)" class="ng-scope">
+                                    <div ng-mouseover="accordionWillBeOpened(configItem)">
+                                        <div class="div-field" ng-repeat="item in configItem.editors" ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!--<accordion close-others="oneAtATime">
                         <accordion-group ng-init="initTuning()"
                                             ng-repeat="configItem in tuningModel.configs"
                                             ng-class="{true:'selected', false:''}[isOpen]"
@@ -65,7 +91,7 @@
 
                             <accordion-heading>
                                 <span ng-click="accordionOpened(configItem.name)" ng-mouseover="accordionWillBeOpened(configItem.schema)">
-                                    {{configItem.name}}
+                                    {{configItem.name}} {{isOpen}}
                                 </span>
                             </accordion-heading>
 
@@ -74,7 +100,7 @@
                             </div>
 
                         </accordion-group>
-                    </accordion>
+                    </accordion>-->
 
                     <!-- Split button -->
                     <div class="btn-group">
