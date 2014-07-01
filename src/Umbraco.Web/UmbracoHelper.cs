@@ -1328,21 +1328,23 @@ namespace Umbraco.Web
             int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
             string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
             string result = string.Empty;
+            string cssPath = TuningUtility.GetStylesheetPath(path, false);
 
             if (UmbracoContext.Current.InPreviewMode)
             {
                 tuningConfigPath = !string.IsNullOrEmpty(tuningConfigPath) ? tuningConfigPath : "/umbraco/js/tuning.config.js";
                 tuningPalettesPath = !string.IsNullOrEmpty(tuningPalettesPath) ? tuningConfigPath : "/umbraco/js/tuning.palettes.js";
-                result = string.Format(previewLink, tuningConfigPath, tuningPalettesPath, pageId);
+                
+                if (!string.IsNullOrEmpty(cssPath))
+                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+
+                result = result + string.Format(previewLink, tuningConfigPath, tuningPalettesPath, pageId);
             }
             else
             {
                 // Get css path for current page
-                string cssPath = TuningUtility.GetStylesheetPath(path, false);
                 if (!string.IsNullOrEmpty(cssPath))
                     result = string.Format(noPreviewLinks, cssPath);
-                else
-                    result = string.Format(noPreviewLinks, "/Umbraco/assets/css/tuning.defaultStyle.css");
             }
 
             return new HtmlString(result);
