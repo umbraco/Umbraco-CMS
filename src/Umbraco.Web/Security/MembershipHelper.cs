@@ -312,7 +312,7 @@ namespace Umbraco.Web.Security
 
             if (provider.IsUmbracoMembershipProvider())
             {                
-                var membershipUser = provider.GetCurrentUser();
+                var membershipUser = provider.GetCurrentUserOnline();
                 var member = GetCurrentPersistedMember();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
                 // to use the front-end!
@@ -476,7 +476,7 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                var member = provider.GetCurrentUser();
+                var member = provider.GetCurrentUserOnline();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
                 // to use the front-end!
                 if (member == null)
