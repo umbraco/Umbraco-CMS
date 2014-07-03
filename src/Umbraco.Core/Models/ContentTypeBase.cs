@@ -370,6 +370,9 @@ namespace Umbraco.Core.Models
         /// This list aggregates PropertyTypes across the PropertyGroups.
         /// </summary>
         /// <remarks>
+        /// 
+        /// The setter is used purely to set the property types that DO NOT belong to a group!
+        /// 
         /// Marked as DoNotClone because the result of this property is not the natural result of the data, it is 
         /// a union of data so when auto-cloning if the setter is used it will be setting the unnatural result of the 
         /// data. We manually clone this instead. 

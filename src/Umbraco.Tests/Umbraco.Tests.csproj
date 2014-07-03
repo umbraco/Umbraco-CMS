@@ -298,6 +298,7 @@
     <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Querying\PropertyTypeRelatorTests.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />

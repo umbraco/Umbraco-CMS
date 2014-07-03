@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -33,6 +34,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of RepositoryBase<int,IContentType>
 
+        //TODO: We need to overhaul the SQL to create a content type, see below for notes....
+
         protected override IContentType PerformGet(int id)
         {
             var contentTypeSql = GetBaseQuery(false);
@@ -42,7 +45,13 @@ namespace Umbraco.Core.Persistence.Repositories
             // at the top to populate the default template property correctly.
             contentTypeSql.OrderByDescending<DocumentTypeDto>(x => x.IsDefault);
 
+            //NOTE: SQL call #1
+
             var dto = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
+
+            //var dto = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto, ContentTypeAllowedContentTypeDto, DocumentTypeDto>(
+            //    new AllowedContentTypeRelator().Map,
+            //    contentTypeSql);
 
             if (dto == null)
                 return null;
@@ -50,15 +59,33 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new ContentTypeFactory(NodeObjectTypeId);
             var contentType = factory.BuildEntity(dto);
 
+            //NOTE: SQL call #2
+
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
-            contentType.PropertyGroups = GetPropertyGroupCollection(id, contentType.CreateDate, contentType.UpdateDate);
-            ((ContentType)contentType).PropertyTypes = GetPropertyTypeCollection(id, contentType.CreateDate, contentType.UpdateDate);
+
+            PropertyGroupCollection propGroups;
+            PropertyTypeCollection propTypes;
+            ContentTypeQueries.PopulateGroupsAndProperties(id, Database, out propTypes, out propGroups);
+            contentType.PropertyGroups = propGroups;
+            ((ContentType) contentType).PropertyTypes = propTypes;
+
+            ////NOTE: SQL call #3
+            //contentType.PropertyGroups = GetPropertyGroupCollection(id, contentType.CreateDate, contentType.UpdateDate);
+
+            ////NOTE: SQL call #4
+            //((ContentType)contentType).PropertyTypes = GetPropertyTypeCollection(id, contentType.CreateDate, contentType.UpdateDate);
+
+            //NOTE: SQL call #5
 
             var templates = Database.Fetch<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = id });
             if(templates.Any())
             {
+                //NOTE: SQL call #6++
+
                 contentType.AllowedTemplates = templates.Select(template => _templateRepository.Get(template.TemplateNodeId)).ToList();
             }
+
+            //NOTE: SQL call #7
 
             var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = id});
             foreach (var contentTypeDto in list)
@@ -129,6 +156,8 @@ namespace Umbraco.Core.Persistence.Repositories
                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
                .InnerJoin<NodeDto>()
                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+               //.LeftJoin<ContentTypeAllowedContentTypeDto>()
+               //.On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.AllowedId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
@@ -270,5 +299,107 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        internal static class ContentTypeQueries
+        {
+
+            public static void PopulateGroupsAndProperties(int contentTypeId, Database db, out PropertyTypeCollection propertyTypeCollection, out PropertyGroupCollection propertyGroupCollection)
+            {
+                // first part Gets all property groups including property type data even when no property type exists on the group
+                // second part Gets all property types including ones that are not on a group
+                // therefore the union of the two contains all of the property type and property group information we need
+
+                var sql = @"SELECT PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptHelpText,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
+                            PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
+                            PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as pgText
+                        FROM cmsPropertyTypeGroup as PG
+                        LEFT JOIN
+                        (
+                            SELECT PT.id as ptId, PT.Alias as ptAlias, PT." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Description") + @" as ptDesc, PT.helpText as ptHelpText,
+                                    PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
+                                    PT.propertyTypeGroupId as ptGroupId,
+                                    DT.dbType as dtDbType, DT.nodeId as dtId, DT.propertyEditorAlias as dtPropEdAlias
+                            FROM cmsPropertyType as PT
+                            INNER JOIN cmsDataType as DT
+                            ON PT.dataTypeId = DT.nodeId
+                        )  as  PT
+                        ON PG.[id] = PT.ptGroupId
+                        WHERE (PG.contenttypeNodeId = @contentTypeId)
+                        
+                        UNION
+
+                        SELECT PT.id as ptId, PT.Alias as ptAlias, PT." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Description") + @" as ptDesc, PT.helpText as ptHelpText,
+                                PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
+                                DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
+                                PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as pgText
+                        FROM cmsPropertyType as PT
+                        INNER JOIN cmsDataType as DT
+                        ON PT.dataTypeId = DT.[nodeId]
+                        LEFT JOIN cmsPropertyTypeGroup as PG
+                        ON PG.[id] = PT.propertyTypeGroupId
+                        WHERE (PT.contentTypeId = @contentTypeId)
+
+                        ORDER BY (PG.id)";
+
+                var result = db.Fetch<dynamic>(sql, new { contentTypeId = contentTypeId });
+
+                //from this we need to make :
+                // * PropertyGroupCollection - Contains all property groups along with all property types associated with a group
+                // * PropertyTypeCollection - Contains all property types that do not belong to a group
+
+                //create the property group collection first, this means all groups (even empty ones) and all groups with properties
+
+                propertyGroupCollection = new PropertyGroupCollection(result
+                    //get all rows that have a group id
+                    .Where(x => x.pgId != null)
+                    //turn that into a custom object containing only the group info
+                    .Select(x => new { GroupId = x.pgId, ParentGroupId = x.pgParentGroupId, SortOrder = x.pgSortOrder, Text = x.pgText })
+                    //get distinct data by id
+                    .DistinctBy(x => (int)x.GroupId)
+                    //for each of these groups, create a group object with it's associated properties
+                    .Select(group => new PropertyGroup(new PropertyTypeCollection(
+                        result
+                            .Where(row => row.pgId == group.GroupId && row.ptId != null)
+                            .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType))
+                            {
+                                //fill in the rest of the property type properties
+                                Alias = row.ptAlias,
+                                Description = row.ptDesc,
+                                DataTypeDefinitionId = row.dtId,
+                                Id = row.ptId,
+                                Mandatory = row.ptMandatory,
+                                Name = row.ptName,
+                                PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
+                                SortOrder = row.ptSortOrder,
+                                ValidationRegExp = row.ptRegExp
+                            })))
+                    {
+                        //fill in the rest of the group properties
+                        Id = group.GroupId,
+                        Name = group.Text,
+                        ParentId = group.ParentGroupId,
+                        SortOrder = group.SortOrder
+                    }).ToArray());
+
+                //Create the property type collection now (that don't have groups)
+
+                propertyTypeCollection = new PropertyTypeCollection(result
+                    .Where(x => x.pgId == null)
+                    .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType))
+                    {
+                        //fill in the rest of the property type properties
+                        Alias = row.ptAlias,
+                        Description = row.ptDesc,
+                        DataTypeDefinitionId = row.dtId,
+                        Id = row.ptId,
+                        Mandatory = row.ptMandatory,
+                        Name = row.ptName,
+                        PropertyGroupId = null,
+                        SortOrder = row.ptSortOrder,
+                        ValidationRegExp = row.ptRegExp
+                    }).ToArray());
+            }
+
+        }
     }
 }

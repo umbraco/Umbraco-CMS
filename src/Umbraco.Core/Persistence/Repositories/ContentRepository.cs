@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
-
+        
         public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
             : base(work)
         {
@@ -123,17 +123,11 @@ namespace Umbraco.Core.Persistence.Repositories
                         .ToArray();
             }
 
-            ITemplate[] templates;
-            using (DisposableTimer.DebugDuration<ContentRepository>("Getting all templates types"))
-            {
-                templates = _templateRepository.GetAll(
-                    dtos
-                        .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                        .Select(x => x.TemplateId.Value).ToArray())
-                    .ToArray();
-            }
-
-
+            var templates = _templateRepository.GetAll(
+                dtos
+                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                    .Select(x => x.TemplateId.Value).ToArray())
+                .ToArray();
 
             //Go get the property data for each document
             var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
