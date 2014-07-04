@@ -48,16 +48,21 @@ namespace Umbraco.Tests.Persistence.Querying
 
                 DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99998, Id = 99997, SortOrder = 1 });
                 DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99999, Id = 99997, SortOrder = 2});
+
+                DatabaseContext.Database.Insert(new ContentType2ContentTypeDto {ChildId = 99999, ParentId = 99997});
+                DatabaseContext.Database.Insert(new ContentType2ContentTypeDto { ChildId = 99998, ParentId = 99997 });
                 
                 transaction.Complete();
             }
 
             IEnumerable<Tuple<int, string, string>> assocatedTemplates;
-            var contentType = ContentTypeRepository.ContentTypeQueries.MapContentType(99997, DatabaseContext.Database, out assocatedTemplates);
+            IEnumerable<int> childContentTypes;
+            var contentType = ContentTypeRepository.ContentTypeQueries.MapContentType(99997, DatabaseContext.Database, out assocatedTemplates, out childContentTypes);
 
             Assert.IsNotNull(contentType);
             Assert.AreEqual(2, contentType.AllowedContentTypes.Count());
             Assert.AreEqual(2, assocatedTemplates.Count());
+            Assert.AreEqual(2, childContentTypes.Count());
 
         }
 

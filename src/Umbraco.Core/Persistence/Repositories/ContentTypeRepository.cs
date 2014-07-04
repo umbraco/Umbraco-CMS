@@ -21,13 +21,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-		public ContentTypeRepository(IDatabaseUnitOfWork work, ITemplateRepository templateRepository)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, ITemplateRepository templateRepository)
             : base(work)
         {
             _templateRepository = templateRepository;
         }
 
-		public ContentTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ITemplateRepository templateRepository)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ITemplateRepository templateRepository)
             : base(work, cache)
         {
             _templateRepository = templateRepository;
@@ -49,7 +49,8 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: SQL call #1
 
             IEnumerable<Tuple<int, string, string>> assocatedTemplates;
-            var contentType = ContentTypeQueries.MapContentType(id, Database, out assocatedTemplates);
+            IEnumerable<int> childContentTypeIds;
+            var contentType = ContentTypeQueries.MapContentType(id, Database, out assocatedTemplates, out childContentTypeIds);
 
             if (contentType == null)
                 return null;
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories
             PropertyTypeCollection propTypes;
             ContentTypeQueries.MapGroupsAndProperties(id, Database, out propTypes, out propGroups);
             contentType.PropertyGroups = propGroups;
-            ((ContentType)contentType).PropertyTypes = propTypes;  
+            ((ContentType)contentType).PropertyTypes = propTypes;
 
             //NOTE: SQL call #3++
             //SEE: http://issues.umbraco.org/issue/U4-5174 to fix this
@@ -69,13 +70,16 @@ namespace Umbraco.Core.Persistence.Repositories
             contentType.AllowedTemplates = templates.ToArray();
 
             //NOTE: SQL call #5++
-            //TODO: Fix this part up, surely we can include it in the first sql call
 
-            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = id });
-            foreach (var contentTypeDto in list)
+            var childIdsAsArray = childContentTypeIds.ToArray();
+            if (childIdsAsArray.Any())
             {
-                bool result = contentType.AddContentType(Get(contentTypeDto.ParentId));
-                //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)
+                var childContentTypes = GetAll(childIdsAsArray);
+                foreach (var childContentType in childContentTypes)
+                {
+                    var result = contentType.AddContentType(childContentType);
+                    //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
+                }    
             }
 
             //on initial construction we don't want to have dirty properties tracked
@@ -136,11 +140,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
 
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<DocumentTypeDto>()
-               .RightJoin<ContentTypeDto>()
-               .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
+               .From<ContentTypeDto>()
                .InnerJoin<NodeDto>()
                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+               .LeftJoin<DocumentTypeDto>()
+               .On<DocumentTypeDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.DocumentType));
 
             return sql;
@@ -205,16 +209,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
                                     () =>
-                                        {
-                                            var message =
-                                                string.Format(
-                                                    "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
-                                                    entity.Name);
-                                            var exception = new Exception(message);
+                                    {
+                                        var message =
+                                            string.Format(
+                                                "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                entity.Name);
+                                        var exception = new Exception(message);
 
-                                            LogHelper.Error<ContentTypeRepository>(message, exception);
-                                            throw exception;
-                                        });
+                                        LogHelper.Error<ContentTypeRepository>(message, exception);
+                                        throw exception;
+                                    });
 
             ((ContentType)entity).AddingEntity();
 
@@ -232,8 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert allowed Templates not including the default one, as that has already been inserted
             foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
             {
-                Database.Insert(new DocumentTypeDto
-                                    {ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false});
+                Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -265,7 +268,7 @@ namespace Umbraco.Core.Persistence.Repositories
             PersistUpdatedBaseContentType(dto.ContentTypeDto, entity);
 
             //Look up DocumentType entries for updating - this could possibly be a "remove all, insert all"-approach
-            Database.Delete<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id});
+            Database.Delete<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
             //Insert the updated DocumentTypeDto if a template exists
             if (dto.TemplateNodeId > 0)
             {
@@ -286,21 +289,25 @@ namespace Umbraco.Core.Persistence.Repositories
         internal static class ContentTypeQueries
         {
 
-            public static IContentType MapContentType(int contentTypeId, Database db, out IEnumerable<Tuple<int, string, string>> associatedTemplates)
+            public static IContentType MapContentType(int contentTypeId, Database db,
+                //TODO: Make this some sort of model?
+                out IEnumerable<Tuple<int, string, string>> associatedTemplates,
+                out IEnumerable<int> childContentTypeIds)
             {
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
 		                        cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
 		                        cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
+                                ChildTypes.childContentTypeId as chtChildId,                                
                                 umbracoNode.createDate as nCreateDate, umbracoNode.[level] as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode.[path] as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode.[text] as nName, umbracoNode.trashed as nTrashed,
 		                        umbracoNode.uniqueID as nUniqueId,                                
 		                        Template.alias as tAlias, Template.nodeId as tId,Template.text as tText
-                        FROM cmsDocumentType
-                        RIGHT JOIN cmsContentType
-                        ON cmsContentType.nodeId = cmsDocumentType.contentTypeNodeId
+                        FROM cmsContentType
                         INNER JOIN umbracoNode
                         ON cmsContentType.nodeId = umbracoNode.id
+                        LEFT JOIN cmsDocumentType
+                        ON cmsDocumentType.contentTypeNodeId = cmsContentType.nodeId
                         LEFT JOIN (
 	                        SELECT cmsContentTypeAllowedContentType.Id, cmsContentTypeAllowedContentType.AllowedId, cmsContentType.alias, cmsContentTypeAllowedContentType.SortOrder 
 	                        FROM cmsContentTypeAllowedContentType	
@@ -314,10 +321,12 @@ namespace Umbraco.Core.Persistence.Repositories
 	                        ON cmsTemplate.nodeId = umbracoNode.id
                         ) as Template
                         ON Template.nodeId = cmsDocumentType.templateNodeId
+                        LEFT JOIN cmsContentType2ContentType as ChildTypes
+                        ON ChildTypes.parentContentTypeId = cmsContentType.nodeId	
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         AND (umbracoNode.id = @contentTypeId)
                         ORDER BY cmsDocumentType.IsDefault DESC";
-
+                
                 var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType), contentTypeId = contentTypeId });
 
                 //first we want to get the main content type data this is 1 : 1 with umbraco node data
@@ -329,13 +338,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (ct == null)
                 {
                     associatedTemplates = null;
+                    childContentTypeIds = null;
                     return null;
                 }
 
                 //get the unique list of associated templates
                 var defaultTemplates = result
                     //use a tuple so that distinct checks both values
-                    .Select(x => new Tuple<bool?, int?>(x.dtIsDefault, x.dtTemplateId ))
+                    .Select(x => new Tuple<bool?, int?>(x.dtIsDefault, x.dtTemplateId))
                     .Where(x => x.Item1.HasValue && x.Item2.HasValue)
                     .Distinct()
                     .ToArray();
@@ -360,7 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         NodeDto = new NodeDto
                         {
                             CreateDate = ct.nCreateDate,
-                            Level = (short)ct.nLevel,
+                            Level = (short) ct.nLevel,
                             NodeId = ct.ctId,
                             NodeObjectType = ct.nObjectType,
                             ParentId = ct.nParentId,
@@ -374,7 +384,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     },
                     ContentTypeNodeId = ct.ctId,
                     IsDefault = defaultTemplate != null,
-                    TemplateNodeId = defaultTemplate != null ? defaultTemplate.Item2.Value : 0
+                    TemplateNodeId = defaultTemplate != null ? defaultTemplate.Item2.Value : 0,
                 };
 
                 // We will return a subset of the associated template - alias, id, name
@@ -387,7 +397,6 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select(x => new Tuple<int, string, string>(x.Item1.Value, x.Item2, x.Item3))
                     .Distinct()
                     .ToArray();
-                    
 
                 //now create the content type object
 
@@ -402,7 +411,14 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Distinct()
                     .Select(x => new ContentTypeSort(new Lazy<int>(() => x.Item1.Value), x.Item2.Value, x.Item3))
                     .ToList();
-                    
+
+                //map the child content type ids
+                childContentTypeIds = result
+                    .Select(x => (int?) x.chtChildId)
+                    .Where(x => x.HasValue)
+                    .Distinct()
+                    .Select(x => x.Value).ToList();
+
                 return contentType;
             }
 
