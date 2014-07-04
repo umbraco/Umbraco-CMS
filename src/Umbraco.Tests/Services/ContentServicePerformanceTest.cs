@@ -40,10 +40,26 @@ namespace Umbraco.Tests.Services
             //NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
             // the old way takes 143795ms, the new above way takes: 14249ms that is a 90% savings of processing and sql calls!
 
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");            
+            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");                        
             var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "test2");
-            var contentType3 = MockedContentTypes.CreateTextpageContentType("test3", "test3");
+            var contentType3 = MockedContentTypes.CreateTextpageContentType("test3", "test3");            
             ServiceContext.ContentTypeService.Save(new[] {contentType1, contentType2, contentType3});
+            contentType1.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 0, contentType2.Alias),
+                new ContentTypeSort(new Lazy<int>(() => contentType3.Id), 1, contentType3.Alias)
+            };
+            contentType2.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
+                new ContentTypeSort(new Lazy<int>(() => contentType3.Id), 1, contentType3.Alias)
+            };
+            contentType3.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
+                new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 1, contentType2.Alias)
+            };
+            ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
             
             var roots = MockedContent.CreateTextpageContent(contentType1, -1, 10);
             ServiceContext.ContentService.Save(roots);

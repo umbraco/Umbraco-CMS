@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -47,47 +48,30 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //NOTE: SQL call #1
 
-            var dto = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
+            IEnumerable<Tuple<int, string, string>> assocatedTemplates;
+            var contentType = ContentTypeQueries.MapContentType(id, Database, out assocatedTemplates);
 
-            //var dto = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto, ContentTypeAllowedContentTypeDto, DocumentTypeDto>(
-            //    new AllowedContentTypeRelator().Map,
-            //    contentTypeSql);
-
-            if (dto == null)
+            if (contentType == null)
                 return null;
-
-            var factory = new ContentTypeFactory(NodeObjectTypeId);
-            var contentType = factory.BuildEntity(dto);
 
             //NOTE: SQL call #2
 
-            contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
-
             PropertyGroupCollection propGroups;
             PropertyTypeCollection propTypes;
-            ContentTypeQueries.PopulateGroupsAndProperties(id, Database, out propTypes, out propGroups);
+            ContentTypeQueries.MapGroupsAndProperties(id, Database, out propTypes, out propGroups);
             contentType.PropertyGroups = propGroups;
-            ((ContentType) contentType).PropertyTypes = propTypes;
+            ((ContentType)contentType).PropertyTypes = propTypes;  
 
-            ////NOTE: SQL call #3
-            //contentType.PropertyGroups = GetPropertyGroupCollection(id, contentType.CreateDate, contentType.UpdateDate);
+            //NOTE: SQL call #3++
+            //SEE: http://issues.umbraco.org/issue/U4-5174 to fix this
 
-            ////NOTE: SQL call #4
-            //((ContentType)contentType).PropertyTypes = GetPropertyTypeCollection(id, contentType.CreateDate, contentType.UpdateDate);
+            var templates = _templateRepository.GetAll(assocatedTemplates.Select(x => x.Item1).ToArray());
+            contentType.AllowedTemplates = templates.ToArray();
 
-            //NOTE: SQL call #5
+            //NOTE: SQL call #5++
+            //TODO: Fix this part up, surely we can include it in the first sql call
 
-            var templates = Database.Fetch<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = id });
-            if(templates.Any())
-            {
-                //NOTE: SQL call #6++
-
-                contentType.AllowedTemplates = templates.Select(template => _templateRepository.Get(template.TemplateNodeId)).ToList();
-            }
-
-            //NOTE: SQL call #7
-
-            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = id});
+            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = id });
             foreach (var contentTypeDto in list)
             {
                 bool result = contentType.AddContentType(Get(contentTypeDto.ParentId));
@@ -150,15 +134,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
+
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<DocumentTypeDto>()
                .RightJoin<ContentTypeDto>()
                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
                .InnerJoin<NodeDto>()
                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-               //.LeftJoin<ContentTypeAllowedContentTypeDto>()
-               //.On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.AllowedId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.DocumentType));
 
             return sql;
         }
@@ -303,7 +286,129 @@ namespace Umbraco.Core.Persistence.Repositories
         internal static class ContentTypeQueries
         {
 
-            public static void PopulateGroupsAndProperties(int contentTypeId, Database db, out PropertyTypeCollection propertyTypeCollection, out PropertyGroupCollection propertyGroupCollection)
+            public static IContentType MapContentType(int contentTypeId, Database db, out IEnumerable<Tuple<int, string, string>> associatedTemplates)
+            {
+                var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
+		                        cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
+		                        cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
+                                AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
+                                umbracoNode.createDate as nCreateDate, umbracoNode.[level] as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
+		                        umbracoNode.parentID as nParentId, umbracoNode.[path] as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode.[text] as nName, umbracoNode.trashed as nTrashed,
+		                        umbracoNode.uniqueID as nUniqueId,                                
+		                        Template.alias as tAlias, Template.nodeId as tId,Template.text as tText
+                        FROM cmsDocumentType
+                        RIGHT JOIN cmsContentType
+                        ON cmsContentType.nodeId = cmsDocumentType.contentTypeNodeId
+                        INNER JOIN umbracoNode
+                        ON cmsContentType.nodeId = umbracoNode.id
+                        LEFT JOIN (
+	                        SELECT cmsContentTypeAllowedContentType.Id, cmsContentTypeAllowedContentType.AllowedId, cmsContentType.alias, cmsContentTypeAllowedContentType.SortOrder 
+	                        FROM cmsContentTypeAllowedContentType	
+	                        INNER JOIN cmsContentType
+	                        ON cmsContentTypeAllowedContentType.AllowedId = cmsContentType.nodeId
+                        ) AllowedTypes
+                        ON AllowedTypes.Id = cmsContentType.nodeId
+                        LEFT JOIN (
+	                        SELECT * FROM cmsTemplate
+	                        INNER JOIN umbracoNode
+	                        ON cmsTemplate.nodeId = umbracoNode.id
+                        ) as Template
+                        ON Template.nodeId = cmsDocumentType.templateNodeId
+                        WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
+                        AND (umbracoNode.id = @contentTypeId)
+                        ORDER BY cmsDocumentType.IsDefault DESC";
+
+                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType), contentTypeId = contentTypeId });
+
+                //first we want to get the main content type data this is 1 : 1 with umbraco node data
+                var ct = result
+                    .Select(x => new { x.ctPk, x.ctId, x.ctAlias, x.ctAllowAtRoot, x.ctDesc, x.ctIcon, x.ctIsContainer, x.ctThumb, x.nName, x.nCreateDate, x.nLevel, x.nObjectType, x.nUser, x.nParentId, x.nPath, x.nSortOrder, x.nTrashed, x.nUniqueId })
+                    .DistinctBy(x => (int)x.ctId)
+                    .FirstOrDefault();
+
+                if (ct == null)
+                {
+                    associatedTemplates = null;
+                    return null;
+                }
+
+                //get the unique list of associated templates
+                var defaultTemplates = result
+                    //use a tuple so that distinct checks both values
+                    .Select(x => new Tuple<bool?, int?>(x.dtIsDefault, x.dtTemplateId ))
+                    .Where(x => x.Item1.HasValue && x.Item2.HasValue)
+                    .Distinct()
+                    .ToArray();
+                //if there isn't one set to default explicitly, we'll pick the first one
+                var defaultTemplate = defaultTemplates.FirstOrDefault(x => x.Item1.Value)
+                    ?? defaultTemplates.FirstOrDefault();
+
+                var dtDto = new DocumentTypeDto
+                {
+                    //create the content type dto
+                    ContentTypeDto = new ContentTypeDto
+                    {
+                        Alias = ct.ctAlias,
+                        AllowAtRoot = ct.ctAllowAtRoot,
+                        Description = ct.ctDesc,
+                        Icon = ct.ctIcon,
+                        IsContainer = ct.ctIsContainer,
+                        NodeId = ct.ctId,
+                        PrimaryKey = ct.ctPk,
+                        Thumbnail = ct.ctThumb,
+                        //map the underlying node dto
+                        NodeDto = new NodeDto
+                        {
+                            CreateDate = ct.nCreateDate,
+                            Level = (short)ct.nLevel,
+                            NodeId = ct.ctId,
+                            NodeObjectType = ct.nObjectType,
+                            ParentId = ct.nParentId,
+                            Path = ct.nPath,
+                            SortOrder = ct.nSortOrder,
+                            Text = ct.nName,
+                            Trashed = ct.nTrashed,
+                            UniqueId = ct.nUniqueId,
+                            UserId = ct.nUser
+                        }
+                    },
+                    ContentTypeNodeId = ct.ctId,
+                    IsDefault = defaultTemplate != null,
+                    TemplateNodeId = defaultTemplate != null ? defaultTemplate.Item2.Value : 0
+                };
+
+                // We will return a subset of the associated template - alias, id, name
+                // TODO: See: http://issues.umbraco.org/issue/U4-5174
+
+                //next, we'll get the template subset
+                associatedTemplates = result
+                    .Select(x => new Tuple<int?, string, string>(x.tId, x.tAlias, x.tText))
+                    .Where(x => x.Item1.HasValue)
+                    .Select(x => new Tuple<int, string, string>(x.Item1.Value, x.Item2, x.Item3))
+                    .Distinct()
+                    .ToArray();
+                    
+
+                //now create the content type object
+
+                var factory = new ContentTypeFactory(new Guid(Constants.ObjectTypes.DocumentType));
+                var contentType = factory.BuildEntity(dtDto);
+
+                //map the allowed content types
+                contentType.AllowedContentTypes = result
+                    //use tuple so we can use distinct on all vals
+                    .Select(x => new Tuple<int?, int?, string>(x.ctaAllowedId, x.ctaSortOrder, x.ctaAlias))
+                    .Where(x => x.Item1.HasValue && x.Item2.HasValue && x.Item3 != null)
+                    .Distinct()
+                    .Select(x => new ContentTypeSort(new Lazy<int>(() => x.Item1.Value), x.Item2.Value, x.Item3))
+                    .ToList();
+                    
+                return contentType;
+            }
+
+
+
+            public static void MapGroupsAndProperties(int contentTypeId, Database db, out PropertyTypeCollection propertyTypeCollection, out PropertyGroupCollection propertyGroupCollection)
             {
                 // first part Gets all property groups including property type data even when no property type exists on the group
                 // second part Gets all property types including ones that are not on a group
@@ -323,7 +428,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             INNER JOIN cmsDataType as DT
                             ON PT.dataTypeId = DT.nodeId
                         )  as  PT
-                        ON PG.[id] = PT.ptGroupId
+                        ON PT.ptGroupId = PG.id
                         WHERE (PG.contenttypeNodeId = @contentTypeId)
                         
                         UNION
