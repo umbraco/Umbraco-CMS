@@ -116,12 +116,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
             //content types
-            IContentType[] contentTypes;
-            using (DisposableTimer.DebugDuration<ContentRepository>("Getting all content types"))
-            {
-                contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
-                        .ToArray();
-            }
+            var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
+                .ToArray();
 
             var templates = _templateRepository.GetAll(
                 dtos
@@ -146,16 +142,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
                 templates.FirstOrDefault(tem => tem.Id == (dto.TemplateId.HasValue ? dto.TemplateId.Value : -1)),
                 propertyData[dto.NodeId]));
-
-            //NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
-            // the old way takes 143795ms, the new above way takes: 14249ms that is a 90% savings of processing and sql calls!
-
-            ////NOTE: Won't work with language related queries because the language version isn't passed to the Get() method.
-            ////A solution could be to look at the sql for the LanguageLocale column and choose the foreach-loop based on that.
-            //foreach (var dto in dtos.DistinctBy(x => x.NodeId))
-            //{
-            //    yield return Get(dto.NodeId);
-            //}
         }
 
         #endregion

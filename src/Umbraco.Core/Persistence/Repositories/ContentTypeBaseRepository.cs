@@ -36,6 +36,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
+        /// <summary>
+        /// Returns the content type ids that match the query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
         {
             var sqlClause = new Sql();

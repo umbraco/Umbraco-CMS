@@ -55,11 +55,17 @@ namespace Umbraco.Tests.Persistence.Querying
                 transaction.Complete();
             }
 
-            IEnumerable<Tuple<int, string, string>> assocatedTemplates;
-            IEnumerable<int> childContentTypes;
-            var contentType = ContentTypeRepository.ContentTypeQueries.MapContentType(99997, DatabaseContext.Database, out assocatedTemplates, out childContentTypes);
+            IDictionary<int, IEnumerable<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssocatedTemplates;
+            IDictionary<int, IEnumerable<int>> allChildContentTypeIds;
+            var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapContentTypes(new[] { 99997 }, DatabaseContext.Database, out allAssocatedTemplates, out allChildContentTypeIds)
+                .ToArray();
 
+            var contentType = contentTypes.SingleOrDefault();
             Assert.IsNotNull(contentType);
+
+            var assocatedTemplates = allAssocatedTemplates[contentType.Id];
+            var childContentTypes = allChildContentTypeIds[contentType.Id];
+
             Assert.AreEqual(2, contentType.AllowedContentTypes.Count());
             Assert.AreEqual(2, assocatedTemplates.Count());
             Assert.AreEqual(2, childContentTypes.Count());
@@ -106,7 +112,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             PropertyTypeCollection propTypeCollection;
             PropertyGroupCollection propGroupCollection;
-            ContentTypeRepository.ContentTypeQueries.MapGroupsAndProperties(99999, DatabaseContext.Database, out propTypeCollection, out propGroupCollection);
+            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(99999, DatabaseContext.Database, out propTypeCollection, out propGroupCollection);
 
             Assert.AreEqual(4, propGroupCollection.Count);
             Assert.AreEqual(2, propGroupCollection["Group1"].PropertyTypes.Count);

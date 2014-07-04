@@ -34,57 +34,13 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #region Overrides of RepositoryBase<int,IContentType>
-
-        //TODO: We need to overhaul the SQL to create a content type, see below for notes....
-
+        
         protected override IContentType PerformGet(int id)
         {
-            var contentTypeSql = GetBaseQuery(false);
-            contentTypeSql.Where(GetBaseWhereClause(), new { Id = id });
-
-            // The SQL will contain one record for each allowed template, so order to put the default one
-            // at the top to populate the default template property correctly.
-            contentTypeSql.OrderByDescending<DocumentTypeDto>(x => x.IsDefault);
-
-            //NOTE: SQL call #1
-
-            IEnumerable<Tuple<int, string, string>> assocatedTemplates;
-            IEnumerable<int> childContentTypeIds;
-            var contentType = ContentTypeQueries.MapContentType(id, Database, out assocatedTemplates, out childContentTypeIds);
-
-            if (contentType == null)
-                return null;
-
-            //NOTE: SQL call #2
-
-            PropertyGroupCollection propGroups;
-            PropertyTypeCollection propTypes;
-            ContentTypeQueries.MapGroupsAndProperties(id, Database, out propTypes, out propGroups);
-            contentType.PropertyGroups = propGroups;
-            ((ContentType)contentType).PropertyTypes = propTypes;
-
-            //NOTE: SQL call #3++
-            //SEE: http://issues.umbraco.org/issue/U4-5174 to fix this
-
-            var templates = _templateRepository.GetAll(assocatedTemplates.Select(x => x.Item1).ToArray());
-            contentType.AllowedTemplates = templates.ToArray();
-
-            //NOTE: SQL call #5++
-
-            var childIdsAsArray = childContentTypeIds.ToArray();
-            if (childIdsAsArray.Any())
-            {
-                var childContentTypes = GetAll(childIdsAsArray);
-                foreach (var childContentType in childContentTypes)
-                {
-                    var result = contentType.AddContentType(childContentType);
-                    //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
-                }    
-            }
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)contentType).ResetDirtyProperties(false);
+            var contentTypes = ContentTypeQueryMapper.GetContentTypes(
+                new[] {id}, Database, this, _templateRepository);
+            
+            var contentType = contentTypes.SingleOrDefault();
             return contentType;
         }
 
@@ -92,18 +48,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                return ContentTypeQueryMapper.GetContentTypes(ids, Database, this, _templateRepository);
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var allIds = Database.Fetch<int>(sql).ToArray();
+                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, this, _templateRepository);
             }
         }
 
@@ -115,22 +66,24 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderBy<NodeDto>(x => x.Text);
 
             var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
-
-            foreach (var dto in dtos.DistinctBy(x => x.ContentTypeDto.NodeId))
-            {
-                yield return Get(dto.ContentTypeDto.NodeId);
-            }
+            return dtos.Any()
+                ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
+                : Enumerable.Empty<IContentType>();
         }
 
         #endregion
 
+        /// <summary>
+        /// Gets all entities of the specified <see cref="PropertyType"/> query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>An enumerable list of <see cref="IContentType"/> objects</returns>
         public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
         {
-            var ints = PerformGetByQuery(query);
-            foreach (var i in ints)
-            {
-                yield return Get(i);
-            }
+            var ints = PerformGetByQuery(query).ToArray();
+            return ints.Any()
+                ? GetAll(ints)
+                : Enumerable.Empty<IContentType>();
         }
 
         #region Overrides of PetaPocoRepositoryBase<int,IContentType>
@@ -286,19 +239,124 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        internal static class ContentTypeQueries
+        internal static class ContentTypeQueryMapper
         {
 
-            public static IContentType MapContentType(int contentTypeId, Database db,
-                //TODO: Make this some sort of model?
-                out IEnumerable<Tuple<int, string, string>> associatedTemplates,
-                out IEnumerable<int> childContentTypeIds)
+            public class AssociatedTemplate
             {
+                public AssociatedTemplate(int templateId, string @alias, string templateName)
+                {
+                    TemplateId = templateId;
+                    Alias = alias;
+                    TemplateName = templateName;
+                }
+
+                public int TemplateId { get; set; }
+                public string Alias { get; set; }
+                public string TemplateName { get; set; }
+
+                protected bool Equals(AssociatedTemplate other)
+                {
+                    return TemplateId == other.TemplateId;
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (ReferenceEquals(null, obj)) return false;
+                    if (ReferenceEquals(this, obj)) return true;
+                    if (obj.GetType() != this.GetType()) return false;
+                    return Equals((AssociatedTemplate) obj);
+                }
+
+                public override int GetHashCode()
+                {
+                    return TemplateId;
+                }
+            }
+
+            public static IEnumerable<IContentType> GetContentTypes(
+                int[] contentTypeIds, Database db,
+                IContentTypeRepository contentTypeRepository,
+                ITemplateRepository templateRepository)
+            {
+                IDictionary<int, IEnumerable<AssociatedTemplate>> allAssocatedTemplates;
+                IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
+                var contentTypes = MapContentTypes(contentTypeIds, db, out allAssocatedTemplates, out allParentContentTypeIds)
+                    .ToArray();
+
+                foreach (var contentType in contentTypes)
+                {
+                    var assocatedTemplates = allAssocatedTemplates[contentType.Id];
+                    var parentContentTypeIds = allParentContentTypeIds[contentType.Id];
+
+                    MapContentTypeTemplatesAndChildren(
+                        contentType, db, contentTypeRepository, templateRepository, assocatedTemplates, parentContentTypeIds);
+
+                    //on initial construction we don't want to have dirty properties tracked
+                    // http://issues.umbraco.org/issue/U4-1946
+                    ((Entity)contentType).ResetDirtyProperties(false);    
+                }
+                
+                return contentTypes;
+            }
+
+            internal static void MapContentTypeTemplatesAndChildren(IContentType contentType,
+                Database db,
+                IContentTypeRepository contentTypeRepository,
+                ITemplateRepository templateRepository,
+                IEnumerable<AssociatedTemplate> associatedTemplates, 
+                IEnumerable<int> parentContentTypeIds)
+            {
+                //NOTE: SQL call #2
+
+                PropertyGroupCollection propGroups;
+                PropertyTypeCollection propTypes;
+                MapGroupsAndProperties(contentType.Id, db, out propTypes, out propGroups);
+                contentType.PropertyGroups = propGroups;
+                ((ContentType)contentType).PropertyTypes = propTypes;
+
+                //NOTE: SQL call #3++
+                //SEE: http://issues.umbraco.org/issue/U4-5174 to fix this
+
+                var templateIds = associatedTemplates.Select(x => x.TemplateId).ToArray();
+                var templates = templateIds.Any()
+                    ? templateRepository.GetAll()
+                    : Enumerable.Empty<ITemplate>();
+                contentType.AllowedTemplates = templates.ToArray();
+
+                //NOTE: SQL call #4++
+
+                var parentIdsAsArray = parentContentTypeIds.ToArray();
+                if (parentIdsAsArray.Any())
+                {
+                    var parentContentTypes = contentTypeRepository.GetAll(parentIdsAsArray);
+                    foreach (var parentContentType in parentContentTypes)
+                    {
+                        var result = contentType.AddContentType(parentContentType);
+                        //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
+                    }
+                }
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((Entity)contentType).ResetDirtyProperties(false);
+            }
+
+            internal static IEnumerable<IContentType> MapContentTypes(int[] contentTypeIds, Database db,
+                out IDictionary<int, IEnumerable<AssociatedTemplate>> associatedTemplates,
+                out IDictionary<int, IEnumerable<int>> parentContentTypeIds)
+            {
+                Mandate.That(contentTypeIds.Any(), () => new InvalidOperationException("must be at least one content type id specified"));
+                Mandate.ParameterNotNull(db, "db");
+                
+                //ensure they are unique
+                contentTypeIds = contentTypeIds.Distinct().ToArray();
+
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
 		                        cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
 		                        cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
-                                ChildTypes.childContentTypeId as chtChildId,                                
+                                ParentTypes.parentContentTypeId as chtParentId,
                                 umbracoNode.createDate as nCreateDate, umbracoNode.[level] as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode.[path] as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode.[text] as nName, umbracoNode.trashed as nTrashed,
 		                        umbracoNode.uniqueID as nUniqueId,                                
@@ -321,110 +379,134 @@ namespace Umbraco.Core.Persistence.Repositories
 	                        ON cmsTemplate.nodeId = umbracoNode.id
                         ) as Template
                         ON Template.nodeId = cmsDocumentType.templateNodeId
-                        LEFT JOIN cmsContentType2ContentType as ChildTypes
-                        ON ChildTypes.parentContentTypeId = cmsContentType.nodeId	
+                        LEFT JOIN cmsContentType2ContentType as ParentTypes
+                        ON ParentTypes.childContentTypeId = cmsContentType.nodeId	
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
-                        AND (umbracoNode.id = @contentTypeId)
-                        ORDER BY cmsDocumentType.IsDefault DESC";
+                        AND (umbracoNode.id IN (@contentTypeIds))";
                 
-                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType), contentTypeId = contentTypeId });
+                //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
+                // since there will be 2 params per single row it will be half that amount
+                if ((contentTypeIds.Length - 1) > 2000)
+                    throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
+                
+                var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType), contentTypeIds = contentTypeIds });
 
-                //first we want to get the main content type data this is 1 : 1 with umbraco node data
-                var ct = result
-                    .Select(x => new { x.ctPk, x.ctId, x.ctAlias, x.ctAllowAtRoot, x.ctDesc, x.ctIcon, x.ctIsContainer, x.ctThumb, x.nName, x.nCreateDate, x.nLevel, x.nObjectType, x.nUser, x.nParentId, x.nPath, x.nSortOrder, x.nTrashed, x.nUniqueId })
-                    .DistinctBy(x => (int)x.ctId)
-                    .FirstOrDefault();
-
-                if (ct == null)
+                if (result.Any() == false)
                 {
+                    parentContentTypeIds = null;
                     associatedTemplates = null;
-                    childContentTypeIds = null;
-                    return null;
+                    return Enumerable.Empty<IContentType>();
                 }
 
-                //get the unique list of associated templates
-                var defaultTemplates = result
-                    //use a tuple so that distinct checks both values
-                    .Select(x => new Tuple<bool?, int?>(x.dtIsDefault, x.dtTemplateId))
-                    .Where(x => x.Item1.HasValue && x.Item2.HasValue)
-                    .Distinct()
-                    .ToArray();
-                //if there isn't one set to default explicitly, we'll pick the first one
-                var defaultTemplate = defaultTemplates.FirstOrDefault(x => x.Item1.Value)
-                    ?? defaultTemplates.FirstOrDefault();
+                parentContentTypeIds = new Dictionary<int, IEnumerable<int>>();
+                associatedTemplates = new Dictionary<int, IEnumerable<AssociatedTemplate>>();
+                var mappedContentTypes = new List<IContentType>();
 
-                var dtDto = new DocumentTypeDto
+                foreach (var contentTypeId in contentTypeIds)
                 {
-                    //create the content type dto
-                    ContentTypeDto = new ContentTypeDto
+                    //the current content type id that we're working with
+
+                    var currentCtId = contentTypeId;
+
+                    //first we want to get the main content type data this is 1 : 1 with umbraco node data
+
+                    var ct = result
+                        .Where(x => x.ctId == currentCtId)
+                        .Select(x => new { x.ctPk, x.ctId, x.ctAlias, x.ctAllowAtRoot, x.ctDesc, x.ctIcon, x.ctIsContainer, x.ctThumb, x.nName, x.nCreateDate, x.nLevel, x.nObjectType, x.nUser, x.nParentId, x.nPath, x.nSortOrder, x.nTrashed, x.nUniqueId })
+                        .DistinctBy(x => (int)x.ctId)
+                        .FirstOrDefault();
+
+                    if (ct == null)
                     {
-                        Alias = ct.ctAlias,
-                        AllowAtRoot = ct.ctAllowAtRoot,
-                        Description = ct.ctDesc,
-                        Icon = ct.ctIcon,
-                        IsContainer = ct.ctIsContainer,
-                        NodeId = ct.ctId,
-                        PrimaryKey = ct.ctPk,
-                        Thumbnail = ct.ctThumb,
-                        //map the underlying node dto
-                        NodeDto = new NodeDto
+                        continue;
+                    }
+
+                    //get the unique list of associated templates
+                    var defaultTemplates = result
+                        .Where(x => x.ctId == currentCtId)
+                        //use a tuple so that distinct checks both values
+                        .Select(x => new Tuple<bool?, int?>(x.dtIsDefault, x.dtTemplateId))
+                        .Where(x => x.Item1.HasValue && x.Item2.HasValue)
+                        .Distinct()
+                        .OrderByDescending(x => x.Item1.Value)
+                        .ToArray();
+                    //if there isn't one set to default explicitly, we'll pick the first one
+                    var defaultTemplate = defaultTemplates.FirstOrDefault(x => x.Item1.Value)
+                        ?? defaultTemplates.FirstOrDefault();
+
+                    var dtDto = new DocumentTypeDto
+                    {
+                        //create the content type dto
+                        ContentTypeDto = new ContentTypeDto
                         {
-                            CreateDate = ct.nCreateDate,
-                            Level = (short) ct.nLevel,
+                            Alias = ct.ctAlias,
+                            AllowAtRoot = ct.ctAllowAtRoot,
+                            Description = ct.ctDesc,
+                            Icon = ct.ctIcon,
+                            IsContainer = ct.ctIsContainer,
                             NodeId = ct.ctId,
-                            NodeObjectType = ct.nObjectType,
-                            ParentId = ct.nParentId,
-                            Path = ct.nPath,
-                            SortOrder = ct.nSortOrder,
-                            Text = ct.nName,
-                            Trashed = ct.nTrashed,
-                            UniqueId = ct.nUniqueId,
-                            UserId = ct.nUser
-                        }
-                    },
-                    ContentTypeNodeId = ct.ctId,
-                    IsDefault = defaultTemplate != null,
-                    TemplateNodeId = defaultTemplate != null ? defaultTemplate.Item2.Value : 0,
-                };
+                            PrimaryKey = ct.ctPk,
+                            Thumbnail = ct.ctThumb,
+                            //map the underlying node dto
+                            NodeDto = new NodeDto
+                            {
+                                CreateDate = ct.nCreateDate,
+                                Level = (short)ct.nLevel,
+                                NodeId = ct.ctId,
+                                NodeObjectType = ct.nObjectType,
+                                ParentId = ct.nParentId,
+                                Path = ct.nPath,
+                                SortOrder = ct.nSortOrder,
+                                Text = ct.nName,
+                                Trashed = ct.nTrashed,
+                                UniqueId = ct.nUniqueId,
+                                UserId = ct.nUser
+                            }
+                        },
+                        ContentTypeNodeId = ct.ctId,
+                        IsDefault = defaultTemplate != null,
+                        TemplateNodeId = defaultTemplate != null ? defaultTemplate.Item2.Value : 0,
+                    };
 
-                // We will return a subset of the associated template - alias, id, name
-                // TODO: See: http://issues.umbraco.org/issue/U4-5174
+                    // We will map a subset of the associated template - alias, id, name
 
-                //next, we'll get the template subset
-                associatedTemplates = result
-                    .Select(x => new Tuple<int?, string, string>(x.tId, x.tAlias, x.tText))
-                    .Where(x => x.Item1.HasValue)
-                    .Select(x => new Tuple<int, string, string>(x.Item1.Value, x.Item2, x.Item3))
-                    .Distinct()
-                    .ToArray();
+                    associatedTemplates.Add(currentCtId, result
+                        .Where(x => x.ctId == currentCtId)
+                        .Where(x => x.tId != null)
+                        .Select(x => new AssociatedTemplate(x.tId, x.tAlias, x.tText))
+                        .Distinct()
+                        .ToArray());
 
-                //now create the content type object
+                    //now create the content type object
 
-                var factory = new ContentTypeFactory(new Guid(Constants.ObjectTypes.DocumentType));
-                var contentType = factory.BuildEntity(dtDto);
+                    var factory = new ContentTypeFactory(new Guid(Constants.ObjectTypes.DocumentType));
+                    var contentType = factory.BuildEntity(dtDto);
 
-                //map the allowed content types
-                contentType.AllowedContentTypes = result
-                    //use tuple so we can use distinct on all vals
-                    .Select(x => new Tuple<int?, int?, string>(x.ctaAllowedId, x.ctaSortOrder, x.ctaAlias))
-                    .Where(x => x.Item1.HasValue && x.Item2.HasValue && x.Item3 != null)
-                    .Distinct()
-                    .Select(x => new ContentTypeSort(new Lazy<int>(() => x.Item1.Value), x.Item2.Value, x.Item3))
-                    .ToList();
+                    //map the allowed content types
+                    contentType.AllowedContentTypes = result
+                        //use tuple so we can use distinct on all vals
+                        .Select(x => new Tuple<int?, int?, string>(x.ctaAllowedId, x.ctaSortOrder, x.ctaAlias))
+                        .Where(x => x.Item1.HasValue && x.Item2.HasValue && x.Item3 != null)
+                        .Distinct()
+                        .Select(x => new ContentTypeSort(new Lazy<int>(() => x.Item1.Value), x.Item2.Value, x.Item3))
+                        .ToList();
 
-                //map the child content type ids
-                childContentTypeIds = result
-                    .Select(x => (int?) x.chtChildId)
-                    .Where(x => x.HasValue)
-                    .Distinct()
-                    .Select(x => x.Value).ToList();
+                    mappedContentTypes.Add(contentType);
 
-                return contentType;
+                    //map the child content type ids
+                    parentContentTypeIds.Add(currentCtId, result
+                        .Select(x => (int?) x.chtParentId)
+                        .Where(x => x.HasValue)
+                        .Distinct()
+                        .Select(x => x.Value).ToList());
+                }
+
+                return mappedContentTypes;
             }
 
-
-
-            public static void MapGroupsAndProperties(int contentTypeId, Database db, out PropertyTypeCollection propertyTypeCollection, out PropertyGroupCollection propertyGroupCollection)
+            internal static void MapGroupsAndProperties(int contentTypeId, Database db, 
+                out PropertyTypeCollection propertyTypeCollection, 
+                out PropertyGroupCollection propertyGroupCollection)
             {
                 // first part Gets all property groups including property type data even when no property type exists on the group
                 // second part Gets all property types including ones that are not on a group
