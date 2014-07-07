@@ -15,6 +15,7 @@ namespace Umbraco.Core.Services
     {
         public static SupportTagsAttribute GetAttribute(PropertyEditor propEd)
         {
+            if (propEd == null) return null;
             var tagSupport = propEd.GetType().GetCustomAttribute<SupportTagsAttribute>(false);
             return tagSupport;
         }
