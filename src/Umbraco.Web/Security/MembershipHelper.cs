@@ -225,7 +225,7 @@ namespace Umbraco.Web.Security
             }
 
             var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
-            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
+            return result == null ? null : new MemberPublishedContent(result);
         }
 
         public IPublishedContent GetById(int memberId)
@@ -237,7 +237,7 @@ namespace Umbraco.Web.Security
             }
 
             var result = _applicationContext.Services.MemberService.GetById(memberId);
-            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
+            return result == null ? null : new MemberPublishedContent(result);
         }
 
         public IPublishedContent GetByUsername(string username)
@@ -249,7 +249,7 @@ namespace Umbraco.Web.Security
             }
 
             var result = _applicationContext.Services.MemberService.GetByUsername(username);
-            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
+            return result == null ? null : new MemberPublishedContent(result);
         }
 
         public IPublishedContent GetByEmail(string email)
@@ -261,7 +261,7 @@ namespace Umbraco.Web.Security
             }
 
             var result = _applicationContext.Services.MemberService.GetByEmail(email);
-            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
+            return result == null ? null : new MemberPublishedContent(result);
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace Umbraco.Web.Security
             }
             var result = GetCurrentPersistedMember();
             var provider = MPE.GetMembersMembershipProvider();
-            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, true));
+            return result == null ? null : new MemberPublishedContent(result);
         }
 
         /// <summary>

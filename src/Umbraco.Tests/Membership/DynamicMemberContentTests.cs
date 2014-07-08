@@ -51,24 +51,20 @@ namespace Umbraco.Tests.Membership
         {
             var date = DateTime.Now;
 
-            var m = Mock.Of<MembershipUser>(
-                user => user.UserName == "test username" 
-                    && user.Comment == "test comment"
-                    && user.IsApproved == true
-                    && user.IsLockedOut == false
-                    && user.CreationDate == date
-                    && user.Email == "test@email.com"
-                    && user.LastActivityDate == date.AddMinutes(1)
-                    && user.LastLockoutDate == date.AddMinutes(2)
-                    && user.LastLoginDate == date.AddMinutes(3)
-                    && user.LastPasswordChangedDate == date.AddMinutes(4)
-                    && user.PasswordQuestion == "test question");
+            var member = new Member("test name", "test@email.com", "test username", "test password",
+                GetMemberType());
+            member.Comments = "test comment";
+            member.IsApproved = true;
+            member.IsLockedOut = false;
+            member.CreateDate = date;
+            member.LastLoginDate = date.AddMinutes(1);
+            member.LastLockoutDate = date.AddMinutes(2);
+            //NOTE: Last activity date is always the same as last login date since we don't have a place to store that data
+            //member.LastLoginDate = date.AddMinutes(3);
+            member.LastPasswordChangeDate = date.AddMinutes(4);
+            member.PasswordQuestion = "test question";
 
-
-            var mpc = new MemberPublishedContent(
-                new Member("test name", "test@email.com", "test username", "test password",
-                    Mock.Of<IMemberType>(type => type.Alias == "Member")),
-                m);                
+            var mpc = new MemberPublishedContent(member);                
 
             var d = mpc.AsDynamic();
 
@@ -79,7 +75,7 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual(false, d.IsLockedOut);
             Assert.AreEqual(date.AddMinutes(1), d.LastActivityDate);
             Assert.AreEqual(date.AddMinutes(2), d.LastLockoutDate);
-            Assert.AreEqual(date.AddMinutes(3), d.LastLoginDate);
+            Assert.AreEqual(date.AddMinutes(1), d.LastLoginDate);
             Assert.AreEqual(date.AddMinutes(4), d.LastPasswordChangedDate);
             Assert.AreEqual("test name", d.Name);
             Assert.AreEqual("test question", d.PasswordQuestion);
@@ -92,24 +88,20 @@ namespace Umbraco.Tests.Membership
         {
             var date = DateTime.Now;
 
-            var m = Mock.Of<MembershipUser>(
-                user => user.UserName == "test username"
-                    && user.Comment == "test comment"
-                    && user.IsApproved == true
-                    && user.IsLockedOut == false
-                    && user.CreationDate == date
-                    && user.Email == "test@email.com"
-                    && user.LastActivityDate == date.AddMinutes(1)
-                    && user.LastLockoutDate == date.AddMinutes(2)
-                    && user.LastLoginDate == date.AddMinutes(3)
-                    && user.LastPasswordChangedDate == date.AddMinutes(4)
-                    && user.PasswordQuestion == "test question");
+            var member = new Member("test name", "test@email.com", "test username", "test password",
+               GetMemberType());
+            member.Comments = "test comment";
+            member.IsApproved = true;
+            member.IsLockedOut = false;
+            member.CreateDate = date;
+            member.LastLoginDate = date.AddMinutes(1);
+            member.LastLockoutDate = date.AddMinutes(2);
+            //NOTE: Last activity date is always the same as last login date since we don't have a place to store that data
+            //member.LastLoginDate = date.AddMinutes(3);
+            member.LastPasswordChangeDate = date.AddMinutes(4);
+            member.PasswordQuestion = "test question";
 
-
-            var mpc = new MemberPublishedContent(
-                new Member("test name", "test@email.com", "test username", "test password",
-                    Mock.Of<IMemberType>(type => type.Alias == "Member")) ,
-                m);
+            var mpc = new MemberPublishedContent(member);
 
             var d = mpc.AsDynamic();
 
@@ -120,7 +112,7 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual(false, d.isLockedOut);
             Assert.AreEqual(date.AddMinutes(1), d.lastActivityDate);
             Assert.AreEqual(date.AddMinutes(2), d.lastLockoutDate);
-            Assert.AreEqual(date.AddMinutes(3), d.lastLoginDate);
+            Assert.AreEqual(date.AddMinutes(1), d.lastLoginDate);
             Assert.AreEqual(date.AddMinutes(4), d.lastPasswordChangedDate);
             Assert.AreEqual("test name", d.name);
             Assert.AreEqual("test question", d.passwordQuestion);
@@ -133,25 +125,23 @@ namespace Umbraco.Tests.Membership
         {
             var date = DateTime.Now;
 
-            var m = Mock.Of<MembershipUser>(
-                user => user.UserName == "test username"
-                    && user.Comment == "test comment"
-                    && user.IsApproved == true
-                    && user.IsLockedOut == false
-                    && user.CreationDate == date
-                    && user.Email == "test@email.com"
-                    && user.LastActivityDate == date.AddMinutes(1)
-                    && user.LastLockoutDate == date.AddMinutes(2)
-                    && user.LastLoginDate == date.AddMinutes(3)
-                    && user.LastPasswordChangedDate == date.AddMinutes(4)
-                    && user.PasswordQuestion == "test question");
-
             var memberType = MockedContentTypes.CreateSimpleMemberType("Member", "Member");
             var member = MockedMember.CreateSimpleMember(memberType, "test name", "test@email.com", "test password", "test username");
+            member.Comments = "test comment";
+            member.IsApproved = true;
+            member.IsLockedOut = false;
+            member.CreateDate = date;
+            member.LastLoginDate = date.AddMinutes(1);
+            member.LastLockoutDate = date.AddMinutes(2);
+            //NOTE: Last activity date is always the same as last login date since we don't have a place to store that data
+            //member.LastLoginDate = date.AddMinutes(3);
+            member.LastPasswordChangeDate = date.AddMinutes(4);
+            member.PasswordQuestion = "test question";
+
             member.Properties["title"].Value = "Test Value 1";
             member.Properties["bodyText"].Value = "Test Value 2";
             member.Properties["author"].Value = "Test Value 3";
-            var mpc = new MemberPublishedContent(member, m);
+            var mpc = new MemberPublishedContent(member);
 
             var d = mpc.AsDynamic();
 
@@ -165,6 +155,21 @@ namespace Umbraco.Tests.Membership
 
         }
 
+        private IMemberType GetMemberType()
+        {
+            var entity = new MemberType(-1)
+            {
+                Alias = "Member"
+            };
+
+            entity.AddPropertyGroup(Umbraco.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
+            var standardPropertyTypes = Umbraco.Core.Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            foreach (var standardPropertyType in standardPropertyTypes)
+            {
+                entity.AddPropertyType(standardPropertyType.Value, Umbraco.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
+            }
+            return entity;
+        }
 
     }
 }
