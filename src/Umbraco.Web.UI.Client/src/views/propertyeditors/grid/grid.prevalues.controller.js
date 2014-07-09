@@ -193,11 +193,11 @@ angular.module("umbraco")
             utillities
         *****************/
         $scope.scaleUp = function(section, max){
-           var add = (max > 2) ? 2 : max;
+           var add = (max > 1) ? 1 : max;
            section.grid = section.grid+add;
         };
         $scope.scaleDown = function(section){
-           var remove = (section.grid > 2) ? 2 : section.grid;
+           var remove = (section.grid > 1) ? 1 : section.grid;
            section.grid = section.grid-remove;
         };    
         $scope.toggleCollection = function(collection){
