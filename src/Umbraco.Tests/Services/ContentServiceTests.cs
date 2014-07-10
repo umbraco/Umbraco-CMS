@@ -182,6 +182,44 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Tags_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Restored()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content1);
+
+            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content2);
+
+            contentService.MoveToRecycleBin(content1);
+            contentService.MoveToRecycleBin(content2);
+
+            // Act            
+            contentService.Move(content1, -1);
+            contentService.Publish(content1);
+
+            // Assert
+
+            var tags = tagService.GetTagsForEntity(content1.Id);
+            Assert.AreEqual(4, tags.Count());
+            var allTags = tagService.GetAllContentTags();
+            Assert.AreEqual(4, allTags.Count());
+        }
+
+        [Test]
         public void Create_Tag_Data_Bulk_Publish_Operation()
         {
             //Arrange
