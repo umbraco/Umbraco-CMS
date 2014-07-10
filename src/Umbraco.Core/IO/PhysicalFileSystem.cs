@@ -98,11 +98,6 @@ namespace Umbraco.Core.IO
             
             EnsureDirectory(Path.GetDirectoryName(path));
 
-            if (exists)
-            {
-                DeleteFile(path);
-            }
-
             if (stream.CanSeek)
                 stream.Seek(0, 0);
 
