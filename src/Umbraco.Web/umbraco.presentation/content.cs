@@ -309,11 +309,12 @@ namespace umbraco
                 XmlContentInternal = xmlDoc;
 
                 // It is correct to manually call PersistXmlToFile here event though the setter of XmlContentInternal
-                // queues this up, because this delegate is executing on a different thread and may complete
-                // after the request which invoked it (which would normally persist the file on completion)
-                // So we are responsible for ensuring the content is persisted in this case.
+                // queues this up, because it is possible that this method gets called outside of a web context and in that
+                // case the queue is not going to be executed by the UmbracoModule. So we'll process inline on this thread
+                // and clear the queue in case is this a web request, we don't want it reprocessing.
                         if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
                 {
+                    RemoveXmlFilePersistenceQueue();
                     PersistXmlToFile(xmlDoc);
                 }
             }
@@ -1189,7 +1190,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// </summary>
         private void QueueXmlForPersistence()
         {
-            //if this is called outside a web request we cannot queue it.
+            //if this is called outside a web request we cannot queue it it will run in the current thread.
             
             if (HttpContext.Current != null)
             {
@@ -1206,7 +1207,20 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 {
                     HttpContext.Current.Application.UnLock();    
                 }
-            }           
+            }          
+            else
+            {
+                // Save copy of content
+                if (UmbracoSettings.CloneXmlCacheOnPublish)
+                {
+                    XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
+                    PersistXmlToFile(xmlContentCopy);
+                }
+                else
+                {
+                    PersistXmlToFile();
+                }
+            }    
         }
 
         internal DateTime GetCacheFileUpdateTime()
