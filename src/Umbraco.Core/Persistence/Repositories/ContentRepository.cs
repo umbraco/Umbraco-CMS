@@ -296,9 +296,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userPermissions = (
                     from perm in parentPermissions 
                     from p in perm.AssignedPermissions 
-                    select new Tuple<int, string>(perm.UserId, p)).ToList();
-                
-                permissionsRepo.ReplaceEntityPermissions(entity, userPermissions);
+                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
+
+                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;

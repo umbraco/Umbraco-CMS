@@ -351,6 +351,7 @@
     <Compile Include="Models\IPublishedProperty.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
+    <Compile Include="Models\Membership\EntityPermissionSet.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\MemberGroup.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
