@@ -79,7 +79,7 @@ namespace umbraco.presentation.channels
 
                 
                 if (UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent)
-                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
+                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(RemoveLeftUrl(post.description), false);
                 else
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = RemoveLeftUrl(post.description);
 
