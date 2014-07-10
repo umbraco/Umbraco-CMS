@@ -19,7 +19,10 @@ namespace Umbraco.Core.IO
 
         public static void CopyFile(this IFileSystem fs, string path, string newPath)
         {
-            fs.AddFile(newPath, fs.OpenFile(path));
+            using (var stream = fs.OpenFile(path))
+            {
+                fs.AddFile(newPath, stream);
+            }
         }
 
         public static string GetExtension(this IFileSystem fs, string path)

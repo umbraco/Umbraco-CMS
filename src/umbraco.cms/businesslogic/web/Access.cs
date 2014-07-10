@@ -451,7 +451,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
-                    return provider.GetUser(currentNode.Attributes.GetNamedItem("memberId").Value, true);
+                    return provider.GetUser(currentNode.Attributes.GetNamedItem("memberId").Value, false);
                 }
             }
 
@@ -506,7 +506,7 @@ namespace umbraco.cms.businesslogic.web
 
                 var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
-                var member = provider.GetUser(memberId, true);
+                var member = provider.GetUser(memberId, false);
                 var currentNode = GetPage(GetProtectedPage(node.Path));
 
                 if (member != null)

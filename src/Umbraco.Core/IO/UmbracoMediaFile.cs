@@ -133,16 +133,23 @@ namespace Umbraco.Core.IO
         {
             if (_size == null)
             {
-                EnsureFileSupportsResizing();
+                if (_fs.FileExists(Path))
+                {
+                    EnsureFileSupportsResizing();
 
-                var fs = _fs.OpenFile(Path);
-                var image = Image.FromStream(fs);
-                var fileWidth = image.Width;
-                var fileHeight = image.Height;
-                fs.Close();
-                image.Dispose();
+                    using (var fs = _fs.OpenFile(Path))
+                    using (var image = Image.FromStream(fs))
+                    {
 
-                _size = new Size(fileWidth, fileHeight);    
+                        var fileWidth = image.Width;
+                        var fileHeight = image.Height;
+                        _size = new Size(fileWidth, fileHeight);
+                    }
+                }
+                else
+                {
+                    _size = new Size(-1, -1);
+                }
             }
             return _size.Value;
         }
