@@ -376,7 +376,6 @@
     <Compile Include="Editors\MacroController.cs" />
     <Compile Include="Editors\MembershipProviderValidationFilterAttribute.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
-    <Compile Include="Editors\TagExtractor.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
     <Compile Include="MembershipProviderExtensions.cs" />
     <Compile Include="Models\ChangingPasswordModel.cs" />

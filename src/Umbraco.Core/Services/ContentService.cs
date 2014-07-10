@@ -75,6 +75,20 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Used to bulk update the permissions set for a content item. This will replace all permissions
+        /// assigned to an entity with a list of user id & permission pairs.
+        /// </summary>
+        /// <param name="permissionSet"></param>
+        public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                repository.ReplaceContentPermissions(permissionSet);
+            }
+        }
+
+        /// <summary>
         /// Assigns a single permission to the current content item for the specified user ids
         /// </summary>
         /// <param name="entity"></param>
@@ -1159,12 +1173,18 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, c));
                     uow.Commit();
 
-                    //TODO: Move this to the repository layer in a single transaction!
+
                     //Special case for the associated tags
-                    var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
-                    foreach (var tag in tags)
+                    //TODO: Move this to the repository layer in a single transaction!
+                    //don't copy tags data in tags table if the item is in the recycle bin
+                    if (parentId != Constants.System.RecycleBinContent)
                     {
-                        uow.Database.Insert(new TagRelationshipDto { NodeId = copy.Id, TagId = tag.TagId, PropertyTypeId = tag.PropertyTypeId });
+                        
+                        var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
+                        foreach (var tag in tags)
+                        {
+                            uow.Database.Insert(new TagRelationshipDto { NodeId = copy.Id, TagId = tag.TagId, PropertyTypeId = tag.PropertyTypeId });
+                        }   
                     }
                 }
 
@@ -1629,29 +1649,26 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
-            using (new WriteLock(Locker))
+            var unpublished = _publishingStrategy.UnPublish(content, userId);
+            if (unpublished)
             {
-                var unpublished = _publishingStrategy.UnPublish(content, userId);
-                if (unpublished)
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    var uow = _uowProvider.GetUnitOfWork();
-                    using (var repository = _repositoryFactory.CreateContentRepository(uow))
-                    {
-                        content.WriterId = userId;
-                        repository.AddOrUpdate(content);
-                        repository.DeleteContentXml(content);
+                    content.WriterId = userId;
+                    repository.AddOrUpdate(content);
+                    repository.DeleteContentXml(content);
 
-                        uow.Commit();
-                    }
-                    //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
-                    if (omitCacheRefresh == false)
-                        _publishingStrategy.UnPublishingFinalized(content);
-
-                    Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId, content.Id);
+                    uow.Commit();
                 }
+                //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
+                if (omitCacheRefresh == false)
+                    _publishingStrategy.UnPublishingFinalized(content);
 
-                return unpublished;
+                Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId, content.Id);
             }
+
+            return unpublished;
         }
 
         /// <summary>

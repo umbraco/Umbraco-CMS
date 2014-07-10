@@ -62,12 +62,30 @@ namespace Umbraco.Core.Security
             return Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
         }
 
-        public static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)
+        /// <summary>
+        /// Returns the currently logged in MembershipUser and flags them as being online - use sparingly (i.e. login)
+        /// </summary>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
+        public static MembershipUser GetCurrentUserOnline(this MembershipProvider membershipProvider)
         {
             var username = membershipProvider.GetCurrentUserName();
             return username.IsNullOrWhiteSpace()
                 ? null
                 : membershipProvider.GetUser(username, true);
+        }
+
+        /// <summary>
+        /// Returns the currently logged in MembershipUser
+        /// </summary>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
+        public static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)
+        {
+            var username = membershipProvider.GetCurrentUserName();
+            return username.IsNullOrWhiteSpace()
+                ? null
+                : membershipProvider.GetUser(username, false);
         }
 
         /// <summary>

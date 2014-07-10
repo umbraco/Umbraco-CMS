@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Sync
         [Test]
         public void RefreshIntId()
         {
-            for (var i = 0; i < 10; i++)
+            for (var i = 1; i < 11; i++)
             {
                 DistributedCache.Instance.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Sync
         [Test]
         public void RemoveIds()
         {
-            for (var i = 0; i < 12; i++)
+            for (var i = 1; i < 13; i++)
             {
                 DistributedCache.Instance.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }

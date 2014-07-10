@@ -351,6 +351,7 @@
     <Compile Include="Models\IPublishedProperty.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
+    <Compile Include="Models\Membership\EntityPermissionSet.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\MemberGroup.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
@@ -364,6 +365,8 @@
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TagCacheStorageType.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
+    <Compile Include="Models\TaggedEntity.cs" />
+    <Compile Include="Models\TaggedProperty.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\PackageBinaryByteInspector.cs" />
@@ -1068,6 +1071,7 @@
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
+    <Compile Include="Services\TagExtractor.cs" />
     <Compile Include="Services\TagService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />

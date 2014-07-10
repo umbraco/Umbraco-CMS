@@ -1,14 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Web;
+using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using File = System.IO.File;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 
 namespace umbraco.cms.businesslogic.packager
@@ -120,14 +126,14 @@ namespace umbraco.cms.businesslogic.packager
                 //Info section..
                 AppendElement(utill.PackageInfo(pack, _packageManifest));
 
-                //Documents...
+                //Documents and tags...
                 var contentNodeId = 0;
                 if (string.IsNullOrEmpty(pack.ContentNodeId) == false && int.TryParse(pack.ContentNodeId, out contentNodeId))
                 {
                     if (contentNodeId > 0)
                     {
+                        //Create the Documents/DocumentSet node
                         XmlNode documents = _packageManifest.CreateElement("Documents");
-
                         XmlNode documentSet = _packageManifest.CreateElement("DocumentSet");
                         XmlAttribute importMode = _packageManifest.CreateAttribute("importMode", "");
                         importMode.Value = "root";
@@ -139,7 +145,66 @@ namespace umbraco.cms.businesslogic.packager
                         
                         documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
 
-                        AppendElement(documents);   
+                        AppendElement(documents);
+
+                        ////Create the TagProperties node - this is used to store a definition for all
+                        //// document properties that are tags, this ensures that we can re-import tags properly
+                        //XmlNode tagProps = _packageManifest.CreateElement("TagProperties");
+
+                        ////before we try to populate this, we'll do a quick lookup to see if any of the documents
+                        //// being exported contain published tags. 
+                        //var allExportedIds = documents.SelectNodes("//@id").Cast<XmlNode>()
+                        //    .Select(x => x.Value.TryConvertTo<int>())
+                        //    .Where(x => x.Success)
+                        //    .Select(x => x.Result)
+                        //    .ToArray();
+                        //var allContentTags = new List<ITag>();
+                        //foreach (var exportedId in allExportedIds)
+                        //{                            
+                        //    allContentTags.AddRange(
+                        //        ApplicationContext.Current.Services.TagService.GetTagsForEntity(exportedId));
+                        //}
+
+                        ////This is pretty round-about but it works. Essentially we need to get the properties that are tagged
+                        //// but to do that we need to lookup by a tag (string)
+                        //var allTaggedEntities = new List<TaggedEntity>();
+                        //foreach (var group in allContentTags.Select(x => x.Group).Distinct())
+                        //{
+                        //    allTaggedEntities.AddRange(
+                        //        ApplicationContext.Current.Services.TagService.GetTaggedContentByTagGroup(group));
+                        //}
+
+                        ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
+                        //var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
+                        //    .DistinctBy(x => x.EntityId)
+                        //    .OrderBy(x => x.EntityId);
+
+                        //foreach (var taggedEntity in allExportedTaggedEntities)
+                        //{
+                        //    foreach (var taggedProperty in taggedEntity.TaggedProperties.Where(x => x.Tags.Any()))
+                        //    {
+                        //        XmlNode tagProp = _packageManifest.CreateElement("TagProperty");
+                        //        var docId = _packageManifest.CreateAttribute("docId", "");
+                        //        docId.Value = taggedEntity.EntityId.ToString(CultureInfo.InvariantCulture);
+                        //        tagProp.Attributes.Append(docId);
+
+                        //        var propertyAlias = _packageManifest.CreateAttribute("propertyAlias", "");
+                        //        propertyAlias.Value = taggedProperty.PropertyTypeAlias;
+                        //        tagProp.Attributes.Append(propertyAlias);
+                                
+                        //        var group = _packageManifest.CreateAttribute("group", "");
+                        //        group.Value = taggedProperty.Tags.First().Group;
+                        //        tagProp.Attributes.Append(group);
+
+                        //        tagProp.AppendChild(_packageManifest.CreateCDataSection(
+                        //            JsonConvert.SerializeObject(taggedProperty.Tags.Select(x => x.Text).ToArray())));
+
+                        //        tagProps.AppendChild(tagProp);
+                        //    }
+                        //}
+
+                        //AppendElement(tagProps);
+
                     }
                 }
 

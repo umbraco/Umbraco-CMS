@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.Membership
+﻿using System.Collections;
+
+namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents a user -> entity permission

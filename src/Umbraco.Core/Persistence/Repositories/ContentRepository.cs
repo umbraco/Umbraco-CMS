@@ -296,9 +296,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userPermissions = (
                     from perm in parentPermissions 
                     from p in perm.AssignedPermissions 
-                    select new Tuple<int, string>(perm.UserId, p)).ToList();
-                
-                permissionsRepo.ReplaceEntityPermissions(entity, userPermissions);
+                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
+
+                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;
@@ -402,7 +402,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //a flag that we'll use later to create the tags in the tag db table
-            var isNewPublishedVersion = false;
+            var publishedStateChanged = false;
 
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
@@ -418,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
 
                 //this is a newly published version so we'll update the tags table too (end of this method)
-                isNewPublishedVersion = true;
+                publishedStateChanged = true;
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
@@ -481,9 +481,14 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //lastly, check if we are a newly published version and then update the tags table
-            if (isNewPublishedVersion)
+            if (publishedStateChanged && entity.Published)
             {
                 UpdatePropertyTags(entity, _tagRepository);
+            }
+            else if (publishedStateChanged && (entity.Trashed || entity.Published == false))
+            {
+                //it's in the trash or not published remove all entity tags
+                ClearEntityTags(entity, _tagRepository);
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -556,6 +561,12 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return CreateContentFromDto(dto, dto.VersionId);    
                 }
             }
+        }
+
+        public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            repo.ReplaceEntityPermissions(permissionSet);
         }
 
         public IContent GetByLanguage(int id, string language)
