@@ -12,6 +12,13 @@ namespace Umbraco.Core.Services
     public interface IContentService : IService
     {
         /// <summary>
+        /// Used to bulk update the permissions set for a content item. This will replace all permissions
+        /// assigned to an entity with a list of user id & permission pairs.
+        /// </summary>
+        /// <param name="permissionSet"></param>
+        void ReplaceContentPermissions(EntityPermissionSet permissionSet);
+
+        /// <summary>
         /// Assigns a single permission to the current content item for the specified user ids
         /// </summary>
         /// <param name="entity"></param>

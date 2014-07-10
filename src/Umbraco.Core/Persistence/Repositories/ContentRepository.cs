@@ -558,6 +558,12 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            repo.ReplaceEntityPermissions(permissionSet);
+        }
+
         public IContent GetByLanguage(int id, string language)
         {
             var sql = GetBaseQuery(false);
