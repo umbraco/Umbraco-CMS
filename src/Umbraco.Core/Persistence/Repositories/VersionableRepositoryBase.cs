@@ -97,6 +97,16 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         /// <summary>
+        /// This removes associated tags from the entity - used generally when an entity is recycled
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="tagRepo"></param>
+        protected void ClearEntityTags(IContentBase entity, ITagsRepository tagRepo)
+        {
+            tagRepo.ClearTagsFromEntity(entity.Id);
+        }
+
+        /// <summary>
         /// Updates the tag repository with any tag enabled properties and their values
         /// </summary>
         /// <param name="entity"></param>

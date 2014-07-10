@@ -57,5 +57,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to remove from the property</param>
         void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags);
+
+        /// <summary>
+        /// Removes all tag associations from the property
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="propertyTypeId"></param>
+        void ClearTagsFromProperty(int contentId, int propertyTypeId);
+
+        /// <summary>
+        /// Removes all tag associations from the entity
+        /// </summary>
+        /// <param name="contentId"></param>
+        void ClearTagsFromEntity(int contentId);
     }
 }

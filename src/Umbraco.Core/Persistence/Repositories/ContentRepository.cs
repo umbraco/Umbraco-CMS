@@ -418,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
 
                 //this is a newly published version so we'll update the tags table too (end of this method)
-                isNewPublishedVersion = true;
+                isNewPublishedVersion = entity.Published;
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
@@ -484,6 +484,11 @@ namespace Umbraco.Core.Persistence.Repositories
             if (isNewPublishedVersion)
             {
                 UpdatePropertyTags(entity, _tagRepository);
+            }
+            else if (entity.Trashed || entity.Published == false)
+            {
+                //it's in the trash or not published remove all entity tags
+                ClearEntityTags(entity, _tagRepository);
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
