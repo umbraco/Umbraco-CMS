@@ -402,7 +402,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //a flag that we'll use later to create the tags in the tag db table
-            var isNewPublishedVersion = false;
+            var publishedStateChanged = false;
 
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
@@ -418,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
 
                 //this is a newly published version so we'll update the tags table too (end of this method)
-                isNewPublishedVersion = entity.Published;
+                publishedStateChanged = true;
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
@@ -481,11 +481,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //lastly, check if we are a newly published version and then update the tags table
-            if (isNewPublishedVersion)
+            if (publishedStateChanged && entity.Published)
             {
                 UpdatePropertyTags(entity, _tagRepository);
             }
-            else if (entity.Trashed || entity.Published == false)
+            else if (publishedStateChanged && (entity.Trashed || entity.Published == false))
             {
                 //it's in the trash or not published remove all entity tags
                 ClearEntityTags(entity, _tagRepository);
