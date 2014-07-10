@@ -93,9 +93,15 @@ namespace Umbraco.Core.IO
 
         public void AddFile(string path, Stream stream, bool overrideIfExists)
         {
-            if (FileExists(path) && !overrideIfExists) throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
-
+            var exists = FileExists(path);
+            if (exists && overrideIfExists == false) throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            
             EnsureDirectory(Path.GetDirectoryName(path));
+
+            if (exists)
+            {
+                DeleteFile(path);
+            }
 
             if (stream.CanSeek)
                 stream.Seek(0, 0);
