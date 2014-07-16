@@ -165,11 +165,6 @@ namespace Umbraco.Core.IO
                 else
                 {
                     _size = new Size(-1, -1);
-                    }
-                }
-                else
-                {
-                    _size = new Size(-1, -1);
                 }
             }
             return _size.Value;
