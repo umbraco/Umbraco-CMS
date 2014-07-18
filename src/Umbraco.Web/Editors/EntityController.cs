@@ -24,6 +24,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
 using umbraco;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Web.Editors
 {
@@ -289,45 +290,77 @@ namespace Umbraco.Web.Editors
             // the rest will be normal without wildcards
             var sb = new StringBuilder();
 
-            var querywords = query.Split(' ');
-
-            //node name exactly boost x 10
-            sb.Append("+(__nodeName:");
-            sb.Append("\"");
-            sb.Append(query.ToLower());
-            sb.Append("\"");
-            sb.Append("^10.0 ");
-
-            //node name normally with wildcards
-            sb.Append(" __nodeName:");
-            sb.Append("(");
-            foreach (var w in querywords)
+            bool hasSingleQuotes = Regex.IsMatch(query, "\"[^\"]*");
+            if (hasSingleQuotes)
             {
-                sb.Append(w.ToLower());
-                sb.Append("* ");
+                //we cannot search for single qoutes, so we ignore them
+                query = query.Replace("\"", "");
             }
-            sb.Append(") ");
 
+            var querywords = query.Split(' ');
+            bool hasDoubleQuotes = Regex.IsMatch(query, "\"[^\"]*\"");
 
-            foreach (var f in fields)
+            if (string.IsNullOrWhiteSpace(query))
             {
-                //additional fields normally
-                sb.Append(f);
-                sb.Append(":");
+                return new List<EntityBasic>();
+            }
+            if (hasDoubleQuotes)
+            {
+
+                //node name exactly boost x 10
+                sb.Append("+(__nodeName: (");
+                sb.Append(query.ToLower());
+                sb.Append(")^10.0 ");
+
+                foreach (var f in fields)
+                {
+                    //additional fields normally
+                    sb.Append(f);
+                    sb.Append(": (");
+                    sb.Append(query);
+                    sb.Append(") ");
+                }
+            }
+            else
+            {
+                //node name exactly boost x 10
+                sb.Append("+(__nodeName:");
+                sb.Append("\"");
+                sb.Append(query.ToLower());
+                sb.Append("\"");
+                sb.Append("^10.0 ");
+
+                //node name normally with wildcards
+                sb.Append(" __nodeName:");
                 sb.Append("(");
                 foreach (var w in querywords)
                 {
                     sb.Append(w.ToLower());
                     sb.Append("* ");
                 }
-                sb.Append(")");
-                sb.Append(" ");
+                sb.Append(") ");
+
+
+                foreach (var f in fields)
+                {
+                    //additional fields normally
+                    sb.Append(f);
+                    sb.Append(":");
+                    sb.Append("(");
+                    foreach (var w in querywords)
+                    {
+                        sb.Append(w.ToLower());
+                        sb.Append("* ");
+                    }
+                    sb.Append(")");
+                    sb.Append(" ");
+                }
             }
 
             //must match index type
             sb.Append(") +__IndexType:");
             sb.Append(type);
-
+            
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
             
             var result = internalSearcher.Search(raw);
