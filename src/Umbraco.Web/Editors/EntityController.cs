@@ -288,23 +288,39 @@ namespace Umbraco.Web.Editors
             // then __nodeName will be matched normally with wildcards
             // the rest will be normal without wildcards
             var sb = new StringBuilder();
-            
+
+            var querywords = query.Split(' ');
+
             //node name exactly boost x 10
             sb.Append("+(__nodeName:");
+            sb.Append("\"");
             sb.Append(query.ToLower());
+            sb.Append("\"");
             sb.Append("^10.0 ");
 
             //node name normally with wildcards
-            sb.Append(" __nodeName:");            
-            sb.Append(query.ToLower());
-            sb.Append("* ");
+            sb.Append(" __nodeName:");
+            sb.Append("(");
+            foreach (var w in querywords)
+            {
+                sb.Append(w.ToLower());
+                sb.Append("* ");
+            }
+            sb.Append(") ");
+
 
             foreach (var f in fields)
             {
                 //additional fields normally
                 sb.Append(f);
                 sb.Append(":");
-                sb.Append(query);
+                sb.Append("(");
+                foreach (var w in querywords)
+                {
+                    sb.Append(w.ToLower());
+                    sb.Append("* ");
+                }
+                sb.Append(")");
                 sb.Append(" ");
             }
 
