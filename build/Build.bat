@@ -10,7 +10,7 @@ SET version=%release%
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
 ECHO Building Umbraco %version%
 
-ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %release%
+
 
 ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise you'd have to run build.cmd twice
 SET nuGetFolder=%CD%\..\src\packages\
