@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public PublishedContentModelFactory(IEnumerable<Type> types)
         {
             var ctorArgTypes = new[] { typeof(IPublishedContent) };
-            var constructors = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>();
+            var constructors = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var type in types)
             {
@@ -40,7 +40,6 @@ namespace Umbraco.Core.Models.PublishedContent
                     throw new InvalidOperationException(string.Format("Type {0} is missing a public constructor with one argument of type IPublishedContent.", type.FullName));
                 var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
-                typeName = typeName.ToLowerInvariant();
 
                 if (constructors.ContainsKey(typeName))
                     throw new InvalidOperationException(string.Format("More that one type want to be a model for content type {0}.", typeName));
@@ -70,7 +69,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 return content;
 
             // be case-insensitive
-            var contentTypeAlias = content.DocumentTypeAlias.ToLowerInvariant();
+            var contentTypeAlias = content.DocumentTypeAlias;
 
             //ConstructorInfo constructor;
             //return _constructors.TryGetValue(contentTypeAlias, out constructor)
