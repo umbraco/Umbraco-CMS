@@ -69,6 +69,11 @@
             }
         }
 
+        // Initialise model value if not set
+        if (!$scope.model.value) {
+            setModelValueFromSlider(sliderVal);
+        }
+
         //initiate slider, add event handler and get the instance reference (stored in data)
         var slider = $element.find('.slider-item').slider({
             max: $scope.model.config.maxVal,
@@ -81,16 +86,21 @@
             value: sliderVal
         }).on('slideStop', function () {
             angularHelper.safeApply($scope, function () {
-                //Get the value from the slider and format it correctly, if it is a range we want a comma delimited value
-                if ($scope.model.config.enableRange === "1") {
-                    $scope.model.value = slider.getValue().join(",");
-                }
-                else {
-                    $scope.model.value = slider.getValue().toString();
-                }
+                setModelValueFromSlider(slider.getValue());
             });
         }).data('slider');
+    }
 
+    /** Called on start-up when no model value has been applied and on change of the slider via the UI - updates
+        the model with the currently selected slider value(s) **/
+    function setModelValueFromSlider(sliderVal) {
+        //Get the value from the slider and format it correctly, if it is a range we want a comma delimited value
+        if ($scope.model.config.enableRange === "1") {
+            $scope.model.value = sliderVal.join(",");
+        }
+        else {
+            $scope.model.value = sliderVal.toString();
+        }
     }
 
     //tell the assetsService to load the bootstrap slider
