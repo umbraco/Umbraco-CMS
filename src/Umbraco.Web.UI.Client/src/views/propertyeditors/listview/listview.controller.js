@@ -80,7 +80,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         contentResource.getChildren(id, $scope.options).then(function (data) {
 
             $scope.listViewResultSet = data;
-            $scope.pagination = [];
+            $scope.pagination = [];            
 
             for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
                 $scope.pagination[i] = { index: i, name: i + 1 };
