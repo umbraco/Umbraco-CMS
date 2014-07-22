@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -338,6 +339,29 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(ServiceContext.MemberService.Exists(member.Id));
             Assert.IsFalse(ServiceContext.MemberService.Exists(9876));
+        }
+
+        [Test]
+        public void Tracks_Dirty_Changes()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            var resolved = ServiceContext.MemberService.GetByEmail(member.Email);
+
+            //NOTE: This will not trigger a property isDirty because this is not based on a 'Property', it is
+            // just a c# property of the Member object
+            resolved.Email = "changed@test.com";
+            //NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
+            // the underlying 'Property'
+            resolved.FailedPasswordAttempts = 1234;
+
+            var dirtyMember = (ICanBeDirty)resolved;
+            var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
+            Assert.IsTrue(dirtyMember.IsDirty());
+            Assert.AreEqual(1, dirtyProperties.Count());
         }
 
         [Test]
