@@ -20,6 +20,7 @@ namespace umbraco.presentation.umbraco.Search
     /// </summary>
     [WebService(Namespace = "http://tempuri.org/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    [Obsolete("This is not used and will be removed in the future")]
     public class QuickSearchHandler : IHttpHandler
     {
 

@@ -262,7 +262,7 @@ namespace Umbraco.Web.Editors
         {
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id" };
+            var fields = new[] { "id", "__NodeId" };
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Member:
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
-                    fields = new[] { "id", "email", "loginName"};
+                    fields = new[] { "id", "__NodeId", "email", "loginName"};
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
