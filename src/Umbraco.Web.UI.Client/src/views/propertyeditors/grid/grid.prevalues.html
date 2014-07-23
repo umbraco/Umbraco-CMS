@@ -2,70 +2,77 @@
 
     <div style="width: 600px">
         
-        <div class="control-group uSky-templates" ng-if="!currentTemplate">
-            <umb-control-group label="Template grids" description="Grids are the overall layout for the grid editor, usually you only need one or two overall templates" hide-label="false">
+            <div class="control-group uSky-templates" ng-if="!currentTemplate">
 
-            <ul class="unstyled"
-                ui-sortable
-                ng-model="model.value.templates">
-                
-                <li ng-repeat="template in model.value.templates">
+                <umb-control-group label="Template grids" description="Grids are the overall layout for the grid editor, usually you only need one or two overall templates" hide-label="false">
 
-                    <div class="uSky-templates-template" style="float: left">
-                        <a href class="tb" ng-click="configureTemplate(template)">
-                            <div class="tr">
-                                <div class="td uSky-templates-column" 
-                                    ng-class="{last:$last}" 
-                                    ng-repeat="section in template.sections" 
-                                    style="width:{{ percentage(section.grid) }}%">
-                                </div>
+                    <ul class="unstyled"
+                        ui-sortable
+                        ng-model="model.value.templates">
+
+                        <li ng-repeat="template in model.value.templates">
+
+                            <div class="uSky-templates-template" style="float: left">
+                                <a href class="tb" ng-click="configureTemplate(template)">
+                                    <div class="tr">
+                                        <div class="td uSky-templates-column"
+                                             ng-class="{last:$last}"
+                                             ng-repeat="section in template.sections"
+                                             style="width:{{ percentage(section.grid) }}%">
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
-                    </div>
 
 
-                    <div>
-                        <a ng-click="configureTemplate(template)" href>{{template.name}}</a><br/>
-                        <small>{{template.sections.length}} configurable sections</small><br/>
+                            <div>
+                                <a ng-click="configureTemplate(template)" href>{{template.name}}</a><br />
+                                <small>{{template.sections.length}} configurable sections</small><br />
 
-                        <a class="btn btn-small btn-link" href ng-click="deleteTemplate($index)"><i class="icon-delete red"></i> Delete template </a>
-                    </div>   
+                                <a class="btn btn-small btn-link" href ng-click="deleteTemplate($index)"><i class="icon-delete red"></i> Delete template </a>
+                            </div>
 
-                    <br style="clear: both"/> 
-                </li>   
-            </ul>
+                            <br style="clear: both" />
 
-            <button class="btn btn-small" 
-                prevent-default 
-                ng-click="configureTemplate()"><i class="icon-add"></i>Add template</button>
-        </div>    
+                        </li>
 
+                    </ul>
 
-        <div ng-if="currentTemplate">
-            <h5>Template</h5>
-            <umb-control-group label="Name" hide-label="false">
+                    <button class="btn btn-small"
+                            prevent-default
+                            ng-click="configureTemplate()">
+                        <i class="icon-add"></i>Add template
+                    </button>
+
+                </umb-control-group>
+
+            </div>
+
+            <div ng-if="currentTemplate">
+                <h5>Template</h5>
+                <umb-control-group label="Name" hide-label="false">
                     <input type="text" class="" ng-model="currentTemplate.name" />
-            </umb-control-group>
+                </umb-control-group>
 
-            <umb-control-group label="Sections" description="Choose a section from the grid to edit" hide-label="false">
-                     <div class="uSky-templates-template" 
+                <umb-control-group label="Sections" description="Choose a section from the grid to edit" hide-label="false">
+                    <div class="uSky-templates-template"
                          style="margin: 0; width: 350px; position: relative;">
-                         <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
-                             <div class="tr">
-                                 <a class="td uSky-templates-column" 
-                                     ng-class="{last:$last, selected:section==currentSection}" 
-                                     ng-repeat="section in currentTemplate.sections"
-                                     ng-click="configureSection(section, currentTemplate)" 
-                                     style="width:{{ percentage(section.grid) }}%">
-                                 </a>
+                        <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
+                            <div class="tr">
+                                <a class="td uSky-templates-column"
+                                   ng-class="{last:$last, selected:section==currentSection}"
+                                   ng-repeat="section in currentTemplate.sections"
+                                   ng-click="configureSection(section, currentTemplate)"
+                                   style="width:{{ percentage(section.grid) }}%">
+                                </a>
 
-                                 <a class="td uSky-templates-column add" ng-if="availableTemplateSpace > 0" 
-                                     ng-click="configureSection(undefined, currentTemplate)" 
-                                     style="width:{{ percentage(availableTemplateSpace) }}%">
-                                     <i class="icon icon-add"></i>
-                                 </a>
-                             </div>
-                         </div>
+                                <a class="td uSky-templates-column add" ng-if="availableTemplateSpace > 0"
+                                   ng-click="configureSection(undefined, currentTemplate)"
+                                   style="width:{{ percentage(availableTemplateSpace) }}%">
+                                    <i class="icon icon-add"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
                     <div ng-if="currentSection" style="padding-bottom: 50px;">
@@ -75,22 +82,22 @@
                                 <a href ng-click="scaleDown(currentSection)">
                                     <i class="icon icon-remove"></i>
                                 </a>
-                                    {{currentSection.grid}}
+                                {{currentSection.grid}}
                                 <a href ng-click="scaleUp(currentSection, availableTemplateSpace)">
                                     <i class="icon icon-add"></i>
                                 </a>
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group hide-label="true">     
+                        <umb-control-group hide-label="true">
                             <ul class="unstyled">
                                 <li>
                                     <label>
                                         <input type="checkbox"
-                                            ng-model="currentSection.allowAll" 
-                                            ng-checked="currentSection.allowed === undefined" 
-                                            ng-change="toggleCollection(currentSection.allowed, currentSection.allowAll)" /> 
-                                            Allow all layouts
+                                               ng-model="currentSection.allowAll"
+                                               ng-checked="currentSection.allowed === undefined"
+                                               ng-change="toggleCollection(currentSection.allowed, currentSection.allowAll)" />
+                                        Allow all layouts
                                     </label>
                                 </li>
                             </ul>
@@ -102,15 +109,15 @@
                                     <ul class="unstyled"
                                         ui-sortable
                                         ng-model="model.value.templates">
-                                        
+
                                         <li ng-repeat="layout in model.value.layouts">
 
-                                            <input type="checkbox" 
-                                              checklist-model="currentSection.allowed" 
-                                              checklist-value="layout.name" 
-                                              style="float: left; margin-right: 10px;">
+                                            <input type="checkbox"
+                                                   checklist-model="currentSection.allowed"
+                                                   checklist-value="layout.name"
+                                                   style="float: left; margin-right: 10px;">
 
-                                            <div class="uSky-templates-row"  style="float: left">
+                                            <div class="uSky-templates-row" style="float: left">
                                                 <a href class="tb mainTbpt">
                                                     <div class="tr">
                                                         <div style="width:{{ percentage(area.grid); }}%" class="middle mainTdpt td" ng-repeat="area in layout.areas">
@@ -121,36 +128,37 @@
                                             </div>
 
                                             <div>
-                                                {{layout.name}}<br/>
-                                                <small>{{layout.areas.length}} configurable areas</small><br/>
+                                                {{layout.name}}<br />
+                                                <small>{{layout.areas.length}} configurable areas</small><br />
                                             </div>
 
-                                            <br style="clear: both"/> 
-                                        </li>   
-                                    </ul> 
+                                            <br style="clear: both" />
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </umb-control-group>
 
                         <button prevent-default ng-click="closeSection()" class="btn btn-small">Finish editing section</button>
 
-                        <a class="btn btn-small btn-link" 
-                            href 
-                            ng-click="deleteSection($index)"><i class="icon-delete red"></i> Delete section </a>
+                        <a class="btn btn-small btn-link"
+                           href
+                           ng-click="deleteSection($index)"><i class="icon-delete red"></i>Delete section</a>
                     </div>
 
-            </umb-control-group>
-            
+                </umb-control-group>
 
 
-            <umb-control-group hide-label="false" ng-if="!currentSection">
-                <button  prevent-default ng-click="closeTemplate()" class="btn btn-small">
-                    Finish editing template
-                </button> 
-            </umb-control-group>
-        </div>
+
+                <umb-control-group hide-label="false" ng-if="!currentSection">
+                    <button prevent-default ng-click="closeTemplate()" class="btn btn-small">
+                        Finish editing template
+                    </button>
+                </umb-control-group>
+            </div>
+
         
-        </umb-control-group>
+
     </div>
 
 
@@ -162,13 +170,14 @@
                 description="Layouts are predefined layouts of editors arranged in a row of cells with different editors associated" 
                 hide-label="false">
                 <div class="control-group uSky-templates-rows">
+
                     <ul class="unstyled"
                         ui-sortable
-                        ng-model="model.value.templates">
-                        
+                        ng-model="model.value.layouts">
+
                         <li ng-repeat="layout in model.value.layouts">
 
-                            <div class="uSky-templates-row"  style="float: left">
+                            <div class="uSky-templates-row" style="float: left">
                                 <a href class="tb mainTbpt" ng-click="configureLayout(layout)">
                                     <div class="tr">
                                         <div style="width:{{ percentage(area.grid); }}%" class="middle mainTdpt td" ng-repeat="area in layout.areas">
@@ -179,24 +188,27 @@
                             </div>
 
                             <div>
-                                <a ng-click="configureLayout(layout)" href>{{layout.name}}</a><br/>
-                                <small>{{layout.areas.length}} configurable areas</small><br/>
+                                <a ng-click="configureLayout(layout)" href>{{layout.name}}</a><br />
+                                <small>{{layout.areas.length}} configurable areas</small><br />
                                 <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)"><i class="icon-delete red"></i> Delete layout </a>
                             </div>
 
-                            <br style="clear: both"/> 
-                        </li>   
+                            <br style="clear: both" />
+                        </li>
                     </ul>
 
                     <button class="btn btn-small" 
                         prevent-default 
                         ng-click="configureLayout()"><i class="icon-add"></i>Add layout</button>
+
                 </div>
             </umb-control-group>
         </div>
 
         <div ng-if="currentLayout">
+
             <h5>Layout</h5>
+
             <umb-control-group 
                 label="Name" 
                 hide-label="false">
@@ -283,7 +295,6 @@
                 <button  prevent-default ng-click="closeLayout()" class="btn btn-small">Finish editing layout</button> 
             </umb-control-group>
         </div> 
-
 
     </div>
 

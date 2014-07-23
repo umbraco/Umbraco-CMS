@@ -61,9 +61,6 @@ angular.module("umbraco")
             ]
         };
 
-
-
-
         /****************
             template
         *****************/
@@ -242,7 +239,7 @@ angular.module("umbraco")
             $scope.editors = response.data;
         });
 
-        /* init grid data */
+        /* init grid data */  
         if (!$scope.model.value || $scope.model.value === "" || !$scope.model.value.templates) {
             $scope.model.value = emptyModel;
         }
