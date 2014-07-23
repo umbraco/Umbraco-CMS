@@ -262,7 +262,7 @@ namespace Umbraco.Web.Editors
         {
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id", "bodyText" };
+            var fields = new[] { "id" };
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -289,23 +289,25 @@ namespace Umbraco.Web.Editors
             // then __nodeName will be matched normally with wildcards
             // the rest will be normal without wildcards
             var sb = new StringBuilder();
-
-            bool hasSingleQuotes = Regex.IsMatch(query, "\"[^\"]*");
-            if (hasSingleQuotes)
+            
+            //check if text is surrounded by single or double quotes, if so, then exact match
+            var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
+                                     || Regex.IsMatch(query, "^\'.*?\'$");
+            
+            if (surroundedByQuotes)
             {
-                //we cannot search for single qoutes, so we ignore them
-                query = query.Replace("\"", "");
-            }
+                //strip quotes, escape string, the replace again
+                query = query.Trim(new[] { '\"', '\'' });
 
-            var querywords = query.Split(' ');
-            bool hasDoubleQuotes = Regex.IsMatch(query, "\"[^\"]*\"");
+                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return new List<EntityBasic>();
-            }
-            if (hasDoubleQuotes)
-            {
+                if (query.IsNullOrWhiteSpace())
+                {
+                    return new List<EntityBasic>();
+                }
+
+                //add back the surrounding quotes
+                query = string.Format("{0}{1}{0}", "\"", query);
 
                 //node name exactly boost x 10
                 sb.Append("+(__nodeName: (");
@@ -323,6 +325,15 @@ namespace Umbraco.Web.Editors
             }
             else
             {
+                if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
+                {
+                    return new List<EntityBasic>();
+                }
+                
+                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+
+                var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
                 //node name exactly boost x 10
                 sb.Append("+(__nodeName:");
                 sb.Append("\"");
