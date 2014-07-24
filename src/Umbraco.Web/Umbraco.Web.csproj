@@ -298,6 +298,7 @@
     <Compile Include="Models\PublishedProperty.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PublishedCache\MemberPublishedContent.cs" />
     <Compile Include="PublishedCache\RawValueProperty.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragment.cs" />

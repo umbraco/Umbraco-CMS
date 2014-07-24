@@ -11,7 +11,7 @@ using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-	/// <summary>
+    /// <summary>
 	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
 	/// used dynamically.
 	/// </summary>
