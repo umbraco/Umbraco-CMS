@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return Guid.Parse(Constants.PropertyEditors.MacroContainer).Equals(propertyType.PropertyEditorGuid);
+            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.MacroContainerAlias;
         }
 
         // NOT thread-safe over a request because it modifies the
