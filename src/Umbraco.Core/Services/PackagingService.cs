@@ -107,18 +107,7 @@ namespace Umbraco.Core.Services
                 if (ImportingContent.IsRaisedEventCancelled(new ImportEventArgs<IContent>(element), this))
                     return Enumerable.Empty<IContent>();
             }
-
-            //check for tag properties element at root
-            XElement tagProperties = null;
-            if (element.Document != null && element.Document.Root != null)
-            {
-                var found = element.Document.Root.XPathSelectElement("/umbPackage/TagProperties");
-                if (found != null)
-                {
-                    tagProperties = found;
-                }
-            }
-
+            
             var name = element.Name.LocalName;
             if (name.Equals("DocumentSet"))
             {
@@ -127,7 +116,7 @@ namespace Umbraco.Core.Services
                             where (string)doc.Attribute("isDoc") == ""
                             select doc;
 
-                var contents = ParseDocumentRootXml(roots, parentId, tagProperties);
+                var contents = ParseDocumentRootXml(roots, parentId);
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
@@ -141,7 +130,7 @@ namespace Umbraco.Core.Services
             {
                 //This is a single doc import
                 var elements = new List<XElement> { element };
-                var contents = ParseDocumentRootXml(elements, parentId, tagProperties);
+                var contents = ParseDocumentRootXml(elements, parentId);
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
@@ -155,7 +144,7 @@ namespace Umbraco.Core.Services
                 "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
         }
 
-        private IEnumerable<IContent> ParseDocumentRootXml(IEnumerable<XElement> roots, int parentId, XElement tagProperties)
+        private IEnumerable<IContent> ParseDocumentRootXml(IEnumerable<XElement> roots, int parentId)
         {
             var contents = new List<IContent>();
             foreach (var root in roots)
@@ -171,19 +160,19 @@ namespace Umbraco.Core.Services
                     _importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId, isLegacySchema, tagProperties);
+                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId, isLegacySchema);
                 contents.Add(content);
 
                 var children = from child in root.Elements()
                                where (string)child.Attribute("isDoc") == ""
                                select child;
                 if (children.Any())
-                    contents.AddRange(CreateContentFromXml(children, content, isLegacySchema, tagProperties));
+                    contents.AddRange(CreateContentFromXml(children, content, isLegacySchema));
             }
             return contents;
         }
 
-        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent, bool isLegacySchema, XElement tagProperties)
+        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent, bool isLegacySchema)
         {
             var list = new List<IContent>();
             foreach (var child in children)
@@ -199,7 +188,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Create and add the child to the list
-                var content = CreateContentFromXml(child, _importedContentTypes[contentTypeAlias], parent, default(int), isLegacySchema, tagProperties);
+                var content = CreateContentFromXml(child, _importedContentTypes[contentTypeAlias], parent, default(int), isLegacySchema);
                 list.Add(content);
 
                 //Recursive call
@@ -209,13 +198,13 @@ namespace Umbraco.Core.Services
                                     select grand;
 
                 if (grandChildren.Any())
-                    list.AddRange(CreateContentFromXml(grandChildren, content, isLegacySchema, tagProperties));
+                    list.AddRange(CreateContentFromXml(grandChildren, content, isLegacySchema));
             }
 
             return list;
         }
 
-        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId, bool isLegacySchema, XElement tagProperties)
+        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId, bool isLegacySchema)
         {
             var id = element.Attribute("id").Value;
             var level = element.Attribute("level").Value;
@@ -256,6 +245,8 @@ namespace Umbraco.Core.Services
                     {
                         if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
                         {
+
+                            //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
                             var database = ApplicationContext.Current.DatabaseContext.Database;
                             var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = propertyType.DataTypeDefinitionId});
 
@@ -267,28 +258,11 @@ namespace Umbraco.Core.Services
 
                             propertyValue = string.Join(",", propertyValueList.ToArray());
 
-                            //set value as per normal
-                            content.SetValue(propertyTypeAlias, propertyValue);    
                         }
-                        //else
-                        //{
-                        //    //check if this exists in tagProperties
-                        //    var hasTags = tagProperties.XPathSelectElement(string.Format("//TagProperty[@docId=\"{0}\" and @propertyAlias=\"{1}\"]", id, propertyType.Alias));
-                        //    if (hasTags != null)
-                        //    {
-                        //        var tags = JsonConvert.DeserializeObject<string[]>(hasTags.Value);                                
-                        //        content.SetTags(propertyTypeAlias, tags, true, hasTags.Attribute("group").Value);
-                        //    }
-                            
-                        //}
 
-                    }
-                    else
-                    {
-                        //set value as per normal
+                        //set property value
                         content.SetValue(propertyTypeAlias, propertyValue);        
                     }
-                    
                 }
             }
 
