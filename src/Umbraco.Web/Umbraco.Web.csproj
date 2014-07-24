@@ -592,9 +592,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
-    <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

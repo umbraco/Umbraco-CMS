@@ -2103,7 +2103,6 @@
     <Content Include="Install\Steps\welcome.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="Umbraco\cacheBrowser.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
