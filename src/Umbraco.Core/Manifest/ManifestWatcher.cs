@@ -8,6 +8,8 @@ namespace Umbraco.Core.Manifest
     internal class ManifestWatcher : DisposableObject
     {
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();
+        private static volatile bool _isRestarting = false;
+        private static readonly object Locker = new object();
 
         public void Start(params string[] packageFolders)
         {
@@ -32,9 +34,21 @@ namespace Umbraco.Core.Manifest
         {
             if (e.Name.InvariantContains("package.manifest"))
             {
-                LogHelper.Info<ManifestWatcher>("manifest has changed, app pool is restarting (" + e.FullPath + ")");
-                HttpRuntime.UnloadAppDomain();
-                Dispose();    
+                //Ensure the app is not restarted multiple times for multiple saving during the same app domain execution
+                if (_isRestarting == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_isRestarting == false)
+                        {
+                            _isRestarting = true;
+
+                            LogHelper.Info<ManifestWatcher>("manifest has changed, app pool is restarting (" + e.FullPath + ")");
+                            HttpRuntime.UnloadAppDomain();
+                            Dispose();               
+                        }
+                    }
+                }                
             }
         }
 
