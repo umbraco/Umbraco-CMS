@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Factories
                 };
 
             if (entity.HasIdentity)
-                dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
+                dto.Id = int.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
 
             return dto;
         }

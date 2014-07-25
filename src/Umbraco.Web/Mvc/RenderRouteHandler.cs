@@ -228,8 +228,9 @@ namespace Umbraco.Web.Mvc
                     // If more than one route is found, find one with a matching action
                     if (surfaceRoutes.Count() > 1)
                     {
-                        surfaceRoute = surfaceRoutes.SingleOrDefault(x =>
-                                        x.Defaults["action"].ToString().InvariantEquals(postedInfo.ActionName));
+                        surfaceRoute = surfaceRoutes.FirstOrDefault(x =>
+                            x.Defaults["action"] != null &&
+                            x.Defaults["action"].ToString().InvariantEquals(postedInfo.ActionName));
                     }
                     else
                     {

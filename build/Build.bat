@@ -14,12 +14,14 @@ ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %rel
 
 ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise you'd have to run build.cmd twice
 SET nuGetFolder=%CD%\..\src\packages\
+..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/
 ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
 
 ECHO Removing the belle build folder to make sure everything is clean as a whistle
 RD ..\src\Umbraco.Web.UI.Client\build /Q /S
 
 ECHO Removing existing built files to make sure everything is clean as a whistle
+RMDIR /Q /S _BuildOutput
 DEL /F /Q UmbracoCms.*.zip
 DEL /F /Q UmbracoCms.*.nupkg
 DEL /F /Q webpihash.txt
