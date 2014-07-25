@@ -12,6 +12,7 @@ namespace umbraco.presentation.Search
 	/// <summary>
 	///		Summary description for quickEdit.
 	/// </summary>
+	[Obsolete("This is not used and will be removed in the future")]
 	public partial class QuickSearch : System.Web.UI.UserControl
 	{
 

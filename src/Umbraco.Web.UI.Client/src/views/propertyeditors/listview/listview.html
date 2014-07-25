@@ -95,18 +95,22 @@
                         </div>
                         <div class="pagination pagination-right">
                             <ul>
-                                <li><a href="#" ng-click="prev()" prevent-default>
-                                    <localize key="general_previous">Previous</localize>
-                                </a></li>
+                                <li ng-class="{disabled:options.pageNumber <= 1}">
+                                    <a href="#" ng-click="prev()" prevent-default>
+                                        <localize key="general_previous">Previous</localize>
+                                    </a>
+                                </li>
 
                                 <li ng-repeat="pgn in pagination track by $index"
-                                    ng-class="{active:$index==options.offset}">
+                                    ng-class="{active:$index + 1 == options.pageNumber}">
                                     <a href="#" ng-click="goToPage($index)" prevent-default>{{$index + 1}}</a>
                                 </li>
 
-                                <li><a href="#" ng-click="next()" prevent-default>
-                                    <localize key="general_next">Next</localize>
-                                </a></li>
+                                <li ng-class="{disabled:options.pageNumber >= listViewResultSet.totalPages}">
+                                    <a href="#" ng-click="next()" prevent-default>
+                                        <localize key="general_next">Next</localize>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 

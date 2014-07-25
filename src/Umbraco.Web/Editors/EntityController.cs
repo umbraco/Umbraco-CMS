@@ -24,6 +24,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
 using umbraco;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Web.Editors
 {
@@ -261,7 +262,7 @@ namespace Umbraco.Web.Editors
         {
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id", "bodyText" };
+            var fields = new[] { "id", "__NodeId" };
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -269,7 +270,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Member:
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
-                    fields = new[] { "id", "email", "loginName"};
+                    fields = new[] { "id", "__NodeId", "email", "loginName"};
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
@@ -289,29 +290,88 @@ namespace Umbraco.Web.Editors
             // the rest will be normal without wildcards
             var sb = new StringBuilder();
             
-            //node name exactly boost x 10
-            sb.Append("+(__nodeName:");
-            sb.Append(query.ToLower());
-            sb.Append("^10.0 ");
-
-            //node name normally with wildcards
-            sb.Append(" __nodeName:");            
-            sb.Append(query.ToLower());
-            sb.Append("* ");
-
-            foreach (var f in fields)
+            //check if text is surrounded by single or double quotes, if so, then exact match
+            var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
+                                     || Regex.IsMatch(query, "^\'.*?\'$");
+            
+            if (surroundedByQuotes)
             {
-                //additional fields normally
-                sb.Append(f);
-                sb.Append(":");
-                sb.Append(query);
-                sb.Append(" ");
+                //strip quotes, escape string, the replace again
+                query = query.Trim(new[] { '\"', '\'' });
+
+                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+
+                if (query.IsNullOrWhiteSpace())
+                {
+                    return new List<EntityBasic>();
+                }
+
+                //add back the surrounding quotes
+                query = string.Format("{0}{1}{0}", "\"", query);
+
+                //node name exactly boost x 10
+                sb.Append("+(__nodeName: (");
+                sb.Append(query.ToLower());
+                sb.Append(")^10.0 ");
+
+                foreach (var f in fields)
+                {
+                    //additional fields normally
+                    sb.Append(f);
+                    sb.Append(": (");
+                    sb.Append(query);
+                    sb.Append(") ");
+                }
+            }
+            else
+            {
+                if (query.Trim(new[] { '\"', '\'' }).IsNullOrWhiteSpace())
+                {
+                    return new List<EntityBasic>();
+                }
+                
+                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+
+                var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                //node name exactly boost x 10
+                sb.Append("+(__nodeName:");
+                sb.Append("\"");
+                sb.Append(query.ToLower());
+                sb.Append("\"");
+                sb.Append("^10.0 ");
+
+                //node name normally with wildcards
+                sb.Append(" __nodeName:");
+                sb.Append("(");
+                foreach (var w in querywords)
+                {
+                    sb.Append(w.ToLower());
+                    sb.Append("* ");
+                }
+                sb.Append(") ");
+
+
+                foreach (var f in fields)
+                {
+                    //additional fields normally
+                    sb.Append(f);
+                    sb.Append(":");
+                    sb.Append("(");
+                    foreach (var w in querywords)
+                    {
+                        sb.Append(w.ToLower());
+                        sb.Append("* ");
+                    }
+                    sb.Append(")");
+                    sb.Append(" ");
+                }
             }
 
             //must match index type
             sb.Append(") +__IndexType:");
             sb.Append(type);
-
+            
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
             
             var result = internalSearcher.Search(raw);
