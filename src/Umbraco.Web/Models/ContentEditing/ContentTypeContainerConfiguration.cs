@@ -29,5 +29,26 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "orderDirection")]
         [Required]
         public string OrderDirection { get; set; }
+
+        /// <summary>
+        /// Flag for whether bulk publishing is allowed
+        /// </summary>
+        [DataMember(Name = "allowBulkPublish")]
+        [Required]
+        public bool AllowBulkPublish { get; set; }
+
+        /// <summary>
+        /// Flag for whether bulk unpublishing is allowed
+        /// </summary>
+        [DataMember(Name = "allowBulkUnpublish")]
+        [Required]
+        public bool AllowBulkUnpublish { get; set; }
+
+        /// <summary>
+        /// Flag for whether bulk deletion is allowed
+        /// </summary>
+        [DataMember(Name = "allowBulkDelete")]
+        [Required]
+        public bool AllowBulkDelete { get; set; }
     }
 }

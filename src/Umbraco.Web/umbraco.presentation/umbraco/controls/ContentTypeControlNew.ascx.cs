@@ -7,26 +7,18 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Threading.Tasks;
 using System.Web.Routing;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
 using Umbraco.Web.UI.Controls;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
 using Umbraco.Core.IO;
-using umbraco.presentation;
 using umbraco.BasePages;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 using PropertyType = Umbraco.Core.Models.PropertyType;
@@ -377,6 +369,9 @@ namespace umbraco.controls
             var pageSize = 10;
             var orderBy = "UpdateDate";
             var orderDirection = "desc";
+            var allowBulkPublish = true;
+            var allowBulkUnpublish = true;
+            var allowBulkDelete = true;
             if (int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
             {
                 configProvided = true; 
@@ -394,6 +389,24 @@ namespace umbraco.controls
                 configProvided = true;
             }
 
+            if (ddlContainerConfigAllowBulkPublish.SelectedIndex > 0)
+            {
+                allowBulkPublish = ddlContainerConfigAllowBulkPublish.SelectedIndex == 1;
+                configProvided = true;
+            }
+
+            if (ddlContainerConfigAllowBulkUnpublish.SelectedIndex > 0)
+            {
+                allowBulkUnpublish = ddlContainerConfigAllowBulkUnpublish.SelectedIndex == 1;
+                configProvided = true;
+            }
+
+            if (ddlContainerConfigAllowBulkDelete.SelectedIndex > 0)
+            {
+                allowBulkDelete = ddlContainerConfigAllowBulkDelete.SelectedIndex == 1;
+                configProvided = true;
+            }
+
             if (configProvided)
             {
                 var containerConfig = new ContentTypeContainerConfiguration
@@ -401,6 +414,9 @@ namespace umbraco.controls
                     PageSize = pageSize,
                     OrderBy = orderBy,
                     OrderDirection = orderDirection,
+                    AllowBulkPublish = allowBulkPublish,
+                    AllowBulkUnpublish = allowBulkUnpublish,
+                    AllowBulkDelete = allowBulkDelete,
                 };
 
                 return JsonConvert.SerializeObject(containerConfig);
@@ -620,12 +636,18 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             ddlContainerConfigOrderBy.SelectedIndex = -1;
             ddlContainerConfigOrderDirection.SelectedIndex = -1;
+            ddlContainerConfigAllowBulkPublish.SelectedIndex = -1;
+            ddlContainerConfigAllowBulkUnpublish.SelectedIndex = -1;
+            ddlContainerConfigAllowBulkDelete.SelectedIndex = -1;
             if (!string.IsNullOrEmpty(_contentType.ContainerConfig))
             {
                 var containerConfig = GetContentTypeContainerConfigurationFromJsonString(_contentType.ContainerConfig);
                 txtContainerConfigPageSize.Text = containerConfig.PageSize.ToString();
                 ddlContainerConfigOrderBy.Items.FindByValue(containerConfig.OrderBy).Selected = true;
                 ddlContainerConfigOrderDirection.Items.FindByValue(containerConfig.OrderDirection).Selected = true;
+                ddlContainerConfigAllowBulkPublish.SelectedIndex = containerConfig.AllowBulkPublish ? 1 : 2;
+                ddlContainerConfigAllowBulkUnpublish.SelectedIndex = containerConfig.AllowBulkUnpublish ? 1 : 2;
+                ddlContainerConfigAllowBulkDelete.SelectedIndex = containerConfig.AllowBulkDelete ? 1 : 2;
             }
             else
             {
@@ -1412,7 +1434,16 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderBy;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderDirection;
-        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderDirection;  
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderDirection;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowBulkPublish;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAllowBulkPublish;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowBulkUnpublish;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAllowBulkUnpublish;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowBulkDelete;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAllowBulkDelete;  
 
         /// <summary>
         /// txtNewTab control.
