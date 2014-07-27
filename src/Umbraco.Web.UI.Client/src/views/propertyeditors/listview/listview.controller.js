@@ -29,16 +29,21 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         items: []
     };
 
+    // Set default default options (i.e. those if no container configuration has been saved)
+    $scope.options = {
+        pageSize: 10,
+        pageNumber: 1,
+        filter: '',
+        orderBy: 'UpdateDate',
+        orderDirection: "desc"
+    };
+
     // Retrieve the container configuration for the content type and set options before presenting initial view
     contentTypeResource.getContainerConfig($routeParams.id)
         .then(function (config) {
-            $scope.options = {
-                pageSize: config.pageSize,
-                pageNumber: 1,
-                filter: '',
-                orderBy: 'UpdateDate',
-                orderDirection: "desc"
-            };
+            if (typeof(config.pageSize) !== 'undefined') {
+                $scope.options.pageSize = config.pageSize;
+            }
 
             $scope.initView();
         });

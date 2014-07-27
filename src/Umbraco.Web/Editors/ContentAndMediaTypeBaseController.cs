@@ -41,7 +41,12 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(contentItem.ContentType.ContainerConfig);
+            if (!string.IsNullOrEmpty(contentItem.ContentType.ContainerConfig))
+            {
+                return JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(contentItem.ContentType.ContainerConfig);
+            }
+
+            return null;
         }
     }
 }
