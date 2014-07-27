@@ -81,7 +81,7 @@
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" /><br />            
         </cc2:PropertyPanel>   
 
-        <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="List view page size<br/><small>If selected as a container type the page size is defined here (default if not provided: 10)</small>">
+        <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="List view page size<br/><small>Number of entries per page if selected for display in list view</small>">
             <asp:TextBox ID="txtContainerConfigPageSize" CssClass="guiInputText guiInputStandardSize" runat="server" type="number" min="1" max="100"></asp:TextBox>        
         </cc2:PropertyPanel> 
     </cc2:Pane>

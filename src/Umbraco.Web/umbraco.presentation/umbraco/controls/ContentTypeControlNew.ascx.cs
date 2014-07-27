@@ -372,18 +372,29 @@ namespace umbraco.controls
         /// <returns>Container configuration as JSON string</returns>
         private string GetProvidedContainerConfigAsJsonString()
         {
+            var configProvided = false;
+
             int pageSize;
-            if (!int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
+            if (int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
+            {
+                configProvided = true; 
+            }
+            else
             {
                 pageSize = 10;  // - default page size if none configured
             }
 
-            var containerConfig = new ContentTypeContainerConfiguration
+            if (configProvided)
             {
-                PageSize = pageSize,
-            };
+                var containerConfig = new ContentTypeContainerConfiguration
+                {
+                    PageSize = pageSize,
+                };
 
-            return JsonConvert.SerializeObject(containerConfig);
+                return JsonConvert.SerializeObject(containerConfig);
+            }
+
+            return string.Empty;
         }
 
         /// <summary>
