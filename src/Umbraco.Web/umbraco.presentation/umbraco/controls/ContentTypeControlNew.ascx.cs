@@ -382,9 +382,9 @@ namespace umbraco.controls
                 configProvided = true; 
             }
 
-            if (!string.IsNullOrEmpty(txtContainerConfigOrderBy.Text))
+            if (ddlContainerConfigOrderBy.SelectedIndex > 0)
             {
-                orderBy = txtContainerConfigOrderBy.Text;
+                orderBy = ddlContainerConfigOrderBy.SelectedItem.Value;
                 configProvided = true; 
             }
 
@@ -618,19 +618,18 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             allowAtRoot.Checked = _contentType.AllowAtRoot;
             cb_isContainer.Checked = _contentType.IsContainerContentType;
 
+            ddlContainerConfigOrderBy.SelectedIndex = -1;
+            ddlContainerConfigOrderDirection.SelectedIndex = -1;
             if (!string.IsNullOrEmpty(_contentType.ContainerConfig))
             {
                 var containerConfig = GetContentTypeContainerConfigurationFromJsonString(_contentType.ContainerConfig);
                 txtContainerConfigPageSize.Text = containerConfig.PageSize.ToString();
-                txtContainerConfigOrderBy.Text = containerConfig.OrderBy;
-                ddlContainerConfigOrderDirection.SelectedIndex = -1;
+                ddlContainerConfigOrderBy.Items.FindByValue(containerConfig.OrderBy).Selected = true;
                 ddlContainerConfigOrderDirection.Items.FindByValue(containerConfig.OrderDirection).Selected = true;
             }
             else
             {
                 txtContainerConfigPageSize.Text = string.Empty;
-                txtContainerConfigOrderBy.Text = string.Empty;
-                ddlContainerConfigOrderDirection.SelectedIndex = -1;
             }
         }
 
@@ -1410,7 +1409,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected global::System.Web.UI.WebControls.TextBox txtContainerConfigPageSize;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderBy;
-        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigOrderBy;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderBy;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderDirection;
         protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderDirection;  

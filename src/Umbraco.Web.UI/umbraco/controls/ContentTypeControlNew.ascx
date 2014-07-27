@@ -86,7 +86,12 @@
         </cc2:PropertyPanel> 
 
         <cc2:PropertyPanel ID="pp_containerConfigOrderBy" runat="server" Text="List view order by<br/><small>The column for the default order for the list (default if not provided: UpdateDate)</small>">
-            <asp:TextBox ID="txtContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>        
+            <asp:DropDownList ID="ddlContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server">
+                <asp:ListItem Value=""></asp:ListItem>
+                <asp:ListItem Value="Name">Node Name</asp:ListItem>
+                <asp:ListItem Value="UpdateDate">Last Edited Date</asp:ListItem>
+                <asp:ListItem Value="Owner">Updated By</asp:ListItem>
+            </asp:DropDownList>        
         </cc2:PropertyPanel> 
 
         <cc2:PropertyPanel ID="pp_containerConfigOrderDirection" runat="server" Text="List view order direction<br/><small>The direction of the default order for the list (default if not provided: Descending)</small>">
