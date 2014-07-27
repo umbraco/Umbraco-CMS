@@ -29,13 +29,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         items: []
     };
 
-    // Set default default options (i.e. those if no container configuration has been saved)
+    // Set "default default" options (i.e. those if no container configuration has been saved)
     $scope.options = {
         pageSize: 10,
         pageNumber: 1,
         filter: '',
         orderBy: 'UpdateDate',
-        orderDirection: "desc"
+        orderDirection: "desc",
+        allowBulkPublish: true,
+        allowBulkUnpublish: true,
+        allowBulkDelete: true,
     };
 
     // Retrieve the container configuration for the content type and set options before presenting initial view
@@ -51,6 +54,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             if (typeof (config.orderDirection) !== 'undefined') {
                 $scope.options.orderDirection = config.orderDirection;
+            }
+
+            if (typeof (config.allowBulkPublish) !== 'undefined') {
+                $scope.options.allowBulkPublish = config.allowBulkPublish;
+            }
+
+            if (typeof (config.allowBulkUnpublish) !== 'undefined') {
+                $scope.options.allowBulkUnpublish = config.allowBulkUnpublish;
+            }
+
+            if (typeof (config.allowBulkDelete) !== 'undefined') {
+                $scope.options.allowBulkDelete = config.allowBulkDelete;
             }
 
             $scope.initView();
