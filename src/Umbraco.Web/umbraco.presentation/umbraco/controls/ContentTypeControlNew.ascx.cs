@@ -31,6 +31,8 @@ using umbraco.presentation;
 using umbraco.BasePages;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 using PropertyType = Umbraco.Core.Models.PropertyType;
+using Umbraco.Web.Models.ContentEditing;
+using Newtonsoft.Json;
 
 namespace umbraco.controls
 {
@@ -295,12 +297,13 @@ namespace umbraco.controls
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
                     _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
-                        _contentType.ContentTypeItem.Icon = tb_icon.Value;
+                    _contentType.ContentTypeItem.Icon = tb_icon.Value;
                     _contentType.ContentTypeItem.Description = description.Text;
                         //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
                     _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
-                        _contentType.ContentTypeItem.IsContainer = cb_isContainer.Checked;
-
+                    _contentType.ContentTypeItem.IsContainer = cb_isContainer.Checked;
+                    _contentType.ContentTypeItem.ContainerConfig = GetProvidedContainerConfigAsJsonString();
+                    
                     int i = 0;
                     var ids = SaveAllowedChildTypes();
                     _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
@@ -352,6 +355,35 @@ namespace umbraco.controls
 
             //execute the async tasks
             Page.ExecuteRegisteredAsyncTasks();
+        }
+
+        /// <summary>
+        /// Helper to retrive the strongly typed container configuration from the persisted JSON string
+        /// </summary>
+        /// <returns>Container configuration as JSON string</returns>
+        private ContentTypeContainerConfiguration GetContentTypeContainerConfigurationFromJsonString(string config)
+        {
+            return JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(config);
+        }
+
+        /// <summary>
+        /// Helper to parse the container configuration provided by the form fields into a JSON string for persistance
+        /// </summary>
+        /// <returns>Container configuration as JSON string</returns>
+        private string GetProvidedContainerConfigAsJsonString()
+        {
+            int pageSize;
+            if (!int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
+            {
+                pageSize = 10;  // - default page size if none configured
+            }
+
+            var containerConfig = new ContentTypeContainerConfiguration
+            {
+                PageSize = pageSize,
+            };
+
+            return JsonConvert.SerializeObject(containerConfig);
         }
 
         /// <summary>
@@ -562,6 +594,16 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             allowAtRoot.Checked = _contentType.AllowAtRoot;
             cb_isContainer.Checked = _contentType.IsContainerContentType;
+
+            if (!string.IsNullOrEmpty(_contentType.ContainerConfig))
+            {
+                var containerConfig = GetContentTypeContainerConfigurationFromJsonString(_contentType.ContainerConfig);
+                txtContainerConfigPageSize.Text = containerConfig.PageSize.ToString();
+            }
+            else
+            {
+                txtContainerConfigPageSize.Text = string.Empty;
+            }
         }
 
         private int[] SaveAllowedChildTypes()
@@ -1334,7 +1376,10 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected global::umbraco.uicontrols.PropertyPanel pp_newTab;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_isContainer;
-        protected global::System.Web.UI.WebControls.CheckBox cb_isContainer;    
+        protected global::System.Web.UI.WebControls.CheckBox cb_isContainer;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigPageSize;
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigPageSize;  
 
         /// <summary>
         /// txtNewTab control.

@@ -80,6 +80,10 @@
         <cc2:PropertyPanel ID="pp_isContainer" runat="server" Text="Container<br/><small>A container type doesn't display children in the tree, but as a grid instead</small>">
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" /><br />            
         </cc2:PropertyPanel>   
+
+        <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="List view page size<br/><small>If selected as a container type the page size is defined here (default if not provided: 10)</small>">
+            <asp:TextBox ID="txtContainerConfigPageSize" CssClass="guiInputText guiInputStandardSize" runat="server" type="number" min="1" max="100"></asp:TextBox>        
+        </cc2:PropertyPanel> 
     </cc2:Pane>
   <cc2:Pane ID="Pane5" runat="server">
  
