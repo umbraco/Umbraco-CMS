@@ -24,8 +24,8 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
-    [PluginController("UmbracoApi")]    
-    public class ContentTypeController : UmbracoAuthorizedJsonController
+    [PluginController("UmbracoApi")]
+    public class ContentTypeController : ContentAndMediaTypeBaseController
     {
         private ICultureDictionary _cultureDictionary;
 
@@ -85,21 +85,6 @@ namespace Umbraco.Web.Editors
             }
 
             return basics;
-        }
-
-        /// <summary>
-        /// Returns the container configuration JSON structure for the content item id passed in
-        /// </summary>
-        /// <param name="contentId"></param>
-        public ContentTypeContainerConfiguration GetContainerConfig(int contentId)
-        {
-            var contentItem = Services.ContentService.GetById(contentId);
-            if (contentItem == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(contentItem.ContentType.ContainerConfig);
         }
 
         // TODO: This should really be centralized and used anywhere globalization applies.
