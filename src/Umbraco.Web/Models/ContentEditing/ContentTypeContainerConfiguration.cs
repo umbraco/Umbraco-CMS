@@ -12,8 +12,22 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// The page size for the list
         /// </summary>
-        [DataMember(Name = "pageSize", IsRequired = true)]
+        [DataMember(Name = "pageSize")]
         [Required]
         public int PageSize { get; set; }
+
+        /// <summary>
+        /// The default order by column for the list
+        /// </summary>
+        [DataMember(Name = "orderBy")]
+        [Required]
+        public string OrderBy { get; set; }
+
+        /// <summary>
+        /// The default order direction for the list
+        /// </summary>
+        [DataMember(Name = "orderDirection")]
+        [Required]
+        public string OrderDirection { get; set; }
     }
 }

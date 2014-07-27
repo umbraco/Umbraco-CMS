@@ -45,6 +45,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 $scope.options.pageSize = config.pageSize;
             }
 
+            if (typeof (config.orderBy) !== 'undefined') {
+                $scope.options.orderBy = config.orderBy;
+            }
+
+            if (typeof (config.orderDirection) !== 'undefined') {
+                $scope.options.orderDirection = config.orderDirection;
+            }
+
             $scope.initView();
         });
 

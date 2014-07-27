@@ -8,7 +8,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Routing;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -374,14 +373,25 @@ namespace umbraco.controls
         {
             var configProvided = false;
 
-            int pageSize;
+            // Set defaults for saving if not all fields are provided
+            var pageSize = 10;
+            var orderBy = "UpdateDate";
+            var orderDirection = "desc";
             if (int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
             {
                 configProvided = true; 
             }
-            else
+
+            if (!string.IsNullOrEmpty(txtContainerConfigOrderBy.Text))
             {
-                pageSize = 10;  // - default page size if none configured
+                orderBy = txtContainerConfigOrderBy.Text;
+                configProvided = true; 
+            }
+
+            if (ddlContainerConfigOrderDirection.SelectedIndex > 0)
+            {
+                orderDirection = ddlContainerConfigOrderDirection.SelectedItem.Value;
+                configProvided = true;
             }
 
             if (configProvided)
@@ -389,6 +399,8 @@ namespace umbraco.controls
                 var containerConfig = new ContentTypeContainerConfiguration
                 {
                     PageSize = pageSize,
+                    OrderBy = orderBy,
+                    OrderDirection = orderDirection,
                 };
 
                 return JsonConvert.SerializeObject(containerConfig);
@@ -610,10 +622,15 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 var containerConfig = GetContentTypeContainerConfigurationFromJsonString(_contentType.ContainerConfig);
                 txtContainerConfigPageSize.Text = containerConfig.PageSize.ToString();
+                txtContainerConfigOrderBy.Text = containerConfig.OrderBy;
+                ddlContainerConfigOrderDirection.SelectedIndex = -1;
+                ddlContainerConfigOrderDirection.Items.FindByValue(containerConfig.OrderDirection).Selected = true;
             }
             else
             {
                 txtContainerConfigPageSize.Text = string.Empty;
+                txtContainerConfigOrderBy.Text = string.Empty;
+                ddlContainerConfigOrderDirection.SelectedIndex = -1;
             }
         }
 
@@ -1390,7 +1407,13 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected global::System.Web.UI.WebControls.CheckBox cb_isContainer;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigPageSize;
-        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigPageSize;  
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigPageSize;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderBy;
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigOrderBy;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderDirection;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderDirection;  
 
         /// <summary>
         /// txtNewTab control.
