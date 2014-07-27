@@ -30,7 +30,7 @@ angular.module("umbraco")
             var stylesheets = [];
             var styleFormats = [];
             var await = [];
-            if (!editorConfig.maxImageSize) {
+            if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
