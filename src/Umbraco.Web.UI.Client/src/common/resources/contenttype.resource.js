@@ -68,6 +68,38 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                        "GetAllowedChildren",
                        [{ contentId: contentId }])),
                'Failed to retrieve data for content id ' + contentId);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#getContainerConfig
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Returns a JSON structure for configuration of the container content type
+         *
+         * ##usage
+         * <pre>
+         * contentTypeResource.getContainerConfig(1234)
+         *    .then(function(config) {
+         *      $scope.options = {
+         *         pageSize: config.pageSize,
+         *      };
+         *    });
+         * </pre> 
+         * @param {Int} contentId id of the content item to retrive the container config for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getContainerConfig: function (contentId) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetContainerConfig",
+                       [{ contentId: contentId }])),
+               'Failed to retrieve container config data for content id ' + contentId);
         }
 
     };

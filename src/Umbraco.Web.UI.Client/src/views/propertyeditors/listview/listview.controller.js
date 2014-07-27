@@ -29,14 +29,19 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         items: []
     };
 
-    $scope.options = {
-        pageSize: 10,
-        pageNumber: 1,
-        filter: '',
-        orderBy: 'UpdateDate',
-        orderDirection: "desc"
-    };
+    // Retrieve the container configuration for the content type and set options before presenting initial view
+    contentTypeResource.getContainerConfig($routeParams.id)
+        .then(function (config) {
+            $scope.options = {
+                pageSize: config.pageSize,
+                pageNumber: 1,
+                filter: '',
+                orderBy: 'UpdateDate',
+                orderDirection: "desc"
+            };
 
+            $scope.initView();
+        });
 
     $scope.next = function () {
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
@@ -54,13 +59,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
         $scope.options.orderBy = field;
 
-
         if ($scope.options.orderDirection === "desc") {
             $scope.options.orderDirection = "asc";
         } else {
             $scope.options.orderDirection = "desc";
         }
-
 
         $scope.reloadView($scope.contentId);
     };
@@ -72,6 +75,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     };
 
+    $scope.initView = function () {
+        if ($routeParams.id) {
+            $scope.pagination = new Array(10);
+            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+            $scope.reloadView($routeParams.id);
+
+            $scope.contentId = $routeParams.id;
+            $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
+        }
+    };
+
     /*Loads the search results, based on parameters set in prev,next,sort and so on*/
     /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
     with simple values */
@@ -80,7 +94,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         contentResource.getChildren(id, $scope.options).then(function (data) {
 
             $scope.listViewResultSet = data;
-            $scope.pagination = [];            
+            $scope.pagination = [];
 
             for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
                 $scope.pagination[i] = { index: i, name: i + 1 };
@@ -235,16 +249,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 });
         }
     };
-
-    if ($routeParams.id) {
-        $scope.pagination = new Array(10);
-        $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
-        $scope.reloadView($routeParams.id);
-
-        $scope.contentId = $routeParams.id;
-        $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
-
-    }
 
 }
 

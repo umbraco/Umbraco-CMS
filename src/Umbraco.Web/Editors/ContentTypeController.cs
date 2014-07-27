@@ -12,6 +12,7 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.Editors
 {
@@ -84,6 +85,21 @@ namespace Umbraco.Web.Editors
             }
 
             return basics;
+        }
+
+        /// <summary>
+        /// Returns the container configuration JSON structure for the content item id passed in
+        /// </summary>
+        /// <param name="contentId"></param>
+        public ContentTypeContainerConfiguration GetContainerConfig(int contentId)
+        {
+            var contentItem = Services.ContentService.GetById(contentId);
+            if (contentItem == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(contentItem.ContentType.ContainerConfig);
         }
 
         // TODO: This should really be centralized and used anywhere globalization applies.

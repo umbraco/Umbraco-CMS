@@ -39,6 +39,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool IsContainer { get; set; }
 
+        [Column("containerConfig")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string ContainerConfig { get; set; }
+
         [Column("allowAtRoot")]
         [Constraint(Default = "0")]
         public bool AllowAtRoot { get; set; }

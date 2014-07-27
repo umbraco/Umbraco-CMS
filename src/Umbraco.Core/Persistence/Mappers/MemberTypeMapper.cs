@@ -48,6 +48,7 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<MemberType, ContentTypeDto>(src => src.Description, dto => dto.Description);
                 CacheMap<MemberType, ContentTypeDto>(src => src.Icon, dto => dto.Icon);
                 CacheMap<MemberType, ContentTypeDto>(src => src.IsContainer, dto => dto.IsContainer);
+                CacheMap<MemberType, ContentTypeDto>(src => src.ContainerConfig, dto => dto.ContainerConfig);
                 CacheMap<MemberType, ContentTypeDto>(src => src.Thumbnail, dto => dto.Thumbnail);
             }
         }
