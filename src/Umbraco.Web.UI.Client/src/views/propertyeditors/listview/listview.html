@@ -58,10 +58,10 @@
                         </a>
                     </td>
 
-                    <td ng-repeat="alias in options.additionalColumnAliases">
-                        <a href="#" ng-click="sort(alias)" prevent-default>
-                            <localize ng-if="getColumnLocalizationKey($index) !== ''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>   
-                            <span ng-if="getColumnLocalizationKey($index) === ''">{{getColumnName($index)}}</span>                         
+                    <td ng-repeat="column in options.additionalColumns">
+                        <a href="#" ng-click="sort(column.alias)" prevent-default>
+                            <localize ng-if="getColumnLocalizationKey($index) !== ''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>
+                            <span ng-if="getColumnLocalizationKey($index) === ''">{{getColumnName($index)}}</span>
                             <i class="icon-sort"></i>
                         </a>
                     </td>
@@ -87,8 +87,8 @@
                         <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a>
                     </td>
 
-                    <td ng-repeat="alias in options.additionalColumnAliases">
-                        {{getPropertyValue(alias, result)}}
+                    <td ng-repeat="column in options.additionalColumns">
+                        {{getPropertyValue(column.alias, result)}}
                     </td>
 
                     <td></td>

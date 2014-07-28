@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -48,14 +49,11 @@ namespace Umbraco.Web.Editors
             if (!string.IsNullOrEmpty(contentItem.ContentType.ContainerConfig))
             {
                 var containerConfig = JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(contentItem.ContentType.ContainerConfig);
+                containerConfig.AdditionalColumns = new List<ContentTypeContainerConfiguration.AdditionalColumnDetail>();
 
-                // Populate the column headings and localization keys
+                // Populate the column headings and localization keys                
                 if (!string.IsNullOrEmpty(containerConfig.AdditionalColumnAliases))
                 {
-                    var aliases = containerConfig.AdditionalColumnAliases.Split(',');
-                    var headings = new string[aliases.Length];
-                    var localizationKeys = new string[aliases.Length];
-
                     // Find all the properties for doc types that might be in the list
                     var allowedContentTypeIds = contentItem.ContentType.AllowedContentTypes
                         .Select(x => x.Id.Value)
@@ -65,38 +63,43 @@ namespace Umbraco.Web.Editors
                         .SelectMany(x => x.PropertyTypes)
                         .ToList();
 
-                    for (int i = 0; i < aliases.Length; i++)
+                    foreach (var alias in containerConfig.AdditionalColumnAliases.Split(','))
                     {
+                        var column = new ContentTypeContainerConfiguration.AdditionalColumnDetail
+                        {
+                            Alias = alias,                            
+                        };
+
                         // Try to find heading from custom property (getting the name from the alias)
                         // - need to look in children of the current content's content type
                         var property = allPropertiesOfAllowedContentTypes
-                            .FirstOrDefault(x => x.Alias == aliases[i].ToFirstLower());
+                            .FirstOrDefault(x => x.Alias == alias.ToFirstLower());
                         if (property != null)
                         {
-                            headings[i] = property.Name;
+                            column.Header = property.Name;
+                            column.LocalizationKey = string.Empty;
                         }
-                        else if (aliases[i] == "UpdateDate")
+                        else if (alias == "UpdateDate")
                         {
                             // Special case to restore hard-coded column titles
-                            headings[i] = "Last edited";
-                            localizationKeys[i] = "defaultdialogs_lastEdited";
+                            column.Header = "Last edited";
+                            column.LocalizationKey = "defaultdialogs_lastEdited";
                         }
-                        else if (aliases[i] == "Owner")
+                        else if (alias == "Owner")
                         {
                             // Special case to restore hard-coded column titles (2)
-                            headings[i] = "Updated by";
-                            localizationKeys[i] = "content_updatedBy";
+                            column.Header = "Updated by";
+                            column.LocalizationKey = "content_updatedBy";
                         }
                         else
                         {
                             // Otherwise just sentence case the alias
-                            headings[i] = aliases[i].ToFirstUpper().SplitPascalCasing();
-                            localizationKeys[i] = "content_" + aliases[i].ToFirstLower();
+                            column.Header = alias.ToFirstUpper().SplitPascalCasing();
+                            column.LocalizationKey = "content_" + alias.ToFirstLower();
                         }
-                    }
 
-                    containerConfig.AdditionalColumnHeaders = string.Join(",", headings);
-                    containerConfig.AdditionalColumnLocalizationKeys = string.Join(",", localizationKeys);
+                        containerConfig.AdditionalColumns.Add(column);
+                    }
                 }
 
                 return containerConfig;

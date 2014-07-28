@@ -39,9 +39,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         allowBulkPublish: true,
         allowBulkUnpublish: true,
         allowBulkDelete: true,
-        additionalColumnAliases: ['UpdateDate', 'Owner'],
-        additionalColumnHeaders: ['Last edited', 'Updated by'],
-        additionalColumnLocalizationKeys: ['defaultdialogs_lastEdited', 'content_updatedBy']
+        additionalColumns: [
+                { alias: 'UpdateDate', header: 'Last edited', localizationKey: 'defaultdialogs_lastEdited' },
+                { alias: 'Owner', header: 'Last edited', localizationKey: 'content_updatedBy' }
+            ]
     };
 
     // Retrieve the container configuration for the content type and set options before presenting initial view
@@ -50,10 +51,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             if (typeof config.pageSize !== 'undefined') {
                 $scope.options.pageSize = config.pageSize;
             }
-            if (typeof config.additionalColumnAliases !== 'undefined') {
-                $scope.options.additionalColumnAliases = config.additionalColumnAliases.split(',');
-                $scope.options.additionalColumnHeaders = config.additionalColumnHeaders.split(',');
-                $scope.options.additionalColumnLocalizationKeys = config.additionalColumnLocalizationKeys.split(',');
+            if (typeof config.additionalColumns !== 'undefined') {
+                $scope.options.additionalColumns = config.additionalColumns;
             }
             if (typeof config.orderBy !== 'undefined') {
                 $scope.options.orderBy = config.orderBy;
@@ -138,11 +137,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     $scope.getColumnName = function (index) {
-        return $scope.options.additionalColumnHeaders[index];
+        return $scope.options.additionalColumns[index].header;
     };
 
     $scope.getColumnLocalizationKey = function (index) {
-        return $scope.options.additionalColumnLocalizationKeys[index];
+        return $scope.options.additionalColumns[index].localizationKey;
     };
 
     $scope.getPropertyValue = function (alias, result) {
