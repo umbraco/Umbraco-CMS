@@ -52,15 +52,15 @@
                         <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()">
                     </td>
                     <td>
-                        <a href="#" ng-click="sort('Name')" prevent-default>
+                        <a href="#" ng-click="sort('Name', true)" prevent-default>
                             <localize key="general_name">Name</localize>
                             <i class="icon-sort"></i>
                         </a>
                     </td>
 
                     <td ng-repeat="column in options.additionalColumns">
-                        <a href="#" ng-click="sort(column.alias)" prevent-default>
-                            <localize ng-if="getColumnLocalizationKey($index) !== ''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>
+                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'no-sort':!column.allowSorting}" prevent-default>
+                            <localize ng-if="getColumnLocalizationKey($index) !==''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>
                             <span ng-if="getColumnLocalizationKey($index) === ''">{{getColumnName($index)}}</span>
                             <i class="icon-sort"></i>
                         </a>

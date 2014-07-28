@@ -70,6 +70,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
             [DataMember(Name = "localizationKey")]
             public string LocalizationKey { get; set; }
+
+            [DataMember(Name = "allowSorting")]
+            public bool AllowSorting { get; set; }
         }
     }
 }

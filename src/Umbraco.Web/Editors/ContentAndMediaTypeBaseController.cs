@@ -67,7 +67,9 @@ namespace Umbraco.Web.Editors
                     {
                         var column = new ContentTypeContainerConfiguration.AdditionalColumnDetail
                         {
-                            Alias = alias,                            
+                            Alias = alias,     
+                            LocalizationKey = string.Empty,
+                            AllowSorting = true,
                         };
 
                         // Try to find heading from custom property (getting the name from the alias)
@@ -77,7 +79,7 @@ namespace Umbraco.Web.Editors
                         if (property != null)
                         {
                             column.Header = property.Name;
-                            column.LocalizationKey = string.Empty;
+                            column.AllowSorting = false;    // can't sort on custom property columns
                         }
                         else if (alias == "UpdateDate")
                         {

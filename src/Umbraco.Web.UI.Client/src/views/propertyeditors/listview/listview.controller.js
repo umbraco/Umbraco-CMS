@@ -85,17 +85,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.reloadView($scope.contentId);
     };
 
-    $scope.sort = function (field) {
+    $scope.sort = function (field, allow) {
+        if (allow) {
+            $scope.options.orderBy = field;
 
-        $scope.options.orderBy = field;
+            if ($scope.options.orderDirection === "desc") {
+                $scope.options.orderDirection = "asc";
+            } else {
+                $scope.options.orderDirection = "desc";
+            }
 
-        if ($scope.options.orderDirection === "desc") {
-            $scope.options.orderDirection = "asc";
-        } else {
-            $scope.options.orderDirection = "desc";
+            $scope.reloadView($scope.contentId);
         }
-
-        $scope.reloadView($scope.contentId);
     };
 
     $scope.prev = function () {
