@@ -34,37 +34,40 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         pageSize: 10,
         pageNumber: 1,
         filter: '',
-        orderBy: 'UpdateDate',
+        orderBy: 'updateDate',
         orderDirection: "desc",
         allowBulkPublish: true,
         allowBulkUnpublish: true,
         allowBulkDelete: true,
+        additionalColumnAliases: ['UpdateDate', 'Owner'],
+        additionalColumnHeaders: ['Last edited', 'Updated by'],
+        additionalColumnLocalizationKeys: ['defaultdialogs_lastEdited', 'content_updatedBy']
     };
 
     // Retrieve the container configuration for the content type and set options before presenting initial view
     contentTypeResource.getContainerConfig($routeParams.id)
         .then(function (config) {
-            if (typeof(config.pageSize) !== 'undefined') {
+            if (typeof config.pageSize !== 'undefined') {
                 $scope.options.pageSize = config.pageSize;
             }
-
-            if (typeof (config.orderBy) !== 'undefined') {
+            if (typeof config.additionalColumnAliases !== 'undefined') {
+                $scope.options.additionalColumnAliases = config.additionalColumnAliases.split(',');
+                $scope.options.additionalColumnHeaders = config.additionalColumnHeaders.split(',');
+                $scope.options.additionalColumnLocalizationKeys = config.additionalColumnLocalizationKeys.split(',');
+            }
+            if (typeof config.orderBy !== 'undefined') {
                 $scope.options.orderBy = config.orderBy;
             }
-
-            if (typeof (config.orderDirection) !== 'undefined') {
+            if (typeof config.orderDirection !== 'undefined') {
                 $scope.options.orderDirection = config.orderDirection;
             }
-
-            if (typeof (config.allowBulkPublish) !== 'undefined') {
+            if (typeof config.allowBulkPublish !== 'undefined') {
                 $scope.options.allowBulkPublish = config.allowBulkPublish;
             }
-
-            if (typeof (config.allowBulkUnpublish) !== 'undefined') {
+            if (typeof config.allowBulkUnpublish !== 'undefined') {
                 $scope.options.allowBulkUnpublish = config.allowBulkUnpublish;
             }
-
-            if (typeof (config.allowBulkDelete) !== 'undefined') {
+            if (typeof config.allowBulkDelete !== 'undefined') {
                 $scope.options.allowBulkDelete = config.allowBulkDelete;
             }
 
@@ -120,7 +123,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.reloadView = function (id) {
         contentResource.getChildren(id, $scope.options).then(function (data) {
-
             $scope.listViewResultSet = data;
             $scope.pagination = [];
 
@@ -133,6 +135,56 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             }
 
         });
+    };
+
+    $scope.getColumnName = function (index) {
+        return $scope.options.additionalColumnHeaders[index];
+    };
+
+    $scope.getColumnLocalizationKey = function (index) {
+        return $scope.options.additionalColumnLocalizationKeys[index];
+    };
+
+    $scope.getPropertyValue = function (alias, result) {
+
+        // Camel-case the alias
+        alias = alias.charAt(0).toLowerCase() + alias.slice(1);
+
+        // First try to pull the value directly from the alias (e.g. updatedBy)        
+        var value = result[alias];
+
+        // If this returns an object, look for the name property of that (e.g. owner.name)
+        if (value === Object(value)) {
+            value = value['name'];
+        }
+
+        // If we've got nothing yet, look at a user defined property
+        if (typeof value === 'undefined') {
+            value = $scope.getCustomPropertyValue(alias, result.properties);
+        }
+
+        // Return what we've got
+        return value;
+
+    };
+
+    $scope.getCustomPropertyValue = function (alias, properties) {
+        var value = '';
+        var index = 0;
+        var foundAlias = false;
+        for (var i = 0; i < properties.length; i++) {            
+            if (properties[i].alias == alias) {
+                foundAlias = true;
+                break;
+            }
+            index++;
+        }
+
+        if (foundAlias) {
+            value = properties[index].value;
+        }
+
+        return value;
     };
 
     //assign debounce method to the search to limit the queries

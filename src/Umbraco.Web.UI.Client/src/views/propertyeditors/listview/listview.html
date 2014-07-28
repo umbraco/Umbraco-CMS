@@ -49,16 +49,23 @@
             <thead>
                 <tr>
                     <td style="width: 35px">
-                        <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()"></td>
-                    <td><a href="#" ng-click="sort('Name')" prevent-default>
-                        <localize key="general_name">Name</localize>
-                        <i class="icon-sort"></i></a></td>
-                    <td><a href="#" ng-click="sort('UpdateDate')" prevent-default>
-                        <localize key="defaultdialogs_lastEdited">Last edited</localize>
-                        <i class="icon-sort"></i></a></td>
-                    <td><a href="#" ng-click="sort('Owner')" prevent-default>
-                        <localize key="content_updatedBy">Updated by</localize>
-                        <i class="icon-sort"></i></a></td>
+                        <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()">
+                    </td>
+                    <td>
+                        <a href="#" ng-click="sort('Name')" prevent-default>
+                            <localize key="general_name">Name</localize>
+                            <i class="icon-sort"></i>
+                        </a>
+                    </td>
+
+                    <td ng-repeat="alias in options.additionalColumnAliases">
+                        <a href="#" ng-click="sort(alias)" prevent-default>
+                            <localize ng-if="getColumnLocalizationKey($index) !== ''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>   
+                            <span ng-if="getColumnLocalizationKey($index) === ''">{{getColumnName($index)}}</span>                         
+                            <i class="icon-sort"></i>
+                        </a>
+                    </td>
+
                     <td>
                         <form class="pull-right" novalidate>
                             <i class="icon-search"></i>
@@ -74,16 +81,16 @@
 
                     <td>
                         <i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
-
-                        <input type="checkbox" ng-model="result.selected"></td>
+                        <input type="checkbox" ng-model="result.selected">
+                    </td>
                     <td>
-                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td>{{result.updateDate|date:'medium'}} 
-                        <!--<<span class="label label-success">Publish</span>-->
+                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a>
                     </td>
-                    <td>{{result.owner.name}}
-                        <!--<span class="label">Admin</span>-->
+
+                    <td ng-repeat="alias in options.additionalColumnAliases">
+                        {{getPropertyValue(alias, result)}}
                     </td>
+
                     <td></td>
                 </tr>
             </tbody>

@@ -367,6 +367,7 @@ namespace umbraco.controls
 
             // Set defaults for saving if not all fields are provided
             var pageSize = 10;
+            var additionalColumns = "UpdateDate,Owner";
             var orderBy = "UpdateDate";
             var orderDirection = "desc";
             var allowBulkPublish = true;
@@ -377,9 +378,15 @@ namespace umbraco.controls
                 configProvided = true; 
             }
 
-            if (ddlContainerConfigOrderBy.SelectedIndex > 0)
+            if (!string.IsNullOrEmpty(txtContainerConfigAdditionalColumns.Text))
             {
-                orderBy = ddlContainerConfigOrderBy.SelectedItem.Value;
+                additionalColumns = txtContainerConfigAdditionalColumns.Text;
+                configProvided = true;
+            }
+
+            if (!string.IsNullOrEmpty(txtContainerConfigOrderBy.Text))
+            {
+                orderBy = txtContainerConfigOrderBy.Text;
                 configProvided = true; 
             }
 
@@ -412,6 +419,7 @@ namespace umbraco.controls
                 var containerConfig = new ContentTypeContainerConfiguration
                 {
                     PageSize = pageSize,
+                    AdditionalColumnAliases = additionalColumns,
                     OrderBy = orderBy,
                     OrderDirection = orderDirection,
                     AllowBulkPublish = allowBulkPublish,
@@ -419,7 +427,13 @@ namespace umbraco.controls
                     AllowBulkDelete = allowBulkDelete,
                 };
 
-                return JsonConvert.SerializeObject(containerConfig);
+                // Serialize the object ignoring nulls so the calculated property AdditionalColumnHeadings is not persisted
+                return JsonConvert.SerializeObject(containerConfig, 
+                    Formatting.None, 
+                    new JsonSerializerSettings 
+                    { 
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
             }
 
             return string.Empty;
@@ -634,7 +648,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             allowAtRoot.Checked = _contentType.AllowAtRoot;
             cb_isContainer.Checked = _contentType.IsContainerContentType;
 
-            ddlContainerConfigOrderBy.SelectedIndex = -1;
             ddlContainerConfigOrderDirection.SelectedIndex = -1;
             ddlContainerConfigAllowBulkPublish.SelectedIndex = -1;
             ddlContainerConfigAllowBulkUnpublish.SelectedIndex = -1;
@@ -643,7 +656,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 var containerConfig = GetContentTypeContainerConfigurationFromJsonString(_contentType.ContainerConfig);
                 txtContainerConfigPageSize.Text = containerConfig.PageSize.ToString();
-                ddlContainerConfigOrderBy.Items.FindByValue(containerConfig.OrderBy).Selected = true;
+                txtContainerConfigAdditionalColumns.Text = containerConfig.AdditionalColumnAliases;
+                txtContainerConfigOrderBy.Text = containerConfig.OrderBy;
                 ddlContainerConfigOrderDirection.Items.FindByValue(containerConfig.OrderDirection).Selected = true;
                 ddlContainerConfigAllowBulkPublish.SelectedIndex = containerConfig.AllowBulkPublish ? 1 : 2;
                 ddlContainerConfigAllowBulkUnpublish.SelectedIndex = containerConfig.AllowBulkUnpublish ? 1 : 2;
@@ -1430,8 +1444,11 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigPageSize;
         protected global::System.Web.UI.WebControls.TextBox txtContainerConfigPageSize;
 
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigAdditionalColumns;
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigAdditionalColumns;
+
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderBy;
-        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderBy;
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigOrderBy;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderDirection;
         protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderDirection;

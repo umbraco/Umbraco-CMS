@@ -82,20 +82,19 @@
         </cc2:PropertyPanel>   
 
         <div style="margin-left: 20px;">
-            <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="List view page size<br/><small>Number of entries per page if selected for display in list view (default if not provided: 10)</small>">
+            <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="Page size<br/><small>Number of entries per page when selected for display in list view.<br/>Default if not provided: 10</small>">
                 <asp:TextBox ID="txtContainerConfigPageSize" CssClass="guiInputText guiInputStandardSize" runat="server" type="number" min="1" max="100"></asp:TextBox>        
             </cc2:PropertyPanel> 
 
-            <cc2:PropertyPanel ID="pp_containerConfigOrderBy" runat="server" Text="List view order by<br/><small>The column for the default order for the list (default if not provided: UpdateDate)</small>">
-                <asp:DropDownList ID="ddlContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server">
-                    <asp:ListItem Value=""></asp:ListItem>
-                    <asp:ListItem Value="Name">Node Name</asp:ListItem>
-                    <asp:ListItem Value="UpdateDate">Last Edited Date</asp:ListItem>
-                    <asp:ListItem Value="Owner">Updated By</asp:ListItem>
-                </asp:DropDownList>   
+            <cc2:PropertyPanel ID="pp_containerConfigAdditionalColumns" runat="server" Text="Additional columns<br/><small>A comma separated list of the names (native properties) or aliases (custom properties) for additional columns displayed after the node name.<br/>Default if not provided: UpdateDate,Owner</small>">
+                <asp:TextBox ID="txtContainerConfigAdditionalColumns" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>   
+            </cc2:PropertyPanel> 
+
+            <cc2:PropertyPanel ID="pp_containerConfigOrderBy" runat="server" Text="Order by<br/><small>The name (native properties) or alias (custom properties) for the default order for the list.<br/>Default if not provided: UpdateDate</small>">
+                <asp:TextBox ID="txtContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>   
             </cc2:PropertyPanel> 
                     
-            <cc2:PropertyPanel ID="pp_containerConfigOrderDirection" runat="server" Text="List view order direction<br/><small>The direction of the default order for the list (default if not provided: Descending)</small>">
+            <cc2:PropertyPanel ID="pp_containerConfigOrderDirection" runat="server" Text="Order direction<br/><small>The direction of the default order for the list.<br/>default if not provided: Descending</small>">
                 <asp:DropDownList ID="ddlContainerConfigOrderDirection" CssClass="guiInputText guiInputStandardSize" runat="server">
                     <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="asc">Ascending</asp:ListItem>
@@ -103,7 +102,7 @@
                 </asp:DropDownList>        
             </cc2:PropertyPanel> 
 
-            <cc2:PropertyPanel ID="pp_allowBulkPublish" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk publishing is allowed when defined as a list view (default if not provided: Yes)</small>">
+            <cc2:PropertyPanel ID="pp_allowBulkPublish" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk publishing is allowed when defined as a list view<br/>Default if not provided: Yes</small>">
                 <asp:DropDownList ID="ddlContainerConfigAllowBulkPublish" CssClass="guiInputText guiInputStandardSize" runat="server">
                     <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="1">Yes</asp:ListItem>
@@ -111,7 +110,7 @@
                 </asp:DropDownList>       
             </cc2:PropertyPanel>    
             
-            <cc2:PropertyPanel ID="pp_allowBulkUnpublish" runat="server" Text="Allow bulk unpublish<br/><small>Indicates if bulk unpublishing is allowed when defined as a list view (default if not provided: Yes)</small>">
+            <cc2:PropertyPanel ID="pp_allowBulkUnpublish" runat="server" Text="Allow bulk unpublish<br/><small>Indicates if bulk unpublishing is allowed when defined as a list view<br/>Default if not provided: Yes</small>">
                 <asp:DropDownList ID="ddlContainerConfigAllowBulkUnpublish" CssClass="guiInputText guiInputStandardSize" runat="server">
                     <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="1">Yes</asp:ListItem>
@@ -119,7 +118,7 @@
                 </asp:DropDownList>           
             </cc2:PropertyPanel>
             
-            <cc2:PropertyPanel ID="pp_allowBulkDelete" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk deletion is allowed when defined as a list view (default if not provided: Yes)</small>">
+            <cc2:PropertyPanel ID="pp_allowBulkDelete" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk deletion is allowed when defined as a list view<br/>Default if not provided: Yes</small>">
                 <asp:DropDownList ID="ddlContainerConfigAllowBulkDelete" CssClass="guiInputText guiInputStandardSize" runat="server">
                     <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="1">Yes</asp:ListItem>
