@@ -162,9 +162,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             value = $scope.getCustomPropertyValue(alias, result.properties);
         }
 
+        // If we have a date, format it
+        if (isDate(value)) {
+            value = value.substring(0, value.length - 3);
+        }
+
         // Return what we've got
         return value;
 
+    };
+
+    isDate = function (val) {
+        return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
     };
 
     $scope.getCustomPropertyValue = function (alias, properties) {
