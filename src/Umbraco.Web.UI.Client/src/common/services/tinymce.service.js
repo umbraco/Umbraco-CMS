@@ -121,7 +121,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                     var imgElm = editor.dom.get('__mcenew');
                                     var size = editor.dom.getSize(imgElm);
 
-                                    if (editor.settings.maxImageSize && editor.settings.maxImageSize != 0) {
+                                    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
                                         var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
 
                                         var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
