@@ -419,6 +419,7 @@
     <Compile Include="PropertyEditors\SupportTagsAttribute.cs" />
     <Compile Include="PropertyEditors\TagPropertyDefinition.cs" />
     <Compile Include="PropertyEditors\TagValueType.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverterMeta.cs" />
     <Compile Include="PropertyEditors\ValueConverters\JsonValueConverter.cs" />
