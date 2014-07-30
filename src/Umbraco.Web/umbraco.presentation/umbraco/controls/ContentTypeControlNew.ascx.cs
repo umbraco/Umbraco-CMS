@@ -378,80 +378,32 @@ namespace umbraco.controls
         /// <returns>Container configuration as JSON string</returns>
         private string GetProvidedContainerConfigAsJsonString()
         {
-            var configProvided = false;
-
-            // Set defaults for saving if not all fields are provided
-            var pageSize = 10;
-            var additionalColumns = string.Empty;
-            var orderBy = "Name";
-            var orderDirection = "asc";
-            var allowBulkPublish = true;
-            var allowBulkUnpublish = true;
-            var allowBulkDelete = true;
-            if (int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
+            // Create configuation from form fields
+            var containerConfig = new ContentTypeContainerConfiguration
             {
-                configProvided = true; 
+                AdditionalColumnAliases = txtContainerConfigAdditionalColumns.Text,
+                OrderBy = ddlContainerConfigOrderBy.SelectedItem.Value,
+                OrderDirection = ddlContainerConfigOrderDirection.SelectedItem.Value,
+                AllowBulkPublish = ddlContainerConfigAllowBulkPublish.SelectedIndex == 0,
+                AllowBulkUnpublish = ddlContainerConfigAllowBulkUnpublish.SelectedIndex == 0,
+                AllowBulkDelete = ddlContainerConfigAllowBulkDelete.SelectedIndex == 0,
+            };
+
+            int pageSize;
+            if (!int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
+            {
+                pageSize = 10;
             }
 
-            if (!string.IsNullOrEmpty(txtContainerConfigAdditionalColumns.Text))
-            {
-                additionalColumns = txtContainerConfigAdditionalColumns.Text;
-                configProvided = true;
-            }
-
-            if (ddlContainerConfigOrderBy.SelectedIndex > 0)
-            {
-                orderBy = ddlContainerConfigOrderBy.SelectedItem.Value;
-                configProvided = true; 
-            }
-
-            if (ddlContainerConfigOrderDirection.SelectedIndex > 0)
-            {
-                orderDirection = ddlContainerConfigOrderDirection.SelectedItem.Value;
-                configProvided = true;
-            }
-
-            if (ddlContainerConfigAllowBulkPublish.SelectedIndex > 0)
-            {
-                allowBulkPublish = ddlContainerConfigAllowBulkPublish.SelectedIndex == 1;
-                configProvided = true;
-            }
-
-            if (ddlContainerConfigAllowBulkUnpublish.SelectedIndex > 0)
-            {
-                allowBulkUnpublish = ddlContainerConfigAllowBulkUnpublish.SelectedIndex == 1;
-                configProvided = true;
-            }
-
-            if (ddlContainerConfigAllowBulkDelete.SelectedIndex > 0)
-            {
-                allowBulkDelete = ddlContainerConfigAllowBulkDelete.SelectedIndex == 1;
-                configProvided = true;
-            }
-
-            if (configProvided)
-            {
-                var containerConfig = new ContentTypeContainerConfiguration
-                {
-                    PageSize = pageSize,
-                    AdditionalColumnAliases = additionalColumns,
-                    OrderBy = orderBy,
-                    OrderDirection = orderDirection,
-                    AllowBulkPublish = allowBulkPublish,
-                    AllowBulkUnpublish = allowBulkUnpublish,
-                    AllowBulkDelete = allowBulkDelete,
-                };
-
-                // Serialize the object ignoring nulls so the calculated property AdditionalColumnHeadings is not persisted
-                return JsonConvert.SerializeObject(containerConfig, 
-                    Formatting.None, 
-                    new JsonSerializerSettings 
-                    { 
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
-            }
-
-            return string.Empty;
+            containerConfig.PageSize = pageSize;
+            
+            // Serialize the object ignoring nulls so the calculated properties are not persisted
+            return JsonConvert.SerializeObject(containerConfig, 
+                Formatting.None, 
+                new JsonSerializerSettings 
+                { 
+                    NullValueHandling = NullValueHandling.Ignore
+                });
         }
 
         /// <summary>
@@ -669,7 +621,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             ddlContainerConfigOrderBy.Items.Add(new ListItem("Created by", "Owner"));
 
             ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Select a column...", string.Empty));
-            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Node name", "Name"));
             ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Last edited on", "UpdateDate"));
             ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Last updated by", "Updator"));
             ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Created on", "CreateDate"));

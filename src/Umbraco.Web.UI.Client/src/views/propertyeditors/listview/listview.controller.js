@@ -77,12 +77,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
             $scope.options.pageNumber++;
             $scope.reloadView($scope.contentId);
+
+            saveLastPageNumber();
         }
     };
 
     $scope.goToPage = function (pageNumber) {
         $scope.options.pageNumber = pageNumber + 1;
         $scope.reloadView($scope.contentId);
+
+        saveLastPageNumber();
     };
 
     $scope.sort = function (field, allow) {
@@ -103,17 +107,31 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if ($scope.options.pageNumber > 1) {
             $scope.options.pageNumber--;
             $scope.reloadView($scope.contentId);
+
+            saveLastPageNumber();
         }
+    };
+
+    saveLastPageNumber = function () {
+        // Saves the last page number into rootScope, so we can retrieve it when returning to the list and
+        // re-present the correct page
+        $rootScope.lastPageNumber = $scope.options.pageNumber;
     };
 
     $scope.initView = function () {
         if ($routeParams.id) {
             $scope.pagination = new Array(10);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
-            $scope.reloadView($routeParams.id);
 
             $scope.contentId = $routeParams.id;
             $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
+
+            // If we have a last page number saved, go straight to that one
+            if ($rootScope.lastPageNumber) {
+                $scope.goToPage($rootScope.lastPageNumber - 1);
+            } else {
+                $scope.reloadView($scope.contentId);
+            }
         }
     };
 

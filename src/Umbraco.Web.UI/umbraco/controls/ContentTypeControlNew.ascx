@@ -86,7 +86,7 @@
             #container-config-panel { margin-left: 20px; }
             #container-config-column-list { margin: 8px 0 16px 0; }
             #container-config-column-list th, #container-config-column-list td { text-align: left; padding: 2px 0px 4px 10px; }
-            #<%= txtContainerConfigAdditionalColumns.ClientID %> { display: block; }
+            #<%= txtContainerConfigAdditionalColumns.ClientID %> { display: none; }
         </style>
         
         <!-- Scripting for list view configuration -->
