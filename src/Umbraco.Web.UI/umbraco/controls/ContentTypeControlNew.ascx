@@ -76,51 +76,200 @@
         <cc2:PropertyPanel ID="pp_Root" runat="server" Text="Allow at root <br/><small>Only Content Types with this checked can be created at the root level of Content and Media trees</small>">
             <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />            
         </cc2:PropertyPanel>
+
+        <!-- Styling for list view configuration -->
+        <style type="text/css">
+            #container-config-column-list { margin: 8px 0 16px 0; }
+            #container-config-column-list th, #container-config-column-list td { text-align: left; padding: 2px 0px 4px 10px; }
+            #<%= txtContainerConfigAdditionalColumns.ClientID %> { display: none; }
+        </style>
         
+        <!-- Scripting for list view configuration -->
+        <script type="text/javascript">            
+            jQuery(document).ready(function () {               
+
+                var isContainerCheckBox = jQuery("#<%= cb_isContainer.ClientID %>");
+                var containerConfigPanel = jQuery("#container-config-panel");
+                var containerConfigAddColumnSelect = jQuery("#<%= ddlContainerConfigAdditionalColumnsChooser.ClientID %>");
+                var containerConfigColumnList = jQuery("#container-config-column-list");
+                var containerConfigHiddenField = jQuery("#<%= txtContainerConfigAdditionalColumns.ClientID %>");
+
+                function showHideContainerConfig(closingAnimation) {                                        
+                    if (isContainerCheckBox.is(":checked")) {
+                        containerConfigPanel.slideDown();
+                    }
+                    else
+                    {       
+                        if (closingAnimation == 'hide') {
+                            
+                            containerConfigPanel.hide();
+                        } else {
+                            containerConfigPanel.slideUp();
+                        }
+                    }
+                }
+
+                function loadColumnListFromHiddenField() {
+                    if (containerConfigHiddenField.val() != '') {
+                        var columns = getSelectedColumnAliases();
+                        for (var i = 0; i < columns.length; i++) {
+                            addColumnToList(columns[i]);
+                        }
+                        bindRemoveLinks();
+                    }
+                }
+
+                function getSelectedColumnAliases() {
+                    return containerConfigHiddenField.val().split(',');
+                }
+
+                function getColumnName(alias) {
+                    return jQuery('option[value="' + alias + '"]', containerConfigAddColumnSelect).text();
+                }
+
+                function addColumn() {
+                    var alias = containerConfigAddColumnSelect.val();  
+                    if (!isColumnAlreadyAdded(alias)) {
+                        addColumnToList(alias);
+                        addColumnToField(alias);
+                        bindRemoveLinks();
+                    }
+                }
+
+                function isColumnAlreadyAdded(alias) {
+                    var columns = getSelectedColumnAliases();
+                    for (var i = 0; i < columns.length; i++) {
+                        if (columns[i] == alias) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                function getColumnIndex(alias) {
+                    var columns = getSelectedColumnAliases();
+                    var index = 0;
+                    for (var i = 0; i < columns.length; i++) {
+                        if (columns[i] == alias) {
+                            return index;
+                        }
+                        index++;
+                    }
+                    return -1;
+                }
+
+                function addColumnToList(alias) {
+                    var html = '<tr>' +
+                        '<td><i class="icon-navigation handle"></i></td>' +
+                        '<td>' + getColumnName(alias) + '</td><td><button type="button" class="remove" data-alias="' + alias + '">Remove</button></td>' +
+                        '</tr>';
+                    jQuery('tbody', containerConfigColumnList).append(html);
+                }
+
+                function addColumnToField(alias) {
+                    if (containerConfigHiddenField.val() == '') {
+                        containerConfigHiddenField.val(alias)
+                    } else {
+                        var columns = getSelectedColumnAliases();
+                        columns.push(alias);
+                        containerConfigHiddenField.val(columns.join());
+                    }
+                }
+
+                function removeColumn(alias) {
+                    var index = getColumnIndex(alias);
+                    removeColumnFromList(index);
+                    removeColumnFromField(index);
+                }
+
+                function removeColumnFromList(index) {
+                    jQuery('tbody tr:eq(' + index + ')', containerConfigColumnList).fadeOut(300, function() { 
+                        jQuery(this).remove(); 
+                    })
+                }
+
+                function removeColumnFromField(index) {
+                    var columns = getSelectedColumnAliases();
+                    columns.splice(index, 1);
+                    containerConfigHiddenField.val(columns.join());
+                }
+
+                function bindRemoveLinks() {
+                    jQuery(".remove", containerConfigColumnList).off('click').on('click', function (e) {
+                        e.preventDefault();
+                        var alias = jQuery(this).attr('data-alias');
+                        removeColumn(alias);
+                    });
+                }
+                
+                isContainerCheckBox.on("change", function () {
+                    showHideContainerConfig();
+                });
+
+                containerConfigAddColumnSelect.on('change', function () {
+                    var ddl = jQuery(this);
+                    if (ddl.val() != '') {
+                        addColumn();
+                        ddl.prop('selectedIndex', 0);
+                    }
+                });
+
+                showHideContainerConfig('hide');
+                loadColumnListFromHiddenField();
+            });
+        </script>
         <cc2:PropertyPanel ID="pp_isContainer" runat="server" Text="Container<br/><small>A container type doesn't display children in the tree, but as a grid instead</small>">
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" /><br />            
         </cc2:PropertyPanel>   
 
-        <div style="margin-left: 20px;">
-            <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="Page size<br/><small>Number of entries per page when selected for display in list view.<br/>Default if not provided: 10</small>">
+        <div id="container-config-panel" style="margin-left: 20px;">
+            <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server" Text="Page size<br/><small>Number of entries per page when selected for display in list view.</small>">
                 <asp:TextBox ID="txtContainerConfigPageSize" CssClass="guiInputText guiInputStandardSize" runat="server" type="number" min="1" max="100"></asp:TextBox>        
             </cc2:PropertyPanel> 
 
-            <cc2:PropertyPanel ID="pp_containerConfigAdditionalColumns" runat="server" Text="Additional columns<br/><small>A comma separated list of the names (native properties) or aliases (custom properties) for additional columns displayed after the node name.<br/>Default if not provided: UpdateDate,Owner</small>">
+            <cc2:PropertyPanel ID="pp_containerConfigAdditionalColumns" runat="server" Text="Additional columns<br/><small>Select the additional columns displayed after the node name.</small>">
+                <asp:DropDownList ID="ddlContainerConfigAdditionalColumnsChooser" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:DropDownList>   
+                <table id="container-config-column-list">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Selected columns</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
                 <asp:TextBox ID="txtContainerConfigAdditionalColumns" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>   
             </cc2:PropertyPanel> 
 
-            <cc2:PropertyPanel ID="pp_containerConfigOrderBy" runat="server" Text="Order by<br/><small>The name (native properties) or alias (custom properties) for the default order for the list.<br/>Default if not provided: UpdateDate</small>">
-                <asp:TextBox ID="txtContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>   
+            <cc2:PropertyPanel ID="pp_containerConfigOrderBy" runat="server" Text="Order by<br/><small>The default order for the list.</small>">
+                <asp:DropDownList ID="ddlContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:DropDownList>   
             </cc2:PropertyPanel> 
                     
-            <cc2:PropertyPanel ID="pp_containerConfigOrderDirection" runat="server" Text="Order direction<br/><small>The direction of the default order for the list.<br/>default if not provided: Descending</small>">
+            <cc2:PropertyPanel ID="pp_containerConfigOrderDirection" runat="server" Text="Order direction<br/><small>The direction of the default order for the list.</small>">
                 <asp:DropDownList ID="ddlContainerConfigOrderDirection" CssClass="guiInputText guiInputStandardSize" runat="server">
-                    <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="asc">Ascending</asp:ListItem>
                     <asp:ListItem Value="desc">Descending</asp:ListItem>
                 </asp:DropDownList>        
             </cc2:PropertyPanel> 
 
-            <cc2:PropertyPanel ID="pp_allowBulkPublish" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk publishing is allowed when defined as a list view<br/>Default if not provided: Yes</small>">
+            <cc2:PropertyPanel ID="pp_allowBulkPublish" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk publishing is allowed when defined as a list view</small>">
                 <asp:DropDownList ID="ddlContainerConfigAllowBulkPublish" CssClass="guiInputText guiInputStandardSize" runat="server">
-                    <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="1">Yes</asp:ListItem>
                     <asp:ListItem Value="0">No</asp:ListItem>
                 </asp:DropDownList>       
             </cc2:PropertyPanel>    
             
-            <cc2:PropertyPanel ID="pp_allowBulkUnpublish" runat="server" Text="Allow bulk unpublish<br/><small>Indicates if bulk unpublishing is allowed when defined as a list view<br/>Default if not provided: Yes</small>">
+            <cc2:PropertyPanel ID="pp_allowBulkUnpublish" runat="server" Text="Allow bulk unpublish<br/><small>Indicates if bulk unpublishing is allowed when defined as a list view</small>">
                 <asp:DropDownList ID="ddlContainerConfigAllowBulkUnpublish" CssClass="guiInputText guiInputStandardSize" runat="server">
-                    <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="1">Yes</asp:ListItem>
                     <asp:ListItem Value="0">No</asp:ListItem>
                 </asp:DropDownList>           
             </cc2:PropertyPanel>
             
-            <cc2:PropertyPanel ID="pp_allowBulkDelete" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk deletion is allowed when defined as a list view<br/>Default if not provided: Yes</small>">
+            <cc2:PropertyPanel ID="pp_allowBulkDelete" runat="server" Text="Allow bulk publish<br/><small>Indicates if bulk deletion is allowed when defined as a list view</small>">
                 <asp:DropDownList ID="ddlContainerConfigAllowBulkDelete" CssClass="guiInputText guiInputStandardSize" runat="server">
-                    <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="1">Yes</asp:ListItem>
                     <asp:ListItem Value="0">No</asp:ListItem>
                 </asp:DropDownList>       

@@ -87,15 +87,21 @@ namespace Umbraco.Web.Editors
                             column.Header = "Last edited";
                             column.LocalizationKey = "defaultdialogs_lastEdited";
                         }
-                        else if (alias == "Owner")
+                        else if (alias == "Updator")
                         {
                             // Special case to restore hard-coded column titles (2)
                             column.Header = "Updated by";
                             column.LocalizationKey = "content_updatedBy";
                         }
+                        else if (alias == "Owner")
+                        {
+                            // Special case to restore hard-coded column titles (3)
+                            column.Header = "Created by";
+                            column.LocalizationKey = "content_createBy";
+                        }
                         else
                         {
-                            // Otherwise just sentence case the alias
+                            // For others just sentence case the alias and camel case for the key
                             column.Header = alias.ToFirstUpper().SplitPascalCasing();
                             column.LocalizationKey = "content_" + alias.ToFirstLower();
                         }

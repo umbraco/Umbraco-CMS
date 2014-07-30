@@ -41,7 +41,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         allowBulkDelete: true,
         additionalColumns: [
                 { alias: 'UpdateDate', header: 'Last edited', localizationKey: 'defaultdialogs_lastEdited' },
-                { alias: 'Owner', header: 'Last edited', localizationKey: 'content_updatedBy' }
+                { alias: 'Updator', header: 'Last edited', localizationKey: 'content_updatedBy' }
             ]
     };
 
