@@ -103,6 +103,14 @@ namespace umbraco.controls
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
 
             pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser);
+
+            pp_containerConfigPageSize.Text = ui.Text("editcontenttype", "containerConfigPageSize", Security.CurrentUser);
+            pp_containerConfigAdditionalColumns.Text = ui.Text("editcontenttype", "containerConfigAdditionalColumns", Security.CurrentUser);
+            pp_containerConfigOrderBy.Text = ui.Text("editcontenttype", "containerConfigOrderBy", Security.CurrentUser);
+            pp_containerConfigOrderDirection.Text = ui.Text("editcontenttype", "containerConfigOrderDirection", Security.CurrentUser);
+            pp_allowBulkPublish.Text = ui.Text("editcontenttype", "allowBulkPublish", Security.CurrentUser);
+            pp_allowBulkUnpublish.Text = ui.Text("editcontenttype", "allowBulkUnpublish", Security.CurrentUser);
+            pp_allowBulkDelete.Text = ui.Text("editcontenttype", "allowBulkDelete", Security.CurrentUser);
             
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
