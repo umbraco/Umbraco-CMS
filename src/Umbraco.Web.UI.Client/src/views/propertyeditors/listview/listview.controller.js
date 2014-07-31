@@ -115,7 +115,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     saveLastPageNumber = function () {
         // Saves the last page number into rootScope, so we can retrieve it when returning to the list and
         // re-present the correct page
-        $rootScope.lastPageNumber = $scope.options.pageNumber;
+        $rootScope.lastListViewPageViewed = {
+            contentId: $scope.contentId,
+            pageNumber: $scope.options.pageNumber
+        };
     };
 
     $scope.initView = function () {
@@ -127,8 +130,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
 
             // If we have a last page number saved, go straight to that one
-            if ($rootScope.lastPageNumber) {
-                $scope.goToPage($rootScope.lastPageNumber - 1);
+            if ($rootScope.lastListViewPageViewed && $rootScope.lastListViewPageViewed.contentId == $scope.contentId) {
+                $scope.goToPage($rootScope.lastListViewPageViewed.pageNumber - 1);
             } else {
                 $scope.reloadView($scope.contentId);
             }

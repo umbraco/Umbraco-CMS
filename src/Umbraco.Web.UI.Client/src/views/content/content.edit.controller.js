@@ -193,7 +193,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
         // we can restore the page.  If we've moved on to edit a piece of content that's not the list or it's children
         // we should remove this so as not to confuse if navigating to a different list
         if (!content.isChildOfListView && !content.isContainer) {
-            $rootScope.lastPageNumber = null;
+            $rootScope.lastListViewPageViewed = null;
         }
     }
 
