@@ -1,76 +1,81 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.PropertyEditors.RelatedLinksController">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <td>Caption</td>
-                    <td>Link</td>
-                    <td>New window</td>
-                    <td></td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="link in model.value">
-                    <td style="word-wrap:break-word; word-break: break-all">
-                        <span ng-show="!link.edit">{{link.caption}}</span>
-                        <input type="text" ng-model="link.caption" ng-show="link.edit"/>
-                    </td>
-                    <td style="word-wrap:break-word; word-break: break-all">
-                        <div ng-show="!link.edit">
-                            <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <td></td>
+                <td>Caption</td>
+                <td>Link</td>
+                <td>New window</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody ui-sortable="sortableOptions">
+            <tr ng-repeat="link in model.value" data-link="{{link.link}}">
+                <td style="width: 20px"><i class="icon icon-navigation handle"></i></td>
+                <td style="word-wrap:break-word; word-break: break-all">
+                    <span ng-show="!link.edit">{{link.caption}}</span>
+                    <input type="text" ng-model="link.caption" ng-show="link.edit" />
+                </td>
+                <td style="word-wrap:break-word; word-break: break-all">
+                    <div ng-show="!link.edit">
+                        <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
                             <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName">
-                               
-                            </a>
+
+                        </a>
+                    </div>
+                    <div ng-show="link.edit">
+                        <div ng-show="!link.isInternal">
+                            <input type="text" ng-model="link.link" /><br />
+                            or <a href="#" ng-click="switchLinkType($event,link)">choose internal page</a>
                         </div>
-                        <div ng-show="link.edit">
-                            <div ng-show="!link.isInternal">
-                                <input type="text" ng-model="link.link"/><br />
-                                or <a href="#" ng-click="switchLinkType($event,link)">choose internal page</a>
-                            </div>
-                            
-                            <div ng-show="link.isInternal">
-                                <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)">Choose</a><br/>
-                                or <a href="#" ng-click="switchLinkType($event,link)">enter external link</a>
-                            </div>
+
+                        <div ng-show="link.isInternal">
+                            <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)">Choose</a><br />
+                            or <a href="#" ng-click="switchLinkType($event,link)">enter external link</a>
                         </div>
-                    </td>
+                    </div>
+                </td>
+                <td>
+                    <span ng-show="!link.edit">{{link.newWindow}}</span>
+                    <input type="checkbox" ng-model="link.newWindow" ng-show="link.edit" />
+                </td>
+                <td>
+
+                    <div class="btn-group" ng-show="!link.edit">
+                        <button type="button" class="btn btn-default" ng-click="edit($index)">Edit</button>
+                        <button type="button" class="btn btn-default" ng-click="delete($index)">Delete</button>
+                    </div>
+                    <div class="btn-group" ng-show="link.edit">
+                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Cancel</button>
+                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Save</button>
+                    </div>
+
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                    <td></td>
+                    <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" val-highlight="hasError" /></td>
                     <td>
-                        <span ng-show="!link.edit">{{link.newWindow}}</span>
-                        <input type="checkbox" ng-model="link.newWindow" ng-show="link.edit"/>
+                        <div ng-show="addExternal">
+                            <input type="text" ng-model="newLink" placeholder="Enter the link" />
+                            <br /> or
+                            <a href="#" ng-click="switch($event)">choose internal page</a>
+                        </div>
+
+                        <div ng-show="!addExternal">
+                            <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)">Choose</a><br />
+                            or <a href="#" ng-click="switch($event)">enter external link</a>
+                        </div>
                     </td>
+                    <td><input type="checkbox" ng-model="newNewWindow" /> </td>
                     <td>
-                       
-                        <div class="btn-group" ng-show="!link.edit">
-                            <button type="button" class="btn btn-default" ng-click="edit($index)">Edit</button>
-                            <button type="button" class="btn btn-default" ng-click="delete($index)">Delete</button>
-                        </div>
-                        <div class="btn-group" ng-show="link.edit">
-                            <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Cancel</button>
-                            <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Save</button>
-                        </div>
-                        
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" val-highlight="hasError"/></td>
-                        <td>
-                            <div ng-show="addExternal">
-                                <input type="text" ng-model="newLink" placeholder="Enter the link"/>
-                                <br/> or
-                                <a href="#" ng-click="switch($event)">choose internal page</a>
-                            </div>
-                            
-                            <div ng-show="!addExternal">
-                                <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)">Choose</a><br/>
-                                or <a href="#" ng-click="switch($event)">enter external link</a>
-                            </div>
-                        </td>
-                    <td><input type="checkbox" ng-model="newNewWindow"/> </td>
-                        <td>
                         <div class="btn-group">
                             <button class="btn btn-default" ng-click="add($event)">Add</button>
                         </div>
                     </td>
-                </tr>
-            </tbody>
-        </table>
+            </tr>
+        </tfoot>
+    </table>
 </div>
