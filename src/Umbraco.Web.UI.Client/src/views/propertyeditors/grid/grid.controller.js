@@ -71,12 +71,16 @@ angular.module("umbraco")
             } 
         };
 
-        $scope.addRow = function (column, layout) {
+      
+
+        $scope.addRow = function (section, layout) {
             //copy the selected layout into the rows collection
             var row = angular.copy(layout);
-            $scope.initRow(row);
+            row = $scope.initRow(row);
             
-            column.rows.push(row);
+            if(row){
+               section.rows.push(row);
+            }
         };
 
         $scope.removeRow = function (section, $index) {
@@ -252,8 +256,16 @@ angular.module("umbraco")
             if(!section.rows){
                 section.rows = [];
             }else{
-                _.forEach(section.rows, function(row){
-                    $scope.initRow(row);
+                _.forEach(section.rows, function(row, index){
+                    if(!row.$initialized){
+                        var initd = $scope.initRow(row);
+                        //if init fails, remove
+                        if(!initd){
+                            section.rows.splic(index, 1);
+                        }else{
+                            section.rows[index] = initd;
+                        }
+                    }
                 });    
             }
         };
@@ -264,38 +276,55 @@ angular.module("umbraco")
         // *********************************************                
         $scope.initRow = function(row){
             
-            if(!row.areas){
-                row.areas = [];
-            }
+            //merge the layout data with the original config data
+            //if there are no config info on this, splice it out
+            var original = _.find($scope.model.config.items.layouts, function(o){ return o.name === row.name; });           
+            if(!original){
+                return null;
+            }else{
+                //make a copy to not touch the original config
+                original = angular.copy(original);
 
-            //set a disposable unique ID
-            row.$uniqueId = $scope.setUniqueId();
-            
-            //populate with data
-            _.forEach(row.areas, function(area){
-                if(!area.controls){
-                    area.controls = [];
-                }else{
-                    _.forEach(area.controls, function(control, index){
-                        $scope.initControl(control, index);
-                    });
-                }
-                
-                area.$percentage = $scope.percentage(area.grid);
+                //sync area configuration
+                _.each(original.areas, function(area, areaIndex){
+                    //copy over existing controls into the new areas
+                    if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
+                        area.controls = row.areas[areaIndex].controls;
 
-                if(!area.allowed){
-                    area.$allowedEditors = $scope.availableEditors;
-                    area.$allowsRTE = true;
-                }else{
-                    area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
-                        return _.indexOf(area.allowed, editor.alias) >= 0;
-                    });
+                        _.forEach(area.controls, function(control, controlIndex){
+                            $scope.initControl(control, controlIndex);
+                        });
 
-                    if(_.indexOf(area.allowed,"rte")>=0){
-                        area.$allowsRTE = true;
+                    }else{
+                        area.controls = [];
                     }
-                }
-            });
+
+                    //set width
+                    area.$percentage = $scope.percentage(area.grid);
+
+                    //set editor permissions
+                    if(!area.allowed || area.allowAll === true){
+                        area.$allowedEditors = $scope.availableEditors;
+                        area.$allowsRTE = true;
+                    }else{
+                        area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
+                            return _.indexOf(area.allowed, editor.alias) >= 0;
+                        });
+
+                        if(_.indexOf(area.allowed,"rte")>=0){
+                            area.$allowsRTE = true;
+                        }
+                    }
+                });
+    
+                //replace the old row
+                original.$initialized = true;
+
+                //set a disposable unique ID
+                original.$uniqueId = $scope.setUniqueId();
+                return original;
+            }
+            
         };
 
 

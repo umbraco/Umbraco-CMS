@@ -160,6 +160,7 @@ angular.module("umbraco")
 
            $scope.currentLayout = undefined;
         };
+        
 
         /****************
             area
@@ -197,8 +198,8 @@ angular.module("umbraco")
            var remove = (section.grid > 1) ? 1 : section.grid;
            section.grid = section.grid-remove;
         };    
-        $scope.toggleCollection = function(collection){
-            if(collection === undefined){
+        $scope.toggleCollection = function(collection, toggle){
+            if(toggle){
                 collection = [];
             }else{
                 delete collection;
