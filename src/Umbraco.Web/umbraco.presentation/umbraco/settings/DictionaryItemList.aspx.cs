@@ -49,9 +49,9 @@ namespace umbraco.presentation.settings {
                     lt_table.Text += "<td>";
 
                     if (string.IsNullOrEmpty(di.Value(lang.id)))
-                        lt_table.Text += "<img src='../images/false.png' />";
+                        lt_table.Text += "<i class='icon-alert'></i>";
                     else
-                        lt_table.Text += "<img src='../images/true.png' />";
+                        lt_table.Text += "<i class='icon-check'></i>";
 
                     lt_table.Text += "</td>";
                 }
