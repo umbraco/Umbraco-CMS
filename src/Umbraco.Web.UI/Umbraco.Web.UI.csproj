@@ -2076,6 +2076,12 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Partials\Grid\bootstrap3.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\embed.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\macro.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\media.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\rte.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\textstring.cshtml" />
+    <Content Include="Views\Partials\Grid\bootstrap2.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
