@@ -12,10 +12,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Returns all tags for an entity type (content/media/member)
         /// </summary>
-        /// <param name="objectType"></param>
+        /// <param name="objectType">Entity type</param>
         /// <param name="group">Optional group</param>
+        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null);
+        IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null, bool withCount = false);
 
         /// <summary>
         /// Returns all tags that exist on the content item - Content/Media/Member
