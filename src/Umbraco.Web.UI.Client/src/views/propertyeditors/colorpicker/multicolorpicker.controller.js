@@ -1,13 +1,14 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
     function ($scope, $timeout, assetsService, angularHelper, $element) {
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
-
-        $scope.newColor = "";
+        var defaultColor = "000000";
+        
+        $scope.newColor = defaultColor;
         $scope.hasError = false;
 
         assetsService.load([
             //"lib/spectrum/tinycolor.js",
-            "lib/spectrum/spectrum.js"			
+            "lib/spectrum/spectrum.js"          
         ]).then(function () {
             var elem = $element.find("input");
             elem.spectrum({
@@ -67,7 +68,10 @@
                 });
                 if (!exists) {
                     $scope.model.value.push({ value: $scope.newColor });
-                    $scope.newColor = "";
+                    //$scope.newColor = defaultColor;
+                    // set colorpicker to default color
+                    //var elem = $element.find("input");
+                    //elem.spectrum("set", $scope.newColor);
                     $scope.hasError = false;
                     return;
                 }
