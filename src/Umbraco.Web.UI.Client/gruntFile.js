@@ -3,10 +3,12 @@ module.exports = function (grunt) {
 
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
-  grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
+    grunt.registerTask('dev', ['jshint:dev', 'build-dev', 'webserver', 'open:dev', 'watch']);
+    grunt.registerTask('vs', ['jshint:dev', 'build-dev', 'watch']);
 
+    //TODO: Too much watching, this brings windows to it's knees when in dev mode
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs', 'karma:unit']);
   grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning','copy:tuning', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
@@ -16,6 +18,8 @@ module.exports = function (grunt) {
 
   //triggered from grunt dev or grunt
   grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:tuning', 'bower', 'copy']);
+    //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
+    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'copy']);
 
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -165,6 +169,7 @@ module.exports = function (grunt) {
               //then we need to figure out how to not copy all the test stuff either!?
               { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
               { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
+              { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
               { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]

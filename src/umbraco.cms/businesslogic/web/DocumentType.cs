@@ -477,7 +477,7 @@ namespace umbraco.cms.businesslogic.web
         public XmlElement ToXml(XmlDocument xd)
         {
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(ApplicationContext.Current.Services.DataTypeService, _contentType);
+            var xml = exporter.Serialize(ApplicationContext.Current.Services.DataTypeService, ContentType);
 
             //convert the Linq to Xml structure to the old .net xml structure
             var xNode = xml.GetXmlNode();
