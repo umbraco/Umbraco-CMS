@@ -92,13 +92,14 @@ namespace umbraco.presentation.dialogs
                     catch { }
                 }
 
-                pl_buttons.Visible = true;
+                Button1.Visible = true;
+                
 
             }
             else
             {
                 diffPanel.Visible = false;
-                pl_buttons.Visible = false;
+                Button1.Visible = false;
             }
 
         }
