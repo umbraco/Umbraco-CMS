@@ -151,6 +151,35 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Update_Remove_Property()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+            IMacro macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
+            macro.Properties.Add(new MacroProperty("blah2", "Blah2", 1, "blah2"));
+            macro.Properties.Add(new MacroProperty("blah3", "Blah3", 2, "blah3"));
+            macroService.Save(macro);
+
+            // Act
+            macro.Properties["blah1"].Alias = "newAlias";
+            macro.Properties["blah1"].Name = "new Name";
+            macro.Properties["blah1"].SortOrder = 1;
+            macro.Properties["blah1"].EditorAlias = "new";
+            macro.Properties.Remove("blah3");
+            macroService.Save(macro);
+
+            macro = macroService.GetById(macro.Id);
+
+            //assert
+            Assert.AreEqual(2, macro.Properties.Count());
+            Assert.AreEqual("newAlias", macro.Properties["newAlias"].Alias);
+            Assert.AreEqual("new Name", macro.Properties["newAlias"].Name);
+            Assert.AreEqual(1, macro.Properties["newAlias"].SortOrder);
+            Assert.AreEqual("new", macro.Properties["newAlias"].EditorAlias);
+        }
+
+        [Test]
         public void Can_Add_And_Remove_Properties()
         {
             var macroService = ServiceContext.MacroService;

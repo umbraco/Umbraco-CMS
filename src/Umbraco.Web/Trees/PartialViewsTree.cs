@@ -70,6 +70,8 @@ namespace Umbraco.Web.Trees
 			ChangeNodeAction(xNode);
 			xNode.Icon = "settingView.gif";
 			xNode.OpenIcon = "settingView.gif";
+
+            xNode.Text = xNode.Text.StripFileExtension();
 		}
 
 		

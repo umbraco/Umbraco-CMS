@@ -73,6 +73,8 @@ function openXslt(id) {
             xNode.Action = xNode.Action.Replace("openFile", "openXslt");
             xNode.Icon = "icon-code";
             xNode.OpenIcon = "icon-code";
+
+            xNode.Text = xNode.Text.StripFileExtension();
         }
 
         protected override void OnRenderFolderNode(ref XmlTreeNode xNode)

@@ -64,6 +64,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override IEnumerable<Script> GetAll(params string[] ids)
         {
+            //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
+            ids = ids.Distinct().ToArray();
+
             if (ids.Any())
             {
                 foreach (var id in ids)

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
@@ -31,6 +32,7 @@ using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
@@ -297,7 +299,6 @@ namespace Umbraco.Web
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
             //Override the ServerMessengerResolver to set a username/password for the distributed calls
-            //ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(() =>
             ServerMessengerResolver.Current.SetServerMessenger(new BatchedServerMessenger(() =>
             {
                 //we should not proceed to change this if the app/database is not configured since there will 
@@ -338,6 +339,9 @@ namespace Umbraco.Web
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
                 new PublishedCache.XmlPublishedCache.PublishedMediaCache()));
+
+            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector), 
+                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
                 // add all known factories, devs can then modify this list on application

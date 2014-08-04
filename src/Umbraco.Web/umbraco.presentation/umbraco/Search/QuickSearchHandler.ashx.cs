@@ -20,6 +20,7 @@ namespace umbraco.presentation.umbraco.Search
     /// </summary>
     [WebService(Namespace = "http://tempuri.org/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    [Obsolete("This is not used and will be removed in the future")]
     public class QuickSearchHandler : IHttpHandler
     {
 
@@ -61,7 +62,7 @@ namespace umbraco.presentation.umbraco.Search
             else
             {
 				var words = txt.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.ToLower().MultipleCharacterWildcard()).ToList();
-				var operation = criteria.GroupedOr(new[] { "__nodeName" }, new[] { words[0] });
+                var operation = criteria.GroupedOr(new[] { "__nodeName", "__NodeId", "id" }, new[] { words[0] });
 				words.RemoveAt(0);
 				foreach (var word in words)
 					operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });

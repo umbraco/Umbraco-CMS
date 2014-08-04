@@ -1,20 +1,9 @@
-﻿
-// debugging
-// define WRTCONS to write cleaning details & steps to console
-// leave it wrapped within #if DEBUG to make sure it does leak
-// into RELEASE, see http://issues.umbraco.org/issue/U4-4199
-#if DEBUG
-#undef WRTCONS
-#endif
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Strings
@@ -519,10 +508,6 @@ function validateSafeAlias(input, value, immediate, callback) {{
             if (culture == null)
                 throw new ArgumentNullException("culture");
 
-#if WRTCONS
-            Console.WriteLine("STRING TYPE {0}", stringType);
-#endif
-
             // get config
             var config = GetConfig(stringType, culture);
             stringType = config.StringTypeExtend(stringType);
@@ -594,9 +579,6 @@ function validateSafeAlias(input, value, immediate, callback) {{
             var state = StateBreak;
 
             caseType &= CleanStringType.CaseMask;
-#if WRTCONS
-            Console.WriteLine("CASE {0}", caseType);
-#endif
 
             // if we apply global ToUpper or ToLower to text here
             // then we cannot break words on uppercase chars
@@ -622,13 +604,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
                 var isPair = char.IsSurrogate(c);
                 if (isPair)
                     throw new NotSupportedException("Surrogate pairs are not supported.");
-#if WRTCONS
-                Console.WriteLine("CHAR '{0}' {1} {2} - {3} - {4}/{5} {6}",
-                    c,
-                    isTerm ? "term" : "!term", isUpper ? "upper" : "!upper",
-                    state,
-                    i, ipos, leading ? "leading" : "!leading");
-#endif
+
                 switch (state)
                 {
                     // within a break
@@ -662,7 +638,6 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     case StateAcronym:
                         // end an acronym if char is not a term char,
                         // or if it's not uppercase / config
-                        //Console.WriteLine("acro {0} {1}", c, (config.CutAcronymOnNonUpper && isUpper == false));
                         if (isTerm == false || (config.CutAcronymOnNonUpper && isUpper == false))
                         {
                             // whether it's part of the acronym depends on whether we're greedy
@@ -735,12 +710,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
             CleanStringType caseType, CultureInfo culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
-#if WRTCONS
-            Console.WriteLine("TERM \"{0}\" {1} {2}",
-                term,
-                isAcronym ? "acronym" : "word",
-                caseType);
-#endif
+
             if (isAcronym)
             {
                 if ((caseType == CleanStringType.CamelCase && len <= 2 && opos > 0) ||

@@ -410,6 +410,18 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Execute(deleteSql);
         }
 
+        public void ClearTagsFromProperty(int contentId, int propertyTypeId)
+        {
+            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId", 
+                new { nodeId = contentId, propertyTypeId = propertyTypeId });
+        }
+
+        public void ClearTagsFromEntity(int contentId)
+        {
+            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
+                new { nodeId = contentId });
+        }
+
         private Guid GetNodeObjectType(TaggableObjectTypes type)
         {
             switch (type)

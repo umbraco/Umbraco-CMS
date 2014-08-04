@@ -34,18 +34,15 @@ namespace umbraco.editorControls.imagecropper
             //DirectoryInfo di = new DirectoryInfo(path);
             //if (!di.Exists) di.Create();
 
-            Image image = Image.FromStream(_fs.OpenFile(sourceFile));
-
-            using (Image croppedImage = CropImage(image, new Rectangle(cropX, cropY, cropWidth, cropHeight)))
+            using (var stream = _fs.OpenFile(sourceFile))
+            using (var image = Image.FromStream(stream))
+            using (var croppedImage = CropImage(image, new Rectangle(cropX, cropY, cropWidth, cropHeight)))
+            using (var resizedImage = ResizeImage(croppedImage, new Size(sizeWidth, sizeHeight)))
+            using (var b = new Bitmap(resizedImage))
             {
-                using (Image resizedImage = ResizeImage(croppedImage, new Size(sizeWidth, sizeHeight)))
-                {
-                    using (Bitmap b = new Bitmap(resizedImage))
-                    {
-                        SaveJpeg(String.Format("{0}/{1}.jpg", path, name), b, quality);
-                    }
-                }
+                SaveJpeg(String.Format("{0}/{1}.jpg", path, name), b, quality);
             }
+           
         }
 
         private static void SaveJpeg(string path, Bitmap img, long quality)
@@ -62,13 +59,13 @@ namespace umbraco.editorControls.imagecropper
             EncoderParameters encoderParams = new EncoderParameters(1);
             encoderParams.Param[0] = qualityParam;
 
-            var fileStream = new MemoryStream();
+            using (var fileStream = new MemoryStream())
+            {
+                img.Save(fileStream, jpegCodec, encoderParams);
+                fileStream.Position = 0;
+                _fs.AddFile(path, fileStream, true);    
+            }
 
-            img.Save(fileStream, jpegCodec, encoderParams);
-            fileStream.Position = 0;
-            _fs.AddFile(path, fileStream, true);
-            //just to be sure
-            fileStream.Dispose();
         }
 
         private static ImageCodecInfo GetEncoderInfo(string mimeType)
@@ -108,20 +105,24 @@ namespace umbraco.editorControls.imagecropper
 
             Bitmap b = new Bitmap(destWidth, destHeight);
 
-            ImageAttributes ia = new ImageAttributes();
-            ia.SetWrapMode(WrapMode.TileFlipXY);
+            using (var ia = new ImageAttributes())
+            {
+                ia.SetWrapMode(WrapMode.TileFlipXY);
 
-            Graphics g = Graphics.FromImage(b);
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.Clear(Color.White);
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.CompositingQuality = CompositingQuality.HighQuality;
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.DrawImage(imgToResize, new Rectangle(0, 0, destWidth, destHeight), 0, 0, imgToResize.Width,
-                        imgToResize.Height, GraphicsUnit.Pixel, ia);
+                using (Graphics g = Graphics.FromImage(b))
+                {
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    g.Clear(Color.White);
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.CompositingQuality = CompositingQuality.HighQuality;
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.DrawImage(imgToResize, new Rectangle(0, 0, destWidth, destHeight), 0, 0, imgToResize.Width,
+                                imgToResize.Height, GraphicsUnit.Pixel, ia);
 
-            ia.Dispose();
-            g.Dispose();
+                    ia.Dispose();
+                }
+            }
+            
 
             return b;
         }

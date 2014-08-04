@@ -590,6 +590,12 @@ namespace Umbraco.Core.Models
             {
                 throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
             }
+            property.SetTags(storageType, propertyTypeAlias, tags, replaceTags, tagGroup);
+        }
+
+        internal static void SetTags(this Property property, TagCacheStorageType storageType, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        {
+            if (property == null) throw new ArgumentNullException("property");
 
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
 

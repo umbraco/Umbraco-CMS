@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.TestHelpers;
 
@@ -77,6 +80,55 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.That(xml.ToString(), Is.EqualTo(languageItemsElement.ToString()));
+        }
+
+        private static string GetTestPackagePath(string packageName)
+        {
+            const string testPackagesDirName = "Packaging\\Packages";
+            string path = Path.Combine(Core.Configuration.GlobalSettings.FullpathToRoot, testPackagesDirName, packageName);
+            return path;
+        }
+
+
+        [Test]
+        public void PackagingService_Can_ImportPackage()
+        {
+            var packagingService = (PackagingService)ServiceContext.PackagingService;
+
+            const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+
+            string testPackagePath = GetTestPackagePath(documentTypePickerUmb);
+
+            InstallationSummary installationSummary = packagingService.InstallPackage(testPackagePath);
+
+            Assert.IsNotNull(installationSummary);
+        }
+
+
+        [Test]
+        public void PackagingService_Can_GetPackageMetaData()
+        {
+            var packagingService = (PackagingService)ServiceContext.PackagingService;
+
+            const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+
+            string testPackagePath = GetTestPackagePath(documentTypePickerUmb);
+
+            MetaData packageMetaData = packagingService.GetPackageMetaData(testPackagePath);
+            Assert.IsNotNull(packageMetaData);
+        }
+
+        [Test]
+        public void PackagingService_Can_GetPackageWarnings()
+        {
+            var packagingService = (PackagingService)ServiceContext.PackagingService;
+
+            const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+
+            string testPackagePath = GetTestPackagePath(documentTypePickerUmb);
+
+            PreInstallWarnings preInstallWarnings = packagingService.GetPackageWarnings(testPackagePath);
+            Assert.IsNotNull(preInstallWarnings);
         }
 
         private void CreateDictionaryData()

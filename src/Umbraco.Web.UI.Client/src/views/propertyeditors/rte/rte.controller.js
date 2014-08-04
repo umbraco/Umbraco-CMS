@@ -30,6 +30,9 @@ angular.module("umbraco")
             var stylesheets = [];
             var styleFormats = [];
             var await = [];
+            if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
+                editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
+            }
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
@@ -80,6 +83,7 @@ angular.module("umbraco")
                     statusbar: false,
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
+                    maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets.join(','),
                     relative_urls: false,

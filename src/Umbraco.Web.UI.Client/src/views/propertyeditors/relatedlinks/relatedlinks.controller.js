@@ -94,7 +94,48 @@
                     link.link = $scope.newLink;
                 $event.preventDefault();
             };
-            
+
+            $scope.move = function (index, direction) {
+                var temp = $scope.model.value[index];
+                $scope.model.value[index] = $scope.model.value[index + direction];
+                $scope.model.value[index + direction] = temp;                
+            };
+
+            $scope.sortableOptions = {
+                containment: 'parent',
+                cursor: 'move',
+                helper: function (e, ui) {
+                    // When sorting <trs>, the cells collapse.  This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                    ui.children().each(function () {
+                        $(this).width($(this).width());
+                    });
+                    return ui;
+                },
+                items: '> tr',
+                tolerance: 'pointer',
+                update: function (e, ui) {
+                    // Get the new and old index for the moved element (using the URL as the identifier)
+                    var newIndex = ui.item.index();
+                    var movedLinkUrl = ui.item.attr('data-link');
+                    var originalIndex = getElementIndexByUrl(movedLinkUrl);
+
+                    // Move the element in the model
+                    var movedElement = $scope.model.value[originalIndex];
+                    $scope.model.value.splice(originalIndex, 1);
+                    $scope.model.value.splice(newIndex, 0, movedElement);
+                }
+            };
+
+            function getElementIndexByUrl(url) {
+                for (var i = 0; i < $scope.model.value.length; i++) {
+                    if ($scope.model.value[i].link === url) {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }
+
             function select(data) {
                 if ($scope.currentEditLink != null) {
                     $scope.currentEditLink.internal = data.id;

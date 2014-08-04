@@ -40,6 +40,25 @@ namespace Umbraco.Core
                 ToCSharpEscapeChars[escape[0]] = escape[1];
         }
 
+        internal static string StripFileExtension(this string fileName)
+        {
+            //filenames cannot contain line breaks
+            if (fileName.Contains(Environment.NewLine) || fileName.Contains("\r") || fileName.Contains("\n")) return fileName;
+
+            var lastIndex = fileName.LastIndexOf('.');
+            if (lastIndex > 0)
+            {
+                var ext = fileName.Substring(lastIndex);
+                //file extensions cannot contain whitespace
+                if (ext.Contains(" ")) return fileName;
+
+                return string.Format("{0}", fileName.Substring(0, fileName.IndexOf(ext, StringComparison.Ordinal)));
+            }
+            return fileName;
+
+            
+        }
+
         /// <summary>
         /// This tries to detect a json string, this is not a fail safe way but it is quicker than doing 
         /// a try/catch when deserializing when it is not json.

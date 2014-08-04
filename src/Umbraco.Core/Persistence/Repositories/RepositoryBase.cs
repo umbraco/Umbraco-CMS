@@ -133,6 +133,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<TEntity> GetAll(params TId[] ids)
         {
+            //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
+            ids = ids.Distinct().ToArray();
+
             if (ids.Any())
             {
                 var entities = _cache.GetByIds(

@@ -396,15 +396,15 @@ namespace umbraco.cms.businesslogic.packager
                         insPack.Data.Actions += n.OuterXml;
                     }
 
+                    //Run the actions tagged only for 'install'
+
                     if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
                     {
-                        try
-                        {
-                            PackageAction.RunPackageAction(insPack.Data.Name, n.Attributes["alias"].Value, n);
-                        }
-                        catch
-                        {
+                        var alias = n.Attributes["alias"] != null ? n.Attributes["alias"].Value : "";
 
+                        if (alias.IsNullOrWhiteSpace() == false)
+                        {
+                            PackageAction.RunPackageAction(insPack.Data.Name, alias, n);             
                         }
                     }
                 }
@@ -582,9 +582,9 @@ namespace umbraco.cms.businesslogic.packager
 
             wc.DownloadFile(
                 "http://" + PackageServer + "/fetch?package=" + Package.ToString(),
-                IOHelper.MapPath(SystemDirectories.Packages + "/" + Package.ToString() + ".umb"));
+                IOHelper.MapPath(SystemDirectories.Packages + "/" + Package + ".umb"));
 
-            return "packages\\" + Package.ToString() + ".umb";
+            return "packages\\" + Package + ".umb";
         }
         
         #endregion
@@ -641,7 +641,6 @@ namespace umbraco.cms.businesslogic.packager
                 return path + fileName;
             return path + Path.DirectorySeparatorChar + fileName;
         }
-
         private static string UnPack(string zipName)
         {
             // Unzip

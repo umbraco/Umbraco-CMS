@@ -71,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
                     && x.Value != null                                                   
                     && string.IsNullOrEmpty(x.Value.ToString()) == false))
                 {
-                    if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                    if (fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
                     {
                         var currentPath = fs.GetRelativePath(property.Value.ToString());
                         var propertyId = e.Copy.Properties.First(x => x.Alias == property.Alias).Id;

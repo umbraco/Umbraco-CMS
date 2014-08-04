@@ -1,12 +1,13 @@
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Mvc.Async;
 
 namespace Umbraco.Web.Mvc
 {
 	/// <summary>
 	/// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
 	/// </summary>
-	public class RenderActionInvoker : ControllerActionInvoker
+    public class RenderActionInvoker : AsyncControllerActionInvoker
 	{
 
 		/// <summary>

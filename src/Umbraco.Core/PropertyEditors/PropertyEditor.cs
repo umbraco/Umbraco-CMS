@@ -114,7 +114,7 @@ namespace Umbraco.Core.PropertyEditors
                 throw new NotImplementedException("This method must be implemented if a view is not explicitly set");
             }
 
-            editor.View = _attribute.EditorView;
+            editor.View = _attribute.EditorView.StartsWith("~/") ? IOHelper.ResolveUrl(_attribute.EditorView) : _attribute.EditorView;
             editor.ValueType = _attribute.ValueType;
             editor.HideLabel = _attribute.HideLabel;
             return editor;
