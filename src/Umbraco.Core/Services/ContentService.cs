@@ -74,6 +74,33 @@ namespace Umbraco.Core.Services
             _dataTypeService = dataTypeService;
         }
 
+        public int Count(string contentTypeAlias = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {                
+                return repository.Count(contentTypeAlias);
+            }
+        }
+
+        public int CountChildren(int parentId, string contentTypeAlias = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.CountChildren(parentId, contentTypeAlias);
+            }
+        }
+
+        public int CountDescendants(int parentId, string contentTypeAlias = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.CountDescendants(parentId, contentTypeAlias);
+            }
+        }
+
         /// <summary>
         /// Assigns a single permission to the current content item for the specified user ids
         /// </summary>

@@ -13,6 +13,17 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : IAggregateRoot
     {
         /// <summary>
+        /// Get the total count of entities
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <returns></returns>
+        int Count(string contentTypeAlias = null);
+
+        int CountChildren(int parentId, string contentTypeAlias = null);
+
+        int CountDescendants(int parentId, string contentTypeAlias = null);
+
+        /// <summary>
         /// Gets a list of all versions for an <see cref="TEntity"/>.
         /// </summary>
         /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
