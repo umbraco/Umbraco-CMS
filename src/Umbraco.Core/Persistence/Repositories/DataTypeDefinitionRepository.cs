@@ -426,7 +426,7 @@ AND umbracoNode.id <> @id",
         {
             //go get the data
             var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
-            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
+            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
             var collection = PreValueConverter.ConvertToPreValuesCollection(list);
 
             //now create the cache key, this needs to include all pre-value ids so that we can use this cached item in the GetPreValuesAsString method
