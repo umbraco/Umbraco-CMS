@@ -243,7 +243,9 @@ namespace Umbraco.Web
 
                         asyncResultsList.Add(
                             cacheRefresher.BeginBulkRefresh(
-                                instructions, Login, Password, null, null));
+                                instructions, 
+                                HttpRuntime.AppDomainAppId,
+                                Login, Password, null, null));
                     }
 
                     var waitHandlesList = asyncResultsList.Select(x => x.AsyncWaitHandle).ToArray();
