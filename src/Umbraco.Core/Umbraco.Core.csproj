@@ -372,7 +372,6 @@
     <Compile Include="Models\TaggedProperty.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
-    <Compile Include="Packaging\PackageBinaryByteInspector.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
     <Compile Include="Packaging\Models\PreInstallWarnings.cs" />
@@ -419,6 +418,7 @@
     <Compile Include="PropertyEditors\SupportTagsAttribute.cs" />
     <Compile Include="PropertyEditors\TagPropertyDefinition.cs" />
     <Compile Include="PropertyEditors\TagValueType.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverterMeta.cs" />
     <Compile Include="PropertyEditors\ValueConverters\JsonValueConverter.cs" />
