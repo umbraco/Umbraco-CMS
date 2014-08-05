@@ -8,6 +8,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -229,7 +230,7 @@ namespace Umbraco.Web.Security
                     }
 
                     var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
-                    return result == null ? null : new MemberPublishedContent(result);
+                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
                 });
         }
 
@@ -245,7 +246,7 @@ namespace Umbraco.Web.Security
                     }
 
                     var result = _applicationContext.Services.MemberService.GetById(memberId);
-                    return result == null ? null : new MemberPublishedContent(result);
+                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
                 });
         }
 
@@ -261,7 +262,7 @@ namespace Umbraco.Web.Security
                     }
 
                     var result = _applicationContext.Services.MemberService.GetByUsername(username);
-                    return result == null ? null : new MemberPublishedContent(result);
+                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
                 });
         }
 
@@ -277,7 +278,7 @@ namespace Umbraco.Web.Security
                     }
 
                     var result = _applicationContext.Services.MemberService.GetByEmail(email);
-                    return result == null ? null : new MemberPublishedContent(result);
+                    return result == null ? null : new MemberPublishedContent(result).CreateModel();
                 });
         }
 
@@ -293,7 +294,7 @@ namespace Umbraco.Web.Security
             }
             var result = GetCurrentPersistedMember();
             var provider = MPE.GetMembersMembershipProvider();
-            return result == null ? null : new MemberPublishedContent(result);
+            return result == null ? null : new MemberPublishedContent(result).CreateModel();
         }
 
         /// <summary>
