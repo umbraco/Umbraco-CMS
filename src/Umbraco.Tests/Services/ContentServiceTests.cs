@@ -40,6 +40,82 @@ namespace Umbraco.Tests.Services
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         [Test]
+        public void Count_All()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            for (int i = 0; i < 20; i++)
+            {
+                contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);    
+            }
+
+            // Assert
+            Assert.AreEqual(24, contentService.Count());
+        }
+
+        [Test]
+        public void Count_By_Content_Type()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
+            contentTypeService.Save(contentType);
+
+            // Act
+            for (int i = 0; i < 20; i++)
+            {
+                contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+            }
+
+            // Assert
+            Assert.AreEqual(20, contentService.Count(contentTypeAlias: "umbBlah"));
+        }
+
+        [Test]
+        public void Count_Children()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
+            contentTypeService.Save(contentType);
+            var parent = contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+
+            // Act
+            for (int i = 0; i < 20; i++)
+            {
+                contentService.CreateContentWithIdentity("Test", parent, "umbBlah");
+            }
+
+            // Assert
+            Assert.AreEqual(20, contentService.CountChildren(parent.Id));
+        }
+
+        [Test]
+        public void Count_Descendants()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
+            contentTypeService.Save(contentType);
+            var parent = contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+
+            // Act
+            IContent current = parent;
+            for (int i = 0; i < 20; i++)
+            {
+                current = contentService.CreateContentWithIdentity("Test", current, "umbBlah");
+            }
+
+            // Assert
+            Assert.AreEqual(20, contentService.CountDescendants(parent.Id));
+        }
+
+        [Test]
         public void Tags_For_Entity_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Recycled()
         {
             var contentService = ServiceContext.ContentService;
