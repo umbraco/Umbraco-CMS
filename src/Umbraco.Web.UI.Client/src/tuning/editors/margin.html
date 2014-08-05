@@ -1,0 +1,20 @@
+﻿
+<div ng-controller="Umbraco.tuning.margin">
+
+    <h5>{{item.name}}</h5>
+
+    <div class="box-slider"> 
+        <ul class="box-preview">
+            <li class="border-all" ng-class="{selected: selectedmargin.name == 'all'}" ng-click="setSelectedmargin('all')"></li>
+            <li class="border-left" ng-class="{selected: selectedmargin.name == 'left'}" ng-click="setSelectedmargin('left')"></li>
+            <li class="border-right" ng-class="{selected: selectedmargin.name == 'right'}" ng-click="setSelectedmargin('right')"></li>
+            <li class="border-top" ng-class="{selected: selectedmargin.name == 'top'}" ng-click="setSelectedmargin('top')"></li>
+            <li class="border-bottom" ng-class="{selected: selectedmargin.name == 'bottom'}" ng-click="setSelectedmargin('bottom')"></li>
+        </ul>
+    </div>
+
+    <div class="box-slider">
+        <div ui-slider min="0" max="40" step="1" ng-model="selectedmargin.value"></div>
+    </div>
+
+</div>

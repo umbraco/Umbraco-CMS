@@ -1,13 +1,15 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />
+    <!--<link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />-->
     <link href="/Umbraco/assets/css/tuning.panelStyles.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
-</head>
+    <!--<link href="/umbraco/lib/antiscroll/antiscroll.css" type="text/css" rel="stylesheet" />-->
 
-<body id="tuningPanel" ng-class="{open:isOpen}" ng-controller="Umbraco.tuningController">
+</head>
+ 
+<body id="tuningPanel" ng-mouseover="outlinePositionHide()" ng-class="{ rightOpen: showStyleEditor && !showDevicesPreview }" ng-controller="Umbraco.tuningController">
 
     <div class="wait" ng-show="!frameLoaded">Loading ...</div>
 
@@ -15,186 +17,139 @@
         <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
     </div>
 
-    <div class="tuning"> 
+    <div class="tuning" ng-init="showDevicesPreview = true; showPalettePicker = true">
 
-        <div id="TuningBg" ng-class="{open:isOpen}" style="display: block;">
+        <div class="fix-left-menu selected">
 
-            <div class="tuning-tools">
-
-                <div ng-click="togglePanel()">
-                    <i ng-if="isOpen" class="icon icon-left-double-arrow"></i>
-                    <i ng-if="!isOpen" class="icon icon-right-double-arrow"></i>
-                </div>
-
-                <div ng-if="isOpen" ng-click="settingOpen('previewDevice')" ng-class="{selected:settingIsOpen=='previewDevice', show:frameLoaded}" style="display:none">
-                    <i class="icon icon-display"></i>
-                </div>
-
-                <div ng-if="isOpen" ng-click="settingOpen('setting')" ng-class="{selected:settingIsOpen=='setting', show:enableTuning > 0}" style="display:none">
-                    <i class="icon icon-paint-roller"></i>
-                </div>
-
-                <div ng-if="isOpen" ng-click="settingOpen('presetColors')" ng-class="{selected:settingIsOpen=='presetColors', show:enableTuning > 0}" style="display:none">
-                    <i class="icon icon-palette"></i>
-                </div>
-
+            <div class="avatar">
+                <img ng-src="/umbraco/assets/img/application/logo.png">
             </div>
 
-            <div class="tuning-wrapper">
 
-                <div ng-show="settingIsOpen == 'previewDevice'">
+            <ul class="sections" ng-class="{selected: showDevicesPreview}">
+                <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
+                    <a href="#"><i class="icon {{device.icon}}"></i><span></span></a>
+                </li>
+                <li ng-click="closePreviewDevice()">
+                    <a href="#"><i class="icon icon-arrow-left"></i><span></span></a>
+                </li>
+            </ul>
 
-                    <h2>DEVICES</h2>
-                    <ul class="preview-device">
-                        <li ng-repeat="device in devices" ng-class=" { selected:previewDevice==device }" ng-click="updatePreviewDevice(device)">
-                            <div><i class="icon {{device.icon}}"></i><span>{{device.name}}</span></div>
-                        </li>
-                    </ul>
 
-                </div>
+            <ul class="sections" ng-class="{selected: !showDevicesPreview}">
+                <li ng-click="openPreviewDevice()">
+                    <a href="#"><i class="icon {{previewDevice.icon}}"></i><span>Preview</span></a>
+                </li>
+                <li ng-click="openPalettePicker()" ng-class=" { current:showPalettePicker }">
+                    <a href="#"><i class="icon icon-palette"></i><span>Palette</span></a>
+                </li>
+                <li ng-click="openStyleEditor()" ng-class=" { current:showStyleEditor }">
+                    <a href="#"><i class="icon icon-paint-roller"></i><span>UI Designer</span></a>
+                </li>
+            </ul>
 
-                <div ng-show="settingIsOpen == 'setting'">
-
-                    <h2>STYLING</h2>
-
-                    <div class="tuning-panel-property"
-                         ng-repeat="configItem in tuningModel.configs"
-                         ng-class="{selected : ( schemaFocus != '' && schemaFocus.toLowerCase() == configItem.name.toLowerCase() )}">
-
-                        <div class="tuning-panel-property-heading">
-                            <h4 class="panel-title">
-                                <a>
-                                    <span ng-click="accordionOpened(configItem.name)" ng-mouseover="accordionWillBeOpened(configItem)">
-                                        {{configItem.name}}
-                                    </span>
-                                </a>
-                            </h4>
-                        </div>
-
-                        <div class="tuning-property-collapse">
-                            <div class="tuning-panel-body">
-                                <div ng-mouseover="accordionWillBeOpened(configItem)" class="ng-scope">
-                                    <div ng-mouseover="accordionWillBeOpened(configItem)">
-                                        <div class="div-field" ng-repeat="item in configItem.editors" ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!--<accordion close-others="oneAtATime">
-                        <accordion-group ng-init="initTuning()"
-                                            ng-repeat="configItem in tuningModel.configs"
-                                            ng-class="{true:'selected', false:''}[isOpen]"
-                                            is-open="(schemaFocus != '' && schemaFocus.toLowerCase() == configItem.name.toLowerCase())">
-
-                            <accordion-heading>
-                                <span ng-click="accordionOpened(configItem.name)" ng-mouseover="accordionWillBeOpened(configItem.schema)">
-                                    {{configItem.name}} {{isOpen}}
-                                </span>
-                            </accordion-heading>
-
-                            <div ng-mouseover="accordionWillBeOpened(configItem.schema)">
-                                <div class="div-field" ng-repeat="item in configItem.editors" ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
-                            </div>
-
-                        </accordion-group>
-                    </accordion>-->
-
-                    <!-- Split button -->
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-success" ng-click="saveStyle()">Save Style</button>
-                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                            <span class="caret"></span>
-                            <span class="sr-only">Save Style</span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a ng-click="createStyle()">Create Page Style</a></li>
-                            <li><a ng-click="deleteTuning()">Reset page style</a></li>
-                        </ul>
-                    </div>
-
-                </div>
-
-                <div ng-show="settingIsOpen == 'presetColors'">
-
-                    <h2>PALETTE COLORS</h2>
-                    <ul class="palette">
-                        <li ng-click="refreshtuningByPalette(palette)" ng-repeat="palette in tuningPalette">
-                            <div>
-                                <span style="background-color: {{ palette.mainColor }}"></span>
-                            </div>
-                            <p>{{ palette.name }}</p>
-                        </li>
-                    </ul>
-
-                    <button class="btn btn-default btn-default-save" style="display:none" ng-click="saveLessParameters()">save</button>
-                    <button class="btn btn-default btn-default-save" ng-click="makePreset()">make it !</button>
-
-                </div>
-
+            <div class="help">
+                <div class="display-i"><i class="icon icon-help-alt"></i><span></span></div>
             </div>
-
-            <script type="text/ng-template" id="myModalContent.html">
-                <div class="modal-header bodyTuningImagePicker ng-scope">
-                    <ul class="breadcrumb">
-                        <li ng-if="startNodeId == -1">
-                            <a href="" ng-click="gotoFolder()">Media</a>
-                        </li>
-
-                        <!-- ngRepeat: item in path -->
-                        <li ng-repeat="item in currentPath" class="ng-scope">
-                            <a ng-if="currentFolder.id == item.id" href="" ng-class="{disabled:currentFolder.id == item.id}">{{ item.name }}</a>
-                            <a ng-if="currentFolder.id != item.id" ng-click="gotoFolder(item)">{{ item.name }}</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="modal-body bodyTuningImagePicker">
-                    <ul class="tuningImagePicker">
-                        <li>
-                            <ul class="media-items">
-                                <li ng-repeat="child in currentFolder.children | orderBy:'isFolder':true">
-                                    <div ng-if="!child.isFolder" class=" media-preview" ng-class="{selected:selectedMedia.id == child.id}" ng-click="selectMedia(child)" style="background-image: url({{ child.thumbnail }})"></div>
-                                    <div ng-if="child.isFolder" class=" media-preview" ng-click="selectMedia(child)">
-                                        <i class="icon icon-folder folder"><p class="folder-name">{{child.name}}</p></i>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" ng-click="ok()">OK</button>
-                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-                </div>
-            </script>
-
-            <script type="text/ng-template" id="fontFamilyPickerModel.html">
-
-                <div class="modal-header tuning-fontfamilypicker">
-                    <select ng-model="selectedFont" ng-change="showFontPreview(selectedFont)" ng-options="font as font.fontFamily group by font.fontType for font in fonts"></select>
-                    <select ng-model="selectedFont.variant" ng-change="showFontPreview(selectedFont)" ng-options="variant for variant in selectedFont.variants" />
-                </div>
-
-                <div class="modal-body tuning-fontfamilypicker">
-                    <span class="show" ng-style="setStyleVariant()">Aa Bb Cc 1 2 3 4&hellip; <br />The quick brown fox jumps over the lazy dog&hellip;</span>
-                </div>
-
-                <div class="modal-footer tuning-fontfamilypicker">
-                    <button class="btn btn-primary" ng-click="ok()">OK</button>
-                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-                </div>
-
-            </script>
 
         </div>
 
+        <div class="float-left-menu" ng-class="{selected: !showDevicesPreview && showPalettePicker}">
+
+            <div class="header">
+                <h3>Palette Style</h3>
+            </div>
+
+            <div class="content">
+
+                <ul class="samples">
+                    <li>
+                        <a href="#">
+                            <h4>Lipsum upsum ...</h4>
+                            <ul class="samples">
+                                <li class="sample1"></li>
+                                <li class="sample2"></li>
+                                <li class="sample3"></li>
+                                <li class="sample4"></li>
+                                <li class="sample5"></li>
+                                <li class="sample6"></li>
+                            </ul>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <h4>Lipsum upsum ...</h4>
+                            <ul class="samples">
+                                <li class="sample1"></li>
+                                <li class="sample2"></li>
+                                <li class="sample3"></li>
+                                <li class="sample4"></li>
+                                <li class="sample5"></li>
+                                <li class="sample6"></li>
+                            </ul>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <h4>Lipsum upsum ...</h4>
+                            <ul class="samples">
+                                <li class="sample1"></li>
+                                <li class="sample2"></li>
+                                <li class="sample3"></li>
+                                <li class="sample4"></li>
+                                <li class="sample5"></li>
+                                <li class="sample6"></li>
+                            </ul>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+        <div class="fix-right-menu devices-preview" ng-class="{selected: !showDevicesPreview && showStyleEditor}">
+
+            <div ng-repeat="configItem in tuningModel.configs" ng-show="schemaFocus.toLowerCase() == configItem.name.toLowerCase()" on-finish-render-filters>
+
+                <div class="header">
+                    <h3>{{configItem.name}}</h3>
+                </div>
+                <div class="content">
+                    <div ng-repeat="category in propertyCategories">
+                        <h4 class="panel-title">{{category}}</h4>
+                        <div class="tuning-panel-container">
+                            <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category"
+                                 ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="float-right-menu devices-preview" ng-class="{selected: showRightModal}">
+
+        </div>
+
+
     </div>
 
-    <div id="speechbubble">
+    <!--<div id="speechbubble">
         <p>Styles saved and visible at the website</p>
-    </div>
+    </div>-->
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
     <script src="/umbraco/js/tuning.loader.js"></script>

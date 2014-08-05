@@ -5,7 +5,7 @@
 
 angular.module("umbraco.tuning")
 
-.controller("Umbraco.tuning.googlefontpicker", function ($scope, $modal) {
+.controller("Umbraco.tuning.googlefontpicker", function ($scope, dialogService) {
 
     if (!$scope.item.values) {
         $scope.item.values = {
@@ -28,44 +28,32 @@ angular.module("umbraco.tuning")
 
     $scope.open = function (field) {
 
-        $scope.data = {
-            modalField: field
+        var config = {
+            template: "googlefontdialog.html",
+            change: function (data) {
+                $scope.item.values = data;
+            },
+            callback: function (data) {
+                $scope.item.values = data;
+            },
+            cancel: function (data) {
+                $scope.item.values = data;
+            },
+            dialogData: $scope.googleFontFamilies,
+            dialogItem: $scope.item.values
         };
 
-        var modalInstance = $modal.open({
-            scope: $scope,
-            templateUrl: 'fontFamilyPickerModel.html',
-            controller: 'tuning.fontfamilypickercontroller',
-            resolve: {
-                googleFontFamilies: function () {
-                    return $scope.googleFontFamilies;
-                },
-                item: function () {
-                    return field;
-                }
-            }
-        });
-        modalInstance.result.then(function (selectedItem) {
-            field.fontFamily = selectedItem.fontFamily;
-            field.fontType = selectedItem.fontType;
-            field.fontWeight = selectedItem.fontWeight;
-            field.fontStyle = selectedItem.fontStyle;
-        });
+        dialogService.open(config);
+
     };
 
 })
 
-.controller('tuning.fontfamilypickercontroller', function ($scope, $modalInstance, item, googleFontFamilies, $http) {
+.controller("googlefontdialog.controller", function ($scope) {
 
     $scope.safeFonts = ["Arial, Helvetica", "Impact", "Lucida Sans Unicode", "Tahoma", "Trebuchet MS", "Verdana", "Georgia", "Times New Roman", "Courier New, Courier"];
     $scope.fonts = [];
     $scope.selectedFont = {};
-
-    var originalFont = {};
-    originalFont.fontFamily = $scope.data.modalField.fontFamily;
-    originalFont.fontType = $scope.data.modalField.fontType;
-    originalFont.fontWeight = $scope.data.modalField.fontWeight;
-    originalFont.fontStyle = $scope.data.modalField.fontStyle;
 
     var googleGetWeight = function (googleVariant) {
         return (googleVariant != undefined && googleVariant != "") ? googleVariant.replace("italic", "") : "";
@@ -90,7 +78,7 @@ angular.module("umbraco.tuning")
         });
     });
 
-    angular.forEach(googleFontFamilies.items, function (value, key) {
+    angular.forEach($scope.dialogData.items, function (value, key) {
         var variants = value.variants;
         var variant = value.variants.length > 0 ? value.variants[0] : "";
         var fontWeight = googleGetWeight(variant);
@@ -107,7 +95,7 @@ angular.module("umbraco.tuning")
     });
 
     $scope.setStyleVariant = function () {
-        if ($scope.selectedFont != undefined) {
+        if ($scope.dialogItem != undefined) {
             return {
                 'font-family': $scope.selectedFont.fontFamily,
                 'font-weight': $scope.selectedFont.fontWeight,
@@ -117,6 +105,7 @@ angular.module("umbraco.tuning")
     };
 
     $scope.showFontPreview = function (font) {
+
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
 
             // Font needs to be independently loaded in the iframe for live preview to work.
@@ -130,34 +119,35 @@ angular.module("umbraco.tuning")
                     console.log('loading');
                 },
                 active: function () {
-                    // If $apply isn't called, the new font family isn't applied until the next user click.
-                    $scope.$apply(function () {
-                        $scope.selectedFont = font;
-                        $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
-                        $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
-
-                        // Apply to the page content as a preview.
-                        $scope.data.modalField.fontFamily = $scope.selectedFont.fontFamily;
-                        $scope.data.modalField.fontType = $scope.selectedFont.fontType;
-                        $scope.data.modalField.fontWeight = $scope.selectedFont.fontWeight;
-                        $scope.data.modalField.fontStyle = $scope.selectedFont.fontStyle;
-                    });
+                    $scope.selectedFont = font;
+                    $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
+                    $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
                 }
             });
+
         }
         else {
+
             // Font is available, apply it immediately in modal preview.
             $scope.selectedFont = font;
-            // And to page content.
-            $scope.data.modalField.fontFamily = $scope.selectedFont.fontFamily;
-            $scope.data.modalField.fontType = $scope.selectedFont.fontType;
-            $scope.data.modalField.fontWeight = $scope.selectedFont.fontWeight;
-            $scope.data.modalField.fontStyle = $scope.selectedFont.fontStyle;
         }
+
+        // If $apply isn't called, the new font family isn't applied until the next user click.
+        $scope.change({
+            fontFamily: $scope.selectedFont.fontFamily,
+            fontType: $scope.selectedFont.fontType,
+            fontWeight: $scope.selectedFont.fontWeight,
+            fontStyle: $scope.selectedFont.fontStyle,
+        });
+
     }
 
-    $scope.ok = function () {
-        $modalInstance.close({
+    $scope.cancelAndClose = function () {
+        $scope.cancel();
+    }
+
+    $scope.submitAndClose = function () {
+        $scope.submit({
             fontFamily: $scope.selectedFont.fontFamily,
             fontType: $scope.selectedFont.fontType,
             fontWeight: $scope.selectedFont.fontWeight,
@@ -165,23 +155,13 @@ angular.module("umbraco.tuning")
         });
     };
 
-    $scope.cancel = function () {
-        // Discard font change.
-        $modalInstance.close({
-            fontFamily: originalFont.fontFamily,
-            fontType: originalFont.fontType,
-            fontWeight: originalFont.fontWeight,
-            fontStyle: originalFont.fontStyle,
-        });
-    };
-
-    if (item != undefined) {
+    if ($scope.dialogItem != undefined) {
         angular.forEach($scope.fonts, function (value, key) {
-            if (value.fontFamily == item.fontFamily) {
+            if (value.fontFamily == $scope.dialogItem.fontFamily) {
                 $scope.selectedFont = value;
-                $scope.selectedFont.variant = item.fontWeight + item.fontStyle;
-                $scope.selectedFont.fontWeight = item.fontWeight;
-                $scope.selectedFont.fontStyle = item.fontStyle;
+                $scope.selectedFont.variant = $scope.dialogItem.fontWeight + $scope.dialogItem.fontStyle;
+                $scope.selectedFont.fontWeight = $scope.dialogItem.fontWeight;
+                $scope.selectedFont.fontStyle = $scope.dialogItem.fontStyle;
             }
         });
     }

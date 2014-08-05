@@ -1,0 +1,25 @@
+﻿
+<div ng-controller="Umbraco.tuning.radius">
+
+    <h5>{{item.name}}</h5>
+
+    <div class="box-slider">
+        <ul class="box-preview">
+            <li ng-class="{selected: selectedradius.name == 'all'}" ng-click="setSelectedradius('all')">
+                <span class="radius-top-left"></span>
+                <span class="radius-top-right"></span>
+                <span class="radius-bottom-left"></span>
+                <span class="radius-bottom-right"></span>
+            </li>
+            <li ng-class="{selected: selectedradius.name == 'topleft'}" ng-click="setSelectedradius('topleft')"><span class="radius-top-left"></span></li>
+            <li ng-class="{selected: selectedradius.name == 'topright'}" ng-click="setSelectedradius('topright')"><span class="radius-top-right"></span></li>
+            <li ng-class="{selected: selectedradius.name == 'bottomleft'}" ng-click="setSelectedradius('bottomleft')"><span class="radius-bottom-left"></span></li>
+            <li ng-class="{selected: selectedradius.name == 'bottomright'}" ng-click="setSelectedradius('bottomright')"><span class="radius-bottom-right"></span></li>
+        </ul>
+    </div>
+
+    <div class="box-slider">
+        <div ui-slider min="0" max="40" step="1" ng-model="selectedradius.value"></div>
+    </div>
+
+</div>

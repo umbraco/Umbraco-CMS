@@ -3,21 +3,16 @@
 /* tuning panel app and controller */
 /*********************************************************************************************************/
 
-angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services'])
+var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services', 'antiscroll'])
 
-.controller("Umbraco.tuningController", function ($scope, $modal, $http, $window, $timeout, $location) {
+.controller("Umbraco.tuningController", function ($scope, $http, $window, $timeout, $location, dialogService) {
 
     $scope.isOpen = false;
     $scope.frameLoaded = false;
     $scope.enableTuning = 0;
     $scope.schemaFocus = "body";
     $scope.settingIsOpen = 'previewDevice';
-    $scope.BackgroundPositions = ['center', 'left', 'right', 'bottom center', 'bottom left', 'bottom right', 'top center', 'top left', 'top right'];
-    $scope.BackgroundRepeats = ['no-repeat', 'repeat', 'repeat-x', 'repeat-y'];
-    $scope.BackgroundAttachments = ['scroll', 'fixed'];
-    $scope.Layouts = ['boxed', 'wide', 'full'];
-    $scope.displays = ['float-left', 'float-right', 'block-left', 'block-right', 'none'];
-    $scope.optionHomes = ['icon', 'text', 'none'];
+    $scope.propertyCategories = [];
     $scope.googleFontFamilies = {};
     $scope.pageId = "../dialogs/Preview.aspx?id=" + $location.search().id;
     $scope.devices = [
@@ -50,22 +45,19 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
         $.each($scope.tuningModel.configs, function (indexConfig, config) {
             $.each(config.editors, function (indexItem, item) {
 
+                /* try to get value */
                 try {
 
                     if (item.values) {
                         angular.forEach(Object.keys(item.values), function (key, indexKey) {
-
                             if (key != "''") {
                                 var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
                                 var newValue = eval("data." + propertyAlias.replace("@", ""));
-
                                 if (newValue == "''") {
                                     newValue = "";
                                 }
-
                                 item.values[key] = newValue;
                             }
-
                         })
                     }
 
@@ -99,11 +91,10 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
             .success(function (data) {
 
                 updateConfigValue(data);
-                $scope.frameLoaded = true;
-
-                if ($scope.settingIsOpen == "setting") {
-                    openIntelTuning();
-                }
+                
+                $timeout(function () {
+                    $scope.frameLoaded = true;
+                }, 200);
 
             });
 
@@ -111,13 +102,21 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
     // Refresh all less parameters for every changes watching tuningModel 
     var refreshtuning = function () {
+
         var parameters = [];
 
         if ($scope.tuningModel) {
 
-
             angular.forEach($scope.tuningModel.configs, function (config, indexConfig) {
+
+                // Get currrent selected element
+                if ($scope.schemaFocus && angular.lowercase($scope.schemaFocus) == angular.lowercase(config.name)) {
+                    $scope.currentSelected = config.selector ? config.selector : config.schema;
+                }
+
                 angular.forEach(config.editors, function (item, indexItem) {
+
+                    // Add new style
                     if (item.values) {
                         angular.forEach(Object.keys(item.values), function (key, indexKey) {
                             var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
@@ -130,6 +129,11 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
 
             // Refrech page style
             refreshFrontStyles(parameters);
+
+            // Refrech layout of selected element
+            if ($scope.currentSelected) {
+                setSelectedSchema($scope.currentSelected);
+            }
             
         }
     }
@@ -249,65 +253,84 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     /* Panel managment */
     /*****************************************************************************/
 
-    // Toggle panel
-    $scope.togglePanel = function () {
-        if ($scope.isOpen) {
-            $scope.isOpen = false;
-            closeIntelTuning();
-        }
-        else {
-            $scope.isOpen = true;
-            $scope.settingOpen($scope.settingIsOpen);
+    $scope.openPreviewDevice = function () {
+        $scope.showDevicesPreview = true;
+        $scope.closeIntelTuning()
+    }
+
+    $scope.closePreviewDevice = function(){
+        $scope.showDevicesPreview = false;
+        if ($scope.showStyleEditor) {
+            $scope.openIntelTuning();
         }
     }
+
+    $scope.openPalettePicker = function () {
+        $scope.showPalettePicker = true;
+        $scope.showStyleEditor = false;
+        $scope.closeIntelTuning()
+    }
+
+    $scope.openStyleEditor = function () {
+        $scope.showStyleEditor = true;
+        $scope.showPalettePicker = false;
+        $scope.openIntelTuning()
+    }
+
+    // Toggle panel
+    //$scope.togglePanel = function () {
+    //    if ($scope.isOpen) {
+    //        $scope.isOpen = false;
+    //        closeIntelTuning();
+    //    }
+    //    else {
+    //        $scope.isOpen = true;
+    //        $scope.settingOpen($scope.settingIsOpen);
+    //    }
+    //}
 
     // Toggle setting
-    $scope.settingOpen = function (a) {
+    //$scope.settingOpen = function (a) {
 
-        if ($scope.settingIsOpen == "setting" && a != "setting") {
-            closeIntelTuning();
-        }
+    //    if ($scope.settingIsOpen == "setting" && a != "setting") {
+    //        closeIntelTuning();
+    //    }
 
-        if (a == "setting") {
-            openIntelTuning();
-        }
+    //    if (a == "setting") {
+    //        openIntelTuning();
+    //    }
 
-        $scope.settingIsOpen = a;
-    }
+    //    $scope.settingIsOpen = a;
+    //}
 
     // Remove value from field
     $scope.removeField = function (field) {
         field.value = "";
     }
 
-    // Accordion open event
-    $scope.accordionOpened = function (schema) {
-        $scope.schemaFocus = schema;
-    }
+    //// Accordion open event
+    //$scope.accordionOpened = function (schema) {
+    //    $scope.schemaFocus = schema;
+    //}
 
-    // Focus schema in front
-    $scope.accordionWillBeOpened = function (editor) {
-        var selector = editor.selector ? editor.selector : editor.schema
-        setSelectedSchema(selector);
-    }
+    //// Focus schema in front
+    //$scope.accordionWillBeOpened = function (editor) {
+    //    var selector = editor.selector ? editor.selector : editor.schema
+    //    setSelectedSchema(selector);
+    //}
 
     /*****************************************************************************/
     /* Call function into the front-end   */
     /*****************************************************************************/
 
-    var openIntelTuning = function () {
-        if (document.getElementById("resultFrame").contentWindow.initIntelTuning)
-            document.getElementById("resultFrame").contentWindow.initIntelTuning($scope.tuningModel);
-    }
-
-    var closeIntelTuning = function () {
-        if (document.getElementById("resultFrame").contentWindow.closeIntelTuning)
-            document.getElementById("resultFrame").contentWindow.closeIntelTuning($scope.tuningModel);
-    }
-
     var loadGoogleFontInFront = function (font) {
         if (document.getElementById("resultFrame").contentWindow.getFont)
             document.getElementById("resultFrame").contentWindow.getFont(font);
+    }
+
+    var setOutlinePosition = function (schema) {
+        if (document.getElementById("resultFrame").contentWindow.setOutlinePosition)
+            document.getElementById("resultFrame").contentWindow.setOutlinePosition(schema);
     }
 
     var setSelectedSchema = function (schema) {
@@ -318,6 +341,34 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     var refreshFrontStyles = function (parameters) {
         if (document.getElementById("resultFrame").contentWindow.refrechLayout)
             document.getElementById("resultFrame").contentWindow.refrechLayout(parameters);
+    }
+
+    $scope.openIntelTuning = function () {
+        if (document.getElementById("resultFrame").contentWindow.initIntelTuning)
+            document.getElementById("resultFrame").contentWindow.initIntelTuning($scope.tuningModel);
+
+        // Refrech layout of selected element
+        if ($scope.currentSelected) {
+            setSelectedSchema($scope.currentSelected);
+        }
+
+    }
+
+    $scope.closeIntelTuning = function () {
+        if (document.getElementById("resultFrame").contentWindow.closeIntelTuning)
+            document.getElementById("resultFrame").contentWindow.closeIntelTuning($scope.tuningModel);
+        $scope.outlinePositionHide();
+        $scope.outlineSelectedHide();
+    }
+
+    $scope.outlinePositionHide = function () {
+        if (document.getElementById("resultFrame").contentWindow.outlinePositionHide)
+            document.getElementById("resultFrame").contentWindow.outlinePositionHide();
+    }
+
+    $scope.outlineSelectedHide = function () {
+        if (document.getElementById("resultFrame").contentWindow.outlineSelectedHide)
+            document.getElementById("resultFrame").contentWindow.outlineSelectedHide();
     }
 
     /*****************************************************************************/
@@ -368,7 +419,32 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     $scope.$watch("enableTuning", function () {
         $timeout(function () {
             if ($scope.enableTuning > 0) {
-                $scope.initTuning();
+                
+
+
+
+                $.each($scope.tuningModel.configs, function (indexConfig, config) {
+                    $.each(config.editors, function (indexItem, item) {
+
+                        /* get distinct dategoryies */
+                        if (item.category) {
+                            if ($.inArray(item.category, $scope.propertyCategories) < 0) {
+                                $scope.propertyCategories.splice($scope.propertyCategories.length + 1, 0, item.category);
+                            }
+                        }
+
+                    })
+                });
+
+
+
+
+
+                $scope.$watch('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    $scope.initTuning();
+                });
+
+
                 $scope.$watch('tuningModel', function () {
                     refreshtuning();
                 }, true);
@@ -377,3 +453,18 @@ angular.module("umbraco.tuning", ['ui.bootstrap', 'spectrumcolorpicker', 'ui.sli
     }, true)
 
 })
+
+.directive('onFinishRenderFilters', function ($timeout) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            if (scope.$last === true) {
+                $timeout(function () {
+                    scope.$emit('ngRepeatFinished');
+                });
+            }
+        }
+    }
+});
+
+

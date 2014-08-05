@@ -215,7 +215,7 @@ module.exports = function (grunt) {
           }
         },
         tuningJs: {
-            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/editors/*.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
+            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/editors/*.js', 'src/tuning/lib/*.js'],
             dest: '<%= distdir %>/js/tuning.panel.js'
         },
         controllers: {

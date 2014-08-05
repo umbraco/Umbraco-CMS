@@ -155,7 +155,7 @@ namespace Umbraco.Web
                         }
 
                         lessContent = lessContent + Environment.NewLine + lessModel
-                            .Replace("-ALIAS-", alias)
+                            .Replace("-ALIAS-", alias.ToLower())
                             .Replace("-SCHEMA-", schema);
 
                         foreach (var parameter in editorItem)

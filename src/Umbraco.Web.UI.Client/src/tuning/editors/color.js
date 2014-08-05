@@ -5,7 +5,7 @@
 
 angular.module("umbraco.tuning")
 
-.controller("Umbraco.tuning.colorpicker", function ($scope) {
+.controller("Umbraco.tuning.color", function ($scope) {
 
     if (!$scope.item.values) {
         $scope.item.values = {

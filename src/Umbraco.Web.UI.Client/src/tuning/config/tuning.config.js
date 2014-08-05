@@ -11,12 +11,45 @@ var tuningConfig = {
         editors: [
             {
                 type: "background",
-                name: "Image Background"
+                category: "Color",
+                name: "Background",
+                css: "color"
             },
             {
-                type: "colorpicker",
-                name: "Title Background Color",
-                css: "background-color"
-            }]
+                type: "color",
+                category: "Font",
+                name: "Font Color",
+                css: "color"
+            },
+            {
+                type: "googlefontpicker",
+                category: "Font",
+                name: "Font Family",
+                css: "color"
+            },
+            {
+                type: "border",
+                category: "Styling",
+                name: "Border",
+                schema: ".wrapper"
+            },
+            {
+                type: "radius",
+                category: "Styling",
+                name: "Radius",
+                schema: ".wrapper"
+            },
+            {
+                type: "padding",
+                category: "Position",
+                name: "Padding"
+            },
+            {
+                type: "margin",
+                category: "Position",
+                name: "Margin" 
+            }
+        ]
     }]
 };
+

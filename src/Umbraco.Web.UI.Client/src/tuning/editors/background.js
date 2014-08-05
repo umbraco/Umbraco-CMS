@@ -5,40 +5,39 @@
 
 angular.module("umbraco.tuning")
 
-.controller("Umbraco.tuning.background", function ($scope, $modal) {
+.controller("Umbraco.tuning.background", function ($scope, dialogService) {
 
     if (!$scope.item.values) {
         $scope.item.values = {
-            imageorpattern: ''
+            imageorpattern: '',
+            color:''
         };
     }
 
-    // Open image picker modal
     $scope.open = function (field) {
 
-        $scope.data = {
-            newFolder: "",
-            modalField: field
+        var config = {
+            template: "mediaPickerModal.html",
+            change: function (data) {
+                $scope.item.values.imageorpattern = data;
+            },
+            callback: function (data) {
+                $scope.item.values.imageorpattern = data;
+            },
+            cancel: function (data) {
+                $scope.item.values.imageorpattern = data;
+            },
+            dialogData: $scope.googleFontFamilies,
+            dialogItem: $scope.item.values.imageorpattern
         };
 
-        var modalInstance = $modal.open({
-            scope: $scope,
-            templateUrl: 'myModalContent.html',
-            controller: 'tuning.mediapickercontroller',
-            resolve: {
-                items: function () {
-                    return field.imageorpattern;
-                }
-            }
-        });
-        modalInstance.result.then(function (selectedItem) {
-            field.imageorpattern = selectedItem;
-        });
+        dialogService.open(config);
+
     };
 
 })
 
-.controller('tuning.mediapickercontroller', function ($scope, $modalInstance, items, $http, mediaResource, umbRequestHelper, entityResource, mediaHelper) {
+.controller('tuning.mediaPickerModal', function ($scope, $http, mediaResource, umbRequestHelper, entityResource, mediaHelper) {
 
     if (mediaHelper && mediaHelper.registerFileResolver) {
         mediaHelper.registerFileResolver("Umbraco.UploadField", function (property, entity, thumbnail) {
@@ -63,7 +62,7 @@ angular.module("umbraco.tuning")
         });
     }
 
-    var modalFieldvalue = $scope.data.modalField.imageorpattern;
+    var modalFieldvalue = $scope.dialogItem;
 
     $scope.currentFolder = {};
     $scope.currentFolder.children = [];
@@ -128,10 +127,15 @@ angular.module("umbraco.tuning")
 
                 angular.forEach(folder.children, function (child) {
                     child.isFolder = child.contentTypeAlias == "Folder" ? true : false;
-
                     if (!child.isFolder) {
-                        child.thumbnail = mediaHelper.resolveFile(child, true);
-                        child.image = mediaHelper.resolveFile(child, false);
+                        angular.forEach(child.properties, function (property) {
+                            // TODO, resolve with thumbnail
+                            if (property.alias = "umbracoFile" && property.value.src)
+                            {
+                                child.thumbnail = property.value.src;
+                                child.image = property.value.src;
+                            }
+                        })
                     }
                 });
 
@@ -147,11 +151,13 @@ angular.module("umbraco.tuning")
         if (!media.isFolder) {
             //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
             $scope.selectedMedia = media;
-            $scope.data.modalField.imageorpattern = "url(" + $scope.selectedMedia.image + ")";
+            modalFieldvalue = "url(" + $scope.selectedMedia.image + ")";
+            $scope.change(modalFieldvalue);
         }
         else {
             $scope.gotoFolder(media);
         }
+
     };
 
     //default root item
@@ -159,13 +165,17 @@ angular.module("umbraco.tuning")
         $scope.gotoFolder();
     }
 
-    $scope.ok = function () {
-        $modalInstance.close($scope.data.modalField.imageorpattern);
+    $scope.submitAndClose = function () {
+        if (modalFieldvalue != "") {
+            $scope.submit(modalFieldvalue);
+        } else {
+            $scope.cancel();
+        }
+        
     };
 
-    $scope.cancel = function () {
-        $scope.data.modalField.imageorpattern = modalFieldvalue;
-        $modalInstance.dismiss('cancel');
-    };
+    $scope.cancelAndClose = function () {
+        $scope.cancel();
+    }
 
 })

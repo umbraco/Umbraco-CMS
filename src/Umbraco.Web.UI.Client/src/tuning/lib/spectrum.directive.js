@@ -17,6 +17,7 @@ angular.module('spectrumcolorpicker', [])
 
               $element.find("input").spectrum({
                   color: scope.colorselected,
+                  allowEmpty: true,
                   preferredFormat: "rgb",
                   showAlpha: true,
                   showInput: true,
@@ -44,7 +45,7 @@ angular.module('spectrumcolorpicker', [])
 
           },
           template:
-          '<div><input type=\'text\' ng-model=\'colorselected\' /></div>',
+          '      <div class="spectrumcolorpicker"><div class="real-color-preview" style="background-color:{{colorselected}}"></div><input type=\'text\' ng-model=\'colorselected\' /></div>',
           replace: true
       };
   })

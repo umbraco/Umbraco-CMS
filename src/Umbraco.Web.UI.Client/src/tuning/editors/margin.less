@@ -1,0 +1,43 @@
+﻿
+/************************************************************************/
+/* margin -ALIAS- */
+/************************************************************************/
+
+/***start-lessParam--ALIAS-***/
+@marginvalue-ALIAS-:0;
+@leftmarginvalue-ALIAS-:0;
+@rightmarginvalue-ALIAS-:0;
+@topmarginvalue-ALIAS-:0;
+@bottommarginvalue-ALIAS-:0;
+
+
+/***end-lessParam--ALIAS-***/
+
+/***start-lessStyle--ALIAS-***/
+
+.left () when  (@leftmarginvalue-ALIAS- > 0) {
+    margin-left: @leftmarginvalue-ALIAS- + 0px;
+}
+
+.right () when  (@rightmarginvalue-ALIAS- > 0) {
+    margin-right: @rightmarginvalue-ALIAS- + 0px;
+}
+
+.top () when  (@topmarginvalue-ALIAS- > 0) {
+    margin-top: @topmarginvalue-ALIAS- + 0px;
+}
+
+.bottom () when  (@bottommarginvalue-ALIAS- > 0) {
+    margin-bottom: @bottommarginvalue-ALIAS- + 0px;
+}
+
+-SCHEMA- {
+    margin: @marginvalue-ALIAS- + 0px;
+    .left;
+    .right;
+    .top;
+    .bottom;
+}
+/***end-lessStyle--ALIAS-***/ 
+
+
