@@ -455,7 +455,7 @@ namespace Umbraco.Core.Packaging
             // Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
             string[] assemblyErrors;
             IEnumerable<byte[]> assemblyesToScan =_packageExtraction.ReadFilesFromArchive(packagePath, dlls);
-            return PackageBinaryByteInspector.ScanAssembliesForTypeReference<IDataType>(assemblyesToScan, out assemblyErrors).ToArray();
+            return PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(assemblyesToScan, out assemblyErrors).ToArray();
         }
 
         private KeyValuePair<string, string>[] FindUnsecureFiles(IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
