@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sql\Total.sql" />
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Sql\Version4_1_Upgrade.sql" />
   </ItemGroup>
