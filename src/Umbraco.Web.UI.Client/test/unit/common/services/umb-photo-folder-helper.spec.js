@@ -72,6 +72,26 @@ describe('umbPhotoFolderHelper tests', function () {
             expect(result.images.length).toBe(1);
 
         });
+
+        //SEE: http://issues.umbraco.org/issue/U4-5304
+        it('When a row fits with width but its too short, we remove one and scale up, but that comes up too narrow, so we just render what we have', function () {
+
+            var images = [
+{ "properties": [{ "value": "/test35.jpg", "alias": "umbracoFile" }, { "value": "1000", "alias": "umbracoWidth" }, { "value": "1041", "alias": "umbracoHeight" }], "contentTypeAlias": "Image", "name": "Test.jpg", "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1349", "originalWidth": 1000, "originalHeight": 1041 },
+{ "properties": [{ "value": "/test36.jpg", "alias": "umbracoFile" }, { "value": "1000", "alias": "umbracoWidth" }, { "value": "2013", "alias": "umbracoHeight" }], "contentTypeAlias": "Image", "name": "Test.jpg", "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1349", "originalWidth": 1000, "originalHeight": 2013 },
+{ "properties": [{ "value": "/test37.jpg", "alias": "umbracoFile" }, { "value": "840", "alias": "umbracoWidth" }, { "value": "360", "alias": "umbracoHeight" }], "contentTypeAlias": "Image", "name": "Test.jpg", "thumbnail": "/umbraco/UmbracoApi/Images/GetBigThumbnail?mediaId=1349", "originalWidth": 840, "originalHeight": 360 }
+            ];
+            var maxRowHeight = 250;
+            var minDisplayHeight = 105; 
+            var maxRowWidth = 400;
+            var idealImgPerRow = 3;
+            var margin = 5;
+
+            var result = umbPhotoFolderHelper.buildRow(images, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
+
+            expect(result.images.length).toBe(2);
+
+        });
         
         
     });
