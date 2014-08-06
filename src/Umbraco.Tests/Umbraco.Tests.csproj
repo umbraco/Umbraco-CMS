@@ -311,6 +311,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
+    <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
@@ -697,6 +698,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Install\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
