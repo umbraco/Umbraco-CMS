@@ -9,7 +9,8 @@
 					<small>{{image.name}}</small>
 				</span>
 
-				<a href class="picked-image" ng-click="remove($index)"><i class="icon icon-delete"></i></a>
+                <a title="Edit in Media" href="#media/media/edit/{{image.id}}" class="picked-image media-image"><i class="icon icon-umb-media"></i></a>
+                <a title="Remove link to Media" href class="picked-image" ng-click="remove($index)"><i class="icon icon-delete"></i></a>
 		</li>
 	</ul>
 
