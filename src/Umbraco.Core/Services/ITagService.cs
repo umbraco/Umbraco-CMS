@@ -33,25 +33,22 @@ namespace Umbraco.Core.Services
         /// Get all tags for content items (with optional group)
         /// </summary>
         /// <param name="group">Optional group</param>
-        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        IEnumerable<ITag> GetAllContentTags(string group = null, bool withCount = false);
+        IEnumerable<ITag> GetAllContentTags(string group = null);
 
         /// <summary>
         /// Get all tags for media items (with optional group)
         /// </summary>
         /// <param name="group">Optional group</param>
-        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        IEnumerable<ITag> GetAllMediaTags(string group = null, bool withCount = false);
+        IEnumerable<ITag> GetAllMediaTags(string group = null);
 
         /// <summary>
         /// Get all tags for member items (with optional group)
         /// </summary>
         /// <param name="group">Optional group</param>
-        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        IEnumerable<ITag> GetAllMemberTags(string group = null, bool withCount = false);
+        IEnumerable<ITag> GetAllMemberTags(string group = null);
 
         /// <summary>
         /// Returns all tags attached to a property by entity id

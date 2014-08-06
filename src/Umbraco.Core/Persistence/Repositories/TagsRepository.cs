@@ -226,11 +226,11 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null, bool withCount = false)
+        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null)
         {
             var nodeObjectType = GetNodeObjectType(objectType);
 
-            var sql = GetTagsQuerySelect(withCount);
+            var sql = GetTagsQuerySelect(true);
 
             sql = ApplyRelationshipJoinToTagsQuery(sql);
 
@@ -243,7 +243,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
 
-            sql = ApplyGroupByToTagsQuery(sql, withCount);
+            sql = ApplyGroupByToTagsQuery(sql);
 
             return ExecuteTagsQuery(sql);
         }
@@ -279,11 +279,11 @@ namespace Umbraco.Core.Persistence.Repositories
             return ExecuteTagsQuery(sql);
         }
 
-        private Sql GetTagsQuerySelect(bool withCount = false)
+        private Sql GetTagsQuerySelect(bool withGrouping = false)
         {
             var sql = new Sql();
 
-            if (withCount)
+            if (withGrouping)
             {
                 sql = sql.Select("cmsTags.Id, cmsTags.Tag, cmsTags.[Group], Count(*) NodeCount");
             }
@@ -313,14 +313,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private Sql ApplyGroupByToTagsQuery(Sql sql, bool withCount)
+        private Sql ApplyGroupByToTagsQuery(Sql sql)
         {
-            if (withCount)
-            {
-                sql = sql.GroupBy(new string[] { "cmsTags.Id", "cmsTags.Tag", "cmsTags.[Group]" });
-            }
-
-            return sql;
+            return sql.GroupBy(new string[] { "cmsTags.Id", "cmsTags.Tag", "cmsTags.[Group]" });
         }
 
         private IEnumerable<ITag> ExecuteTagsQuery(Sql sql)

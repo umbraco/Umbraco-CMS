@@ -111,13 +111,12 @@ namespace Umbraco.Core.Services
         /// Get all tags for content items (with optional group)
         /// </summary>
         /// <param name="group">Optional group</param>
-        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        public IEnumerable<ITag> GetAllContentTags(string group = null, bool withCount = false)
+        public IEnumerable<ITag> GetAllContentTags(string group = null)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetTagsForEntityType(TaggableObjectTypes.Content, group, withCount);
+                return repository.GetTagsForEntityType(TaggableObjectTypes.Content, group);
             }
         }
 
@@ -125,13 +124,12 @@ namespace Umbraco.Core.Services
         /// Get all tags for media items (with optional group)
         /// </summary>
         /// <param name="group">Optional group</param>
-        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        public IEnumerable<ITag> GetAllMediaTags(string group = null, bool withCount = false)
+        public IEnumerable<ITag> GetAllMediaTags(string group = null)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetTagsForEntityType(TaggableObjectTypes.Media, group, withCount);
+                return repository.GetTagsForEntityType(TaggableObjectTypes.Media, group);
             }
         }
 
@@ -139,13 +137,12 @@ namespace Umbraco.Core.Services
         /// Get all tags for member items (with optional group)
         /// </summary>
         /// <param name="group">Optional group</param>
-        /// <param name="withCount">Optional flag to return the number of content items tagged with the tag</param>
         /// <returns></returns>
-        public IEnumerable<ITag> GetAllMemberTags(string group = null, bool withCount = false)
+        public IEnumerable<ITag> GetAllMemberTags(string group = null)
         {
             using (var repository = _repositoryFactory.CreateTagsRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetTagsForEntityType(TaggableObjectTypes.Member, group, withCount);
+                return repository.GetTagsForEntityType(TaggableObjectTypes.Member, group);
             }
         }
 
