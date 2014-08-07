@@ -16,9 +16,15 @@ namespace Umbraco.Core.Models
 
         public Tag(int id, string text, string @group)
         {
+            Id = id;
             Text = text;
             Group = @group;
-            Id = id;
+        }
+
+        public Tag(int id, string text, string @group, int nodeCount)
+            : this(id, text, @group)
+        {
+            NodeCount = nodeCount;            
         }
 
         private static readonly PropertyInfo TextSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
@@ -51,6 +57,8 @@ namespace Umbraco.Core.Models
                 }, _group, GroupSelector);
             }
         }
+
+        public int NodeCount { get; internal set; }
 
         //TODO: enable this at some stage
         //public int ParentId { get; set; }

@@ -27,5 +27,9 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(100)]
         public string Group { get; set; }//NOTE Is set to [varchar] (100) in Sql Server script
+
+        [Column("NodeCount")]
+        [Ignore]
+        public int NodeCount { get; set; }
     }
 }
