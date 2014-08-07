@@ -4,23 +4,23 @@
 /************************************************************************/
 
 /***start-lessParam--ALIAS-***/
-@bordersize-ALIAS-:0;
+@bordersize-ALIAS-:'';
 @bordercolor-ALIAS-:'';
 @bordertype-ALIAS-:solid;
 
-@leftbordersize-ALIAS-:0;
+@leftbordersize-ALIAS-:'';
 @leftbordercolor-ALIAS-:'';
 @leftbordertype-ALIAS-:solid;
 
-@rightbordersize-ALIAS-:0;
+@rightbordersize-ALIAS-:'';
 @rightbordercolor-ALIAS-:'';
 @rightbordertype-ALIAS-:solid;
 
-@topbordersize-ALIAS-:0;
+@topbordersize-ALIAS-:'';
 @topbordercolor-ALIAS-:'';
 @topbordertype-ALIAS-:solid;
 
-@bottombordersize-ALIAS-:0;
+@bottombordersize-ALIAS-:'';
 @bottombordercolor-ALIAS-:'';
 @bottombordertype-ALIAS-:solid;
 
@@ -28,38 +28,42 @@
 
 /***start-lessStyle--ALIAS-***/
 
-.left () when  (@leftbordersize-ALIAS- > 0) {
+.all-ALIAS- () when  (@bordersize-ALIAS- > 0) {
+    border: @bordersize-ALIAS- + 0px;
+    border-color:@bordercolor-ALIAS-;
+    border-style:@bordertype-ALIAS-;
+}
+
+.left-ALIAS- () when  (@leftbordersize-ALIAS- > 0) {
     border-left: @leftbordersize-ALIAS- + 0px;
     border-left-color:@leftbordercolor-ALIAS-;
     border-left-style:@leftbordertype-ALIAS-;
 }
 
-.right () when  (@rightbordersize-ALIAS- > 0) {
+.right-ALIAS- () when  (@rightbordersize-ALIAS- > 0) {
     border-right: @rightbordersize-ALIAS- + 0px;
     border-right-color:@rightbordercolor-ALIAS-;
     border-right-style:@rightbordertype-ALIAS-;
 }
 
-.top () when  (@topbordersize-ALIAS- > 0) {
+.top-ALIAS- () when  (@topbordersize-ALIAS- > 0) {
     border-top: @topbordersize-ALIAS- + 0px;
     border-top-color:@topbordercolor-ALIAS-;
     border-top-style:@topbordertype-ALIAS-;
 }
 
-.bottom () when  (@bottombordersize-ALIAS- > 0) {
+.bottom-ALIAS- () when  (@bottombordersize-ALIAS- > 0) {
     border-bottom: @bottombordersize-ALIAS- + 0px;
     border-bottom-color:@bottombordercolor-ALIAS-;
     border-bottom-style:@bottombordertype-ALIAS-;
 }
 
 -SCHEMA- {
-    border: @bordersize-ALIAS- + 0px;
-    border-color:@bordercolor-ALIAS-;
-    border-style:@bordertype-ALIAS-;
-    .left;
-    .right;
-    .top;
-    .bottom;
+    .all-ALIAS-;
+    .left-ALIAS-;
+    .right-ALIAS-;
+    .top-ALIAS-;
+    .bottom-ALIAS-;
 }
 /***end-lessStyle--ALIAS-***/ 
 

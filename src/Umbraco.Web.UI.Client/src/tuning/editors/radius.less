@@ -4,36 +4,42 @@
 /************************************************************************/
 
 /***start-lessParam--ALIAS-***/
-@radiusvalue-ALIAS-:0;
-@topleftradiusvalue-ALIAS-:0;
-@toprightradiusvalue-ALIAS-:0;
-@bottomleftradiusvalue-ALIAS-:0;
-@bottomrightradiusvalue-ALIAS-:0;
+@radiusvalue-ALIAS-:'';
+@topleftradiusvalue-ALIAS-:'';
+@toprightradiusvalue-ALIAS-:'';
+@bottomleftradiusvalue-ALIAS-:'';
+@bottomrightradiusvalue-ALIAS-:'';
 
 
 /***end-lessParam--ALIAS-***/
 
 /***start-lessStyle--ALIAS-***/
 
-.topleft () when  (@topleftradiusvalue-ALIAS- > 0) {
+.all-ALIAS- () when (isnumber(@radiusvalue-ALIAS-)) {
+    -webkit-border-radius: @radiusvalue-ALIAS- + 0px;
+    -moz-border-radius: @radiusvalue-ALIAS- + 0px;
+    border-radius: @radiusvalue-ALIAS- + 0px;
+}
+
+.topleft-ALIAS- () when (isnumber(@topleftradiusvalue-ALIAS-)) {
     -webkit-border-top-left-radius: @topleftradiusvalue-ALIAS- + 0px;
     -moz-border-radius-topleft: @topleftradiusvalue-ALIAS- + 0px;
     border-top-left-radius: @topleftradiusvalue-ALIAS- + 0px;
 }
 
-.topright () when  (@toprightradiusvalue-ALIAS- > 0) {
+.topright-ALIAS- () when (isnumber(@toprightradiusvalue-ALIAS-)) {
     -webkit-border-top-right-radius: @toprightradiusvalue-ALIAS- + 0px;
     -moz-border-radius-topright: @toprightradiusvalue-ALIAS- + 0px;
     border-top-right-radius: @toprightradiusvalue-ALIAS- + 0px;
 }
 
-.bottomleft () when  (@bottomleftradiusvalue-ALIAS- > 0) {
+.bottomleft-ALIAS- () when (isnumber(@bottomleftradiusvalue-ALIAS-)) {
     -webkit-border-bottom-left-radius: @bottomleftradiusvalue-ALIAS- + 0px;
     -moz-border-radius-bottomleft: @bottomleftradiusvalue-ALIAS- + 0px;
     border-bottom-left-radius: @bottomleftradiusvalue-ALIAS- + 0px;
 }
 
-.bottomright () when  (@bottomrightradiusvalue-ALIAS- > 0) {
+.bottomright-ALIAS- () when (isnumber(@bottomrightradiusvalue-ALIAS-)) {
     -webkit-border-bottom-right-radius: @bottomrightradiusvalue-ALIAS- + 0px;
     -moz-border-radius-bottomright: @bottomrightradiusvalue-ALIAS- + 0px;
     border-bottom-right-radius: @bottomrightradiusvalue-ALIAS- + 0px;
@@ -41,13 +47,11 @@
 
 
 -SCHEMA- {
-    -webkit-border-radius: @radiusvalue-ALIAS- + 0px;
-    -moz-border-radius: @radiusvalue-ALIAS- + 0px;
-    border-radius: @radiusvalue-ALIAS- + 0px;
-    .topleft;
-    .topright;
-    .bottomleft;
-    .bottomright;
+    .all-ALIAS-;
+    .topleft-ALIAS-;
+    .topright-ALIAS-;
+    .bottomleft-ALIAS-;
+    .bottomright-ALIAS-;
 }
 /***end-lessStyle--ALIAS-***/ 
 

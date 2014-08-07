@@ -104,24 +104,34 @@ angular.module("umbraco.tuning")
         }
     };
 
-    $scope.showFontPreview = function (font) {
+    $scope.showFontPreview = function (font, variant) {
+
+        if (!variant)
+            variant = font.variant;
 
         if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
 
             // Font needs to be independently loaded in the iframe for live preview to work.
-            document.getElementById("resultFrame").contentWindow.getFont(font.fontFamily + ":" + font.variant);
+            document.getElementById("resultFrame").contentWindow.getFont(font.fontFamily + ":" + variant);
 
             WebFont.load({
                 google: {
-                    families: [font.fontFamily + ":" + font.variant]
+                    families: [font.fontFamily + ":" + variant]
                 },
                 loading: function () {
                     console.log('loading');
                 },
                 active: function () {
                     $scope.selectedFont = font;
-                    $scope.selectedFont.fontWeight = googleGetWeight($scope.selectedFont.variant);
-                    $scope.selectedFont.fontStyle = googleGetStyle($scope.selectedFont.variant);
+                    $scope.selectedFont.fontWeight = googleGetWeight(variant);
+                    $scope.selectedFont.fontStyle = googleGetStyle(variant);
+                    // If $apply isn't called, the new font family isn't applied until the next user click.
+                    $scope.change({
+                        fontFamily: $scope.selectedFont.fontFamily,
+                        fontType: $scope.selectedFont.fontType,
+                        fontWeight: $scope.selectedFont.fontWeight,
+                        fontStyle: $scope.selectedFont.fontStyle,
+                    });
                 }
             });
 
@@ -130,15 +140,16 @@ angular.module("umbraco.tuning")
 
             // Font is available, apply it immediately in modal preview.
             $scope.selectedFont = font;
+            // If $apply isn't called, the new font family isn't applied until the next user click.
+            $scope.change({
+                fontFamily: $scope.selectedFont.fontFamily,
+                fontType: $scope.selectedFont.fontType,
+                fontWeight: $scope.selectedFont.fontWeight,
+                fontStyle: $scope.selectedFont.fontStyle,
+            });
         }
 
-        // If $apply isn't called, the new font family isn't applied until the next user click.
-        $scope.change({
-            fontFamily: $scope.selectedFont.fontFamily,
-            fontType: $scope.selectedFont.fontType,
-            fontWeight: $scope.selectedFont.fontWeight,
-            fontStyle: $scope.selectedFont.fontStyle,
-        });
+
 
     }
 

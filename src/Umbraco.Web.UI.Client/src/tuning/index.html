@@ -11,10 +11,10 @@
  
 <body id="tuningPanel" ng-mouseover="outlinePositionHide()" ng-class="{ rightOpen: showStyleEditor && !showDevicesPreview }" ng-controller="Umbraco.tuningController">
 
-    <div class="wait" ng-show="!frameLoaded">Loading ...</div>
+    <div class="wait" ng-show="!frameLoaded"></div>
 
     <div id="demo-iframe-wrapper" ng-show="frameLoaded" class="{{previewDevice.css}}">
-        <iframe id="resultFrame" ng-src="{{pageId}}" frameborder="0"></iframe>
+        <iframe id="resultFrame" ng-src="{{pageUrl}}" frameborder="0" iframe-is-loaded></iframe>
     </div>
 
     <div class="tuning" ng-init="showDevicesPreview = true; showPalettePicker = true">
@@ -25,18 +25,20 @@
                 <img ng-src="/umbraco/assets/img/application/logo.png">
             </div>
 
-
             <ul class="sections" ng-class="{selected: showDevicesPreview}">
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
                     <a href="#"><i class="icon {{device.icon}}"></i><span></span></a>
                 </li>
-                <li ng-click="closePreviewDevice()">
-                    <a href="#"><i class="icon icon-arrow-left"></i><span></span></a>
+                <li ng-click="closePreviewDevice()" ng-if="enableTuning > 0">
+                    <a href="" class="more-options">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </a>
                 </li>
             </ul>
 
-
-            <ul class="sections" ng-class="{selected: !showDevicesPreview}">
+            <ul class="sections" ng-class="{selected: !showDevicesPreview}" ng-if="enableTuning > 0">
                 <li ng-click="openPreviewDevice()">
                     <a href="#"><i class="icon {{previewDevice.icon}}"></i><span>Preview</span></a>
                 </li>
@@ -48,9 +50,9 @@
                 </li>
             </ul>
 
-            <div class="help">
+            <!--<div class="help">
                 <div class="display-i"><i class="icon icon-help-alt"></i><span></span></div>
-            </div>
+            </div>-->
 
         </div>
 
@@ -63,34 +65,8 @@
             <div class="content">
 
                 <ul class="samples">
-                    <li>
-                        <a href="#">
-                            <h4>Lipsum upsum ...</h4>
-                            <ul class="samples">
-                                <li class="sample1"></li>
-                                <li class="sample2"></li>
-                                <li class="sample3"></li>
-                                <li class="sample4"></li>
-                                <li class="sample5"></li>
-                                <li class="sample6"></li>
-                            </ul>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <h4>Lipsum upsum ...</h4>
-                            <ul class="samples">
-                                <li class="sample1"></li>
-                                <li class="sample2"></li>
-                                <li class="sample3"></li>
-                                <li class="sample4"></li>
-                                <li class="sample5"></li>
-                                <li class="sample6"></li>
-                            </ul>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
+                    <li ng-repeat="palette in tuningPalette">
+                        <a href="#" ng-click="refreshtuningByPalette(palette)">
                             <h4>Lipsum upsum ...</h4>
                             <ul class="samples">
                                 <li class="sample1"></li>
@@ -105,15 +81,19 @@
                 </ul>
             </div>
 
+            <div class="btn-group">
+                <a class="btn btn-success" ng-click="saveStyle()">Save Style</a>
+                <a class="btn btn-success dropdown-toggle" ng-click="opendropdown = !opendropdown">
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
+                    <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
+                    <li><a ng-click="deleteTuning();opendropdown = false">Reset page style</a></li>
+                    <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
+                </ul>
+            </div>
+                
         </div>
-
-
-
-
-
-
-
-
 
         <div class="fix-right-menu devices-preview" ng-class="{selected: !showDevicesPreview && showStyleEditor}">
 
@@ -123,7 +103,7 @@
                     <h3>{{configItem.name}}</h3>
                 </div>
                 <div class="content">
-                    <div ng-repeat="category in propertyCategories">
+                    <div ng-repeat="category in propertyCategories" ng-show="hasEditor(configItem.editors, category)">
                         <h4 class="panel-title">{{category}}</h4>
                         <div class="tuning-panel-container">
                             <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category"
@@ -135,21 +115,27 @@
 
             </div>
 
+            <div class="btn-group">
+                <a class="btn btn-success" ng-click="saveStyle()">Save Style</a>
+                <a class="btn btn-success dropdown-toggle" ng-click="opendropdown = !opendropdown">
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
+                    <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
+                    <li><a ng-click="deleteTuning();opendropdown = false">Reset page style</a></li>
+                    <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
+                </ul>
+            </div>
+
         </div>
 
-
-
-
-        <div class="float-right-menu devices-preview" ng-class="{selected: showRightModal}">
-
-        </div>
-
+        <div class="float-right-menu devices-preview" ng-class="{selected: showRightModal}"></div>
 
     </div>
 
-    <!--<div id="speechbubble">
-        <p>Styles saved and visible at the website</p>
-    </div>-->
+    <div id="speechbubble">
+        <p>Styles saved and published</p>
+    </div>
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
     <script src="/umbraco/js/tuning.loader.js"></script>

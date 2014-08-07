@@ -98,6 +98,9 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                     if (isNaN(ngModel.$viewValue) && !(ngModel.$viewValue instanceof Array))
                         ngModel.$viewValue = 0;
 
+                    if (ngModel.$viewValue == '')
+                        ngModel.$viewValue = 0;
+
                     scope.value = ngModel.$viewValue;
 
                     // Do some sanity check of range values
@@ -120,6 +123,8 @@ angular.module('ui.slider', []).value('uiSliderConfig', {}).directive('uiSlider'
                             if (prevRangeValues.max <= ngModel.$viewValue[0])
                                 ngModel.$viewValue[1] = prevRangeValues.max;
                         }
+
+
 
                         // Store values for later user
                         prevRangeValues.min = ngModel.$viewValue[0];

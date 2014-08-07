@@ -7,10 +7,11 @@ angular.module("umbraco.tuning")
 
 .controller("Umbraco.tuning.padding", function ($scope, dialogService) {
 
-    $scope.paddingList = ["all", "left", "right", "top", "bottom"];
+    $scope.defaultPaddingList = ["all", "left", "right", "top", "bottom"];
+    $scope.paddingList = [];
    
     $scope.selectedpadding = {
-        name: "all",
+        name: "",
         value: 0,
     };
 
@@ -45,15 +46,28 @@ angular.module("umbraco.tuning")
 
     if (!$scope.item.values) {
         $scope.item.values = {
-            paddingvalue: '0',
-            leftpaddingvalue: '0',
-            rightpaddingvalue: '0',
-            toppaddingvalue: '0',
-            bottompaddingvalue: '0',
+            paddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 0 ? $scope.item.defaultValue[0] : 0,
+            leftpaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 1 ? $scope.item.defaultValue[1] : 0,
+            rightpaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 2 ? $scope.item.defaultValue[2] : 0,
+            toppaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 3 ? $scope.item.defaultValue[3] : 0,
+            bottompaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : 0,
         };
     }
 
-    $scope.setSelectedpadding("all");
+    if ($scope.item.enable) {
+        angular.forEach($scope.defaultPaddingList, function (key, indexKey) {
+            if ($.inArray(key, $scope.item.enable) >= 0) {
+                $scope.paddingList.splice($scope.paddingList.length + 1, 0, key);
+            }
+        })
+    }
+    else {
+        $scope.paddingList = $scope.defaultPaddingList;
+    }
+
+    $scope.$watch("valueAreLoaded", function () {
+        $scope.setSelectedpadding($scope.paddingList[0]);
+    }, false);
 
     $scope.$watch( "selectedpadding", function () {
 
@@ -78,5 +92,7 @@ angular.module("umbraco.tuning")
         }
 
     }, true)
+
+
 
 })

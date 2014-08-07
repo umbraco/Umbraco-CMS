@@ -5,16 +5,12 @@
 
     <div class="box-slider">
         <ul class="box-preview">
-            <li class="border-all" ng-class="{selected: selectedpadding.name == 'all'}" ng-click="setSelectedpadding('all')"></li>
-            <li class="border-left" ng-class="{selected: selectedpadding.name == 'left'}" ng-click="setSelectedpadding('left')"></li>
-            <li class="border-right" ng-class="{selected: selectedpadding.name == 'right'}" ng-click="setSelectedpadding('right')"></li>
-            <li class="border-top" ng-class="{selected: selectedpadding.name == 'top'}" ng-click="setSelectedpadding('top')"></li>
-            <li class="border-bottom" ng-class="{selected: selectedpadding.name == 'bottom'}" ng-click="setSelectedpadding('bottom')"></li>
+            <li ng-repeat="padding in paddingList" class="border-{{padding}}" ng-class="{selected: selectedpadding.name == padding}" ng-click="setSelectedpadding(padding)"></li>
         </ul>
     </div>
 
     <div class="box-slider">
-        <div ui-slider min="0" max="40" step="1" ng-model="selectedpadding.value"></div>
+        <div ui-slider min="0" max="400" step="1" ng-model="selectedpadding.value"></div>
     </div>
 
 </div>

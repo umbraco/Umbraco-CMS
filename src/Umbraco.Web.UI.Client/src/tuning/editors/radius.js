@@ -7,10 +7,11 @@ angular.module("umbraco.tuning")
 
 .controller("Umbraco.tuning.radius", function ($scope, dialogService) {
 
-    $scope.radiusList = ["all", "topleft", "topright", "bottomleft", "bottomright"];
+    $scope.defaultRadiusList = ["all", "topleft", "topright", "bottomleft", "bottomright"];
+    $scope.radiusList = [];
    
     $scope.selectedradius = {
-        name: "all",
+        name: "",
         value: 0,
     };
 
@@ -45,15 +46,28 @@ angular.module("umbraco.tuning")
 
     if (!$scope.item.values) {
         $scope.item.values = {
-            radiusvalue: '0',
-            topleftradiusvalue: '0',
-            toprightradiusvalue: '0',
-            bottomleftradiusvalue: '0',
-            bottomrightradiusvalue: '0',
+            radiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 0 ? $scope.item.defaultValue[0] : 0,
+            topleftradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 1 ? $scope.item.defaultValue[1] : 0,
+            toprightradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 2 ? $scope.item.defaultValue[2] : 0,
+            bottomleftradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 3 ? $scope.item.defaultValue[3] : 0,
+            bottomrightradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : 0,
         };
     }
 
-    $scope.setSelectedradius("all");
+    if ($scope.item.enable) {
+        angular.forEach($scope.defaultRadiusList, function (key, indexKey) {
+            if ($.inArray(key, $scope.item.enable) >= 0) {
+                $scope.radiusList.splice($scope.radiusList.length + 1, 0, key);
+            }
+        })
+    }
+    else {
+        $scope.radiusList = $scope.defaultRadiusList;
+    }
+
+    $scope.$watch("valueAreLoaded", function () {
+        $scope.setSelectedradius($scope.radiusList[0]);
+    }, false);
 
     $scope.$watch( "selectedradius", function () {
 

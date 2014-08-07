@@ -5,11 +5,8 @@
 
     <div class="box-slider">
         <ul class="box-preview">
-            <li class="border-all" ng-class="{selected: selectedBorder.name == 'all'}" ng-click="setselectedBorder('all')"></li>
-            <li class="border-left" ng-class="{selected: selectedBorder.name == 'left'}" ng-click="setselectedBorder('left')"></li>
-            <li class="border-right" ng-class="{selected: selectedBorder.name == 'right'}" ng-click="setselectedBorder('right')"></li>
-            <li class="border-top" ng-class="{selected: selectedBorder.name == 'top'}" ng-click="setselectedBorder('top')"></li>
-            <li class="border-bottom" ng-class="{selected: selectedBorder.name == 'bottom'}" ng-click="setselectedBorder('bottom')"></li>
+            <li ng-repeat="border in borderList" class="border-{{border}}" ng-class="{selected: selectedBorder.name == border}" ng-click="setselectedBorder(border)"></li>
+
         </ul>
     </div>
 

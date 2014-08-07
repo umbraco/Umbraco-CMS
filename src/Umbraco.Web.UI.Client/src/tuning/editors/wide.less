@@ -1,19 +1,24 @@
 ﻿
 /************************************************************************/
-/* slider -ALIAS- -CSS- */ 
+/* wide -ALIAS- -CSS- */ 
 /************************************************************************/
 
 /***start-lessParam--ALIAS-***/
-@slider-ALIAS-:'';
+@wide-ALIAS-:wide;
 /***end-lessParam--ALIAS-***/
 
 /***start-lessStyle--ALIAS-***/
 
-.valueslider-ALIAS- () when  (isnumber(@slider-ALIAS-)) {
-    -CSS-:@slider-ALIAS- + 0px;
+.wide-ALIAS- () when  (@wide-ALIAS- = box) {
+    margin: 0 auto;
+    width: 1240px;
+    background: #fff;
+    padding-right: 20px;
+    padding-left: 20px;
 }
 
--SCHEMA- {
-    .valueslider-ALIAS-
+#main-wrapper, #banner-wrapper, #header, #footer {
+    .wide-ALIAS-
 }
+
 /***end-lessStyle--ALIAS-***/ 

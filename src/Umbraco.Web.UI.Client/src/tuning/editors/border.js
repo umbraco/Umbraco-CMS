@@ -7,7 +7,9 @@ angular.module("umbraco.tuning")
 
 .controller("Umbraco.tuning.border", function ($scope, dialogService) {
 
-    $scope.borderList = ["all", "left", "right", "top", "bottom"];
+    $scope.defaultBorderList = ["all", "left", "right", "top", "bottom"];
+    $scope.borderList = [];
+
     $scope.bordertypes = ["solid", "dashed", "dotted"];
     $scope.selectedBorder = {
         name: "all",
@@ -57,25 +59,38 @@ angular.module("umbraco.tuning")
 
     if (!$scope.item.values) {
         $scope.item.values = {
-            bordersize: '0',
+            bordersize: '',
             bordercolor: '',
             bordertype: 'solid',
-            leftbordersize: '0',
+            leftbordersize: '',
             leftbordercolor: '',
             leftbordertype: 'solid',
-            rightbordersize: '0',
+            rightbordersize: '',
             rightbordercolor: '',
             rightbordertype: 'solid',
-            topbordersize: '0',
+            topbordersize: '',
             topbordercolor: '',
             topbordertype: 'solid',
-            bottombordersize: '0',
+            bottombordersize: '',
             bottombordercolor: '',
             bottombordertype: 'solid',
         };
     }
 
-    $scope.setselectedBorder("all");
+    if ($scope.item.enable) {
+        angular.forEach($scope.defaultBorderList, function (key, indexKey) {
+            if ($.inArray(key, $scope.item.enable) >= 0) {
+                $scope.borderList.splice($scope.borderList.length + 1, 0, key);
+            }
+        })
+    }
+    else {
+        $scope.borderList = $scope.defaultBorderList;
+    }
+
+    $scope.$watch("valueAreLoaded", function () {
+        $scope.setselectedBorder($scope.borderList[0]);
+    }, false);
 
     $scope.$watch( "selectedBorder", function () {
 

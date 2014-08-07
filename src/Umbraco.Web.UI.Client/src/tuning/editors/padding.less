@@ -4,39 +4,41 @@
 /************************************************************************/
 
 /***start-lessParam--ALIAS-***/
-@paddingvalue-ALIAS-:0;
-@leftpaddingvalue-ALIAS-:0;
-@rightpaddingvalue-ALIAS-:0;
-@toppaddingvalue-ALIAS-:0;
-@bottompaddingvalue-ALIAS-:0;
-
-
+@paddingvalue-ALIAS-:'';
+@leftpaddingvalue-ALIAS-:'';
+@rightpaddingvalue-ALIAS-:'';
+@toppaddingvalue-ALIAS-:'';
+@bottompaddingvalue-ALIAS-:'';
 /***end-lessParam--ALIAS-***/
 
 /***start-lessStyle--ALIAS-***/
 
-.left () when  (@leftpaddingvalue-ALIAS- > 0) {
+.all-ALIAS- () when  (isnumber(@paddingvalue-ALIAS-)) {
+    padding: @paddingvalue-ALIAS- + 0px;
+}
+
+.left-ALIAS- () when  (isnumber(@leftpaddingvalue-ALIAS-)) {
     padding-left: @leftpaddingvalue-ALIAS- + 0px;
 }
 
-.right () when  (@rightpaddingvalue-ALIAS- > 0) {
+.right-ALIAS- () when (isnumber(@rightpaddingvalue-ALIAS-)) {
     padding-right: @rightpaddingvalue-ALIAS- + 0px;
 }
 
-.top () when  (@toppaddingvalue-ALIAS- > 0) {
+.top-ALIAS- () when (isnumber(@toppaddingvalue-ALIAS-)) {
     padding-top: @toppaddingvalue-ALIAS- + 0px;
 }
 
-.bottom () when  (@bottompaddingvalue-ALIAS- > 0) {
+.bottom-ALIAS- () when (isnumber(@bottompaddingvalue-ALIAS-)) {
     padding-bottom: @bottompaddingvalue-ALIAS- + 0px;
 }
 
 -SCHEMA- {
-    padding: @paddingvalue-ALIAS- + 0px;
-    .left;
-    .right;
-    .top;
-    .bottom;
+    .all-ALIAS-;
+    .left-ALIAS-;
+    .right-ALIAS-;
+    .top-ALIAS-;
+    .bottom-ALIAS-;
 }
 /***end-lessStyle--ALIAS-***/ 
 

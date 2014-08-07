@@ -22,7 +22,13 @@ angular.module('spectrumcolorpicker', [])
                   showAlpha: true,
                   showInput: true,
                   change: function (color) {
-                      scope.colorselected = color.toRgbString();
+
+                      if (color) {
+                          scope.colorselected = color.toRgbString();
+                      }
+                      else {
+                          scope.colorselected = '';
+                      }
                       scope.$apply();
                   },
                   move: function (color) {
