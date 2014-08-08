@@ -132,26 +132,25 @@ namespace Umbraco.Web.Trees
 
                 //user permission override root
                 if (hasUserRoot)
-                    idToLoad = UserStartNode.ToString();
+                    idToLoad = UserStartNode.ToString(CultureInfo.InvariantCulture);
 
                 //tree overrides root
                 if (hasTreeRoot)
                 {
                     //but only if the user is allowed to access this node
-                    var _id = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+                    var altId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
                     //so if we dont have a user content root or the user has access
-                    if (!hasUserRoot || HasPathAccess(_id, queryStrings))
+                    if (hasUserRoot == false || HasPathAccess(altId, queryStrings))
                     {
-                        idToLoad = _id;
+                        idToLoad = altId;
                     }
                 }
 
                 //load whatever root nodes we concluded was the user/tree root
-                var nodes = new TreeNodeCollection();
-                nodes = GetTreeNodesInternal(idToLoad, queryStrings);
+                var nodes = GetTreeNodesInternal(idToLoad, queryStrings);                
 
-                //only render the recycle bin if we are not in dialog and the start id id still the root
+                //only render the recycle bin if we are not in dialog and the start id is still the root
                 if (IsDialog(queryStrings) == false && idToLoad == Constants.System.Root.ToInvariantString())
                 {
                     nodes.Add(CreateTreeNode(
