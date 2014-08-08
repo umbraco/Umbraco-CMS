@@ -208,18 +208,6 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             for (var i = 0; i < imgs.length; i++) {
                 //get the lower width to ensure it always fits
                 var scaledWidth = Math.floor(this.getScaledWidth(imgs[i], imageRowHeight.height));
-
-                //in this case, a single image will not fit into the row so we need to crop/center
-                // width the full width and the min display height
-                if (imageRowHeight.imgCount === 1) {
-                    sizes.push({
-                        width: targetWidth,
-                        //ensure that the height is rounded
-                        height: Math.round(minDisplayHeight)
-                    });
-                    row.images.push(imgs[i]);
-                    break;
-                }
                 
                 if (currRowWidth + scaledWidth <= targetWidth) {
                     currRowWidth += scaledWidth;                    
