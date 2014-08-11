@@ -319,7 +319,7 @@ namespace Umbraco.Core.Packaging
                     "documentsElement");
             }
 
-            if (string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName) == false)
+            if (string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName))
                 return _packagingService.ImportContent(documentsElement, -1, userId);
 
             return
