@@ -24,7 +24,9 @@
                     <p><%= umbraco.ui.Text("sort", "sortPleaseWait") %></p>
                 </div>
                 <br />
-                <cc1:ProgressBar ID="prog1" runat="server" Title="sorting.." />
+                <div style="overflow: hidden; margin-left: -20px; margin-right: -20px;">
+                    <cc1:ProgressBar ID="prog1" runat="server" Title="sorting.." />
+                </div>
             </div>
 
             <div id="sortingDone" style="display: none;" class="success">
