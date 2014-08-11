@@ -51,15 +51,25 @@ var closeIntelTuning = function (tuningModel) {
 
     if (tuningModel) {
 
-        $("[tuning-over]").css('outline', 'none');
         $.each(tuningModel.configs, function (indexConfig, config) {
             if (config.schema) {
                 $(config.schema).unbind();
                 $(config.schema).removeAttr("tuning-over");
             }
         });
+
+        initBodyClickEvent();
+
     }
 
+}
+
+var initBodyClickEvent = function () {
+    $("body").on("click", function () {
+        if (parent.iframeBodyClick) {
+            parent.iframeBodyClick();
+        }
+    });
 }
 
 var initIntelTuning = function (tuningModel) {
@@ -175,6 +185,7 @@ var outlinePositionHide = function () {
 }
 
 var outlineSelectedHide = function () {
+    currentTarget = undefined;
     $(".tuning-overlay-selected").css('display', "none");
 }
 
@@ -258,6 +269,9 @@ $(function () {
         // Overlay background-color: rgba(28, 203, 255, 0.05); 
         $("body").append("<div class=\"tuning-overlay\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9999; border: 1px solid #2ebdff; border-radius: 3px; \"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
         $("body").append("<div class=\"tuning-overlay-selected\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9998; border: 2px solid #2ebdff; border-radius: 3px;\"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
+
+        // Set event for any body click
+        initBodyClickEvent()
 
         // Init tuning panel
         initTuningPanel();

@@ -5,7 +5,6 @@
     <link href="/Umbraco/assets/css/tuning.panelStyles.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
-    <!--<link href="/umbraco/lib/antiscroll/antiscroll.css" type="text/css" rel="stylesheet" />-->
 
 </head>
  
@@ -63,18 +62,16 @@
             </div>
 
             <div class="content">
-
                 <ul class="samples">
                     <li ng-repeat="palette in tuningPalette">
                         <a href="#" ng-click="refreshtuningByPalette(palette)">
-                            <h4>Lipsum upsum ...</h4>
+                            <h4>{{palette.name}}</h4>
                             <ul class="samples">
-                                <li class="sample1"></li>
-                                <li class="sample2"></li>
-                                <li class="sample3"></li>
-                                <li class="sample4"></li>
-                                <li class="sample5"></li>
-                                <li class="sample6"></li>
+                                <li style="background-color:{{palette.color1}}"></li>
+                                <li style="background-color:{{palette.color2}}"></li>
+                                <li style="background-color:{{palette.color3}}"></li>
+                                <li style="background-color:{{palette.color4}}"></li>
+                                <li style="background-color:{{palette.color5}}"></li>
                             </ul>
                         </a>
                     </li>
@@ -89,7 +86,7 @@
                 <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
                     <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
                     <li><a ng-click="deleteTuning();opendropdown = false">Reset page style</a></li>
-                    <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
+                    <!--<li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>-->
                 </ul>
             </div>
                 
@@ -123,13 +120,13 @@
                 <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
                     <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
                     <li><a ng-click="deleteTuning();opendropdown = false">Reset page style</a></li>
-                    <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
+                    <!--<li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>-->
                 </ul>
             </div>
 
         </div>
 
-        <div class="float-right-menu devices-preview" ng-class="{selected: showRightModal}"></div>
+        <div class="float-right-menu devices-preview"></div>
 
     </div>
 
@@ -139,6 +136,7 @@
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
     <script src="/umbraco/js/tuning.loader.js"></script>
+
 
 </body>
 

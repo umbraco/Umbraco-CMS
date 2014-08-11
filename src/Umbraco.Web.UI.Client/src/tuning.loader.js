@@ -11,12 +11,6 @@ LazyLoad.js([
       '/Umbraco/lib/spectrum/spectrum.js',
       'http://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js',
       '/umbraco/js/tuning.panel.js',
-
-      '/umbraco/lib/jquery/jquery-mousewheel.js',
-      '/umbraco/lib/antiscroll/antiscroll.js',
-      '/umbraco/lib/antiscroll/angular-antiscroll.js',
-
-
 ], function () {
     jQuery(document).ready(function () {
         angular.bootstrap(document, ['umbraco.tuning']);

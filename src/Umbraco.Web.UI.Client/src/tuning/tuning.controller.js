@@ -3,7 +3,7 @@
 /* tuning panel app and controller */
 /*********************************************************************************************************/
 
-var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services', 'antiscroll'])
+var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services'])
 
 .controller("Umbraco.tuningController", function ($scope, $http, $window, $timeout, $location, dialogService) {
 
@@ -165,7 +165,7 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
                     })
 
                     // TODO: special init for font family picker
-                    if (item.type == "googlefontpicker") {
+                    if (item.type == "googlefontpicker" && item.values.fontFamily) {
                         var variant = item.values.fontWeight != "" || item.values.fontStyle != "" ? ":" + item.values.fontWeight + item.values.fontStyle : "";
                         var gimport = "@import url('http://fonts.googleapis.com/css?family=" + item.values.fontFamily + variant + "');";
                         if ($.inArray(gimport, parameters) < 0) {
@@ -214,7 +214,7 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
 
     // Refresh with selected tuning palette
     $scope.refreshtuningByPalette = function (palette) {
-        updateConfigValue(palette.colors);
+        updateConfigValue(palette.data);
         refreshtuning();
     }
 
@@ -235,7 +235,7 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
             })
         });
 
-        $(".btn-group").append("<textarea>{name:\"\", mainColor:\"\", mainColor:\"\", mainColor:\"\", mainColor:\"\", mainColor:\"\", mainColor:\"\", colors:{" + parameters.join(",") + "}}</textarea>");
+        $(".btn-group").append("<textarea>{name:\"\", color1:\"\", color2:\"\", color3:\"\", color4:\"\", color5:\"\", data:{" + parameters.join(",") + "}}</textarea>");
 
     }
 
@@ -283,6 +283,16 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
         return result;
     }
 
+    $scope.closeFloatPanels = function () {
+
+        /* hack to hide color picker */
+        $(".spectrumcolorpicker input").spectrum("hide");
+
+        dialogService.close();
+        $scope.showPalettePicker = false;
+        $scope.$apply();
+    }
+
     /*****************************************************************************/
     /* Call function into the front-end   */
     /*****************************************************************************/
@@ -321,18 +331,13 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
     $scope.closeIntelTuning = function () {
         if (document.getElementById("resultFrame").contentWindow.closeIntelTuning)
             document.getElementById("resultFrame").contentWindow.closeIntelTuning($scope.tuningModel);
-        $scope.outlinePositionHide();
         $scope.outlineSelectedHide();
-    }
-
-    $scope.outlinePositionHide = function () {
-        if (document.getElementById("resultFrame").contentWindow.outlinePositionHide)
-            document.getElementById("resultFrame").contentWindow.outlinePositionHide();
     }
 
     $scope.outlineSelectedHide = function () {
         if (document.getElementById("resultFrame").contentWindow.outlineSelectedHide)
             document.getElementById("resultFrame").contentWindow.outlineSelectedHide();
+        $scope.schemaFocus = "body";
     }
 
 

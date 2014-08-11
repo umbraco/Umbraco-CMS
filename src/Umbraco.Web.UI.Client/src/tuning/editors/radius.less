@@ -15,7 +15,13 @@
 
 /***start-lessStyle--ALIAS-***/
 
-.all-ALIAS- () when (isnumber(@radiusvalue-ALIAS-)) {
+.allzero-ALIAS- () when (isnumber(@radiusvalue-ALIAS-)) {
+    -webkit-border-radius: @radiusvalue-ALIAS- + 0px;
+    -moz-border-radius: @radiusvalue-ALIAS- + 0px;
+    border-radius: @radiusvalue-ALIAS- + 0px;
+}
+
+.all-ALIAS- () when (isnumber(@radiusvalue-ALIAS-)) and (@radiusvalue-ALIAS- > 0) {
     -webkit-border-radius: @radiusvalue-ALIAS- + 0px;
     -moz-border-radius: @radiusvalue-ALIAS- + 0px;
     border-radius: @radiusvalue-ALIAS- + 0px;
@@ -47,11 +53,12 @@
 
 
 -SCHEMA- {
-    .all-ALIAS-;
+    .allzero-ALIAS-;
     .topleft-ALIAS-;
     .topright-ALIAS-;
     .bottomleft-ALIAS-;
     .bottomright-ALIAS-;
+    .all-ALIAS-;
 }
 /***end-lessStyle--ALIAS-***/ 
 

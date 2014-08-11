@@ -98,15 +98,6 @@ var tuningConfig = {
         selector: "#header .logo div",
         editors: [
             {
-                type: "slider",
-                category: "Font",
-                name: "Font size",
-                css: "font-size",
-                schema: "#header .logo div",
-                min: 0,
-                max:40
-            },
-            {
                 type: "color",
                 category: "Color",
                 name: "Border color",
@@ -133,6 +124,12 @@ var tuningConfig = {
                 name: "Border color",
                 css: "border-top-color",
                 schema: "h2.major"
+            },
+            {
+                type: "color",
+                category: "Font",
+                name: "Font color",
+                css: "color",
             }
         ]
     },
@@ -143,10 +140,64 @@ var tuningConfig = {
         editors: [
             {
                 type: "color",
-                category: "Color",
+                category: "Font",
                 name: "Font color",
                 css: "color",
             }
+        ]
+    },
+    {
+        name: "Banner Title",
+        schema: "#banner h2",
+        selector: "#banner h2",
+        editors: [
+            {
+                type: "color",
+                category: "Font",
+                name: "Font color",
+                css: "color",
+            },
+            {
+                type: "slider",
+                category: "Font",
+                name: "Font size",
+                css: "font-size",
+                min: 18,
+                max: 100
+            },
+            {
+                type: "margin",
+                category: "Position",
+                name: "Margin",
+            }
+
+        ]
+    },
+    {
+        name: "Banner Sub-title",
+        schema: "#banner .byline",
+        selector: "#banner .byline",
+        editors: [
+            {
+                type: "color",
+                category: "Font",
+                name: "Font color",
+                css: "color",
+            },
+            {
+                type: "slider",
+                category: "Font",
+                name: "Font size",
+                css: "font-size",
+                min: 18,
+                max: 100
+            },
+            {
+                type: "margin",
+                category: "Position",
+                name: "Margin",
+            }
+
         ]
     },
     {
@@ -171,7 +222,6 @@ var tuningConfig = {
                 type: "background",
                 category: "Color",
                 name: "Background",
-                css: "color"
             },
             {
                 type: "padding",
@@ -204,6 +254,63 @@ var tuningConfig = {
                 category: "Styling",
                 name: "Radius"
             }
+        ]
+    },
+    {
+        name: "Button",
+        schema: ".button",
+        selector: ".button",
+        editors: [
+            {
+                type: "color",
+                category: "Color",
+                name: "Color",
+                css: "color"
+            },
+            {
+                type: "color",
+                category: "Color",
+                name: "Background",
+                css: "background"
+            },
+            {
+                type: "color",
+                category: "Color",
+                name: "Background Hover",
+                css: "background",
+                schema: ".button:hover"
+            },
+            {
+                type: "radius",
+                category: "Styling",
+                name: "Radius"
+            }
+        ]
+    },
+    {
+        name: "Button Alt",
+        schema: ".button-alt",
+        selector: ".button-alt",
+        editors: [
+            {
+                type: "color",
+                category: "Color",
+                name: "Color",
+                css: "color"
+            },
+            {
+                type: "color",
+                category: "Color",
+                name: "Background",
+                css: "background"
+            },
+            {
+                type: "color",
+                category: "Color",
+                name: "Background Hover",
+                css: "background",
+                schema: ".button-alt:hover"
+            },
         ]
     }
 ]

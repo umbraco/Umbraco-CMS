@@ -24,15 +24,29 @@ var refrechIntelTuning = function (name) {
             scope.schemaFocus = name.toLowerCase();
         }
 
-        scope.$apply();
     }
+
+    scope.closeFloatPanels();
+
+    scope.$apply();
+
 }
 
 /* Called when the iframe is first loaded */
 var setFrameIsLoaded = function (tuningConfig, tuningPalette) {
+
     var scope = angular.element($("#tuningPanel")).scope();
+
     scope.tuningModel = tuningConfig;
     scope.tuningPalette = tuningPalette;
     scope.enableTuning++;
     scope.$apply();
+}
+
+/* Iframe body click */
+var iframeBodyClick = function () {
+
+    var scope = angular.element($("#tuningPanel")).scope();
+
+    scope.closeFloatPanels();
 }

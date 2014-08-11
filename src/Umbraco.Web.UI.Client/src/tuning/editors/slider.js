@@ -9,7 +9,7 @@ angular.module("umbraco.tuning")
 
     if (!$scope.item.values) {
         $scope.item.values = {
-            slider: $scope.item.min
+            slider: ''
         }
     }
 
