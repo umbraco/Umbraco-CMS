@@ -307,7 +307,7 @@ namespace Umbraco.Core.Packaging
 
 
                     return packageAction;
-                });
+                }).ToArray();
         }
 
         private IEnumerable<IContent> InstallDocuments(XElement documentsElement, int userId = 0)
@@ -323,9 +323,9 @@ namespace Umbraco.Core.Packaging
                 return _packagingService.ImportContent(documentsElement, -1, userId);
 
             return
-                documentsElement.Elements()
-                    .Where(e => e.Name.LocalName == Constants.Packaging.DocumentSetNodeName)
-                    .SelectMany(documentSetElement => _packagingService.ImportContent(documentSetElement, -1, userId));
+                documentsElement.Elements(Constants.Packaging.DocumentSetNodeName)
+                    .SelectMany(documentSetElement => _packagingService.ImportContent(documentSetElement, -1, userId))
+                    .ToArray();
         }
 
         private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Packaging
 
             _packageExtraction.CopyFilesFromArchive(packageFilePath, sourceDestination);
             
-            return sourceDestination.Select(sd => sd.Value);
+            return sourceDestination.Select(sd => sd.Value).ToArray();
         }
 
         private KeyValuePair<string, string>[] AppendRootToDestination(string fullpathToRoot, IEnumerable<KeyValuePair<string, string>> sourceDestination)
