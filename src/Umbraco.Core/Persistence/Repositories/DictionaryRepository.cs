@@ -146,6 +146,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DictionaryItem)entity).AddingEntity();
 
+            foreach (var translation in entity.Translations)
+                translation.Value = translation.Value.ToValidXmlString();
+
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);
 
@@ -166,6 +169,9 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistUpdatedItem(IDictionaryItem entity)
         {
             ((Entity)entity).UpdatingEntity();
+
+            foreach (var translation in entity.Translations)
+                translation.Value = translation.Value.ToValidXmlString();
 
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);

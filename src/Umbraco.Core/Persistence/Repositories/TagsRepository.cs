@@ -137,6 +137,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Entity)entity).AddingEntity();
 
+            entity.SanitizeTagsForXmlStorage();
+
             var factory = new TagFactory();
             var dto = factory.BuildDto(entity);
 
