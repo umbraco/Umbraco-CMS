@@ -671,8 +671,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
             // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id
+            // So we'll modify the SQL
+            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
+
+            // This I don't follow, but the "Newest" where clause added above doesn't get into the generated SQL
+            // So we'll add it.
+            modifiedSQL = modifiedSQL.Replace("WHERE ", "WHERE Newest = 1 AND ");
+
             IEnumerable<IContent> result;
-            var pagedResult = Database.Page<DocumentDto>(pageNumber, pageSize, sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId"));
+            var pagedResult = Database.Page<DocumentDto>(pageNumber, pageSize, modifiedSQL);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
             if (totalRecords > 0)
             {
