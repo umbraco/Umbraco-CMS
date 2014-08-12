@@ -238,6 +238,15 @@ namespace Umbraco.Core.Services
         bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias);
 
         /// <summary>
+        /// Checks whether two items are related
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
+        /// <returns>Returns <c>True</c> if any relations exist between the entities, otherwise <c>False</c></returns>
+        bool AreRelated(int parentId, int childId, string relationTypeAlias);
+
+        /// <summary>
         /// Saves a <see cref="Relation"/>
         /// </summary>
         /// <param name="relation">Relation to save</param>
