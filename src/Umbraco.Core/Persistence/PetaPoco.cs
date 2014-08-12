@@ -2309,6 +2309,11 @@ namespace Umbraco.Core.Persistence
 			return Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
 		}
 
+        public Sql OrderByDescending(params object[] columns)
+        {
+            return Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString() + " DESC").ToArray())));
+        }
+
 		public Sql Select(params object[] columns)
 		{
 			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));

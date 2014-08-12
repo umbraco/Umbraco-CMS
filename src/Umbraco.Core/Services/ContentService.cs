@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
@@ -13,6 +14,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -468,6 +470,28 @@ namespace Umbraco.Core.Services
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
                 var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
+
+                return contents;
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirections">Direction to order by</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren, 
+            string orderBy, Direction orderDirection)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+                var contents = repository.GetPagedResultsByQuery(query, pageNumber, pageSize, out totalChildren, orderBy, orderDirection);
 
                 return contents;
             }
