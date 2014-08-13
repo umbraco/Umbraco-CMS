@@ -209,6 +209,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Member)entity).AddingEntity();
 
+            //Ensure that strings don't contain characters that are invalid in XML
+            entity.SanitizeEntityPropertiesForXmlStorage();
+
             var factory = new MemberFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
@@ -283,6 +286,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Updates Modified date
             ((Member)entity).UpdatingEntity();
+
+            //Ensure that strings don't contain characters that are invalid in XML
+            entity.SanitizeEntityPropertiesForXmlStorage();
 
             var dirtyEntity = (ICanBeDirty) entity;
 
