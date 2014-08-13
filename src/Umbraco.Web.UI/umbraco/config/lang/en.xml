@@ -150,6 +150,7 @@
     <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
     <key alias="statistics">Statistics</key>
     <key alias="titleOptional">Title (optional)</key>
+    <key alias="altTextOptional">Alternative text (optional)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Unpublish</key>
     <key alias="updateDate">Last edited</key>

@@ -94,7 +94,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     if(selectedElm.nodeName === 'IMG'){
                         var img = $(selectedElm);
                         currentTarget = {
-                            name: img.attr("alt"),
+                            altText: img.attr("alt"),
                             url: img.attr("src"),
                             id: img.attr("rel")
                         };
@@ -109,7 +109,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             if (img) {
                                 
                                 var data = {
-                                    alt: img.name,
+                                    alt: img.altText,
                                     src: (img.url) ? img.url : "nothing.jpg",
                                     rel: img.id,
                                     id: '__mcenew'
