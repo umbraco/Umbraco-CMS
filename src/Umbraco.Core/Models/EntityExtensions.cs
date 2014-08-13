@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -23,5 +20,5 @@ namespace Umbraco.Core.Models
             var dirty = (IRememberBeingDirty)entity;
             return dirty.WasPropertyDirty("Id");
         }
-        }
+    }
 }

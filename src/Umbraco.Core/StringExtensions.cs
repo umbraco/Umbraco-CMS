@@ -1318,10 +1318,18 @@ namespace Umbraco.Core
                 @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
                 RegexOptions.Compiled);
 
+
+        /// <summary>
+        /// An extension method that returns a new string in which all occurrences of an 
+        /// unicode characters that are invalid in XML files are replaced with an empty string. 
+        /// </summary>
+        /// <param name="text">Current instance of the string</param>
+        /// <returns>Updated string</returns>
+        /// 
         /// <summary>
         /// removes any unusual unicode characters that can't be encoded into XML
         /// </summary>
-        public static string ToValidXmlString(this string text)
+        internal static string ToValidXmlString(this string text)
         {
             return string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Replace(text, "");
         }
