@@ -118,9 +118,10 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
-            string orderBy, Direction orderDirection);
+            string orderBy, Direction orderDirection, string filter = "");
         
         /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by its Id

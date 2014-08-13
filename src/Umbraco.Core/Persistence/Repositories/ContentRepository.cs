@@ -648,9 +648,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageNumber, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection)
+            string orderBy, Direction orderDirection, string filter = "")
         {
             // Get base query
             var sqlClause = GetBaseQuery(false);
@@ -658,7 +659,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .Where<DocumentDto>(x => x.Newest);
 
-            // Apply order by according to parameters
+            // Apply order according to parameters
             var orderByParams = new[] { orderBy };
             if (orderDirection == Direction.Ascending)
             {
@@ -670,14 +671,24 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
-            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id
-            // So we'll modify the SQL
+            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            // So we'll modify the SQL.
             var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
 
-            // This I don't follow, but the "Newest" where clause added above doesn't get into the generated SQL
-            // So we'll add it.
+            // HACK: the .Where<DocumentDto>(x => x.Newest) clause above is also being used in PerformGetQuery, so included here,
+            // but it doesn't look to do anything as the clause isn't added to the the generated SQL.
+            // So we'll add it here.
             modifiedSQL = modifiedSQL.Replace("WHERE ", "WHERE Newest = 1 AND ");
 
+            // HACK: Apply filter.  Again, can't get expression based Where filter to be added to the generated SQL, 
+            // so working with the raw string.  Potential SQL injection here so, although escaped, should be modified.
+            if (!string.IsNullOrEmpty(filter))
+            {
+                modifiedSQL = modifiedSQL.Replace("WHERE ", 
+                    string.Format("WHERE cmsDocument.text LIKE '%{0}%' AND ", filter.Replace("'", "''")));
+            }
+
+            // Get page of results and total count
             IEnumerable<IContent> result;
             var pagedResult = Database.Page<DocumentDto>(pageNumber, pageSize, modifiedSQL);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);

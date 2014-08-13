@@ -157,25 +157,15 @@ namespace Umbraco.Web.Editors
             Direction orderDirection = Direction.Ascending, 
             string filter = "")
         {
-            //TODO: move this filter to repo level as needs to be included in paging
-            //if (!string.IsNullOrEmpty(filter))
-            //{
-            //    filter = filter.ToLower();
-            //    result = result.Where(x => x.Name.InvariantContains(filter));
-            //}
-
             int totalChildren;
-            var children = Services.ContentService.GetPagedChildren(id, pageNumber, pageSize, out totalChildren, orderBy, orderDirection).ToArray();
+            var children = Services.ContentService.GetPagedChildren(id, pageNumber, pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
 
             if (totalChildren == 0)
             {
                 return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
             }
 
-             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(
-                totalChildren,
-                pageNumber,
-                pageSize);
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children
                 .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
 

@@ -484,14 +484,15 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren, 
-            string orderBy, Direction orderDirection)
+        public IEnumerable<IContent> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
+            string orderBy, Direction orderDirection, string filter = "")
         {
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                var contents = repository.GetPagedResultsByQuery(query, pageNumber, pageSize, out totalChildren, orderBy, orderDirection);
+                var contents = repository.GetPagedResultsByQuery(query, pageNumber, pageSize, out totalChildren, orderBy, orderDirection, filter);
 
                 return contents;
             }
