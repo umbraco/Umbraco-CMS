@@ -64,6 +64,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                     return;
                 }
 
+                console.log("I am dirty");
                 var path = nextLocation.split("#")[1];
                 if (path) {
                     if (path.indexOf("%253") || path.indexOf("%252")) {
