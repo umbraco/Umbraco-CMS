@@ -660,14 +660,17 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .Where<DocumentDto>(x => x.Newest);
 
             // Apply order according to parameters
-            var orderByParams = new[] { orderBy };
-            if (orderDirection == Direction.Ascending)
+            if (!string.IsNullOrEmpty(orderBy))
             {
-                sql = sql.OrderBy(orderByParams);
-            }
-            else
-            {
-                sql = sql.OrderByDescending(orderByParams);
+                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sql = sql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sql = sql.OrderByDescending(orderByParams);
+                }
             }
 
             // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
@@ -703,13 +706,14 @@ namespace Umbraco.Core.Persistence.Repositories
                     .AsQueryable();
 
                 // Now we need to ensure this result is also ordered by the same order by clause
+                var orderByProperty = GetIContentPropertyNameForOrderBy(orderBy);
                 if (orderDirection == Direction.Ascending)
                 {
-                    result = content.OrderBy(orderBy);
+                    result = content.OrderBy(orderByProperty);
                 }
                 else
                 {
-                    result = content.OrderByDescending(orderBy);
+                    result = content.OrderByDescending(orderByProperty);
                 }
             }
             else
@@ -718,6 +722,38 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return result;
+        }
+
+        private string GetDatabaseFieldNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the database field names.
+            switch (orderBy)
+            {
+                case "Name":
+                    return "cmsDocument.text";
+                case "Owner":
+                    return "umbracoNode.nodeUser";
+                case "Updator":
+                    return "cmsDocument.documentUser";
+                default:
+                    return orderBy;
+            }
+        }
+
+        private string GetIContentPropertyNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the IContent property names.
+            switch (orderBy)
+            {
+                case "Owner":
+                    return "CreatorId";
+                case "Updator":
+                    return "WriterId";
+                default:
+                    return orderBy;
+            }
         }
 
         #endregion
