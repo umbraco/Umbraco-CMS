@@ -149,8 +149,6 @@
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
-    <Compile Include="Cache\DictionaryCacheWrapper.cs" />
-    <Compile Include="Cache\DictionaryItemWrapper.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IRuntimeCacheProvider.cs" />
@@ -371,6 +369,7 @@
     <Compile Include="Models\TaggedEntity.cs" />
     <Compile Include="Models\TaggedProperty.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="MonitorLock.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
