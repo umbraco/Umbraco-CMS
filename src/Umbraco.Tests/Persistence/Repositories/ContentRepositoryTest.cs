@@ -375,6 +375,27 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithSinglePage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(2));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetPagedResultsByQuery_WithDescendingOrder_On_ContentRepository()
         {
             // Arrange
@@ -396,7 +417,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_GetPagedResultsByQuery_WithFilter_On_ContentRepository()
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingSome_On_ContentRepository()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -415,7 +436,28 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
             }
         }
-        
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingAll_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending, "Page");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+            }
+        }
+
         [Test]
         public void Can_Perform_GetAll_By_Param_Ids_On_ContentRepository()
         {
