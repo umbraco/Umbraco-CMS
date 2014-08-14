@@ -488,6 +488,7 @@
     <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasksBase.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
