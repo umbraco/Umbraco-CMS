@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// Represents a collection of DynamicPublishedContent items.
     /// </summary>
-    public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>, IEnumerable<IPublishedContent>
+    public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>
     {
         private readonly List<IPublishedContent> _content;
         private readonly PublishedContentSet<IPublishedContent> _contentSet;

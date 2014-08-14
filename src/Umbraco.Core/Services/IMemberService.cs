@@ -11,6 +11,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMemberService : IMembershipMemberService
     {
+        int Count(string contentTypeAlias = null);     
+
         IMember CreateMember(string username, string email, string name, string memberTypeAlias);
         IMember CreateMember(string username, string email, string name, IMemberType memberType);
         IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias);
