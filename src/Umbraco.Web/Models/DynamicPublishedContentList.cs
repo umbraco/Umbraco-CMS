@@ -574,11 +574,6 @@ namespace Umbraco.Web.Models
 
         #region Enumerate inner IPublishedContent items
 
-        IEnumerator<IPublishedContent> IEnumerable<IPublishedContent>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
         public IEnumerator<DynamicPublishedContent> GetEnumerator()
     	{
     		return Items.GetEnumerator();
