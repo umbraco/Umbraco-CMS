@@ -32,40 +32,39 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Get all tags for content items (with optional group)
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">Optional group</param>
         /// <returns></returns>
         IEnumerable<ITag> GetAllContentTags(string group = null);
 
         /// <summary>
         /// Get all tags for media items (with optional group)
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">Optional group</param>
         /// <returns></returns>
         IEnumerable<ITag> GetAllMediaTags(string group = null);
 
         /// <summary>
         /// Get all tags for member items (with optional group)
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">Optional group</param>
         /// <returns></returns>
         IEnumerable<ITag> GetAllMemberTags(string group = null);
 
         /// <summary>
         /// Returns all tags attached to a property by entity id
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="tagGroup"></param>
+        /// <param name="contentId">The content item id to get tags for</param>
+        /// <param name="propertyTypeAlias">Property type alias</param>
+        /// <param name="tagGroup">Optional tag group</param>
         /// <returns></returns>
         IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null);
 
         /// <summary>
         /// Returns all tags attached to an entity (content, media or member) by entity id
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="tagGroup"></param>
+        /// <param name="contentId">The content item id to get tags for</param>
+        /// <param name="tagGroup">Optional tag group</param>
         /// <returns></returns>
         IEnumerable<ITag> GetTagsForEntity(int contentId, string tagGroup = null);
-
     }
 }

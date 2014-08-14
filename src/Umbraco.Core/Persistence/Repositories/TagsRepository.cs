@@ -230,63 +230,96 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var nodeObjectType = GetNodeObjectType(objectType);
 
-            var sql = new Sql()
-                .Select("DISTINCT cmsTags.*")
-                .From<TagDto>()
-                .InnerJoin<TagRelationshipDto>()
-                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+            var sql = GetTagsQuerySelect(true);
+
+            sql = ApplyRelationshipJoinToTagsQuery(sql);
+
+            sql = sql
                 .InnerJoin<ContentDto>()
                 .On<ContentDto, TagRelationshipDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
 
-            if (group.IsNullOrWhiteSpace() == false)
-            {
-                sql = sql.Where<TagDto>(dto => dto.Group == group);
-            }
+            sql = ApplyGroupFilterToTagsQuery(sql, group);
 
-            var factory = new TagFactory();
+            sql = ApplyGroupByToTagsQuery(sql);
 
-            return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
+            return ExecuteTagsQuery(sql);
         }
 
         public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null)
         {
-            var sql = new Sql()
-                .Select("DISTINCT cmsTags.*")
-                .From<TagDto>()
-                .InnerJoin<TagRelationshipDto>()
-                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+            var sql = GetTagsQuerySelect();
+
+            sql = ApplyRelationshipJoinToTagsQuery(sql);
+
+            sql = sql
                 .Where<TagRelationshipDto>(dto => dto.NodeId == contentId);
 
-            if (group.IsNullOrWhiteSpace() == false)
-            {
-                sql = sql.Where<TagDto>(dto => dto.Group == group);
-            }
+            sql = ApplyGroupFilterToTagsQuery(sql, group);
 
-            var factory = new TagFactory();
-
-            return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
+            return ExecuteTagsQuery(sql);
         }
 
         public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null)
         {
-            var sql = new Sql()
-                .Select("DISTINCT cmsTags.*")
-                .From<TagDto>()
-                .InnerJoin<TagRelationshipDto>()
-                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+            var sql = GetTagsQuerySelect();
+
+            sql = ApplyRelationshipJoinToTagsQuery(sql);
+
+            sql = sql
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyTypeDto, TagRelationshipDto>(left => left.Id, right => right.PropertyTypeId)
                 .Where<TagRelationshipDto>(dto => dto.NodeId == contentId)
                 .Where<PropertyTypeDto>(dto => dto.Alias == propertyTypeAlias);
 
-            if (group.IsNullOrWhiteSpace() == false)
+            sql = ApplyGroupFilterToTagsQuery(sql, group);
+
+            return ExecuteTagsQuery(sql);
+        }
+
+        private Sql GetTagsQuerySelect(bool withGrouping = false)
+        {
+            var sql = new Sql();
+
+            if (withGrouping)
+            {
+                sql = sql.Select("cmsTags.Id, cmsTags.Tag, cmsTags.[Group], Count(*) NodeCount");
+            }
+            else
+            {
+                sql = sql.Select("DISTINCT cmsTags.*");
+            }
+
+            return sql;
+        }
+
+        private Sql ApplyRelationshipJoinToTagsQuery(Sql sql)
+        {
+            return sql
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>()
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id);
+        }
+
+        private Sql ApplyGroupFilterToTagsQuery(Sql sql, string group)
+        {
+            if (!group.IsNullOrWhiteSpace())
             {
                 sql = sql.Where<TagDto>(dto => dto.Group == group);
             }
 
+            return sql;
+        }
+
+        private Sql ApplyGroupByToTagsQuery(Sql sql)
+        {
+            return sql.GroupBy(new string[] { "cmsTags.Id", "cmsTags.Tag", "cmsTags.[Group]" });
+        }
+
+        private IEnumerable<ITag> ExecuteTagsQuery(Sql sql)
+        {
             var factory = new TagFactory();
 
             return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);

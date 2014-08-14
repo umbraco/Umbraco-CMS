@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Tag service to query for tags in the tags db table. The tags returned are only relavent for published content & saved media or members 
+    /// Tag service to query for tags in the tags db table. The tags returned are only relevant for published content & saved media or members 
     /// </summary>
     /// <remarks>
     /// If there is unpublished content with tags, those tags will not be contained
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Get all tags for content items (with optional group)
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">Optional group</param>
         /// <returns></returns>
         public IEnumerable<ITag> GetAllContentTags(string group = null)
         {
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Get all tags for media items (with optional group)
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">Optional group</param>
         /// <returns></returns>
         public IEnumerable<ITag> GetAllMediaTags(string group = null)
         {
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Get all tags for member items (with optional group)
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="group">Optional group</param>
         /// <returns></returns>
         public IEnumerable<ITag> GetAllMemberTags(string group = null)
         {
@@ -149,9 +149,9 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Returns all tags attached to a property by entity id
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="tagGroup"></param>
+        /// <param name="contentId">The content item id to get tags for</param>
+        /// <param name="propertyTypeAlias">Property type alias</param>
+        /// <param name="tagGroup">Optional tag group</param>
         /// <returns></returns>
         public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null)
         {
@@ -164,8 +164,8 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Returns all tags attached to an entity (content, media or member) by entity id
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="tagGroup"></param>
+        /// <param name="contentId">The content item id to get tags for</param>
+        /// <param name="tagGroup">Optional tag group</param>
         /// <returns></returns>
         public IEnumerable<ITag> GetTagsForEntity(int contentId, string tagGroup = null)
         {

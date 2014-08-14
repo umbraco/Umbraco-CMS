@@ -20,18 +20,19 @@ namespace Umbraco.Core.Sync
     {
         private readonly Func<Tuple<string, string>> _getUserNamePasswordDelegate;
         private volatile bool _hasResolvedDelegate = false;
-        private readonly object _locker = new object();        
-        private bool _useDistributedCalls;
+        private readonly object _locker = new object();
 
         protected string Login { get; private set; }
         protected string Password{ get; private set; }
+
+        protected bool UseDistributedCalls { get; private set; }
 
         /// <summary>
         /// Without a username/password all distribuion will be disabled
         /// </summary>
         internal DefaultServerMessenger()
         {
-            _useDistributedCalls = false;
+            UseDistributedCalls = false;
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Sync
             if (login == null) throw new ArgumentNullException("login");
             if (password == null) throw new ArgumentNullException("password");
 
-            _useDistributedCalls = useDistributedCalls;
+            UseDistributedCalls = useDistributedCalls;
             Login = login;
             Password = password;
         }
@@ -221,13 +222,13 @@ namespace Umbraco.Core.Sync
                             {
                                 Login = null;
                                 Password = null;
-                                _useDistributedCalls = false;
+                                UseDistributedCalls = false;
                             }
                             else
                             {
                                 Login = result.Item1;
                                 Password = result.Item2;
-                                _useDistributedCalls = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;    
+                                UseDistributedCalls = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;    
                             }
                         }
                         catch (Exception ex)
@@ -235,7 +236,7 @@ namespace Umbraco.Core.Sync
                             LogHelper.Error<DefaultServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
                             Login = null;
                             Password = null;
-                            _useDistributedCalls = false;
+                            UseDistributedCalls = false;
                         }
                     }
                 }
@@ -314,7 +315,7 @@ namespace Umbraco.Core.Sync
 
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
-            if (!_useDistributedCalls || !servers.Any())
+            if (!UseDistributedCalls || !servers.Any())
             {
                 //if we are not, then just invoke the call on the cache refresher
                 InvokeMethodOnRefresherInstance(refresher, dispatchType, getId, instances);
@@ -325,7 +326,7 @@ namespace Umbraco.Core.Sync
             MessageSeversForIdsOrJson(servers, refresher, dispatchType, instances.Select(getId));
         }
 
-        private void MessageSeversForIdsOrJson(
+        protected virtual void MessageSeversForIdsOrJson(
             IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType dispatchType,
@@ -345,7 +346,7 @@ namespace Umbraco.Core.Sync
 
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
-            if (!_useDistributedCalls || !servers.Any())
+            if (!UseDistributedCalls || !servers.Any())
             {
                 //if we are not, then just invoke the call on the cache refresher
                 InvokeMethodOnRefresherInstance(refresher, dispatchType, ids, jsonPayload);
@@ -456,16 +457,16 @@ namespace Umbraco.Core.Sync
                         }
                     }
 
-                    List<WaitHandle> waitHandlesList;
-                    var asyncResults = GetAsyncResults(asyncResultsList, out waitHandlesList);
-
+                    var waitHandlesList = asyncResultsList.Select(x => x.AsyncWaitHandle).ToArray();
+                    
                     var errorCount = 0;
 
-                    // Once for each WaitHandle that we have, wait for a response and log it
-                    // We're previously submitted all these requests effectively in parallel and will now retrieve responses on a FIFO basis
-                    foreach (var t in asyncResults)
+                    //Wait for all requests to complete
+                    WaitHandle.WaitAll(waitHandlesList.ToArray());
+                    
+                    foreach (var t in asyncResultsList)
                     {
-                        var handleIndex = WaitHandle.WaitAny(waitHandlesList.ToArray(), TimeSpan.FromSeconds(15));
+                        //var handleIndex = WaitHandle.WaitAny(waitHandlesList.ToArray(), TimeSpan.FromSeconds(15));
 
                         try
                         {
@@ -520,18 +521,7 @@ namespace Umbraco.Core.Sync
                 LogDispatchBatchError(ee);
             }
         }
-
-        internal IEnumerable<IAsyncResult> GetAsyncResults(List<IAsyncResult> asyncResultsList, out List<WaitHandle> waitHandlesList)
-        {
-            var asyncResults = asyncResultsList.ToArray();
-            waitHandlesList = new List<WaitHandle>();
-            foreach (var asyncResult in asyncResults)
-            {
-                waitHandlesList.Add(asyncResult.AsyncWaitHandle);
-            }
-            return asyncResults;
-        }
-
+        
         private void LogDispatchBatchError(Exception ee)
         {
             LogHelper.Error<DefaultServerMessenger>("Error refreshing distributed list", ee);

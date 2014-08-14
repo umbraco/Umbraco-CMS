@@ -31,7 +31,7 @@ namespace Umbraco.Core
 
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
-        
+
         static StringExtensions()
         {
             var escapes = new[] { "\aa", "\bb", "\ff", "\nn", "\rr", "\tt", "\vv", "\"\"", "\\\\", "??", "\00" };
@@ -56,7 +56,7 @@ namespace Umbraco.Core
             }
             return fileName;
 
-            
+
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Umbraco.Core
             //remove any prefixed '&' or '?'
             for (var i = 0; i < queryStrings.Length; i++)
             {
-                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');            
+                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');
             }
 
             var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -169,66 +169,66 @@ namespace Umbraco.Core
             }
             return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
         }
-        
-		/// <summary>
-		/// Encrypt the string using the MachineKey in medium trust
-		/// </summary>
-		/// <param name="value">The string value to be encrypted.</param>
-		/// <returns>The encrypted string.</returns>
-		public static string EncryptWithMachineKey(this string value)
+
+        /// <summary>
+        /// Encrypt the string using the MachineKey in medium trust
+        /// </summary>
+        /// <param name="value">The string value to be encrypted.</param>
+        /// <returns>The encrypted string.</returns>
+        public static string EncryptWithMachineKey(this string value)
         {
-			if (value == null)
-				return null;
+            if (value == null)
+                return null;
 
-			string valueToEncrypt = value;
-			List<string> parts = new List<string>();
+            string valueToEncrypt = value;
+            List<string> parts = new List<string>();
 
-			const int EncrpytBlockSize = 500;
+            const int EncrpytBlockSize = 500;
 
-			while (valueToEncrypt.Length > EncrpytBlockSize)
-			{
-				parts.Add(valueToEncrypt.Substring(0, EncrpytBlockSize));
-				valueToEncrypt = valueToEncrypt.Remove(0, EncrpytBlockSize);
-			}
+            while (valueToEncrypt.Length > EncrpytBlockSize)
+            {
+                parts.Add(valueToEncrypt.Substring(0, EncrpytBlockSize));
+                valueToEncrypt = valueToEncrypt.Remove(0, EncrpytBlockSize);
+            }
 
-			if (valueToEncrypt.Length > 0)
-			{
-				parts.Add(valueToEncrypt);
-			}
+            if (valueToEncrypt.Length > 0)
+            {
+                parts.Add(valueToEncrypt);
+            }
 
-			StringBuilder encrpytedValue = new StringBuilder();
+            StringBuilder encrpytedValue = new StringBuilder();
 
-			foreach (var part in parts)
-			{
-				var encrpytedBlock = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(0, string.Empty, DateTime.Now, DateTime.MaxValue, false, part));
-				encrpytedValue.AppendLine(encrpytedBlock);
-			}
+            foreach (var part in parts)
+            {
+                var encrpytedBlock = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(0, string.Empty, DateTime.Now, DateTime.MaxValue, false, part));
+                encrpytedValue.AppendLine(encrpytedBlock);
+            }
 
-			return encrpytedValue.ToString().TrimEnd();
+            return encrpytedValue.ToString().TrimEnd();
         }
 
         /// <summary>
-		/// Decrypt the encrypted string using the Machine key in medium trust
-		/// </summary>
-		/// <param name="value">The string value to be decrypted</param>
-		/// <returns>The decrypted string.</returns>
-		public static string DecryptWithMachineKey(this string value)
+        /// Decrypt the encrypted string using the Machine key in medium trust
+        /// </summary>
+        /// <param name="value">The string value to be decrypted</param>
+        /// <returns>The decrypted string.</returns>
+        public static string DecryptWithMachineKey(this string value)
         {
-			if (value == null)
-				return null;
+            if (value == null)
+                return null;
 
-			string[] parts = value.Split('\n');
+            string[] parts = value.Split('\n');
 
-			StringBuilder decryptedValue = new StringBuilder();
+            StringBuilder decryptedValue = new StringBuilder();
 
-			foreach (var part in parts)
-			{
-				decryptedValue.Append(FormsAuthentication.Decrypt(part.TrimEnd()).UserData);
-			}
+            foreach (var part in parts)
+            {
+                decryptedValue.Append(FormsAuthentication.Decrypt(part.TrimEnd()).UserData);
+            }
 
-			return decryptedValue.ToString();
+            return decryptedValue.ToString();
         }
-        
+
         //this is from SqlMetal and just makes it a bit of fun to allow pluralisation
         public static string MakePluralName(this string name)
         {
@@ -974,8 +974,8 @@ namespace Umbraco.Core
         {
             var helper = ShortStringHelper;
             var legacy = helper as LegacyShortStringHelper;
-            return legacy != null 
-                ? legacy.LegacyToUrlAlias(value, charReplacements, replaceDoubleDashes, stripNonAscii, urlEncode) 
+            return legacy != null
+                ? legacy.LegacyToUrlAlias(value, charReplacements, replaceDoubleDashes, stripNonAscii, urlEncode)
                 : helper.CleanStringForUrlSegment(value);
         }
 
@@ -1082,7 +1082,7 @@ namespace Umbraco.Core
         }
 
         // the new methods to get a url segment
-        
+
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an url segment.
         /// </summary>
@@ -1220,7 +1220,7 @@ namespace Umbraco.Core
         {
             return ShortStringHelper.CleanStringForSafeFileName(text, culture);
         }
-        
+
         /// <summary>
         /// An extension method that returns a new string in which all occurrences of a 
         /// specified string in the current instance are replaced with another specified string.
@@ -1239,7 +1239,7 @@ namespace Umbraco.Core
             int index = -1 * newString.Length;
 
             // Determine if there are any matches left in source, starting from just after the result of replacing the last match.
-            while((index = source.IndexOf(oldString, index + newString.Length, stringComparison)) >= 0)
+            while ((index = source.IndexOf(oldString, index + newString.Length, stringComparison)) >= 0)
             {
                 // Remove the old text.
                 source = source.Remove(index, oldString.Length);
@@ -1309,6 +1309,29 @@ namespace Umbraco.Core
             }
             var idCheckList = csv.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             return idCheckList.Contains(value);
+        }
+
+        // From: http://stackoverflow.com/a/961504/5018
+        // filters control characters but allows only properly-formed surrogate sequences
+        private static readonly Regex InvalidXmlChars =
+            new Regex(
+                @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
+                RegexOptions.Compiled);
+
+
+        /// <summary>
+        /// An extension method that returns a new string in which all occurrences of an 
+        /// unicode characters that are invalid in XML files are replaced with an empty string. 
+        /// </summary>
+        /// <param name="text">Current instance of the string</param>
+        /// <returns>Updated string</returns>
+        /// 
+        /// <summary>
+        /// removes any unusual unicode characters that can't be encoded into XML
+        /// </summary>
+        internal static string ToValidXmlString(this string text)
+        {
+            return string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Replace(text, "");
         }
     }
 }

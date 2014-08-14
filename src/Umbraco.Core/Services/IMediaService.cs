@@ -9,6 +9,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMediaService : IService
     {
+        int Count(string contentTypeAlias = null);
+        int CountChildren(int parentId, string contentTypeAlias = null);
+        int CountDescendants(int parentId, string contentTypeAlias = null);
+
         IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
 
         /// <summary>

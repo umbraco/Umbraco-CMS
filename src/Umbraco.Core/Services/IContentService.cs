@@ -11,6 +11,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+        int Count(string contentTypeAlias = null);
+        int CountChildren(int parentId, string contentTypeAlias = null);
+        int CountDescendants(int parentId, string contentTypeAlias = null);
+
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
         /// assigned to an entity with a list of user id & permission pairs.

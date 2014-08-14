@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public ITag BuildEntity(TagDto dto)
         {
-            var model = new Tag(dto.Id, dto.Tag, dto.Group);            
+            var model = new Tag(dto.Id, dto.Tag, dto.Group, dto.NodeCount);            
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             model.ResetDirtyProperties(false);
@@ -20,7 +20,8 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     Id = entity.Id,
                     Group = entity.Group,
-                    Tag = entity.Text
+                    Tag = entity.Text,
+                    NodeCount = entity.NodeCount,
                 };
         }
     }

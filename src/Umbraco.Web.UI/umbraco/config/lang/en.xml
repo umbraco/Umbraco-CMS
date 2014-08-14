@@ -150,6 +150,7 @@
     <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
     <key alias="statistics">Statistics</key>
     <key alias="titleOptional">Title (optional)</key>
+    <key alias="altTextOptional">Alternative text (optional)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Unpublish</key>
     <key alias="updateDate">Last edited</key>
@@ -175,7 +176,7 @@
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
     <key alias="dontShowAgain">- Hide</key>
-    <key alias="nothinghappens">If umbraco isn't opening, you might need to allow popups from this site</key>
+    <key alias="nothinghappens">If Umbraco isn't opening, you might need to allow popups from this site</key>
     <key alias="openinnew">has opened in a new window</key>
     <key alias="restart">Restart</key>
     <key alias="visit">Visit</key>
@@ -203,7 +204,7 @@
     <key alias="lastEdited">Last Edited</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internal link:</key>
-    <key alias="linklocaltip">When using local links, insert "#" infront of link</key>
+    <key alias="linklocaltip">When using local links, insert "#" in front of link</key>
     <key alias="linknewwindow">Open in new window?</key>
     <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
@@ -245,6 +246,7 @@
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child node types</key>
+    <key alias="contenttypecompositions">Document Type Compositions</key>
     <key alias="create">Create</key>
     <key alias="deletetab">Delete tab</key>
     <key alias="description">Description</key>
@@ -436,12 +438,12 @@
       proceed. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
     <key alias="defaultUserText"><![CDATA[
         <p>
-          umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
+          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
           changed to something unique.
         </p>
         <p>
@@ -449,29 +451,29 @@
         </p>
       ]]></key>
     <key alias="greatStart">Get a great start, watch our introduction videos</key>
-    <key alias="licenseText">By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this umbraco distribution consists of two different licenses, the open source MIT license for the framework and the umbraco freeware license that covers the UI.</key>
+    <key alias="licenseText">By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this Umbraco distribution consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license that covers the UI.</key>
     <key alias="None">Not installed yet.</key>
     <key alias="permissionsAffectedFolders">Affected files and folders</key>
-    <key alias="permissionsAffectedFoldersMoreInfo">More information on setting up permissions for umbraco here</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">More information on setting up permissions for Umbraco here</key>
     <key alias="permissionsAffectedFoldersText">You need to grant ASP.NET modify permissions to the following files/folders</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
-        You can run umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of umbraco.]]></key>
+        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">How to Resolve</key>
     <key alias="permissionsHowtoResolveLink">Click here to read the text version</key>
-    <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for umbraco or read the text version.]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for Umbraco or read the text version.]]></key>
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Your permission settings might be an issue!</strong>
       <br/><br />
-      You can run umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for umbraco!</strong>
+      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for Umbraco!</strong>
           <br /><br />
-          In order to run umbraco, you'll need to update your permission settings.]]></key>
+          In order to run Umbraco, you'll need to update your permission settings.]]></key>
     <key alias="permissionsPerfect"><![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
-              You are ready to run umbraco and install packages!]]></key>
+              You are ready to run Umbraco and install packages!]]></key>
     <key alias="permissionsResolveFolderIssues">Resolving folder issue</key>
     <key alias="permissionsResolveFolderIssuesLink">Follow this link for more information on problems with ASP.NET and creating folders</key>
     <key alias="permissionsSettingUpPermissions">Setting up folder permissions</key>
     <key alias="permissionsText"><![CDATA[
-      umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.
+      Umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.
       It also stores temporary data (aka: cache) for enhancing the performance of your website.
     ]]></key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
@@ -504,25 +506,25 @@
     <key alias="step1">Step 1/5 Accept license</key>
     <key alias="step2">Step 2/5: Database configuration</key>
     <key alias="step3">Step 3/5: Validating File Permissions</key>
-    <key alias="step4">Step 4/5: Check umbraco security</key>
+    <key alias="step4">Step 4/5: Check Umbraco security</key>
     <key alias="step5">Step 5/5: Umbraco is ready to get you started</key>
-    <key alias="thankYou">Thank you for choosing umbraco</key>
+    <key alias="thankYou">Thank you for choosing Umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Browse your new site</h3>
 You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
-Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the umbraco terminology]]></key>
+Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
     <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
         manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to umbraco</strong>, 
+    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
     <key alias="Unavailable">Connection to database failed.</key>
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
     <key alias="watch">Watch</key>
-    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
+    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
                                 <br /><br />
                                 Press <strong>"next"</strong> to start the wizard.]]></key>
   </area>
@@ -544,7 +546,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="greeting6">Happy Caturday</key>
     <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -578,7 +580,7 @@ To manage your website, simply open the umbraco back office and start adding con
 
       Have a nice day!
 
-      Cheers from the umbraco robot
+      Cheers from the Umbraco robot
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
@@ -605,7 +607,7 @@ To manage your website, simply open the umbraco back office and start adding con
 		  </div>
 
 		  <p>Have a nice day!<br /><br />
-			  Cheers from the umbraco robot
+			  Cheers from the Umbraco robot
 		  </p>]]></key>
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
     <key alias="notifications">Notifications</key>
@@ -613,7 +615,7 @@ To manage your website, simply open the umbraco back office and start adding con
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
-         button and locating the package. umbraco packages usually have a ".umb" or ".zip" extension.
+         button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
       ]]></key>
     <key alias="packageAuthor">Author</key>
     <key alias="packageDemonstration">Demonstration</key>
@@ -637,20 +639,20 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="packageUpgradeDownload">Download update from the repository</key>
     <key alias="packageUpgradeHeader">Upgrade package</key>
     <key alias="packageUpgradeInstructions">Upgrade instructions</key>
-    <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the umbraco package repository.</key>
+    <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the Umbraco package repository.</key>
     <key alias="packageVersion">Package version</key>
     <key alias="packageVersionHistory">Package version history</key>
     <key alias="viewPackageWebsite">View package website</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
-    <key alias="errorMessage">The text you're trying to paste contains special characters or formatting. This could be caused by copying text from Microsoft Word. umbraco can remove special characters or formatting automatically, so the pasted content will be more suitable for the web.</key>
+    <key alias="errorMessage">The text you're trying to paste contains special characters or formatting. This could be caused by copying text from Microsoft Word. Umbraco can remove special characters or formatting automatically, so the pasted content will be more suitable for the web.</key>
     <key alias="removeAll">Paste as raw text without any formatting at all</key>
     <key alias="removeSpecialFormattering">Paste, but remove formatting (Recommended)</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
-    <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using umbraco's member groups.]]></key>
+    <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
     <key alias="paAdvancedNoGroups"><![CDATA[You need to create a membergroup before you can use <br />role-based authentication.]]></key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
@@ -658,7 +660,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="paIsProtected">%0% is now protected</key>
     <key alias="paIsRemoved">Protection removed from %0%</key>
     <key alias="paLoginPage">Login Page</key>
-    <key alias="paLoginPageHelp">Choose the page that has the login formular</key>
+    <key alias="paLoginPageHelp">Choose the page that contains the login form</key>
     <key alias="paRemoveProtection">Remove Protection</key>
     <key alias="paSelectPages">Select the pages that contain login form and error messages</key>
     <key alias="paSelectRoles">Pick the roles who have access to this page</key>
@@ -667,16 +669,14 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">
-      <![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]>
-    </key>
+    ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
-      %0% could not be published, due to a 3rd party extension cancelling the action.
+      %0% could not be published, a 3rd party add-in cancelled the action.
     ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% can not be published, because a parent page is not published.
@@ -688,7 +688,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="nodePublishAll">%0% and subpages have been published</key>
     <key alias="publishAll">Publish %0% and all its subpages</key>
     <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
-      You can publish this page and all its sub-pages by checking <em>publish all children</em> below.
+      You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
       ]]></key>
   </area>
   <area alias="colorpicker">
@@ -710,7 +710,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
-    <key alias="htmlHelp">This displays the selected version as html, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
+    <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
@@ -732,6 +732,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
     <key alias="help" version="7.0">Help</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -825,9 +826,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="insertContentAreaPlaceHolder">Insert content area placeholder</key>
     <key alias="insertDictionaryItem">Insert dictionary item</key>
     <key alias="insertMacro">Insert Macro</key>
-    <key alias="insertPageField">Insert umbraco page field</key>
+    <key alias="insertPageField">Insert Umbraco page field</key>
     <key alias="mastertemplate">Master template</key>
-    <key alias="quickGuide">Quick Guide to umbraco template tags</key>
+    <key alias="quickGuide">Quick Guide to Umbraco template tags</key>
     <key alias="template">Template</key>
   </area>
   <area alias="templateEditor">
@@ -868,9 +869,9 @@ To manage your website, simply open the umbraco back office and start adding con
     ]]></key>
     <key alias="closeTask">close task</key>
     <key alias="details">Translation details</key>
-    <key alias="downloadAllAsXml">Download all translation tasks as xml</key>
-    <key alias="downloadTaskAsXml">Download xml</key>
-    <key alias="DownloadXmlDTD">Download xml DTD</key>
+    <key alias="downloadAllAsXml">Download all translation tasks as XML</key>
+    <key alias="downloadTaskAsXml">Download XML</key>
+    <key alias="DownloadXmlDTD">Download XML DTD</key>
     <key alias="fields">Fields</key>
     <key alias="includeSubpages">Include subpages</key>
     <key alias="mailBody"><![CDATA[
@@ -881,12 +882,12 @@ To manage your website, simply open the umbraco back office and start adding con
 
       Go to http://%3%/translation/details.aspx?id=%4% to edit.
 
-      Or log into umbraco to get an overview of your translation tasks
+      Or log into Umbraco to get an overview of your translation tasks
       http://%3%
 
       Have a nice day!
 
-      Cheers from the umbraco robot
+      Cheers from the Umbraco robot
     ]]></key>
     <key alias="mailSubject">[%0%] Translation task for %1%</key>
     <key alias="noTranslators">No translator users found. Please create a translator user before you start sending content to translation</key>
@@ -903,10 +904,10 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="translateTo">Translate to</key>
     <key alias="translationDone">Translation completed.</key>
     <key alias="translationDoneHelp">You can preview the pages, you've just translated, by clicking below. If the original page is found, you will get a comparison of the 2 pages.</key>
-    <key alias="translationFailed">Translation failed, the xml file might be corrupt</key>
+    <key alias="translationFailed">Translation failed, the XML file might be corrupt</key>
     <key alias="translationOptions">Translation options</key>
     <key alias="translator">Translator</key>
-    <key alias="uploadTranslationXml">Upload translation xml</key>
+    <key alias="uploadTranslationXml">Upload translation XML</key>
   </area>
   <area alias="treeHeaders">
     <key alias="cacheBrowser">Cache Browser</key>
@@ -937,6 +938,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Templates</key>
     <key alias="xslt">XSLT Files</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
