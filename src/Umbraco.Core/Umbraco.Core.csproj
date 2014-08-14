@@ -123,8 +123,6 @@
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
-    <Compile Include="Cache\DictionaryCacheWrapper.cs" />
-    <Compile Include="Cache\DictionaryItemWrapper.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
     <Compile Include="Cache\ICacheProvider.cs" />
@@ -219,6 +217,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="MonitorLock.cs" />
     <Compile Include="Packaging\Models\InstallAction.cs" />
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
     <Compile Include="Packaging\Models\MetaData.cs" />

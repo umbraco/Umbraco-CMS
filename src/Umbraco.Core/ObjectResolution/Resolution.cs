@@ -63,6 +63,11 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
+        // NOTE - the ugly code below exists only because of umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers
+        // which wants to re-register actions and handlers instead of properly restarting the application. Don't even think
+        // about using it for anything else. Also, while the backdoor is open, the resolution system is locked so nothing
+        // can work properly => deadlocks. Therefore, open the backdoor, do resolution changes EXCLUSIVELY, and close the door!
+
         /// <summary>
         /// Returns a disposable object that reprents dirty access to temporarily unfrozen resolution configuration.
         /// </summary>

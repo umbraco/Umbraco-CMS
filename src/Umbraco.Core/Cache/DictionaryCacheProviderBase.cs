@@ -1,218 +1,204 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace Umbraco.Core.Cache
 {
     internal abstract class DictionaryCacheProviderBase : ICacheProvider
     {
-        protected static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        protected abstract DictionaryCacheWrapper DictionaryCache { get; }
-
-        /// <summary>
-        /// Clears everything in umbraco's runtime cache
-        /// </summary>
-        /// <remarks>
-        /// Does not clear other stuff the user has put in httpruntime.cache!
-        /// </remarks>
-        public virtual void ClearAllCache()
-        {
-            using (new WriteLock(Locker))
-            {
-                var keysToRemove = DictionaryCache.Cast<object>()
-                                                  .Select(item => new DictionaryItemWrapper(item))
-                                                  .Where(c => c.Key is string && ((string)c.Key).StartsWith(CacheItemPrefix) && DictionaryCache[c.Key.ToString()] != null)
-                                                  .Select(c => c.Key)
-                                                  .ToList();
-
-                foreach (var k in keysToRemove)
-                {
-                    DictionaryCache.Remove(k);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Clears the item in umbraco's runtime cache with the given key 
-        /// </summary>
-        /// <param name="key">Key</param>
-        public virtual void ClearCacheItem(string key)
-        {
-            using (new WriteLock(Locker))
-            {
-                if (DictionaryCache[GetCacheKey(key)] == null) return;
-                DictionaryCache.Remove(GetCacheKey(key)); ;
-            }
-        }
-
-        /// <summary>
-        /// Clears all objects in the System.Web.Cache with the System.Type name as the
-        /// input parameter. (using [object].GetType())
-        /// </summary>
-        /// <param name="typeName">The name of the System.Type which should be cleared from cache ex "System.Xml.XmlDocument"</param>
-        public virtual void ClearCacheObjectTypes(string typeName)
-        {
-            using (new WriteLock(Locker))
-            {
-                var keysToRemove = DictionaryCache
-                    .Cast<object>()
-                    .Select(item => new DictionaryItemWrapper(item))
-                    .Where(c =>
-                    {
-                        var k = c.Key.ToString();
-                        var v = DictionaryCache[k];
-                        return v != null && v.GetType().ToString().InvariantEquals(typeName);
-                    })
-                    .Select(c => c.Key)
-                    .ToList();
-
-                foreach (var k in keysToRemove)
-                    DictionaryCache.Remove(k);
-            }
-        }
-
-        public virtual void ClearCacheObjectTypes<T>()
-        {
-            using (new WriteLock(Locker))
-            {
-                var typeOfT = typeof(T);
-                var keysToRemove = DictionaryCache
-                    .Cast<object>()
-                    .Select(item => new DictionaryItemWrapper(item))
-                    .Where(c =>
-                    {
-                        var k = c.Key.ToString();
-                        var v = DictionaryCache[k];
-                        return v != null && v.GetType() == typeOfT;
-                    })
-                    .Select(c => c.Key)
-                    .ToList();
-
-                foreach (var k in keysToRemove)
-                    DictionaryCache.Remove(k);
-            }
-        }
-
-        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
-        {
-            using (new WriteLock(Locker))
-            {
-                var typeOfT = typeof(T);
-                var keysToRemove = DictionaryCache
-                    .Cast<object>()
-                    .Select(item => new DictionaryItemWrapper(item))
-                    .Where(c =>
-                    {
-                        var k = c.Key.ToString();
-                        var v = DictionaryCache[k];
-                        return v != null && v.GetType() == typeOfT && predicate(k, (T)v);
-                    })
-                    .Select(c => c.Key)
-                    .ToList();
-
-                foreach (var k in keysToRemove)
-                    DictionaryCache.Remove(k);
-            }
-        }
-
-        /// <summary>
-        /// Clears all cache items that starts with the key passed.
-        /// </summary>
-        /// <param name="keyStartsWith">The start of the key</param>
-        public virtual void ClearCacheByKeySearch(string keyStartsWith)
-        {
-            var keysToRemove = DictionaryCache.Cast<object>()
-                                              .Select(item => new DictionaryItemWrapper(item))
-                                              .Where(c => c.Key is string && ((string)c.Key).InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith)))
-                                              .Select(c => c.Key)
-                                              .ToList();
-
-            foreach (var k in keysToRemove)
-            {
-                DictionaryCache.Remove(k);
-            }
-        }
-
-        /// <summary>
-        /// Clears all cache items that have a key that matches the regular expression
-        /// </summary>
-        /// <param name="regexString"></param>
-        public virtual void ClearCacheByKeyExpression(string regexString)
-        {
-            var keysToRemove = new List<object>();
-            foreach (var item in DictionaryCache)
-            {
-                var c = new DictionaryItemWrapper(item);
-                var s = c.Key as string;
-                if (s != null)
-                {
-                    var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
-                    if (Regex.IsMatch(withoutPrefix, regexString))
-                    {
-                        keysToRemove.Add(c.Key);
-                    }
-                }
-            }
-
-            foreach (var k in keysToRemove)
-            {
-                DictionaryCache.Remove(k);
-            }
-        }
-
-        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
-        {
-            return (from object item in DictionaryCache
-                    select new DictionaryItemWrapper(item)
-                    into c
-                    where c.Key is string && ((string) c.Key).InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith))
-                    select c.Value).ToList();
-        }
-
-        public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
-        {
-            var found = new List<object>();
-            foreach (var item in DictionaryCache)
-            {
-                var c = new DictionaryItemWrapper(item);
-                var s = c.Key as string;
-                if (s != null)
-                {
-                    var withoutPrefix = s.TrimStart(string.Format("{0}-", CacheItemPrefix));
-                    if (Regex.IsMatch(withoutPrefix, regexString))
-                    {
-                        found.Add(c.Value);
-                    }
-                }
-            }
-
-            return found;
-        }
-
-        /// <summary>
-        /// Returns a cache item by key, does not update the cache if it isn't there.
-        /// </summary>
-        /// <param name="cacheKey"></param>
-        /// <returns></returns>
-        public virtual object GetCacheItem(string cacheKey)
-        {
-            var result = DictionaryCache.Get(GetCacheKey(cacheKey));
-            return result;
-        }
-
-        public abstract object GetCacheItem(string cacheKey, Func<object> getCacheItem);        
-
-        /// <summary>
-        /// We prefix all cache keys with this so that we know which ones this class has created when 
-        /// using the HttpRuntime cache so that when we clear it we don't clear other entries we didn't create.
-        /// </summary>
+        // prefix cache keys so we know which one are ours
         protected const string CacheItemPrefix = "umbrtmche";
+
+        // an object that represent a value that has not been created yet
+        protected readonly object ValueNotCreated = new object();
+
+        // manupulate the underlying cache entries
+        // these *must* be called from within the appropriate locks
+        // and use the full prefixed cache keys
+        protected abstract IEnumerable<DictionaryEntry> GetDictionaryEntries();
+        protected abstract void RemoveEntry(string key);
+        protected abstract object GetEntry(string key);
+
+        // read-write lock the underlying cache
+        protected abstract IDisposable ReadLock { get; }
+        protected abstract IDisposable WriteLock { get; }
 
         protected string GetCacheKey(string key)
         {
             return string.Format("{0}-{1}", CacheItemPrefix, key);
         }
+
+        protected object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
+        {
+            try
+            {
+                // if onlyIfValueIsCreated, do not trigger value creation
+                // must return something, though, to differenciate from null values
+                if (onlyIfValueIsCreated && lazy.IsValueCreated == false) return ValueNotCreated;
+                return lazy.Value;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #region Clear
+
+        public virtual void ClearAllCache()
+        {
+            using (WriteLock)
+            {
+                foreach (var entry in GetDictionaryEntries()
+                    .ToArray())
+                    RemoveEntry((string) entry.Key);
+            }
+        }
+
+        public virtual void ClearCacheItem(string key)
+        {
+            var cacheKey = GetCacheKey(key);
+            using (WriteLock)
+            {
+                RemoveEntry(cacheKey);
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes(string typeName)
+        {
+            using (WriteLock)
+            {
+                foreach (var entry in GetDictionaryEntries()
+                    .Where(x =>
+                    {
+                        // entry.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
+                        // get non-created as NonCreatedValue & exceptions as null
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        return value == null || value.GetType().ToString().InvariantEquals(typeName);
+                    })
+                    .ToArray())
+                    RemoveEntry((string) entry.Key);
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes<T>()
+        {
+            var typeOfT = typeof(T);
+            using (WriteLock)
+            {
+                foreach (var entry in GetDictionaryEntries()
+                    .Where(x =>
+                    {
+                        // entry.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
+                        // compare on exact type, don't use "is"
+                        // get non-created as NonCreatedValue & exceptions as null
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        return value == null || value.GetType() == typeOfT;
+                    })
+                    .ToArray())
+                    RemoveEntry((string) entry.Key);
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            var typeOfT = typeof(T);
+            var plen = CacheItemPrefix.Length + 1;
+            using (WriteLock)
+            {
+                foreach (var entry in GetDictionaryEntries()
+                    .Where(x =>
+                    {
+                        // entry.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
+                        // compare on exact type, don't use "is"
+                        // get non-created as NonCreatedValue & exceptions as null
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        if (value == null) return true;
+                        return value.GetType() == typeOfT
+                            // run predicate on the 'public key' part only, ie without prefix
+                            && predicate(((string)x.Key).Substring(plen), (T)value);
+                    }))
+                    RemoveEntry((string) entry.Key);
+            }
+        }
+
+        public virtual void ClearCacheByKeySearch(string keyStartsWith)
+        {
+            var plen = CacheItemPrefix.Length + 1;
+            using (WriteLock)
+            {
+                foreach (var entry in GetDictionaryEntries()
+                    .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
+                    .ToArray())
+                    RemoveEntry((string) entry.Key);
+            }
+        }
+
+        public virtual void ClearCacheByKeyExpression(string regexString)
+        {
+            var plen = CacheItemPrefix.Length + 1;
+            using (WriteLock)
+            {
+                foreach (var entry in GetDictionaryEntries()
+                    .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
+                    .ToArray())
+                    RemoveEntry((string) entry.Key);
+            }
+        }
+
+        #endregion
+
+        #region Get
+
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        {
+            var plen = CacheItemPrefix.Length + 1;
+            IEnumerable<DictionaryEntry> entries;
+            using (ReadLock)
+            {
+                entries = GetDictionaryEntries()
+                    .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
+                    .ToArray(); // evaluate while locked
+            }
+            return entries
+                    .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                    .Where(x => x != null); // backward compat, don't store null values in the cache
+        }
+
+        public virtual IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        {
+            const string prefix = CacheItemPrefix + "-";
+            var plen = prefix.Length;
+            IEnumerable<DictionaryEntry> entries;
+            using (ReadLock)
+            {
+                entries = GetDictionaryEntries()
+                    .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
+                    .ToArray(); // evaluate while locked
+            }
+            return entries
+                    .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                    .Where(x => x != null); // backward compat, don't store null values in the cache
+        }
+
+        public virtual object GetCacheItem(string cacheKey)
+        {
+            cacheKey = GetCacheKey(cacheKey);
+            Lazy<object> result;
+            using (ReadLock)
+            {
+                result = GetEntry(cacheKey) as Lazy<object>; // null if key not found
+            }
+            return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
+        }
+
+        public abstract object GetCacheItem(string cacheKey, Func<object> getCacheItem);
+
+        #endregion
     }
 }

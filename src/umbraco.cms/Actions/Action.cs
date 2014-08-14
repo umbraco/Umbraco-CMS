@@ -51,21 +51,26 @@ namespace umbraco.BusinessLogic.Actions
 		/// </remarks>
 		public static void ReRegisterActionsAndHandlers()
 		{
-			lock (Lock)
-			{
+            //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+            
+            lock (Lock)
+            {
+                // NOTE use the DirtyBackdoor to change the resolution configuration EXCLUSIVELY
+                // ie do NOT do ANYTHING else while holding the backdoor, because while it is open
+                // the whole resolution system is locked => nothing can work properly => deadlocks
+
+                var newResolver = new ActionsResolver(
+                        () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+
                 using (Umbraco.Core.ObjectResolution.Resolution.DirtyBackdoorToConfiguration)
                 {
-                    //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
                     ActionsResolver.Reset(false); // and do NOT reset the whole resolution!
-                    ActionHandlers.Clear();
-
-                    //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
-                    ActionsResolver.Current = new ActionsResolver(
-					    () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
-
-                    RegisterIActionHandlers();
+                    ActionsResolver.Current = newResolver;
                 }
-			}
+
+                ActionHandlers.Clear();
+                RegisterIActionHandlers();
+            }
 		}
 
         /// <summary>
