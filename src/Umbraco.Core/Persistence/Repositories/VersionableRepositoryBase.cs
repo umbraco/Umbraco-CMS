@@ -96,6 +96,90 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        public int CountDescendants(int parentId, string contentTypeAlias = null)
+        {
+            var pathMatch = parentId == -1
+                ? "-1,"
+                : "," + parentId + ",";
+            var sql = new Sql();
+            if (contentTypeAlias.IsNullOrWhiteSpace())
+            {
+                sql.Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.Path.Contains(pathMatch));
+            }
+            else
+            {
+                sql.Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.Path.Contains(pathMatch))
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+            }
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
+        public int CountChildren(int parentId, string contentTypeAlias = null)
+        {
+            var sql = new Sql();
+            if (contentTypeAlias.IsNullOrWhiteSpace())
+            {
+                sql.Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.ParentId == parentId);
+            }
+            else
+            {
+                sql.Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.ParentId == parentId)
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+            }
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
+        /// <summary>
+        /// Get the total count of entities
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <returns></returns>
+        public int Count(string contentTypeAlias = null)
+        {
+            var sql = new Sql();
+            if (contentTypeAlias.IsNullOrWhiteSpace())
+            {
+                sql.Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            }
+            else
+            {
+                sql.Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+            }
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
         /// <summary>
         /// This removes associated tags from the entity - used generally when an entity is recycled
         /// </summary>

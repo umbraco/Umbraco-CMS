@@ -67,6 +67,43 @@ namespace Umbraco.Web
             public string JsonPayload { get; set; }
         }
 
+        /// <summary>
+        /// We need to check if distributed calls are enabled, if they are we also want to make sure 
+        /// that the current server's cache is updated internally in real time instead of at the end of
+        /// the call. This is because things like the URL cache, etc... might need to be updated during
+        /// the request that is making these calls.
+        /// </summary>
+        /// <param name="servers"></param>
+        /// <param name="refresher"></param>
+        /// <param name="dispatchType"></param>
+        /// <param name="ids"></param>
+        /// <param name="jsonPayload"></param>
+        /// <remarks>
+        /// See: http://issues.umbraco.org/issue/U4-2633#comment=67-15604
+        /// </remarks>
+        protected override void MessageSeversForIdsOrJson(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType dispatchType, IEnumerable<object> ids = null, string jsonPayload = null)
+        {
+            //do all the normal stuff
+            base.MessageSeversForIdsOrJson(servers, refresher, dispatchType, ids, jsonPayload);
+
+            //Now, check if we are using Distrubuted calls
+            if (UseDistributedCalls && servers.Any())
+            {
+                //invoke on the current server - we will basically be double cache refreshing for the calling
+                // server but that just needs to be done currently, see the link above for details.
+                InvokeMethodOnRefresherInstance(refresher, dispatchType, ids, jsonPayload);
+            }
+        }
+
+        /// <summary>
+        /// This adds the call to batched list
+        /// </summary>
+        /// <param name="servers"></param>
+        /// <param name="refresher"></param>
+        /// <param name="dispatchType"></param>
+        /// <param name="ids"></param>
+        /// <param name="idArrayType"></param>
+        /// <param name="jsonPayload"></param>
         protected override void PerformDistributedCall(
             IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
@@ -75,6 +112,7 @@ namespace Umbraco.Web
             Type idArrayType = null,
             string jsonPayload = null)
         {
+
             //NOTE: we use UmbracoContext instead of HttpContext.Current because when some web methods run async, the 
             // HttpContext.Current is null but the UmbracoContext.Current won't be since we manually assign it.
             if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
@@ -205,19 +243,22 @@ namespace Umbraco.Web
 
                         asyncResultsList.Add(
                             cacheRefresher.BeginBulkRefresh(
-                                instructions, Login, Password, null, null));
+                                instructions, 
+                                HttpRuntime.AppDomainAppId,
+                                Login, Password, null, null));
                     }
 
-                    List<WaitHandle> waitHandlesList;
-                    var asyncResults = GetAsyncResults(asyncResultsList, out waitHandlesList);
-
+                    var waitHandlesList = asyncResultsList.Select(x => x.AsyncWaitHandle).ToArray();
+                    
                     var errorCount = 0;
 
-                    // Once for each WaitHandle that we have, wait for a response and log it
-                    // We're previously submitted all these requests effectively in parallel and will now retrieve responses on a FIFO basis
-                    foreach (var t in asyncResults)
+                    //Wait for all requests to complete
+                    WaitHandle.WaitAll(waitHandlesList.ToArray());
+                    
+                    foreach (var t in asyncResultsList)
                     {
-                        var handleIndex = WaitHandle.WaitAny(waitHandlesList.ToArray(), TimeSpan.FromSeconds(15));
+                        //var handleIndex = WaitHandle.WaitAny(waitHandlesList.ToArray(), TimeSpan.FromSeconds(15));
+
                         try
                         {
                             cacheRefresher.EndBulkRefresh(t);

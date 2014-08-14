@@ -24,11 +24,24 @@ namespace umbraco.presentation.webservices
 	{   
 
         [WebMethod]
-        public void BulkRefresh(RefreshInstruction[] instructions, string login, string password)
+        public void BulkRefresh(RefreshInstruction[] instructions, string appId, string login, string password)
         {
             if (BusinessLogic.User.validateCredentials(login, password) == false)
             {
                 return;
+            }
+
+            //check if this is the same app id as the one passed in, if it is, then we will ignore
+            // the request - we will have to assume that the cache refeshing has already been applied to the server
+            // that executed the request.
+            if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+            {
+                //we can only check this in full trust. if it's in medium trust we'll just end up with 
+                // the server refreshing it's cache twice.
+                if (HttpRuntime.AppDomainAppId == appId)
+                {
+                    return;
+                }
             }
 
             //only execute distinct instructions - no sense in running the same one.

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -374,6 +375,34 @@ namespace Umbraco.Tests.Services
 
             Assert.IsNotNull(ServiceContext.MemberService.GetByEmail(member.Email));
             Assert.IsNull(ServiceContext.MemberService.GetByEmail("do@not.find"));
+        }
+
+        [Test]
+        public void Get_Member_Name()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "Test Real Name", "test@test.com", "pass", "testUsername");
+            ServiceContext.MemberService.Save(member);
+
+
+            Assert.AreEqual("Test Real Name", member.Name);
+        }
+
+        [Test]
+        public void Get_Member_Name_In_Created_Event()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+
+            TypedEventHandler<IMemberService, NewEventArgs<IMember>> callback = (sender, args) =>
+            {
+                Assert.AreEqual("Test Real Name", args.Entity.Name);
+            };
+
+            MemberService.Created += callback;
+            var member = ServiceContext.MemberService.CreateMember("testUsername", "test@test.com", "Test Real Name", memberType);
+            MemberService.Created -= callback;
         }
 
         [Test]

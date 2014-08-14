@@ -8,5 +8,7 @@ namespace Umbraco.Core.Sync
     public interface IServerAddress
     {
         string ServerAddress { get; }
+
+        //TODO : Should probably add things like port, protocol, server name, app id
     }
 }

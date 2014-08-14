@@ -240,6 +240,28 @@ namespace Umbraco.Core.Models
             return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                           .Contains(recycleBinId.ToInvariantString());
         }
+        
+        /// <summary>
+        /// Removes characters that are not valide XML characters from all entity properties 
+        /// of type string. See: http://stackoverflow.com/a/961504/5018
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// If this is not done then the xml cache can get corrupt and it will throw YSODs upon reading it.
+        /// </remarks>
+        /// <param name="entity"></param>
+        public static void SanitizeEntityPropertiesForXmlStorage(this IContentBase entity)
+        {
+            entity.Name = entity.Name.ToValidXmlString();
+            foreach (var property in entity.Properties)
+            {
+                if (property.Value is string)
+                {
+                    var value = (string)property.Value;
+                    property.Value = value.ToValidXmlString();
+                }
+            }
+        }
 
         /// <summary>
         /// Checks if the IContentBase has children
@@ -734,10 +756,6 @@ namespace Umbraco.Core.Models
         {
             return ((PackagingService)(ApplicationContext.Current.Services.PackagingService)).Export(member);
         }
-
         #endregion
     }
-
-
-
 }

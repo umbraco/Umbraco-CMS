@@ -98,7 +98,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             //this gets the image with the smallest height which equals the maximum we can scale up for this image block
             var maxScaleableHeight = this.getMaxScaleableHeight(idealImages, maxRowHeight);
             //if the max scale height is smaller than the min display height, we'll use the min display height
-            targetHeight = targetHeight ? targetHeight : Math.max(maxScaleableHeight, minDisplayHeight);
+            targetHeight =  targetHeight !== undefined ? targetHeight : Math.max(maxScaleableHeight, minDisplayHeight);
             
             var attemptedRowHeight = this.performGetRowHeight(idealImages, targetRowWidth, minDisplayHeight, targetHeight);
 
@@ -109,7 +109,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 if (attemptedRowHeight < minDisplayHeight) {
 
                     if (idealImages.length > 1) {
-                        //we'll generate a new targetHeight that is halfway between the max and the current and recurse, passing in a new targetHeight
+                        
+                        //we'll generate a new targetHeight that is halfway between the max and the current and recurse, passing in a new targetHeight                        
                         targetHeight += Math.floor((maxRowHeight - targetHeight) / 2);
                         return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow - 1, margin, targetHeight);
                     }
@@ -156,7 +157,19 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 //Ok, we couldn't actually scale it up with the ideal row count we'll just recurse with a lesser image count.
                 return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow - 1, margin);
             }
+            else if (targetHeight === maxRowHeight) {
+
+                //This is going to happen when:
+                // * We can fit a list of images in a row, but they come up too short (based on minDisplayHeight)
+                // * Then we'll try to remove an image, but when we try to scale to fit, the width comes up too narrow but the images are already at their
+                //      maximum height (maxRowHeight)
+                // * So we're stuck, we cannot precicely fit the current list of images, so we'll render a row that will be max height but won't be wide enough
+                //      which is better than rendering a row that is shorter than the minimum since that could be quite small.
+
+                return { height: targetHeight, imgCount: idealImages.length };
+            }
             else {
+
                 //we have additional images so we'll recurse and add 1 to the idealImgPerRow until it fits
                 return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow + 1, margin);
             }
@@ -195,18 +208,6 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             for (var i = 0; i < imgs.length; i++) {
                 //get the lower width to ensure it always fits
                 var scaledWidth = Math.floor(this.getScaledWidth(imgs[i], imageRowHeight.height));
-
-                //in this case, a single image will not fit into the row so we need to crop/center
-                // width the full width and the min display height
-                if (imageRowHeight.imgCount === 1) {
-                    sizes.push({
-                        width: targetWidth,
-                        //ensure that the height is rounded
-                        height: Math.round(minDisplayHeight)
-                    });
-                    row.images.push(imgs[i]);
-                    break;
-                }
                 
                 if (currRowWidth + scaledWidth <= targetWidth) {
                     currRowWidth += scaledWidth;                    

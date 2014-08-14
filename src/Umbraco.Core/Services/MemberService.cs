@@ -644,6 +644,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public int Count(string contentTypeAlias = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.Count(contentTypeAlias);
+            }
+        }
+
         /// <summary>
         /// Creates a member object
         /// </summary>
