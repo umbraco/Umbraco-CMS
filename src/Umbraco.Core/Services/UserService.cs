@@ -10,8 +10,6 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
-
-
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/>, <see cref="IMembershipUser"/> and eventually Backoffice Users.
     /// </summary>
@@ -37,10 +35,11 @@ namespace Umbraco.Core.Services
         #region Implementation of IMembershipUserService
 
         /// <summary>
-        /// By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll return the first type that is not an admin, otherwise if there's only one
-        /// we will return that one.
+        /// Gets the default MemberType alias
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
+        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
+        /// <returns>Alias of the default MemberType</returns>
         public string GetDefaultMemberType()
         {
             using (var repository = _repositoryFactory.CreateUserTypeRepository(_uowProvider.GetUnitOfWork()))
@@ -67,6 +66,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Checks if a User with the username exists
+        /// </summary>
+        /// <param name="username">Username to check</param>
+        /// <returns><c>True</c> if the User exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -88,7 +92,15 @@ namespace Umbraco.Core.Services
             return CreateUserWithIdentity(username, email, "", userType);
         }
 
-        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
+        /// <summary>
+        /// Creates and persists a new <see cref="IUser"/>
+        /// </summary>
+        /// <param name="username">Username of the <see cref="IUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <returns><see cref="IUser"/></returns>
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
         {
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)
@@ -96,10 +108,20 @@ namespace Umbraco.Core.Services
                 throw new EntityNotFoundException("The user type " + memberTypeAlias + " could not be resolved");
             }
 
-            return CreateUserWithIdentity(username, email, rawPasswordValue, userType);
+            return CreateUserWithIdentity(username, email, passwordValue, userType);
         }
 
-        private IUser CreateUserWithIdentity(string username, string email, string rawPasswordValue, IUserType userType)
+        /// <summary>
+        /// Creates and persists a Member
+        /// </summary>
+        /// <remarks>Using this method will persist the Member object before its returned 
+        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="userType">MemberType the Member should be based on</param>
+        /// <returns><see cref="IUser"/></returns>
+        private IUser CreateUserWithIdentity(string username, string email, string passwordValue, IUserType userType)
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
@@ -118,7 +140,7 @@ namespace Umbraco.Core.Services
                     Email = email,
                     Language = Configuration.GlobalSettings.DefaultUILanguage,
                     Name = username,
-                    RawPasswordValue = rawPasswordValue,                    
+                    RawPasswordValue = passwordValue,                    
                     Username = username,
                     StartContentId = -1,
                     StartMediaId = -1,
@@ -138,6 +160,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a User by its integer id
+        /// </summary>
+        /// <param name="id"><see cref="System.int"/> Id</param>
+        /// <returns><see cref="IUser"/></returns>
         public IUser GetById(int id)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -148,6 +175,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets an <see cref="IUser"/> by its provider key
+        /// </summary>
+        /// <param name="id">Id to use for retrieval</param>
+        /// <returns><see cref="IUser"/></returns>
         public IUser GetByProviderKey(object id)
         {
             var asInt = id.TryConvertTo<int>();
@@ -159,6 +191,11 @@ namespace Umbraco.Core.Services
             return null;
         }
 
+        /// <summary>
+        /// Get an <see cref="IUser"/> by email
+        /// </summary>
+        /// <param name="email">Email to use for retrieval</param>
+        /// <returns><see cref="IUser"/></returns>
         public IUser GetByEmail(string email)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -170,6 +207,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Get an <see cref="IUser"/> by username
+        /// </summary>
+        /// <param name="username">Username to use for retrieval</param>
+        /// <returns><see cref="IUser"/></returns>
         public IUser GetByUsername(string username)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -180,9 +222,9 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// This disables and renames the user, it does not delete them, use the overload to delete them
+        /// Deletes an <see cref="IUser"/>
         /// </summary>
-        /// <param name="membershipUser"></param>
+        /// <param name="membershipUser"><see cref="IUser"/> to Delete</param>
         public void Delete(IUser membershipUser)
         {            
             //disable
@@ -256,6 +298,12 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Saves an <see cref="IUser"/>
+        /// </summary>
+        /// <param name="entity"><see cref="IUser"/> to Save</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IUser entity, bool raiseEvents = true)
         {
             if (raiseEvents)
@@ -275,6 +323,12 @@ namespace Umbraco.Core.Services
                 SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entity, false), this);
         }
 
+        /// <summary>
+        /// Saves a list of <see cref="IUser"/> objects
+        /// </summary>
+        /// <param name="entities"><see cref="IEnumerable{IUser}"/> to save</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
         {
             if (raiseEvents)
@@ -298,6 +352,15 @@ namespace Umbraco.Core.Services
                 SavedUser.RaiseEvent(new SaveEventArgs<IUser>(entities, false), this);
         }
 
+        /// <summary>
+        /// Finds a list of <see cref="IUser"/> objects by a partial email string
+        /// </summary>
+        /// <param name="emailStringToMatch">Partial email string to match</param>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
+        /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -330,6 +393,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Finds a list of <see cref="IUser"/> objects by a partial username
+        /// </summary>
+        /// <param name="login">Partial username to match</param>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
+        /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -362,6 +434,16 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets the total number of Users based on the count type
+        /// </summary>
+        /// <remarks>
+        /// The way the Online count is done is the same way that it is done in the MS SqlMembershipProvider - We query for any members
+        /// that have their last active date within the Membership.UserIsOnlineTimeWindow (which is in minutes). It isn't exact science
+        /// but that is how MS have made theirs so we'll follow that principal.
+        /// </remarks>
+        /// <param name="countType"><see cref="MemberCountType"/> to count by</param>
+        /// <returns><see cref="System.int"/> with number of Users for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -398,6 +480,13 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a list of paged <see cref="IUser"/> objects
+        /// </summary>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IUser> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -449,7 +538,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
-        /// <remarks>Note: If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
         /// <param name="userId">Id of the user</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>

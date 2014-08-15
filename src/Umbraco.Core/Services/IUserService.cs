@@ -65,7 +65,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
-        /// <remarks>Note: If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
         /// <param name="userId">Id of the user</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
