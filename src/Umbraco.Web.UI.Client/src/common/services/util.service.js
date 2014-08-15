@@ -136,7 +136,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             }
             else if (idealImages.length === 1) {
                 //this will occur when we only have one image remaining in the row to process but it's not really going to fit ideally
-                // in the row so we'll just return the minDisplayHeight and it will just get centered on the row
+                // in the row. 
                 return { height: minDisplayHeight, imgCount: 1 };
             }
             else if (idealImages.length === idealImgPerRow && targetHeight < maxRowHeight) {
@@ -191,9 +191,14 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 
                 return newHeight;
             }
-
-            //if it's not successful, return false
-            return null;
+            else if (idealImages.length === 1 && (currRowWidth <= targetRowWidth) && !idealImages[0].isFolder) {
+                //if there is only one image, then return the target height
+                return targetHeight;
+            }
+            else {
+                //if it's not successful, return false
+                return null;
+            }
         },
 
         /** builds an image grid row */
@@ -205,19 +210,29 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             var targetWidth = this.getTargetWidth(imageRowHeight.imgCount, maxRowWidth, margin);
 
             var sizes = [];
-            for (var i = 0; i < imgs.length; i++) {
+            //loop through the images we know fit into the height
+            for (var i = 0; i < imageRowHeight.imgCount; i++) {
                 //get the lower width to ensure it always fits
                 var scaledWidth = Math.floor(this.getScaledWidth(imgs[i], imageRowHeight.height));
                 
                 if (currRowWidth + scaledWidth <= targetWidth) {
                     currRowWidth += scaledWidth;                    
                     sizes.push({
-                        width: scaledWidth,
+                        width:scaledWidth,
                         //ensure that the height is rounded
                         height: Math.round(imageRowHeight.height)
                     });
                     row.images.push(imgs[i]);
-                }                
+                }
+                else if (imageRowHeight.imgCount === 1 && row.images.length === 0) {
+                    //the image is simply too wide, we'll crop/center it
+                    sizes.push({
+                        width: maxRowWidth,
+                        //ensure that the height is rounded
+                        height: Math.round(imageRowHeight.height)
+                    });
+                    row.images.push(imgs[i]);
+                }
                 else {
                     //the max width has been reached
                     break;
@@ -234,8 +249,11 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 this.setImageStyle(row.images[j], sizes[j].width, sizes[j].height, margin, bottomMargin);
             }
 
-            ////set the row style
-            //row.style = { "width": maxRowWidth + "px" };
+            if (row.images.length === 1) {
+                //if there's only one image on the row, set the container to max width
+                row.images[0].style.width = maxRowWidth + "px"; 
+            }
+            
 
             return row;
         },
@@ -282,6 +300,11 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                     imagesProcessed += row.images.length;
                 }
                 else {
+
+                    if (currImgs.length > 0) {
+                        throw "Could not fill grid with all images, images remaining: " + currImgs.length;
+                    }
+
                     //if there was nothing processed, exit
                     break;
                 }
