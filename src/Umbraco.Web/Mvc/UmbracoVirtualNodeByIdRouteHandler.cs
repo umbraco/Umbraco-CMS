@@ -3,11 +3,11 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Mvc
 {
-    public abstract class UmbracoVirtualNodeByIdRouteHandler : UmbracoVirtualNodeRouteHandler
+    public class UmbracoVirtualNodeByIdRouteHandler : UmbracoVirtualNodeRouteHandler
     {
         private readonly int _realNodeId;
 
-        protected UmbracoVirtualNodeByIdRouteHandler(int realNodeId)
+        public UmbracoVirtualNodeByIdRouteHandler(int realNodeId)
         {
             _realNodeId = realNodeId;
         }
@@ -20,6 +20,9 @@ namespace Umbraco.Web.Mvc
             return FindContent(requestContext, umbracoContext, byId);
         }
 
-        protected abstract IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext, IPublishedContent baseContent);
+        protected virtual IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext, IPublishedContent baseContent)
+        {
+            return baseContent;
+        }
     }
 }
