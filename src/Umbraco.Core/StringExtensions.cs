@@ -72,6 +72,13 @@ namespace Umbraco.Core
                    || (input.StartsWith("[") && input.EndsWith("]"));
         }
 
+        internal static bool DetectIsEmptyJson(this string input)
+        {
+            input = input.Trim();
+            return (input.StartsWith("{") && input.EndsWith("}") && input.Replace(" ", "") == "{}")
+                   || (input.StartsWith("[") && input.EndsWith("]") && input.Replace(" ", "") == "[]");
+        }
+
         /// <summary>
         /// Returns a JObject/JArray instance if the string can be converted to json, otherwise returns the string
         /// </summary>
