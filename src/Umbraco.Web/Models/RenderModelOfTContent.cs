@@ -5,7 +5,7 @@ using Umbraco.Web.Mvc;
 namespace Umbraco.Web.Models
 {
     public class RenderModel<TContent> : RenderModel
-        where TContent : class, IPublishedContent
+        where TContent : IPublishedContent
     {
         /// <summary>
         /// Constructor specifying both the IPublishedContent and the CultureInfo
