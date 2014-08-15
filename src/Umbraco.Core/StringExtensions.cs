@@ -72,11 +72,11 @@ namespace Umbraco.Core
                    || (input.StartsWith("[") && input.EndsWith("]"));
         }
 
+        internal static readonly Regex Whitespace = new Regex(@"\s+", RegexOptions.Compiled);
+        internal static readonly string[] JsonEmpties = new [] { "[]", "{}" };
         internal static bool DetectIsEmptyJson(this string input)
         {
-            input = input.Trim();
-            return (input.StartsWith("{") && input.EndsWith("}") && input.Replace(" ", "") == "{}")
-                   || (input.StartsWith("[") && input.EndsWith("]") && input.Replace(" ", "") == "[]");
+            return JsonEmpties.Contains(Whitespace.Replace(input, string.Empty));
         }
 
         /// <summary>
