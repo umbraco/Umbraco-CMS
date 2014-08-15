@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -78,6 +75,14 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Creates a new User
+        /// </summary>
+        /// <remarks>The user will be saved in the database and returned with an Id</remarks>
+        /// <param name="username">Username of the user to create</param>
+        /// <param name="email">Email of the user to create</param>
+        /// <param name="userType"><see cref="IUserType"/> which the User should be based on</param>
+        /// <returns><see cref="IUser"/></returns>
         public IUser CreateUserWithIdentity(string username, string email, IUserType userType)
         {
             return CreateUserWithIdentity(username, email, "", userType);
@@ -165,11 +170,11 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IUser GetByUsername(string login)
+        public IUser GetByUsername(string username)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(login));
+                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -197,11 +202,11 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
-        /// <param name="user">The user to save the password for</param>
-        /// <param name="password"></param>
         /// <remarks>
         /// This method exists so that Umbraco developers can use one entry point to create/update users if they choose to.
         /// </remarks>
+        /// <param name="user">The user to save the password for</param>
+        /// <param name="password">The password to save</param>
         public void SavePassword(IUser user, string password)
         {
             if (user == null) throw new ArgumentNullException("user");
@@ -225,10 +230,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// To permanently delete the user pass in true, otherwise they will just be disabled
+        /// Deletes or disables a User
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="deletePermanently"></param>
+        /// <param name="user"><see cref="IUser"/> to delete</param>
+        /// <param name="deletePermanently"><c>True</c> to permanently delete the user, <c>False</c> to disable the user</param>
         public void Delete(IUser user, bool deletePermanently)
         {
             if (deletePermanently == false)
@@ -417,12 +422,22 @@ namespace Umbraco.Core.Services
             return user.ProfileData;
         }
 
-        public IProfile GetProfileByUserName(string login)
+        /// <summary>
+        /// Gets a profile by username
+        /// </summary>
+        /// <param name="username">Username</param>
+        /// <returns><see cref="IProfile"/></returns>
+        public IProfile GetProfileByUserName(string username)
         {
-            var user = GetByUsername(login);
+            var user = GetByUsername(username);
             return user.ProfileData;
         }
-        
+
+        /// <summary>
+        /// Gets a user by Id
+        /// </summary>
+        /// <param name="id">Id of the user to retrieve</param>
+        /// <returns><see cref="IUser"/></returns>
         public IUser GetUserById(int id)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -430,13 +445,14 @@ namespace Umbraco.Core.Services
                 return repository.Get(id);
             }
         }
-        
+
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="permissions"></param>
-        /// <param name="entityIds"></param>
+        /// <remarks>Note: If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
+        /// <param name="userId">Id of the user</param>
+        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
         public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -446,6 +462,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets all UserTypes or thosed specified as parameters
+        /// </summary>
+        /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
+        /// <returns>An enumerable list of <see cref="IUserType"/></returns>
         public IEnumerable<IUserType> GetAllUserTypes(params int[] ids)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -456,7 +477,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets an IUserType by its Alias
+        /// Gets a UserType by its Alias
         /// </summary>
         /// <param name="alias">Alias of the UserType to retrieve</param>
         /// <returns><see cref="IUserType"/></returns>
@@ -470,6 +491,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a UserType by its Id
+        /// </summary>
+        /// <param name="id">Id of the UserType to retrieve</param>
+        /// <returns><see cref="IUserType"/></returns>
         public IUserType GetUserTypeById(int id)
         {
             using (var repository = _repositoryFactory.CreateUserTypeRepository(_uowProvider.GetUnitOfWork()))
@@ -479,7 +505,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets an IUserType by its Name
+        /// Gets a UserType by its Name
         /// </summary>
         /// <param name="name">Name of the UserType to retrieve</param>
         /// <returns><see cref="IUserType"/></returns>
@@ -493,6 +519,12 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Saves a UserType
+        /// </summary>
+        /// <param name="userType">UserType to save</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void SaveUserType(IUserType userType, bool raiseEvents = true)
         {
             if (raiseEvents)
@@ -512,6 +544,10 @@ namespace Umbraco.Core.Services
                 SavedUserType.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this);
         }
 
+        /// <summary>
+        /// Deletes a UserType
+        /// </summary>
+        /// <param name="userType">UserType to delete</param>
         public void DeleteUserType(IUserType userType)
         {
             if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
@@ -528,9 +564,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// This is useful for when a section is removed from config
+        /// Removes a specific section from all users
         /// </summary>
-        /// <param name="sectionAlias"></param>
+        /// <remarks>This is useful when an entire section is removed from config</remarks>
+        /// <param name="sectionAlias">Alias of the section to remove</param>
         public void DeleteSectionFromAllUsers(string sectionAlias)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -548,14 +585,12 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Returns permissions for a given user for any number of nodes
+        /// Get permissions set for a user and optional node ids
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="nodeIds"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If no permissions are found for a particular entity then the user's default permissions will be applied
-        /// </remarks>
+        /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
+        /// <param name="user">User to retrieve permissions for</param>
+        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
