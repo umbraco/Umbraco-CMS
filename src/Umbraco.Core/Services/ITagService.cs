@@ -68,36 +68,36 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets every tag stored in the database
         /// </summary>
-        /// <param name="group">Optional name of the 'Tag Group'</param>
+        /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
-        IEnumerable<ITag> GetAllTags(string group = null);
+        IEnumerable<ITag> GetAllTags(string tagGroup = null);
 
         /// <summary>
         /// Gets all tags for content items
         /// </summary>
-        /// <remarks>Use the optional group parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the 
         /// result to a specific 'Tag Group'.</remarks>
-        /// <param name="group">Optional name of the 'Tag Group'</param>
+        /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
-        IEnumerable<ITag> GetAllContentTags(string group = null);
+        IEnumerable<ITag> GetAllContentTags(string tagGroup = null);
 
         /// <summary>
         /// Gets all tags for media items
         /// </summary>
-        /// <remarks>Use the optional group parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the 
         /// result to a specific 'Tag Group'.</remarks>
-        /// <param name="group">Optional name of the 'Tag Group'</param>
+        /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
-        IEnumerable<ITag> GetAllMediaTags(string group = null);
+        IEnumerable<ITag> GetAllMediaTags(string tagGroup = null);
 
         /// <summary>
         /// Gets all tags for member items
         /// </summary>
-        /// <remarks>Use the optional group parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the 
         /// result to a specific 'Tag Group'.</remarks>
-        /// <param name="group">Optional name of the 'Tag Group'</param>
+        /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
-        IEnumerable<ITag> GetAllMemberTags(string group = null);
+        IEnumerable<ITag> GetAllMemberTags(string tagGroup = null);
 
         /// <summary>
         /// Gets all tags attached to a property by entity id
