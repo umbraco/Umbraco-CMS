@@ -47,13 +47,16 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
                     // Get the id of the datepicker button that was clicked
                     var pickerId = $scope.model.alias;
+
                     // Open the datepicker and add a changeDate eventlistener
                     $element.find("div:first")
                         .datetimepicker($scope.model.config)
                         .on("changeDate", applyDate);
 
-                    //now assign the date
-                    $("#datepicker" + pickerId).val($scope.model.value);
+                    if ($scope.model.value) {
+                        //manually assign the date to the plugin
+                        $element.find("div:first").datetimepicker("setValue", $scope.model.value);
+                    }
 
                     //Ensure to remove the event handler when this instance is destroyted
                     $scope.$on('$destroy', function () {
