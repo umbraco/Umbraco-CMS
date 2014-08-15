@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
+    /// <summary>
+    /// Defines the base contract for <see cref="IMember"/> and <see cref="IUser"/>
+    /// </summary>
     public interface IMembershipUser : IAggregateRoot
     {        
         object ProviderUserKey { get; set; }

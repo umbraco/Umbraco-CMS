@@ -3,6 +3,9 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
+    /// <summary>
+    /// Represents a Tag, which is composed of a Text, Group and NodeCount property.
+    /// </summary>
     public interface ITag : IAggregateRoot
     {
         [DataMember]

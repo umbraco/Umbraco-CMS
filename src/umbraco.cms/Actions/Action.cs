@@ -33,7 +33,6 @@ namespace umbraco.BusinessLogic.Actions
     [Obsolete("Actions and ActionHandlers are obsolete and should no longer be used")]
     public class Action
     {
-       
         private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
 
         private static readonly object Lock = new object();
@@ -49,21 +48,25 @@ namespace umbraco.BusinessLogic.Actions
 		/// </summary>
 		/// <remarks>
 		/// TODO: this shouldn't be needed... we should restart the app pool when a package is installed!
-		/// </remarks>		
+		/// </remarks>
 		public static void ReRegisterActionsAndHandlers()
 		{
-			lock (Lock)
-			{
+            lock (Lock)
+            {
+                // NOTE use the DirtyBackdoor to change the resolution configuration EXCLUSIVELY
+                // ie do NOT do ANYTHING else while holding the backdoor, because while it is open
+                // the whole resolution system is locked => nothing can work properly => deadlocks
+
+                var newResolver = new ActionsResolver(
+                        () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+
                 using (Umbraco.Core.ObjectResolution.Resolution.DirtyBackdoorToConfiguration)
                 {
-                    //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
                     ActionsResolver.Reset(false); // and do NOT reset the whole resolution!
-
-                    //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
-                    ActionsResolver.Current = new ActionsResolver(
-					    () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+                    ActionsResolver.Current = newResolver;
                 }
-			}
+
+            }
 		}
 
         /// <summary>
