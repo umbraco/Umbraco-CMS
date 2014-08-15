@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security;
@@ -96,7 +97,9 @@ namespace Umbraco.Tests.TestHelpers
 
             var httpContextMock = new Mock<HttpContextBase>();
             httpContextMock.Setup(x => x.Cache).Returns(HttpRuntime.Cache);
-            httpContextMock.Setup(x => x.Items).Returns(new Dictionary<object, object>());
+            //note: foreach on Items should return DictionaryEntries!
+            //httpContextMock.Setup(x => x.Items).Returns(new Dictionary<object, object>());
+		    httpContextMock.Setup(x => x.Items).Returns(new Hashtable());
             httpContextMock.Setup(x => x.Request).Returns(requestMock.Object);
             httpContextMock.Setup(x => x.Server).Returns(serverMock.Object);
             httpContextMock.Setup(x => x.Response).Returns(responseMock.Object);
