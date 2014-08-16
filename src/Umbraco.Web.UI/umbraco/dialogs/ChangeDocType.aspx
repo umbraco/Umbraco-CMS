@@ -110,7 +110,9 @@
     </asp:PlaceHolder>
 
     <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
-        <br />
+        <p class="help">
+            <%= umbraco.ui.Text("changeDocType", "changeDocTypeInstruction3") %>            
+        </p>
         <p>
             <asp:PlaceHolder ID="SavePlaceholder" runat="server">        
                 <asp:Button ID="ValidateAndSave" runat="server" OnClick="ValidateAndSave_Click" />

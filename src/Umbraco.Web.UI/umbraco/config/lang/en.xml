@@ -96,6 +96,7 @@
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
     <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
+    <key alias="changeDocTypeInstruction3">Please note that following this operation all previous versions of the content will be deleted. Rollback to versions using the previous document type will not be possible.</key>
     <key alias="contentRepublished">The content has been re-published.</key>
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>

@@ -228,15 +228,24 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 }
                 propertiesMappedMessageBuilder.Append("</ul>");
 
-                // Save
+                // Save (and publish if the content was already published)
                 var user = global::umbraco.BusinessLogic.User.GetCurrent();
-                ApplicationContext.Current.Services.ContentService.Save(_content, user.Id);
-
-                // Publish if the content was already published
+                var contentService = ApplicationContext.Current.Services.ContentService;
                 if (wasPublished)
                 {
-                    ApplicationContext.Current.Services.ContentService.Publish(_content, user.Id);
+                    contentService.SaveAndPublishWithStatus(_content, user.Id);
                 }
+                else
+                {
+                    contentService.Save(_content, user.Id);
+                }
+
+                // Delete the previous versions of the content (as no longer useful, being of the previous document type)
+                var currentVersionDate = contentService.GetVersions(_content.Id)
+                    .OrderByDescending(x => x.CreateDate)
+                    .First()
+                    .UpdateDate;
+                contentService.DeleteVersions(_content.Id, currentVersionDate, user.Id);
 
                 // Sync the tree
                 ClientTools.SyncTree(_content.Path, true);
