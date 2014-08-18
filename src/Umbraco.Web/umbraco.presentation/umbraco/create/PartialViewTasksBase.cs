@@ -60,7 +60,6 @@ namespace umbraco
                             CreateMacro = ParentID == 1,
                             CodeHeader = CodeHeader,
                             ParentFolderName = ParentFolderName,
-                            AssignedApp = AssignedApp,
                             EditViewFile = EditViewFile,
                             BasePath = BasePath
                         };

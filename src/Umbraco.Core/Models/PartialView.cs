@@ -29,9 +29,7 @@ namespace Umbraco.Core.Models
         public override bool IsValid()
         {
             //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(Path, new List<string> { "cshtml" });
-
-            return validExtension;
+            return IOHelper.VerifyFileExtension(Path, new List<string> { "cshtml" });
         }
 
         public string FileName { get; set; }
@@ -44,8 +42,6 @@ namespace Umbraco.Core.Models
 
         public string ParentFolderName { get; set; }
 
-        public string AssignedApp { get; set; }
-
         public string EditViewFile { get; set; }
 
         public string BasePath { get; set; }
@@ -56,10 +52,7 @@ namespace Umbraco.Core.Models
 
         internal Regex HeaderMatch
         {
-            get
-            {
-                return _headerMatch;
-            }
+            get { return _headerMatch; }
         }
 
         internal Attempt<string> TryGetSnippetPath(string fileName)
@@ -71,6 +64,5 @@ namespace Umbraco.Core.Models
                 ? Attempt<string>.Succeed(snippetPath)
                 : Attempt<string>.Fail();
         }
-
     }
 }
