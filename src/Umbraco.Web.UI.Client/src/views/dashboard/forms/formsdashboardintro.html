@@ -1,0 +1,34 @@
+<div ng-controller="Umbraco.Dashboard.FormsDashboardController">
+	<h3>Build flawless forms without a single line of code</h3>
+	<h5>Contour makes creating contact forms, entry forms and questionnaires just as easy as using Word. You won't need to write a single line of code.</h5>
+	<h5>Instead, you can create, edit and administer your forms via a user interface that is a fully integrated part of Umbraco.</h5>
+
+	<button class="btn" ng-click="installForms()">Download a free trial now</button>
+
+
+	<div style="width: 99%; overflow: hidden" ng-if="state">
+		<p>{{state}}...</p>
+		<div class="umb-loader"></div>
+	</div>
+
+	{{error}}
+	
+	<hr/>
+
+	<h3>Some of the great features</h3>
+
+	<div class="row-fluid">
+		<div class="span3">
+			<h4>Feature</h4>
+		</div>
+		<div class="span3">
+			<h4>Feature</h4>
+		</div>
+		<div class="span3">
+			<h4>Feature</h4>
+		</div>
+		<div class="span3">
+			<h4>Feature</h4>
+		</div>
+	</div>
+</div>

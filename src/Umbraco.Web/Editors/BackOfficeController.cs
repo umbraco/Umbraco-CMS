@@ -179,6 +179,10 @@ namespace Umbraco.Web.Editors
                                         controller => controller.GetByKey(Guid.Empty))
                                 },
                                 {
+                                    "packageInstallApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
+                                        controller => controller.Fetch(string.Empty))
+                                },
+                                {
                                     "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                                         controller => controller.GetConfiguration())
                                 },
@@ -186,6 +190,7 @@ namespace Umbraco.Web.Editors
                                     "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                                         controller => controller.GetAll())
                                 },
+
                                  {
                                     "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
                                         controller => controller.GetById(0))

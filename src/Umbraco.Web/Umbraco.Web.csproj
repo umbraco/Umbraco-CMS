@@ -160,6 +160,7 @@
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
@@ -302,9 +303,11 @@
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
+    <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TuningController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\TemplateQuery\ContentTypeModel.cs" />
     <Compile Include="Models\TemplateQuery\PropertyModel.cs" />
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />
