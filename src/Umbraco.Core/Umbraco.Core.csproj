@@ -366,6 +366,7 @@
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
+    <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\TagCacheStorageType.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TaggedEntity.cs" />

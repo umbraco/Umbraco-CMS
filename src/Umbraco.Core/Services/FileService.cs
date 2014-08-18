@@ -1,7 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Web;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -362,6 +367,95 @@ namespace Umbraco.Core.Services
             return template.IsValid();
         }
 
+        internal PartialView CreatePartialView(PartialView partialView)
+        {
+            var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
+            var relativeFilePath = partialView.ParentFolderName.EnsureEndsWith('/') + partialViewsFileSystem.GetRelativePath(partialView.FileName);
+
+            //return the link to edit the file if it already exists
+            if (partialViewsFileSystem.FileExists(partialView.Path))
+            {
+                partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
+                partialView.SaveSucceeded = true;
+                return partialView;
+            }
+
+            if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<PartialView>(partialView, true, partialView.Alias, -1), this))
+            {
+                partialView.SaveSucceeded = false;
+                return partialView;
+            }
+
+            //create the file
+            var snippetPathAttempt = partialView.TryGetSnippetPath(partialView.SnippetName);
+            if (snippetPathAttempt.Success == false)
+            {
+                throw new InvalidOperationException("Could not load template with name " + partialView.SnippetName);
+            }
+
+            using (var snippetFile = new StreamReader(partialViewsFileSystem.OpenFile(snippetPathAttempt.Result)))
+            {
+                var snippetContent = snippetFile.ReadToEnd().Trim();
+
+                //strip the @inherits if it's there
+                snippetContent = partialView.HeaderMatch.Replace(snippetContent, string.Empty);
+
+                var content = string.Format("{0}{1}{2}", partialView.CodeHeader, Environment.NewLine, snippetContent);
+
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                partialViewsFileSystem.AddFile(partialView.Path, stream);
+            }
+
+            if (partialView.CreateMacro)
+                CreatePartialViewMacro(partialView);
+
+            partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
+
+
+            CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
+
+            return partialView;
+        }
+
+        internal static void CreatePartialViewMacro(PartialView partialView)
+        {
+            var name = partialView.FileName.Substring(0, (partialView.FileName.LastIndexOf('.') + 1))
+                .Trim('.')
+                .SplitPascalCasing()
+                .ToFirstUpperInvariant();
+
+            var macroService = new MacroService();
+            var macro = new Macro(name, name) { ScriptPath = partialView.BasePath + partialView.FileName };
+            macroService.Save(macro);
+        }
+
+        internal bool DeletePartialView(PartialView partialView, int userId = 0)
+        {
+            var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
+
+            if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<PartialView>(partialView), this))
+            {
+                return false;
+            }
+
+            if (partialViewsFileSystem.FileExists(partialView.FileName))
+            {
+                partialViewsFileSystem.DeleteFile(partialView.FileName);
+                LogHelper.Info<FileService>(string.Format("Partial View file {0} deleted by user {1}", partialViewsFileSystem.GetFullPath(partialView.FileName), userId));
+            }
+            // TODO: does this ever even happen? I don't think folders show up in the tree currently. 
+            // Leaving this here as it was in the original PartialViewTasks code - SJ
+            else if (partialViewsFileSystem.DirectoryExists(partialView.FileName))
+            {
+                partialViewsFileSystem.DeleteDirectory(partialView.FileName, true);
+                LogHelper.Info<FileService>(string.Format("Partial View directory {0} deleted by user {1}", partialViewsFileSystem.GetFullPath(partialView.FileName), userId));
+            }
+
+            DeletedPartialView.RaiseEvent(new DeleteEventArgs<PartialView>(partialView, false), this);
+
+            return true;
+        }
+
         //TODO Method to change name and/or alias of view/masterpage template
 
         #region Event Handlers
@@ -424,6 +518,26 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
+
+        /// <summary>
+        /// Occurs before Create
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, NewEventArgs<PartialView>> CreatingPartialView;
+
+        /// <summary>
+        /// Occurs after Create
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, NewEventArgs<PartialView>> CreatedPartialView;
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, DeleteEventArgs<PartialView>> DeletingPartialView;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, DeleteEventArgs<PartialView>> DeletedPartialView;
 
         #endregion
     }
