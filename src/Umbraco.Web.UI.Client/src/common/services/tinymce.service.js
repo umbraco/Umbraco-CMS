@@ -23,7 +23,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                   $http.get(
                       umbRequestHelper.getApiUrl(
                           "rteApiBaseUrl",
-                          "GetConfiguration")),
+                          "GetConfiguration"), { cache: true }),
                   'Failed to retrieve tinymce configuration');
         },
 
