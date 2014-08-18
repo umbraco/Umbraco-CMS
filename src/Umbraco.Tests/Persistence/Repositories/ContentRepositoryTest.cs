@@ -15,6 +15,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -328,6 +329,132 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_ForFirstPage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_ForSecondPage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 2, 1, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithSinglePage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(2));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithDescendingOrder_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Descending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingSome_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending, "Page 2");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(1));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingAll_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending, "Page");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
             }
         }
 
