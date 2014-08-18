@@ -41,11 +41,7 @@
             <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
         </div>
 
-        <p ng-show="listViewResultSet.totalItems === 0">
-            <localize key="content_listViewNoItems">There are no items show in the list.</localize>
-        </p>
-
-        <table class="table table-striped" ng-show="listViewResultSet.totalItems > 0">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <td style="width: 35px">
@@ -62,26 +58,38 @@
                     <td>
                         <form class="pull-right" novalidate>
                             <i class="icon-search"></i>
-                            <input type="text" ng-model="options.filter" on-keyup="search()">
+                            <input type="text" ng-model="options.filter" on-keyup="search()" no-dirty-check>
                         </form>
                     </td>
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody ng-show="listViewResultSet.totalItems === 0">
+                <tr>
+                    <td colspan="5">
+                        <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
+                    </td>
+                </tr>
+            </tbody>
+
+            <tbody ng-show="listViewResultSet.totalItems > 0">
                 <tr ng-repeat="result in listViewResultSet.items"
                     ng-class="{selected:result.selected}">
 
                     <td>
                         <i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
 
-                        <input type="checkbox" ng-model="result.selected"></td>
+                        <input type="checkbox" ng-model="result.selected">
+                    </td>
                     <td>
-                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td>{{result.updateDate|date:'medium'}} 
+                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a>
+                    </td>
+                    <td>
+                        {{result.updateDate|date:'medium'}}
                         <!--<<span class="label label-success">Publish</span>-->
                     </td>
-                    <td>{{result.owner.name}}
+                    <td>
+                        {{result.owner.name}}
                         <!--<span class="label">Admin</span>-->
                     </td>
                     <td></td>

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -642,7 +644,117 @@ namespace Umbraco.Core.Persistence.Repositories
 
             _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IContent>(previewExists, content, xml));
         }
-        
+
+        /// <summary>
+        /// Gets paged content results
+        /// </summary>
+        /// <param name="query">Query to excute</param>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageNumber, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string filter = "")
+        {
+            // Get base query
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IContent>(sqlClause, query);
+            var sql = translator.Translate()
+                                .Where<DocumentDto>(x => x.Newest);
+
+            // Apply filter
+            if (!string.IsNullOrEmpty(filter))
+            {
+                sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
+            }
+
+            // Apply order according to parameters
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sql = sql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sql = sql.OrderByDescending(orderByParams);
+                }
+            }
+
+            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            // So we'll modify the SQL.
+            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
+
+            // Get page of results and total count
+            IEnumerable<IContent> result;
+            var pagedResult = Database.Page<DocumentDto>(pageNumber, pageSize, modifiedSQL, sql.Arguments);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            if (totalRecords > 0)
+            {
+                // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
+                // methods OrderBy or OrderByDescending)
+                var content = GetAll(pagedResult.Items
+                    .DistinctBy(x => x.NodeId)
+                    .Select(x => x.NodeId).ToArray())
+                    .Cast<Content>()
+                    .AsQueryable();
+
+                // Now we need to ensure this result is also ordered by the same order by clause
+                var orderByProperty = GetIContentPropertyNameForOrderBy(orderBy);
+                if (orderDirection == Direction.Ascending)
+                {
+                    result = content.OrderBy(orderByProperty);
+                }
+                else
+                {
+                    result = content.OrderByDescending(orderByProperty);
+                }
+            }
+            else
+            {
+                result = Enumerable.Empty<IContent>();
+            }
+
+            return result;
+        }
+
+        private string GetDatabaseFieldNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the database field names.
+            switch (orderBy)
+            {
+                case "Name":
+                    return "cmsDocument.text";
+                case "Owner":
+                    return "umbracoNode.nodeUser";
+                case "Updator":
+                    return "cmsDocument.documentUser";
+                default:
+                    return orderBy;
+            }
+        }
+
+        private string GetIContentPropertyNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the IContent property names.
+            switch (orderBy)
+            {
+                case "Owner":
+                    return "CreatorId";
+                case "Updator":
+                    return "WriterId";
+                default:
+                    return orderBy;
+            }
+        }
+
         #endregion
         
         /// <summary>
