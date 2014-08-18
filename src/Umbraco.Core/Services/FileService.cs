@@ -382,6 +382,7 @@ namespace Umbraco.Core.Services
 
             if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<PartialView>(partialView, true, partialView.Alias, -1), this))
             {
+                LogHelper.Info<FileService>(string.Format("Creating Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName)));
                 partialView.SaveSucceeded = false;
                 return partialView;
             }
@@ -410,8 +411,7 @@ namespace Umbraco.Core.Services
                 CreatePartialViewMacro(partialView);
 
             partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
-
-
+            
             CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
 
             return partialView;
@@ -435,6 +435,7 @@ namespace Umbraco.Core.Services
 
             if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<PartialView>(partialView), this))
             {
+                LogHelper.Info<FileService>(string.Format("Deleting Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName)));
                 return false;
             }
 

@@ -15,7 +15,7 @@ namespace umbraco
     [UmbracoWillObsolete("http://issues.umbraco.org/issue/U4-1373", "This will one day be removed when we overhaul the create process")]
     public abstract class PartialViewTasksBase : LegacyDialogTask
     {
-        private string _returnUrl = "";
+        private string _returnUrl = string.Empty;
         public override string ReturnUrl
         {
             get { return _returnUrl; }
