@@ -368,6 +368,7 @@ namespace Umbraco.Core.Services
             return template.IsValid();
         }
 
+        // TODO: Before making this public: How to get feedback in the UI when cancelled
         internal Attempt<PartialView> CreatePartialView(PartialView partialView)
         {
             var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
@@ -431,6 +432,7 @@ namespace Umbraco.Core.Services
             macroService.Save(macro);
         }
 
+        // TODO: Before making this public: How to get feedback in the UI when cancelled
         internal bool DeletePartialView(PartialView partialView, int userId = 0)
         {
             var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
