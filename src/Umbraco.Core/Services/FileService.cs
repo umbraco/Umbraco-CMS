@@ -403,8 +403,10 @@ namespace Umbraco.Core.Services
 
                 var content = string.Format("{0}{1}{2}", partialView.CodeHeader, Environment.NewLine, snippetContent);
 
-                var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                partialViewsFileSystem.AddFile(partialView.Path, stream);
+                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+                {
+                    partialViewsFileSystem.AddFile(partialView.Path, stream);
+                }
             }
 
             if (partialView.CreateMacro)
