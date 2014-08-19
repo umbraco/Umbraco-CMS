@@ -1,0 +1,20 @@
+﻿<div ng-controller="Chalmers.MediaContentUsageController" ng-model="media">
+
+    <ul class="unstyled" ng-show="media.HasContentUsage">
+        <li ng-repeat="node in media.Content">
+            <i class="icon-umb-content"></i>
+            <span style="color:grey;" ng-show="node.PathName" ng-if="showPath">{{node.PathName}} &gt; </span>
+            <a href="#/content/content/edit/{{node.Id}}">{{node.Name}}</a>
+            <small ng-show="node.State">({{node.State}})</small>
+        </li>
+    </ul>
+
+    <div ng-hide="media.HasContentUsage" ng-if="!loading">
+        No content found
+    </div>
+
+    <div ng-show="loading">
+        Searching for content...
+    </div>
+
+</div>

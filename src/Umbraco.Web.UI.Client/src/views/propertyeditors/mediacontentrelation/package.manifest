@@ -1,0 +1,28 @@
+﻿{     
+    propertyEditors: [      
+        {
+			alias: "Chalmers.MediaContentUsage",
+            name: "Media Content Usage",
+			
+            editor: {
+                view: "/App_Plugins/MediaContentUsage/mediacontentusage.html"
+            },
+
+			prevalues: {
+				fields: [
+					{
+                        label: "Show content path",
+						description: "Shows the whole path to the content nodes",
+                        key: "showPath",
+                        view: "boolean"
+                    }
+				]
+			}
+        }
+    ],
+
+    javascript: [
+        '/App_Plugins/MediaContentUsage/mediacontentusage.controller.js',
+		'/App_Plugins/MediaContentUsage/mediacontentusage.resource.js'
+    ]
+}
