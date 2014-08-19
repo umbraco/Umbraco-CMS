@@ -92,6 +92,7 @@ angular.module('umbraco.mocks').
                   "buttons_tableInsert": "Insert table",
                   "changeDocType_changeDocTypeInstruction": "To change the document type for the selected content, first select from the list of valid types for this location.",
                   "changeDocType_changeDocTypeInstruction2": "Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.",
+                  "changeDocType_changeDocTypeInstruction3": "Please note that following this operation all previous versions of the content will be deleted. Rollback to versions using the previous document type will not be possible.",
                   "changeDocType_contentRepublished": "The content has been re-published.",
                   "changeDocType_currentProperty": "Current Property",
                   "changeDocType_currentType": "Current type",
