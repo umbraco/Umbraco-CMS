@@ -65,11 +65,11 @@ namespace umbraco
                         };
 
             var fileService = new FileService();
-            var partialView = fileService.CreatePartialView(model);
+            var attempt = fileService.CreatePartialView(model);
 
-            _returnUrl = partialView.ReturnUrl;
+            _returnUrl = attempt.Result.ReturnUrl;
 
-            return partialView.SaveSucceeded;
+            return attempt.Success;
         }
 
         public override bool PerformDelete()

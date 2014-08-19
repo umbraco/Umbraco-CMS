@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Web;
 using Umbraco.Core.Auditing;
@@ -367,24 +368,25 @@ namespace Umbraco.Core.Services
             return template.IsValid();
         }
 
-        internal PartialView CreatePartialView(PartialView partialView)
+        internal Attempt<PartialView> CreatePartialView(PartialView partialView)
         {
             var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
             var relativeFilePath = partialView.ParentFolderName.EnsureEndsWith('/') + partialViewsFileSystem.GetRelativePath(partialView.FileName);
+            partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
 
             //return the link to edit the file if it already exists
             if (partialViewsFileSystem.FileExists(partialView.Path))
-            {
-                partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
-                partialView.SaveSucceeded = true;
-                return partialView;
-            }
+                return Attempt<PartialView>.Succeed(partialView);
 
             if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<PartialView>(partialView, true, partialView.Alias, -1), this))
             {
-                LogHelper.Info<FileService>(string.Format("Creating Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName)));
-                partialView.SaveSucceeded = false;
-                return partialView;
+                // We have nowhere to return to, clear ReturnUrl
+                partialView.ReturnUrl = string.Empty;
+
+                var failureMessage = string.Format("Creating Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName));
+                LogHelper.Info<FileService>(failureMessage);
+
+                return Attempt<PartialView>.Fail(partialView, new ArgumentException(failureMessage));
             }
 
             //create the file
@@ -411,12 +413,10 @@ namespace Umbraco.Core.Services
 
             if (partialView.CreateMacro)
                 CreatePartialViewMacro(partialView);
-
-            partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
             
             CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
 
-            return partialView;
+            return Attempt<PartialView>.Succeed(partialView);
         }
 
         internal static void CreatePartialViewMacro(PartialView partialView)
@@ -457,6 +457,46 @@ namespace Umbraco.Core.Services
             DeletedPartialView.RaiseEvent(new DeleteEventArgs<PartialView>(partialView, false), this);
 
             return true;
+        }
+
+        internal Attempt<PartialView> SavePartialView(PartialView partialView, int userId = 0)
+        {
+            if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<PartialView>(partialView, true), this))
+            {
+                return Attempt<PartialView>.Fail(new ArgumentException("Save was cancelled by an event handler " + partialView.FileName));
+            }
+            
+            //Directory check.. only allow files in script dir and below to be edited
+            if (partialView.IsValid() == false)
+            {
+                return Attempt<PartialView>.Fail(
+                    new ArgumentException(string.Format("Illegal path: {0} or illegal file extension {1}",
+                        partialView.Path,
+                        partialView.FileName.Substring(partialView.FileName.LastIndexOf(".", StringComparison.Ordinal)))));
+            }
+
+            //NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
+            // BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
+            // http://issues.umbraco.org/issue/U4-2118
+            //using (var sw = System.IO.File.CreateText(savePath))
+            //{
+            //    sw.Write(val);
+            //}
+            
+            System.IO.File.WriteAllText(partialView.Path, partialView.Content, Encoding.UTF8);
+
+            //deletes the old file
+            if (partialView.FileName != partialView.OldFileName)
+            {
+                // Create a new PartialView class so that we can set the FileName of the file that needs deleting
+                var deletePartial = partialView;
+                deletePartial.FileName = partialView.OldFileName;
+                DeletePartialView(deletePartial, userId);
+            }
+
+            SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView), this);
+
+            return Attempt.Succeed(partialView);
         }
 
         //TODO Method to change name and/or alias of view/masterpage template
@@ -523,6 +563,16 @@ namespace Umbraco.Core.Services
         public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
 
         /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, SaveEventArgs<PartialView>> SavingPartialView;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, SaveEventArgs<PartialView>> SavedPartialView;
+
+        /// <summary>
         /// Occurs before Create
         /// </summary>
         internal static event TypedEventHandler<IFileService, NewEventArgs<PartialView>> CreatingPartialView;
@@ -543,5 +593,6 @@ namespace Umbraco.Core.Services
         internal static event TypedEventHandler<IFileService, DeleteEventArgs<PartialView>> DeletedPartialView;
 
         #endregion
+
     }
 }

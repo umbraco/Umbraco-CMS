@@ -28,9 +28,17 @@ namespace Umbraco.Core.Models
         /// <returns>True if file is valid, otherwise false</returns>
         public override bool IsValid()
         {
-            //Validate extension
-            return IOHelper.VerifyFileExtension(Path, new List<string> { "cshtml" });
+            //TODO: Validate using the macro engine
+            //var engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
+            //engine.Validate(...)
+            
+            var validatePath = IOHelper.ValidateEditPath(IOHelper.MapPath(Path), BasePath);
+            var verifyFileExtension = IOHelper.VerifyFileExtension(Path, new List<string> { "cshtml" });
+
+            return validatePath && verifyFileExtension;
         }
+
+        public string OldFileName { get; set; }
 
         public string FileName { get; set; }
 
@@ -47,8 +55,6 @@ namespace Umbraco.Core.Models
         public string BasePath { get; set; }
 
         public string ReturnUrl { get; set; }
-
-        public bool SaveSucceeded { get; set; }
 
         internal Regex HeaderMatch
         {

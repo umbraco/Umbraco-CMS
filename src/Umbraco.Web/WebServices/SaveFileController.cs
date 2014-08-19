@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
@@ -38,56 +39,26 @@ namespace Umbraco.Web.WebServices
         public JsonResult SavePartialView(string filename, string oldName, string contents)
         {
             var folderPath = SystemDirectories.MvcViews.EnsureEndsWith('/');// +"/Partials/";
-
-            // validate file
-            IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);
-            // validate extension
-            IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] { "cshtml" }.ToList());
-
-            //TODO: Validate using the macro engine
-            var engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-            //engine.Validate(...)
-
-            var val = contents;
-            var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
             var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);
 
-            //Directory check.. only allow files in script dir and below to be edited
-            if (!savePath.StartsWith(IOHelper.MapPath(folderPath)))
+            var partialView = new PartialView(savePath)
+            {
+                BasePath = folderPath,
+                OldFileName = oldName,
+                FileName = filename,
+                Content = contents,
+            };
+
+            var fileService = new FileService();
+            var attempt = fileService.SavePartialView(partialView);
+
+            if (attempt.Success == false)
             {
                 return Failed(
                     ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
                     //pass in a new exception ... this will also append the the message
-                    new ArgumentException("Illegal path: " + savePath));
+                    attempt.Exception);
             }
-
-
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<string>(savePath), this))
-            {
-                return Failed(
-                    ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                    //pass in a new exception ... this will also append the the message
-                    new ArgumentException("Save was cancelled by an event handler " + savePath));
-            }
-
-            //deletes the old file
-            if (savePath != saveOldPath)
-            {
-                if (System.IO.File.Exists(saveOldPath))
-                    System.IO.File.Delete(saveOldPath);
-            }
-
-            //NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
-            // BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
-            // http://issues.umbraco.org/issue/U4-2118
-            //using (var sw = System.IO.File.CreateText(savePath))
-            //{
-            //    sw.Write(val);
-            //}
-
-            System.IO.File.WriteAllText(savePath, val, Encoding.UTF8);
-
-            Saved.RaiseEvent(new SaveEventArgs<string>(savePath, false), this);
 
             return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
         }
@@ -185,15 +156,5 @@ namespace Umbraco.Web.WebServices
                 message = message + (exception == null ? "" : (exception.Message + ". Check log for details."))
             });
         }
-
-        /// <summary>
-        /// Occurs before Create
-        /// </summary>
-        internal static event TypedEventHandler<SaveFileController, SaveEventArgs<string>> Saving;
-
-        /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        internal static event TypedEventHandler<SaveFileController, SaveEventArgs<string>> Saved;
     }
 }
