@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
@@ -27,7 +28,7 @@ namespace Umbraco.Web.WebServices
     {
 
         /// <summary>
-        /// Saves a partial view for a partial view macr
+        /// Saves a partial view for a partial view macro
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="oldName"></param>
@@ -129,13 +130,6 @@ namespace Umbraco.Web.WebServices
 
             try
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<string>(t.TemplateFilePath), this))
-                {
-                    return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"),
-                            //pass in a new exception ... this will also append the the message
-                            new ArgumentException("Save was cancelled by an event handler: " + t.TemplateFilePath));
-                }
-
                 t.Save();
 
                 //ensure the correct path is synced as the parent might have been changed
@@ -146,8 +140,6 @@ namespace Umbraco.Web.WebServices
                     t = new Template(templateId);
                 }
                 var syncPath = "-1,init," + t.Path.Replace("-1,", "");
-
-                Saved.RaiseEvent(new SaveEventArgs<string>(t.TemplateFilePath, false), this);
 
                 return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"),
                     new { path = syncPath });
