@@ -174,6 +174,13 @@ namespace umbraco.cms.businesslogic.web
 
         public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
         {
+            // Remove .css extension from stylesheet if created with it, to avoid duplicating the extension 
+            // as it is added anyway to the file name, and also to prevent clashes with nodes created as e.g.
+            // 'style' and 'style.css' (U4-5129)
+            if (Text.ToLowerInvariant().EndsWith(".css"))
+            {
+                Text = Text.Substring(0, Text.Length - ".css".Length);
+            }
 
             // validate if node ends with css, if it does we'll remove it as we append it later
             if (Text.ToLowerInvariant().EndsWith(".css"))
