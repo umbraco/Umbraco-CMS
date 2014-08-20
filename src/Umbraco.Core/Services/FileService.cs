@@ -23,19 +23,21 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IUnitOfWorkProvider _fileUowProvider;
         private readonly IDatabaseUnitOfWorkProvider _dataUowProvider;
+        private readonly IMacroService _macroService;
 
         public FileService()
             : this(new RepositoryFactory())
         { }
 
         public FileService(RepositoryFactory repositoryFactory)
-            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory, new MacroService())
         {
         }
 
-        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
+        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory, IMacroService macroService)
         {
             _repositoryFactory = repositoryFactory;
+            _macroService = macroService;
             _fileUowProvider = fileProvider;
             _dataUowProvider = dataProvider;
         }
@@ -420,16 +422,15 @@ namespace Umbraco.Core.Services
             return Attempt<PartialView>.Succeed(partialView);
         }
 
-        internal static void CreatePartialViewMacro(PartialView partialView)
+        internal void CreatePartialViewMacro(PartialView partialView)
         {
             var name = partialView.FileName.Substring(0, (partialView.FileName.LastIndexOf('.') + 1))
                 .Trim('.')
                 .SplitPascalCasing()
                 .ToFirstUpperInvariant();
 
-            var macroService = new MacroService();
             var macro = new Macro(name, name) { ScriptPath = partialView.BasePath + partialView.FileName };
-            macroService.Save(macro);
+            _macroService.Save(macro);
         }
 
         // TODO: Before making this public: How to get feedback in the UI when cancelled

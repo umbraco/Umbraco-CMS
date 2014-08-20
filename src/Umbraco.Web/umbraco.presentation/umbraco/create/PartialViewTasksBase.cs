@@ -64,7 +64,7 @@ namespace umbraco
                             BasePath = BasePath
                         };
 
-            var fileService = new FileService();
+            var fileService = (FileService)ApplicationContext.Current.Services.FileService;
             var attempt = fileService.CreatePartialView(model);
 
             _returnUrl = attempt.Result.ReturnUrl;
@@ -79,8 +79,8 @@ namespace umbraco
             var fullFilePath = partialViewsFileSystem.GetFullPath(path);
             
             var model = new PartialView(fullFilePath) { BasePath = BasePath, FileName = path };
-            
-            var fileService = new FileService();
+
+            var fileService = (FileService)ApplicationContext.Current.Services.FileService;
             return fileService.DeletePartialView(model, UmbracoEnsuredPage.CurrentUser.Id);
         }
     }

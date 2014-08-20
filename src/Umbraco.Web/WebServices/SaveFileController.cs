@@ -49,7 +49,7 @@ namespace Umbraco.Web.WebServices
                 Content = contents,
             };
 
-            var fileService = new FileService();
+            var fileService = (FileService)ApplicationContext.Current.Services.FileService;
             var attempt = fileService.SavePartialView(partialView);
 
             if (attempt.Success == false)
