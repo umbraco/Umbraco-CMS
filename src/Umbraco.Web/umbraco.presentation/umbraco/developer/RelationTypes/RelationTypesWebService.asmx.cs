@@ -1,4 +1,6 @@
 ﻿using System.Web.Services;
+using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
@@ -9,7 +11,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 	[WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 	[System.ComponentModel.ToolboxItem(false)]
 	[System.Web.Script.Services.ScriptService] // Allows this Web Service to be called from script, using ASP.NET AJAX
-	public class RelationTypesWebService : System.Web.Services.WebService
+	public class RelationTypesWebService : WebService
 	{
 		/// <summary>
 		/// Delete an Umbraco RelationType and all it's associated Relations
@@ -18,15 +20,13 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		[WebMethod]
 		public void DeleteRelationType(int relationTypeId)
 		{
-			// Check user calling this service is of type administrator
-			umbraco.BusinessLogic.User user = umbraco.BusinessLogic.User.GetCurrent();
+		    var user = UmbracoContext.Current.Security.CurrentUser;
+            
 			if (user.UserType.Name == "Administrators")
 			{
-				// Delete all relations for this relation type!
-				uQuery.SqlHelper.ExecuteNonQuery(string.Format("DELETE FROM umbracoRelation WHERE relType = {0}", relationTypeId.ToString()));
-
-				// Delete relation type
-				uQuery.SqlHelper.ExecuteNonQuery(string.Format("DELETE FROM umbracoRelationType WHERE id = {0}", relationTypeId.ToString()));
+                var relationService = ApplicationContext.Current.Services.RelationService;
+			    var relationType = relationService.GetRelationTypeById(relationTypeId);
+			    relationService.Delete(relationType);
 			}
 		}
 	}
