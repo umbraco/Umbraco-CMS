@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,10 +20,9 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
-using Member = umbraco.cms.businesslogic.member.Member;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
 {
@@ -506,11 +504,24 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, provider.GetCurrentUser());
+                return _membershipHelper.IsLoggedIn()
+                    && Access.HasAccess(nodeId, path, GetCurrentMember());
 			}
 			return true;
 		}
+
+        /// <summary>
+        /// Gets (or adds) the current member from the current request cache
+        /// </summary>
+        private MembershipUser GetCurrentMember()
+        {
+            return UmbracoContext.Application.ApplicationCache.RequestCache
+                .GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
+                {
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    return provider.GetCurrentUser();
+                });
+        }
 
 		/// <summary>
 		/// Whether or not the current member is logged in (based on the membership provider)
