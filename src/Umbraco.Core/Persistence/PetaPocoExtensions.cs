@@ -221,6 +221,7 @@ namespace Umbraco.Core.Persistence
             if (overwrite && tableExist)
             {
                 db.DropTable(tableName);
+                tableExist = false;
             }
 
             if (tableExist == false)
