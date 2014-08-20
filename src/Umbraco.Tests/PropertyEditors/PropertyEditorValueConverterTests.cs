@@ -36,27 +36,27 @@ namespace Umbraco.Tests.PropertyEditors
                 Assert.AreNotEqual(dateTime.Date, ((DateTime)result).Date);
         }
 
-        // see the notes in the converter
-        // values such as "true" are NOT expected here
-
-        //[TestCase("TRUE", true)]
-        //[TestCase("True", true)]
-        //[TestCase("true", true)]
-		[TestCase("1", true)]
-        //[TestCase("FALSE", false)]
-        //[TestCase("False", false)]
-        //[TestCase("false", false)]
-		[TestCase("0", false)]
-		[TestCase("", false)]
-        [TestCase("true", false)]
+        [TestCase("TRUE", true)]
+        [TestCase("True", true)]
+        [TestCase("true", true)]
+        [TestCase("1", true)]
+        [TestCase(1, true)]
+        [TestCase(true, true)]
+        [TestCase("FALSE", false)]
+        [TestCase("False", false)]
         [TestCase("false", false)]
+        [TestCase("0", false)]
+        [TestCase(0, false)]
+        [TestCase(false, false)]
+        [TestCase("", false)]
+        [TestCase(null, false)]
         [TestCase("blah", false)]
-        public void CanConvertYesNoPropertyEditor(string value, bool expected)
-		{
-			var converter = new YesNoValueConverter();
+        public void CanConvertYesNoPropertyEditor(object value, bool expected)
+        {
+            var converter = new YesNoValueConverter();
             var result = converter.ConvertDataToSource(null, value, false); // does not use type for conversion
 
-			Assert.AreEqual(expected, result);
-		}
+            Assert.AreEqual(expected, result);
+        }
 	}
 }
