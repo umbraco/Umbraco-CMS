@@ -2,7 +2,7 @@
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.relation;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
@@ -40,7 +40,8 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// <param name="args">to set validation respose</param>
 		protected void AliasCustomValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			args.IsValid = RelationType.GetByAlias(this.aliasTextBox.Text.Trim()) == null;
+		    var relationService = Services.RelationService;
+			args.IsValid = relationService.GetRelationTypeByAlias(this.aliasTextBox.Text.Trim()) == null;
 		}
 
 		/// <summary>
@@ -54,19 +55,18 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			{
                 var newRelationTypeAlias = this.aliasTextBox.Text.Trim();
 
-                uQuery.SqlHelper.ExecuteNonQuery(
-                    string.Format("INSERT INTO umbracoRelationType ([dual], parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
-                        this.dualRadioButtonList.SelectedValue,
-                        uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid().ToString(),
-                        uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid().ToString(),
-                        this.descriptionTextBox.Text,
-                        newRelationTypeAlias));
+			    var relationService = Services.RelationService;
+			    var relationType = new RelationType(new Guid(this.childDropDownList.SelectedValue),
+			        new Guid(this.parentDropDownList.SelectedValue), newRelationTypeAlias, this.descriptionTextBox.Text)
+			                       {
+			                           IsBidirectional = bool.Parse(this.dualRadioButtonList.SelectedValue)
+			                       };
 
-                var newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
+                relationService.Save(relationType);
 
-				// base.speechBubble(BasePage.speechBubbleIcon.success, "New Relation Type", "relation type created");
+			    var newRelationTypeId = relationService.GetRelationTypeByAlias(newRelationTypeAlias);
 
-				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId.ToString()).CloseModalWindow().ChildNodeCreated();
+				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId).CloseModalWindow().ChildNodeCreated();
 			}
 		}
 
