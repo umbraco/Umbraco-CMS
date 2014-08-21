@@ -16,12 +16,34 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             // in xml a boolean is: string
             // in the database a boolean is: string "1" or "0" or empty
-            // the converter does not need to handle anything else ("true"...)
+            // typically the converter does not need to handle anything else ("true"...)
+            // however there are cases where the value passed to the converter could be a non-string object, e.g. int, bool
+
+            if (source is string)
+            {
+                var str = (string)source;
+
+                if (str == null || str.Length == 0 || str == "0")
+                    return false;
+
+                if (str == "1")
+                    return true;
+
+                bool result;
+                if (bool.TryParse(str, out result))
+                    return result;
+
+                return false;
+            }
+
+            if (source is int)
+                return (int)source == 1;
+
+            if (source is bool)
+                return (bool)source;
 
             // default value is: false
-            var sourceString = source as string;
-            if (sourceString == null) return false;
-            return sourceString == "1";
+            return false;
         }
 
         // default ConvertSourceToObject just returns source ie a boolean value
@@ -29,7 +51,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a boolean already
-            return (bool) source ? "1" : "0";
+            return (bool)source ? "1" : "0";
         }
     }
 }
