@@ -867,6 +867,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByUsername(string username)
         {
+            //TODO: Somewhere in here, whether at this level or the repository level, we need to add 
+            // a caching mechanism since this method is used by all the membership providers and could be
+            // called quite a bit when dealing with members.
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
