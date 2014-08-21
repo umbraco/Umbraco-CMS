@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Models;
@@ -42,6 +44,13 @@ namespace Umbraco.Web.Mvc
 
         protected virtual void PreparePublishedContentRequest(PublishedContentRequest publishedContentRequest)
         {
+            //need to set the culture for this to work
+            if (publishedContentRequest.Culture == null)
+            {
+                //none specified so get the default
+                var defaultLanguage = global::umbraco.cms.businesslogic.language.Language.GetAllAsList().FirstOrDefault();
+                publishedContentRequest.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
+            }
         }
     }
 }

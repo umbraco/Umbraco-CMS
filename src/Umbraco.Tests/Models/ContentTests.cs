@@ -5,8 +5,10 @@ using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -14,7 +16,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTests
+    public class ContentTests : BaseUmbracoConfigurationTest
     {
         [SetUp]
         public void Init()
@@ -179,6 +181,62 @@ namespace Umbraco.Tests.Models
             Assert.That(clone.HasIdentity, Is.False);
 
             Assert.AreNotSame(content.Properties, clone.Properties);
+        }
+
+        [Ignore]
+        [Test]
+        public void Can_Deep_Clone_Perf_Test()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.Id = 99;
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+            var i = 200;
+            foreach (var property in content.Properties)
+            {
+                property.Id = ++i;
+            }
+            content.Id = 10;
+            content.CreateDate = DateTime.Now;
+            content.CreatorId = 22;
+            content.ExpireDate = DateTime.Now;
+            content.Key = Guid.NewGuid();
+            content.Language = "en";
+            content.Level = 3;
+            content.Path = "-1,4,10";
+            content.ReleaseDate = DateTime.Now;
+            content.ChangePublishedState(PublishedState.Published);
+            content.SortOrder = 5;
+            content.Template = new Template("-1,2,3,4", "Test Template", "testTemplate")
+            {
+                Id = 88
+            };
+            content.Trashed = false;
+            content.UpdateDate = DateTime.Now;
+            content.Version = Guid.NewGuid();
+            content.WriterId = 23;
+
+            ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
+
+            var runtimeCache = new RuntimeCacheProvider();
+            runtimeCache.Save(typeof(IContent), content);
+
+            using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
+            {
+                for (int j = 0; j < 1000; j++)
+                {
+                    var clone = runtimeCache.GetById(typeof(IContent), content.Id.ToGuid());
+                }
+            }
+
+            using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITHOUT RUNTIME CACHE"))
+            {
+                for (int j = 0; j < 1000; j++)
+                {
+                    var clone = (ContentType)contentType.DeepClone();
+                }
+            }
         }
 
         [Test]

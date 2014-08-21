@@ -137,7 +137,7 @@ namespace Umbraco.Core
         }
         
         /// <summary>
-        /// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
+        /// This is a performance tweak to check if this not an ASP.Net server file
         /// .Net will pass these requests through to the module when in integrated mode.
         /// We want to ignore all of these requests immediately.
         /// </summary>
@@ -145,10 +145,10 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static bool IsClientSideRequest(this Uri url)
         {
-            // fixme - IsClientSideRequest should not use an hard-coded list of extensions
-            // a client-side request is anything that has an extension that is not .aspx?
-            var toIgnore = new[] { ".js", ".css", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".html", ".svg" };
-            return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
+            var ext = Path.GetExtension(url.LocalPath);
+            if (ext.IsNullOrWhiteSpace()) return false;
+            var toInclude = new[] { ".aspx", ".ashx", ".asmx", ".axd", ".svc" };
+            return toInclude.Any(ext.InvariantEquals) == false;
         }
 
         /// <summary>

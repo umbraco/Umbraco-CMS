@@ -223,6 +223,12 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         public virtual object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
+            //if it's json but it's empty json, then return null
+            if (ValueType.InvariantEquals("JSON") && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
+            {
+                return null;
+            }
+
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {

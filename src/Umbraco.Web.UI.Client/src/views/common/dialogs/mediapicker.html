@@ -19,14 +19,10 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
  						ng-disabled="target.id"/>	
  				</umb-control-group>
 
- 				<umb-control-group label="@content_titleOptional">
- 					
+ 				<umb-control-group label="@content_altTextOptional">
  					<input type="text"
- 						localize="placeholder" 
- 						placeholder="@placeholders_entername" 
  						class="umb-editor umb-textstring" 
- 						ng-model="target.name" />
-
+ 						ng-model="target.altText" />
  				</umb-control-group>
  			</umb-pane>
  		</div>
@@ -98,8 +94,9 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 	</div>
 
 	<div class="umb-panel-body with-footer">
-        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
-        	ng-hide="active() == 0"></div>
+		<div style="overflow: hidden; margin-left: -20px; margin-right: -20px;">
+	        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" ng-hide="active() == 0"></div>
+        </div>
         <umb-photo-folder 
         	min-height="105" 
         	min-width="150"

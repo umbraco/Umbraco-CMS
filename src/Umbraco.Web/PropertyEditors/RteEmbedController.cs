@@ -5,7 +5,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
+using umbraco.BusinessLogic;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -65,8 +67,9 @@ namespace Umbraco.Web.PropertyEditors
                         result.Markup = prov.GetMarkup(url, width, height);
                         result.Status = Status.Success;
                     }
-                    catch
+                    catch(Exception ex)
                     {
+                        LogHelper.Error<RteEmbedController>(string.Format("Error embedding url {0} - width: {1} height: {2}", url, width, height), ex);
                         result.Status = Status.Error;
                     }
 

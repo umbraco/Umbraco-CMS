@@ -15,6 +15,7 @@ namespace Umbraco.Core.Services
     {
         public static SupportTagsAttribute GetAttribute(PropertyEditor propEd)
         {
+            if (propEd == null) return null;
             var tagSupport = propEd.GetType().GetCustomAttribute<SupportTagsAttribute>(false);
             return tagSupport;
         }
@@ -84,8 +85,11 @@ namespace Umbraco.Core.Services
                                 try
                                 {
                                     var parsedJson = JsonConvert.DeserializeObject<IEnumerable<string>>(convertedPropertyValue.ToString());
-                                    //recurse with new value
-                                    SetPropertyTags(property, parsedJson, delimiter, replaceTags, tagGroup, valueType, storageType);
+                                    if (parsedJson != null)
+                                    {
+                                        //recurse with new value
+                                        SetPropertyTags(property, parsedJson, delimiter, replaceTags, tagGroup, valueType, storageType);   
+                                    }                                    
                                 }
                                 catch (Exception ex)
                                 {

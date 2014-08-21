@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -28,6 +29,11 @@ namespace Umbraco.Core.Models
     public static class DeepCloneHelper
     {
         /// <summary>
+        /// Used to avoid constant reflection (perf)
+        /// </summary>
+        private static readonly ConcurrentDictionary<Type, PropertyInfo[]> PropCache = new ConcurrentDictionary<Type, PropertyInfo[]>(); 
+
+        /// <summary>
         /// Used to deep clone any reference properties on the object (should be done after a MemberwiseClone for which the outcome is 'output')
         /// </summary>
         /// <param name="input"></param>
@@ -43,16 +49,18 @@ namespace Umbraco.Core.Models
                 throw new InvalidOperationException("Both the input and output types must be the same");
             }
 
-            var refProperties = inputType.GetProperties()
-                .Where(x =>
-                    //is not attributed with the ignore clone attribute
-                    x.GetCustomAttribute<DoNotCloneAttribute>() == null
-                    //reference type but not string
-                    && x.PropertyType.IsValueType == false && x.PropertyType != typeof (string)
-                        //settable
-                    && x.CanWrite
-                        //non-indexed
-                    && x.GetIndexParameters().Any() == false);
+            var refProperties = PropCache.GetOrAdd(inputType, type =>
+                inputType.GetProperties()
+                    .Where(x =>
+                        //is not attributed with the ignore clone attribute
+                        x.GetCustomAttribute<DoNotCloneAttribute>() == null
+                            //reference type but not string
+                        && x.PropertyType.IsValueType == false && x.PropertyType != typeof (string)
+                            //settable
+                        && x.CanWrite
+                            //non-indexed
+                        && x.GetIndexParameters().Any() == false)
+                    .ToArray());
 
             foreach (var propertyInfo in refProperties)
             {

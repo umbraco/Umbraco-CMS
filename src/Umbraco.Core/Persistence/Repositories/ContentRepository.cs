@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -276,6 +278,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+            
+            //Ensure that strings don't contain characters that are invalid in XML
+            entity.SanitizeEntityPropertiesForXmlStorage();
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
@@ -317,9 +322,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userPermissions = (
                     from perm in parentPermissions 
                     from p in perm.AssignedPermissions 
-                    select new Tuple<int, string>(perm.UserId, p)).ToList();
-                
-                permissionsRepo.ReplaceEntityPermissions(entity, userPermissions);
+                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
+
+                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;
@@ -387,6 +392,9 @@ namespace Umbraco.Core.Persistence.Repositories
             //Ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
+            //Ensure that strings don't contain characters that are invalid in XML
+            entity.SanitizeEntityPropertiesForXmlStorage();
+
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
@@ -423,7 +431,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //a flag that we'll use later to create the tags in the tag db table
-            var isNewPublishedVersion = false;
+            var publishedStateChanged = false;
 
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
@@ -439,7 +447,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
 
                 //this is a newly published version so we'll update the tags table too (end of this method)
-                isNewPublishedVersion = true;
+                publishedStateChanged = true;
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
@@ -502,9 +510,14 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //lastly, check if we are a newly published version and then update the tags table
-            if (isNewPublishedVersion)
+            if (publishedStateChanged && entity.Published)
             {
                 UpdatePropertyTags(entity, _tagRepository);
+            }
+            else if (publishedStateChanged && (entity.Trashed || entity.Published == false))
+            {
+                //it's in the trash or not published remove all entity tags
+                ClearEntityTags(entity, _tagRepository);
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -579,6 +592,12 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            repo.ReplaceEntityPermissions(permissionSet);
+        }
+
         public IContent GetByLanguage(int id, string language)
         {
             var sql = GetBaseQuery(false);
@@ -646,7 +665,117 @@ namespace Umbraco.Core.Persistence.Repositories
 
             _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IContent>(previewExists, content, xml));
         }
-        
+
+        /// <summary>
+        /// Gets paged content results
+        /// </summary>
+        /// <param name="query">Query to excute</param>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageNumber, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string filter = "")
+        {
+            // Get base query
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IContent>(sqlClause, query);
+            var sql = translator.Translate()
+                                .Where<DocumentDto>(x => x.Newest);
+
+            // Apply filter
+            if (!string.IsNullOrEmpty(filter))
+            {
+                sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
+            }
+
+            // Apply order according to parameters
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sql = sql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sql = sql.OrderByDescending(orderByParams);
+                }
+            }
+
+            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            // So we'll modify the SQL.
+            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
+
+            // Get page of results and total count
+            IEnumerable<IContent> result;
+            var pagedResult = Database.Page<DocumentDto>(pageNumber, pageSize, modifiedSQL, sql.Arguments);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            if (totalRecords > 0)
+            {
+                // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
+                // methods OrderBy or OrderByDescending)
+                var content = GetAll(pagedResult.Items
+                    .DistinctBy(x => x.NodeId)
+                    .Select(x => x.NodeId).ToArray())
+                    .Cast<Content>()
+                    .AsQueryable();
+
+                // Now we need to ensure this result is also ordered by the same order by clause
+                var orderByProperty = GetIContentPropertyNameForOrderBy(orderBy);
+                if (orderDirection == Direction.Ascending)
+                {
+                    result = content.OrderBy(orderByProperty);
+                }
+                else
+                {
+                    result = content.OrderByDescending(orderByProperty);
+                }
+            }
+            else
+            {
+                result = Enumerable.Empty<IContent>();
+            }
+
+            return result;
+        }
+
+        private string GetDatabaseFieldNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the database field names.
+            switch (orderBy)
+            {
+                case "Name":
+                    return "cmsDocument.text";
+                case "Owner":
+                    return "umbracoNode.nodeUser";
+                case "Updator":
+                    return "cmsDocument.documentUser";
+                default:
+                    return orderBy;
+            }
+        }
+
+        private string GetIContentPropertyNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the IContent property names.
+            switch (orderBy)
+            {
+                case "Owner":
+                    return "CreatorId";
+                case "Updator":
+                    return "WriterId";
+                default:
+                    return orderBy;
+            }
+        }
+
         #endregion
 
         /// <summary>

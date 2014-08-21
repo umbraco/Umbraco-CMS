@@ -23,7 +23,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                   $http.get(
                       umbRequestHelper.getApiUrl(
                           "rteApiBaseUrl",
-                          "GetConfiguration")),
+                          "GetConfiguration"), { cache: true }),
                   'Failed to retrieve tinymce configuration');
         },
 
@@ -40,7 +40,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                var cfg = {};
                        cfg.toolbar = ["code", "bold", "italic", "styleselect","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
                        cfg.stylesheets = [];
-                       cfg.dimensions = {height: 500};
+                       cfg.dimensions = { height: 500 };
+                       cfg.maxImageSize = 500;
                 return cfg;
         },
 
@@ -93,7 +94,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     if(selectedElm.nodeName === 'IMG'){
                         var img = $(selectedElm);
                         currentTarget = {
-                            name: img.attr("alt"),
+                            altText: img.attr("alt"),
                             url: img.attr("src"),
                             id: img.attr("rel")
                         };
@@ -108,7 +109,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             if (img) {
                                 
                                 var data = {
-                                    alt: img.name,
+                                    alt: img.altText,
                                     src: (img.url) ? img.url : "nothing.jpg",
                                     rel: img.id,
                                     id: '__mcenew'
@@ -120,17 +121,18 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                     var imgElm = editor.dom.get('__mcenew');
                                     var size = editor.dom.getSize(imgElm);
 
-                                    var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
+                                    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
+                                        var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
 
-                                    var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                                    editor.dom.setAttrib(imgElm, 'style', s);
-                                    editor.dom.setAttrib(imgElm, 'id', null);
+                                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                                        editor.dom.setAttrib(imgElm, 'style', s);
+                                        editor.dom.setAttrib(imgElm, 'id', null);
 
-                                    if(img.url){
-                                        var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
-                                        editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                                        if (img.url) {
+                                            var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                                            editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                                        }
                                     }
-                                 
                                 }, 500);
                             }
                         }

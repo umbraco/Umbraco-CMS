@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Cache
         {
             base.Setup();
             _ctx = new FakeHttpContextFactory("http://localhost/test");
-            _provider = new HttpRequestCacheProvider(() => _ctx.HttpContext);
+            _provider = new HttpRequestCacheProvider(_ctx.HttpContext);
         }
 
         internal override ICacheProvider Provider

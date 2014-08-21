@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -72,7 +73,7 @@ namespace umbraco.presentation.dialogs
             else
             {
                 var words = txt.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.ToLower().MultipleCharacterWildcard()).ToList();
-                var operation = criteria.GroupedOr(new[] { "__nodeName" }, new[] { words[0] });
+                var operation = criteria.GroupedOr(new[] { "__nodeName", "__NodeId", "id" }, new[] { words[0] });
                 words.RemoveAt(0);
                 foreach (var word in words)
                     operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
@@ -80,6 +81,8 @@ namespace umbraco.presentation.dialogs
                 // ensure the user can only find nodes they are allowed to see
                 if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
                 {
+                    //TODO: This is not correct! This will not filter out seearches 'from' this node, this
+                    // query is meant to search 'for' a specific node.
                     operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
                 }
 
@@ -99,7 +102,7 @@ namespace umbraco.presentation.dialogs
             foreach (var r in results)
             {
                 var x = XmlHelper.AddTextNode(result, "result", "");
-                x.Attributes.Append(XmlHelper.AddAttribute(result, "id", r.Id.ToString()));
+                x.Attributes.Append(XmlHelper.AddAttribute(result, "id", r.Id.ToString(CultureInfo.InvariantCulture)));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "title", r.Fields["nodeName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "author", r.Fields["writerName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "changeDate", r.Fields["updateDate"]));

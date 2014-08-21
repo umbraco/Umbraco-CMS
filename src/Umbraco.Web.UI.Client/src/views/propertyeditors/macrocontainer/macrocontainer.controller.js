@@ -37,26 +37,26 @@ angular.module('umbraco')
 		function openDialog(index){
 			var dialogData = {};
 
-			if(index){
+			if(index !== null && $scope.renderModel[index]) {
 				var macro = $scope.renderModel[index];
 				dialogData = {macroData: macro};
 			}
 			
 			dialogService.macroPicker({
-                dialogData : dialogData,
-                    callback: function(data) {
+				dialogData : dialogData,
+				callback: function(data) {
 
-                    	collectDetails(data);
+					collectDetails(data);
 
-                        //update the raw syntax and the list...
-                        if(index){
-                        	$scope.renderModel[index] = data;
-                        }else{
-                        	$scope.renderModel.push(data);
-                        }
-                    }
-                });
-		}	
+					//update the raw syntax and the list...
+					if(index !== null && $scope.renderModel[index]) {
+						$scope.renderModel[index] = data;
+					} else {
+						$scope.renderModel.push(data);
+					}
+				}
+			});
+		}
 
 
 

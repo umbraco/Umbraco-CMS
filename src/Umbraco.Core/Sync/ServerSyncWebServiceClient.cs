@@ -22,19 +22,21 @@ namespace Umbraco.Core.Sync
 
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/BulkRefresh", RequestNamespace = "http://umbraco.org/webservices/", ResponseNamespace = "http://umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void BulkRefresh(RefreshInstruction[] instructions, string login, string password)
+        public void BulkRefresh(RefreshInstruction[] instructions, string appId, string login, string password)
         {
             this.Invoke("BulkRefresh", new object[] {
 													   instructions,
+                                                       appId,
 													   login,
 													   password});
         }
 
         /// <remarks/>
-        public System.IAsyncResult BeginBulkRefresh(RefreshInstruction[] instructions, string login, string password, System.AsyncCallback callback, object asyncState)
+        public System.IAsyncResult BeginBulkRefresh(RefreshInstruction[] instructions, string appId, string login, string password, System.AsyncCallback callback, object asyncState)
         {
             return this.BeginInvoke("BulkRefresh", new object[] {
 																   instructions,
+                                                                   appId,
 																   login,
 																   password}, callback, asyncState);
         }

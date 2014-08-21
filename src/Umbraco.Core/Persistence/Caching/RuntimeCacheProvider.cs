@@ -41,7 +41,8 @@ namespace Umbraco.Core.Persistence.Caching
 
         public static RuntimeCacheProvider Current { get { return lazy.Value; } }
 
-        private RuntimeCacheProvider()
+        //internal for testing! - though I'm not a huge fan of these being singletons!
+        internal RuntimeCacheProvider()
         {
             if (HttpContext.Current == null)
             {
@@ -246,7 +247,7 @@ namespace Umbraco.Core.Persistence.Caching
 
         private string GetCompositeId(Type type, Guid id)
         {
-            return string.Format("{0}{1}-{2}", CacheItemPrefix, type.Name, id.ToString());
+            return string.Format("{0}{1}-{2}", CacheItemPrefix, type.Name, id);
         }
 
         private string GetCompositeId(Type type, int id)

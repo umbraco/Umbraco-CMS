@@ -40,6 +40,262 @@ namespace Umbraco.Tests.Services
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         [Test]
+        public void Count_All()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            for (int i = 0; i < 20; i++)
+            {
+                contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);    
+            }
+
+            // Assert
+            Assert.AreEqual(24, contentService.Count());
+        }
+
+        [Test]
+        public void Count_By_Content_Type()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
+            contentTypeService.Save(contentType);
+
+            // Act
+            for (int i = 0; i < 20; i++)
+            {
+                contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+            }
+
+            // Assert
+            Assert.AreEqual(20, contentService.Count(contentTypeAlias: "umbBlah"));
+        }
+
+        [Test]
+        public void Count_Children()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
+            contentTypeService.Save(contentType);
+            var parent = contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+
+            // Act
+            for (int i = 0; i < 20; i++)
+            {
+                contentService.CreateContentWithIdentity("Test", parent, "umbBlah");
+            }
+
+            // Assert
+            Assert.AreEqual(20, contentService.CountChildren(parent.Id));
+        }
+
+        [Test]
+        public void Count_Descendants()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
+            contentTypeService.Save(contentType);
+            var parent = contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+
+            // Act
+            IContent current = parent;
+            for (int i = 0; i < 20; i++)
+            {
+                current = contentService.CreateContentWithIdentity("Test", current, "umbBlah");
+            }
+
+            // Assert
+            Assert.AreEqual(20, contentService.CountDescendants(parent.Id));
+        }
+
+        [Test]
+        public void Tags_For_Entity_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Recycled()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content1);
+
+            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content2);
+
+            // Act            
+            contentService.MoveToRecycleBin(content1);
+
+            // Assert
+
+            //there should be no tags for this entity
+            var tags = tagService.GetTagsForEntity(content1.Id);            
+            Assert.AreEqual(0, tags.Count());
+
+            //these tags should still be returned since they still have actively published content assigned
+            var allTags = tagService.GetAllContentTags();
+            Assert.AreEqual(4, allTags.Count());
+        }
+
+        [Test]
+        public void All_Tags_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Recycled()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content1);
+
+            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content2);
+
+            // Act            
+            contentService.MoveToRecycleBin(content1);
+            contentService.MoveToRecycleBin(content2);
+
+            // Assert
+            
+            //there should be no exposed content tags now that nothing is published.
+            var allTags = tagService.GetAllContentTags();
+            Assert.AreEqual(0, allTags.Count());
+        }
+
+        [Test]
+        public void All_Tags_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Un_Published()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content1);
+
+            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content2);
+
+            // Act            
+            contentService.UnPublish(content1);
+            contentService.UnPublish(content2);
+
+            // Assert
+
+            //there should be no exposed content tags now that nothing is published.
+            var allTags = tagService.GetAllContentTags();
+            Assert.AreEqual(0, allTags.Count());
+        }
+
+        [Test]
+        public void Tags_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Re_Published()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content1);
+
+            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content2);
+
+            contentService.UnPublish(content1);
+            contentService.UnPublish(content2);
+
+            // Act            
+            contentService.Publish(content1);
+
+            // Assert
+
+            var tags = tagService.GetTagsForEntity(content1.Id);
+            Assert.AreEqual(4, tags.Count());
+            var allTags = tagService.GetAllContentTags();
+            Assert.AreEqual(4, allTags.Count());
+        }
+
+        [Test]
+        public void Tags_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Restored()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "tags",
+                    DataTypeDefinitionId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content1);
+
+            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            contentService.Publish(content2);
+
+            contentService.MoveToRecycleBin(content1);
+            contentService.MoveToRecycleBin(content2);
+
+            // Act            
+            contentService.Move(content1, -1);
+            contentService.Publish(content1);
+
+            // Assert
+
+            var tags = tagService.GetTagsForEntity(content1.Id);
+            Assert.AreEqual(4, tags.Count());
+            var allTags = tagService.GetAllContentTags();
+            Assert.AreEqual(4, allTags.Count());
+        }
+
+        [Test]
         public void Create_Tag_Data_Bulk_Publish_Operation()
         {
             //Arrange

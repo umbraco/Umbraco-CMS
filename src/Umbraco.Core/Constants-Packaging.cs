@@ -23,6 +23,7 @@
             public const string DictionaryItemsNodeName = "DictionaryItems";
             public const string DictionaryItemNodeName = "DictionaryItem";
             public const string MacrosNodeName = "Macros";
+            public const string DocumentsNodeName = "Documents";
             public const string DocumentSetNodeName = "DocumentSet";
             public const string DocumentTypesNodeName = "DocumentTypes";
             public const string DocumentTypeNodeName = "DocumentType";

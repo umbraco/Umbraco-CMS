@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core.Persistence.Querying;
@@ -124,6 +125,11 @@ namespace Umbraco.Core.Persistence
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(rightTableName),
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(rightColumnName));
             return sql.On(onClause);
+        }
+
+        public static Sql OrderByDescending(this Sql sql, params object[] columns)
+        {
+            return sql.Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString() + " DESC").ToArray())));
         }
     }
 }

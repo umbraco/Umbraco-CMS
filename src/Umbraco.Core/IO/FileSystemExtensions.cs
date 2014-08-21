@@ -18,9 +18,9 @@ namespace Umbraco.Core.IO
 
         public static void CopyFile(this IFileSystem fs, string path, string newPath)
         {
-            using (var fileStream = fs.OpenFile(path))
+            using (var stream = fs.OpenFile(path))
             {
-                fs.AddFile(newPath, fileStream);
+                fs.AddFile(newPath, stream);
             }
         }
 
