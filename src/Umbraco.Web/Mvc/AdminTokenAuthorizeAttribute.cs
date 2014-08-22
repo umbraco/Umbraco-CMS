@@ -87,9 +87,9 @@ namespace Umbraco.Web.Mvc
                 var encrypted = Encoding.UTF8.GetString(bytes);
                 //decrypt the string
                 var text = encrypted.DecryptWithMachineKey();
-                
-                //split
-                var split = text.Split(new[] {"u____u"}, StringSplitOptions.RemoveEmptyEntries);
+
+                //split - some users have not set an email, don't strip out empty entries
+                var split = text.Split(new[] {"u____u"}, StringSplitOptions.None);
                 if (split.Length != 3) return false;
                 
                 //compare
