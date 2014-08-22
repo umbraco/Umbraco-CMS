@@ -43,12 +43,8 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         public static string GetAuthHeaderTokenVal(ApplicationContext appContext)
         {
-            int numberOfUsers;
-            var users = appContext.Services.UserService.GetAll(0, 25, out numberOfUsers);
-            var admin = users.FirstOrDefault(u => u.UserType.Alias == "admin" && u.RawPasswordValue != string.Empty && u.RawPasswordValue.InvariantEquals("default") == false);
+            var admin = appContext.Services.UserService.GetUserById(0);
 
-            if (admin == null) 
-                return string.Empty;
 
             var token = string.Format("{0}u____u{1}u____u{2}", admin.Email, admin.Username, admin.RawPasswordValue);
 
@@ -95,8 +91,8 @@ namespace Umbraco.Web.Mvc
                 //decrypt the string
                 var text = encrypted.DecryptWithMachineKey();
 
-                //split
-                var split = text.Split(new[] { "u____u" }, StringSplitOptions.RemoveEmptyEntries);
+                //split - some users have not set an email, don't strip out empty entries
+                var split = text.Split(new[] {"u____u"}, StringSplitOptions.None);
                 if (split.Length != 3) return false;
 
                 //compare
