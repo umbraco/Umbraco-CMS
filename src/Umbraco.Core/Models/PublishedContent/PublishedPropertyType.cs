@@ -65,7 +65,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The new published property type does not belong to a published content type.</para>
         /// <para>It is a copy of the initial published property type, with a different alias.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, PublishedPropertyType propertyType)
+        public PublishedPropertyType(string propertyTypeAlias, PublishedPropertyType propertyType)
             : this(propertyTypeAlias, propertyType.DataTypeId, propertyType.PropertyEditorAlias)
         { }
 
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// to make decisions, fetch prevalues, etc.</para>
         /// <para>The value of <paramref name="propertyEditorAlias"/> is assumed to be valid.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, string propertyEditorAlias)
+        public PublishedPropertyType(string propertyTypeAlias, string propertyEditorAlias)
             : this(propertyTypeAlias, 0, propertyEditorAlias)
         { }
 
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>The new published property type does not belong to a published content type.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, IDataTypeDefinition dataTypeDefinition)
+        public PublishedPropertyType(string propertyTypeAlias, IDataTypeDefinition dataTypeDefinition)
             : this(propertyTypeAlias, dataTypeDefinition.Id, dataTypeDefinition.PropertyEditorAlias)
         { }
 
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The values of <paramref name="dataTypeDefinitionId"/> and <paramref name="propertyEditorAlias"/> are
         /// assumed to be valid and consistent.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias)
+        public PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias)
         {
             // ContentType 
             // - in unit tests, to be set by PublishedContentType when creating it
@@ -415,7 +415,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>Only a published property type that has not already been detached or nested, can be detached.</para>
         /// <para>Use detached published property type when creating detached properties outside of a published content.</para>
         /// </remarks>
-        internal PublishedPropertyType Detached()
+        public PublishedPropertyType Detached()
         {
             // verify
             if (IsDetachedOrNested)
@@ -445,7 +445,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>Only a published property type that has not already been detached or nested, can be nested.</para>
         /// <para>Use nested published property type when creating detached properties within a published content.</para>
         /// </remarks>
-        internal PublishedPropertyType Nested(PublishedPropertyType containerType)
+        public PublishedPropertyType Nested(PublishedPropertyType containerType)
         {
             // verify
             if (IsDetachedOrNested)
