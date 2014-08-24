@@ -409,6 +409,8 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMedia> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            Mandate.ParameterCondition(pageNumber > 0, "pageSize");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IMedia>.Builder.Where(x => x.ParentId == id);
