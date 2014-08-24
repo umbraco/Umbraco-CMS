@@ -486,6 +486,8 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            Mandate.ParameterCondition(pageNumber > 0, "pageSize");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
