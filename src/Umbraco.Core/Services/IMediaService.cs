@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Services
 {
@@ -60,6 +61,20 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the Parent to retrieve Children from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetChildren(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IMedia> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
+            string orderBy, Direction orderDirection, string filter = "");
 
         /// <summary>
         /// Gets descendants of a <see cref="IMedia"/> object by its Id
