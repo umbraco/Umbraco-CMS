@@ -5,7 +5,7 @@ using Umbraco.Web.Models;
 namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoTemplatePage<TContent> : UmbracoViewPage<RenderModel<TContent>>
-        where TContent : class, IPublishedContent
+        where TContent : IPublishedContent
     {
         private object _currentPage;
 

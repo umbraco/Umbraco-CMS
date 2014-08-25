@@ -279,6 +279,22 @@ namespace Umbraco.Core
 				/// </summary>
 				public const string AltTemplate = "altTemplate";
 			}
+            
+            /// <summary>
+            /// Defines the alias identifiers for Umbraco relation types.
+            /// </summary>
+            public static class RelationTypes
+            {
+                /// <summary>
+                /// ContentType name for default relation type "Relate Document On Copy".
+                /// </summary>
+                public const string RelateDocumentOnCopyName = "Relate Document On Copy";
+                
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Document On Copy".
+                /// </summary>
+                public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
+            }
 		}
 	}
 }

@@ -132,10 +132,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateCmsContentTypeData()
         {
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "icon-picture", Thumbnail = "mediaPhoto.png" });
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "icon-document", Thumbnail = "mediaFile.png" });
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.DefaultAlias, Icon = "icon-user", Thumbnail = "folder.png" });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = "icon-folder", Thumbnail = "icon-folder", IsContainer = false, AllowAtRoot = true });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "icon-picture", Thumbnail = "icon-picture" });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "icon-document", Thumbnail = "icon-document" });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.DefaultAlias, Icon = "icon-user", Thumbnail = "icon-user" });
         }
 
         private void CreateUmbracoUserData()
@@ -255,7 +255,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoRelationTypeData()
         {
-            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = "relateDocumentOnCopy", ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), Dual = true, Name = "Relate Document On Copy" });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), Dual = true, Name = Constants.Conventions.RelationTypes.RelateDocumentOnCopyName });
         }
 
         private void CreateCmsTaskTypeData()

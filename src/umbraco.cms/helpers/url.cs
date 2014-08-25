@@ -38,6 +38,9 @@ namespace umbraco.cms.helpers
                 return false;
             }
 
+            if (url.StartsWith("//"))
+                return false;
+
             Uri requestUri;
             if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out requestUri))
             {

@@ -117,46 +117,50 @@ namespace Umbraco.Web.Trees
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             //check if we're rendering the root
-            if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
+            if (id == Constants.System.Root.ToInvariantString())
             {
-                var nodes = new TreeNodeCollection();
-                var altStartId = string.Empty;
+                //when rendering the root, 3 things can happen:
+                //1. we return -1 children without modifications
+                //2. the user has a non -1 content root set and we return that
+                //3. the tree has a non -1 content root set and we return that - if the user has access to it.
 
-                if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
-                    altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+                var hasUserRoot = UserStartNode != Constants.System.Root;
+                var hasTreeRoot = queryStrings.HasKey(TreeQueryStringParameters.StartNodeId);
 
+                //initial id
+                var idToLoad = id;
 
-                //check if a request has been made to render from a specific start node
-                //TODO: This 'undefined' check should not be required whatseover - this parameter should not be sent up ever it if is null from the front-end.
-                if (!string.IsNullOrEmpty(altStartId) && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+                //user permission override root
+                if (hasUserRoot)
+                    idToLoad = UserStartNode.ToString(CultureInfo.InvariantCulture);
+
+                //tree overrides root
+                if (hasTreeRoot)
                 {
-                    id = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+                    //but only if the user is allowed to access this node
+                    var altId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
-                    //we need to verify that the user has access to view this node, otherwise we'll render an empty tree collection
-                    // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access                
-                    if (HasPathAccess(id, queryStrings))
+                    //so if we dont have a user content root or the user has access
+                    if (hasUserRoot == false || HasPathAccess(altId, queryStrings))
                     {
-                        nodes = GetTreeNodesInternal(id, queryStrings);
+                        idToLoad = altId;
                     }
                 }
-                else
-                {
-                    //load normally
-                    nodes = GetTreeNodesInternal(id, queryStrings);
-                }
 
-                //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == Constants.System.Root.ToInvariantString())
+                //load whatever root nodes we concluded was the user/tree root
+                var nodes = GetTreeNodesInternal(idToLoad, queryStrings);                
+
+                //only render the recycle bin if we are not in dialog and the start id is still the root
+                if (IsDialog(queryStrings) == false && idToLoad == Constants.System.Root.ToInvariantString())
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
-                        id,
+                        idToLoad,
                         queryStrings,
                         ui.GetText("general", "recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
-
                 }
 
                 return nodes;

@@ -147,7 +147,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static DocumentType MakeNew(User u, string Text)
         {
-            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
+            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType);
 

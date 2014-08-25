@@ -87,13 +87,13 @@ namespace Umbraco.Core.Models
         {
             var type = typeof(UmbracoObjectTypes);
             var memInfo = type.GetMember(umbracoObjectType.ToString());
-            var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
+            var attributes = memInfo[0].GetCustomAttributes(typeof(FriendlyNameAttribute),
                 false);
 
             if (attributes.Length == 0)
                 return string.Empty;
 
-            var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
+            var attribute = ((FriendlyNameAttribute)attributes[0]);
             if (attribute == null)
                 return string.Empty;
 

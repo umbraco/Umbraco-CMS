@@ -44,7 +44,7 @@ namespace Umbraco.Core
 	        : this(
 	            new HttpRuntimeCacheProvider(HttpRuntime.Cache),
 	            new StaticCacheProvider(),
-	            new HttpRequestCacheProvider(() => new HttpContextWrapper(HttpContext.Current)))
+                new HttpRequestCacheProvider())
 	    {
 	    }
 
@@ -56,7 +56,7 @@ namespace Umbraco.Core
 	        : this(
 	            new HttpRuntimeCacheProvider(cache),
 	            new StaticCacheProvider(),
-	            new HttpRequestCacheProvider(() => new HttpContextWrapper(HttpContext.Current)))
+                new HttpRequestCacheProvider())
 	    {
 	    }
 

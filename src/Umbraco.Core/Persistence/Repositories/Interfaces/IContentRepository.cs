@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -66,5 +68,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="xml"></param>
         void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml);
 
+        /// <summary>
+        /// Gets paged content results
+        /// </summary>
+        /// <param name="query">Query to excute</param>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageNumber, int pageSize, out int totalRecords, 
+            string orderBy, Direction orderDirection, string filter = "");
     }
 }

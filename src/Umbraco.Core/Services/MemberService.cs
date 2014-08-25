@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
-using System.Xml.Linq;
-using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.Events;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
@@ -23,7 +17,6 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
-
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
@@ -77,9 +70,11 @@ namespace Umbraco.Core.Services
         #region IMemberService Implementation
 
         /// <summary>
-        /// Get the default member type from the database - first check if the type "Member" is there, if not choose the first one found
+        /// Gets the default MemberType alias
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
+        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
+        /// <returns>Alias of the default MemberType</returns>
         public string GetDefaultMemberType()
         {
             using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
@@ -101,10 +96,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Checks if a member with the username exists
+        /// Checks if a Member with the username exists
         /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
+        /// <param name="username">Username to check</param>
+        /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -116,11 +111,10 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
-        /// <param name="member">The member to save the password for</param>
-        /// <param name="password"></param>
-        /// <remarks>
-        /// This method exists so that Umbraco developers can use one entry point to create/update members if they choose to.
-        /// </remarks>
+        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update 
+        /// Members if they choose to. </remarks>
+        /// <param name="member">The Member to save the password for</param>
+        /// <param name="password">The password to encrypt and save</param>
         public void SavePassword(IMember member, string password)
         {
             if (member == null) throw new ArgumentNullException("member");
@@ -148,10 +142,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Checks if a member with the id exists
+        /// Checks if a Member with the id exists
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Id of the Member</param>
+        /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         public bool Exists(int id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -161,10 +155,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a Member by its integer Id
+        /// Gets a Member by its integer id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id"><see cref="System.int"/> Id</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember GetById(int id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -174,14 +168,12 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a Member by its Guid key
+        /// Gets a Member by the unique key
         /// </summary>
-        /// <remarks>
-        /// The guid key corresponds to the unique id in the database
-        /// and the user id in the membership provider.
-        /// </remarks>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <remarks>The guid key corresponds to the unique id in the database
+        /// and the user id in the membership provider.</remarks>
+        /// <param name="id"><see cref="Guid"/> Id</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember GetByKey(Guid id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -193,10 +185,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members by their MemberType
+        /// Gets all Members for the specified MemberType alias
         /// </summary>
-        /// <param name="memberTypeAlias"></param>
-        /// <returns></returns>
+        /// <param name="memberTypeAlias">Alias of the MemberType</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -208,10 +200,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members by their MemberType
+        /// Gets all Members for the MemberType id
         /// </summary>
-        /// <param name="memberTypeId"></param>
-        /// <returns></returns>
+        /// <param name="memberTypeId">Id of the MemberType</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -224,10 +216,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members by the MemberGroup they are part of
+        /// Gets all Members within the specified MemberGroup name
         /// </summary>
-        /// <param name="memberGroupName"></param>
-        /// <returns></returns>
+        /// <param name="memberGroupName">Name of the MemberGroup</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByGroup(string memberGroupName)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -237,10 +229,11 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of all Members
+        /// Gets all Members with the ids specified
         /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
+        /// <remarks>If no Ids are specified all Members will be retrieved</remarks>
+        /// <param name="ids">Optional list of Member Ids</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetAllMembers(params int[] ids)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -249,6 +242,10 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Delete Members of the specified MemberType id
+        /// </summary>
+        /// <param name="memberTypeId">Id of the MemberType</param>
         public void DeleteMembersOfType(int memberTypeId)
         {
             using (new WriteLock(Locker))
@@ -272,6 +269,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Finds Members based on their display name
+        /// </summary>
+        /// <param name="displayNameToMatch">Display name to match</param>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -314,14 +320,14 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Does a search for members that contain the specified string in their email address
+        /// Finds a list of <see cref="IMember"/> objects by a partial email string
         /// </summary>
-        /// <param name="emailStringToMatch"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="matchType"></param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
+        /// <param name="emailStringToMatch">Partial email string to match</param>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -354,6 +360,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Finds a list of <see cref="IMember"/> objects by a partial username
+        /// </summary>
+        /// <param name="login">Partial username to match</param>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -387,12 +402,12 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members with a certain string property value
+        /// Gets a list of Members based on a property search
         /// </summary>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="value"></param>
-        /// <param name="matchType"></param>
-        /// <returns></returns>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
+        /// <param name="value"><see cref="System.string"/> Value to match</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -443,12 +458,12 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members with a certain integer property value
+        /// Gets a list of Members based on a property search
         /// </summary>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="value"></param>
-        /// <param name="matchType"></param>
-        /// <returns></returns>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
+        /// <param name="value"><see cref="System.int"/> Value to match</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -502,11 +517,11 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members with a certain boolean property value
+        /// Gets a list of Members based on a property search
         /// </summary>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
+        /// <param name="value"><see cref="System.bool"/> Value to match</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -523,12 +538,12 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Members with a certain date time property value
+        /// Gets a list of Members based on a property search
         /// </summary>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="value"></param>
-        /// <param name="matchType"></param>
-        /// <returns></returns>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
+        /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
+        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -586,15 +601,15 @@ namespace Umbraco.Core.Services
         #region IMembershipMemberService Implementation
 
         /// <summary>
-        /// Returns the count of members based on the countType
+        /// Gets the total number of Members based on the count type
         /// </summary>
-        /// <param name="countType"></param>
-        /// <returns></returns>
         /// <remarks>
         /// The way the Online count is done is the same way that it is done in the MS SqlMembershipProvider - We query for any members
         /// that have their last active date within the Membership.UserIsOnlineTimeWindow (which is in minutes). It isn't exact science
         /// but that is how MS have made theirs so we'll follow that principal.
         /// </remarks>
+        /// <param name="countType"><see cref="MemberCountType"/> to count by</param>
+        /// <returns><see cref="System.int"/> with number of Members for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -635,6 +650,13 @@ namespace Umbraco.Core.Services
 
         }
 
+        /// <summary>
+        /// Gets a list of paged <see cref="IMember"/> objects
+        /// </summary>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -645,13 +667,31 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Creates a member object
+        /// Gets the count of Members by an optional MemberType alias
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="email"></param>
-        /// <param name="name"></param>
-        /// <param name="memberTypeAlias"></param>
-        /// <returns></returns>
+        /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
+        /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
+        /// <returns><see cref="System.int"/> with number of Members</returns>
+        public int Count(string memberTypeAlias = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.Count(memberTypeAlias);
+            }
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IMember"/> object without persisting it
+        /// </summary>
+        /// <remarks>This method is convenient for when you need to add properties to a new Member
+        /// before persisting it in order to limit the amount of times its saved.
+        /// Also note that the returned <see cref="IMember"/> will not have an Id until its saved.</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="name">Name of the Member to create</param>
+        /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember CreateMember(string username, string email, string name, string memberTypeAlias)
         {
             var memberType = FindMemberTypeByAlias(memberTypeAlias);
@@ -659,13 +699,16 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Creates a new member object
+        /// Creates an <see cref="IMember"/> object without persisting it
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="email"></param>
-        /// <param name="name"></param>
-        /// <param name="memberType"></param>
-        /// <returns></returns>
+        /// <remarks>This method is convenient for when you need to add properties to a new Member
+        /// before persisting it in order to limit the amount of times its saved.
+        /// Also note that the returned <see cref="IMember"/> will not have an Id until its saved.</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="name">Name of the Member to create</param>
+        /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember CreateMember(string username, string email, string name, IMemberType memberType)
         {
             var member = new Member(name, email.ToLower().Trim(), username, memberType);
@@ -676,13 +719,15 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Creates a member with an Id
+        /// Creates and persists a Member
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="email"></param>
-        /// <param name="name"></param>
-        /// <param name="memberTypeAlias"></param>
-        /// <returns></returns>
+        /// <remarks>Using this method will persist the Member object before its returned 
+        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="name">Name of the Member to create</param>
+        /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
         {
             var memberType = FindMemberTypeByAlias(memberTypeAlias);
@@ -690,49 +735,65 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Creates a member with an Id, the username will be used as their name
+        /// Creates and persists a Member
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="email"></param>
-        /// <param name="memberType"></param>
-        /// <returns></returns>
+        /// <remarks>Using this method will persist the Member object before its returned 
+        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
         {
             return CreateMemberWithIdentity(username, email, username, memberType);
         }
 
         /// <summary>
-        /// Creates a member with an Id
+        /// Creates and persists a Member
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="email"></param>
-        /// <param name="name"></param>
-        /// <param name="memberType"></param>
-        /// <returns></returns>
+        /// <remarks>Using this method will persist the Member object before its returned 
+        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="name">Name of the Member to create</param>
+        /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
         {
             return CreateMemberWithIdentity(username, email, name, "", memberType);
         }
 
         /// <summary>
-        /// Creates and persists a new Member
+        /// Creates and persists a new <see cref="IMember"/>
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="username"></param>
-        /// <param name="rawPasswordValue"></param>
-        /// <param name="memberTypeAlias"></param>
-        /// <returns></returns>
-        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <returns><see cref="IMember"/></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
         {
             var memberType = FindMemberTypeByAlias(memberTypeAlias);
-            return CreateMemberWithIdentity(username, email, username, rawPasswordValue, memberType);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType);
         }
 
-        private IMember CreateMemberWithIdentity(string username, string email, string name, string rawPasswordValue, IMemberType memberType)
+        /// <summary>
+        /// Creates and persists a Member
+        /// </summary>
+        /// <remarks>Using this method will persist the Member object before its returned 
+        /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
+        /// <param name="username">Username of the Member to create</param>
+        /// <param name="email">Email of the Member to create</param>
+        /// <param name="name">Name of the Member to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <returns><see cref="IMember"/></returns>
+        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(name, email.ToLower().Trim(), username, rawPasswordValue, memberType);
+            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
 
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
             {
@@ -762,13 +823,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a Member by its Id
+        /// Gets an <see cref="IMember"/> by its provider key
         /// </summary>
-        /// <remarks>
-        /// The Id should be an integer or Guid.
-        /// </remarks>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Id to use for retrieval</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember GetByProviderKey(object id)
         {
             var asGuid = id.TryConvertTo<Guid>();
@@ -786,10 +844,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a Member by its Email
+        /// Get an <see cref="IMember"/> by email
         /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
+        /// <param name="email">Email to use for retrieval</param>
+        /// <returns><see cref="IMember"/></returns>
         public IMember GetByEmail(string email)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -803,16 +861,20 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a Member by its Username
+        /// Get an <see cref="IMember"/> by username
         /// </summary>
-        /// <param name="userName"></param>
-        /// <returns></returns>
-        public IMember GetByUsername(string userName)
+        /// <param name="username">Username to use for retrieval</param>
+        /// <returns><see cref="IMember"/></returns>
+        public IMember GetByUsername(string username)
         {
+            //TODO: Somewhere in here, whether at this level or the repository level, we need to add 
+            // a caching mechanism since this method is used by all the membership providers and could be
+            // called quite a bit when dealing with members.
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var query = Query<IMember>.Builder.Where(x => x.Username.Equals(userName));
+                var query = Query<IMember>.Builder.Where(x => x.Username.Equals(username));
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
@@ -820,9 +882,9 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Deletes a Member
+        /// Deletes an <see cref="IMember"/>
         /// </summary>
-        /// <param name="member"></param>
+        /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
             if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(member), this))
@@ -837,12 +899,13 @@ namespace Umbraco.Core.Services
 
             Deleted.RaiseEvent(new DeleteEventArgs<IMember>(member, false), this);
         }
-        
+
         /// <summary>
-        /// Saves an updated Member
+        /// Saves an <see cref="IMember"/>
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="raiseEvents"></param>
+        /// <param name="entity"><see cref="IMember"/> to Save</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember entity, bool raiseEvents = true)
         {
             if (raiseEvents)
@@ -851,7 +914,6 @@ namespace Umbraco.Core.Services
                 {
                     return;
                 }
-
             }
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -872,6 +934,12 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IMember>(entity, false), this);
         }
 
+        /// <summary>
+        /// Saves a list of <see cref="IMember"/> objects
+        /// </summary>
+        /// <param name="entities"><see cref="IEnumerable{IMember}"/> to save</param>
+        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
             var asArray = entities.ToArray();
@@ -1252,7 +1320,5 @@ namespace Umbraco.Core.Services
 
             return new Member(name, email, username, password, memType);
         }
-
-
     }
 }

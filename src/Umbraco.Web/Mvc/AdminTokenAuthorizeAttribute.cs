@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 
@@ -41,7 +43,12 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         public static string GetAuthHeaderTokenVal(ApplicationContext appContext)
         {
-            var admin = appContext.Services.UserService.GetUserById(0);
+            int numberOfUsers;
+            var users = appContext.Services.UserService.GetAll(0, 25, out numberOfUsers);
+            var admin = users.FirstOrDefault(u => u.UserType.Alias == "admin" && u.RawPasswordValue != string.Empty && u.RawPasswordValue.InvariantEquals("default") == false);
+
+            if (admin == null) 
+                return string.Empty;
 
             var token = string.Format("{0}u____u{1}u____u{2}", admin.Email, admin.Username, admin.RawPasswordValue);
 
@@ -50,7 +57,7 @@ namespace Umbraco.Web.Mvc
             var base64 = Convert.ToBase64String(bytes);
             return "AToken val=\"" + base64 + "\"";
         }
-
+        
         /// <summary>
         /// Ensures that the user must be in the Administrator or the Install role
         /// </summary>
@@ -91,7 +98,7 @@ namespace Umbraco.Web.Mvc
                 //split - some users have not set an email, don't strip out empty entries
                 var split = text.Split(new[] {"u____u"}, StringSplitOptions.None);
                 if (split.Length != 3) return false;
-                
+
                 //compare
                 return
                     split[0] == admin.Email

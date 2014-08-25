@@ -144,7 +144,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -486,6 +486,7 @@
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\NotificationsHandler.cs" />
+    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -510,6 +511,7 @@
     <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasksBase.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

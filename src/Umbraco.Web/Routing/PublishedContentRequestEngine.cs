@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using System.IO;
-
+using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -517,6 +517,11 @@ namespace Umbraco.Web.Routing
 			if (Access.IsProtected(_pcr.PublishedContent.Id, path))
 			{
 				LogHelper.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
+
+                //TODO: We coud speed this up, the only reason we are looking up the members is for it's
+                // ProviderUserKey (id). We could store this id in the FormsAuth cookie custom data when 
+                // a member logs in. Then we can check if the value exists and just use that, otherwise lookup 
+                // the member like we are currently doing.
 
 				System.Web.Security.MembershipUser user = null;
 				try

@@ -89,7 +89,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
 
     //watch the value change but don't do the search on every change - that's far too many queries
     // we need to debounce
-    $scope.$watch("searchTerm", _.debounce(function () {
+    var debounced = _.debounce(function () {
         if ($scope.searchTerm) {
             $scope.isSearching = true;
             navigationService.showSearch();
@@ -102,7 +102,10 @@ function SearchController($scope, searchService, $log, $location, navigationServ
             navigationService.hideSearch();
             $scope.selectedItem = undefined;
         }
-    }, 100));
+    }, 300);
+
+    
+    $scope.$watch("searchTerm", debounced);
 
 }
 //register it

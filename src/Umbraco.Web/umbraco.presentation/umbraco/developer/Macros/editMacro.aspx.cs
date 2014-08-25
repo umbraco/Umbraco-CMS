@@ -27,8 +27,8 @@ namespace umbraco.cms.presentation.developer
 			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
 		}
 
-		protected PlaceHolder buttons;
-		protected Table macroElements;
+		protected PlaceHolder Buttons;
+		protected Table MacroElements;
 
 		public TabPage InfoTabPage;
 		public TabPage Parameters;
@@ -43,7 +43,7 @@ namespace umbraco.cms.presentation.developer
 			{
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
-                    .SyncTree("-1,init," + _macro.Id.ToString(), false);
+                    .SyncTree("-1,init," + _macro.Id, false);
 
                 string tempMacroAssembly = _macro.ControlAssembly ?? "";
                 string tempMacroType = _macro.ControlType ?? "";
@@ -51,7 +51,7 @@ namespace umbraco.cms.presentation.developer
                 PopulateFieldsOnLoad(_macro, tempMacroAssembly, tempMacroType);
 
 				// Check for assemblyBrowser
-				if (tempMacroType.IndexOf(".ascx") > 0)
+				if (tempMacroType.IndexOf(".ascx", StringComparison.Ordinal) > 0)
 					assemblyBrowserUserControl.Controls.Add(
 						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
                                            "&macroID=" + _macro.Id.ToInvariantString() +
@@ -68,8 +68,8 @@ namespace umbraco.cms.presentation.developer
 				// Load xslt files from default dir
 				PopulateXsltFiles();
 
-				// Load python files from default dir
-				PopulatePythonFiles();
+				// Load razor script files from default dir
+                PopulateMacroScriptFiles();
 
 				// Load usercontrols
 				PopulateUserControls(IOHelper.MapPath(SystemDirectories.UserControls));
@@ -151,28 +151,28 @@ namespace umbraco.cms.presentation.developer
 			xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
 		}
 
-		private static void GetPythonFilesFromDir(string orgPath, string path, ArrayList files)
+		private static void GetMacroScriptFilesFromDir(string orgPath, string path, ArrayList files)
 		{
 			var dirInfo = new DirectoryInfo(path);
-			if (!dirInfo.Exists)
+			if (dirInfo.Exists == false)
 				return;
 
-			var fileInfo = dirInfo.GetFiles("*.*");
+			var fileInfo = dirInfo.GetFiles("*.*").Where(f => f.Name.ToLowerInvariant() != "web.config".ToLowerInvariant());
 			foreach (var file in fileInfo)
 				files.Add(path.Replace(orgPath, string.Empty) + file.Name);
 
 			// Populate subdirectories
 			var dirInfos = dirInfo.GetDirectories();
 			foreach (var dir in dirInfos)
-				GetPythonFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
+				GetMacroScriptFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
 		}
 
-		private void PopulatePythonFiles()
+        private void PopulateMacroScriptFiles()
 		{
-			var pythons = new ArrayList();
-			var pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
-			GetPythonFilesFromDir(pythonDir, pythonDir, pythons);
-			pythonFiles.DataSource = pythons;
+			var razors = new ArrayList();
+			var razorDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
+			GetMacroScriptFilesFromDir(razorDir, razorDir, razors);
+			pythonFiles.DataSource = razors;
 			pythonFiles.DataBind();
 			pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
 		}
@@ -197,13 +197,10 @@ namespace umbraco.cms.presentation.developer
 
 		public object CheckNull(object test)
 		{
-			if (Convert.IsDBNull(test))
-				return 0;
-			else
-				return test;
+		    return Convert.IsDBNull(test) ? 0 : test;
 		}
 
-        [Obsolete("No longer used and will be removed in the future.")]
+	    [Obsolete("No longer used and will be removed in the future.")]
 		public IRecordsReader GetMacroPropertyTypes()
         {
             return null;
@@ -257,15 +254,12 @@ namespace umbraco.cms.presentation.developer
 
 		public bool macroIsVisible(object isChecked)
 		{
-			if (Convert.ToBoolean(isChecked))
-				return true;
-			else
-				return false;
+		    return Convert.ToBoolean(isChecked);
 		}
 
-		public void AddChooseList(Object sender, EventArgs e)
+	    public void AddChooseList(Object sender, EventArgs e)
 		{
-			if (!IsPostBack)
+			if (IsPostBack == false)
 			{
 				var dropDown = (DropDownList)sender;
 				dropDown.Items.Insert(0, new ListItem("Choose...", string.Empty));
@@ -274,22 +268,18 @@ namespace umbraco.cms.presentation.developer
 
 		private void PopulateUserControls(string path)
 		{
-			var di = new DirectoryInfo(path);
+			var directoryInfo = new DirectoryInfo(path);
 
-			string rootDir = IOHelper.MapPath(SystemDirectories.UserControls);
+			var rootDir = IOHelper.MapPath(SystemDirectories.UserControls);
 
-			foreach (var uc in di.GetFiles("*.ascx"))
+			foreach (var uc in directoryInfo.GetFiles("*.ascx"))
 			{
-				userControlList.Items.Add(
-					new ListItem(SystemDirectories.UserControls +
-							uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
-				/*
-										uc.FullName.IndexOf(usercontrolsDir), 
-										uc.FullName.Length - uc.FullName.IndexOf(usercontrolsDir)).Replace(IOHelper.DirSepChar, '/')));
-				*/
+			    userControlList.Items.Add(
+			        new ListItem(SystemDirectories.UserControls +
+			                     uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
 
 			}
-			foreach (var dir in di.GetDirectories())
+			foreach (var dir in directoryInfo.GetDirectories())
 				PopulateUserControls(dir.FullName);
 		}
 
@@ -313,7 +303,7 @@ namespace umbraco.cms.presentation.developer
             Parameters = TabView1.NewTabPage("Parameters");
             Parameters.Controls.Add(Panel2);
 
-            MenuButton save = TabView1.Menu.NewButton();
+            var save = TabView1.Menu.NewButton();
             save.ButtonType = MenuButtonType.Primary;
             save.Text = ui.Text("save");
             save.ID = "save";

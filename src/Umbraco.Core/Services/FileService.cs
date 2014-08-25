@@ -1,7 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Remoting.Messaging;
+using System.Text;
+using System.Web;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -17,19 +23,21 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IUnitOfWorkProvider _fileUowProvider;
         private readonly IDatabaseUnitOfWorkProvider _dataUowProvider;
+        private readonly IMacroService _macroService;
 
         public FileService()
             : this(new RepositoryFactory())
         { }
 
         public FileService(RepositoryFactory repositoryFactory)
-            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory, new MacroService())
         {
         }
 
-        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
+        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory, IMacroService macroService)
         {
             _repositoryFactory = repositoryFactory;
+            _macroService = macroService;
             _fileUowProvider = fileProvider;
             _dataUowProvider = dataProvider;
         }
@@ -362,6 +370,138 @@ namespace Umbraco.Core.Services
             return template.IsValid();
         }
 
+        // TODO: Before making this public: How to get feedback in the UI when cancelled
+        internal Attempt<PartialView> CreatePartialView(PartialView partialView)
+        {
+            var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
+            var relativeFilePath = partialView.ParentFolderName.EnsureEndsWith('/') + partialViewsFileSystem.GetRelativePath(partialView.FileName);
+            partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
+
+            //return the link to edit the file if it already exists
+            if (partialViewsFileSystem.FileExists(partialView.Path))
+                return Attempt<PartialView>.Succeed(partialView);
+
+            if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<PartialView>(partialView, true, partialView.Alias, -1), this))
+            {
+                // We have nowhere to return to, clear ReturnUrl
+                partialView.ReturnUrl = string.Empty;
+
+                var failureMessage = string.Format("Creating Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName));
+                LogHelper.Info<FileService>(failureMessage);
+
+                return Attempt<PartialView>.Fail(partialView, new ArgumentException(failureMessage));
+            }
+
+            //create the file
+            var snippetPathAttempt = partialView.TryGetSnippetPath(partialView.SnippetName);
+            if (snippetPathAttempt.Success == false)
+            {
+                throw new InvalidOperationException("Could not load template with name " + partialView.SnippetName);
+            }
+
+            using (var snippetFile = new StreamReader(partialViewsFileSystem.OpenFile(snippetPathAttempt.Result)))
+            {
+                var snippetContent = snippetFile.ReadToEnd().Trim();
+
+                //strip the @inherits if it's there
+                snippetContent = partialView.HeaderMatch.Replace(snippetContent, string.Empty);
+
+                var content = string.Format("{0}{1}{2}", partialView.CodeHeader, Environment.NewLine, snippetContent);
+
+                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+                {
+                    partialViewsFileSystem.AddFile(partialView.Path, stream);
+                }
+            }
+
+            if (partialView.CreateMacro)
+                CreatePartialViewMacro(partialView);
+            
+            CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
+
+            return Attempt<PartialView>.Succeed(partialView);
+        }
+
+        internal void CreatePartialViewMacro(PartialView partialView)
+        {
+            var name = partialView.FileName.Substring(0, (partialView.FileName.LastIndexOf('.') + 1))
+                .Trim('.')
+                .SplitPascalCasing()
+                .ToFirstUpperInvariant();
+
+            var macro = new Macro(name, name) { ScriptPath = partialView.BasePath + partialView.FileName };
+            _macroService.Save(macro);
+        }
+
+        // TODO: Before making this public: How to get feedback in the UI when cancelled
+        internal bool DeletePartialView(PartialView partialView, int userId = 0)
+        {
+            var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
+
+            if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<PartialView>(partialView), this))
+            {
+                LogHelper.Info<FileService>(string.Format("Deleting Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName)));
+                return false;
+            }
+
+            if (partialViewsFileSystem.FileExists(partialView.FileName))
+            {
+                partialViewsFileSystem.DeleteFile(partialView.FileName);
+                LogHelper.Info<FileService>(string.Format("Partial View file {0} deleted by user {1}", partialViewsFileSystem.GetFullPath(partialView.FileName), userId));
+            }
+            // TODO: does this ever even happen? I don't think folders show up in the tree currently. 
+            // Leaving this here as it was in the original PartialViewTasks code - SJ
+            else if (partialViewsFileSystem.DirectoryExists(partialView.FileName))
+            {
+                partialViewsFileSystem.DeleteDirectory(partialView.FileName, true);
+                LogHelper.Info<FileService>(string.Format("Partial View directory {0} deleted by user {1}", partialViewsFileSystem.GetFullPath(partialView.FileName), userId));
+            }
+
+            DeletedPartialView.RaiseEvent(new DeleteEventArgs<PartialView>(partialView, false), this);
+
+            return true;
+        }
+
+        internal Attempt<PartialView> SavePartialView(PartialView partialView, int userId = 0)
+        {
+            if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<PartialView>(partialView, true), this))
+            {
+                return Attempt<PartialView>.Fail(new ArgumentException("Save was cancelled by an event handler " + partialView.FileName));
+            }
+            
+            //Directory check.. only allow files in script dir and below to be edited
+            if (partialView.IsValid() == false)
+            {
+                return Attempt<PartialView>.Fail(
+                    new ArgumentException(string.Format("Illegal path: {0} or illegal file extension {1}",
+                        partialView.Path,
+                        partialView.FileName.Substring(partialView.FileName.LastIndexOf(".", StringComparison.Ordinal)))));
+            }
+
+            //NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
+            // BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
+            // http://issues.umbraco.org/issue/U4-2118
+            //using (var sw = System.IO.File.CreateText(savePath))
+            //{
+            //    sw.Write(val);
+            //}
+            
+            System.IO.File.WriteAllText(partialView.Path, partialView.Content, Encoding.UTF8);
+
+            //deletes the old file
+            if (partialView.FileName != partialView.OldFileName)
+            {
+                // Create a new PartialView class so that we can set the FileName of the file that needs deleting
+                var deletePartial = partialView;
+                deletePartial.FileName = partialView.OldFileName;
+                DeletePartialView(deletePartial, userId);
+            }
+
+            SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView), this);
+
+            return Attempt.Succeed(partialView);
+        }
+
         //TODO Method to change name and/or alias of view/masterpage template
 
         #region Event Handlers
@@ -425,6 +565,37 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
 
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, SaveEventArgs<PartialView>> SavingPartialView;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, SaveEventArgs<PartialView>> SavedPartialView;
+
+        /// <summary>
+        /// Occurs before Create
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, NewEventArgs<PartialView>> CreatingPartialView;
+
+        /// <summary>
+        /// Occurs after Create
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, NewEventArgs<PartialView>> CreatedPartialView;
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, DeleteEventArgs<PartialView>> DeletingPartialView;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        internal static event TypedEventHandler<IFileService, DeleteEventArgs<PartialView>> DeletedPartialView;
+
         #endregion
+
     }
 }

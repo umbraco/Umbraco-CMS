@@ -130,11 +130,12 @@
     </Reference>
     <Reference Include="ImageProcessor, Version=1.8.8.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ImageProcessor.1.8.8.0\lib\ImageProcessor.dll</HintPath>
+      <HintPath>..\packages\ImageProcessor.1.9.5.0\lib\ImageProcessor.dll</HintPath>
     </Reference>
     <Reference Include="ImageProcessor.Web, Version=3.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ImageProcessor.Web.3.2.2.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+      <HintPath>..\packages\ImageProcessor.Web.3.3.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -166,8 +167,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MySql.Data.6.6.5\lib\net40\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
