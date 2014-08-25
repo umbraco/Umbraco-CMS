@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -240,13 +241,159 @@ namespace Umbraco.Tests.Persistence.Repositories
             MediaTypeRepository mediaTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
             {
-
                 // Act
                 var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
                 var result = repository.GetByQuery(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2)); //There should be two entities on level 2: File and Media
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_ForFirstPage_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "SortOrder", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Test Image"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_ForSecondPage_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 2, 1, out totalRecords, "SortOrder", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Test File"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithSinglePage_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "SortOrder", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(2));
+                Assert.That(result.First().Name, Is.EqualTo("Test Image"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithDescendingOrder_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "SortOrder", Direction.Descending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Test File"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WitAlternateOrder_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Test File"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingSome_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "SortOrder", Direction.Ascending, "File");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(1));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Test File"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingAll_On_MediaRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "SortOrder", Direction.Ascending, "Test");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Test Image"));
             }
         }
 
