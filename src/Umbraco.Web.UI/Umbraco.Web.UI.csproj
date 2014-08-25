@@ -1611,7 +1611,6 @@
     <Content Include="Umbraco\Dashboard\Images\starterkit32x32.png" />
     <Content Include="Umbraco\Dashboard\Images\TV.png" />
     <Content Include="Umbraco\Dashboard\Images\ZipFile.png" />
-    <Content Include="Umbraco\Dashboard\Swfs\AIRInstallBadge.swf" />
     <Content Include="Umbraco\Dashboard\Swfs\expressinstall.swf" />
     <Content Include="Umbraco\Images\Editor\insMacroSB.png" />
     <Content Include="Umbraco\Images\Editor\insRazorMacro.png" />
@@ -2676,7 +2675,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>6210</DevelopmentServerPort>
+          <DevelopmentServerPort>6220</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:6220</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
