@@ -252,10 +252,11 @@
 
                 <cc1:PropertyPanel runat="server" Text=" ">
                     <br />
-                    <div id="installingMessage" style="display: none; overflow: hidden; margin-left: -100%; margin-right: -20px;">
-                        <cc1:ProgressBar runat="server" ID="_progbar1" />
-                        <br />
-                        <em>&nbsp; &nbsp;Installing package, please wait...</em><br />
+                    <div id="installingMessage" style="display: none;">
+                        <div style="overflow: hidden; margin-left: -100%; margin-right: -20px;">
+                            <cc1:ProgressBar runat="server" ID="_progbar1" />
+                        </div>
+                        <em>Installing package, please wait...</em><br /><br />
                     </div>
                     <asp:Button ID="ButtonInstall" runat="server" Text="Install Package" CssClass="btn btn-primary" Enabled="False"
                         OnClick="startInstall"></asp:Button>
