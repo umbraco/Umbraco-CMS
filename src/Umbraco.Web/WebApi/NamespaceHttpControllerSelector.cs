@@ -25,7 +25,10 @@ namespace Umbraco.Web.WebApi
         public override HttpControllerDescriptor SelectController(HttpRequestMessage request)
         {
             var routeData = request.GetRouteData();
-            if (routeData == null || routeData.Route == null || routeData.Route.DataTokens["Namespaces"] == null) 
+            if (routeData == null 
+                || routeData.Route == null
+                || routeData.Route.DataTokens == null 
+                || routeData.Route.DataTokens["Namespaces"] == null)
                 return base.SelectController(request);
             
             // Look up controller in route data
