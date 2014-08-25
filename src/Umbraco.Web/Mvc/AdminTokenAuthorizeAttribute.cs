@@ -45,8 +45,6 @@ namespace Umbraco.Web.Mvc
         {
             var admin = appContext.Services.UserService.GetUserById(0);
 
-            if (admin == null) 
-                return string.Empty;
 
             var token = string.Format("{0}u____u{1}u____u{2}", admin.Email, admin.Username, admin.RawPasswordValue);
 
