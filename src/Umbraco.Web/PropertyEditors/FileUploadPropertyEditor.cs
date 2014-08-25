@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -149,24 +150,28 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
             {
-                var result = new Dictionary<string, object>();
+                var result = new List<PreValue>();
 
                 //the pre-values just take up one field with a semi-colon delimiter so we'll just parse
                 var dictionary = persistedPreVals.FormatAsDictionary();
                 if (dictionary.Any())
                 {
                     //there should only be one val
-                    var delimited = dictionary.First().Value.Value.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+                    var delimited = dictionary.First().Value.Value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     for (var index = 0; index < delimited.Length; index++)
                     {
-                        result.Add(index.ToInvariantString(), delimited[index]);
+                        result.Add(new PreValue(index, delimited[index]));
                     }
                 }
 
                 //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-                return new Dictionary<string, object> { { "items", result } };
+                return new Dictionary<string, object> { { "items", result.ToDictionary(x => x.Id, x => PreValueAsDictionary(x)) } };
             }
 
+            private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)
+            {
+                return new Dictionary<string, object> { { "value", preValue.Value }, { "sortOrder", preValue.SortOrder } };
+            }
             /// <summary>
             /// Take the posted values and convert them to a semi-colon separated list so that its backwards compatible
             /// </summary>
