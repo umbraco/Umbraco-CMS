@@ -20,6 +20,7 @@ using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
+using Umbraco.Web;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Node = umbraco.NodeFactory.Node;
 using Umbraco.Core;
@@ -96,13 +97,13 @@ namespace umbraco
         {
             get
             {
-                if (HttpContext.Current == null)
+                if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
                     return XmlContentInternal;
-                var content = HttpContext.Current.Items[XmlContextContentItemKey] as XmlDocument;
+                var content = UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] as XmlDocument;
                 if (content == null)
                 {
                     content = XmlContentInternal;
-                    HttpContext.Current.Items[XmlContextContentItemKey] = content;
+                    UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] = content;
                 }
                 return content;
             }
@@ -827,24 +828,27 @@ namespace umbraco
 		/// </summary>
 		internal void RemoveXmlFilePersistenceQueue()
 		{
-			HttpContext.Current.Application.Lock();
-			HttpContext.Current.Application[PersistenceFlagContextKey] = null;
-			HttpContext.Current.Application.UnLock();
+		    if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
+		    {
+                UmbracoContext.Current.HttpContext.Application.Lock();
+                UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] = null;
+                UmbracoContext.Current.HttpContext.Application.UnLock();   
+		    }			
 		}
 
         internal bool IsXmlQueuedForPersistenceToFile
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
                 {
-                    bool val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
+                    bool val = UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] != null;
                     if (val)
                     {
                         DateTime persistenceTime = DateTime.MinValue;
                         try
                         {
-                            persistenceTime = (DateTime)HttpContext.Current.Application[PersistenceFlagContextKey];
+                            persistenceTime = (DateTime)UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey];
                             if (persistenceTime > GetCacheFileUpdateTime())
                             {
                                 return true;
@@ -893,8 +897,8 @@ namespace umbraco
         private void ClearContextCache()
         {
             // If running in a context very important to reset context cache orelse new nodes are missing
-            if (HttpContext.Current != null && HttpContext.Current.Items.Contains(XmlContextContentItemKey))
-                HttpContext.Current.Items.Remove(XmlContextContentItemKey);
+            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
+                UmbracoContext.Current.HttpContext.Items.Remove(XmlContextContentItemKey);
         }
 
         /// <summary>
@@ -1192,20 +1196,20 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             //if this is called outside a web request we cannot queue it it will run in the current thread.
             
-            if (HttpContext.Current != null)
+            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
             {
-                HttpContext.Current.Application.Lock();
+                UmbracoContext.Current.HttpContext.Application.Lock();
                 try
                 {
-                    if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
+                    if (UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] != null)
                     {
-                        HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
+                        UmbracoContext.Current.HttpContext.Application.Add(PersistenceFlagContextKey, null);
                     }
-                    HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
+                    UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
                 }
                 finally
                 {
-                    HttpContext.Current.Application.UnLock();    
+                    UmbracoContext.Current.HttpContext.Application.UnLock();    
                 }
             }          
             else
