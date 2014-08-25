@@ -43,9 +43,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         public static string GetAuthHeaderTokenVal(ApplicationContext appContext)
         {
-            int numberOfUsers;
-            var users = appContext.Services.UserService.GetAll(0, 25, out numberOfUsers);
-            var admin = users.FirstOrDefault(u => u.UserType.Alias == "admin" && u.RawPasswordValue != string.Empty && u.RawPasswordValue.InvariantEquals("default") == false);
+            var admin = appContext.Services.UserService.GetUserById(0);
 
             if (admin == null) 
                 return string.Empty;
