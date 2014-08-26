@@ -322,8 +322,16 @@ namespace umbraco
             }
         }
 
-        public static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
+        public static XmlNode TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode, XmlDocument Document)
         {
+            if(UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema == false)
+            {
+                //If we're using the new XML, the node name is the content type alias.
+                //The content type can be changed, so we need to make sure we update the node name as well
+               
+                PublishedNode = Document.CreateElement(DocumentNode.Name);
+            }
+
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
             string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
@@ -339,6 +347,9 @@ namespace umbraco
                 XmlNode newDatael = PublishedNode.OwnerDocument.ImportNode(el, true);
                 PublishedNode.AppendChild(newDatael);
             }
+
+            return PublishedNode;
+            
         }
 
         /// <summary>
@@ -415,8 +426,11 @@ namespace umbraco
                     var currParentId = currentNode.AttributeValue<int>("parentID");
 
                     //update the node with it's new values
-                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
-
+                    //We're replacing the node, as it is impossible to update the node name on an existing node
+                    //which is neccesary for Change document type to work
+                    var newNode = TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode, xmlContentCopy);
+                    parentNode.ReplaceChild(newNode, currentNode);
+                    currentNode = newNode;
                     //If the node is being moved we also need to ensure that it exists under the new parent!
                     // http://issues.umbraco.org/issue/U4-2312
                     // we were never checking this before and instead simply changing the parentId value but not 
