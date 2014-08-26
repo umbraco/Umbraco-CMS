@@ -1,0 +1,84 @@
+<h1><code ng:non-bindable="">authResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-authresource-page"><p>This Resource perfomrs actions to common authentication tasks for the Umbraco backoffice user</p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$q">$q</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$http">$http</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/umbRequestHelper">umbRequestHelper</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/angularHelper">angularHelper</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_getcurrentuser">getCurrentUser()</h3>
+<div class="getcurrentuser"><div class="umbraco-resources-authresource-getcurrentuser-page"><p>Sends a request to the server to get the current user details, will return a 401 if the user is not logged in</p>
+<h5 id="methods_getcurrentuser_usage">usage</h5>
+<pre class="prettyprint linenums">
+authResource.getCurrentUser()
+   .then(function(data) {
+       //Do stuff for fetching the current logged in Umbraco backoffice user
+   });
+</pre>
+</div><h5 id="methods_getcurrentuser_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-authresource-getcurrentuser-page"><p>resourcePromise object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getremainingtimeoutseconds">getRemainingTimeoutSeconds()</h3>
+<div class="getremainingtimeoutseconds"><div class="umbraco-resources-authresource-getremainingtimeoutseconds-page"><p>Gets the user&#39;s remaining seconds before their login times out</p>
+<h5 id="methods_getremainingtimeoutseconds_usage">usage</h5>
+<pre class="prettyprint linenums">
+authResource.getRemainingTimeoutSeconds()
+   .then(function(data) {
+       //Number of seconds is returned
+   });
+</pre>
+</div><h5 id="methods_getremainingtimeoutseconds_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-authresource-getremainingtimeoutseconds-page"><p>resourcePromise object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_isauthenticated">isAuthenticated()</h3>
+<div class="isauthenticated"><div class="umbraco-resources-authresource-isauthenticated-page"><p>Checks if the user is logged in or not - does not return 401 or 403</p>
+<h5 id="methods_isauthenticated_usage">usage</h5>
+<pre class="prettyprint linenums">
+authResource.isAuthenticated()
+   .then(function(data) {
+       //Do stuff to check if user is authenticated
+   });
+</pre>
+</div><h5 id="methods_isauthenticated_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-authresource-isauthenticated-page"><p>resourcePromise object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_performlogin">performLogin(login, password)</h3>
+<div class="performlogin"><div class="umbraco-resources-authresource-performlogin-page"><p>Logs the Umbraco backoffice user in if the credentials are good</p>
+<h5 id="methods_performlogin_usage">usage</h5>
+<pre class="prettyprint linenums">
+authResource.performLogin(login, password)
+   .then(function(data) {
+       //Do stuff for login...
+   });
+</pre> </p>
+</div><h5 id="methods_performlogin_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>login</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-authresource-performlogin-page"><p>Username of backoffice user</p>
+</div></td></tr><tr><td>password</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-authresource-performlogin-page"><p>Password of backoffice user</p>
+</div></td></tr></tbody></table><h5 id="methods_performlogin_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-authresource-performlogin-page"><p>resourcePromise object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_performlogout">performLogout()</h3>
+<div class="performlogout"><div class="umbraco-resources-authresource-performlogout-page"><p>Logs out the Umbraco backoffice user</p>
+<h5 id="methods_performlogout_usage">usage</h5>
+<pre class="prettyprint linenums">
+authResource.performLogout()
+   .then(function(data) {
+       //Do stuff for logging out...
+   });
+</pre>
+</div><h5 id="methods_performlogout_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-authresource-performlogout-page"><p>resourcePromise object</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

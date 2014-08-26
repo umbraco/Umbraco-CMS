@@ -1,0 +1,82 @@
+<h1><code ng:non-bindable="">memberResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-memberresource-page"><p>Loads in data for members</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_deletebykey">deleteByKey(key)</h3>
+<div class="deletebykey"><div class="umbraco-resources-memberresource-deletebykey-page"><p>Deletes a member item with a given key</p>
+<h5 id="methods_deletebykey_usage">usage</h5>
+<pre class="prettyprint linenums">
+memberResource.deleteByKey("0000-0000-000-00000-000")
+   .then(function() {
+       alert('its gone!');
+   });
+</pre> </p>
+</div><h5 id="methods_deletebykey_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>key</td><td><a href="" class="label type-hint type-hint-guid">Guid</a></td><td><div class="umbraco-resources-memberresource-deletebykey-page"><p>id of member item to delete</p>
+</div></td></tr></tbody></table><h5 id="methods_deletebykey_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-memberresource-deletebykey-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbykey">getByKey(key)</h3>
+<div class="getbykey"><div class="umbraco-resources-memberresource-getbykey-page"><p>Gets a member item with a given key</p>
+<h5 id="methods_getbykey_usage">usage</h5>
+<pre class="prettyprint linenums">
+memberResource.getByKey("0000-0000-000-00000-000")
+   .then(function(member) {
+       var mymember = member; 
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbykey_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>key</td><td><a href="" class="label type-hint type-hint-guid">Guid</a></td><td><div class="umbraco-resources-memberresource-getbykey-page"><p>key of member item to return</p>
+</div></td></tr></tbody></table><h5 id="methods_getbykey_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-memberresource-getbykey-page"><p>resourcePromise object containing the member item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getscaffold">getScaffold(alias)</h3>
+<div class="getscaffold"><div class="umbraco-resources-memberresource-getscaffold-page"><p>Returns a scaffold of an empty member item, given the id of the member item to place it underneath and the member type alias.</p>
+<ul>
+<li>Member Type alias must be provided so umbraco knows which properties to put on the member scaffold </li>
+</ul>
+<p>The scaffold is used to build editors for member that has not yet been populated with data.</p>
+<h5 id="methods_getscaffold_usage">usage</h5>
+<pre class="prettyprint linenums">
+memberResource.getScaffold('client')
+.then(function(scaffold) {
+var myDoc = scaffold;
+myDoc.name = "My new member item"; 
+
+memberResource.save(myDoc, true)
+    .then(function(member){
+        alert("Retrieved, updated and saved again");
+    });
+});
+</pre> </p>
+</div><h5 id="methods_getscaffold_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>alias</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-memberresource-getscaffold-page"><p>membertype alias to base the scaffold on</p>
+</div></td></tr></tbody></table><h5 id="methods_getscaffold_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-memberresource-getscaffold-page"><p>resourcePromise object containing the member scaffold.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_save">save(media, isNew, files)</h3>
+<div class="save"><div class="umbraco-resources-memberresource-save-page"><p>Saves changes made to a member, if the member is new, the isNew paramater must be passed to force creation
+if the member needs to have files attached, they must be provided as the files param and passed seperately </p>
+<h5 id="methods_save_usage">usage</h5>
+<pre class="prettyprint linenums">
+memberResource.getBykey("23234-sd8djsd-3h8d3j-sdh8d")
+   .then(function(member) {
+         member.name = "Bob";
+         memberResource.save(member, false)
+           .then(function(member){
+               alert("Retrieved, updated and saved again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_save_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>media</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-memberresource-save-page"><p>The member item object with changes applied</p>
+</div></td></tr><tr><td>isNew</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-resources-memberresource-save-page"><p>set to true to create a new item or to update an existing</p>
+</div></td></tr><tr><td>files</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-memberresource-save-page"><p>collection of files for the media item</p>
+</div></td></tr></tbody></table><h5 id="methods_save_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-memberresource-save-page"><p>resourcePromise object containing the saved media item.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

@@ -1,0 +1,23 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="running-umbraco-7-page"><h3 id="overview">Overview</h3>
+<p>This document explains how you can run Umbraco from one of our nightly builds on Windows.</p>
+<p>You must have either IIS, IISExpress and/or WebMatrix installed</p>
+<h3 id="getting-the-build">Getting the build</h3>
+<p>Our buildserver runs every morning at 9 danish time, and each day it produces 3 zip files with the latest changes compiled and ready to run.</p>
+<p>The umbraco 7 nightly builds can be downloaded from <a href="nightly.umbraco.org"><a href="http://nightly.umbraco.org/umbraco%207.0.0/">http://nightly.umbraco.org/umbraco%207.0.0/</a></a></p>
+<p>As you can see, there are different types of builds: </p>
+<ul>
+<li>UmbracoCms.7.0.0-build.##.zip</li>
+<li>UmbracoCms.AllBinaries.7.0.0.build.##.zip</li>
+<li>UmbracoCms.WebPi.7.0.0.build.##.zip</li>
+</ul>
+<p>The first one contains the full website, ready to run in IIS, the AllBinaries one only contains the comiled .dll&#39;s and finally WebPi is for installing through microsoft platform installer. </p>
+<p>You should download the latest of the first kind. </p>
+<h3 id="unzipping-and-installing">Unzipping and installing</h3>
+<p>When downloaded, <em>Remember</em> to right-click the file, choose properties and select <em>Unblock file</em> </p>
+<p>UnZip and setup IIS/IISExpress to run the site from this folder, or if you have webmatrix installed, right click it and choose &quot;run as website from webmatrix&quot;</p>
+<p>During install, you can choose between Sql Server and Sql CE, both versions work, with CE being perfectly fine for local developement on machines where you dont want to bother with SQL Server. </p>
+</div></div>

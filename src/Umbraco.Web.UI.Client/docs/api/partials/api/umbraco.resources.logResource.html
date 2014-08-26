@@ -1,0 +1,53 @@
+<h1><code ng:non-bindable="">logResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-logresource-page"><p>Retrives log history from umbraco</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_getentitylog">getEntityLog(id)</h3>
+<div class="getentitylog"><div class="umbraco-resources-logresource-getentitylog-page"><p>Gets the log history for a give entity id</p>
+<h5 id="methods_getentitylog_usage">usage</h5>
+<pre class="prettyprint linenums">
+logResource.getEntityLog(1234)
+   .then(function(log) {
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getentitylog_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-logresource-getentitylog-page"><p>id of entity to return log history</p>
+</div></td></tr></tbody></table><h5 id="methods_getentitylog_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-logresource-getentitylog-page"><p>resourcePromise object containing the log.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getlog">getLog(type, since)</h3>
+<div class="getlog"><div class="umbraco-resources-logresource-getlog-page"><p>Gets the log history for a given type of log entry</p>
+<h5 id="methods_getlog_usage">usage</h5>
+<pre class="prettyprint linenums">
+logResource.getLog("save", new Date())
+   .then(function(log) {
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getlog_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-logresource-getlog-page"><p>logtype to query for</p>
+</div></td></tr><tr><td>since</td><td><a href="" class="label type-hint type-hint-datetime">DateTime</a></td><td><div class="umbraco-resources-logresource-getlog-page"><p>query the log back to this date, by defalt 7 days ago</p>
+</div></td></tr></tbody></table><h5 id="methods_getlog_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-logresource-getlog-page"><p>resourcePromise object containing the log.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getuserlog">getUserLog(type, since)</h3>
+<div class="getuserlog"><div class="umbraco-resources-logresource-getuserlog-page"><p>Gets the current users&#39; log history for a given type of log entry</p>
+<h5 id="methods_getuserlog_usage">usage</h5>
+<pre class="prettyprint linenums">
+logResource.getUserLog("save", new Date())
+   .then(function(log) {
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getuserlog_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-logresource-getuserlog-page"><p>logtype to query for</p>
+</div></td></tr><tr><td>since</td><td><a href="" class="label type-hint type-hint-datetime">DateTime</a></td><td><div class="umbraco-resources-logresource-getuserlog-page"><p>query the log back to this date, by defalt 7 days ago</p>
+</div></td></tr></tbody></table><h5 id="methods_getuserlog_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-logresource-getuserlog-page"><p>resourcePromise object containing the log.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

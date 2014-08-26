@@ -1,0 +1,69 @@
+<h1><code ng:non-bindable="">appState</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-appstate-page"><p>Tracks the various application state variables when working in the back office, raises events when state changes.</p>
+<h4 id="description_samples">Samples</h4>
+<h6 id="description_samples_subscribe-to-global-state-changes">Subscribe to global state changes:</h6>
+<pre class="prettyprint linenums">
+   scope.showTree = appState.getGlobalState("showNavigation");
+
+   eventsService.on("appState.globalState.changed", function (e, args) {
+              if (args.key === "showNavigation") {
+                  scope.showTree = args.value;
+              }
+          });  
+</pre>
+<h6 id="description_samples_subscribe-to-section-state-changes">Subscribe to section-state changes</h6>
+<pre class="prettyprint linenums">
+   scope.currentSection = appState.getSectionState("currentSection");
+
+   eventsService.on("appState.sectionState.changed", function (e, args) {
+              if (args.key === "currentSection") {
+                  scope.currentSection = args.value;
+              }
+          });  
+</pre>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_getglobalstate">getGlobalState()</h3>
+<div class="getglobalstate"><div class="umbraco-services-angularhelper-getglobalstate-page"><p>Returns the current global state value by key - we do not return an object reference here - we do NOT want this
+to be publicly mutable and allow setting arbitrary values</p>
+</div></div>
+</li>
+<li><h3 id="methods_getmenustate">getMenuState()</h3>
+<div class="getmenustate"><div class="umbraco-services-angularhelper-getmenustate-page"><p>Returns the current menu state value by key - we do not return an object here - we do NOT want this
+to be publicly mutable and allow setting arbitrary values</p>
+</div></div>
+</li>
+<li><h3 id="methods_getsectionstate">getSectionState()</h3>
+<div class="getsectionstate"><div class="umbraco-services-angularhelper-getsectionstate-page"><p>Returns the current section state value by key - we do not return an object here - we do NOT want this
+to be publicly mutable and allow setting arbitrary values</p>
+</div></div>
+</li>
+<li><h3 id="methods_gettreestate">getTreeState()</h3>
+<div class="gettreestate"><div class="umbraco-services-angularhelper-gettreestate-page"><p>Returns the current tree state value by key - we do not return an object here - we do NOT want this
+to be publicly mutable and allow setting arbitrary values</p>
+</div></div>
+</li>
+<li><h3 id="methods_setglobalstate">setGlobalState()</h3>
+<div class="setglobalstate"><div class="umbraco-services-angularhelper-setglobalstate-page"><p>Sets a global state value by key</p>
+</div></div>
+</li>
+<li><h3 id="methods_setmenustate">setMenuState()</h3>
+<div class="setmenustate"><div class="umbraco-services-angularhelper-setmenustate-page"><p>Sets a section state value by key</p>
+</div></div>
+</li>
+<li><h3 id="methods_setsectionstate">setSectionState()</h3>
+<div class="setsectionstate"><div class="umbraco-services-angularhelper-setsectionstate-page"><p>Sets a section state value by key</p>
+</div></div>
+</li>
+<li><h3 id="methods_settreestate">setTreeState()</h3>
+<div class="settreestate"><div class="umbraco-services-angularhelper-settreestate-page"><p>Sets a section state value by key</p>
+</div></div>
+</li>
+</ul>
+</div>
+</div>

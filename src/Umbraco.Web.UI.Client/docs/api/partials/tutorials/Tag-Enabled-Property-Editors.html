@@ -1,0 +1,43 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="adding-tag-support-to-property-editors-page"><h3 id="what-is-tag-support">What is tag support?</h3>
+<p>This document will explain how to add tagging support to property editors and what tagging support means. A property editor that has tag support enabled means 
+that any time a document is published (or saved in the case of media/members) that has a property editor with tagging support, the tags the are exposed
+by these property editors will be saved into the tag table in the database and associated with the corresponding document property. This then allows you 
+to query or render content based on tags on the front-end.</p>
+<p><em>NOTE: The documentation for querying tag data is coming soon....</em></p>
+<h3 id="enabling-tag-support">Enabling tag support</h3>
+<p>This will explain both ways to enable tag support for property editors: both in c# or by the manifest.</p>
+<h4 id="enabling-tag-support_csharp">CSharp</h4>
+<p>Like creating a normal c# property editor you start by declaring a class with the PropertyEditor attribute:</p>
+<pre><code>[PropertyEditor(&quot;tags&quot;, &quot;Tags&quot;, &quot;tags&quot;)]
+public class TagsPropertyEditor : PropertyEditor
+{
+}</code></pre>
+<p>To add tag support, we simply add the SupportsTags attribute:</p>
+<pre><code>[SupportTags]
+[PropertyEditor(Constants.PropertyEditors.TagsAlias, &quot;Tags&quot;, &quot;readonlyvalue&quot;)]
+public class TagsPropertyEditor : PropertyEditor
+{
+}</code></pre>
+<p>There are a few options for the <code>SupportsTag</code> attribute but normally the default options will suffice. 
+The default options are:</p>
+<ul>
+<li>Requires that the property editor value is a comma delimited string value</li>
+<li>Will replace the current property&#39;s tags in the tags database table with the ones in the value</li>
+<li>Will add all tags as part of the &#39;default&#39; tag group in the database table</li>
+</ul>
+<p>These options can all be changed on the attribute, you can specify a different delimiter, you can specify whether to replace or append the tags associated with the property and you can specify a different tag group.</p>
+<p>There is one last option that can be set which is the <code>TagValueType</code> enum, the values can be:</p>
+<ul>
+<li><code>FromDelimitedValue</code> - this is the default</li>
+<li><code>CustomTagList</code> - if this is used then it is expected that the property editor&#39;s value (returned from the method <code>ConvertEditorToDb</code>) is an <code>IEnumerable&lt;string&gt;</code><ul>
+<li>This setting might be handy if you need to dynamically (in c#) generate the tags list</li>
+</ul>
+</li>
+</ul>
+<h4 id="enabling-tag-support_manifest">Manifest</h4>
+<p><em>Coming soon!</em></p>
+</div></div>

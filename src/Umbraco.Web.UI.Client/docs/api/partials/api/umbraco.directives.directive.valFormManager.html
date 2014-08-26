@@ -1,0 +1,21 @@
+<h1><code ng:non-bindable="">valFormManager</code>
+<div><span class="hint">directive in module <code ng:non-bindable="">umbraco.directives</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-directives-directive-page umbraco-directives-directive-valformmanager-page"><p>Used to broadcast an event to all elements inside this one to notify that form validation has
+changed. If we don&#39;t use this that means you have to put a watch for each directive on a form&#39;s validation
+changing which would result in much higher processing. We need to actually watch the whole $error collection of a form
+because just watching $valid or $invalid doesn&#39;t acurrately trigger form validation changing.
+This also sets the show-validation (or a custom) css class on the element when the form is invalid - this lets
+us css target elements to be displayed when the form is submitting/submitted.
+Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
+be marked with the &#39;error&#39; css class. This ensures that labels included in that control group are styled correctly.</p>
+</div></div>
+<h2 id="usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY val-form-manager&gt;
+   ...
+&lt;/ANY&gt;</pre>
+</div>
+</div>

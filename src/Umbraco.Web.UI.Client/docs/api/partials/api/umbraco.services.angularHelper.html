@@ -1,0 +1,38 @@
+<h1><code ng:non-bindable="">angularHelper</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-angularhelper-page"><p>Some angular helper/extension methods</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_getcurrentform">getCurrentForm()</h3>
+<div class="getcurrentform"><div class="getcurrentform-page"><p>Returns the current form object applied to the scope or null if one is not found</p>
+</div></div>
+</li>
+<li><h3 id="methods_getnullform">getNullForm(formName)</h3>
+<div class="getnullform"><div class="getnullform-page"><p>Returns a null angular FormController, mostly for use in unit tests
+NOTE: This is actually the same construct as angular uses internally for creating a null form but they don&#39;t expose
+    any of this publicly to us, so we need to create our own.</p>
+</div><h5 id="methods_getnullform_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>formName</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="getnullform-page"><p>The form name to assign</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_safeapply">safeApply()</h3>
+<div class="safeapply"><div class="safeapply-page"><p>This checks if a digest/apply is already occuring, if not it will force an apply call</p>
+</div></div>
+</li>
+<li><h3 id="methods_rejectedpromise">rejectedPromise(objReject)</h3>
+<div class="rejectedpromise"><div class="umbraco-services-angularhelper-rejectedpromise-page"><p>In some situations we need to return a promise as a rejection, normally based on invalid data. This
+is a wrapper to do that so we can save on writing a bit of code.</p>
+</div><h5 id="methods_rejectedpromise_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>objReject</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-angularhelper-rejectedpromise-page"><p>The object to send back with the promise rejection</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_validatehasform">validateHasForm()</h3>
+<div class="validatehasform"><div class="validatehasform-page"><p>This will validate that the current scope has an assigned form object, if it doesn&#39;t an exception is thrown, if
+it does we return the form object.</p>
+</div></div>
+</li>
+</ul>
+</div>
+</div>

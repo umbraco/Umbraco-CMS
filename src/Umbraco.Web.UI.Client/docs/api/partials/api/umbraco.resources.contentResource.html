@@ -1,0 +1,316 @@
+<h1><code ng:non-bindable="">contentResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-contentresource-page"><p>Handles all transactions of content data
+from the angular application to the Umbraco database, using the Content WebApi controller</p>
+<p>all methods returns a resource promise async, so all operations won&#39;t complete untill .then() is completed.</p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$q">$q</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$http">$http</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/umbDataFormatter">umbDataFormatter</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/umbRequestHelper">umbRequestHelper</a></code>
+<div class="umbraco-resources-contentresource-page"><h4 id="dependencies_usage">usage</h4>
+<p>To use, simply inject the contentResource into any controller or service that needs it, and make
+sure the umbraco.resources module is accesible - which it should be by default.</p>
+<pre class="prettyprint linenums">
+   contentResource.getById(1234)
+         .then(function(data) {
+             $scope.content = data;
+         });    
+</pre> </p>
+</div></li>
+</ul>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_copy">copy(args)</h3>
+<div class="copy"><div class="umbraco-resources-contentresource-copy-page"><p>Copies a node underneath a new parentId</p>
+<h5 id="methods_copy_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.copy({ parentId: 1244, id: 123 })
+   .then(function() {
+       alert("node was copied");
+   }, function(err){
+     alert("node wasnt copy:" + err.data.Message); 
+   });
+</pre> </p>
+</div><h5 id="methods_copy_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-copy-page"><p>arguments object</p>
+</div></td></tr><tr><td>args.id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-copy-page"><p>the ID of the node to copy</p>
+</div></td></tr><tr><td>args.parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-copy-page"><p>the ID of the parent node to copy to</p>
+</div></td></tr><tr><td>args.relateToOriginal</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-resources-contentresource-copy-page"><p>if true, relates the copy to the original through the relation api</p>
+</div></td></tr></tbody></table><h5 id="methods_copy_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-copy-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_deletebyid">deleteById(id)</h3>
+<div class="deletebyid"><div class="umbraco-resources-contentresource-deletebyid-page"><p>Deletes a content item with a given id</p>
+<h5 id="methods_deletebyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.deleteById(1234)
+   .then(function() {
+       alert('its gone!');
+   });
+</pre> </p>
+</div><h5 id="methods_deletebyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-deletebyid-page"><p>id of content item to delete</p>
+</div></td></tr></tbody></table><h5 id="methods_deletebyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-deletebyid-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_emptyrecyclebin">emptyRecycleBin()</h3>
+<div class="emptyrecyclebin"><div class="umbraco-resources-contentresource-emptyrecyclebin-page"><p>Empties the content recycle bin</p>
+<h5 id="methods_emptyrecyclebin_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.emptyRecycleBin()
+   .then(function() {
+       alert('its empty!');
+   });
+</pre> </p>
+</div><h5 id="methods_emptyrecyclebin_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-emptyrecyclebin-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyid">getById(id)</h3>
+<div class="getbyid"><div class="umbraco-resources-contentresource-getbyid-page"><p>Gets a content item with a given id</p>
+<h5 id="methods_getbyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getById(1234)
+   .then(function(content) {
+       var myDoc = content; 
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-getbyid-page"><p>id of content item to return</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-getbyid-page"><p>resourcePromise object containing the content item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyids">getByIds(ids)</h3>
+<div class="getbyids"><div class="umbraco-resources-contentresource-getbyids-page"><p>Gets an array of content items, given a collection of ids</p>
+<h5 id="methods_getbyids_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getByIds( [1234,2526,28262])
+   .then(function(contentArray) {
+       var myDoc = contentArray; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyids_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>ids</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-contentresource-getbyids-page"><p>ids of content items to return as an array</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyids_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-getbyids-page"><p>resourcePromise object containing the content items array.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getchildren">getChildren(parentid, options)</h3>
+<div class="getchildren"><div class="umbraco-resources-contentresource-getchildren-page"><p>Gets children of a content item with a given id</p>
+<h5 id="methods_getchildren_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getChildren(1234, {pageSize: 10, pageNumber: 2})
+   .then(function(contentArray) {
+       var children = contentArray; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getchildren_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>parentid</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>id of content item to return children of</p>
+</div></td></tr><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>optional options object</p>
+</div></td></tr><tr><td>options.pageSize</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>if paging data, number of nodes per page, default = 0</p>
+</div></td></tr><tr><td>options.pageNumber</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>if paging data, current page index, default = 0</p>
+</div></td></tr><tr><td>options.filter</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>if provided, query will only return those with names matching the filter</p>
+</div></td></tr><tr><td>options.orderDirection</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>can be <code>Ascending</code> or <code>Descending</code> - Default: <code>Ascending</code></p>
+</div></td></tr><tr><td>options.orderBy</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>property to order items by, default: <code>SortOrder</code></p>
+</div></td></tr></tbody></table><h5 id="methods_getchildren_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-getchildren-page"><p>resourcePromise object containing an array of content items.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getniceurl">getNiceUrl(id)</h3>
+<div class="getniceurl"><div class="umbraco-resources-contentresource-getniceurl-page"><p>Returns a url, given a node ID</p>
+<h5 id="methods_getniceurl_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getNiceUrl(id)
+   .then(function(url) {
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getniceurl_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-getniceurl-page"><p>Id of node to return the public url to</p>
+</div></td></tr></tbody></table><h5 id="methods_getniceurl_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-getniceurl-page"><p>resourcePromise object containing the url.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getscaffold">getScaffold(parentId, alias)</h3>
+<div class="getscaffold"><div class="umbraco-resources-contentresource-getscaffold-page"><p>Returns a scaffold of an empty content item, given the id of the content item to place it underneath and the content type alias.</p>
+<ul>
+<li>Parent Id must be provided so umbraco knows where to store the content</li>
+<li>Content Type alias must be provided so umbraco knows which properties to put on the content scaffold </li>
+</ul>
+<p>The scaffold is used to build editors for content that has not yet been populated with data.</p>
+<h5 id="methods_getscaffold_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getScaffold(1234, 'homepage')
+   .then(function(scaffold) {
+       var myDoc = scaffold;
+       myDoc.name = "My new document"; 
+
+       contentResource.publish(myDoc, true)
+           .then(function(content){
+               alert("Retrieved, updated and published again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_getscaffold_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-getscaffold-page"><p>id of content item to return</p>
+</div></td></tr><tr><td>alias</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-contentresource-getscaffold-page"><p>contenttype alias to base the scaffold on</p>
+</div></td></tr></tbody></table><h5 id="methods_getscaffold_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-getscaffold-page"><p>resourcePromise object containing the content scaffold.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getscaffold">getScaffold()</h3>
+<div class="getscaffold"><div class="umbraco-resources-contentresource-getscaffold-page"><p>Returns a scaffold of an empty data type item</p>
+<p>The scaffold is used to build editors for data types that has not yet been populated with data.</p>
+<h5 id="methods_getscaffold_usage">usage</h5>
+<pre class="prettyprint linenums">
+dataTypeResource.getScaffold()
+   .then(function(scaffold) {
+       var myType = scaffold;
+       myType.name = "My new data type"; 
+
+       dataTypeResource.save(myType, myType.preValues, true)
+           .then(function(type){
+               alert("Retrieved, updated and saved again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_getscaffold_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-getscaffold-page"><p>resourcePromise object containing the data type scaffold.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_haspermission">hasPermission(permission, id)</h3>
+<div class="haspermission"><div class="umbraco-resources-contentresource-haspermission-page"><p>Returns true/false given a permission char to check against a nodeID
+for the current user</p>
+<h5 id="methods_haspermission_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.hasPermission('p',1234)
+   .then(function() {
+       alert('You are allowed to publish this item');
+   });
+</pre> </p>
+</div><h5 id="methods_haspermission_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>permission</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-contentresource-haspermission-page"><p>char representing the permission to check</p>
+</div></td></tr><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-haspermission-page"><p>id of content item to delete</p>
+</div></td></tr></tbody></table><h5 id="methods_haspermission_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-haspermission-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_move">move(args)</h3>
+<div class="move"><div class="umbraco-resources-contentresource-move-page"><p>Moves a node underneath a new parentId</p>
+<h5 id="methods_move_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.move({ parentId: 1244, id: 123 })
+   .then(function() {
+       alert("node was moved");
+   }, function(err){
+     alert("node didnt move:" + err.data.Message); 
+   });
+</pre> </p>
+</div><h5 id="methods_move_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-move-page"><p>arguments object</p>
+</div></td></tr><tr><td>args.idd</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-move-page"><p>the ID of the node to move</p>
+</div></td></tr><tr><td>args.parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-move-page"><p>the ID of the parent node to move to</p>
+</div></td></tr></tbody></table><h5 id="methods_move_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-move-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_publish">publish(content, isNew, files)</h3>
+<div class="publish"><div class="umbraco-resources-contentresource-publish-page"><p>Saves and publishes changes made to a content item to a new version, if the content item is new, the isNew paramater must be passed to force creation
+if the content item needs to have files attached, they must be provided as the files param and passed seperately </p>
+<h5 id="methods_publish_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getById(1234)
+   .then(function(content) {
+         content.name = "I want a new name, and be published!";
+         contentResource.publish(content, false)
+           .then(function(content){
+               alert("Retrieved, updated and published again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_publish_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>content</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-publish-page"><p>The content item object with changes applied</p>
+</div></td></tr><tr><td>isNew</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-resources-contentresource-publish-page"><p>set to true to create a new item or to update an existing</p>
+</div></td></tr><tr><td>files</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-contentresource-publish-page"><p>collection of files for the document</p>
+</div></td></tr></tbody></table><h5 id="methods_publish_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-publish-page"><p>resourcePromise object containing the saved content item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_publishbyid">publishByid(id)</h3>
+<div class="publishbyid"><div class="umbraco-resources-contentresource-publishbyid-page"><p>Publishes a content item with a given ID</p>
+<h5 id="methods_publishbyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.publishById(1234)
+   .then(function(content) {
+       alert("published");
+   });
+</pre> </p>
+</div><h5 id="methods_publishbyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-publishbyid-page"><p>The ID of the conten to publish</p>
+</div></td></tr></tbody></table><h5 id="methods_publishbyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-publishbyid-page"><p>resourcePromise object containing the published content item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_save">save(content, isNew, files)</h3>
+<div class="save"><div class="umbraco-resources-contentresource-save-page"><p>Saves changes made to a content item to its current version, if the content item is new, the isNew paramater must be passed to force creation
+if the content item needs to have files attached, they must be provided as the files param and passed seperately </p>
+<h5 id="methods_save_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getById(1234)
+   .then(function(content) {
+         content.name = "I want a new name!";
+         contentResource.save(content, false)
+           .then(function(content){
+               alert("Retrieved, updated and saved again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_save_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>content</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-save-page"><p>The content item object with changes applied</p>
+</div></td></tr><tr><td>isNew</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-resources-contentresource-save-page"><p>set to true to create a new item or to update an existing</p>
+</div></td></tr><tr><td>files</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-contentresource-save-page"><p>collection of files for the document</p>
+</div></td></tr></tbody></table><h5 id="methods_save_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-save-page"><p>resourcePromise object containing the saved content item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_sendtopublish">sendToPublish(content, isNew, files)</h3>
+<div class="sendtopublish"><div class="umbraco-resources-contentresource-sendtopublish-page"><p>Saves changes made to a content item, and notifies any subscribers about a pending publication</p>
+<h5 id="methods_sendtopublish_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.getById(1234)
+   .then(function(content) {
+         content.name = "I want a new name, and be published!";
+         contentResource.sendToPublish(content, false)
+           .then(function(content){
+               alert("Retrieved, updated and notication send off");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_sendtopublish_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>content</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-sendtopublish-page"><p>The content item object with changes applied</p>
+</div></td></tr><tr><td>isNew</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-resources-contentresource-sendtopublish-page"><p>set to true to create a new item or to update an existing</p>
+</div></td></tr><tr><td>files</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-contentresource-sendtopublish-page"><p>collection of files for the document</p>
+</div></td></tr></tbody></table><h5 id="methods_sendtopublish_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-sendtopublish-page"><p>resourcePromise object containing the saved content item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_sort">sort(args)</h3>
+<div class="sort"><div class="umbraco-resources-contentresource-sort-page"><p>Sorts all children below a given parent node id, based on a collection of node-ids</p>
+<h5 id="methods_sort_usage">usage</h5>
+<pre class="prettyprint linenums">
+var ids = [123,34533,2334,23434];
+contentResource.sort({ parentId: 1244, sortedIds: ids })
+   .then(function() {
+       $scope.complete = true;
+   });
+</pre> </p>
+</div><h5 id="methods_sort_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-contentresource-sort-page"><p>arguments object</p>
+</div></td></tr><tr><td>args.parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-sort-page"><p>the ID of the parent node</p>
+</div></td></tr><tr><td>options.sortedIds</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-contentresource-sort-page"><p>array of node IDs as they should be sorted</p>
+</div></td></tr></tbody></table><h5 id="methods_sort_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-sort-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_unpublish">unPublish(id)</h3>
+<div class="unpublish"><div class="umbraco-resources-contentresource-unpublish-page"><p>Unpublishes a content item with a given Id</p>
+<h5 id="methods_unpublish_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentResource.unPublish(1234)
+   .then(function() {
+       alert("node was unpulished");
+   }, function(err){
+     alert("node wasnt unpublished:" + err.data.Message); 
+   });
+</pre> </p>
+</div><h5 id="methods_unpublish_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contentresource-unpublish-page"><p>the ID of the node to unpublish</p>
+</div></td></tr></tbody></table><h5 id="methods_unpublish_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contentresource-unpublish-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

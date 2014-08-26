@@ -1,0 +1,47 @@
+<h1><code ng:non-bindable="">contentEditingHelper</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-contenteditinghelper-page"><p>A helper service for most editors, some methods are specific to content/media/member model types but most are used by
+all editors to share logic and reduce the amount of replicated code among editors.</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_configurebuttons">configureButtons()</h3>
+<div class="configurebuttons"><div class="umbraco-services-contenteditinghelper-configurebuttons-page"><p>Returns a letter array for buttons, with the primary one first based on content model, permissions and editor state</p>
+</div></div>
+</li>
+<li><h3 id="methods_getallprops">getAllProps()</h3>
+<div class="getallprops"><div class="umbraco-services-contenteditinghelper-getallprops-page"><p>Returns all propertes contained for the content item (since the normal model has properties contained inside of tabs)</p>
+</div></div>
+</li>
+<li><h3 id="methods_getbuttonfromaction">getButtonFromAction()</h3>
+<div class="getbuttonfromaction"><div class="umbraco-services-contenteditinghelper-getbuttonfromaction-page"><p>Returns a button object to render a button for the tabbed editor
+currently only returns built in system buttons for content and media actions
+returns label, alias, action char and hot-key</p>
+</div></div>
+</li>
+<li><h3 id="methods_handlesaveerror">handleSaveError()</h3>
+<div class="handlesaveerror"><div class="umbraco-services-contenteditinghelper-handlesaveerror-page"><p>A function to handle what happens when we have validation issues from the server side</p>
+</div></div>
+</li>
+<li><h3 id="methods_handlesuccessfulsave">handleSuccessfulSave()</h3>
+<div class="handlesuccessfulsave"><div class="umbraco-services-contenteditinghelper-handlesuccessfulsave-page"><p>A function to handle when saving a content item is successful. This will rebind the values of the model that have changed
+ensure the notifications are displayed and that the appropriate events are fired. This will also check if we need to redirect
+when we&#39;re creating new content.</p>
+</div></div>
+</li>
+<li><h3 id="methods_rebindchangedproperties">reBindChangedProperties()</h3>
+<div class="rebindchangedproperties"><div class="umbraco-services-contenteditinghelper-rebindchangedproperties-page"><p>re-binds all changed property values to the origContent object from the savedContent object and returns an array of changed properties.</p>
+</div></div>
+</li>
+<li><h3 id="methods_redirecttocreatedcontent">redirectToCreatedContent()</h3>
+<div class="redirecttocreatedcontent"><div class="umbraco-services-contenteditinghelper-redirecttocreatedcontent-page"><p>Changes the location to be editing the newly created content after create was successful.
+We need to decide if we need to redirect to edito mode or if we will remain in create mode. 
+We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name.</p>
+</div></div>
+</li>
+</ul>
+</div>
+</div>

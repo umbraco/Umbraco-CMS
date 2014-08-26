@@ -1,0 +1,69 @@
+<h1><code ng:non-bindable="">assetsService</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-assetsservice-page"><p>Promise-based utillity service to lazy-load client-side dependencies inside angular controllers.</p>
+<h4 id="description_usage">usage</h4>
+<p>To use, simply inject the assetsService into any controller that needs it, and make
+sure the umbraco.services module is accesible - which it should be by default.</p>
+<pre class="prettyprint linenums">
+     angular.module("umbraco").controller("my.controller". function(assetsService){
+         assetsService.load(["script.js", "styles.css"], $scope).then(function(){
+                //this code executes when the dependencies are done loading
+         });
+     });
+</pre> </p>
+<p>You can also load individual files, which gives you greater control over what attibutes are passed to the file, as well as timeout</p>
+<pre class="prettyprint linenums">
+     angular.module("umbraco").controller("my.controller". function(assetsService){
+         assetsService.loadJs("script.js", $scope, {charset: 'utf-8'}, 10000 }).then(function(){
+                //this code executes when the script is done loading
+         });
+     });
+</pre>
+<p>For these cases, there are 2 individual methods, one for javascript, and one for stylesheets:</p>
+<pre class="prettyprint linenums">
+     angular.module("umbraco").controller("my.controller". function(assetsService){
+         assetsService.loadCss("stye.css", $scope, {media: 'print'}, 10000 }).then(function(){
+                //loadcss cannot determine when the css is done loading, so this will trigger instantly
+         });
+     });
+</pre>  </p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$q">$q</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/angularHelper">angularHelper</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_load">load(pathArray, scope)</h3>
+<div class="load"><div class="umbraco-services-assetsservice-load-page"><p>Injects a collection of files, this can be ONLY js files</p>
+</div><h5 id="methods_load_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>pathArray</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-services-assetsservice-load-page"><p>string array of paths to the files to load</p>
+</div></td></tr><tr><td>scope</td><td><a href="" class="label type-hint type-hint-scope">Scope</a></td><td><div class="umbraco-services-assetsservice-load-page"><p>optional scope to pass into the loader</p>
+</div></td></tr></tbody></table><h5 id="methods_load_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-assetsservice-load-page"><p>Promise object which resolves when all the files has loaded</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_loadcss">loadCss(path, scope, keyvalue, timeout)</h3>
+<div class="loadcss"><div class="umbraco-services-assetsservice-loadcss-page"><p>Injects a file as a stylesheet into the document head</p>
+</div><h5 id="methods_loadcss_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>path</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-assetsservice-loadcss-page"><p>path to the css file to load</p>
+</div></td></tr><tr><td>scope</td><td><a href="" class="label type-hint type-hint-scope">Scope</a></td><td><div class="umbraco-services-assetsservice-loadcss-page"><p>optional scope to pass into the loader</p>
+</div></td></tr><tr><td>keyvalue</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-assetsservice-loadcss-page"><p>collection of attributes to pass to the stylesheet element</p>
+</div></td></tr><tr><td>timeout</td><td><a href="" class="label type-hint type-hint-number">Number</a></td><td><div class="umbraco-services-assetsservice-loadcss-page"><p>in milliseconds</p>
+</div></td></tr></tbody></table><h5 id="methods_loadcss_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-assetsservice-loadcss-page"><p>Promise object which resolves when the file has loaded</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_loadjs">loadJs(path, scope, keyvalue, timeout)</h3>
+<div class="loadjs"><div class="umbraco-services-assetsservice-loadjs-page"><p>Injects a file as a javascript into the document</p>
+</div><h5 id="methods_loadjs_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>path</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-assetsservice-loadjs-page"><p>path to the js file to load</p>
+</div></td></tr><tr><td>scope</td><td><a href="" class="label type-hint type-hint-scope">Scope</a></td><td><div class="umbraco-services-assetsservice-loadjs-page"><p>optional scope to pass into the loader</p>
+</div></td></tr><tr><td>keyvalue</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-assetsservice-loadjs-page"><p>collection of attributes to pass to the script element</p>
+</div></td></tr><tr><td>timeout</td><td><a href="" class="label type-hint type-hint-number">Number</a></td><td><div class="umbraco-services-assetsservice-loadjs-page"><p>in milliseconds</p>
+</div></td></tr></tbody></table><h5 id="methods_loadjs_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-assetsservice-loadjs-page"><p>Promise object which resolves when the file has loaded</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

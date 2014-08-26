@@ -1,0 +1,52 @@
+<h1><code ng:non-bindable="">searchService</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-searchservice-page"><p>Service for handling the main application search, can currently search content, media and members</p>
+<h4 id="description_usage">usage</h4>
+<p>To use, simply inject the searchService into any controller that needs it, and make
+sure the umbraco.services module is accesible - which it should be by default.</p>
+<pre class="prettyprint linenums">
+     searchService.searchMembers({term: 'bob'}).then(function(results){
+         angular.forEach(results, function(result){
+                 //returns:
+                 {name: "name", id: 1234, menuUrl: "url", editorPath: "url", metaData: {}, subtitle: "/path/etc" }
+          })          
+          var result = 
+      }) 
+</pre> </p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_searchall">searchAll(args)</h3>
+<div class="searchall"><div class="umbraco-services-searchservice-searchall-page"><p>Searches all available indexes and returns all results in one collection</p>
+</div><h5 id="methods_searchall_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-searchservice-searchall-page"><p>argument object</p>
+</div></td></tr><tr><td>args.term</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-searchservice-searchall-page"><p>seach term</p>
+</div></td></tr></tbody></table><h5 id="methods_searchall_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-searchservice-searchall-page"><p>returns promise containing all matching items</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_searchcontent">searchContent(args)</h3>
+<div class="searchcontent"><div class="umbraco-services-searchservice-searchcontent-page"><p>Searches the default internal content search index</p>
+</div><h5 id="methods_searchcontent_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-searchservice-searchcontent-page"><p>argument object</p>
+</div></td></tr><tr><td>args.term</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-searchservice-searchcontent-page"><p>seach term</p>
+</div></td></tr></tbody></table><h5 id="methods_searchcontent_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-searchservice-searchcontent-page"><p>returns promise containing all matching content items</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_searchmedia">searchMedia(args)</h3>
+<div class="searchmedia"><div class="umbraco-services-searchservice-searchmedia-page"><p>Searches the default media search index</p>
+</div><h5 id="methods_searchmedia_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-searchservice-searchmedia-page"><p>argument object</p>
+</div></td></tr><tr><td>args.term</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-searchservice-searchmedia-page"><p>seach term</p>
+</div></td></tr></tbody></table><h5 id="methods_searchmedia_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-searchservice-searchmedia-page"><p>returns promise containing all matching media items</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_searchmembers">searchMembers(args)</h3>
+<div class="searchmembers"><div class="umbraco-services-searchservice-searchmembers-page"><p>Searches the default member search index</p>
+</div><h5 id="methods_searchmembers_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-searchservice-searchmembers-page"><p>argument object</p>
+</div></td></tr><tr><td>args.term</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-searchservice-searchmembers-page"><p>seach term</p>
+</div></td></tr></tbody></table><h5 id="methods_searchmembers_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-services-searchservice-searchmembers-page"><p>returns promise containing all matching members</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>
