@@ -1,0 +1,57 @@
+<h1><code ng:non-bindable="">historyService</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-historyservice-page"><p>Service to handle the main application navigation history. Responsible for keeping track
+of where a user navigates to, stores an icon, url and name in a collection, to make it easy
+for the user to go back to a previous editor / action</p>
+<p><strong>Note:</strong> only works with new angular-based editors, not legacy ones</p>
+<h4 id="description_usage">usage</h4>
+<p>To use, simply inject the historyService into any controller that needs it, and make
+sure the umbraco.services module is accesible - which it should be by default.</p>
+<pre class="prettyprint linenums">
+     angular.module("umbraco").controller("my.controller". function(historyService){
+        historyService.add({
+							icon: "icon-class",
+							name: "Editing 'articles',
+							link: "/content/edit/1234"}
+						);
+     }); 
+</pre> </p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$rootScope">$rootScope</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$timeout">$timeout</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/angularHelper">angularHelper</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_add">add(item)</h3>
+<div class="add"><div class="umbraco-services-historyservice-add-page"><p>Adds a given history item to the users history collection.</p>
+</div><h5 id="methods_add_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>item</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-historyservice-add-page"><p>the history item</p>
+</div></td></tr><tr><td>item.icon</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-historyservice-add-page"><p>icon css class for the list, ex: &quot;icon-image&quot;, &quot;icon-doc&quot;</p>
+</div></td></tr><tr><td>item.link</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-historyservice-add-page"><p>route to the editor, ex: &quot;/content/edit/1234&quot;</p>
+</div></td></tr><tr><td>item.name</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-historyservice-add-page"><p>friendly name for the history listing</p>
+</div></td></tr></tbody></table><h5 id="methods_add_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-historyservice-add-page"><p>history item object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getcurrent">getCurrent()</h3>
+<div class="getcurrent"><div class="umbraco-services-historyservice-getcurrent-page"><p>Method to return the current history collection.</p>
+</div></div>
+</li>
+<li><h3 id="methods_remove">remove(index)</h3>
+<div class="remove"><div class="umbraco-services-historyservice-remove-page"><p>Removes a history item from the users history collection, given an index to remove from.</p>
+</div><h5 id="methods_remove_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>index</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-services-historyservice-remove-page"><p>index to remove item from</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_removeall">removeAll()</h3>
+<div class="removeall"><div class="umbraco-services-historyservice-removeall-page"><p>Removes all history items from the users history collection</p>
+</div></div>
+</li>
+</ul>
+</div>
+</div>

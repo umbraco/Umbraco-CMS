@@ -1,0 +1,61 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="integrating-services-with-a-property-editor-page"><h3 id="overview">Overview</h3>
+<p>This is step 3 in the property editor tutorial. In this part we will intergrate one of the built-in 
+umbraco services. For this sample we will use the dialog service to hook into the media picker and return image data to the markdown editor. </p>
+<h3 id="injecting-the-service">Injecting the service.</h3>
+<p>First up, we need to get access to the service, this is done in the constructor of the controller, where we add it as a parameter:</p>
+<pre><code>angular.module(&quot;umbraco&quot;)
+    .controller(&quot;My.MarkdownEditorController&quot;,
+    //inject umbracos assetsServce and dialog service
+    function ($scope,assetsService, dialogService) { ... }</code></pre>
+<p>this works the same way as with the assetsService we added in step 1.</p>
+<h3 id="hooking-into-pagedown">Hooking into pagedown</h3>
+<p>The pagedown editor we are using, has a nice event system inplace, so we can easily hook into the events triggered by the media chooser, by adding a hook, after the editor has started:</p>
+<pre><code>//Start the editor    
+var converter2 = new Markdown.Converter();
+var editor2 = new Markdown.Editor(converter2, &quot;-&quot; + $scope.model.alias);
+editor2.run();
+
+//subscribe to the image dialog clicks
+editor2.hooks.set(&quot;insertImageDialog&quot;, function (callback) {
+       //here we can intercept our own dialog handling
+
+       return true; // tell the editor that we&#39;ll take care of getting the image url
+   });
+});</code></pre>
+<p>Notice the callback, this callback is used to return whatever data we want to editor.</p>
+<p>So now that we have access to the editor events, we will trigger a media picker dialog, by using the <code>dialogService</code>. You can inject whatever html you want with this service, but it also has a number of shorthands for things like a media picker: </p>
+<pre><code>//the callback is called when the use selects images
+dialogService.mediaPicker({callback: function(data){
+                        //data.selection contains an array of images
+                        $(data.selection).each(function(i, item){
+                               //try using $log.log(item) to see what this data contains
+                        });
+                   }});</code></pre>
+<h3 id="getting-to-the-image-data">Getting to the image data</h3>
+<p>Because of Umbraco&#39;s generic nature, you don&#39;t always know where your image is, as a media object&#39;s data is basicly an array of properies, so how do you pick the right one? - you cannot always be sure the property is called <code>umbracoFile</code> for instance.</p>
+<p>For cases like this, a helper service is available: <code>imageHelper</code>. This utillity has usefull methods for getting to images embedded in property data, as well as associated thumbnails. <strong>Remember to</strong> inject this imageHelper in the controller constructor as well (same place as dialogService and assetsService).</p>
+<p>So we get the image page from the selected media item, and return it through the callback: </p>
+<pre><code>var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: item, scope: $scope });
+callback(imagePropVal);</code></pre>
+<p>Now when we run the markdown editor and click the image button, we are presented with a native umbraco dialog, listing the standard media archive. </p>
+<p>Clicking an image and choosing select returns the image to the editor which then renders it as:</p>
+<pre><code>![Koala picture][1]
+
+  [1]: /media/1005/Koala.jpg</code></pre>
+<p>The above is correct markdown code, representing the image, and if preview is turned on, you will see the image below the editor.</p>
+<h3 id="wrap-up">Wrap up</h3>
+<p>So over the 3 previous steps, we&#39;ve:</p>
+<ul>
+<li>created a plugin</li>
+<li>defined an editor</li>
+<li>injected our own javascript libraries and 3rd party ones</li>
+<li>made the editor configurable</li>
+<li>connected the editor with native dialogs and services</li>
+<li>looked at koala pictures.</li>
+</ul>
+<p>The complete project can be found <a href="https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor">here</a>.</p>
+</div></div>

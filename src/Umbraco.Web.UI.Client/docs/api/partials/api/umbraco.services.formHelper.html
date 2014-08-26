@@ -1,0 +1,37 @@
+<h1><code ng:non-bindable="">formHelper</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-formhelper-page"><p>A utility class used to streamline how forms are developed, to ensure that validation is check and displayed consistently and to ensure that the correct events
+fire when they need to.</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_handleerror">handleError(err)</h3>
+<div class="handleerror"><div class="umbraco-services-formhelper-handleerror-page"><p>Needs to be called when a form submission fails, this will wire up all server validation errors in ModelState and
+add the correct messages to the notifications. If a server error has occurred this will show a ysod.</p>
+</div><h5 id="methods_handleerror_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>err</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-formhelper-handleerror-page"><p>The error object returned from the http promise</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_handleservervalidation">handleServerValidation(err)</h3>
+<div class="handleservervalidation"><div class="umbraco-services-formhelper-handleservervalidation-page"><p>This wires up all of the server validation model state so that valServer and valServerField directives work</p>
+</div><h5 id="methods_handleservervalidation_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>err</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-formhelper-handleservervalidation-page"><p>The error object returned from the http promise</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_submitform">submitForm(args)</h3>
+<div class="submitform"><div class="umbraco-services-formhelper-submitform-page"><p>Called by controllers when submitting a form - this ensures that all client validation is checked, 
+server validation is cleared, that the correct events execute and status messages are displayed.
+This returns true if the form is valid, otherwise false if form submission cannot continue.</p>
+</div><h5 id="methods_submitform_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-formhelper-submitform-page"><p>An object containing arguments for form submission</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_submitform">submitForm(args)</h3>
+<div class="submitform"><div class="umbraco-services-formhelper-submitform-page"><p>Called by controllers when a form has been successfully submitted. the correct events execute 
+and that the notifications are displayed if there are any.</p>
+</div><h5 id="methods_submitform_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-formhelper-submitform-page"><p>An object containing arguments for form submission</p>
+</div></td></tr></tbody></table></div>
+</li>
+</ul>
+</div>
+</div>

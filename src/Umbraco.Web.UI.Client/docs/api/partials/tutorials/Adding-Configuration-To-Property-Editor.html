@@ -1,0 +1,46 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="adding-configuration-to-a-property-editor-page"><h3 id="overview">Overview</h3>
+<p>This is step 2 in our guid to building a property editor. This step continues work on the markdown editor we build in step 1, but goes further to show you how you can add configuration options to the editor. </p>
+<h3 id="configuration">Configuration?</h3>
+<p>So, an important part of building good property editors, are to build something relatively flexible, so you can reuse it many many times, for different things. Like the rich text editor in Umbraco, that allows you to choose which buttons and stylesheets you want to use on each instance of the editor. </p>
+<p>So an editor can be used several times, with different configurations, and that is what we will be working on now. </p>
+<h3 id="packagemanifest">package.manifest</h3>
+<p>So to add configuration options to our markdown editor, open the package.manifest file. rigth below the editor definition, paste in the following: </p>
+<pre><code>prevalues: {
+    fields: [
+        {
+            label: &quot;Preview&quot;,
+            description: &quot;Display a live preview&quot;,
+            key: &quot;preview&quot;,
+            view: &quot;boolean&quot;
+        },
+        {
+            label: &quot;Default value&quot;,
+            description: &quot;If value is blank, the editor will show this&quot;,
+            key: &quot;defaultValue&quot;,
+            view: &quot;textarea&quot;
+        }
+    ]
+}</code></pre>
+<p><strong>Remember to: </strong> seperate the editor element and prevalue editor definition with a comma, or you will get a json error. </p>
+<p>So what did we just add? We added a prevalue editor, with a <code>fields</code> collection. This collection contains infomation about the UI we will render on the data type configuration for this editor. </p>
+<p>So the first gets the label &quot;Preview&quot; and uses the view &quot;boolean&quot;, so this will allow us to turn preview on/off and will provide the user with a simple checkbox. The name &quot;boolean&quot; comes from the convention that all preview editors are stored in /umbraco/views/prevalueeditors/ and then found via <code>&lt;name&gt;.html</code></p>
+<p>Same with the next one, only that it will provide the user with a textarea to input a default value for the editor. </p>
+<p>Save the manifest <strong>restart the app pool</strong> and have a look at the markdown datatype in Umbraco now. You should now see that you have 2 configuration options. </p>
+<h3 id="using-the-configuration">Using the configuration</h3>
+<p>The next step is to gain access to our new configuration options. For this, open the <code>markdowneditor.controller.js</code> file </p>
+<p>Lets first add the default value functionality. So basicly when the ´$scope.model.value` is empty or undefined, we want to use the default value, to do that, we add the following to the very beginning of the controller: </p>
+<pre><code>if($scope.model.value === null || $scope.model.value === &quot;&quot;){
+    $scope.model.value = $scope.model.config.defaultValue;
+}</code></pre>
+<p>You see whats new? - the <code>$scope.model.config</code> object is. And the other thing you will notice is that because of our configuration, we now have access to <code>$scope.model.config.defaultValue</code> which contains the configiration value for that key, its that easy to setup and use configuration values from code. </p>
+<p>However, you can also use these values without any javascript, so open the <code>markdowneditor.html</code> file instead. </p>
+<p>Because we can also use the configuration directly in our html like here, where we use it to toggle the preview <code>&lt;div&gt;</code>, using the ng-hide attribute: </p>
+<pre><code>&lt;div ng-show=&quot;model.config.preview&quot; class=&quot;wmd-panel wmd-preview&quot;&gt;</code></pre>
+<p></div></p>
+<h3 id="get-the-codes">Get the codes</h3>
+<p>The latest update to the markdowneditor project is on github where you can see all the files and the manifest <a href="https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor">here</a>.</p>
+</div></div>

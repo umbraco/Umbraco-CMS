@@ -1,0 +1,99 @@
+<h1><code ng:non-bindable="">treeService</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-treeservice-page"><p>The tree service factory, used internally by the umbTree and umbTreeItem directives</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_clearcache">clearCache(args)</h3>
+<div class="clearcache"><div class="umbraco-services-treeservice-clearcache-page"><p>Clears the tree cache - with optional cacheKey, optional section or optional filter.</p>
+</div><h5 id="methods_clearcache_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-treeservice-clearcache-page"><p>arguments</p>
+</div></td></tr><tr><td>args.cacheKey</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-treeservice-clearcache-page"><p>optional cachekey - this is used to clear specific trees in dialogs</p>
+</div></td></tr><tr><td>args.section</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-treeservice-clearcache-page"><p>optional section alias - clear tree for a given section</p>
+</div></td></tr><tr><td>args.childrenOf</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-treeservice-clearcache-page"><p>optional parent ID - only clear the cache below a specific node</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_getchildnode">getChildNode(treeNode, id)</h3>
+<div class="getchildnode"><div class="umbraco-services-treeservice-getchildnode-page"><p>Gets a child node with a given ID, from a specific treeNode</p>
+</div><h5 id="methods_getchildnode_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeNode</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-getchildnode-page"><p>to retrive child node from</p>
+</div></td></tr><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">int</a></td><td><div class="umbraco-services-treeservice-getchildnode-page"><p>id of child node</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_getchildren">getChildren(args)</h3>
+<div class="getchildren"><div class="umbraco-services-treeservice-getchildren-page"><p>Gets the children from the server for a given node </p>
+</div><h5 id="methods_getchildren_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-getchildren-page"><p>Arguments</p>
+</div></td></tr><tr><td>args.node</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-getchildren-page"><p>tree node object to retrieve the children for</p>
+</div></td></tr><tr><td>args.section</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-treeservice-getchildren-page"><p>current section alias</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_getdescendantnode">getDescendantNode(treeNode, id, treeAlias)</h3>
+<div class="getdescendantnode"><div class="umbraco-services-treeservice-getdescendantnode-page"><p>Gets a descendant node by id</p>
+</div><h5 id="methods_getdescendantnode_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeNode</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-getdescendantnode-page"><p>to retrive descendant node from</p>
+</div></td></tr><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">int</a></td><td><div class="umbraco-services-treeservice-getdescendantnode-page"><p>id of descendant node</p>
+</div></td></tr><tr><td>treeAlias</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-treeservice-getdescendantnode-page"><ul>
+<li>optional tree alias, if fetching descendant node from a child of a listview document</li>
+</ul>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_getmenu">getMenu(args)</h3>
+<div class="getmenu"><div class="umbraco-services-treeservice-getmenu-page"><p>Returns available menu actions for a given tree node</p>
+</div><h5 id="methods_getmenu_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-getmenu-page"><p>Arguments</p>
+</div></td></tr><tr><td>args.treeNode</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-treeservice-getmenu-page"><p>tree node object to retrieve the menu for</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_getpath">getPath(node)</h3>
+<div class="getpath"><div class="umbraco-services-treeservice-getpath-page"><p>This will return the current node&#39;s path by walking up the tree </p>
+</div><h5 id="methods_getpath_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>node</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-getpath-page"><p>Tree node to retrieve path for</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_gettree">getTree(args)</h3>
+<div class="gettree"><div class="umbraco-services-treeservice-gettree-page"><p>gets the tree, returns a promise </p>
+</div><h5 id="methods_gettree_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-gettree-page"><p>Arguments</p>
+</div></td></tr><tr><td>args.section</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-treeservice-gettree-page"><p>Section alias</p>
+</div></td></tr><tr><td>args.cacheKey</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-treeservice-gettree-page"><p>Optional cachekey</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_gettreealias">getTreeAlias(treeNode)</h3>
+<div class="gettreealias"><div class="umbraco-services-treeservice-gettreealias-page"><p>Gets the node&#39;s tree alias, this is done by looking up the meta-data of the current node&#39;s root node </p>
+</div><h5 id="methods_gettreealias_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeNode</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-gettreealias-page"><p>to retrive tree alias from</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_gettreepackagefolder">getTreePackageFolder(treeAlias)</h3>
+<div class="gettreepackagefolder"><div class="umbraco-services-treeservice-gettreepackagefolder-page"><p>Determines if the current tree is a plugin tree and if so returns the package folder it has declared
+so we know where to find it&#39;s views, otherwise it will just return undefined.</p>
+</div><h5 id="methods_gettreepackagefolder_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeAlias</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-treeservice-gettreepackagefolder-page"><p>The tree alias to check</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_gettreeroot">getTreeRoot(treeNode)</h3>
+<div class="gettreeroot"><div class="umbraco-services-treeservice-gettreeroot-page"><p>Gets the root node of the current tree type for a given tree node</p>
+</div><h5 id="methods_gettreeroot_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeNode</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-gettreeroot-page"><p>to retrive tree root node from</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_loadnodechildren">loadNodeChildren(args)</h3>
+<div class="loadnodechildren"><div class="umbraco-services-treeservice-loadnodechildren-page"><p>Clears all node children, gets it&#39;s up-to-date children from the server and re-assigns them and then
+returns them in a promise.</p>
+</div><h5 id="methods_loadnodechildren_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-loadnodechildren-page"><p>An arguments object</p>
+</div></td></tr><tr><td>args.node</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-loadnodechildren-page"><p>The tree node</p>
+</div></td></tr><tr><td>args.section</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-loadnodechildren-page"><p>The current section</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_reloadnode">reloadNode(node)</h3>
+<div class="reloadnode"><div class="umbraco-services-treeservice-reloadnode-page"><p>Re-loads the single node from the server</p>
+</div><h5 id="methods_reloadnode_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>node</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-reloadnode-page"><p>Tree node to reload</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_removechildnodes">removeChildNodes(treeNode)</h3>
+<div class="removechildnodes"><div class="umbraco-services-treeservice-removechildnodes-page"><p>Removes all child nodes from a given tree node </p>
+</div><h5 id="methods_removechildnodes_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeNode</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-removechildnodes-page"><p>the node to remove children from</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_removenode">removeNode(treeNode)</h3>
+<div class="removenode"><div class="umbraco-services-treeservice-removenode-page"><p>Removes a given node from the tree</p>
+</div><h5 id="methods_removenode_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>treeNode</td><td><a href="" class="label type-hint type-hint-object">object</a></td><td><div class="umbraco-services-treeservice-removenode-page"><p>the node to remove</p>
+</div></td></tr></tbody></table></div>
+</li>
+</ul>
+</div>
+</div>

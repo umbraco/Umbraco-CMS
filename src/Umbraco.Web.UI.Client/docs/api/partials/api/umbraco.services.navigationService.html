@@ -1,0 +1,117 @@
+<h1><code ng:non-bindable="">navigationService</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-navigationservice-page"><p>Service to handle the main application navigation. Responsible for invoking the tree
+Section navigation and search, and maintain their state for the entire application lifetime</p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$rootScope">$rootScope</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$routeParams">$routeParams</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$log">$log</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$location">$location</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/dialogService">dialogService</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/treeService">treeService</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/sectionResource">sectionResource</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_changesection">changeSection(sectionAlias)</h3>
+<div class="changesection"><div class="umbraco-services-navigationservice-changesection-page"><p>Changes the active section to a given section alias
+If the navigation is &#39;sticky&#39; this will load the associated tree
+and load the dashboard related to the section</p>
+</div><h5 id="methods_changesection_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>sectionAlias</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-navigationservice-changesection-page"><p>The alias of the section</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_hidedialog">hideDialog()</h3>
+<div class="hidedialog"><div class="umbraco-services-navigationservice-hidedialog-page"><p>hides the currently open dialog</p>
+</div></div>
+</li>
+<li><h3 id="methods_hidemenu">hideMenu()</h3>
+<div class="hidemenu"><div class="umbraco-services-navigationservice-hidemenu-page"><p>Hides the menu by hiding the containing dom element</p>
+</div></div>
+</li>
+<li><h3 id="methods_hidenavigation">hideNavigation()</h3>
+<div class="hidenavigation"><div class="umbraco-services-navigationservice-hidenavigation-page"><p>hides any open navigation panes and resets the tree, actions and the currently selected node</p>
+</div></div>
+</li>
+<li><h3 id="methods_hidesearch">hideSearch()</h3>
+<div class="hidesearch"><div class="umbraco-services-navigationservice-hidesearch-page"><p>hides the search pane</p>
+</div></div>
+</li>
+<li><h3 id="methods_hidetree">hideTree()</h3>
+<div class="hidetree"><div class="umbraco-services-navigationservice-hidetree-page"><p>Hides the tree by hiding the containing dom element</p>
+</div></div>
+</li>
+<li><h3 id="methods_load">load(source)</h3>
+<div class="load"><div class="umbraco-services-navigationservice-load-page"><p>Shows the legacy iframe and loads in the content based on the source url</p>
+</div><h5 id="methods_load_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>source</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-navigationservice-load-page"><p>The URL to load into the iframe</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_showdialog">showDialog(args)</h3>
+<div class="showdialog"><div class="umbraco-services-navigationservice-showdialog-page"><p>Opens a dialog, for a given action on a given tree node
+uses the dialogService to inject the selected action dialog
+into #dialog div.umb-panel-body
+the path to the dialog view is determined by: 
+&quot;views/&quot; + current tree + &quot;/&quot; + action alias + &quot;.html&quot;
+The dialog controller will get passed a scope object that is created here with the properties:
+ scope.currentNode = the selected tree node
+ scope.currentAction = the selected menu item
+ so that the dialog controllers can use these properties</p>
+</div><h5 id="methods_showdialog_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-navigationservice-showdialog-page"><p>arguments passed to the function</p>
+</div></td></tr><tr><td>args.scope</td><td><a href="" class="label type-hint type-hint-scope">Scope</a></td><td><div class="umbraco-services-navigationservice-showdialog-page"><p>current scope passed to the dialog</p>
+</div></td></tr><tr><td>args.action</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-navigationservice-showdialog-page"><p>the clicked action containing <code>name</code> and <code>alias</code></p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_showmenu">showMenu(event)</h3>
+<div class="showmenu"><div class="umbraco-services-navigationservice-showmenu-page"><p>Hides the tree by hiding the containing dom element. 
+This always returns a promise!</p>
+</div><h5 id="methods_showmenu_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>event</td><td><a href="" class="label type-hint type-hint-event">Event</a></td><td><div class="umbraco-services-navigationservice-showmenu-page"><p>the click event triggering the method, passed from the DOM element</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_showsearch">showSearch()</h3>
+<div class="showsearch"><div class="umbraco-services-navigationservice-showsearch-page"><p>shows the search pane</p>
+</div></div>
+</li>
+<li><h3 id="methods_showtree">showTree(sectionAlias, syncArgs)</h3>
+<div class="showtree"><div class="umbraco-services-navigationservice-showtree-page"><p>Displays the tree for a given section alias but turning on the containing dom element
+only changes if the section is different from the current one</p>
+</div><h5 id="methods_showtree_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>sectionAlias</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-services-navigationservice-showtree-page"><p>The alias of the section to load</p>
+</div></td></tr><tr><td>syncArgs</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-navigationservice-showtree-page"><p>Optional object of arguments for syncing the tree for the section being shown</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_showuserdialog">showUserDialog()</h3>
+<div class="showuserdialog"><div class="umbraco-services-navigationservice-showuserdialog-page"><p>Opens the user dialog, next to the sections navigation
+template is located in views/common/dialogs/user.html</p>
+</div></div>
+</li>
+<li><h3 id="methods_showuserdialog">showUserDialog()</h3>
+<div class="showuserdialog"><div class="umbraco-services-navigationservice-showuserdialog-page"><p>Opens the user dialog, next to the sections navigation
+template is located in views/common/dialogs/user.html</p>
+</div></div>
+</li>
+<li><h3 id="methods_synctree">syncTree(args)</h3>
+<div class="synctree"><div class="umbraco-services-navigationservice-synctree-page"><p>Syncs a tree with a given path, returns a promise
+The path format is: [&quot;itemId&quot;,&quot;itemId&quot;], and so on
+so to sync to a specific document type node do:
+<pre class="prettyprint linenums">
+navigationService.syncTree({tree: 'content', path: ["-1","123d"], forceReload: true});  
+</pre>
+</div><h5 id="methods_synctree_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-navigationservice-synctree-page"><p>arguments passed to the function</p>
+</div></td></tr><tr><td>args.tree</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-navigationservice-synctree-page"><p>the tree alias to sync to</p>
+</div></td></tr><tr><td>args.path</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-services-navigationservice-synctree-page"><p>the path to sync the tree to</p>
+</div></td></tr><tr><td>args.forceReload</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-navigationservice-synctree-page"><p>optional, specifies whether to force reload the node data from the server even if it already exists in the tree currently</p>
+</div></td></tr><tr><td>args.activate</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-navigationservice-synctree-page"><p>optional, specifies whether to set the synced node to be the active node, this will default to true if not specified</p>
+</div></td></tr></tbody></table></div>
+</li>
+</ul>
+</div>
+</div>

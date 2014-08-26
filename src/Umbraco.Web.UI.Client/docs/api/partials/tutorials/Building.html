@@ -1,0 +1,60 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="building-umbraco-7-from-source-page"><h3 id="overview">Overview</h3>
+<p>Umbraco 7 has a slightly unorthodox project structure, compared to a normal asp.net project. This is by design, and a choice from the beginning to embrace a mucher larger group then &quot;just&quot; the developers who know how to use Visual Studio. </p>
+<p>As a result of that, the Umbraco UI is not a visual studio project, but simply a collection of folders and files, following certain conventions, and a small configuration file called <code>gruntfile</code> - we will get to the grunt part in a moment. </p>
+<p>This means that anyone with a text editor can open the UI source, make changes and run the project, without having Visual Studio installed - we will get into how to do that in a moment as well. </p>
+<p>But bottom line is that the UI project has zero dependencies on asp.net or windows, but you will need node.js installed, but don&#39;t worry we will get into that in a second.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Umbraco 7 needs a couple of things to run:</p>
+<h4 id="prerequisites_nodejs">Node.js</h4>
+<p>To compile and run the UI project you need node.js installed, you can get that at <a href="nodejs.org"><a href="http://nodejs.org">http://nodejs.org</a></a> for both windows and osx.</p>
+<h4 id="prerequisites_grunt">Grunt</h4>
+<p>When you have node.js installed, you need to install grunt. Grunt is a simple javascript task runner, basicly like Nant, Msbuild or any traditional build system [<a href="http://gruntjs.com](more">http://gruntjs.com](more</a> about grunt here).</p>
+<p>To install, open a terminal and run: </p>
+<pre><code>npm install -g grunt-cli</code></pre>
+<p>For OSX users, you will most likely need to do: </p>
+<pre><code>sudo npm install -g grunt-cli</code></pre>
+<p>This installs a <code>grunt</code> command into your terminal so you can run grunt scripts with simple commands. That migth sound scary, but really isn&#39;t, for working with Umbraco 7, you will become really good friends with <code>grunt</code> and your terminal. </p>
+<h4 id="prerequisites_project-dependencies">Project dependencies</h4>
+<p>Now its time to install all the dependencies that the project requires to compile, debug, test, minify and so on. Luckily this is all automatic, and is done wiht the node.js package manager (which you already have installed with node)</p>
+<p>In your terminal, browse to the <code>Umbraco.Web.Ui.Client</code> folder and run the command: </p>
+<pre><code>npm install</code></pre>
+<p>This will output a ton of feedback in your terminal, when it stops, your project is ready to run. </p>
+<p>This might seem like a lot of stuff to do, but think of it this way, every time you setup this environment, all you have to do is run <code>npm install</code> and everything will be running smoothly.</p>
+<h3 id="running-from-source-without-visual-studio-or-iis">Running from source without Visual studio or IIS</h3>
+<p>The Umbraco 7 project includes a complete mocked data model and an embedded webserver to run off. </p>
+<p>So to get the project up and running in a browser as fast as possible, open a terminal and browse to <code>Umbraco.Web.Ui.Client</code> folder, and run the command: </p>
+<pre><code>grunt dev</code></pre>
+<p>this will do the following: </p>
+<ul>
+<li>Compile the project files and merge them</li>
+<li>Compile less files to one .css file</li>
+<li>Lint js files for syntax and style errors</li>
+<li>run unit tests</li>
+<li>Setup a watcher to monitor for ongoing changes. </li>
+<li>Start a webserver on port 9999</li>
+<li>Open a browser to display localhost:9999/belle</li>
+</ul>
+<p>This is all grunt doing that for us, and notice that it sets up a watcher, which means that every time you make a change, it will automaticly recompile and test your code, if something is wrong the terminal will tell you why. </p>
+<p>You can now login (no user/pass) and browse the UI with dummy data, this setup is perfect for fast css and js changes that does not require any <em>real</em> data.</p>
+<h3 id="running-from-visual-studio">Running from Visual Studio</h3>
+<p><strong>Note:</strong> we will make this even easier to so the steps with node and grunt wont be required for .net developers in visual studio, but for now the below is needed:</p>
+<p>To run from Visual Studio, simply open the solution and run the <code>Umbraco.Web.UI</code> project as a normal website project. But to get the latest Umbraco 7 files into this site you still need to open a terminal at <code>Umbraco.Web.Ui.Client</code> and run either:</p>
+<pre><code>grunt dev</code></pre>
+<p>or for a one-time build:</p>
+<pre><code>grunt build</code></pre>
+<p>This will compile all files and copy them into the appropriate folder in the VS project, if you run <code>grunt dev</code> it will also automaticly update the VS project files as you edit them.</p>
+<p>You should never edit the /umbraco/js/umbraco.*.js files directly, these will be overwritten on each build.</p>
+<h3 id="using-buildbat">using build.bat</h3>
+<p>The Umbraco source comes with a build.bat file that runs the full build process, which is the one we use on our nightly builds, it produces a complete zip file with a ready to use distribution. </p>
+<p>The same rules apply as with running from Visual Studio, you need to run </p>
+<pre><code>grunt build </code></pre>
+<p>Before running build.bat, then the latest UI files will be included. </p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Having Umbraco 7 UI as a seperate project does indeed give us a bit more complexity when building and running from visual studio, since 2 build systems are in play: grunt and msbuild. </p>
+<p>However, the alternative would be to shove everything into the msbuil process, making the entire thing inaccesible to a large number of frontend developers and with a clunkier and less uptodate system.</p>
+<p>So see it as an additional powerfull tool in your arsenal, once you see the power, you don&#39;t want to go back.</p>
+</div></div>

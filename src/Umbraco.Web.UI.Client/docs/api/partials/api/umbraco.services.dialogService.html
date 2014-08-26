@@ -1,0 +1,145 @@
+<h1><code ng:non-bindable="">dialogService</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-dialogservice-page"><p>Application-wide service for handling modals, overlays and dialogs
+By default it injects the passed template url into a div to body of the document
+And renders it, but does also support rendering items in an iframe, incase
+serverside processing is needed, or its a non-angular page</p>
+<h4 id="description_usage">usage</h4>
+<p>To use, simply inject the dialogService into any controller that needs it, and make
+sure the umbraco.services module is accesible - which it should be by default.</p>
+<pre class="prettyprint linenums">
+   var dialog = dialogService.open({template: 'path/to/page.html', show: true, callback: done});
+   functon done(data){
+     //The dialog has been submitted 
+     //data contains whatever the dialog has selected / attached
+   }     
+</pre> </p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$rootScope">$rootScope</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$compile">$compile</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$http">$http</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$log">$log</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$q">$q</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$templateCache">$templateCache</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_close">close(dialog, args)</h3>
+<div class="close"><div class="umbraco-services-dialogservice-close-page"><p>Closes a specific dialog</p>
+</div><h5 id="methods_close_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>dialog</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-close-page"><p>the dialog object to close</p>
+</div></td></tr><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-close-page"><p>if specified this object will be sent to any callbacks registered on the dialogs.</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_closeall">closeAll(args)</h3>
+<div class="closeall"><div class="umbraco-services-dialogservice-closeall-page"><p>Closes all dialogs</p>
+</div><h5 id="methods_closeall_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-closeall-page"><p>if specified this object will be sent to any callbacks registered on the dialogs.</p>
+</div></td></tr></tbody></table></div>
+</li>
+<li><h3 id="methods_contentpicker">contentPicker(options)</h3>
+<div class="contentpicker"><div class="umbraco-services-dialogservice-contentpicker-page"><p>Opens a content picker tree in a modal, the callback returns an array of selected documents</p>
+</div><h5 id="methods_contentpicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-contentpicker-page"><p>content picker dialog options object</p>
+</div></td></tr><tr><td>options.multipicker</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-dialogservice-contentpicker-page"><p>should the picker return one or multiple items</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-contentpicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_contentpicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-contentpicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_iconpicker">iconPicker(options)</h3>
+<div class="iconpicker"><div class="umbraco-services-dialogservice-iconpicker-page"><p>Opens a icon picker in a modal, the callback returns a object representing the selected icon</p>
+</div><h5 id="methods_iconpicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-iconpicker-page"><p>iconpicker dialog options object</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-iconpicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_iconpicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-iconpicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_linkpicker">linkPicker(options)</h3>
+<div class="linkpicker"><div class="umbraco-services-dialogservice-linkpicker-page"><p>Opens a link picker tree in a modal, the callback returns a single link</p>
+</div><h5 id="methods_linkpicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-linkpicker-page"><p>content picker dialog options object</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-linkpicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_linkpicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-linkpicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_macropicker">macroPicker(options)</h3>
+<div class="macropicker"><div class="umbraco-services-dialogservice-macropicker-page"><p>Opens a mcaro picker in a modal, the callback returns a object representing the macro and it&#39;s parameters</p>
+</div><h5 id="methods_macropicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-macropicker-page"><p>macropicker dialog options object</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-macropicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_macropicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-macropicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_mediapicker">mediaPicker(options)</h3>
+<div class="mediapicker"><div class="umbraco-services-dialogservice-mediapicker-page"><p>Opens a media picker in a modal, the callback returns an array of selected media items</p>
+</div><h5 id="methods_mediapicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-mediapicker-page"><p>mediapicker dialog options object</p>
+</div></td></tr><tr><td>options.onlyImages</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-dialogservice-mediapicker-page"><p>Only display files that have an image file-extension</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-mediapicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_mediapicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-mediapicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_membergrouppicker">memberGroupPicker(options)</h3>
+<div class="membergrouppicker"><div class="umbraco-services-dialogservice-membergrouppicker-page"><p>Opens a member group picker in a modal, the callback returns a object representing the selected member</p>
+</div><h5 id="methods_membergrouppicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-membergrouppicker-page"><p>member group picker dialog options object</p>
+</div></td></tr><tr><td>options.multiPicker</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-dialogservice-membergrouppicker-page"><p>should the tree pick one or multiple members before returning</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-membergrouppicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_membergrouppicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-membergrouppicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_memberpicker">memberPicker(options)</h3>
+<div class="memberpicker"><div class="umbraco-services-dialogservice-memberpicker-page"><p>Opens a member picker in a modal, the callback returns a object representing the selected member</p>
+</div><h5 id="methods_memberpicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-memberpicker-page"><p>member picker dialog options object</p>
+</div></td></tr><tr><td>options.multiPicker</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-dialogservice-memberpicker-page"><p>should the tree pick one or multiple members before returning</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-memberpicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_memberpicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-memberpicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_open">open(options)</h3>
+<div class="open"><div class="umbraco-services-dialogservice-open-page"><p>Opens a modal rendering a given template url.</p>
+</div><h5 id="methods_open_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>rendering options</p>
+</div></td></tr><tr><td>options.container</td><td><a href="" class="label type-hint type-hint-domelement">DomElement</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>the DOM element to inject the modal into, by default set to body</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>function called when the modal is submitted</p>
+</div></td></tr><tr><td>options.template</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>the url of the template</p>
+</div></td></tr><tr><td>options.animation</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>animation csss class, by default set to &quot;fade&quot;</p>
+</div></td></tr><tr><td>options.modalClass</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>modal css class, by default &quot;umb-modal&quot;</p>
+</div></td></tr><tr><td>options.show</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>show the modal instantly</p>
+</div></td></tr><tr><td>options.iframe</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>load template in an iframe, only needed for serverside templates</p>
+</div></td></tr><tr><td>options.width</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>set a width on the modal, only needed for iframes</p>
+</div></td></tr><tr><td>options.inline</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>strips the modal from any animation and wrappers, used when you want to inject a dialog into an existing container</p>
+</div></td></tr></tbody></table><h5 id="methods_open_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-open-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_propertydialog">propertyDialog(options, editor, value)</h3>
+<div class="propertydialog"><div class="umbraco-services-dialogservice-propertydialog-page"><p>Opens a dialog with a chosen property editor in, a value can be passed to the modal, and this value is returned in the callback</p>
+</div><h5 id="methods_propertydialog_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-propertydialog-page"><p>mediapicker dialog options object</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-propertydialog-page"><p>callback function</p>
+</div></td></tr><tr><td>editor</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-dialogservice-propertydialog-page"><p>editor to use to edit a given value and return on callback</p>
+</div></td></tr><tr><td>value</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-propertydialog-page"><p>value sent to the property editor</p>
+</div></td></tr></tbody></table><h5 id="methods_propertydialog_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-propertydialog-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_treepicker">treePicker(options)</h3>
+<div class="treepicker"><div class="umbraco-services-dialogservice-treepicker-page"><p>Opens a tree picker in a modal, the callback returns a object representing the selected tree item</p>
+</div><h5 id="methods_treepicker_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-treepicker-page"><p>iconpicker dialog options object</p>
+</div></td></tr><tr><td>options.section</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-dialogservice-treepicker-page"><p>tree section to display</p>
+</div></td></tr><tr><td>options.treeAlias</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-services-dialogservice-treepicker-page"><p>specific tree to display</p>
+</div></td></tr><tr><td>options.multiPicker</td><td><a href="" class="label type-hint type-hint-boolean">Boolean</a></td><td><div class="umbraco-services-dialogservice-treepicker-page"><p>should the tree pick one or multiple items before returning</p>
+</div></td></tr><tr><td>options.callback</td><td><a href="" class="label type-hint type-hint-function">Function</a></td><td><div class="umbraco-services-dialogservice-treepicker-page"><p>callback function</p>
+</div></td></tr></tbody></table><h5 id="methods_treepicker_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-services-dialogservice-treepicker-page"><p>modal object</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_ysoddialog">ysodDialog()</h3>
+<div class="ysoddialog"><div class="umbraco-services-dialogservice-ysoddialog-page"><p>Opens a dialog to an embed dialog </p>
+</div></div>
+</li>
+<li><h3 id="methods_ysoddialog">ysodDialog()</h3>
+<div class="ysoddialog"><div class="umbraco-services-dialogservice-ysoddialog-page"><p>Opens a dialog to show a custom YSOD</p>
+</div></div>
+</li>
+</ul>
+</div>
+</div>

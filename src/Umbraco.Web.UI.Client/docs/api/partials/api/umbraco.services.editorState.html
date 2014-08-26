@@ -1,0 +1,35 @@
+<h1><code ng:non-bindable="">editorState</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.services</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-services-editorstate-page"><p>Tracks the parent object for complex editors by exposing it as 
+an object reference via editorState.current.entity</p>
+<p>it is possible to modify this object, so should be used with care</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_current">current()</h3>
+<div class="current"><div class="umbraco-services-angularhelper-current-page"><p>Returns an object reference to the current editor entity.
+the entity is the root object of the editor.
+EditorState is used by property/parameter editors that need
+access to the entire entity being edited, not just the property/parameter </p>
+<p>editorState.current can not be overwritten, you should only read values from it
+since modifying individual properties should be handled by the property editors</p>
+</div></div>
+</li>
+<li><h3 id="methods_reset">reset()</h3>
+<div class="reset"><div class="umbraco-services-angularhelper-reset-page"><p>Since the editorstate entity is read-only, you cannot set it to null
+only through the reset() method</p>
+</div></div>
+</li>
+<li><h3 id="methods_set">set()</h3>
+<div class="set"><div class="umbraco-services-angularhelper-set-page"><p>Sets the current entity object for the currently active editor
+This is only used when implementing an editor with a complex model
+like the content editor, where the model is modified by several
+child controllers. </p>
+</div></div>
+</li>
+</ul>
+</div>
+</div>

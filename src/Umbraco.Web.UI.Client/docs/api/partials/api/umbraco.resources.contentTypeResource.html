@@ -1,0 +1,38 @@
+<h1><code ng:non-bindable="">contentTypeResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-contenttyperesource-page"><p>Loads in data for content types</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_getallowedtypes">getAllowedTypes(contentId)</h3>
+<div class="getallowedtypes"><div class="umbraco-resources-contenttyperesource-getallowedtypes-page"><p>Returns a list of allowed content types underneath a content item with a given ID</p>
+<h5 id="methods_getallowedtypes_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentTypeResource.getAllowedTypes(1234)
+   .then(function(array) {
+       $scope.type = type;
+   });
+</pre> </p>
+</div><h5 id="methods_getallowedtypes_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>contentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contenttyperesource-getallowedtypes-page"><p>id of the content item to retrive allowed child types for</p>
+</div></td></tr></tbody></table><h5 id="methods_getallowedtypes_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contenttyperesource-getallowedtypes-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getcontenttype">getContentType(id)</h3>
+<div class="getcontenttype"><div class="umbraco-resources-contenttyperesource-getcontenttype-page"><p>Returns a content type with a given ID</p>
+<h5 id="methods_getcontenttype_usage">usage</h5>
+<pre class="prettyprint linenums">
+contentTypeResource.getContentType(1234)
+   .then(function(type) {
+       $scope.type = type;
+   });
+</pre> </p>
+</div><h5 id="methods_getcontenttype_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-contenttyperesource-getcontenttype-page"><p>id of the content type to retrieve</p>
+</div></td></tr></tbody></table><h5 id="methods_getcontenttype_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-contenttyperesource-getcontenttype-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

@@ -1,0 +1,177 @@
+<h1><code ng:non-bindable="">mediaResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-mediaresource-page"><p>Loads in data for media</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_addfolder">addFolder(name, parentId)</h3>
+<div class="addfolder"><div class="umbraco-resources-mediaresource-addfolder-page"><p>Shorthand for adding a media item of the type &quot;Folder&quot; under a given parent ID</p>
+<h5 id="methods_addfolder_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.addFolder("My gallery", 1234)
+   .then(function(folder) {
+       alert('New folder');
+   });
+</pre> </p>
+</div><h5 id="methods_addfolder_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>name</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-mediaresource-addfolder-page"><p>Name of the folder to create</p>
+</div></td></tr><tr><td>parentId</td><td><a href="" class="label type-hint type-hint-int">int</a></td><td><div class="umbraco-resources-mediaresource-addfolder-page"><p>Id of the media item to create the folder underneath</p>
+</div></td></tr></tbody></table><h5 id="methods_addfolder_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-addfolder-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_deletebyid">deleteById(id)</h3>
+<div class="deletebyid"><div class="umbraco-resources-mediaresource-deletebyid-page"><p>Deletes a media item with a given id</p>
+<h5 id="methods_deletebyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.deleteById(1234)
+   .then(function() {
+       alert('its gone!');
+   });
+</pre> </p>
+</div><h5 id="methods_deletebyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-deletebyid-page"><p>id of media item to delete</p>
+</div></td></tr></tbody></table><h5 id="methods_deletebyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-deletebyid-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_emptyrecyclebin">emptyRecycleBin()</h3>
+<div class="emptyrecyclebin"><div class="umbraco-resources-mediaresource-emptyrecyclebin-page"><p>Empties the media recycle bin</p>
+<h5 id="methods_emptyrecyclebin_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.emptyRecycleBin()
+   .then(function() {
+       alert('its empty!');
+   });
+</pre> </p>
+</div><h5 id="methods_emptyrecyclebin_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-emptyrecyclebin-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyid">getById(id)</h3>
+<div class="getbyid"><div class="umbraco-resources-mediaresource-getbyid-page"><p>Gets a media item with a given id</p>
+<h5 id="methods_getbyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.getById(1234)
+   .then(function(media) {
+       var myMedia = media; 
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-getbyid-page"><p>id of media item to return</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-getbyid-page"><p>resourcePromise object containing the media item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyids">getByIds(ids)</h3>
+<div class="getbyids"><div class="umbraco-resources-mediaresource-getbyids-page"><p>Gets an array of media items, given a collection of ids</p>
+<h5 id="methods_getbyids_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.getByIds( [1234,2526,28262])
+   .then(function(mediaArray) {
+       var myDoc = contentArray; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyids_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>ids</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-mediaresource-getbyids-page"><p>ids of media items to return as an array</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyids_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-getbyids-page"><p>resourcePromise object containing the media items array.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getchildren">getChildren(parentid, options)</h3>
+<div class="getchildren"><div class="umbraco-resources-mediaresource-getchildren-page"><p>Gets children of a media item with a given id</p>
+<h5 id="methods_getchildren_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.getChildren(1234, {pageSize: 10, pageNumber: 2})
+   .then(function(contentArray) {
+       var children = contentArray; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getchildren_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>parentid</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>id of content item to return children of</p>
+</div></td></tr><tr><td>options</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>optional options object</p>
+</div></td></tr><tr><td>options.pageSize</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>if paging data, number of nodes per page, default = 0</p>
+</div></td></tr><tr><td>options.pageNumber</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>if paging data, current page index, default = 0</p>
+</div></td></tr><tr><td>options.filter</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>if provided, query will only return those with names matching the filter</p>
+</div></td></tr><tr><td>options.orderDirection</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>can be <code>Ascending</code> or <code>Descending</code> - Default: <code>Ascending</code></p>
+</div></td></tr><tr><td>options.orderBy</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>property to order items by, default: <code>SortOrder</code></p>
+</div></td></tr></tbody></table><h5 id="methods_getchildren_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-getchildren-page"><p>resourcePromise object containing an array of content items.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getscaffold">getScaffold(parentId, alias)</h3>
+<div class="getscaffold"><div class="umbraco-resources-mediaresource-getscaffold-page"><p>Returns a scaffold of an empty media item, given the id of the media item to place it underneath and the media type alias.</p>
+<ul>
+<li>Parent Id must be provided so umbraco knows where to store the media</li>
+<li>Media Type alias must be provided so umbraco knows which properties to put on the media scaffold </li>
+</ul>
+<p>The scaffold is used to build editors for media that has not yet been populated with data.</p>
+<h5 id="methods_getscaffold_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.getScaffold(1234, 'folder')
+   .then(function(scaffold) {
+       var myDoc = scaffold;
+       myDoc.name = "My new media item"; 
+
+       mediaResource.save(myDoc, true)
+           .then(function(media){
+               alert("Retrieved, updated and saved again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_getscaffold_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-getscaffold-page"><p>id of media item to return</p>
+</div></td></tr><tr><td>alias</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-mediaresource-getscaffold-page"><p>mediatype alias to base the scaffold on</p>
+</div></td></tr></tbody></table><h5 id="methods_getscaffold_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-getscaffold-page"><p>resourcePromise object containing the media scaffold.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_move">move(args)</h3>
+<div class="move"><div class="umbraco-resources-mediaresource-move-page"><p>Moves a node underneath a new parentId</p>
+<h5 id="methods_move_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.move({ parentId: 1244, id: 123 })
+   .then(function() {
+       alert("node was moved");
+   }, function(err){
+     alert("node didnt move:" + err.data.Message); 
+   });
+</pre> </p>
+</div><h5 id="methods_move_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-mediaresource-move-page"><p>arguments object</p>
+</div></td></tr><tr><td>args.idd</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-move-page"><p>the ID of the node to move</p>
+</div></td></tr><tr><td>args.parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-move-page"><p>the ID of the parent node to move to</p>
+</div></td></tr></tbody></table><h5 id="methods_move_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-move-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_save">save(media, isNew, files)</h3>
+<div class="save"><div class="umbraco-resources-mediaresource-save-page"><p>Saves changes made to a media item, if the media item is new, the isNew paramater must be passed to force creation
+if the media item needs to have files attached, they must be provided as the files param and passed seperately </p>
+<h5 id="methods_save_usage">usage</h5>
+<pre class="prettyprint linenums">
+mediaResource.getById(1234)
+   .then(function(media) {
+         media.name = "I want a new name!";
+         mediaResource.save(media, false)
+           .then(function(media){
+               alert("Retrieved, updated and saved again");
+           });
+   });
+</pre> </p>
+</div><h5 id="methods_save_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>media</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-mediaresource-save-page"><p>The media item object with changes applied</p>
+</div></td></tr><tr><td>isNew</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-resources-mediaresource-save-page"><p>set to true to create a new item or to update an existing</p>
+</div></td></tr><tr><td>files</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-mediaresource-save-page"><p>collection of files for the media item</p>
+</div></td></tr></tbody></table><h5 id="methods_save_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-save-page"><p>resourcePromise object containing the saved media item.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_sort">sort(args)</h3>
+<div class="sort"><div class="umbraco-resources-mediaresource-sort-page"><p>Sorts all children below a given parent node id, based on a collection of node-ids</p>
+<h5 id="methods_sort_usage">usage</h5>
+<pre class="prettyprint linenums">
+var ids = [123,34533,2334,23434];
+mediaResource.sort({ sortedIds: ids })
+   .then(function() {
+       $scope.complete = true;
+   });
+</pre> </p>
+</div><h5 id="methods_sort_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>args</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-mediaresource-sort-page"><p>arguments object</p>
+</div></td></tr><tr><td>args.parentId</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-mediaresource-sort-page"><p>the ID of the parent node</p>
+</div></td></tr><tr><td>options.sortedIds</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-mediaresource-sort-page"><p>array of node IDs as they should be sorted</p>
+</div></td></tr></tbody></table><h5 id="methods_sort_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-mediaresource-sort-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

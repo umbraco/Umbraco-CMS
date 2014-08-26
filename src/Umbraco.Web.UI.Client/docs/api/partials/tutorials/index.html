@@ -1,0 +1,46 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="tutorials-page"><h3 id="tutorials">Tutorials</h3>
+<p>This section contains longer written tutorials on how to perform certain tasks with the new angular-based UI. </p>
+<p>Our initial focus is getting developers up and running with their own property editors, and secondly we will focus on how to use the serverside support methods to hook into the clientside code from asp.net.</p>
+<h3 id="getting-up-and-running">Getting up and running</h3>
+<p>There are 2 ways to get umbraco 7 running, either from source, or from one of the nightly builds. </p>
+<h4 id="getting-up-and-running"><a href="#/tutorials/Running">Running a nightly build</a></h4>
+<p>This only works on windows with IIS or IISExpress</p>
+<h4 id="getting-up-and-running"><a href="#/tutorials/Building">Building from source</a></h4>
+<p>You can run the client bits on osx and windows, or simple run the source from Visual Studio</p>
+<h3 id="create-your-own-editor">Create your own editor</h3>
+<p>One of the big breaking changes in Umbraco 7 is the new format for property editors / data types. Get ahead by reading through our series on how to build your own: </p>
+<h4 id="create-your-own-editor"><a href="#/tutorials/CreatingAPropertyEditor">Create an editor</a></h4>
+<p>The initial setup of the plugin, the manifest and files</p>
+<h4 id="create-your-own-editor"><a href="#/tutorials/Adding-Configuration-To-Property-Editor">Adding configuration</a></h4>
+<p>How we make the editor configurable so it becomes flexible and reusable</p>
+<h4 id="create-your-own-editor"><a href="#/tutorials/Intergrating-Services-With-PropertyEditor">Intergrating services</a></h4>
+<p>How you can get access to all the standard services inside of Umbraco from your editor</p>
+<h4 id="create-your-own-editor"><a href="#/tutorials/Add-ServerSide-Data">Adding serverside data</a></h4>
+<p>How you can return your own custom data from the server to a property editor
+through a ApiController </p>
+<h3 id="start-developing">Start developing</h3>
+<h4 id="start-developing"><a href="#/tutorials/Source-Code-Structure">how the source code is structured</a></h4>
+<p>An overview of the different folders and files in the Umbraco 7 client project</p>
+<h3 id="recommended-reading">Recommended reading</h3>
+<p>It is always recommended to have a clear understanding of the underlying framework, before you start building on top of it. </p>
+<h4 id="recommended-reading_html-and-css">Html and css</h4>
+<p>For our html, css and various widgets, we use twitter bootstrap 2</p>
+<ul>
+<li><a href="http://getbootstrap.com/">getbootstrap.com</a></li>
+</ul>
+<h4 id="recommended-reading_javascript-application-framework">Javascript application framework</h4>
+<p>For the underlying application framework we use AngularJS, there are plenty of really good ressources for learning but these are our preffered ones:</p>
+<ul>
+<li><a href="http://www.egghead.io/">egghead.io</a></li>
+<li><a href="http://docs.angularjs.org/tutorial">angularjs.org/tutorial</a></li>
+<li><a href="http://tekpub.com/products/angular">Tekpub</a></li>
+</ul>
+<h4 id="recommended-reading_environment">Environment</h4>
+<p>We use various tools to built the client-side code. This is to ensure that our javascript is automatically tested, our .less files are compiled, and that files are minified and linted. </p>
+<p>For all these automated tasks, we use <a href="http://gruntjs.com">gruntjs</a> which is a javascript based task-runner for <a href="http://nodejs.com">node.js</a> </p>
+<p>it is highly recommended to read and understand the basics of grunt, and have a closer look at our gruntfile.js in the source, since this ties the entire application together.  </p>
+</div></div>

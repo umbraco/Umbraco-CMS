@@ -1,0 +1,28 @@
+<h1><code ng:non-bindable="">umbTreeItem</code>
+<div><span class="hint">directive in module <code ng:non-bindable="">umbraco.directives</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-directives-directive-page umbraco-directives-directive-umbtreeitem-page"><p>Renders a list item, representing a single node in the tree.
+Includes element to toggle children, and a menu toggling button</p>
+<p><strong>note:</strong> This directive is only used internally in the umbTree directive</p>
+</div></div>
+<h2 id="usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;li umb-tree-item&gt;
+   ...
+&lt;/li&gt;</pre>
+</div>
+<h2 id="example">Example</h2>
+<div class="example"><div class="umbraco-directives-directive-page umbraco-directives-directive-umbtreeitem-page"><h4 id="example_source">Source</h4>
+<div source-edit="umbraco" source-edit-deps="angular.js" source-edit-html="index.html-0" source-edit-css="" source-edit-js="" source-edit-json="" source-edit-unit="" source-edit-scenario=""></div>
+<div class="tabbable"><div class="tab-pane" title="index.html">
+<pre class="prettyprint linenums" ng-set-text="index.html-0" ng-html-wrap-loaded="umbraco angular.js"></pre>
+<script type="text/ng-template" id="index.html-0">
+     <umb-tree-item ng-repeat="child in tree.children" node="child" callback="callback" section="content"></umb-tree-item>
+</script>
+</div>
+</div><h4 id="example_demo">Demo</h4>
+<div class="well doc-example-live animate-container" ng-embed-app="umbraco" ng-set-html="index.html-0" ng-eval-javascript=""></div>
+</div></div>
+</div>

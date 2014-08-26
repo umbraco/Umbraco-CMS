@@ -1,0 +1,71 @@
+<h1><code ng:non-bindable="">dataTypeResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-datatyperesource-page"><p>Loads in data for data types</p>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_deletebyid">deleteById(id)</h3>
+<div class="deletebyid"><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>Deletes a data type with a given id</p>
+<h5 id="methods_deletebyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+dataTypeResource.deleteById(1234)
+   .then(function() {
+       alert('its gone!');
+   });
+</pre> </p>
+</div><h5 id="methods_deletebyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>id of content item to delete</p>
+</div></td></tr></tbody></table><h5 id="methods_deletebyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_deletebyid">deleteById(dataType, preValues, isNew)</h3>
+<div class="deletebyid"><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>Saves or update a data typw</p>
+<h5 id="methods_deletebyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+dataTypeResource.getById(1234)
+   .then(function(type) {
+       type.name ="hibba";
+ 
+       dataTypeResource.save(type, type.preValues, false).then(function(type){
+         alert('its done!');
+       }): 
+   });
+</pre> </p>
+</div><h5 id="methods_deletebyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>dataType</td><td><a href="" class="label type-hint type-hint-object">Object</a></td><td><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>data type object to create/update</p>
+</div></td></tr><tr><td>preValues</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>collection of prevalues on the datatype</p>
+</div></td></tr><tr><td>isNew</td><td><a href="" class="label type-hint type-hint-bool">Bool</a></td><td><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>set to true if type should be create instead of updated</p>
+</div></td></tr></tbody></table><h5 id="methods_deletebyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-datatyperesource-deletebyid-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyid">getById(id)</h3>
+<div class="getbyid"><div class="umbraco-resources-datatyperesource-getbyid-page"><p>Gets a data type item with a given id</p>
+<h5 id="methods_getbyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+dataTypeResource.getById(1234)
+   .then(function() {
+       alert('its gone!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-datatyperesource-getbyid-page"><p>id of data type to retrieve</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-datatyperesource-getbyid-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getprevalues">getPreValues(editorAlias, id)</h3>
+<div class="getprevalues"><div class="umbraco-resources-datatyperesource-getprevalues-page"><p>Retrieves available prevalues for a given data type + editor</p>
+<h5 id="methods_getprevalues_usage">usage</h5>
+<pre class="prettyprint linenums">
+dataTypeResource.getPrevalyes("Umbraco.MediaPicker", 1234)
+   .then(function(prevalues) {
+       alert('its gone!');
+   });
+</pre> </p>
+</div><h5 id="methods_getprevalues_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>editorAlias</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-datatyperesource-getprevalues-page"><p>string alias of editor type to retrive prevalues configuration for</p>
+</div></td></tr><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-datatyperesource-getprevalues-page"><p>id of datatype to retrieve prevalues for</p>
+</div></td></tr></tbody></table><h5 id="methods_getprevalues_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-datatyperesource-getprevalues-page"><p>resourcePromise object.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>

@@ -1,0 +1,141 @@
+<h1><code ng:non-bindable="">entityResource</code>
+<div><span class="hint">service in module <code ng:non-bindable="">umbraco.resources</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="umbraco-resources-entityresource-page"><p>Loads in basic data for all entities</p>
+<h4 id="description_what-is-an-entity">What is an entity?</h4>
+<p>An entity is a basic <strong>read-only</strong> representation of an Umbraco node. It contains only the most
+basic properties used to display the item in trees, lists and navigation. </p>
+<h4 id="description_what-is-the-difference-between-entity-and-content/media/etc">What is the difference between entity and content/media/etc...?</h4>
+<p>the entity only contains the basic node data, name, id and guid, whereas content
+nodes fetched through the content service also contains additional all of the content property data, etc..
+This is the same principal for all entity types. Any user that is logged in to the back office will have access
+to view the basic entity information for all entities since the basic entity information does not contain sensitive information.</p>
+<h4 id="description_entity-object-types">Entity object types?</h4>
+<p>You need to specify the type of object you want returned.</p>
+<p>The core object types are:</p>
+<ul>
+<li>Document</li>
+<li>Media</li>
+<li>Member</li>
+<li>Template</li>
+<li>DocumentType</li>
+<li>MediaType</li>
+<li>MemberType</li>
+<li>Macro</li>
+<li>User</li>
+<li>Language</li>
+<li>Domain</li>
+</ul>
+</div></div>
+<div class="member method"><h2 id="methods">Methods</h2>
+<ul class="methods"><li><h3 id="methods_getancestors">getAncestors(type)</h3>
+<div class="getancestors"><div class="umbraco-resources-entityresource-getancestors-page"><p>Gets ancestor entities for a given item</p>
+</div><h5 id="methods_getancestors_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getancestors-page"><p>Object type name</p>
+</div></td></tr></tbody></table><h5 id="methods_getancestors_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-getancestors-page"><p>resourcePromise object containing the entity.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getancestors">getAncestors(type)</h3>
+<div class="getancestors"><div class="umbraco-resources-entityresource-getancestors-page"><p>Gets children entities for a given item</p>
+</div><h5 id="methods_getancestors_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getancestors-page"><p>Object type name</p>
+</div></td></tr></tbody></table><h5 id="methods_getancestors_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-getancestors-page"><p>resourcePromise object containing the entity.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyid">getById(id, type)</h3>
+<div class="getbyid"><div class="umbraco-resources-entityresource-getbyid-page"><p>Gets an entity with a given id</p>
+<h5 id="methods_getbyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+//get media by id
+entityResource.getEntityById(0, "Media")
+   .then(function(ent) {
+       var myDoc = ent; 
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-entityresource-getbyid-page"><p>id of entity to return</p>
+</div></td></tr><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getbyid-page"><p>Object type name</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-getbyid-page"><p>resourcePromise object containing the entity.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getbyids">getByIds(ids, type)</h3>
+<div class="getbyids"><div class="umbraco-resources-entityresource-getbyids-page"><p>Gets an array of entities, given a collection of ids</p>
+<h5 id="methods_getbyids_usage">usage</h5>
+<pre class="prettyprint linenums">
+//Get templates for ids
+entityResource.getEntitiesByIds( [1234,2526,28262], "Template")
+   .then(function(templateArray) {
+       var myDoc = contentArray; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getbyids_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>ids</td><td><a href="" class="label type-hint type-hint-array">Array</a></td><td><div class="umbraco-resources-entityresource-getbyids-page"><p>ids of entities to return as an array</p>
+</div></td></tr><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getbyids-page"><p>type name</p>
+</div></td></tr></tbody></table><h5 id="methods_getbyids_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-getbyids-page"><p>resourcePromise object containing the entity array.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getentitybyid">getEntityById(type, postFilter, postFilterParams)</h3>
+<div class="getentitybyid"><div class="umbraco-resources-entityresource-getentitybyid-page"><p>Gets an entity with a given id</p>
+<h5 id="methods_getentitybyid_usage">usage</h5>
+<pre class="prettyprint linenums">
+
+//Only return media
+entityResource.getAll("Media")
+   .then(function(ent) {
+       var myDoc = ent; 
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getentitybyid_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getentitybyid-page"><p>Object type name</p>
+</div></td></tr><tr><td>postFilter</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getentitybyid-page"><p>optional filter expression which will execute a dynamic where clause on the server</p>
+</div></td></tr><tr><td>postFilterParams</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getentitybyid-page"><p>optional parameters for the postFilter expression</p>
+</div></td></tr></tbody></table><h5 id="methods_getentitybyid_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-getentitybyid-page"><p>resourcePromise object containing the entity.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_getpath">getPath(id, type)</h3>
+<div class="getpath"><div class="umbraco-resources-entityresource-getpath-page"><p>Returns a path, given a node ID and type</p>
+<h5 id="methods_getpath_usage">usage</h5>
+<pre class="prettyprint linenums">
+entityResource.getPath(id)
+   .then(function(pathArray) {
+       alert('its here!');
+   });
+</pre> </p>
+</div><h5 id="methods_getpath_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>id</td><td><a href="" class="label type-hint type-hint-int">Int</a></td><td><div class="umbraco-resources-entityresource-getpath-page"><p>Id of node to return the public url to</p>
+</div></td></tr><tr><td>type</td><td><a href="" class="label type-hint type-hint-string">string</a></td><td><div class="umbraco-resources-entityresource-getpath-page"><p>Object type name</p>
+</div></td></tr></tbody></table><h5 id="methods_getpath_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-getpath-page"><p>resourcePromise object containing the url.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_searchall">searchAll(Query)</h3>
+<div class="searchall"><div class="umbraco-resources-entityresource-searchall-page"><p>Gets an array of entities from all available search indexes, given a lucene query</p>
+<h5 id="methods_searchall_usage">usage</h5>
+<pre class="prettyprint linenums">
+entityResource.searchAll("bob")
+   .then(function(array) {
+       var myDoc = array; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_searchall_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>Query</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-entityresource-searchall-page"><p>search query</p>
+</div></td></tr></tbody></table><h5 id="methods_searchall_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-searchall-page"><p>resourcePromise object containing the entity array.</p>
+</div></td></tr></table></div>
+</li>
+<li><h3 id="methods_searchmedia">searchMedia(Query, Type)</h3>
+<div class="searchmedia"><div class="umbraco-resources-entityresource-searchmedia-page"><p>Gets an array of entities, given a lucene query and a type</p>
+<h5 id="methods_searchmedia_usage">usage</h5>
+<pre class="prettyprint linenums">
+entityResource.search("news", "Media")
+   .then(function(mediaArray) {
+       var myDoc = mediaArray; 
+       alert('they are here!');
+   });
+</pre> </p>
+</div><h5 id="methods_searchmedia_parameters">Parameters</h5><table class="variables-matrix table table-bordered table-striped"><thead><tr><th>Param</th><th>Type</th><th>Details</th></tr></thead><tbody><tr><td>Query</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-entityresource-searchmedia-page"><p>search query</p>
+</div></td></tr><tr><td>Type</td><td><a href="" class="label type-hint type-hint-string">String</a></td><td><div class="umbraco-resources-entityresource-searchmedia-page"><p>type of conten to search</p>
+</div></td></tr></tbody></table><h5 id="methods_searchmedia_returns">Returns</h5><table class="variables-matrix"><tr><td><a href="" class="label type-hint type-hint-promise">Promise</a></td><td><div class="umbraco-resources-entityresource-searchmedia-page"><p>resourcePromise object containing the entity array.</p>
+</div></td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>
