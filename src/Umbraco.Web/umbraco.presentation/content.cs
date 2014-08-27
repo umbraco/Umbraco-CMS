@@ -402,6 +402,11 @@ namespace umbraco
                                      ? xmlContentCopy.DocumentElement
                                      : xmlContentCopy.GetElementById(parentId.ToString());
 
+            // TODO: Update with new schema!
+            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                            ? "./node"
+                            : "./* [@id]";
+
             if (parentNode != null)
             {
                 if (currentNode == null)
@@ -413,6 +418,14 @@ namespace umbraco
                 {
                     //check the current parent id
                     var currParentId = currentNode.AttributeValue<int>("parentID");
+
+                    
+
+                    //copy over children
+                    foreach (XmlNode child in currentNode.SelectNodes(xpath))
+                    {
+                        docNode.AppendChild(child);
+                    }
 
                     //First, check if we're moving the node
                     if (currParentId != docNode.AttributeValue<int>("parentID"))
@@ -431,10 +444,7 @@ namespace umbraco
                     currentNode = docNode;
                 }
 
-                // TODO: Update with new schema!
-                var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                                ? "./node"
-                                : "./* [@id]";
+                
 
                 var childNodes = parentNode.SelectNodes(xpath);
 
