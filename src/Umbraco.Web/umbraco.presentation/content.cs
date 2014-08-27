@@ -322,16 +322,8 @@ namespace umbraco
             }
         }
 
-        public static XmlNode TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode, XmlDocument Document)
+        public static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
         {
-            if(UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema == false)
-            {
-                //If we're using the new XML, the node name is the content type alias.
-                //The content type can be changed, so we need to make sure we update the node name as well
-               
-                PublishedNode = Document.CreateElement(DocumentNode.Name);
-            }
-
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
             string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
