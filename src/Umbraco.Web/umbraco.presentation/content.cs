@@ -339,9 +339,6 @@ namespace umbraco
                 XmlNode newDatael = PublishedNode.OwnerDocument.ImportNode(el, true);
                 PublishedNode.AppendChild(newDatael);
             }
-
-            return PublishedNode;
-            
         }
 
         /// <summary>
