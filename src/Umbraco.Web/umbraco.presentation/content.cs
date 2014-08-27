@@ -425,24 +425,21 @@ namespace umbraco
                     //check the current parent id
                     var currParentId = currentNode.AttributeValue<int>("parentID");
 
-                    //update the node with it's new values
-                    //We're replacing the node, as it is impossible to update the node name on an existing node
-                    //which is neccesary for Change document type to work
-                    var newNode = TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode, xmlContentCopy);
-                    parentNode.ReplaceChild(newNode, currentNode);
-                    currentNode = newNode;
-                    //If the node is being moved we also need to ensure that it exists under the new parent!
-                    // http://issues.umbraco.org/issue/U4-2312
-                    // we were never checking this before and instead simply changing the parentId value but not 
-                    // changing the actual parent.
-
-                    //check the new parent
-                    if (currParentId != currentNode.AttributeValue<int>("parentID"))
+                    //First, check if we're moving the node
+                    if (currParentId != docNode.AttributeValue<int>("parentID"))
                     {
-                        //ok, we've actually got to move the node
+                        //ok, we've actually got to move the node. First, move the existing node
+                        //and then replace it with the updated one
                         parentNode.AppendChild(currentNode);
+                        parentNode.ReplaceChild(docNode, currentNode);
                     }
-                    
+                    else
+                    {
+                        //Not moving, just replace the node
+                        parentNode.ReplaceChild(docNode, currentNode);
+                    }
+
+                    currentNode = docNode;
                 }
 
                 // TODO: Update with new schema!
