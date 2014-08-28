@@ -8,13 +8,14 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 
 namespace umbraco.presentation.settings {
     public partial class DictionaryItemList : BasePages.UmbracoEnsuredPage {
         public DictionaryItemList()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
-
+	        CurrentApp = ApplicationContext.Current.Services.ApplicationTreeService
+		        .GetByAlias(Constants.Trees.Dictionary).ApplicationAlias;
         }
 
         private cms.businesslogic.language.Language[] languages = cms.businesslogic.language.Language.getAll;
