@@ -4,6 +4,7 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
     grunt.registerTask('dev', ['jshint:dev', 'build-dev', 'webserver', 'open:dev', 'watch']);
+    grunt.registerTask('docserve', ['docs:api', 'connect:docserver', 'open:docs', 'watch:docs']);
     grunt.registerTask('vs', ['jshint:dev', 'build-dev', 'watch']);
 
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
@@ -75,12 +76,31 @@ module.exports = function (grunt) {
                  }
                }
              },
-             testserver: {}
+             testserver: {},
+             docserver: {
+               options: {
+                 port: 8880,
+                 hostname: '0.0.0.0',
+                 base: './docs/api',
+                 middleware: function(connect, options){
+                   return [
+                     //uncomment to enable CSP
+                     // util.csp(),
+                     //util.rewrite(),
+                     connect.static(options.base),
+                     connect.directory(options.base)
+                   ];
+                 }
+               }
+             },
            },
 
     open : {
       dev : {
           path: 'http://localhost:9990/belle/'
+      },
+      docs : {
+          path: 'http://localhost:8880/index.html'
       }
     },
 
@@ -357,6 +377,11 @@ module.exports = function (grunt) {
       packages: {
           files: 'src/packages/**/*.*',
           tasks: ['watch-packages', 'timestamp'],
+      },
+
+      docs: {
+          files: ['src/**/*.js', 'src/*.js'],
+          tasks: ['docs:api'],
       }
     },
 
