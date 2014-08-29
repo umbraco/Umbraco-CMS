@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -375,11 +376,36 @@ namespace Umbraco.Core.Persistence.Repositories
             //Loop through properties to check if the media item contains images/file that should be deleted
             foreach (var property in entity.Properties)
             {
+                string filepath = null;
+                //Check for Upload fields
                 if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias &&
-                    string.IsNullOrEmpty(property.Value.ToString()) == false
-                    && fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
+                    string.IsNullOrEmpty(property.Value.ToString()) == false)
                 {
-                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
+                    filepath = property.Value.ToString();
+                }
+                //Check for image cropper
+                else if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias &&
+                    string.IsNullOrEmpty(property.Value.ToString()) == false)
+                {
+                    string value = property.Value.ToString();
+                    if (value.DetectIsJson())
+                    {
+                        var j = JObject.Parse(value);
+                        if (j != null && j.ContainsKeyIgnoreCase("src"))
+                        {
+                            filepath = j.GetValueAsString("src");
+                        }
+                    }
+                    else
+                    {
+                        //probably an old value from an Upload field, so add it anyway
+                        filepath = value;
+                    }
+                }
+
+                if(!string.IsNullOrWhiteSpace(filepath) && fs.FileExists(fs.GetRelativePath(filepath)))
+                {
+                    var relativeFilePath = fs.GetRelativePath(filepath);
                     var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
 
                     // don't want to delete the media folder if not using directories.
