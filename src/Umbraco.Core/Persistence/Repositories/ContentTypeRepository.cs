@@ -279,18 +279,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 IContentTypeRepository contentTypeRepository,
                 ITemplateRepository templateRepository)
             {
-                IDictionary<int, IEnumerable<AssociatedTemplate>> allAssocatedTemplates;
+                IDictionary<int, IEnumerable<AssociatedTemplate>> allAssociatedTemplates;
                 IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
-                var contentTypes = MapContentTypes(contentTypeIds, db, out allAssocatedTemplates, out allParentContentTypeIds)
+                var contentTypes = MapContentTypes(contentTypeIds, db, out allAssociatedTemplates, out allParentContentTypeIds)
                     .ToArray();
 
                 foreach (var contentType in contentTypes)
                 {
-                    var assocatedTemplates = allAssocatedTemplates[contentType.Id];
+                    var associatedTemplates = allAssociatedTemplates[contentType.Id];
                     var parentContentTypeIds = allParentContentTypeIds[contentType.Id];
 
                     MapContentTypeTemplatesAndChildren(
-                        contentType, db, contentTypeRepository, templateRepository, assocatedTemplates, parentContentTypeIds);
+                        contentType, db, contentTypeRepository, templateRepository, associatedTemplates, parentContentTypeIds);
 
                     //on initial construction we don't want to have dirty properties tracked
                     // http://issues.umbraco.org/issue/U4-1946
@@ -484,6 +484,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     //map the allowed content types
                     contentType.AllowedContentTypes = result
+                        .Where(x => x.ctId == currentCtId)
                         //use tuple so we can use distinct on all vals
                         .Select(x => new Tuple<int?, int?, string>(x.ctaAllowedId, x.ctaSortOrder, x.ctaAlias))
                         .Where(x => x.Item1.HasValue && x.Item2.HasValue && x.Item3 != null)
@@ -495,6 +496,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     //map the child content type ids
                     parentContentTypeIds.Add(currentCtId, result
+                        .Where(x => x.ctId == currentCtId)
                         .Select(x => (int?) x.chtParentId)
                         .Where(x => x.HasValue)
                         .Distinct()

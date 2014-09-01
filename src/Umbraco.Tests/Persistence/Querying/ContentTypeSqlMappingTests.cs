@@ -49,26 +49,37 @@ namespace Umbraco.Tests.Persistence.Querying
                 DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99998, Id = 99997, SortOrder = 1 });
                 DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99999, Id = 99997, SortOrder = 2});
 
-                DatabaseContext.Database.Insert(new ContentType2ContentTypeDto {ChildId = 99999, ParentId = 99997});
+                DatabaseContext.Database.Insert(new ContentType2ContentTypeDto { ChildId = 99999, ParentId = 99997});
                 DatabaseContext.Database.Insert(new ContentType2ContentTypeDto { ChildId = 99998, ParentId = 99997 });
                 
                 transaction.Complete();
             }
 
-            IDictionary<int, IEnumerable<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssocatedTemplates;
-            IDictionary<int, IEnumerable<int>> allChildContentTypeIds;
-            var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapContentTypes(new[] { 99997 }, DatabaseContext.Database, out allAssocatedTemplates, out allChildContentTypeIds)
+            IDictionary<int, IEnumerable<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssociatedTemplates;
+            IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
+            var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapContentTypes(
+                new[] {99997, 99998}, DatabaseContext.Database, out allAssociatedTemplates, out allParentContentTypeIds)
                 .ToArray();
 
-            var contentType = contentTypes.SingleOrDefault();
-            Assert.IsNotNull(contentType);
+            var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
+            Assert.IsNotNull(contentType1);
 
-            var assocatedTemplates = allAssocatedTemplates[contentType.Id];
-            var childContentTypes = allChildContentTypeIds[contentType.Id];
+            var associatedTemplates1 = allAssociatedTemplates[contentType1.Id];
+            var parentContentTypes1 = allParentContentTypeIds[contentType1.Id];
 
-            Assert.AreEqual(2, contentType.AllowedContentTypes.Count());
-            Assert.AreEqual(2, assocatedTemplates.Count());
-            Assert.AreEqual(2, childContentTypes.Count());
+            Assert.AreEqual(2, contentType1.AllowedContentTypes.Count());
+            Assert.AreEqual(2, associatedTemplates1.Count());
+            Assert.AreEqual(0, parentContentTypes1.Count());
+
+            var contentType2 = contentTypes.SingleOrDefault(x => x.Id == 99998);
+            Assert.IsNotNull(contentType2);
+
+            var associatedTemplates2 = allAssociatedTemplates[contentType2.Id];
+            var parentContentTypes2 = allParentContentTypeIds[contentType2.Id];
+
+            Assert.AreEqual(0, contentType2.AllowedContentTypes.Count());
+            Assert.AreEqual(0, associatedTemplates2.Count());
+            Assert.AreEqual(1, parentContentTypes2.Count());
 
         }
 
