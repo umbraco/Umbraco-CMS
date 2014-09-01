@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Member Type
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.MemberType)]
+        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.MemberType, typeof(IMemberType))]
         [FriendlyName("Member Type")]
         MemberType,
 
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Member
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Member)]
+        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.Member, typeof(IMember))]
         [FriendlyName("Member")]
         Member,
 

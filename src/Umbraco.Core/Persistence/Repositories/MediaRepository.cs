@@ -23,11 +23,11 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MediaRepository : VersionableRepositoryBase<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
-        private readonly ITagsRepository _tagRepository;
+        private readonly ITagRepository _tagRepository;
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository, ITagsRepository tagRepository)
+        public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
             : base(work)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
             EnsureUniqueNaming = true;
         }
 
-        public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository, ITagsRepository tagRepository)
+        public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
             : base(work, cache)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");

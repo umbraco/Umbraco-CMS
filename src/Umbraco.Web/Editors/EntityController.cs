@@ -459,7 +459,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support heirarchy here, some might not.
+                //TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 return Services.EntityService.GetChildren(id, objectType.Value).Select(Mapper.Map<EntityBasic>)
                     .WhereNotNull();
@@ -481,7 +481,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support heirarchy here, some might not.
+                //TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse);
                 return ids.Select(m => Mapper.Map<EntityBasic>(Services.EntityService.Get(m, objectType.Value)))
@@ -569,8 +569,11 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                return keys.Select(id => Mapper.Map<EntityBasic>(Services.EntityService.GetByKey(id, objectType.Value)))
-                          .WhereNotNull();
+                var result = Services.EntityService.GetAll(objectType.Value, keys.ToArray())
+                    .WhereNotNull()
+                    .Select(Mapper.Map<EntityBasic>);
+
+                return result;
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -591,8 +594,10 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var result = ids.Select(id => Mapper.Map<EntityBasic>(Services.EntityService.Get(id, objectType.Value)))
-                          .WhereNotNull();
+                var result = Services.EntityService.GetAll(objectType.Value, ids.ToArray())
+                    .WhereNotNull()
+                    .Select(Mapper.Map<EntityBasic>);
+
                 return result;
             }
             //now we need to convert the unknown ones

@@ -139,42 +139,63 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
+            //TODO: Fix the n+1 query!
+
             if (ids.Any())
             {
-                foreach (var id in ids)
+                return ids.Select(id => Get(id, objectTypeId));
+            }
+            else
+            {
+                return PerformGetAll(objectTypeId);
+            }
+        }
+
+        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys)
+        {
+            //TODO: Fix the n+1 query!
+
+            if (keys.Any())
+            {
+                return keys.Select(key => GetByKey(key, objectTypeId));
+            }
+            else
+            {
+                return PerformGetAll(objectTypeId);
+            }
+        }
+
+        private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectTypeId)
+        {
+            //TODO: Fix the n+1 query!
+
+            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
+            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, string.Empty);
+
+            var factory = new UmbracoEntityFactory();
+
+            if (isMedia)
+            {
+                //for now treat media differently
+                //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
+                var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
+                    new UmbracoEntityRelator().Map, sql);
+                foreach (var entity in entities)
                 {
-                    yield return Get(id, objectTypeId);
+                    yield return entity;
                 }
             }
             else
             {
-                bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-                bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
-                var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, string.Empty);
-                
-                var factory = new UmbracoEntityFactory();
-
-                if (isMedia)
+                var dtos = _work.Database.Fetch<dynamic>(sql);
+                foreach (var entity in dtos.Select(dto => factory.BuildEntityFromDynamic(dto)))
                 {
-                    //for now treat media differently
-                    //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
-                    var entities = _work.Database.Fetch<dynamic, UmbracoPropertyDto, UmbracoEntity>(
-                        new UmbracoEntityRelator().Map, sql);
-                    foreach (var entity in entities)
-                    {
-                        yield return entity;
-                    }
-                }
-                else
-                {
-                    var dtos = _work.Database.Fetch<dynamic>(sql);
-                    foreach (var entity in dtos.Select(dto => factory.BuildEntityFromDynamic(dto)))
-                    {
-                        yield return entity;
-                    }
+                    yield return entity;
                 }
             }
         }
+
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {

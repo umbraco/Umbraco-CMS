@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="tagRepo"></param>
-        protected void ClearEntityTags(IContentBase entity, ITagsRepository tagRepo)
+        protected void ClearEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             tagRepo.ClearTagsFromEntity(entity.Id);
         }
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="tagRepo"></param>
-        protected void UpdatePropertyTags(IContentBase entity, ITagsRepository tagRepo)
+        protected void UpdatePropertyTags(IContentBase entity, ITagRepository tagRepo)
         {
             foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
             {

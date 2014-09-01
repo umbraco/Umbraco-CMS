@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);
             memberGroupRepository = new MemberGroupRepository(unitOfWork, NullCacheProvider.Current, CacheHelper.CreateDisabledCacheHelper());
-            var tagRepo = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepo = new TagRepository(unitOfWork, NullCacheProvider.Current);
             var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository, memberGroupRepository, tagRepo);
             return repository;
         }
