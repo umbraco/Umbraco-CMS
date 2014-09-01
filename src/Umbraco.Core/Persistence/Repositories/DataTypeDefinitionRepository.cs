@@ -109,6 +109,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
             var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == entity.Id);
+
+            //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
 
             //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted

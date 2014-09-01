@@ -102,14 +102,44 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMedia>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                                .OrderBy<NodeDto>(x => x.SortOrder);
 
+            //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
 
-            foreach (var dto in dtos)
-            {
-                yield return Get(dto.ContentDto.NodeDto.NodeId);
-            }
+            //content types
+            var contentTypes = _mediaTypeRepository.GetAll(dtos.Select(x => x.ContentDto.ContentTypeId).ToArray())
+                .ToArray();
+
+            //Go get the property data for each document
+            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
+                dto.NodeId,
+                dto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
+                dto.ContentDto.NodeDto.CreateDate,
+                dto.VersionDate))
+                .ToArray();
+
+            var propertyData = GetPropertyCollection(docDefs);
+
+            return dtos.Select(dto => CreateMediaFromDto(
+                dto,
+                dto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
+                propertyData[dto.NodeId]));
+
+
+            //var sqlClause = GetBaseQuery(false);
+            //var translator = new SqlTranslator<IMedia>(sqlClause, query);
+            //var sql = translator.Translate();
+
+            //var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            //foreach (var dto in dtos)
+            //{
+            //    yield return Get(dto.ContentDto.NodeDto.NodeId);
+            //}
         }
 
         #endregion
@@ -502,7 +532,33 @@ namespace Umbraco.Core.Persistence.Repositories
                     return "SortOrder";
             }
         }
-        
+
+        /// <summary>
+        /// Private method to create a media object from a ContentDto
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="versionId"></param>
+        /// <param name="contentType"></param>
+        /// <param name="propCollection"></param>
+        /// <returns></returns>
+        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId,
+            IMediaType contentType = null,
+            Models.PropertyCollection propCollection = null)
+        {
+            contentType = contentType ?? _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+
+            var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
+            var media = factory.BuildEntity(dto);
+            
+            media.Properties = propCollection ??
+                GetPropertyCollection(dto.NodeId, versionId, contentType, media.CreateDate, media.UpdateDate);
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
+            return media;
+        }
+
         private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
             if (EnsureUniqueNaming == false)

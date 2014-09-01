@@ -84,6 +84,55 @@ namespace Umbraco.Tests.Persistence.Querying
         }
 
         [Test]
+        public void Can_Map_Media_Type_And_Allowed_Types()
+        {
+            using (var transaction = DatabaseContext.Database.GetTransaction())
+            {
+                DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));                
+                DatabaseContext.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99997, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99997", SortOrder = 0, UniqueId = new Guid("BB3241D5-6842-4EFA-A82A-5F56885CF528"), Text = "Test Media Type 1", NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
+                DatabaseContext.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99998, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99998", SortOrder = 0, UniqueId = new Guid("EEA66B06-302E-49BA-A8B2-EDF07248BC59"), Text = "Test Media Type 2", NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
+                DatabaseContext.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99999, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99999", SortOrder = 0, UniqueId = new Guid("C45CC083-BB27-4C1C-B448-6F703CC9B799"), Text = "Test Media Type 2", NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
+                DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+
+                DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsContentType"))));
+                DatabaseContext.Database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 88887, NodeId = 99997, Alias = "TestContentType1", Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });
+                DatabaseContext.Database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 88888, NodeId = 99998, Alias = "TestContentType2", Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });
+                DatabaseContext.Database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 88889, NodeId = 99999, Alias = "TestContentType3", Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });
+                DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsContentType"))));
+
+                DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99998, Id = 99997, SortOrder = 1 });
+                DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99999, Id = 99997, SortOrder = 2 });
+
+                DatabaseContext.Database.Insert(new ContentType2ContentTypeDto { ChildId = 99999, ParentId = 99997 });
+                DatabaseContext.Database.Insert(new ContentType2ContentTypeDto { ChildId = 99998, ParentId = 99997 });
+
+                transaction.Complete();
+            }
+
+            IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
+            var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapMediaTypes(
+                new[] { 99997, 99998 }, DatabaseContext.Database, out allParentContentTypeIds)
+                .ToArray();
+
+            var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
+            Assert.IsNotNull(contentType1);
+
+            var parentContentTypes1 = allParentContentTypeIds[contentType1.Id];
+
+            Assert.AreEqual(2, contentType1.AllowedContentTypes.Count());
+            Assert.AreEqual(0, parentContentTypes1.Count());
+
+            var contentType2 = contentTypes.SingleOrDefault(x => x.Id == 99998);
+            Assert.IsNotNull(contentType2);
+
+            var parentContentTypes2 = allParentContentTypeIds[contentType2.Id];
+
+            Assert.AreEqual(0, contentType2.AllowedContentTypes.Count());
+            Assert.AreEqual(1, parentContentTypes2.Count());
+
+        }
+
+        [Test]
         public void Can_Map_All_Property_Groups_And_Types()
         {
             using (var transaction = DatabaseContext.Database.GetTransaction())
