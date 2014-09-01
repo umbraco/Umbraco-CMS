@@ -1312,6 +1312,58 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region tuning
+        
+        public HtmlString EnableTuning()
+        {
+            return EnableTuning(string.Empty, string.Empty);
+        }
+
+        public HtmlString EnableTuning(string tuningConfigPath)
+        {
+            return EnableTuning(tuningConfigPath, string.Empty);
+        }
+
+        public HtmlString EnableTuning(string tuningConfigPath, string tuningPalettesPath)
+        {
+
+            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""{0}"" type=""text/javascript""></script>" +
+                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
+                                 @"<script type=""text/javascript"">var pageId = '{2}'</script>" +
+                                 @"<script src=""/umbraco/js/tuning.front.js"" type=""text/javascript""></script>";
+
+            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />";
+
+            // Get page value
+            int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
+            string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
+            string result = string.Empty;
+            string cssPath = TuningUtility.GetStylesheetPath(path, false);
+
+            if (UmbracoContext.Current.InPreviewMode)
+            {
+                tuningConfigPath = !string.IsNullOrEmpty(tuningConfigPath) ? tuningConfigPath : "/umbraco/js/tuning.config.js";
+                tuningPalettesPath = !string.IsNullOrEmpty(tuningPalettesPath) ? tuningConfigPath : "/umbraco/js/tuning.palettes.js";
+                
+                if (!string.IsNullOrEmpty(cssPath))
+                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+
+                result = result + string.Format(previewLink, tuningConfigPath, tuningPalettesPath, pageId);
+            }
+            else
+            {
+                // Get css path for current page
+                if (!string.IsNullOrEmpty(cssPath))
+                    result = string.Format(noPreviewLinks, cssPath);
+            }
+
+            return new HtmlString(result);
+
+        }
+
+        #endregion
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.

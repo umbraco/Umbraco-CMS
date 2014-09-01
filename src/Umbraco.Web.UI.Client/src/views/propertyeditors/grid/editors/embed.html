@@ -1,0 +1,9 @@
+<div ng-controller="Umbraco.PropertyEditors.Grid.EmbedController">
+
+	<div class="usky-editor-placeholder" ng-click="setEmbed()" ng-if="control.value === null">
+		<i class="icon icon-movie-alt"></i>
+		<div class="help-text">Click to embed</div>
+	</div>
+
+	<div ng-if="control.value" ng-bind-html-unsafe="control.value"></div>
+</div>

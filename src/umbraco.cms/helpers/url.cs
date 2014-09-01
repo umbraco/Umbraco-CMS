@@ -38,6 +38,9 @@ namespace umbraco.cms.helpers
                 return false;
             }
 
+            if (url.StartsWith("//"))
+                return false;
+
             Uri requestUri;
             if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out requestUri))
             {
@@ -47,7 +50,13 @@ namespace umbraco.cms.helpers
                     if (Uri.TryCreate(callerUrl, UriKind.RelativeOrAbsolute, out localUri))
                     {
                         // check for local urls
-                        if (!requestUri.IsAbsoluteUri || requestUri.Host == localUri.Host)
+
+                        //Cannot start with // since that is not a local url
+                        if (!requestUri.OriginalString.StartsWith("//")
+                            //cannot be non-absolute and also contain the char : since that will indicate a protocol
+                            && (!requestUri.IsAbsoluteUri && !requestUri.OriginalString.Contains(":"))
+                            //needs to be non-absolute or the hosts must match the current request
+                            && (!requestUri.IsAbsoluteUri || requestUri.Host == localUri.Host))
                         {
                             return true;
                         }
@@ -58,6 +67,13 @@ namespace umbraco.cms.helpers
                         throw new ArgumentException("CallerUrl is in a wrong format that couldn't be parsed as a valid URI. If you don't want to evaluate for local urls, but just proxy urls then leave callerUrl empty", "callerUrl");
                     }
                 }
+
+                //we cannot continue if the url is not absolute
+                if (!requestUri.IsAbsoluteUri)
+                {
+                    return false;
+                }
+
                 // check for valid proxy urls
                 var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
                 if (feedProxyXml != null &&

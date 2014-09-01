@@ -1,28 +1,28 @@
-﻿<div class="umb-modalcolumn ysod" ng-controller="Umbraco.Dialogs.YsodController">
+﻿<div class="umb-panel ysod" ng-controller="Umbraco.Dialogs.YsodController">
     
-    <a href="" ng-click="closeDialog()" class="btn">Close</a>
+    <div class="umb-panel-body with-footer no-header">
 
-    <h1>{{error.errorMsg}}</h1>
-    <hr />
-    <h2>{{error.data.ExceptionMessage || error.data.Message}}</h2>
-    <div>
-        <b>Description: </b>An unhandled exception occurred during the execution of the current web request. Please review the stack trace for more information about the error and where it originated in the code.
-        <br />
-        <br />
-        <b>Exception Details: </b>{{error.data.ExceptionType}}: {{error.data.ExceptionMessage}}      
-        <br />
-        <br />
-        <b>Stack Trace:</b>
-        <br />
-        <br />
+        <h3 style="padding-left: 20px" class="headline red">Received an error from the server</h3>
 
-        <table>
-            <tr>
-                <td>
-                    <pre>{{error.data.StackTrace}}</pre>
-                </td>
-            </tr>
-        </table>
-
+        <umb-pane>
+            <h4>{{error.errorMsg}}</h4>
+            <p>{{error.data.ExceptionMessage || error.data.Message}}</p>
+        </umb-pane>    
+        
+        <umb-pane>    
+            <h5>Exception Details: </h5>
+            {{error.data.ExceptionType}}: {{error.data.ExceptionMessage}}
+        </umb-pane>   
+        
+        <umb-pane>
+            <h5>Stacktrace: </h5>
+            <pre style="white-space: pre-wrap; overflow-x: auto;">{{error.data.StackTrace}}</pre>
+        </umb-pane>
     </div>
-</div>
+
+    <div class="umb-panel-footer">
+            <a href ng-click="close()" class="btn pull-right">
+                <localize key="general_close">Close</localize>
+            </a>
+    </div>
+</umb-panel>

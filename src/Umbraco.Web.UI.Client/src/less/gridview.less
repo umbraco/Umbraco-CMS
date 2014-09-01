@@ -1,56 +1,662 @@
 // Gridview
 // -------------------------
 
-.editor {
-	border: 1px solid #cdcdcd;
-	text-align: center;
-	line-height: 100px;
-	position: relative;
-	-webkit-transition: all 500ms  ease-in-out;
-		-moz-transition: all 500ms  ease-in-out;
-        -ms-transition: all 500ms  ease-in-out;
-        -o-transition: all 500ms  ease-in-out;
-		transition: all 500ms  ease-in-out;
-	margin: 0 0 1.5% 0
+ 
+
+
+ // Sortabel
+ // -------------------------
+ .usky-grid .ui-sortable-helper  {
+     border: dashed 1px #$000;
+     background: #ccc;
+     opacity: 0.4;
+     height: 50px !important;
+     overflow: hidden;
+     padding: 5px;
+ }
+
+ .usky-grid .ui-sortable-helper *{
+     border: none !important;
+     background: none !important;
+     color: #999 !important;
+     padding: 0 !important;
+     margin: 0 !important;    
+ }
+
+ .usky-grid .ui-sortable-helper .cell-tools{
+     display: none !important;
+ }
+
+ .usky-grid .ui-sortable-placeholder{
+     border: 2px dashed @grayLight;
+     padding: 20px;
+     font-family: icomoon;
+     text-align: center;
+     font-size: 85px;
+     line-height: 65px;
+     color: @grayLighter;
+     vertical-align: middle;
+ }
+
+ .usky-grid .ui-sortable-placeholder:hover{
+     border-color: @gray;
+ }
+
+ .usky-grid .ui-sortable-placeholder:before{
+     content: "\e1bd";
+ }
+
+
+
+ // utils
+ // -------------------------
+ .usky-grid-width {
+     margin: 20px auto;
+     width:100%;
+ }
+ .usky-grid  .right {
+     float:right;
+ }
+ 
+ // general layout components
+ // -------------------------
+ .usky-grid  .tb {
+     display:table;
+     width: 100%;
+     table-layout: fixed;
+ }
+ .usky-grid  .td {
+     display:table-cell;
+     vertical-align:top;
+     border-right:1px dashed rgba(182, 182, 182, 0.0);
+ }
+ .usky-grid .tb:hover .td{
+     border-right:1px dashed rgba(182, 182, 182, 0.3);
+ }
+ .usky-grid  .td.last {
+     border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
+ }
+ .usky-grid  .tr {
+     display:table-row;
+ }
+ .usky-grid  .td2{
+     width: 50%;
+ }
+ .usky-grid  .td3{
+     width: 33.33%;
+ }
+ .usky-grid  .td4{
+     width: 25%;
+ }
+ .usky-grid  .td5{
+     width: 20%;
+ }
+ .usky-grid  .td6{
+     width: 16.6%;
+ }
+ .usky-grid  .middle {
+     text-align: center;
+ }
+
+ .usky-grid  .mainTb {    
+     border-collapse: separate;
+ }
+ .usky-grid  .mainTd {    
+     position:relative;
+ }
+
+
+
+ // COLUMN
+ // -------------------------
+ .usky-grid  .usky-column {
+     
+ }
+ .usky-grid  .usky-column.last {
+     
+ }
+
+
+ // ROW
+ // -------------------------
+.usky-grid .usky-row{
+     position: relative;
+     border: 1px dashed rgba(0,0,0,0);
 }
 
-.editor:hover {
-	border-color: #000
+
+
+
+// CELL
+// -------------------------
+.usky-grid .usky-cell{
+     position: relative;
+     border: 1px dashed rgba(0,0,0,0);
 }
 
-.editor:hover i {
-	opacity: 1
+.usky-grid  .cell-tools {
+    transition: all .20s ease-in-out;
+    -moz-transition: all .20s ease-in-out;
+    -webkit-transition: all .20s ease-in-out;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
-.editor i {
-	position: absolute;
-	top: 0;
-	font-size: 20px;
-	color: @white;
-	background: @black;
-	padding: 10px;
-	-webkit-transition: all 500ms  ease-in-out;
-		-moz-transition: all 500ms  ease-in-out;
-        -ms-transition: all 500ms  ease-in-out;
-        -o-transition: all 500ms  ease-in-out;
-		transition: all 500ms  ease-in-out;
-	opacity: 0
+.usky-grid  .cell-tools-add {
+    position: absolute;
+    text-align: center;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    z-index: 500;
 }
 
-.editor i:hover {
+.usky-grid .cell-tools-add-single i{
+     font-size: 85px;
+     color: @grayLight;
+     display: block;
+     line-height: 55px;
+     margin-bottom: 10px;
 }
 
-.editor i.icon-move {
-	left: 0;
-	cursor: move
-}	
+.usky-grid .cell-tools-add-single a:hover i{color: @gray;}
 
-.editor i.icon-edit {
-	right: 36px;
-	cursor: pointer
+.usky-grid .cell-tools-add-single a{text-decoration:  none;}
+
+.usky-grid .cell-tools-add-single p{
+     display: none;
 }
 
-.editor i.icon-trash {
-	right: 0;
-	cursor: pointer
+.usky-grid .single-editor-rte p{
+     display: block;
 }
+.usky-grid .single-editor-rte i, .usky-grid .single-editor-rte div{
+     display: none;
+}
+
+.usky-grid  .cell-tools-remove {
+    display:inline-block;
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    text-align: right;
+    z-index: 500;
+}
+
+.usky-grid .cell-tools-remove .iconBox:hover, .usky-grid .cell-tools-remove .iconBox:hover *{
+    background: @red !important;
+    border-color: @red !important;
+}
+
+.usky-grid  .cell-tools-move {
+    display:inline-block;
+    position: absolute;
+    top: 20px;
+    right: -20px;
+    z-index: 500;
+    cursor: move
+}
+
+
+
+// CONTROL
+// -------------------------
+.usky-grid .usky-control {
+    transition: all .20s ease-in-out;
+    -moz-transition: all .20s ease-in-out;
+    -webkit-transition: all .20s ease-in-out;
+    position:relative;
+    display:block;
+    
+    border: 1px dashed rgba(255, 0, 0, .0);     
+    border-bottom-width: 2px;
+
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+.usky-grid  .usky-control:hover{
+     border-bottom:2px solid rgba(182, 182, 182, 0.3);
+}
+
+.usky-grid  .usky-control-placeholder:hover{
+     border-bottom:2px solid rgba(182, 182, 182, 0.0) !important;
+}
+
+.usky-grid .removingControl{
+     border: 1px dashed @red !important;
+}
+
+.usky-grid .movingControl{
+     border: 1px dashed @blue !important;
+}
+
+
+
+
+
+// CONTROL PLACEHOLDER
+// -------------------------
+.usky-grid  .usky-control-placeholder {
+    min-height: 50px;
+    position: relative;
+    text-align: center;
+    text-align: -moz-center;
+    cursor: text;
+}
+
+.usky-grid  .usky-control-placeholder .placeholder{
+    font-size: 14px; opacity: 0.7; text-align: left;
+    padding: 5px;
+    border:1px solid rgba(182, 182, 182, 0.3);
+    height: 50px;
+}
+.usky-grid  .usky-control-placeholder:hover .placeholder{
+    border:1px solid rgba(182, 182, 182, 0.8);
+}
+
+
+
+
+
+
+// EDITOR PLACEHOLDER
+// -------------------------
+.usky-grid .usky-editor-placeholder{
+    min-height: 65px;
+    padding: 20px;
+    padding-bottom: 30px;
+    position: relative;
+    background-color: white;
+    border: 4px dashed @grayLight;
+    text-align: center;
+    text-align: -moz-center;
+}
+.usky-grid .usky-editor-placeholder i{
+    color: @grayLight;
+    font-size: 85px;
+    line-height: 85px;  
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+
+// Form elements
+// -------------------------
+ .usky-grid  textarea.textstring{
+     display: block;
+     overflow: hidden;
+     border: none;
+     background: #fff;
+     outline: none;
+     width: 99%;
+     resize: none;
+     color: @gray;
+ }
+
+.usky-grid .usky-cell-rte textarea{
+     display: none !important
+}
+
+.usky-grid .usky-cell-media .caption{
+     display: block;
+     overflow: hidden;
+     border: none;
+     background: #fff;
+     outline: none;
+     width: 99%;
+     resize: none;
+     font-style: italic;
+}
+
+
+ 
+
+ 
+ 
+ 
+
+ 
+
+
+ 
+ .usky-grid  .cellPanelRte {
+     min-height:60px;
+ }
+
+
+
+// ICONS
+// -------------------------
+ .usky-grid  .iconBox {
+     padding: 4px 7px 4px 7px;
+     display: inline-block;
+     cursor: pointer;
+     border-radius: 200px;
+     background: rgba(255,255,255, 1);
+     border:1px solid rgb(182, 182, 182);
+     margin: 2px;
+ }
+ .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
+          background: @blue !important;
+          color: white !important;
+          border-color: @blue !important;
+ }
+
+ .usky-grid  .iconBox a:hover {
+     text-decoration:none;
+     color: white !important;
+ }
+
+ .usky-grid  .iconBox.selected {
+     -webkit-appearance: none;
+     background-image: -moz-linear-gradient(top,#e6e6e6,#bfbfbf);
+     background-image: -webkit-gradient(linear,0 0,0 100%,from(#e6e6e6),to(#bfbfbf));
+     background-image: -webkit-linear-gradient(top,#e6e6e6,#bfbfbf);
+     background-image: -o-linear-gradient(top,#e6e6e6,#bfbfbf);
+     background-image: linear-gradient(to bottom,#e6e6e6,#bfbfbf);
+     background-repeat: repeat-x;
+     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe6e6e6',endColorstr='#ffbfbfbf',GradientType=0);
+     zoom: 1;
+     border-color: #bfbfbf #bfbfbf #999;
+     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+     -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+     border-radius: 3px;
+     background: transparent;
+ }
+
+ .usky-grid  .iconBox i {
+     font-size:16px !important;
+     color: #5F5F5F;
+ }
+
+
+ 
+
+
+ .usky-grid  ul {
+     display:inline-block;
+     list-style:none;
+     padding:0;
+     margin: 10px 0 0 0;
+     text-align:center;
+ }
+
+ .usky-grid  .help-text {
+     background: @grayLighter;
+     color: @gray;
+     font-size: 14px;
+     padding: 10px 20px 10px 20px;
+     border-radius: 15px;
+     display: inline-block;
+     clear: both;
+ }
+
+ .usky-grid  ul li {
+     display: inline-block;
+     width: 120px;
+     margin: 8px 8px 0px 8px;
+ }
+
+
+
+
+ // TINYMCE EDITOR
+ // -------------------------
+ .usky-grid .mce-panel {
+     border:none !important;
+     clear:both;
+ }
+
+ .usky-grid .mce-btn button {
+     padding: 8px 6px;
+     line-height: inherit;
+ }
+
+ .usky-grid .mce-toolbar {
+     border: 1px solid rgba(207, 207, 207, 0.7);
+     background-color: rgba(250, 250, 250, 1);
+     z-index: 100;
+     display: inline-block;
+     float: left;
+     padding: -1px;
+     position: absolute;
+     margin: -1px -1px 0 -1px;
+     -webkit-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     -moz-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     z-index: 9999999;
+ }
+
+ .mce-flow-layout-item {
+     margin: 0;
+ }
+
+ .usky-grid  .mce-panel {
+     background: transparent !important;
+ }
+ .usky-grid  .mce-floatpanel {
+     background-color: #F7F7F7 !important;
+ }
+
+ 
+ // MEDIA EDITOR
+ // -------------------------
+ .usky-grid  .fullSizeImage {
+     width:100%
+ }
+
+
+
+
+ /**************************************************************************************************/
+ /* Width */
+ /**************************************************************************************************/
+
+ .usky-grid  .boxWidth {
+     text-align:right;
+     margin-bottom: 10px;
+ }
+
+ .usky-grid  .boxWidth input {
+     text-align: center;
+     width: 40px;
+ }
+
+ .usky-grid  .boxWidth label {
+     font-size: 10px;
+     padding: 0;
+     margin: 5px 5px 0 0;
+     color: #808080;
+ }
+
+
+
+ /**************************************************************************************************/
+ /* Margin control */
+ /**************************************************************************************************/
+
+ .usky-grid .usky-cell{
+     
+ }
+
+ .usky-grid .usky-row{
+     
+ }
+
+ .usky-grid .usky-control{
+     margin: 15px 30px 0px 10px;
+     padding: 5px;
+ }
+ 
+ .usky-grid .usky-templates-columns{
+     margin-top: 30px;
+ }
+
+
+ /**************************************************************************************************/
+ /* template */
+ /**************************************************************************************************/
+
+ .usky-grid .uSky-templates {
+     text-align:center;
+     overflow:hidden;
+     width:100%;
+ }
+ 
+ .usky-grid .uSky-templates-template {
+     display:inline-block;
+     width:100px;
+     padding-right: 30px;
+     margin: 20px;
+ }
+
+ .usky-grid .uSky-templates-template a.tb:hover {
+     border:5px solid @blue;
+ }
+
+ .usky-grid .uSky-templates-template .tb { 
+     width:100%; 
+     height:150px; 
+     padding:10px;
+     background-color: @grayLighter;
+     border: 5px solid @grayLight;
+     cursor:pointer;
+     position: relative;
+ }
+
+ .usky-grid .uSky-templates-template .tr { 
+     height: 100%;
+     position: relative;
+ }
+ 
+ .usky-grid .uSky-templates-template .tb .uSky-templates-column {
+     height:100%;
+     border: 1px dashed @grayLight;
+     border-right: none;
+ }
+
+ .usky-grid .uSky-templates-template .tb .uSky-templates-column.last {
+     border-right: 1px dashed @grayLight !important;
+ }
+
+ .usky-grid a.uSky-templates-column:hover, .usky-grid a.uSky-templates-column.selected{
+    background-color: @blue;
+ }
+
+
+ /**************************************************************************************************/
+ /* template column */
+ /**************************************************************************************************/
+
+ .usky-grid .usky-templates-columns .td{
+     border: none !important;
+     vertical-align: middle;
+ }
+
+ .usky-grid .usky-templates-columns .td i{
+     color: @gray;
+     opacity: 0.8
+ }
+
+
+ .usky-grid  .mainTbpt:hover {    
+     border-color:@blue;
+ }
+
+ .usky-grid  .mainTbpt {
+     cursor:pointer;
+     border-spacing: 3px;
+     border-collapse: separate;
+     height: 35px;
+     border: 2px solid @grayLight;  
+     margin:0px;
+     background-color: @grayLighter;
+ } 
+ .usky-grid  .mainTdpt {    
+     height: 35px;
+     border: 1px dashed @grayLight;  
+     margin:0px;
+     background-color: rgba(228, 228, 228, 0.41);
+     overflow: hidden;
+ }
+
+
+
+ /**************************************************************************************************/
+ /* Configuration specific styles */
+ /**************************************************************************************************/
+.usky-grid-configuration .uSky-templates{
+    text-align: left;
+}   
+
+.usky-grid-configuration ul{
+    display: block;
+}
+
+.usky-grid-configuration ul li{
+    display: block;
+    width: auto;
+    text-align: left;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template{
+    margin: 0px 20px 20px 0px;
+    width: 60px;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
+    height: 50px;
+    border-width: 2px !important;
+    padding: 0px;
+    border-spacing:2px;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template .tb:hover{
+    border-width: 2px !important;
+}
+
+.usky-grid-configuration .uSky-templates-column{
+    display: block;
+    float: left;
+    margin-left: -1px;
+}
+
+.usky-grid-configuration .uSky-templates-column.last{
+    margin-right: -1px;
+}
+
+.usky-grid-configuration .uSky-templates-column.add{
+    text-align: center;
+    font-size: 20px;
+    line-height: 70px;
+    color: #ccc;
+    text-decoration: none
+}
+
+
+.usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
+    margin: 0px 50px 20px 0px;
+    width: 60px;
+}
+
+.usky-grid-configuration .uSky-templates-rows .uSky-templates-row .tb{
+    border-width: 2px !important;
+    padding: 0px;
+    border-spacing:2px;
+}
+
+.usky-grid-configuration .uSky-templates-rows .mainTdpt{
+    height: 10px !important;
+}
+
+.usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
+

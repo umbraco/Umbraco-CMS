@@ -537,6 +537,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="Config\grid.editors.config.js" />
     <Content Include="Umbraco\Install\Legacy\loadStarterKits.ascx" />
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
@@ -2075,6 +2076,13 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\Partials\Grid\bootstrap3.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\embed.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\macro.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\media.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\rte.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\textstring.cshtml" />
+    <Content Include="Views\Partials\Grid\bootstrap2.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -2505,11 +2513,11 @@
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
     <Folder Include="Umbraco\PartialViews\Templates\" />
+    <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
-    <Folder Include="Views\Partials\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -2530,9 +2538,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7150</DevelopmentServerPort>
+          <DevelopmentServerPort>7200</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7150</IISUrl>
+          <IISUrl>http://localhost:7200</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

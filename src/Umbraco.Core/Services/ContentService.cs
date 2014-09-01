@@ -478,14 +478,16 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the Parent to retrieve Children from</param>
         /// <param name="pageNumber">Page number</param>
         /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            Mandate.ParameterCondition(pageNumber > 0, "pageSize");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);

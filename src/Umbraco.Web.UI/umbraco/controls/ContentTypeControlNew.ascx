@@ -81,13 +81,20 @@
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" /><br />            
         </cc2:PropertyPanel>   
     </cc2:Pane>
-  <cc2:Pane ID="Pane5" runat="server">
- 
-    <cc2:PropertyPanel ID="pp_allowedChildren" runat="server" Text="Allowed Child nodetypes">
-       <asp:CheckBoxList ID="lstAllowedContentTypes" runat="server" EnableViewState="True"/>
-       <asp:PlaceHolder ID="PlaceHolderAllowedContentTypes" runat="server"/>
-    </cc2:PropertyPanel>
-  </cc2:Pane>
+
+    <cc2:Pane ID="Pane5" runat="server">
+        <cc2:PropertyPanel ID="pp_allowedChildren" runat="server" Text="Allowed Child nodetypes">
+            <asp:CheckBoxList ID="lstAllowedContentTypes" runat="server" EnableViewState="True"/>
+            <asp:PlaceHolder ID="PlaceHolderAllowedContentTypes" runat="server"/>
+        </cc2:PropertyPanel>
+    </cc2:Pane>
+    
+    <cc2:Pane ID="Pane9" runat="server">
+        <cc2:PropertyPanel ID="pp_compositions" runat="server" Text="ContentType Compositions">
+            <asp:CheckBoxList ID="lstContentTypeCompositions" runat="server" EnableViewState="True"/>
+            <asp:PlaceHolder ID="PlaceHolderContentTypeCompositions" runat="server"/>
+        </cc2:PropertyPanel>
+    </cc2:Pane>
 </asp:Panel>
 
 

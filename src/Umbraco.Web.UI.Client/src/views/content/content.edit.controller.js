@@ -263,19 +263,22 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
     $scope.preview = function (content) {
 
-        if (!$scope.busy) {            
+
+        if (!$scope.busy) {
+
+            // Chromes popup blocker will kick in if a window is opened 
+            // outwith the initial scoped request. This trick will fix that.
+            //  
+            var previewWindow = $window.open('preview/?id=' + content.id, 'umbpreview');
             $scope.save().then(function (data) {
-
-                // Chromes popup blocker will kick in if a window is opened 
-                // outwith the initial scoped request. This trick will fix that.
-                var previewWindow = $window.open("/umbraco/views/content/umbpreview.html", "umbpreview");
-
-
                 // Build the correct path so both /#/ and #/ work.
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/dialogs/preview.aspx?id=' + data.id;
+                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + data.id;
                 previewWindow.location.href = redirect;
             });
-        }        
+
+
+        }
+ 
     };
 
     /** this method is called for all action buttons and then we proxy based on the btn definition */

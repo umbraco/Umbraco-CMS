@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 
@@ -43,6 +45,7 @@ namespace Umbraco.Web.Mvc
         {
             var admin = appContext.Services.UserService.GetUserById(0);
 
+
             var token = string.Format("{0}u____u{1}u____u{2}", admin.Email, admin.Username, admin.RawPasswordValue);
 
             var encrypted = token.EncryptWithMachineKey();
@@ -50,7 +53,7 @@ namespace Umbraco.Web.Mvc
             var base64 = Convert.ToBase64String(bytes);
             return "AToken val=\"" + base64 + "\"";
         }
-
+        
         /// <summary>
         /// Ensures that the user must be in the Administrator or the Install role
         /// </summary>
@@ -87,11 +90,11 @@ namespace Umbraco.Web.Mvc
                 var encrypted = Encoding.UTF8.GetString(bytes);
                 //decrypt the string
                 var text = encrypted.DecryptWithMachineKey();
-                
-                //split
-                var split = text.Split(new[] {"u____u"}, StringSplitOptions.RemoveEmptyEntries);
+
+                //split - some users have not set an email, don't strip out empty entries
+                var split = text.Split(new[] {"u____u"}, StringSplitOptions.None);
                 if (split.Length != 3) return false;
-                
+
                 //compare
                 return
                     split[0] == admin.Email

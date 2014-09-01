@@ -110,6 +110,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
+    <Reference Include="dotless.Core">
+      <HintPath>..\packages\dotless.1.4.0.0\lib\dotless.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Examine.0.1.57.2941\lib\Examine.dll</HintPath>
@@ -299,8 +302,23 @@
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
+    <Compile Include="Editors\TemplateController.cs" />
+    <Compile Include="Editors\TuningController.cs" />
+    <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Models\TemplateQuery\ContentTypeModel.cs" />
+    <Compile Include="Models\TemplateQuery\PropertyModel.cs" />
+    <Compile Include="Models\TemplateQuery\SourceModel.cs" />
+    <Compile Include="Models\TemplateQuery\TemplateQueryResult.cs" />
+    <Compile Include="Models\TemplateQuery\SortExpression.cs" />
+    <Compile Include="Models\TemplateQuery\Operathor.cs" />
+    <Compile Include="Models\TemplateQuery\OperathorTerm.cs" />
+    <Compile Include="Models\TemplateQuery\QueryCondition.cs" />
+    <Compile Include="Models\TemplateQuery\QueryModel.cs" />
+    <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
+    <Compile Include="Editors\TemplateQueryController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
+    <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\DetachedContent.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
     <Compile Include="Models\ImageCropCoordinates.cs" />
@@ -354,6 +372,7 @@
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
+    <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
@@ -471,12 +490,15 @@
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
+    <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
     <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Models\Trees\CreateChildEntity.cs" />
     <Compile Include="Models\Trees\MenuItemList.cs" />
+    <Compile Include="Trees\TemplateTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
+    <Compile Include="TuningUtility.cs" />
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
@@ -761,6 +783,7 @@
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
+    <Compile Include="WebApi\JsonCamelCaseFormatter.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />

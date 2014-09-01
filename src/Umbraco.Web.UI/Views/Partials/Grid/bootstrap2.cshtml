@@ -1,0 +1,47 @@
+﻿@inherits UmbracoViewPage<dynamic>
+@using Umbraco.Web.Templates
+@using Newtonsoft.Json.Linq;
+
+
+@if (Model != null && !string.IsNullOrEmpty(Model.ToString()))
+{
+    var onlyOneColumn = Model.sections != null ? ((System.Collections.ICollection)Model.sections).Count : 0;
+    
+    <div class="uSky-grid @(onlyOneColumn > 1 ? "container-fluid" : "")">
+        <div class="row-fluid clearfix">
+            @foreach (var s in Model.sections)
+            {
+                <div class="@("span" + s.grid)">
+                    @foreach (var row in s.rows)
+                    {
+                        <div class="gridrow_@row.uniqueId" >
+                            <div>
+                                <div class="row-fluid clearfix">
+
+                                    @foreach (var area in row.areas)
+                                    {
+                                        <div class="@("span" + area.grid)">
+
+                                            @foreach (var control in area.controls)
+                                            {
+                                                if (control != null && control.editor != null && control.editor.view != null)
+                                                {
+
+                                                    string editor = "grid/editors/" + control.editor.view.ToString();
+                                                    <text>
+                                                        @Html.Partial(editor, (object)control)
+                                                    </text>
+                                                }
+                                            }
+                                            
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

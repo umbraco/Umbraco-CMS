@@ -51,6 +51,7 @@ namespace Umbraco.Web
             {
                 // the keepalive service will use that url
                 ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+                LogHelper.Info<UmbracoModule>("Setting OriginalRequestUrl: " + ApplicationContext.Current.OriginalRequestUrl);
             }
 
 			// do not process if client-side request

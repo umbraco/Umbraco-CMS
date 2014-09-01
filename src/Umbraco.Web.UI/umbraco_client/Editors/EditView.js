@@ -69,6 +69,33 @@
             });
         },
 
+
+        openQueryModal: function () {
+            /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
+
+            var self = this;
+
+            UmbClientMgr.openAngularModalWindow({
+                template: "views/common/dialogs/template/queryBuilder.html",
+                callback: function (data) {
+
+                    //var dataFormatted = data.replace(new RegExp('[' + "." + ']', 'g'), "\n\t\t\t\t\t.");
+
+                    var code = "\n@{\n" + "\tvar selection = " + data + ";\n}\n";
+                    code += "<ul>\n" +
+                                "\t@foreach(var item in selection){\n" +
+                                    "\t\t<li>\n" +
+                                        "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
+                                    "\t\t</li>\n" +
+                                "\t}\n" +
+                            "</ul>\n\n";
+
+                    UmbEditor.Insert(code, '', self._opts.codeEditorElementId);
+                }
+            });
+        },
+
+
         doSubmit: function () {
             /// <summary>Submits the data to the server for saving</summary>
             var codeVal = UmbClientMgr.contentFrame().UmbEditor.GetCode();

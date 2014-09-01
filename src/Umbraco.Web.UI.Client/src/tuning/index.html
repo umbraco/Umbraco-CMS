@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--<link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />-->
+    <link href="/Umbraco/assets/css/tuning.panelStyles.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
+
+</head>
+ 
+<body id="tuningPanel" ng-mouseover="outlinePositionHide()" ng-class="{ rightOpen: showStyleEditor && !showDevicesPreview }" ng-controller="Umbraco.tuningController">
+
+    <div class="wait" ng-show="!frameLoaded"></div>
+
+    <div id="demo-iframe-wrapper" ng-show="frameLoaded" class="{{previewDevice.css}}">
+        <iframe id="resultFrame" ng-src="{{pageUrl}}" frameborder="0" iframe-is-loaded></iframe>
+    </div>
+
+    <div class="tuning" ng-init="showDevicesPreview = true; showPalettePicker = true">
+
+        <div class="fix-left-menu selected">
+
+            <div class="avatar">
+                <img ng-src="/umbraco/assets/img/application/logo.png">
+            </div>
+
+            <ul class="sections" ng-class="{selected: showDevicesPreview}">
+                <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
+                    <a href="#"><i class="icon {{device.icon}}"></i><span></span></a>
+                </li>
+                <li ng-click="closePreviewDevice()" ng-if="enableTuning > 0">
+                    <a href="" class="more-options">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="sections" ng-class="{selected: !showDevicesPreview}" ng-if="enableTuning > 0">
+                <li ng-click="openPreviewDevice()">
+                    <a href="#"><i class="icon {{previewDevice.icon}}"></i><span>Preview</span></a>
+                </li>
+                <li ng-click="openPalettePicker()" ng-class=" { current:showPalettePicker }">
+                    <a href="#"><i class="icon icon-palette"></i><span>Palette</span></a>
+                </li>
+                <li ng-click="openStyleEditor()" ng-class=" { current:showStyleEditor }">
+                    <a href="#"><i class="icon icon-paint-roller"></i><span>UI Designer</span></a>
+                </li>
+            </ul>
+
+            <!--<div class="help">
+                <div class="display-i"><i class="icon icon-help-alt"></i><span></span></div>
+            </div>-->
+
+        </div>
+
+        <div class="float-left-menu" ng-class="{selected: !showDevicesPreview && showPalettePicker}">
+
+            <div class="header">
+                <h3>Palette Style</h3>
+            </div>
+
+            <div class="content">
+                <ul class="samples">
+                    <li ng-repeat="palette in tuningPalette">
+                        <a href="#" ng-click="refreshtuningByPalette(palette)">
+                            <h4>{{palette.name}}</h4>
+                            <ul class="samples">
+                                <li style="background-color:{{palette.color1}}"></li>
+                                <li style="background-color:{{palette.color2}}"></li>
+                                <li style="background-color:{{palette.color3}}"></li>
+                                <li style="background-color:{{palette.color4}}"></li>
+                                <li style="background-color:{{palette.color5}}"></li>
+                            </ul>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <a class="btn btn-success" ng-click="saveStyle()">Save Style</a>
+                <a class="btn btn-success dropdown-toggle" ng-click="opendropdown = !opendropdown">
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
+                    <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
+                    <li><a ng-click="deleteTuning();opendropdown = false">Reset page style</a></li>
+                    <!--<li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>-->
+                </ul>
+            </div>
+                
+        </div>
+
+        <div class="fix-right-menu devices-preview" ng-class="{selected: !showDevicesPreview && showStyleEditor}">
+
+            <div ng-repeat="configItem in tuningModel.configs" ng-show="schemaFocus.toLowerCase() == configItem.name.toLowerCase()" on-finish-render-filters>
+
+                <div class="header">
+                    <h3>{{configItem.name}}</h3>
+                </div>
+                <div class="content">
+                    <div ng-repeat="category in propertyCategories" ng-show="hasEditor(configItem.editors, category)">
+                        <h4 class="panel-title">{{category}}</h4>
+                        <div class="tuning-panel-container">
+                            <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category"
+                                 ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <a class="btn btn-success" ng-click="saveStyle()">Save Style</a>
+                <a class="btn btn-success dropdown-toggle" ng-click="opendropdown = !opendropdown">
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
+                    <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
+                    <li><a ng-click="deleteTuning();opendropdown = false">Reset page style</a></li>
+                    <!--<li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>-->
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="float-right-menu devices-preview"></div>
+
+    </div>
+
+    <div id="speechbubble">
+        <p>Styles saved and published</p>
+    </div>
+
+    <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
+    <script src="/umbraco/js/tuning.loader.js"></script>
+
+
+</body>
+
+</html>

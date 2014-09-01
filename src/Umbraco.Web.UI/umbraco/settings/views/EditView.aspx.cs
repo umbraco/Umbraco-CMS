@@ -202,7 +202,12 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					ClientCallbackOpenMacroModel = "function(alias) {editViewEditor.openMacroModal(alias);}"
 				};
             editorSource.Menu.InsertNewControl(macroSplitButton, 40);
-			
+
+            MenuIconI umbTemplateQueryBuilder = editorSource.Menu.NewIcon();
+            umbTemplateQueryBuilder.ImageURL = UmbracoPath + "/images/editor/inshtml.gif";
+            umbTemplateQueryBuilder.OnClickCommand = "editViewEditor.openQueryModal()";
+            umbTemplateQueryBuilder.AltText = "Open query builder";
+
 			if (_template == null)
 			{
 				InitializeEditorForPartialView();

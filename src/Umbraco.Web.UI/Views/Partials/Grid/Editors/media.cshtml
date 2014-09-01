@@ -1,0 +1,13 @@
+﻿@model dynamic
+@using Umbraco.Web.Templates
+
+@if (Model.value != null)
+{ 
+    <div class="thumbnail">
+        <img src="@Model.value.image" alt="@Model.value.caption">
+    </div>
+    if (Model.value.caption != null)
+    {
+        <p class="caption">@Model.value.caption</p>
+    }
+}

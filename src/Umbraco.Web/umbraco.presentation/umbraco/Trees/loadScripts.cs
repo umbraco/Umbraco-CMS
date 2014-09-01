@@ -48,7 +48,10 @@ namespace umbraco
             Javascript.Append(
                 @"
 			function openScriptEditor(id) {
-			UmbClientMgr.contentFrame('settings/scripts/editScript.aspx?file=' + id);
+			    UmbClientMgr.contentFrame('settings/scripts/editScript.aspx?file=' + id);
+			}
+            function openScriptFolder(id) {
+			    return false;
 			}
 		");
         }
@@ -71,6 +74,7 @@ namespace umbraco
         {
 
             xNode.Menu = new List<IAction>(new IAction[] { ActionDelete.Instance, ContextMenuSeperator.Instance, ActionNew.Instance, ContextMenuSeperator.Instance, ActionRefresh.Instance });
+            xNode.Action = "javascript:void(0)";
             xNode.NodeType = "scriptsFolder";
         }
 

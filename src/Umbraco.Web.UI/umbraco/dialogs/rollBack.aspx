@@ -91,8 +91,8 @@
         </asp:Panel>
     </div>
 
-    <div runat="server" id="pl_buttons" visible="false" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <div runat="server" id="pl_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
         <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>
-        <asp:Button ID="Button1" runat="server" CssClass="btn btn-primary" OnClick="doRollback_Click"></asp:Button>
+        <asp:Button ID="Button1" runat="server" visible="false" CssClass="btn btn-primary" OnClick="doRollback_Click"></asp:Button>
     </div>  
 </asp:Content>

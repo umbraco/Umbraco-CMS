@@ -54,7 +54,7 @@ namespace umbraco.cms.businesslogic
         private bool _hasChildrenInitialized;
         private string m_image = "default.png";
         private bool? _isTrashed = null;
-        private IUmbracoEntity _entity;
+        protected IUmbracoEntity Entity;
 
         #endregion
 
@@ -431,7 +431,7 @@ namespace umbraco.cms.businesslogic
         protected internal CMSNode(IUmbracoEntity entity)
         {
             _id = entity.Id;
-            _entity = entity;
+            Entity = entity;
         }
 
         protected internal CMSNode(IEntity entity)
@@ -750,8 +750,8 @@ order by level,sortOrder";
                 _sortOrder = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set sortOrder = '" + value + "' where id = " + this.Id.ToString());
 
-                if (_entity != null)
-                    _entity.SortOrder = value;
+                if (Entity != null)
+                    Entity.SortOrder = value;
             }
         }
 
@@ -815,8 +815,8 @@ order by level,sortOrder";
                 _parentid = value.Id;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id.ToString() + " where id = " + this.Id.ToString());
 
-                if (_entity != null)
-                    _entity.ParentId = value.Id;
+                if (Entity != null)
+                    Entity.ParentId = value.Id;
             }
         }
 
@@ -833,8 +833,8 @@ order by level,sortOrder";
                 _path = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
 
-                if (_entity != null)
-                    _entity.Path = value;
+                if (Entity != null)
+                    Entity.Path = value;
             }
         }
 
@@ -851,8 +851,8 @@ order by level,sortOrder";
                 _level = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
 
-                if (_entity != null)
-                    _entity.Level = value;
+                if (Entity != null)
+                    Entity.Level = value;
             }
         }
 
@@ -972,8 +972,8 @@ order by level,sortOrder";
                                           SqlHelper.CreateParameter("@text", value.Trim()),
                                           SqlHelper.CreateParameter("@id", this.Id));
 
-                if (_entity != null)
-                    _entity.Name = value;
+                if (Entity != null)
+                    Entity.Name = value;
             }
         }
 
@@ -1026,8 +1026,8 @@ order by level,sortOrder";
         {
             _text = txt;
 
-            if (_entity != null)
-                _entity.Name = txt;
+            if (Entity != null)
+                Entity.Name = txt;
         }
 
         /// <summary>
@@ -1166,7 +1166,7 @@ order by level,sortOrder";
             _userId = content.CreatorId;
             _createDate = content.CreateDate;
             _isTrashed = content.Trashed;
-            _entity = content;
+            Entity = content;
         }
 
         internal protected void PopulateCMSNodeFromUmbracoEntity(IAggregateRoot content, Guid objectType)

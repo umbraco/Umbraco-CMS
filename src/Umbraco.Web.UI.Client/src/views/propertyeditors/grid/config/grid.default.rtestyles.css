@@ -1,0 +1,15 @@
+body.mce-content-body {
+    background: transparent  !important;
+    overflow-x:hidden  !important;
+    padding-bottom: 10px  !important;
+    /*margin:0px;*/
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+.button {
+    display: inline-block;
+    border-radius:4px;
+}

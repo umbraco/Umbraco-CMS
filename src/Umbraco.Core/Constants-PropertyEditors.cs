@@ -131,6 +131,12 @@ namespace Umbraco.Core
             public const string FolderBrowserAlias = "Umbraco.FolderBrowser";
 
             /// <summary>
+            /// Alias for the grid datatype.
+            /// </summary>
+            public const string GridAlias = "Umbraco.Grid";
+
+
+            /// <summary>
             /// Guid for the Image Cropper datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]

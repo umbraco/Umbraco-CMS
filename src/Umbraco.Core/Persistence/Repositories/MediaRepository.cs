@@ -4,11 +4,13 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -397,6 +399,109 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets paged media results
+        /// </summary>
+        /// <param name="query">Query to excute</param>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, int pageNumber, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string filter = "")
+        {
+            // Get base query
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IMedia>(sqlClause, query);
+            var sql = translator.Translate();
+
+            // Apply filter
+            if (!string.IsNullOrEmpty(filter))
+            {
+                sql = sql.Where("umbracoNode.text LIKE @0", "%" + filter + "%");
+            }
+
+            // Apply order according to parameters
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sql = sql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sql = sql.OrderByDescending(orderByParams);
+                }
+            }
+
+            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            // So we'll modify the SQL.
+            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsContentVersion.contentId");
+
+            // Get page of results and total count
+            IEnumerable<IMedia> result;
+            var pagedResult = Database.Page<ContentVersionDto>(pageNumber, pageSize, modifiedSQL, sql.Arguments);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            if (totalRecords > 0)
+            {
+                // Parse out node Ids and load media (we need the cast here in order to be able to call the IQueryable extension
+                // methods OrderBy or OrderByDescending)
+                var media = GetAll(pagedResult.Items
+                    .DistinctBy(x => x.NodeId)
+                    .Select(x => x.NodeId).ToArray())
+                    .Cast<Umbraco.Core.Models.Media>()
+                    .AsQueryable();
+
+                // Now we need to ensure this result is also ordered by the same order by clause
+                var orderByProperty = GetIMediaPropertyNameForOrderBy(orderBy);
+                if (orderDirection == Direction.Ascending)
+                {
+                    result = media.OrderBy(orderByProperty);
+                }
+                else
+                {
+                    result = media.OrderByDescending(orderByProperty);
+                }
+            }
+            else
+            {
+                result = Enumerable.Empty<IMedia>();
+            }
+
+            return result;
+        }
+
+        private string GetDatabaseFieldNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the database field names.
+            switch (orderBy)
+            {
+                case "Name":
+                    return "umbracoNode.text";
+                default:
+                    return "umbracoNode.sortOrder";
+            }
+        }
+
+        private string GetIMediaPropertyNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the IMedia property names.
+            switch (orderBy)
+            {
+                case "Name":
+                    return "Name";
+                default:
+                    return "SortOrder";
+            }
+        }
         
         private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {

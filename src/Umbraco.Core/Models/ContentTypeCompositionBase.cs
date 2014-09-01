@@ -93,8 +93,17 @@ namespace Umbraco.Core.Models
         {
             if (ContentTypeCompositionExists(alias))
             {
-                var contentTypeComposition = ContentTypeComposition.First(x => x.Alias == alias);
+                var contentTypeComposition = ContentTypeComposition.FirstOrDefault(x => x.Alias == alias);
+                if (contentTypeComposition == null)//You can't remove a composition from another composition
+                    return false;
+
                 RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
+                
+                //If the ContentType we are removing has Compositions of its own these needs to be removed as well
+                var compositionIdsToRemove = contentTypeComposition.CompositionIds().ToList();
+                if(compositionIdsToRemove.Any())
+                    RemovedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
+
                 OnPropertyChanged(ContentTypeCompositionSelector);
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
