@@ -292,15 +292,18 @@ namespace Umbraco.Core.Persistence.Repositories
                             SortOrder = x.sortorder,
                             Value = x.value
                         })
-                        .ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+                        .Distinct()
+                        .ToArray();
 
-                    var preVals = new PreValueCollection(preValData);
+                    var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
 
-                    var d = new ContentPropertyData(property.Value,
+                    var preVals = new PreValueCollection(asDictionary);
+
+                    var contentPropData = new ContentPropertyData(property.Value,
                         preVals,
                         new Dictionary<string, object>());
 
-                    TagExtractor.SetPropertyTags(property, d, property.Value, tagSupport);
+                    TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
                 }
             }
 
@@ -386,15 +389,18 @@ namespace Umbraco.Core.Persistence.Repositories
                                 SortOrder = x.sortorder,
                                 Value = x.value
                             })
-                            .ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+                            .Distinct()
+                            .ToArray();
+                            
+                        var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
 
-                        var preVals = new PreValueCollection(preValData);
+                        var preVals = new PreValueCollection(asDictionary);
 
-                        var d = new ContentPropertyData(property.Value,
+                        var contentPropData = new ContentPropertyData(property.Value,
                             preVals,
                             new Dictionary<string, object>());
 
-                        TagExtractor.SetPropertyTags(property, d, property.Value, tagSupport);
+                        TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
                     }
                 }
 
