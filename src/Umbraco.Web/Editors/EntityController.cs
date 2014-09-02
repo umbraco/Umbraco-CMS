@@ -461,8 +461,9 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                return Services.EntityService.GetChildren(id, objectType.Value).Select(Mapper.Map<EntityBasic>)
-                    .WhereNotNull();
+                return Services.EntityService.GetChildren(id, objectType.Value)
+                    .WhereNotNull()
+                    .Select(Mapper.Map<EntityBasic>);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -483,9 +484,11 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse);
-                return ids.Select(m => Mapper.Map<EntityBasic>(Services.EntityService.Get(m, objectType.Value)))
-                    .WhereNotNull();
+                var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
+
+                return Services.EntityService.GetAll(objectType.Value, ids)
+                    .WhereNotNull()
+                    .Select(Mapper.Map<EntityBasic>);
             }
             //now we need to convert the unknown ones
             switch (entityType)
