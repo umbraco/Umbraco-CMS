@@ -560,11 +560,14 @@ AND umbracoNode.id <> @id",
                 var contentTypes = MapContentTypes(contentTypeIds, db, out allAssociatedTemplates, out allParentContentTypeIds)
                     .ToArray();
 
-                MapContentTypeTemplates(
-                        contentTypes, db, contentTypeRepository, templateRepository, allAssociatedTemplates);
+                if (contentTypes.Any())
+                {
+                    MapContentTypeTemplates(
+                            contentTypes, db, contentTypeRepository, templateRepository, allAssociatedTemplates);
 
-                MapContentTypeChildren(
-                        contentTypes, db, contentTypeRepository, allParentContentTypeIds);     
+                    MapContentTypeChildren(
+                            contentTypes, db, contentTypeRepository, allParentContentTypeIds);         
+                }
 
                 return contentTypes;
             }
@@ -590,24 +593,29 @@ AND umbracoNode.id <> @id",
                 
                 //NOTE: SQL call #3++
 
-                var allParentIdsAsArray = allParentContentTypeIds.SelectMany(x => x.Value).Distinct().ToArray();
-                if (allParentIdsAsArray.Any())
+                if (allParentContentTypeIds != null)
                 {
-                    var allParentContentTypes = contentTypeRepository.GetAll(allParentIdsAsArray).ToArray();
-                    foreach (var contentType in contentTypes)
+                    var allParentIdsAsArray = allParentContentTypeIds.SelectMany(x => x.Value).Distinct().ToArray();
+                    if (allParentIdsAsArray.Any())
                     {
-                        var parentContentTypes = allParentContentTypes.Where(x => allParentContentTypeIds[contentType.Id].Contains(x.Id));
-                        foreach (var parentContentType in parentContentTypes)
+                        var allParentContentTypes = contentTypeRepository.GetAll(allParentIdsAsArray).ToArray();
+                        foreach (var contentType in contentTypes)
                         {
-                            var result = contentType.AddContentType(parentContentType);
-                            //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
-                        }
+                            var parentContentTypes = allParentContentTypes.Where(x => allParentContentTypeIds[contentType.Id].Contains(x.Id));
+                            foreach (var parentContentType in parentContentTypes)
+                            {
+                                var result = contentType.AddContentType(parentContentType);
+                                //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
+                            }
 
-                        //on initial construction we don't want to have dirty properties tracked
-                        // http://issues.umbraco.org/issue/U4-1946
-                        ((Entity)contentType).ResetDirtyProperties(false);
+                            //on initial construction we don't want to have dirty properties tracked
+                            // http://issues.umbraco.org/issue/U4-1946
+                            ((Entity)contentType).ResetDirtyProperties(false);
+                        }
                     }
                 }
+
+                
             }
 
             internal static void MapContentTypeTemplates<TRepo>(IContentType[] contentTypes,
@@ -617,6 +625,8 @@ AND umbracoNode.id <> @id",
                 IDictionary<int, IEnumerable<AssociatedTemplate>> associatedTemplates)
                 where TRepo : IRepositoryQueryable<int, TEntity>
             {
+                if (associatedTemplates == null || associatedTemplates.Any() == false) return;
+
                 //NOTE: SQL call #3++
                 //SEE: http://issues.umbraco.org/issue/U4-5174 to fix this
 
