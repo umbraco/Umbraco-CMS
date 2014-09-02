@@ -77,12 +77,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql);
+            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
+                .DistinctBy(x => x.Id);
 
-            foreach (var dto in dtos.DistinctBy(x => x.Id))
-            {
-                yield return Get(dto.Id);
-            }
+            return ConvertFromDtos(dtos)
+                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
         }
         
         #endregion
