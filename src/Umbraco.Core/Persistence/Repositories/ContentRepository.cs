@@ -88,17 +88,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IContent> PerformGetAll(params int[] ids)
         {
-            var sqlClause = GetBaseQuery(false);
+            var sql = GetBaseQuery(false);
             if (ids.Any())
             {
-                sqlClause.Where("umbracoNode.id in (@ids)", new {ids = ids});
+                sql.Where("umbracoNode.id in (@ids)", new {ids = ids});
             }
             else
             {
-                sqlClause.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                
+                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                
             }
 
-            return ProcessQuery(sqlClause);
+            return ProcessQuery(sql);
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)

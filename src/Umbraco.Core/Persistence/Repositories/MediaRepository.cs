@@ -66,36 +66,24 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var mediaType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            var content = CreateMediaFromDto(dto, dto.VersionId);
 
-            var factory = new MediaFactory(mediaType, NodeObjectTypeId, id);
-            var media = factory.BuildEntity(dto);
-
-            media.Properties = GetPropertyCollection(id, dto.VersionId, mediaType, media.CreateDate, media.UpdateDate);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
-            return media;
+            return content;
         }
 
         protected override IEnumerable<IMedia> PerformGetAll(params int[] ids)
         {
+            var sql = GetBaseQuery(false);
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                   
             }
+
+            return ProcessQuery(sql);
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -105,41 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-
-            //content types
-            var contentTypes = _mediaTypeRepository.GetAll(dtos.Select(x => x.ContentDto.ContentTypeId).ToArray())
-                .ToArray();
-
-            //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
-                dto.NodeId,
-                dto.VersionId,
-                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
-                dto.ContentDto.NodeDto.CreateDate,
-                dto.VersionDate))
-                .ToArray();
-
-            var propertyData = GetPropertyCollection(docDefs);
-
-            return dtos.Select(dto => CreateMediaFromDto(
-                dto,
-                dto.VersionId,
-                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
-                propertyData[dto.NodeId]));
-
-
-            //var sqlClause = GetBaseQuery(false);
-            //var translator = new SqlTranslator<IMedia>(sqlClause, query);
-            //var sql = translator.Translate();
-
-            //var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-
-            //foreach (var dto in dtos)
-            //{
-            //    yield return Get(dto.ContentDto.NodeDto.NodeId);
-            //}
+            return ProcessQuery(sqlClause);
         }
 
         #endregion
@@ -506,6 +460,33 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return result;
         }
+
+        private IEnumerable<IMedia> ProcessQuery(Sql sql)
+        {
+            //NOTE: This doesn't allow properties to be part of the query
+            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            //content types
+            var contentTypes = _mediaTypeRepository.GetAll(dtos.Select(x => x.ContentDto.ContentTypeId).ToArray())
+                .ToArray();
+
+            //Go get the property data for each document
+            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
+                dto.NodeId,
+                dto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
+                dto.ContentDto.NodeDto.CreateDate,
+                dto.VersionDate))
+                .ToArray();
+
+            var propertyData = GetPropertyCollection(docDefs);
+
+            return dtos.Select(dto => CreateMediaFromDto(
+                dto,
+                dto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
+                propertyData[dto.NodeId]));
+        } 
 
         private string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
