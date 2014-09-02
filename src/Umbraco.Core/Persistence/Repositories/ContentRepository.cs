@@ -88,21 +88,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IContent> PerformGetAll(params int[] ids)
         {
+            var sqlClause = GetBaseQuery(false);
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                sqlClause.Where("umbracoNode.id in (@ids)", new {ids = ids});
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                sqlClause.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                
             }
+
+            return ProcessQuery(sqlClause);
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -114,36 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
-
-            //content types
-            var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
-                .ToArray();
-
-            var templates = _templateRepository.GetAll(
-                dtos
-                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                    .Select(x => x.TemplateId.Value).ToArray())
-                .ToArray();
-
-            //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
-                dto.NodeId,
-                dto.VersionId,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
-                dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                dto.ContentVersionDto.VersionDate))
-                .ToArray();
-
-            var propertyData = GetPropertyCollection(docDefs);
-
-            return dtos.Select(dto => CreateContentFromDto(
-                dto,
-                dto.ContentVersionDto.VersionId,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
-                templates.FirstOrDefault(tem => tem.Id == (dto.TemplateId.HasValue ? dto.TemplateId.Value : -1)),
-                propertyData[dto.NodeId]));
+            return ProcessQuery(sql);
         }
 
         #endregion
@@ -777,6 +744,40 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        private IEnumerable<IContent> ProcessQuery(Sql sql)
+        {
+            //NOTE: This doesn't allow properties to be part of the query
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            //content types
+            var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
+                .ToArray();
+
+            var templates = _templateRepository.GetAll(
+                dtos
+                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                    .Select(x => x.TemplateId.Value).ToArray())
+                .ToArray();
+
+            //Go get the property data for each document
+            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
+                dto.NodeId,
+                dto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
+                dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                dto.ContentVersionDto.VersionDate))
+                .ToArray();
+
+            var propertyData = GetPropertyCollection(docDefs);
+
+            return dtos.Select(dto => CreateContentFromDto(
+                dto,
+                dto.ContentVersionDto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
+                templates.FirstOrDefault(tem => tem.Id == (dto.TemplateId.HasValue ? dto.TemplateId.Value : -1)),
+                propertyData[dto.NodeId]));
+        }
 
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
