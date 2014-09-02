@@ -60,26 +60,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
-            if (ids.Any())
-            {
-                return PerformGetAllOnIds(ids);
-            }
-
             var sql = GetBaseQuery(false);
 
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
-                .ToArray(); // important so we don't iterate twice, if we don't do thsi we can end up with null vals in cache if we were caching.
-        }
-
-        private IEnumerable<IUser> PerformGetAllOnIds(params int[] ids)
-        {
-            if (ids.Any() == false) yield break;
-            foreach (var id in ids)
+            if (ids.Any())
             {
-                yield return Get(id);
+                sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
             }
+            
+            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
+                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
         }
-
+        
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
             var sqlClause = GetBaseQuery(false);
