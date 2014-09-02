@@ -566,6 +566,8 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<EntityBasic> GetResultForKeys(IEnumerable<Guid> keys, UmbracoEntityTypes entityType)
         {
+            if (keys.Any() == false) return Enumerable.Empty<EntityBasic>();
+
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
@@ -591,6 +593,8 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<EntityBasic> GetResultForIds(IEnumerable<int> ids, UmbracoEntityTypes entityType)
         {
+            if (ids.Any() == false) return Enumerable.Empty<EntityBasic>();
+
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {

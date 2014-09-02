@@ -170,9 +170,12 @@ namespace Umbraco.Tests.Persistence.Querying
                 transaction.Complete();
             }
 
-            PropertyTypeCollection propTypeCollection;
-            PropertyGroupCollection propGroupCollection;
-            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(99999, DatabaseContext.Database, out propTypeCollection, out propGroupCollection);
+            IDictionary<int, PropertyTypeCollection> allPropTypeCollection;
+            IDictionary<int, PropertyGroupCollection> allPropGroupCollection;
+            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, DatabaseContext.Database, out allPropTypeCollection, out allPropGroupCollection);
+
+            var propGroupCollection = allPropGroupCollection[99999];
+            var propTypeCollection = allPropTypeCollection[99999];
 
             Assert.AreEqual(4, propGroupCollection.Count);
             Assert.AreEqual(2, propGroupCollection["Group1"].PropertyTypes.Count);

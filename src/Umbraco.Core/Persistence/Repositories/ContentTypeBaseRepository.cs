@@ -544,14 +544,8 @@ AND umbracoNode.id <> @id",
                 var mediaTypes = MapMediaTypes(mediaTypeIds, db, out allParentMediaTypeIds)
                     .ToArray();
 
-                foreach (var mediaType in mediaTypes)
-                {
-                    var parentContentTypeIds = allParentMediaTypeIds[mediaType.Id];
-
-                    MapContentTypeChildren(
-                        mediaType, db, contentTypeRepository, parentContentTypeIds);
-                }
-
+                MapContentTypeChildren(mediaTypes, db, contentTypeRepository, allParentMediaTypeIds);
+                
                 return mediaTypes;
             }
 
@@ -566,68 +560,86 @@ AND umbracoNode.id <> @id",
                 var contentTypes = MapContentTypes(contentTypeIds, db, out allAssociatedTemplates, out allParentContentTypeIds)
                     .ToArray();
 
-                foreach (var contentType in contentTypes)
-                {
-                    var associatedTemplates = allAssociatedTemplates[contentType.Id];
-                    var parentContentTypeIds = allParentContentTypeIds[contentType.Id];
+                MapContentTypeTemplates(
+                        contentTypes, db, contentTypeRepository, templateRepository, allAssociatedTemplates);
 
-                    MapContentTypeTemplates(
-                        contentType, db, contentTypeRepository, templateRepository, associatedTemplates);
-
-                    MapContentTypeChildren(
-                        contentType, db, contentTypeRepository, parentContentTypeIds);                    
-                }
+                MapContentTypeChildren(
+                        contentTypes, db, contentTypeRepository, allParentContentTypeIds);     
 
                 return contentTypes;
             }
 
-            internal static void MapContentTypeChildren<TRepo>(IContentTypeComposition contentType,
+            internal static void MapContentTypeChildren<TRepo>(IContentTypeComposition[] contentTypes,
                 Database db,
                 TRepo contentTypeRepository,
-                IEnumerable<int> parentContentTypeIds)
+                IDictionary<int, IEnumerable<int>> allParentContentTypeIds)
                 where TRepo : IRepositoryQueryable<int, TEntity>
             {
                 //NOTE: SQL call #2
 
-                PropertyGroupCollection propGroups;
-                PropertyTypeCollection propTypes;
-                MapGroupsAndProperties(contentType.Id, db, out propTypes, out propGroups);
-                contentType.PropertyGroups = propGroups;
-                ((ContentTypeBase)contentType).PropertyTypes = propTypes;
+                var ids = contentTypes.Select(x => x.Id).ToArray();
+                IDictionary<int, PropertyGroupCollection> allPropGroups;
+                IDictionary<int, PropertyTypeCollection> allPropTypes;
+                MapGroupsAndProperties(ids, db, out allPropTypes, out allPropGroups);
+
+                foreach (var contentType in contentTypes)
+                {
+                    contentType.PropertyGroups = allPropGroups[contentType.Id];
+                    ((ContentTypeBase) contentType).PropertyTypes = allPropTypes[contentType.Id];
+                }
                 
                 //NOTE: SQL call #3++
 
-                var parentIdsAsArray = parentContentTypeIds.ToArray();
-                if (parentIdsAsArray.Any())
+                var allParentIdsAsArray = allParentContentTypeIds.SelectMany(x => x.Value).Distinct().ToArray();
+                if (allParentIdsAsArray.Any())
                 {
-                    var parentContentTypes = contentTypeRepository.GetAll(parentIdsAsArray);
-                    foreach (var parentContentType in parentContentTypes)
+                    var allParentContentTypes = contentTypeRepository.GetAll(allParentIdsAsArray).ToArray();
+                    foreach (var contentType in contentTypes)
                     {
-                        var result = contentType.AddContentType(parentContentType);
-                        //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
+                        var parentContentTypes = allParentContentTypes.Where(x => allParentContentTypeIds[contentType.Id].Contains(x.Id));
+                        foreach (var parentContentType in parentContentTypes)
+                        {
+                            var result = contentType.AddContentType(parentContentType);
+                            //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)    
+                        }
+
+                        //on initial construction we don't want to have dirty properties tracked
+                        // http://issues.umbraco.org/issue/U4-1946
+                        ((Entity)contentType).ResetDirtyProperties(false);
                     }
                 }
-
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                ((Entity)contentType).ResetDirtyProperties(false);
             }
 
-            internal static void MapContentTypeTemplates<TRepo>(IContentType contentType,
+            internal static void MapContentTypeTemplates<TRepo>(IContentType[] contentTypes,
                 Database db,
                 TRepo contentTypeRepository,
                 ITemplateRepository templateRepository,
-                IEnumerable<AssociatedTemplate> associatedTemplates)
+                IDictionary<int, IEnumerable<AssociatedTemplate>> associatedTemplates)
                 where TRepo : IRepositoryQueryable<int, TEntity>
             {
                 //NOTE: SQL call #3++
                 //SEE: http://issues.umbraco.org/issue/U4-5174 to fix this
 
-                var templateIds = associatedTemplates.Select(x => x.TemplateId).ToArray();
-                var templates = templateIds.Any()
-                    ? templateRepository.GetAll()
-                    : Enumerable.Empty<ITemplate>();
-                contentType.AllowedTemplates = templates.ToArray();                
+                var templateIds = associatedTemplates.SelectMany(x => x.Value).Select(x => x.TemplateId)
+                    .Distinct()
+                    .ToArray();
+
+                var templates = (templateIds.Any()
+                    ? templateRepository.GetAll(templateIds)
+                    : Enumerable.Empty<ITemplate>()).ToArray();
+
+                foreach (var contentType in contentTypes)
+                {
+                    var associatedTemplateIds = associatedTemplates[contentType.Id].Select(x => x.TemplateId)
+                        .Distinct()
+                        .ToArray();
+
+                    contentType.AllowedTemplates = (associatedTemplateIds.Any()
+                        ? templates.Where(x => associatedTemplateIds.Contains(x.Id))
+                        : Enumerable.Empty<ITemplate>()).ToArray();
+                }
+
+                
             }
 
             internal static IEnumerable<IMediaType> MapMediaTypes(int[] mediaTypeIds, Database db,
@@ -662,7 +674,6 @@ AND umbracoNode.id <> @id",
                         AND (umbracoNode.id IN (@contentTypeIds))";
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
-                // since there will be 2 params per single row it will be half that amount
                 if ((mediaTypeIds.Length - 1) > 2000)
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
@@ -781,7 +792,6 @@ AND umbracoNode.id <> @id",
                         AND (umbracoNode.id IN (@contentTypeIds))";
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
-                // since there will be 2 params per single row it will be half that amount
                 if ((contentTypeIds.Length - 1) > 2000)
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
@@ -910,15 +920,17 @@ AND umbracoNode.id <> @id",
                     .Select(x => x.Value).ToList());
             }
 
-            internal static void MapGroupsAndProperties(int contentTypeId, Database db,
-                out PropertyTypeCollection propertyTypeCollection,
-                out PropertyGroupCollection propertyGroupCollection)
-            {
+            internal static void MapGroupsAndProperties(int[] contentTypeIds, Database db,
+                out IDictionary<int, PropertyTypeCollection> allPropertyTypeCollection,
+                out IDictionary<int, PropertyGroupCollection> allPropertyGroupCollection)
+            {   
+
                 // first part Gets all property groups including property type data even when no property type exists on the group
                 // second part Gets all property types including ones that are not on a group
                 // therefore the union of the two contains all of the property type and property group information we need
 
-                var sql = @"SELECT PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptHelpText,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
+                var sql = @"SELECT PG.contenttypeNodeId as contentTypeId,
+                            PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptHelpText,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
                             PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
                             PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyTypeGroup as PG
@@ -933,11 +945,12 @@ AND umbracoNode.id <> @id",
                             ON PT.dataTypeId = DT.nodeId
                         )  as  PT
                         ON PT.ptGroupId = PG.id
-                        WHERE (PG.contenttypeNodeId = @contentTypeId)
+                        WHERE (PG.contenttypeNodeId in (@contentTypeIds))
                         
                         UNION
 
-                        SELECT PT.id as ptId, PT.Alias as ptAlias, PT." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Description") + @" as ptDesc, PT.helpText as ptHelpText,
+                        SELECT  PT.contentTypeId as contentTypeId,
+                                PT.id as ptId, PT.Alias as ptAlias, PT." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Description") + @" as ptDesc, PT.helpText as ptHelpText,
                                 PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
                                 DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
                                 PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as pgText
@@ -946,67 +959,90 @@ AND umbracoNode.id <> @id",
                         ON PT.dataTypeId = DT.[nodeId]
                         LEFT JOIN cmsPropertyTypeGroup as PG
                         ON PG.[id] = PT.propertyTypeGroupId
-                        WHERE (PT.contentTypeId = @contentTypeId)
+                        WHERE (PT.contentTypeId in (@contentTypeIds))
 
                         ORDER BY (PG.id)";
 
-                var result = db.Fetch<dynamic>(sql, new { contentTypeId = contentTypeId });
+                //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
+                // Since there are 2 groups of params, it will be half!
+                if (((contentTypeIds.Length / 2) - 1) > 2000)
+                    throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
-                //from this we need to make :
-                // * PropertyGroupCollection - Contains all property groups along with all property types associated with a group
-                // * PropertyTypeCollection - Contains all property types that do not belong to a group
+                var result = db.Fetch<dynamic>(sql, new { contentTypeIds = contentTypeIds });
 
-                //create the property group collection first, this means all groups (even empty ones) and all groups with properties
+                allPropertyGroupCollection = new Dictionary<int, PropertyGroupCollection>();
+                allPropertyTypeCollection = new Dictionary<int, PropertyTypeCollection>();
 
-                propertyGroupCollection = new PropertyGroupCollection(result
-                    //get all rows that have a group id
-                    .Where(x => x.pgId != null)
-                    //turn that into a custom object containing only the group info
-                    .Select(x => new { GroupId = x.pgId, ParentGroupId = x.pgParentGroupId, SortOrder = x.pgSortOrder, Text = x.pgText })
-                    //get distinct data by id
-                    .DistinctBy(x => (int)x.GroupId)
-                    //for each of these groups, create a group object with it's associated properties
-                    .Select(group => new PropertyGroup(new PropertyTypeCollection(
-                        result
-                            .Where(row => row.pgId == group.GroupId && row.ptId != null)
-                            .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType))
-                            {
-                                //fill in the rest of the property type properties
-                                Alias = row.ptAlias,
-                                Description = row.ptDesc,
-                                DataTypeDefinitionId = row.dtId,
-                                Id = row.ptId,
-                                Mandatory = row.ptMandatory,
-                                Name = row.ptName,
-                                PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
-                                SortOrder = row.ptSortOrder,
-                                ValidationRegExp = row.ptRegExp
-                            })))
-                    {
-                        //fill in the rest of the group properties
-                        Id = group.GroupId,
-                        Name = group.Text,
-                        ParentId = group.ParentGroupId,
-                        SortOrder = group.SortOrder
-                    }).ToArray());
+                foreach (var contentTypeId in contentTypeIds)
+                {
+                    //from this we need to make :
+                    // * PropertyGroupCollection - Contains all property groups along with all property types associated with a group
+                    // * PropertyTypeCollection - Contains all property types that do not belong to a group
 
-                //Create the property type collection now (that don't have groups)
+                    //create the property group collection first, this means all groups (even empty ones) and all groups with properties
 
-                propertyTypeCollection = new PropertyTypeCollection(result
-                    .Where(x => x.pgId == null)
-                    .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType))
-                    {
-                        //fill in the rest of the property type properties
-                        Alias = row.ptAlias,
-                        Description = row.ptDesc,
-                        DataTypeDefinitionId = row.dtId,
-                        Id = row.ptId,
-                        Mandatory = row.ptMandatory,
-                        Name = row.ptName,
-                        PropertyGroupId = null,
-                        SortOrder = row.ptSortOrder,
-                        ValidationRegExp = row.ptRegExp
-                    }).ToArray());
+                    int currId = contentTypeId;
+
+                    var propertyGroupCollection = new PropertyGroupCollection(result                        
+                        //get all rows that have a group id
+                        .Where(x => x.pgId != null)
+                        //filter based on the current content type
+                        .Where(x => x.contentTypeId == currId)
+                        //turn that into a custom object containing only the group info
+                        .Select(x => new { GroupId = x.pgId, ParentGroupId = x.pgParentGroupId, SortOrder = x.pgSortOrder, Text = x.pgText })
+                        //get distinct data by id
+                        .DistinctBy(x => (int)x.GroupId)
+                        //for each of these groups, create a group object with it's associated properties
+                        .Select(group => new PropertyGroup(new PropertyTypeCollection(
+                            result
+                                .Where(row => row.pgId == group.GroupId && row.ptId != null)
+                                .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType))
+                                {
+                                    //fill in the rest of the property type properties
+                                    Alias = row.ptAlias,
+                                    Description = row.ptDesc,
+                                    DataTypeDefinitionId = row.dtId,
+                                    Id = row.ptId,
+                                    Mandatory = row.ptMandatory,
+                                    Name = row.ptName,
+                                    PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
+                                    SortOrder = row.ptSortOrder,
+                                    ValidationRegExp = row.ptRegExp
+                                })))
+                        {
+                            //fill in the rest of the group properties
+                            Id = group.GroupId,
+                            Name = group.Text,
+                            ParentId = group.ParentGroupId,
+                            SortOrder = group.SortOrder
+                        }).ToArray());
+
+                    allPropertyGroupCollection[currId] = propertyGroupCollection;
+
+                    //Create the property type collection now (that don't have groups)
+
+                    var propertyTypeCollection = new PropertyTypeCollection(result                        
+                        .Where(x => x.pgId == null)
+                        //filter based on the current content type
+                        .Where(x => x.contentTypeId == currId)
+                        .Select(row => new PropertyType(row.dtPropEdAlias, Enum<DataTypeDatabaseType>.Parse(row.dtDbType))
+                        {
+                            //fill in the rest of the property type properties
+                            Alias = row.ptAlias,
+                            Description = row.ptDesc,
+                            DataTypeDefinitionId = row.dtId,
+                            Id = row.ptId,
+                            Mandatory = row.ptMandatory,
+                            Name = row.ptName,
+                            PropertyGroupId = null,
+                            SortOrder = row.ptSortOrder,
+                            ValidationRegExp = row.ptRegExp
+                        }).ToArray());
+
+                    allPropertyTypeCollection[currId] = propertyTypeCollection;
+                }
+
+                
             }
 
         }

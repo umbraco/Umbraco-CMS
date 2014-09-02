@@ -70,8 +70,9 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
-                types = contentItem.ContentType.AllowedContentTypes
-                    .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
+
+                types = Services.ContentTypeService.GetAllContentTypes(
+                    contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray())
                     .ToList();
             }
 

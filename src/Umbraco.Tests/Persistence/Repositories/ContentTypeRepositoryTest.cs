@@ -66,6 +66,42 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Maps_Templates_Correctly()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var templateRepo = new TemplateRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var templates = new[]
+                {
+                    new Template("test1.cshtml", "test1", "test1"),
+                    new Template("test2.cshtml", "test2", "test2"),
+                    new Template("test3.cshtml", "test3", "test3")
+                };
+                foreach (var template in templates)
+                {
+                    templateRepo.AddOrUpdate(template);
+                }
+                unitOfWork.Commit();
+                
+                var contentType = MockedContentTypes.CreateSimpleContentType();
+                contentType.AllowedTemplates = new[] {templates[0], templates[1]};
+                contentType.SetDefaultTemplate(templates[0]);
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                //re-get
+                var result = repository.Get(contentType.Id);
+
+                Assert.AreEqual(2, result.AllowedTemplates.Count());
+                Assert.AreEqual(templates[0].Id, result.DefaultTemplate.Id);
+            }
+
+        }
+
+        [Test]
         public void Can_Perform_Add_On_ContentTypeRepository()
         {
             // Arrange
