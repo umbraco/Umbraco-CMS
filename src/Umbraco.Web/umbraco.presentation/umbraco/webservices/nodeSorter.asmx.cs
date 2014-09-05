@@ -155,14 +155,9 @@ namespace umbraco.presentation.webservices
                 // Save content with new sort order and update db+cache accordingly
                 var sorted = contentService.Sort(sortedContent);
 
-                // Refresh sort order on cached xml
-                XmlNode parentNode = parentId == -1
-                                            ? content.Instance.XmlContent.DocumentElement
-                                            : content.Instance.XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture));
-
-                //only try to do the content sort if the the parent node is available... 
-                if (parentNode != null)
-                    content.SortNodes(ref parentNode);
+                // refresh sort order on cached xml
+                // but no... this is not distributed - solely relying on content service & events should be enough
+                //content.Instance.SortNodes(parentId);
 
                 //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
                 ApplicationContext.Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, ApplicationContext);
