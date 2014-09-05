@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.settings
@@ -20,7 +21,8 @@ namespace umbraco.settings
 	{
 	    public EditDictionaryItem()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+			CurrentApp = ApplicationContext.Current.Services.ApplicationTreeService
+				.GetByAlias(Constants.Trees.Dictionary).ApplicationAlias;
 
 	    }
 		protected LiteralControl keyTxt = new LiteralControl();

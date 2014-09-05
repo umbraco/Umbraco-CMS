@@ -66,7 +66,12 @@
             /// <summary>
             /// alias for the datatype tree.
             /// </summary>
-            public const string DataTypes = "datatype";
+			public const string DataTypes = "datatype";
+
+			/// <summary>
+			/// alias for the dictionary tree.
+			/// </summary>
+			public const string Dictionary = "dictionary";
 
             //TODO: Fill in the rest!
 
