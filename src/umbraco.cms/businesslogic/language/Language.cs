@@ -42,7 +42,7 @@ namespace umbraco.cms.businesslogic.language
             get { return Application.SqlHelper; }
         }
 
-        protected internal const string m_SQLOptimizedGetAll = @"select * from umbracoLanguage";
+        protected internal const string m_SQLOptimizedGetAll = @"SELECT * FROM umbracoLanguage ORDER BY languageISOCode ASC";
 
         #endregion
         
