@@ -16,6 +16,21 @@ namespace Umbraco.Web.UI.Pages
     /// </summary>
     public class UmbracoEnsuredPage : BasePage
     {
+        public UmbracoEnsuredPage()
+        {
+            //Assign security automatically if the attribute is found
+            var treeAuth = this.GetType().GetCustomAttribute<WebformsPageTreeAuthorizeAttribute>(true);
+            if (treeAuth != null)
+            {
+                var treeByAlias = ApplicationContext.Current.Services.ApplicationTreeService
+                    .GetByAlias(treeAuth.TreeAlias);
+                if (treeByAlias != null)
+                {
+                    CurrentApp = treeByAlias.ApplicationAlias;
+                }
+            }
+        }
+
         private bool _hasValidated = false;
 
         /// <summary>
@@ -81,5 +96,19 @@ namespace Umbraco.Web.UI.Pages
             }
         }
         
+        /// <summary>
+        /// Used to assign a webforms page's security to a specific tree which will in turn check to see
+        /// if the current user has access to the specified tree's registered section
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Class)]
+        public sealed class WebformsPageTreeAuthorizeAttribute : Attribute
+        {
+            public string TreeAlias { get; private set; }
+
+            public WebformsPageTreeAuthorizeAttribute(string treeAlias)
+            {
+                TreeAlias = treeAlias;
+            }
+        }
     }
 }

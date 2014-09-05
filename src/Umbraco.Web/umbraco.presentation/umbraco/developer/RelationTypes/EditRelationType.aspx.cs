@@ -4,6 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using RelationType = umbraco.cms.businesslogic.relation.RelationType;
 
@@ -12,12 +13,9 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 	/// <summary>
 	/// Edit an existing RelationType
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.RelationTypes)]
 	public partial class EditRelationType : UmbracoEnsuredPage
 	{
-	    public EditRelationType()
-	    {
-	        CurrentApp = DefaultApps.developer.ToString();
-	    }
 
 		/// <summary>
 		/// Class scope reference to the current RelationType being edited

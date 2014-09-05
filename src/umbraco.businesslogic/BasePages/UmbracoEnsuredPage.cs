@@ -29,11 +29,21 @@ namespace umbraco.BasePages
         /// </summary>
         public UmbracoEnsuredPage()
         {
-
+            //Assign security automatically if the attribute is found
+            var treeAuth = this.GetType().GetCustomAttribute<WebformsPageTreeAuthorizeAttribute>(true);
+            if (treeAuth != null)
+            {
+                var treeByAlias = ApplicationContext.Current.Services.ApplicationTreeService
+                    .GetByAlias(treeAuth.TreeAlias);
+                if (treeByAlias != null)
+                {
+                    CurrentApp = treeByAlias.ApplicationAlias;    
+                }
+            }
         }
 
         [Obsolete("This constructor is not used and will be removed from the codebase in the future")]
-        public UmbracoEnsuredPage(string hest)
+        public UmbracoEnsuredPage(string hest) : this()
         {
             
         }
@@ -114,6 +124,21 @@ namespace umbraco.BasePages
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?t=" + umbracoUserContextID, true);
                 else
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + umbracoUserContextID, true);
+            }
+        }
+
+        /// <summary>
+        /// Used to assign a webforms page's security to a specific tree which will in turn check to see
+        /// if the current user has access to the specified tree's registered section
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Class)]
+        public sealed class WebformsPageTreeAuthorizeAttribute : Attribute
+        {
+            public string TreeAlias { get; private set; }
+
+            public WebformsPageTreeAuthorizeAttribute(string treeAlias)
+            {
+                TreeAlias = treeAlias;
             }
         }
     }

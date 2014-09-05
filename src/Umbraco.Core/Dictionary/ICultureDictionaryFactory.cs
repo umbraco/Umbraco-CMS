@@ -1,6 +1,6 @@
 namespace Umbraco.Core.Dictionary
 {
-	internal interface ICultureDictionaryFactory
+	public interface ICultureDictionaryFactory
 	{
 		ICultureDictionary CreateDictionary();
 	}

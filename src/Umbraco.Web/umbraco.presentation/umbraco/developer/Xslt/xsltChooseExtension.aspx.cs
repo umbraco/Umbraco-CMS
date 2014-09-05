@@ -5,19 +5,16 @@ using System.Reflection;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 
 namespace umbraco.developer
 {
     /// <summary>
     /// Summary description for xsltChooseExtension.
     /// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
 	public partial class xsltChooseExtension : BasePages.UmbracoEnsuredPage
 	{
-        public xsltChooseExtension()
-        {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
-
-        }
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

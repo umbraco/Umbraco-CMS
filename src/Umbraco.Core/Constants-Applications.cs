@@ -80,6 +80,12 @@
             /// </summary>
             public const string Templates = "template";
 
+            public const string RelationTypes = "relationTypes";
+
+            public const string Xslt = "xslt";
+
+            public const string Languages = "languages";
+
         }
 	}
 

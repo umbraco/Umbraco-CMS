@@ -17,14 +17,10 @@ namespace umbraco.settings
 	/// <summary>
 	/// Summary description for EditDictionaryItem.
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
 	public partial class EditDictionaryItem : BasePages.UmbracoEnsuredPage
 	{
-	    public EditDictionaryItem()
-	    {
-			CurrentApp = ApplicationContext.Current.Services.ApplicationTreeService
-				.GetByAlias(Constants.Trees.Dictionary).ApplicationAlias;
-
-	    }
+	    
 		protected LiteralControl keyTxt = new LiteralControl();
 		protected uicontrols.TabView tbv = new uicontrols.TabView();
 		private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();
