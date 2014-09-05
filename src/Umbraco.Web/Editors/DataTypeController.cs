@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the developer application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
         /// <summary>
