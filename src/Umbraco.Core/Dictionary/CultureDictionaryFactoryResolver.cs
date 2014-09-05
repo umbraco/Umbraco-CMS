@@ -5,7 +5,7 @@ namespace Umbraco.Core.Dictionary
 	/// <summary>
 	/// Resolves the current CultureDictionaryFactory
 	/// </summary>
-	internal sealed class CultureDictionaryFactoryResolver : SingleObjectResolverBase<CultureDictionaryFactoryResolver, ICultureDictionaryFactory>
+	public sealed class CultureDictionaryFactoryResolver : SingleObjectResolverBase<CultureDictionaryFactoryResolver, ICultureDictionaryFactory>
 	{
 		internal CultureDictionaryFactoryResolver(ICultureDictionaryFactory factory)
 			: base(factory)
