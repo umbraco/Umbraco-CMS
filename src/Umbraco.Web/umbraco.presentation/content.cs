@@ -402,6 +402,11 @@ namespace umbraco
                                      ? xmlContentCopy.DocumentElement
                                      : xmlContentCopy.GetElementById(parentId.ToString());
 
+            // TODO: Update with new schema!
+            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                            ? "./node"
+                            : "./* [@id]";
+
             if (parentNode != null)
             {
                 if (currentNode == null)
@@ -414,27 +419,32 @@ namespace umbraco
                     //check the current parent id
                     var currParentId = currentNode.AttributeValue<int>("parentID");
 
-                    //update the node with it's new values
-                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
-
-                    //If the node is being moved we also need to ensure that it exists under the new parent!
-                    // http://issues.umbraco.org/issue/U4-2312
-                    // we were never checking this before and instead simply changing the parentId value but not 
-                    // changing the actual parent.
-
-                    //check the new parent
-                    if (currParentId != currentNode.AttributeValue<int>("parentID"))
-                    {
-                        //ok, we've actually got to move the node
-                        parentNode.AppendChild(currentNode);
-                    }
                     
+
+                    //copy over children
+                    foreach (XmlNode child in currentNode.SelectNodes(xpath))
+                    {
+                        docNode.AppendChild(child);
+                    }
+
+                    //First, check if we're moving the node
+                    if (currParentId != docNode.AttributeValue<int>("parentID"))
+                    {
+                        //ok, we've actually got to move the node. First, move the existing node
+                        //and then replace it with the updated one
+                        parentNode.AppendChild(currentNode);
+                        parentNode.ReplaceChild(docNode, currentNode);
+                    }
+                    else
+                    {
+                        //Not moving, just replace the node
+                        parentNode.ReplaceChild(docNode, currentNode);
+                    }
+
+                    currentNode = docNode;
                 }
 
-                // TODO: Update with new schema!
-                var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                                ? "./node"
-                                : "./* [@id]";
+                
 
                 var childNodes = parentNode.SelectNodes(xpath);
 
