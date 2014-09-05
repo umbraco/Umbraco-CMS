@@ -117,12 +117,14 @@ function start()
 	// Create legend for keyboard shortcuts for find & replace:
 	var head = parent.document.querySelectorAll('.mce-foot')[0],
 		div = parent.document.createElement('div'),
-		td1 = '<td class="shortcut">',
-		td2 = '<td class="description">';
+		td1 = '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">',
+		td2 = '<td style="font-size:11px;padding-right: 1em;">';
 	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tr>' + td1 + (isMac ? '&#8984;-F' : 'Ctrl-F</td>') + td2 + tinymce.translate('Start search') + '</td>' + td1 + (isMac ? '&#8984;-G' : 'Ctrl-G') + '</td>' + td2 + tinymce.translate('Find next') + '</td>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Find previous') + '</td></tr>' + '<tr>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Replace') + '</td>' + td1 + (isMac ? 'Shift-&#8984;-Alt-F' : 'Shift-Ctrl-R') +'</td>' + td2 + tinymce.translate('Replace all') + '</td></tr></table>';
-	div.className="search-legend";
+	div.style.position = 'absolute';
+	div.style.left = '1em';
+	div.style.bottom = '.5em';
 	head.appendChild(div);
-
+	
 	// Set CodeMirror cursor to same position as cursor was in TinyMCE:
 	var html = editor.getContent({source_view: true});
 	html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
@@ -233,21 +235,6 @@ body {
 
 .CodeMirror-activeline-background {
 	background: #e8f2ff !important;
-}
-
-.search-legend td.description, .search-legend td.shortcut {
-font-size: 11px;
-padding-right: 1em;
-}
-.search-legend td.shortcut {
-font-family: courier;
-font-weight: bold;
-text-align: right;
-}
-.search-legend {
-position: absolute;
-left: 1em;
-bottom: .5em;
 }
 
 </style>
