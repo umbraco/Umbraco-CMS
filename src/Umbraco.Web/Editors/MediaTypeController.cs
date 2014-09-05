@@ -61,10 +61,12 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
-            return contentItem.ContentType.AllowedContentTypes
-                              .Select(x => Services.ContentTypeService.GetMediaType((int) x.Id.Value))
-                              .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
+            if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
+
+            return Services.ContentTypeService.GetAllMediaTypes(ids)
+                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
 
         }
     }

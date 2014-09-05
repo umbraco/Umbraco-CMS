@@ -81,6 +81,10 @@
     <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes">
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.1\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
     </Reference>
+    <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
+    </Reference>
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.1.1309.0919\lib\net40\Moq.dll</HintPath>
     </Reference>
@@ -287,6 +291,7 @@
     <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
@@ -425,6 +430,7 @@
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="TestHelpers\RequiresAutoMapperMappingsAttribute.cs" />
+    <Compile Include="TestHelpers\TestProfiler.cs" />
     <Compile Include="TreesAndSections\ResourceFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

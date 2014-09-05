@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
             var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;

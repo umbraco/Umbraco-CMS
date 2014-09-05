@@ -58,9 +58,9 @@ namespace Umbraco.Core.Persistence
         } 
         #endregion
 
-        public virtual ITagsRepository CreateTagsRepository(IDatabaseUnitOfWork uow)
+        public virtual ITagRepository CreateTagRepository(IDatabaseUnitOfWork uow)
         {
-            return new TagsRepository(
+            return new TagRepository(
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
-                CreateTagsRepository(uow),
+                CreateTagRepository(uow),
                 _cacheHelper) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
         }
 
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateMediaTypeRepository(uow),
-                CreateTagsRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateTagRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Persistence
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateMemberTypeRepository(uow),
                 CreateMemberGroupRepository(uow),
-                CreateTagsRepository(uow));
+                CreateTagRepository(uow));
         }
 
         public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)

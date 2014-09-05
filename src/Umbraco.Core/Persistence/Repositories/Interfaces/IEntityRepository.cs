@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.Repositories
         IUmbracoEntity Get(int id);
         IUmbracoEntity Get(int id, Guid objectTypeId);
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
+        IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys);
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query);
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId);
     }

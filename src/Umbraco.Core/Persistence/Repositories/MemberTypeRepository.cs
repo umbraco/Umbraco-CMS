@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMemberType"/>
     /// </summary>
-    internal class MemberTypeRepository : ContentTypeBaseRepository<int, IMemberType>, IMemberTypeRepository
+    internal class MemberTypeRepository : ContentTypeBaseRepository<IMemberType>, IMemberTypeRepository
     {
         public MemberTypeRepository(IDatabaseUnitOfWork work)
             : base(work)
