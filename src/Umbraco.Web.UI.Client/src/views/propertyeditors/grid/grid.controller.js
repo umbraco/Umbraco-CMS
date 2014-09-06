@@ -38,6 +38,7 @@ angular.module("umbraco")
         var includedRte = [];
         var allowedEditors = [];
         var currentEditor = "";
+        var rteUpdateDone = false;
 
         $scope.sortableOptionsCell = {
 
@@ -48,101 +49,70 @@ angular.module("umbraco")
             connectWith: ".usky-cell",
             forcePlaceholderSize: true,
 
-            receive: function (event, ui) {
+            over: function (event, ui) {
 
-                ui.sender.sortable("cancel");
+                allowedEditors = $(event.target).scope().area.allowed;
 
-                $scope.$apply();
+                console.info(allowedEditors)
 
-                //if ($(this).scope().area)
-                //{
-                //    var allowedEditors = $(this).scope().area.allowed;
-                //}
-
-                //if (ui.item.scope().control) {
-                //    var currentEditor = ui.item.scope().control.editor.alias;
-                //}
+                if ($.inArray(currentEditor, allowedEditors) < 0 && allowedEditors) {
+                    ui.placeholder.hide();
+                }
+                else {
+                    ui.placeholder.show();
+                }
 
             },
 
             update: function (event, ui) {
 
-                //ui.sender.sortable("cancel");
+                if (!ui.sender) {
 
-                //$scope.$apply();
+                    if ($.inArray(currentEditor, allowedEditors) < 0 && allowedEditors) {
+                        ui.item.sortable.cancel();
+                    }
 
-                //if ($.inArray(currentEditor, allowedEditors) < 0) {
+                    ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
+                        tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                        tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                    });
 
-                //    var notIncludedRte = [];
-                //    ui.item.find('.mceNoEditor').each(function () {
-                //        notIncludedRte.splice(0, 0, $(this).attr('id'));
-                //    });
+                    rteUpdateDone = true;
 
-                //    if (ui.sender) {
-                //        ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
-                //            if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
-                //                tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-                //                includedRte.splice(0, 0, $(this).attr('id'));
-                //            }
-                //        });
-                //    }
+                }
+                else {
 
-                //    ui.item.sortable.cancel();
+                    console.info("sender");
 
-
-
-
-                //}
-                //else {
-
-                if (ui.sender) {
                     var notIncludedRte = [];
+
                     ui.item.find('.mceNoEditor').each(function () {
                         notIncludedRte.splice(0, 0, $(this).attr('id'));
                     });
 
-                    
-                        ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
-                            if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
-                                tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-                                includedRte.splice(0, 0, $(this).attr('id'));
-                            }
-                        });
-                    
-
-                    ui.item.find('.mceNoEditor').each(function () {
-                        tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                    $(event.target).find('.mceNoEditor').each(function () {
+                        if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
+                            tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                            tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                        }
                     });
 
-    }
-                //}
-
-
-
-
-
-
+                }
 
             },
 
             start: function (e, ui) {
+                currentEditor = ui.item.scope().control.editor.alias;
                 ui.item.find('.mceNoEditor').each(function () {
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'))
                 });
             },
 
             stop: function (e, ui) {
-
-                $scope.$apply();
-
-                ui.item.find('.mceNoEditor').each(function () {
+                ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
+                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                     tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
-
-                _.forEach(includedRte, function (value, index) {
-                    tinyMCE.execCommand('mceAddEditor', false, value);
-                });
-
             }
         }
 
