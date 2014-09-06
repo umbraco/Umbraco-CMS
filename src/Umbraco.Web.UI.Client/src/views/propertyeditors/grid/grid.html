@@ -36,8 +36,7 @@
                  ng-init="initSection(section)"
                  style="width:{{section.$percentage}}%">
 
-                <!--<div ui-sortable="sortableOptionsTest" ng-model="section.rows">-->
-                <div ng-model="section.rows">
+                <div ui-sortable="sortableOptions" ng-model="section.rows">
 
                     <!-- for each row in template section -->
                     <div ng-repeat="row in section.rows"
@@ -55,7 +54,7 @@
                                 <div class="iconBox"
                                      ng-click="deletePrompt = true"
                                      ng-mouseover="setCurrentRemoveControl(row)"
-                                     ng-mouseleave="disableCurrentRemoveControl(row)">  
+                                     ng-mouseleave="disableCurrentRemoveControl(row)">
 
                                     <span ng-if="deletePrompt">
                                         Are you sure?

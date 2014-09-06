@@ -19,37 +19,133 @@ angular.module("umbraco")
             cursor: "move",
             placeholder: 'ui-sortable-placeholder',
             handle: '.cell-tools-move',
+
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
 
                 });
             },
+
             stop: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
                     tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
             }
+
         };
 
+        var includedRte = [];
+        var allowedEditors = [];
+        var currentEditor = "";
+
         $scope.sortableOptionsCell = {
+
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
             handle: '.cell-tools-move',
             connectWith: ".usky-cell",
+            forcePlaceholderSize: true,
+
+            receive: function (event, ui) {
+
+                ui.sender.sortable("cancel");
+
+                $scope.$apply();
+
+                //if ($(this).scope().area)
+                //{
+                //    var allowedEditors = $(this).scope().area.allowed;
+                //}
+
+                //if (ui.item.scope().control) {
+                //    var currentEditor = ui.item.scope().control.editor.alias;
+                //}
+
+            },
+
+            update: function (event, ui) {
+
+                //ui.sender.sortable("cancel");
+
+                //$scope.$apply();
+
+                //if ($.inArray(currentEditor, allowedEditors) < 0) {
+
+                //    var notIncludedRte = [];
+                //    ui.item.find('.mceNoEditor').each(function () {
+                //        notIncludedRte.splice(0, 0, $(this).attr('id'));
+                //    });
+
+                //    if (ui.sender) {
+                //        ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
+                //            if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
+                //                tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                //                includedRte.splice(0, 0, $(this).attr('id'));
+                //            }
+                //        });
+                //    }
+
+                //    ui.item.sortable.cancel();
+
+
+
+
+                //}
+                //else {
+
+                if (ui.sender) {
+                    var notIncludedRte = [];
+                    ui.item.find('.mceNoEditor').each(function () {
+                        notIncludedRte.splice(0, 0, $(this).attr('id'));
+                    });
+
+                    
+                        ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
+                            if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
+                                tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                                includedRte.splice(0, 0, $(this).attr('id'));
+                            }
+                        });
+                    
+
+                    ui.item.find('.mceNoEditor').each(function () {
+                        tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                    });
+
+    }
+                //}
+
+
+
+
+
+
+
+            },
+
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
-                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-
+                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'))
                 });
             },
+
             stop: function (e, ui) {
+
+                $scope.$apply();
+
                 ui.item.find('.mceNoEditor').each(function () {
                     tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
+
+                _.forEach(includedRte, function (value, index) {
+                    tinyMCE.execCommand('mceAddEditor', false, value);
+                });
+
             }
-        };
+        }
+
 
         // *********************************************
         // Template management functions
