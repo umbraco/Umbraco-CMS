@@ -51,54 +51,38 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IDataTypeDefinition PerformGet(int id)
         {
-            var dataTypeSql = GetBaseQuery(false);
-            dataTypeSql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dataTypeDto = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql).FirstOrDefault();
-
-            if (dataTypeDto == null)
-                return null;
-
-            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
-            var definition = factory.BuildEntity(dataTypeDto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)definition).ResetDirtyProperties(false);
-            return definition;
+            return GetAll(new[] {id}).FirstOrDefault();
         }
 
         protected override IEnumerable<IDataTypeDefinition> PerformGetAll(params int[] ids)
         {
+            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+            var dataTypeSql = GetBaseQuery(false);
+
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                dataTypeSql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
+
+            var dtos = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql);
+            return dtos.Select(factory.BuildEntity).ToArray();
         }
 
         protected override IEnumerable<IDataTypeDefinition> PerformGetByQuery(IQuery<IDataTypeDefinition> query)
         {
+            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dataTypeDtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
 
-            foreach (var dataTypeDto in dataTypeDtos)
-            {
-                yield return Get(dataTypeDto.DataTypeId);
-            }
+            return dtos.Select(factory.BuildEntity).ToArray();
         }
 
         /// <summary>
@@ -109,6 +93,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
             var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == entity.Id);
+
+            //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
 
             //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted

@@ -14,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
     [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, "Data Types")]
     [PluginController("UmbracoTrees")]
     [CoreTree]

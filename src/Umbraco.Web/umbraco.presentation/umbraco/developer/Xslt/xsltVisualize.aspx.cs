@@ -7,17 +7,15 @@ using System.Web.UI.WebControls;
 using System.Text;
 using System.Xml;
 using System.IO;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbraco.developer.Xslt
 {
+    [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
     public partial class xsltVisualize : BasePages.UmbracoEnsuredPage
     {
-        public xsltVisualize()
-        {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
-
-        }
+        
 		// zb-00004 #29956 : refactor cookies names & handling
 		static global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie cookie
 			= new global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_XSLTVISPG", TimeSpan.FromMinutes(20)); // was "XSLTVisualizerPage"

@@ -1,17 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, NUnit.Framework.Ignore]
     public class ContentServicePerformanceTest : BaseDatabaseFactoryTest
     {
@@ -20,6 +25,66 @@ namespace Umbraco.Tests.Services
         {
             base.Initialize();
             CreateTestData();
+        }
+
+        protected override void FreezeResolution()
+        {
+            ProfilerResolver.Current = new ProfilerResolver(new TestProfiler());
+
+            base.FreezeResolution();
+        }
+
+        [Test]
+        public void Retrieving_All_Content_In_Site()
+        {
+            //NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
+            // the old way takes 143795ms, the new above way takes: 14249ms that is a 90% savings of processing and sql calls!
+
+            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");                        
+            var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "test2");
+            var contentType3 = MockedContentTypes.CreateTextpageContentType("test3", "test3");            
+            ServiceContext.ContentTypeService.Save(new[] {contentType1, contentType2, contentType3});
+            contentType1.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 0, contentType2.Alias),
+                new ContentTypeSort(new Lazy<int>(() => contentType3.Id), 1, contentType3.Alias)
+            };
+            contentType2.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
+                new ContentTypeSort(new Lazy<int>(() => contentType3.Id), 1, contentType3.Alias)
+            };
+            contentType3.AllowedContentTypes = new[]
+            {
+                new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
+                new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 1, contentType2.Alias)
+            };
+            ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
+            
+            var roots = MockedContent.CreateTextpageContent(contentType1, -1, 10);
+            ServiceContext.ContentService.Save(roots);
+            foreach (var root in roots)
+            {
+                var item1 = MockedContent.CreateTextpageContent(contentType1, root.Id, 10);
+                var item2 = MockedContent.CreateTextpageContent(contentType2, root.Id, 10);
+                var item3 = MockedContent.CreateTextpageContent(contentType3, root.Id, 10);
+
+                ServiceContext.ContentService.Save(item1.Concat(item2).Concat(item3));
+            }
+
+            var total = new List<IContent>();
+            using (DisposableTimer.TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
+            {
+                TestProfiler.Enable();
+                total.AddRange(ServiceContext.ContentService.GetRootContent());
+                foreach (var content in total.ToArray())
+                {
+                    total.AddRange(ServiceContext.ContentService.GetDescendants(content));
+                }
+                TestProfiler.Disable();
+                LogHelper.Info<ContentServicePerformanceTest>("Returned " + total.Count + " items");
+            }
+
         }
 
         [Test]

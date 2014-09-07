@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             {
                 types = Services.ContentTypeService.GetAllContentTypes().ToList();
 
-                //if no allowed root types are set, just return everythibg
+                //if no allowed root types are set, just return everything
                 if(types.Any(x => x.AllowedAsRoot))
                     types = types.Where(x => x.AllowedAsRoot);
             }
@@ -70,9 +70,12 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
-                types = contentItem.ContentType.AllowedContentTypes
-                    .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
-                    .ToList();
+
+                var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                
+                if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
+
+                types = Services.ContentTypeService.GetAllContentTypes(ids).ToList();
             }
 
             var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();

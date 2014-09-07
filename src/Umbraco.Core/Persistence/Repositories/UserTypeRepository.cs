@@ -29,51 +29,38 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IUserType PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dto = Database.FirstOrDefault<UserTypeDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            var userTypeFactory = new UserTypeFactory();
-            var userType = userTypeFactory.BuildEntity(dto);
-
-            return userType;
+            return GetAll(new[] {id}).FirstOrDefault();
         }
 
         protected override IEnumerable<IUserType> PerformGetAll(params int[] ids)
         {
+            var userTypeFactory = new UserTypeFactory();
+
+            var sql = GetBaseQuery(false);
+            
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                sql.Where("umbracoUserType.id in (@ids)", new { ids = ids });
             }
             else
             {
-                var userDtos = Database.Fetch<UserTypeDto>("WHERE id >= 0");
-                foreach (var userDto in userDtos)
-                {
-                    yield return Get(userDto.Id);
-                }
+                sql.Where<UserTypeDto>(x => x.Id >= 0);
             }
+
+            var dtos = Database.Fetch<UserTypeDto>(sql);
+            return dtos.Select(userTypeFactory.BuildEntity).ToArray();
         }
 
         protected override IEnumerable<IUserType> PerformGetByQuery(IQuery<IUserType> query)
         {
+            var userTypeFactory = new UserTypeFactory();
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IUserType>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<UserTypeDto>(sql);
 
-            foreach (var dto in dtos.DistinctBy(x => x.Id))
-            {
-                yield return Get(dto.Id);
-            }
+            return dtos.Select(userTypeFactory.BuildEntity).ToArray();
         }
 
         #endregion

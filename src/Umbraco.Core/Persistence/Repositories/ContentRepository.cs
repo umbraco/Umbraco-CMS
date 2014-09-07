@@ -28,12 +28,12 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
-        private readonly ITagsRepository _tagRepository;
+        private readonly ITagRepository _tagRepository;
         private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
-
-        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
+        
+        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
             : base(work)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories
 		    EnsureUniqueNaming = true;
         }
 
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
+        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
             : base(work, cache)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -88,21 +88,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IContent> PerformGetAll(params int[] ids)
         {
+            var sql = GetBaseQuery(false);
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                sql.Where("umbracoNode.id in (@ids)", new {ids = ids});
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                
             }
+
+            return ProcessQuery(sql);
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -114,15 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
-
-            //NOTE: Won't work with language related queries because the language version isn't passed to the Get() method.
-            //A solution could be to look at the sql for the LanguageLocale column and choose the foreach-loop based on that.
-            foreach (var dto in dtos.DistinctBy(x => x.NodeId))
-            {
-                yield return Get(dto.NodeId);
-            }
+            return ProcessQuery(sql);
         }
 
         #endregion
@@ -756,16 +744,56 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-        
+
+        private IEnumerable<IContent> ProcessQuery(Sql sql)
+        {
+            //NOTE: This doesn't allow properties to be part of the query
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            //content types
+            var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
+                .ToArray();
+
+            var templates = _templateRepository.GetAll(
+                dtos
+                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                    .Select(x => x.TemplateId.Value).ToArray())
+                .ToArray();
+
+            //Go get the property data for each document
+            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
+                dto.NodeId,
+                dto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
+                dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                dto.ContentVersionDto.VersionDate))
+                .ToArray();
+
+            var propertyData = GetPropertyCollection(docDefs);
+
+            return dtos.Select(dto => CreateContentFromDto(
+                dto,
+                dto.ContentVersionDto.VersionId,
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
+                templates.FirstOrDefault(tem => tem.Id == (dto.TemplateId.HasValue ? dto.TemplateId.Value : -1)),
+                propertyData[dto.NodeId]));
+        }
+
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
         /// <param name="dto"></param>
         /// <param name="versionId"></param>
+        /// <param name="contentType"></param>
+        /// <param name="template"></param>
+        /// <param name="propCollection"></param>
         /// <returns></returns>
-        private IContent CreateContentFromDto(DocumentDto dto, Guid versionId)
+        private IContent CreateContentFromDto(DocumentDto dto, Guid versionId, 
+            IContentType contentType = null,
+            ITemplate template = null,
+            Models.PropertyCollection propCollection = null)
         {
-            var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+            contentType = contentType ?? _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
             var content = factory.BuildEntity(dto);
@@ -773,10 +801,11 @@ namespace Umbraco.Core.Persistence.Repositories
             //Check if template id is set on DocumentDto, and get ITemplate if it is.
             if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
             {
-                content.Template = _templateRepository.Get(dto.TemplateId.Value);
+                content.Template = template ?? _templateRepository.Get(dto.TemplateId.Value);
             }
 
-            content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType, content.CreateDate, content.UpdateDate);
+            content.Properties = propCollection ?? 
+                GetPropertyCollection(dto.NodeId, versionId, contentType, content.CreateDate, content.UpdateDate);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

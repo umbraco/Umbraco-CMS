@@ -134,7 +134,11 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<TEntity> GetAll(params TId[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct().ToArray();
+            ids = ids.Distinct()
+                //don't query by anything that is a default of T (like a zero)
+                //TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
+                //.Where(x => Equals(x, default(TId)) == false)
+                .ToArray();
 
             if (ids.Any())
             {

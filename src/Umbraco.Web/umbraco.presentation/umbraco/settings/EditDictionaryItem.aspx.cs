@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.settings
@@ -16,13 +17,10 @@ namespace umbraco.settings
 	/// <summary>
 	/// Summary description for EditDictionaryItem.
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
 	public partial class EditDictionaryItem : BasePages.UmbracoEnsuredPage
 	{
-	    public EditDictionaryItem()
-	    {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
-
-	    }
+	    
 		protected LiteralControl keyTxt = new LiteralControl();
 		protected uicontrols.TabView tbv = new uicontrols.TabView();
 		private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();

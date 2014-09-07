@@ -28,5 +28,23 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(50)]
         public string Alias { get; set; }
+
+        protected bool Equals(DataTypePreValueDto other)
+        {
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((DataTypePreValueDto) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }

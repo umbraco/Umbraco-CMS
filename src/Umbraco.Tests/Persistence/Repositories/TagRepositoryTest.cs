@@ -29,9 +29,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private TagsRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private TagRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             return tagRepository;
         }
 
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.Current.ResolveByType<ITagsRepository>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<ITagRepository>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -391,6 +391,85 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     var result = repository.GetTagsForEntity(content2.Id);
                     Assert.AreEqual(2, result.Count());
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Get_All()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                var content2 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
+
+                    var result = repository.GetAll();
+                    Assert.AreEqual(4, result.Count());
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Get_All_With_Ids()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                var content2 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    var tags = new[]
+                    {
+                        new Tag {Text = "tag1", Group = "test"},
+                        new Tag {Text = "tag2", Group = "test"},
+                        new Tag {Text = "tag3", Group = "test"},
+                        new Tag {Text = "tag4", Group = "test"}
+                    };
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        tags, false);
+
+                    //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
+                    //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
+                    var all = repository.GetAll().ToArray();
+
+                    var result = repository.GetAll(new[] { all[0].Id, all[1].Id, all[2].Id });
+                    Assert.AreEqual(3, result.Count());
                 }
             }
         }
@@ -865,7 +944,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private ContentRepository CreateContentRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
             var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
@@ -873,7 +952,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaRepository CreateMediaRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             mediaTypeRepository = new MediaTypeRepository(unitOfWork, NullCacheProvider.Current);
             var repository = new MediaRepository(unitOfWork, NullCacheProvider.Current, mediaTypeRepository, tagRepository);
             return repository;

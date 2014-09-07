@@ -17,10 +17,14 @@ namespace Umbraco.Core.Services
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaService _mediaService;
+        private readonly IMemberService _memberService;
+        private readonly IMemberTypeService _memberTypeService;
         private readonly IDataTypeService _dataTypeService;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
 
-        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService)
+        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, 
+            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
+            IMemberService memberService, IMemberTypeService memberTypeService)
         {
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
@@ -28,15 +32,19 @@ namespace Umbraco.Core.Services
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
             _dataTypeService = dataTypeService;
+            _memberService = memberService;
+            _memberTypeService = memberTypeService;
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
-                                                                              {
-                                                                                  {typeof(IDataTypeDefinition).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DataType, _dataTypeService.GetDataTypeDefinitionById)},
-                                                                                  {typeof(IContent).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Document, _contentService.GetById)},
-                                                                                  {typeof(IContentType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DocumentType, _contentTypeService.GetContentType)},
-                                                                                  {typeof(IMedia).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Media, _mediaService.GetById)},
-                                                                                  {typeof(IMediaType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MediaType, _contentTypeService.GetMediaType)}
-                                                                              };
+            {
+                {typeof (IDataTypeDefinition).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DataType, _dataTypeService.GetDataTypeDefinitionById)},
+                {typeof (IContent).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Document, _contentService.GetById)},
+                {typeof (IContentType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DocumentType, _contentTypeService.GetContentType)},
+                {typeof (IMedia).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Media, _mediaService.GetById)},
+                {typeof (IMediaType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MediaType, _contentTypeService.GetMediaType)},
+                {typeof (IMember).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Member, _memberService.GetById)},
+                {typeof (IMemberType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MemberType, _memberTypeService.Get)}
+            };
         }
 
         public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)
@@ -300,7 +308,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <typeparam name="T">Type of the entities to retrieve</typeparam>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        public virtual IEnumerable<IUmbracoEntity> GetAll<T>() where T : IUmbracoEntity
+        public virtual IEnumerable<IUmbracoEntity> GetAll<T>(params int[] ids) where T : IUmbracoEntity
         {
             var typeFullName = typeof(T).FullName;
             Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
@@ -310,15 +318,16 @@ namespace Umbraco.Core.Services
             });
             var objectType = _supportedObjectTypes[typeFullName].Item1;
 
-            return GetAll(objectType);
+            return GetAll(objectType, ids);
         }
 
         /// <summary>
         /// Gets a collection of all <see cref="IUmbracoEntity"/> of a given type.
         /// </summary>
         /// <param name="umbracoObjectType">UmbracoObjectType of the entities to return</param>
+        /// <param name="ids"></param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        public virtual IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes umbracoObjectType)
+        public virtual IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes umbracoObjectType, params int[] ids)
         {
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;
@@ -331,7 +340,24 @@ namespace Umbraco.Core.Services
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(objectTypeId);
+                return repository.GetAll(objectTypeId, ids);
+            }
+        }
+
+        public IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes umbracoObjectType, Guid[] keys)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(objectTypeId, keys);
             }
         }
 
@@ -339,8 +365,9 @@ namespace Umbraco.Core.Services
         /// Gets a collection of <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="objectTypeId">Guid id of the UmbracoObjectType</param>
+        /// <param name="ids"></param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId)
+        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
             var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
             var entityType = GetEntityType(umbracoObjectType);
@@ -353,7 +380,7 @@ namespace Umbraco.Core.Services
 
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(objectTypeId);
+                return repository.GetAll(objectTypeId, ids);
             }
         }
 

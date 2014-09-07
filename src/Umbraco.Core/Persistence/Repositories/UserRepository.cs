@@ -60,38 +60,28 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
-            if (ids.Any())
-            {
-                return PerformGetAllOnIds(ids);
-            }
-
             var sql = GetBaseQuery(false);
 
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
-                .ToArray(); // important so we don't iterate twice, if we don't do thsi we can end up with null vals in cache if we were caching.
-        }
-
-        private IEnumerable<IUser> PerformGetAllOnIds(params int[] ids)
-        {
-            if (ids.Any() == false) yield break;
-            foreach (var id in ids)
+            if (ids.Any())
             {
-                yield return Get(id);
+                sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
             }
+            
+            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
+                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
         }
-
+        
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql);
+            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
+                .DistinctBy(x => x.Id);
 
-            foreach (var dto in dtos.DistinctBy(x => x.Id))
-            {
-                yield return Get(dto.Id);
-            }
+            return ConvertFromDtos(dtos)
+                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
         }
         
         #endregion
@@ -380,21 +370,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
         {
-            var foundUserTypes = new Dictionary<short, IUserType>();
+            var userTypeIds = dtos.Select(x => Convert.ToInt32(x.Type)).ToArray();
+            var allUserTypes = _userTypeRepository.GetAll(userTypeIds);
+
             return dtos.Select(dto =>
-                {
-                    //first we need to get the user type
-                    IUserType userType;
-                    if (foundUserTypes.ContainsKey(dto.Type))
-                    {
-                        userType = foundUserTypes[dto.Type];
-                    }
-                    else
-                    {
-                        userType = _userTypeRepository.Get(dto.Type);
-                        //put it in the local cache
-                        foundUserTypes.Add(dto.Type, userType);
-                    }
+                {   
+                    var userType = allUserTypes.Single(x => x.Id == dto.Type);
 
                     var userFactory = new UserFactory(userType);
                     return userFactory.BuildEntity(dto);

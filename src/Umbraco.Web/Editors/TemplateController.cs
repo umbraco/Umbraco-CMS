@@ -17,7 +17,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    [UmbracoTreeAuthorize(Core.Constants.Trees.Templates)]
     public class TemplateController : UmbracoAuthorizedJsonController
     {
         /// <summary>

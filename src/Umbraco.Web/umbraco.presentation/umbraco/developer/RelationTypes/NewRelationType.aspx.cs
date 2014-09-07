@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Models;
@@ -9,13 +10,9 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 	/// <summary>
 	/// Add a new Relation Type
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.RelationTypes)]
 	public partial class NewRelationType : UmbracoEnsuredPage
 	{
-	    public NewRelationType()
-	    {
-	        CurrentApp = DefaultApps.developer.ToString();
-	    }
-
 		/// <summary>
 		/// On Load event
 		/// </summary>

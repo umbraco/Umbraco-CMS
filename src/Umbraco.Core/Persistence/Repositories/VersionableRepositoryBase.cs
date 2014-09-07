@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="tagRepo"></param>
-        protected void ClearEntityTags(IContentBase entity, ITagsRepository tagRepo)
+        protected void ClearEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             tagRepo.ClearTagsFromEntity(entity.Id);
         }
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="tagRepo"></param>
-        protected void UpdatePropertyTags(IContentBase entity, ITagsRepository tagRepo)
+        protected void UpdatePropertyTags(IContentBase entity, ITagRepository tagRepo)
         {
             foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
             {
@@ -273,9 +273,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             foreach (var property in properties)
-            {                
+            {
+                //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
                 var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
-                //TODO: Should this be cached somehow? Might need to benchmark this
                 var tagSupport = TagExtractor.GetAttribute(editor);
 
                 if (tagSupport != null)
@@ -292,20 +292,123 @@ namespace Umbraco.Core.Persistence.Repositories
                             SortOrder = x.sortorder,
                             Value = x.value
                         })
-                        .ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+                        .Distinct()
+                        .ToArray();
 
-                    var preVals = new PreValueCollection(preValData);
+                    var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
 
-                    var d = new ContentPropertyData(property.Value,
-                        preVals, 
+                    var preVals = new PreValueCollection(asDictionary);
+
+                    var contentPropData = new ContentPropertyData(property.Value,
+                        preVals,
                         new Dictionary<string, object>());
 
-                    TagExtractor.SetPropertyTags(property, d, property.Value, tagSupport);
+                    TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
                 }
             }
-                
 
-            return new PropertyCollection(properties);
+
+            return new PropertyCollection(properties); 
         }
+
+        protected IDictionary<int, PropertyCollection> GetPropertyCollection(
+            Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>[] documentDefs)
+        {
+
+            if (documentDefs.Length <= 0) return new Dictionary<int, PropertyCollection>();
+
+            //FIXME: we need to split on 2100 max SQL server parameters
+            // since there will be 2 params per single row it will be half that amount
+            if ((documentDefs.Length / 2) > 2000)
+                throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
+
+            var sql = new Sql();
+            sql.Select("cmsPropertyData.*, cmsDataTypePreValues.id as preValId, cmsDataTypePreValues.value, cmsDataTypePreValues.sortorder, cmsDataTypePreValues.alias, cmsDataTypePreValues.datatypeNodeId")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+
+                .LeftOuterJoin<DataTypePreValueDto>()
+                .On<PropertyTypeDto, DataTypePreValueDto>(left => left.DataTypeId, right => right.DataTypeNodeId)
+                
+                .Where("cmsPropertyData.contentNodeId IN (@nodeIds) AND cmsPropertyData.versionId IN (@versionIds)",
+                    new { nodeIds = documentDefs.Select(x => x.Item1), versionIds = documentDefs.Select(x => x.Item2) });
+
+            var allData = Database.Fetch<dynamic>(sql);
+
+            var result = new Dictionary<int, PropertyCollection>();
+
+            foreach (var def in documentDefs)
+            {
+                var propertyDataDtos = allData.Select(x => new PropertyDataDto
+                {
+                    Date = x.dataDate,
+                    Id = x.id,
+                    Integer = x.dataInt,
+                    NodeId = x.contentNodeId,
+                    Text = x.dataNtext,
+                    VarChar = x.dataNvarchar,
+                    VersionId = x.versionId,
+                    PropertyTypeId = x.propertytypeid,
+                    //NOTE: This get's used for nothing so we don't need to map it
+                    //PropertyTypeDto = new PropertyTypeDto()
+                })
+                    .Where(x => x.NodeId == def.Item1)
+                    .Distinct();
+
+                var propertyFactory = new PropertyFactory(def.Item3, def.Item2, def.Item1, def.Item4, def.Item5);
+                var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
+
+                var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
+                foreach (var property in newProperties)
+                {
+                    var propertyDataDto = new PropertyDataDto { NodeId = def.Item1, PropertyTypeId = property.PropertyTypeId, VersionId = def.Item2 };
+                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+
+                    property.Version = def.Item2;
+                    property.Id = primaryKey;
+                }
+
+                foreach (var property in properties)
+                {
+                    //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
+                    var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+                    var tagSupport = TagExtractor.GetAttribute(editor);
+
+                    if (tagSupport != null)
+                    {
+
+                        //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
+
+                        var preValData = allData.Where(x => x.propertytypeid == property.PropertyTypeId && x.preValId != null)
+                            .Select(x => new DataTypePreValueDto
+                            {
+                                Alias = x.alias,
+                                DataTypeNodeId = x.datatypeNodeId,
+                                Id = x.preValId,
+                                SortOrder = x.sortorder,
+                                Value = x.value
+                            })
+                            .Distinct()
+                            .ToArray();
+                            
+                        var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+
+                        var preVals = new PreValueCollection(asDictionary);
+
+                        var contentPropData = new ContentPropertyData(property.Value,
+                            preVals,
+                            new Dictionary<string, object>());
+
+                        TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                    }
+                }
+
+                result.Add(def.Item1, new PropertyCollection(properties));
+            }
+
+            return result;
+        }
+        
     }
 }

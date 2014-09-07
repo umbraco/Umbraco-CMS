@@ -3,7 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MarkdownEditorAlias, "Markdown editor", "markdowneditor")]
+    [PropertyEditor(Constants.PropertyEditors.MarkdownEditorAlias, "Markdown editor", "markdowneditor", ValueType = "TEXT")]
     public class MarkdownPropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()
