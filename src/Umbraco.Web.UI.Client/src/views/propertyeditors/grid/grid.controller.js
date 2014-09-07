@@ -23,12 +23,12 @@ angular.module("umbraco")
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-
                 });
             },
 
             stop: function (e, ui) {
-                ui.item.find('.mceNoEditor').each(function () {
+                ui.item.parents(".usky-column").find('.mceNoEditor').each(function () {
+                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                     tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
             }
@@ -109,10 +109,10 @@ angular.module("umbraco")
             },
 
             stop: function (e, ui) {
-                ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
-                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-                    tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
-                });
+                //ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
+                //    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                //    tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                //});
             }
         }
 

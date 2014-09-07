@@ -43,7 +43,7 @@
                          class="usky-row"
                          ng-mouseover="setCurrentRow(row)"
                          ng-mouseleave="disableCurrentRow()"
-                         ng-class="{removingControl:currentRemoveControl == row, movingControl:currentMovedRow == row}">
+                         ng-class="{removingControl:currentRemoveControl == row, movingControl:currentMovedRow == row, selectedRow:currentRow == row && currentControl === null}">
 
                         <!-- Row tool -->
                         <div class="row-tools" ng-animate="'fade'"
