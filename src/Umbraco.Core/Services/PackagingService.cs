@@ -259,10 +259,9 @@ namespace Umbraco.Core.Services
                             propertyValue = string.Join(",", propertyValueList.ToArray());
 
                         }
-
-                        //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue);        
                     }
+                    //set property value
+                    content.SetValue(propertyTypeAlias, propertyValue);
                 }
             }
 
