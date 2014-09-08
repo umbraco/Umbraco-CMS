@@ -174,6 +174,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 .WhereNotNull()
                 .ToArray();
 
+            //We need to put a threshold here! IF there's an insane amount of items
+            // coming back here we don't want to chuck it all into memory, this added cache here
+            // is more for convenience when paging stuff temporarily
+
+            if (entityCollection.Length > 100) return entityCollection;
+
             foreach (var entity in entityCollection)
             {
                 if (entity != null)
