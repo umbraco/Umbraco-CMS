@@ -41,7 +41,7 @@ function openUserTypes(id) {
                     node.NodeID = userType.Id.ToString();
                     node.Action = string.Format("javascript:openUserTypes({0})", userType.Id.ToString());
                     node.Icon = "icon-users";
-                    node.Text = userType.Alias;
+                    node.Text = userType.Name;
 
                     OnBeforeNodeRender(ref tree, ref node, EventArgs.Empty);
                     if (node != null)
