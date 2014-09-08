@@ -133,6 +133,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<TEntity> GetAll(params TId[] ids)
         {
+            if (ids.Length > 2000)
+            {
+                throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
+            }
+
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids.Distinct()
                 //don't query by anything that is a default of T (like a zero)

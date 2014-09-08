@@ -604,6 +604,14 @@ namespace Umbraco.Core.Persistence.Repositories
             Sql sql, int pageIndex, int pageSize, out int totalRecords,
             Func<IEnumerable<TDto>, int[]> resolveIds)
         {
+            //If a max size is passed in, just do a normal get all!
+            if (pageSize == int.MaxValue)
+            {
+                var result = GetAll().ToArray();
+                totalRecords = result.Count();
+                return result;
+            }
+
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
 
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
