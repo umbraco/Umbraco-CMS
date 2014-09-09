@@ -86,8 +86,7 @@ namespace Umbraco.Tests
                 XmlHelper.SortNodes(
                     parentNode, 
                     "./* [@id]", 
-                    element => element.Attribute("id") != null,
-                    element => element.AttributeValue<int>("sortOrder"));
+                    x => x.AttributeValue<int>("sortOrder"));
                 watch.Stop();
                 totalTime += watch.ElapsedMilliseconds;
                 watch.Reset();
@@ -125,8 +124,7 @@ namespace Umbraco.Tests
             XmlHelper.SortNodes(
                 parentNode,
                 "./* [@id]",
-                element => element.Attribute("id") != null,
-                element => element.AttributeValue<int>("sortOrder"));
+                x => x.AttributeValue<int>("sortOrder"));
            
             //do assertions just to make sure it is working properly.
             var currSort = 0;

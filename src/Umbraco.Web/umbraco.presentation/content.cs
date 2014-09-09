@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using umbraco.cms.presentation;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -19,12 +21,14 @@ using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models;
 using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
 using Umbraco.Web;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Node = umbraco.NodeFactory.Node;
 using Umbraco.Core;
+using File = System.IO.File;
 
 namespace umbraco
 {
@@ -322,7 +326,7 @@ namespace umbraco
             }
         }
 
-        public static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
+        private static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
         {
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
@@ -353,8 +357,12 @@ namespace umbraco
             if (d.Published)
             {
                 var parentId = d.Level == 1 ? -1 : d.Parent.Id;
-                xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId,
-                                                   GetPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
+
+                // fix sortOrder - see note in UpdateSortOrder
+                var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
+                var attr = ((XmlElement)node).GetAttributeNode("sortOrder");
+                attr.Value = d.sortOrder.ToString();
+                xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, node, xmlContentCopy);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -382,79 +390,113 @@ namespace umbraco
 			return xmlContentCopy;
 		}
 
-        public static XmlDocument AppendDocumentXml(int id, int level, int parentId, XmlNode docNode, XmlDocument xmlContentCopy)
+        // appends a node (docNode) into a cache (xmlContentCopy)
+        // and returns a cache (not necessarily the original one)
+        //
+        internal static XmlDocument AppendDocumentXml(int id, int level, int parentId, XmlNode docNode, XmlDocument xmlContentCopy)
         {
-            // Find the document in the xml cache
+            // sanity checks
+            if (id != docNode.AttributeValue<int>("id"))
+                throw new ArgumentException("Values of id and docNode/@id are different.");
+            if (parentId != docNode.AttributeValue<int>("parentID"))
+                throw new ArgumentException("Values of parentId and docNode/@parentID are different.");
+
+            // find the document in the cache
             XmlNode currentNode = xmlContentCopy.GetElementById(id.ToString());
 
 			// if the document is not there already then it's a new document
 			// we must make sure that its document type exists in the schema
-            var xmlContentCopy2 = xmlContentCopy;
 			if (currentNode == null && UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema == false)
 			{
-				xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
+                // ValidateSchema looks for the doctype in the schema and if not found
+                // creates a new XML document with a schema containing the doctype. If
+                // a new cache copy is returned, must import the new node into the new
+                // copy.
+                var xmlContentCopy2 = xmlContentCopy;
+                xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
 				if (xmlContentCopy != xmlContentCopy2)
 					docNode = xmlContentCopy.ImportNode(docNode, true);
 			}
 
-            // Find the parent (used for sortering and maybe creation of new node)
+            // find the parent
             XmlNode parentNode = level == 1
-                                     ? xmlContentCopy.DocumentElement
-                                     : xmlContentCopy.GetElementById(parentId.ToString());
+                ? xmlContentCopy.DocumentElement
+                : xmlContentCopy.GetElementById(parentId.ToString());
 
-            if (parentNode != null)
+            // no parent = cannot do anything
+            if (parentNode == null)
+                return xmlContentCopy;
+
+            // define xpath for getting the children nodes (not properties) of a node
+            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                ? "./node"
+                : "./* [@id]";
+
+            // insert/move the node under the parent
+            if (currentNode == null)
             {
-                if (currentNode == null)
+                // document not there, new node, append
+                currentNode = docNode;
+                parentNode.AppendChild(currentNode);
+            }
+            else
+            {
+                // document found... we could just copy the currentNode children nodes over under
+                // docNode, then remove currentNode and insert docNode... the code below tries to
+                // be clever and faster, though only benchmarking could tell whether it's worth the
+                // pain...
+                
+                // first copy current parent ID - so we can compare with target parent
+                var moving = currentNode.AttributeValue<int>("parentID") != parentId;
+
+                if (docNode.Name == currentNode.Name)
                 {
-                    currentNode = docNode;
-                    parentNode.AppendChild(currentNode);
+                    // name has not changed, safe to just update the current node
+                    // by transfering values eg copying the attributes, and importing the data elements
+                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
+
+                    // if moving, move the node to the new parent
+                    // else it's already under the right parent
+                    // (but maybe the sort order has been updated)
+                    if (moving)
+                        parentNode.AppendChild(currentNode); // remove then append to parentNode
                 }
                 else
                 {
-                    //check the current parent id
-                    var currParentId = currentNode.AttributeValue<int>("parentID");
+                    // name has changed, must use docNode (with new name)
+                    // move children nodes from currentNode to docNode (already has properties)
+                    foreach (XmlNode child in currentNode.SelectNodes(childNodesXPath))
+                        docNode.AppendChild(child); // remove then append to docNode
 
-                    //update the node with it's new values
-                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
-
-                    //If the node is being moved we also need to ensure that it exists under the new parent!
-                    // http://issues.umbraco.org/issue/U4-2312
-                    // we were never checking this before and instead simply changing the parentId value but not 
-                    // changing the actual parent.
-
-                    //check the new parent
-                    if (currParentId != currentNode.AttributeValue<int>("parentID"))
+                    // and put docNode in the right place - if parent has not changed, then
+                    // just replace, else remove currentNode and insert docNode under the right parent
+                    // (but maybe not at the right position due to sort order)
+                    if (moving)
                     {
-                        //ok, we've actually got to move the node
-                        parentNode.AppendChild(currentNode);
+                        currentNode.ParentNode.RemoveChild(currentNode);
+                        parentNode.AppendChild(docNode);
                     }
-                    
-                }
-
-                // TODO: Update with new schema!
-                var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                                ? "./node"
-                                : "./* [@id]";
-
-                var childNodes = parentNode.SelectNodes(xpath);
-
-                // Sort the nodes if the added node has a lower sortorder than the last
-                if (childNodes != null && childNodes.Count > 0)
-                {
-                    //get the biggest sort order for all children including the one added
-                    var largestSortOrder = childNodes.Cast<XmlNode>().Max(x => x.AttributeValue<int>("sortOrder"));
-                    var currentSortOrder = currentNode.AttributeValue<int>("sortOrder");
-                    //if the current item's sort order is less than the largest sort order in the list then
-                    //we need to resort the xml structure since this item belongs somewhere in the middle.
-                    //http://issues.umbraco.org/issue/U4-509
-                    if (childNodes.Count > 1 && currentSortOrder < largestSortOrder)
+                    else
                     {
-                        SortNodes(ref parentNode);
+                        // replacing might screw the sort order
+                        parentNode.ReplaceChild(docNode, currentNode);
                     }
+
+                    currentNode = docNode;
                 }
             }
 
-			return xmlContentCopy;
+            // if the nodes are not ordered, must sort
+            // (see U4-509 + has to work with ReplaceChild too)
+            //XmlHelper.SortNodesIfNeeded(parentNode, childNodesXPath, x => x.AttributeValue<int>("sortOrder"));
+            
+            // but...
+            // if we assume that nodes are always correctly sorted
+            // then we just need to ensure that currentNode is at the right position.
+            // should be faster that moving all the nodes around.
+            XmlHelper.SortNode(parentNode, childNodesXPath, currentNode, x => x.AttributeValue<int>("sortOrder"));
+
+            return xmlContentCopy;
         }
 
         private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
@@ -472,18 +514,36 @@ namespace umbraco
         /// <summary>
         /// Sorts the documents.
         /// </summary>
-        /// <param name="parentNode">The parent node.</param>
-        public static void SortNodes(ref XmlNode parentNode)
+        /// <param name="parentId">The parent node identifier.</param>
+        public void SortNodes(int parentId)
         {
-            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                            ? "./node"
-                            : "./* [@id]";
+            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                ? "./node"
+                : "./* [@id]";
 
-            XmlHelper.SortNodes(
-                parentNode,
-                xpath,
-                element => element.Attribute("id") != null,
-                element => element.AttributeValue<int>("sortOrder"));            
+            lock (XmlContentInternalSyncLock)
+            {
+                // modify a clone of the cache because even though we're into the write-lock
+                // we may have threads reading at the same time. why is this an option?
+                var wip = UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent
+                    ? CloneXmlDoc(XmlContentInternal)
+                    : XmlContentInternal;
+
+                var parentNode = parentId == -1
+                    ? XmlContent.DocumentElement
+                    : XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture));
+
+                if (parentNode == null) return;
+
+                var sorted = XmlHelper.SortNodesIfNeeded(
+                    parentNode,
+                    childNodesXPath,
+                    x => x.AttributeValue<int>("sortOrder"));
+
+                if (sorted == false) return;
+                
+                XmlContentInternal = wip;
+            }
         }
 
 
@@ -528,6 +588,50 @@ namespace umbraco
                 ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);                    
                 
                 FireAfterUpdateDocumentCache(d, e);
+            }
+        }
+
+        internal virtual void UpdateSortOrder(int contentId)
+        {
+            var content = ApplicationContext.Current.Services.ContentService.GetById(contentId);
+            if (content != null) return;
+            UpdateSortOrder(content);
+        }
+
+        internal virtual void UpdateSortOrder(IContent c)
+        {
+            // the XML in database is updated only when content is published, and then
+            // it contains the sortOrder value at the time the XML was generated. when
+            // a document with unpublished changes is sorted, then it is simply saved
+            // (see ContentService) and so the sortOrder has changed but the XML has
+            // not been updated accordingly.
+
+            // this updates the published cache to take care of the situation
+            // without ContentService having to ... what exactly?
+
+            // no need to do it if the content is published without unpublished changes,
+            // though, because in that case the XML will get re-generated with the
+            // correct sort order.
+            if (c.Published)
+                return;
+
+            lock (XmlContentInternalSyncLock)
+            {
+                var wip = UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent
+                    ? CloneXmlDoc(XmlContentInternal)
+                    : XmlContentInternal;
+
+                var node = wip.GetElementById(c.Id.ToString());
+                if (node == null) return;
+                var attr = node.GetAttributeNode("sortOrder");
+                var sortOrder = c.SortOrder.ToString();
+                if (attr.Value == sortOrder) return;
+
+                // only if node was actually modified
+                attr.Value = sortOrder;
+                XmlContentInternal = wip;
+
+                // no need to clear any cache
             }
         }
 
@@ -1009,6 +1113,13 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                                 int currentId = dr.GetInt("id");
                                 int parentId = dr.GetInt("parentId");
                                 string xml = dr.GetString("xml");
+
+                                // fix sortOrder - see notes in UpdateSortOrder
+                                var tmp = new XmlDocument();
+                                tmp.LoadXml(xml);
+                                var attr = tmp.DocumentElement.GetAttributeNode("sortOrder");
+                                attr.Value = dr.GetInt("sortOrder").ToString();
+                                xml = tmp.InnerXml;
 
                                 // Call the eventhandler to allow modification of the string
                                 var e1 = new ContentCacheLoadNodeEventArgs();
