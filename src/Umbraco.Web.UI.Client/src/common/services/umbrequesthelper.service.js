@@ -18,7 +18,6 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @param {Array} queryStrings An array of key/value pairs
          */
         dictionaryToQueryString: function (queryStrings) {
-
             
             if (angular.isArray(queryStrings)) {
                 return _.map(queryStrings, function (item) {
@@ -35,15 +34,13 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     return encodeURIComponent(key) + "=" + encodeURIComponent(val);
                 }).join("&");
             }
+            else if (angular.isObject(queryStrings)) {
 
-            /*
-            //if we have a simple object, we can simply map with $.param
-            //but with the current structure we cant since an array is an object and an object is an array
-            if(angular.isObject(queryStrings)){
-                return decodeURIComponent($.param(queryStrings)); 
-            }*/
-
-            throw "The queryString parameter is not an array of key value pairs";
+                //this allows for a normal object to be passed in (ie. a dictionary)
+                return decodeURIComponent($.param(queryStrings));
+            }
+            
+            throw "The queryString parameter is not an array or object of key value pairs";
         },
 
         /**

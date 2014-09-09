@@ -193,12 +193,7 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
               { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
-      },
-      vsLibs: {
-          files: [
-              { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' }
-          ]
-      },
+      },      
       packages: {
         files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
@@ -347,7 +342,7 @@ module.exports = function (grunt) {
 
     watch:{
       css: {
-          files: '**/*.less',
+          files: 'src/**/*.less',
           tasks: ['watch-less', 'timestamp'],
           options: {
             livereload: true,
@@ -374,15 +369,17 @@ module.exports = function (grunt) {
         tasks:['watch-html','timestamp']
       },
 
-      packages: {
-          files: 'src/packages/**/*.*',
-          tasks: ['watch-packages', 'timestamp'],
-      },
+        //SD: Removing package watching, we don't even use these anymore and they should be removed, the more watching we do the slower this gets
+      //packages: {
+      //    files: 'src/packages/**/*.*',
+      //    tasks: ['watch-packages', 'timestamp'],
+      //}
 
-      docs: {
-          files: ['src/**/*.js', 'src/*.js'],
-          tasks: ['docs:api'],
-      }
+        //SD: Removing watch docs, this gets run with the normal watching which we do not want
+      //docs: {
+      //    files: ['src/**/*.js', 'src/*.js'],
+      //    tasks: ['docs:api'],
+      //}
     },
 
 

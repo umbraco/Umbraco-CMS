@@ -217,6 +217,10 @@ namespace Umbraco.Web.Editors
                                 {
                                     "tagsDataBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsDataController>(
                                         controller => controller.GetTags(""))
+                                },
+                                {
+                                    "examineMgmtBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
+                                        controller => controller.GetIndexerDetails())
                                 }
                             }
                     },

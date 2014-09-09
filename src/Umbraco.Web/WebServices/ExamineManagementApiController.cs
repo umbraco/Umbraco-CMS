@@ -41,7 +41,7 @@ namespace Umbraco.Web.WebServices
                     };
                     var props = TypeHelper.CachedDiscoverableProperties(searcher.GetType(), mustWrite: false)
                         //ignore these properties
-                                          .Where(x => !new[] { "Description" }.InvariantContains(x.Name))
+                                          .Where(x => new[] {"Description"}.InvariantContains(x.Name) == false)
                                           .OrderBy(x => x.Name);
                     foreach (var p in props)
                     {
@@ -136,7 +136,7 @@ namespace Umbraco.Web.WebServices
         /// <param name="indexerName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is kind of rudementary since there's no way we can know that the index has rebuilt, we'll just check
+        /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we'll just check
         /// if the index is locked based on Lucene apis
         /// </remarks>
         public ExamineIndexerModel PostCheckRebuildIndex(string indexerName)
@@ -181,7 +181,7 @@ namespace Umbraco.Web.WebServices
             };
             var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                 //ignore these properties
-                                  .Where(x => !new[] { "IndexerData", "Description", "WorkingFolder" }.InvariantContains(x.Name))
+                                  .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                                   .OrderBy(x => x.Name);
             foreach (var p in props)
             {
@@ -193,7 +193,7 @@ namespace Umbraco.Web.WebServices
             {                
                 indexerModel.IsLuceneIndex = true;
                 indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
-                indexerModel.FieldCount = luceneIndexer.GetIndexDocumentCount();
+                indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
                 indexerModel.IsOptimized = luceneIndexer.IsIndexOptimized();
                 indexerModel.DeletionCount = luceneIndexer.GetDeletedDocumentsCount();                
             }

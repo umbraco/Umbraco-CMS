@@ -1,0 +1,231 @@
+<div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineMgmtController">
+
+    <h3>Examine Management</h3>
+
+    <div ng-show="loading">
+        Loading...
+    </div>
+
+    <h4>Indexers</h4>
+
+    <ul ng-hide="loading">
+        <li class="provider" ng-repeat="indexer in indexerDetails">
+
+            <a href="" ng-click="toggle(indexer, 'showProperties')">
+                {{indexer.name}}
+            </a>
+
+            <ul ng-show="indexer.showProperties">
+
+                <li>
+
+                    <a href="" ng-click="toggle(indexer, 'showTools')">Index info & tools</a>
+
+                    <div ng-show="indexer.showTools && indexer.isLuceneIndex">
+                        <div>
+                            <br />
+                            <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)" class="btn-group">
+                                
+                                <button class="btn btn-warning" ng-click="rebuildIndex(indexer)">Rebuild index</button>
+                                <button class="btn btn-warning" ng-click="optimizeIndex(indexer)" ng-show="indexer.documentCount > 0">Optimize index</button>
+                            </div>
+                            <div ng-show="indexer.isProcessing" class="progress progress-striped active">
+                                <div class="bar" style="width: 100%;"></div>
+                            </div>
+                            <div class="error" ng-show="indexer.processingAttempts >= 100">
+                                The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-condensed">
+                            <caption>&nbsp;</caption>
+                            <tr>
+                                <th>Documents in index</th>
+                                <td>{{indexer.documentCount}}</td>
+                            </tr>
+                            <tr>
+                                <th>Fields in index</th>
+                                <td>{{indexer.fieldCount}}</td>
+                            </tr>
+                            <tr>
+                                <th>Has deletions?</th>
+                                <td>
+                                    <span>{{indexer.deletionCount > 0}}</span>
+                                    (<span>{{indexer.deletionCount}}</span>)
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Optimized?</th>
+                                <td>
+                                    <span>{{indexer.isOptimized}}</span>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </li>
+
+                <li ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0 || indexer.indexCriteria.ExcludeNodeTypes.length > 0 || indexer.indexCriteria.ParentNodeId">
+                    <a href="" ng-click="toggle(indexer, 'showNodeTypes')">Node types</a>
+                    <table ng-show="indexer.showNodeTypes" class="table table-bordered table-condensed">
+                        <tr ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0">
+                            <th>Include node types</th>
+                            <td>{{indexer.indexCriteria.IncludeNodeTypes | json}}</td>
+                        </tr>
+                        <tr ng-show="indexer.indexCriteria.ExcludeNodeTypes.length > 0">
+                            <th>Exclude node types</th>
+                            <td>{{indexer.indexCriteria.ExcludeNodeTypes | json}}</td>
+                        </tr>
+                        <tr ng-show="indexer.indexCriteria.ParentNodeId">
+                            <th>Parent node id</th>
+                            <td>{{indexer.indexCriteria.ParentNodeId}}</td>
+                        </tr>
+                    </table>
+                </li>
+
+                <li ng-show="indexer.indexCriteria.StandardFields.length > 0">
+                    <a href="" ng-click="toggle(indexer, 'showSystemFields')">System fields</a>
+                    <table ng-show="indexer.showSystemFields" class="table table-bordered table-condensed">
+                        <caption>&nbsp;</caption>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Enable sorting</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="field in indexer.indexCriteria.StandardFields">
+                                <th>{{field.Name}}</th>
+                                <td>{{field.EnableSorting}}</td>
+                                <td>{{field.Type}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+
+                <li ng-show="indexer.indexCriteria.UserFields.length > 0">
+                    <a href="" ng-click="toggle(indexer, 'showUserFields')">User fields</a>
+                    <table ng-show="indexer.showUserFields" class="table table-bordered table-condensed">
+                        <caption>&nbsp;</caption>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Enable sorting</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="field in indexer.indexCriteria.UserFields">
+                                <th>{{field.Name}}</th>
+                                <td>{{field.EnableSorting}}</td>
+                                <td>{{field.Type}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+
+                <li>
+                    <a href="" ng-click="toggle(indexer, 'showProviderProperties')">Provider properties</a>
+                    <table ng-show="indexer.showProviderProperties" class="table table-bordered table-condensed">
+                        <caption>&nbsp;</caption>
+                        <tr ng-repeat="(key, val) in indexer.providerProperties track by $index">
+                            <th>{{key}}</th>
+                            <td>{{val}}</td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </li>
+
+
+
+    </ul>
+
+    <h4>Searchers</h4>
+
+    <ul ng-hide="loading">
+        <li class="provider" ng-repeat="searcher in searcherDetails">
+            <a href="" ng-click="toggle(searcher, 'showProperties')">
+                {{searcher.name}}
+            </a>
+
+            <ul ng-show="searcher.showProperties">
+
+                <li class="search-tools">
+
+                    <a href="" ng-click="toggle(searcher, 'showTools')">Search tools</a>
+
+                    <div ng-show="searcher.showTools">
+                        <a class="hide" href="" ng-click="closeSearch(searcher)" ng-show="searcher.isSearching">Hide search results</a>
+
+                        <br />
+
+                        <form>
+
+                            <div class="row form-search">
+                                <div class="span8 input-append">
+                                    <input type="text" class="search-query" ng-model="searcher.searchText" />
+                                    <button type="submit" class="btn btn-info" ng-click="search(searcher)" ng-disabled="searcher.isProcessing">Search</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="textSearch" class="radio inline">
+                                    <input type="radio" name="searchType" id="textSearch" value="text" ng-model="searcher.searchType" />
+                                    Text Search
+                                </label>
+                                <label for="luceneSearch" class="radio inline">
+                                    <input type="radio" name="searchType" id="luceneSearch" value="lucene" ng-model="searcher.searchType" />
+                                    Lucene Search
+                                </label>
+                            </div>
+
+
+                        </form>
+
+                        <div class="search-results" ng-show="searcher.isSearching">
+
+                            <div ng-show="indexer.isProcessing" class="progress progress-striped active">
+                                <div class="bar" style="width: 100%;"></div>
+                            </div>
+                            <table ng-hide="searcher.isProcessing" class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="score">Score</th>
+                                        <th class="id">Id</th>
+                                        <th>Values</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="result in searcher.searchResults">
+                                        <td>{{result.Score}}</td>
+                                        <td>{{result.Id}}</td>
+                                        <td>
+                                            <span ng-repeat="(key,val) in result.Fields track by $index">
+                                                <span class=""><em>{{key}}</em>:</span>
+                                                <span class="text-info">{{val}}</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="" ng-click="toggle(searcher, 'showProviderProperties')">Provider properties</a>
+                    <table ng-show="searcher.showProviderProperties" class="table table-bordered table-condensed">
+                        <caption>&nbsp;</caption>
+                        <tr ng-repeat="(key, val) in searcher.providerProperties track by $index">
+                            <th>{{key}}</th>
+                            <td>{{val}}</td>
+                        </tr>
+                    </table>
+                </li>
+
+            </ul>
+
+        </li>
+    </ul>
+
+</div>

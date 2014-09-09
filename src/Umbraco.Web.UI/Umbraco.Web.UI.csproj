@@ -844,9 +844,6 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
-    <Content Include="Umbraco_Client\Dashboards\ExamineManagement.css" />
-    <Content Include="Umbraco_Client\Dashboards\ExamineManagement.js" />
-    <Content Include="Umbraco_Client\Dashboards\ExamineManagementIco.png" />
     <Content Include="Umbraco_Client\Dialogs\SortDialog.css" />
     <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
