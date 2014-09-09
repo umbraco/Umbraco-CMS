@@ -17,22 +17,25 @@ function ($scope, assetsService, dialogService, $log, imageHelper) {
             "lib/markdown/markdown.editor.js"
         ])
 		.then(function () {
+            
+		    // we need a short delay to wait for the textbox to appear.
+		    setTimeout(function() {
+		        //this function will execute when all dependencies have loaded
+		        var converter2 = new Markdown.Converter();
+		        var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
+		        editor2.run();
 
-		    //this function will execute when all dependencies have loaded
-		    var converter2 = new Markdown.Converter();
-		    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
-		    editor2.run();
+		        //subscribe to the image dialog clicks
+		        editor2.hooks.set("insertImageDialog", function (callback) {
 
-		    //subscribe to the image dialog clicks
-		    editor2.hooks.set("insertImageDialog", function (callback) {
+		            dialogService.mediaPicker({ callback: function (data) {
+					    callback(data.url);
+		        	    }
+		            });
 
-		        dialogService.mediaPicker({ callback: function (data) {
-					callback(data.url);
-		        	}
+		            return true; // tell the editor that we'll take care of getting the image url
 		        });
-
-		        return true; // tell the editor that we'll take care of getting the image url
-		    });
+		    }, 200);
 
 		});
 
