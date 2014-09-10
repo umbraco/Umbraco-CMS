@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class ContentTypeController : ContentAndMediaTypeBaseController
+    public class ContentTypeController : ContentTypeControllerBase
     {
         private ICultureDictionary _cultureDictionary;
 

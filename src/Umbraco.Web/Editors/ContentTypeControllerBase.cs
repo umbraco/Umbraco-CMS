@@ -15,12 +15,12 @@ namespace Umbraco.Web.Editors
     /// Am abstract API controller providing functionality used for dealing with content and media types
     /// </summary>
     [PluginController("UmbracoApi")]    
-    public abstract class ContentAndMediaTypeBaseController : UmbracoAuthorizedJsonController
+    public abstract class ContentTypeControllerBase : UmbracoAuthorizedJsonController
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public ContentAndMediaTypeBaseController()
+        public ContentTypeControllerBase()
             : this(UmbracoContext.Current)
         {            
         }
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        public ContentAndMediaTypeBaseController(UmbracoContext umbracoContext)
+        public ContentTypeControllerBase(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
         }

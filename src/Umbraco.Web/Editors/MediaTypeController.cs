@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with media types
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class MediaTypeController : ContentAndMediaTypeBaseController
+    public class MediaTypeController : ContentTypeControllerBase
     {
         /// <summary>
         /// Constructor
