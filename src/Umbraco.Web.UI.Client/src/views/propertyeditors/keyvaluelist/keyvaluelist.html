@@ -1,0 +1,20 @@
+﻿<div class="umb-editor umb-keyvalue-list" ng-controller="Umbraco.PropertyEditors.KeyValueListController">
+
+    <div ui-sortable ng-model="value">
+    <div class="control-group" ng-repeat="item in value">
+    			<i class="icon icon-navigation handle"></i>
+        <input type="text" name="item_{{$index}}" ng-model="item.key" placeholder="key" ng-required="true" /><span> =&gt; </span><input type="text" name="item_{{$index}}_label" ng-model="item.value" placeholder="label" />
+        <a prevent-default href="" title="Remove this text box"
+            ng-show="value.length > model.config.min"
+            ng-click="remove($index)">
+            <i class="icon icon-remove"></i>
+        </a>
+    </div>
+	</div>
+    <a prevent-default href="" title="Add another text box"
+        ng-show="model.config.max <= 0 || value.length < model.config.max"
+        ng-click="add()">
+        <i class="icon icon-add"></i>
+    </a>
+    
+</div>

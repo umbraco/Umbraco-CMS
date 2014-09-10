@@ -227,6 +227,11 @@ namespace Umbraco.Core
             public const string MultipleTextstringAlias = "Umbraco.MultipleTextstring";
 
             /// <summary>
+            /// Alias for the Key/Value List datatype.
+            /// </summary>
+            public const string KeyValueListAlias = "Umbraco.KeyValueList";
+
+            /// <summary>
             /// Guid for the No edit datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
