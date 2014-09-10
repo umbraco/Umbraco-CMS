@@ -11,6 +11,7 @@ namespace Umbraco.Core.Events
 		/// <param name="canCancel"></param>
 		public DeleteEventArgs(IEnumerable<TEntity> eventObject, bool canCancel) : base(eventObject, canCancel)
 		{
+            MediaFilesToDelete = new List<string>();
 		}
 
 		/// <summary>
@@ -19,6 +20,7 @@ namespace Umbraco.Core.Events
 		/// <param name="eventObject"></param>
 		public DeleteEventArgs(IEnumerable<TEntity> eventObject) : base(eventObject)
 		{
+            MediaFilesToDelete = new List<string>();
 		}
 
 		/// <summary>
@@ -28,6 +30,7 @@ namespace Umbraco.Core.Events
 		public DeleteEventArgs(TEntity eventObject)
 			: base(new List<TEntity> { eventObject })
 		{
+            MediaFilesToDelete = new List<string>();
 		}
 
 		/// <summary>
@@ -38,6 +41,7 @@ namespace Umbraco.Core.Events
 		public DeleteEventArgs(TEntity eventObject, bool canCancel)
 			: base(new List<TEntity> { eventObject }, canCancel)
 		{
+            MediaFilesToDelete = new List<string>();
 		}
 
 		/// <summary>
@@ -46,7 +50,12 @@ namespace Umbraco.Core.Events
 		public IEnumerable<TEntity> DeletedEntities
 		{
 			get { return EventObject; }
-		} 
+		}
+
+        /// <summary>
+        /// A list of media files that can be added to during a deleted operation for which Umbraco will ensure are removed
+        /// </summary>
+        public List<string> MediaFilesToDelete { get; private set; } 
 	}
 
 	public class DeleteEventArgs : CancellableEventArgs

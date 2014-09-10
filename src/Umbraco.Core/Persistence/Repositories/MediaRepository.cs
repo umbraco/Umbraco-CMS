@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMedia"/>
     /// </summary>
-    internal class MediaRepository : VersionableRepositoryBase<int, IMedia>, IMediaRepository
+    internal class MediaRepository : RecycleBinRepository<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
@@ -352,36 +352,15 @@ namespace Umbraco.Core.Persistence.Repositories
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(IMedia entity)
+        #endregion
+
+        #region IRecycleBinRepository members
+
+        protected override int RecycleBinId
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            
-            //Loop through properties to check if the media item contains images/file that should be deleted
-            foreach (var property in entity.Properties)
-            {
-                if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias &&
-                    string.IsNullOrEmpty(property.Value.ToString()) == false
-                    && fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
-                {
-                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
-                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        fs.DeleteFile(relativeFilePath, true);
-                    }
-                }
-            }
-
-            base.PersistDeletedItem(entity);
+            get { return Constants.System.RecycleBinMedia; }
         }
-
+      
         #endregion
 
         /// <summary>
@@ -571,5 +550,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return currentName;
         }
+
+        
     }
 }

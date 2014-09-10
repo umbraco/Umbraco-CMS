@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -987,10 +988,14 @@ namespace Umbraco.Core.Services
                 {
                     repository.Delete(content);
                     uow.Commit();
+
+                    var args = new DeleteEventArgs<IContent>(content, false);
+                    Deleted.RaiseEvent(args, this);
+
+                    //remove any flagged media files
+                    repository.DeleteFiles(args.MediaFilesToDelete);
                 }
-
-                Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
-
+                
                 Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId, content.Id);
             }
         }
@@ -1164,25 +1169,33 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                List<int> ids;
+                Dictionary<int, IEnumerable<Property>> entities;
                 List<string> files;
                 bool success;
                 var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
-                using (var repository = _repositoryFactory.CreateRecycleBinRepository(_uowProvider.GetUnitOfWork()))
+                using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
                 {
-                    ids = repository.GetIdsOfItemsInRecycleBin(nodeObjectType);
-                    files = repository.GetFilesInRecycleBin(nodeObjectType);
+                    //Create a dictionary of ids -> dictionary of property aliases + values
+                    entities = repository.GetEntitiesInRecycleBin()
+                        .ToDictionary(
+                            key => key.Id,
+                            val => (IEnumerable<Property>)val.Properties);
 
-                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, ids, files), this))
+                    files = ((ContentRepository)repository).GetFilesInRecycleBinForUploadField();
+
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, entities, files), this))
                         return;
 
-                    success = repository.EmptyRecycleBin(nodeObjectType);
+                    success = repository.EmptyRecycleBin();
+
+                    EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, entities, files, success), this);
+                    
                     if (success)
                         repository.DeleteFiles(files);
                 }
 
-                EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, ids, files, success), this);
+                
             }
             Audit.Add(AuditTypes.Delete, "Empty Content Recycle Bin performed by user", 0, -20);
         }

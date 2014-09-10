@@ -7,9 +7,8 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMediaRepository : IRepositoryVersionable<int, IMedia>
+    public interface IMediaRepository : IRepositoryVersionable<int, IMedia>, IRecycleBinRepository<IMedia>
     {
-
         /// <summary>
         /// Used to add/update published xml for the media item
         /// </summary>

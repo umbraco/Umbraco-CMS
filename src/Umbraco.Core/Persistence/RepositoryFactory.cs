@@ -209,9 +209,5 @@ namespace Umbraco.Core.Persistence
             return new EntityRepository(uow);
         }
 
-        internal virtual RecycleBinRepository CreateRecycleBinRepository(IDatabaseUnitOfWork uow)
-        {
-            return new RecycleBinRepository(uow);
-        }
     }
 }

@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentRepository : IRepositoryVersionable<int, IContent>
+    public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>
     {
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions

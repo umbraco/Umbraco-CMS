@@ -395,6 +395,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\ChangePasswordColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IRecycleBinRepository.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
