@@ -594,12 +594,14 @@ namespace umbraco
         internal virtual void UpdateSortOrder(int contentId)
         {
             var content = ApplicationContext.Current.Services.ContentService.GetById(contentId);
-            if (content != null) return;
+            if (content == null) return;
             UpdateSortOrder(content);
         }
 
         internal virtual void UpdateSortOrder(IContent c)
         {
+            if (c == null) throw new ArgumentNullException("c");
+
             // the XML in database is updated only when content is published, and then
             // it contains the sortOrder value at the time the XML was generated. when
             // a document with unpublished changes is sorted, then it is simply saved
@@ -621,10 +623,11 @@ namespace umbraco
                     ? CloneXmlDoc(XmlContentInternal)
                     : XmlContentInternal;
 
-                var node = wip.GetElementById(c.Id.ToString());
+                var node = wip.GetElementById(c.Id.ToString(CultureInfo.InvariantCulture));
                 if (node == null) return;
                 var attr = node.GetAttributeNode("sortOrder");
-                var sortOrder = c.SortOrder.ToString();
+                if (attr == null) return;
+                var sortOrder = c.SortOrder.ToString(CultureInfo.InvariantCulture);
                 if (attr.Value == sortOrder) return;
 
                 // only if node was actually modified
