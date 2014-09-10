@@ -305,6 +305,7 @@
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TuningController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Media\EmbedProviders\Giphy.cs" />
     <Compile Include="Models\TemplateQuery\ContentTypeModel.cs" />
     <Compile Include="Models\TemplateQuery\PropertyModel.cs" />
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />
