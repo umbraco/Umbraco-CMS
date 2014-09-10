@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,8 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
             //Issue query to get all trashed content or media that has the Upload field as a property
             //The value for each field is stored in a list: FilesToDelete<string>()
             //Alias: Constants.Conventions.Media.File and PropertyEditorAlias: Constants.PropertyEditors.UploadField
-            var sql = new Sql();
-            sql.Select("DISTINCT(dataNvarchar)")
+            var sql_upload = new Sql();
+            sql_upload.Select("DISTINCT(dataNvarchar)")
                 .From<PropertyDataDto>()
                 .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
@@ -45,7 +46,36 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNvarchar IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.propertyEditorAlias = @PropertyEditorAlias)",
                     new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = nodeObjectType, PropertyEditorAlias = Constants.PropertyEditors.UploadFieldAlias });
 
-            var files = db.Fetch<string>(sql);
+            //Now do the same for media with an imagecropper instead of an upload field. This is slightly more complex, as we need to parse
+            //the JSON to find the source URL
+            var sql_crop = new Sql();
+            sql_crop.Select("dataNtext")
+                .From<PropertyDataDto>()
+                .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNtext IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.propertyEditorAlias = @PropertyEditorAlias)",
+                    new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = nodeObjectType, PropertyEditorAlias = Constants.PropertyEditors.ImageCropperAlias });
+
+            var files = db.Fetch<string>(sql_upload);
+
+            foreach (var json in db.Fetch<string>(sql_crop))
+            {
+                if (json.DetectIsJson())
+                {
+                    var j = JObject.Parse(json);
+                    if (j != null && j.ContainsKeyIgnoreCase("src"))
+                    {
+                        files.Add(j.GetValueAsString("src"));
+                    }
+                }
+                else
+                {
+                    //probably an old value from an Upload field, so add it anyway
+                    files.Add(json);
+                }
+            }
+            
             return files;
         }
 
