@@ -6,7 +6,7 @@ angular.module('umbraco')
 	function($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams){
 	    $scope.renderModel = [];
 	    $scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
-        
+
 	    //configuration
 	    $scope.cfg = {
 	        multiPicker: "0",
@@ -16,7 +16,7 @@ angular.module('umbraco')
 	        startNode: {
 				query: "",
 	            type: "content",
-	            id: -1
+	            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
 	        }
 	    };
 
