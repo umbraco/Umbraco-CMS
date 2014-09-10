@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
+function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -188,6 +188,15 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
         return deferred.promise;
     }
 
+    function resetLastListPageNumber(content) {
+        // We're using rootScope to store the page number for list views, so if returning to the list
+        // we can restore the page.  If we've moved on to edit a piece of content that's not the list or it's children
+        // we should remove this so as not to confuse if navigating to a different list
+        if (!content.isChildOfListView && !content.isContainer) {
+            $rootScope.lastListViewPageViewed = null;
+        }
+    }
+
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
@@ -198,6 +207,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 editorState.set($scope.content);
 
                 configureButtons($scope.content);
+
+                resetLastListPageNumber($scope.content);
             });
     }
     else {
@@ -219,6 +230,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                 syncTreeNode($scope.content, data.path, true);
 
+                resetLastListPageNumber($scope.content);
             });
     }
 

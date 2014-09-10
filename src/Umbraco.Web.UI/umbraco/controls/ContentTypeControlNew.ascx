@@ -76,10 +76,224 @@
         <cc2:PropertyPanel ID="pp_Root" runat="server" Text="Allow at root <br/><small>Only Content Types with this checked can be created at the root level of Content and Media trees</small>">
             <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />            
         </cc2:PropertyPanel>
-        
+
         <cc2:PropertyPanel ID="pp_isContainer" runat="server" Text="Container<br/><small>A container type doesn't display children in the tree, but as a grid instead</small>">
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" /><br />            
         </cc2:PropertyPanel>   
+
+        <!-- Styling for list view configuration -->
+        <style type="text/css">
+            #container-config-panel { margin-left: 20px; }
+            #container-config-column-list { margin: 8px 0 16px 0; }
+            #container-config-column-list th, #container-config-column-list td { text-align: left; padding: 2px 0px 4px 10px; }
+            #<%= txtContainerConfigAdditionalColumns.ClientID %> { display: none; }
+        </style>
+        
+        <!-- Scripting for list view configuration -->
+        <script type="text/javascript">            
+            $(document).ready(function () {               
+
+                var isContainerCheckBox = $("#<%= cb_isContainer.ClientID %>");
+                var containerConfigPanel = $("#container-config-panel");
+                var containerConfigAddColumnSelect = $("#<%= ddlContainerConfigAdditionalColumnsChooser.ClientID %>");
+                var containerConfigColumnList = $("#container-config-column-list");
+                var containerConfigHiddenField = $("#<%= txtContainerConfigAdditionalColumns.ClientID %>");
+
+                function showHideContainerConfig(closingAnimation) {                                        
+                    if (isContainerCheckBox.is(":checked")) {
+                        containerConfigPanel.slideDown();
+                    }
+                    else
+                    {       
+                        if (closingAnimation == 'hide') {
+                            
+                            containerConfigPanel.hide();
+                        } else {
+                            containerConfigPanel.slideUp();
+                        }
+                    }
+                }
+
+                function loadColumnListFromHiddenField() {
+                    if (containerConfigHiddenField.val() != '') {
+                        var columns = getSelectedColumnAliases();
+                        for (var i = 0; i < columns.length; i++) {
+                            addColumnToList(columns[i]);
+                        }
+                        bindRemoveLinks();
+                    }
+                }
+
+                function getSelectedColumnAliases() {
+                    return containerConfigHiddenField.val().split(',');
+                }
+
+                function getColumnName(alias) {
+                    return $('option[value="' + alias + '"]', containerConfigAddColumnSelect).text();
+                }
+
+                function addColumn() {
+                    var alias = containerConfigAddColumnSelect.val();  
+                    if (!isColumnAlreadyAdded(alias)) {
+                        addColumnToList(alias);
+                        addColumnToField(alias);
+                        bindRemoveLinks();
+                    }
+                }
+
+                function isColumnAlreadyAdded(alias) {
+                    var columns = getSelectedColumnAliases();
+                    for (var i = 0; i < columns.length; i++) {
+                        if (columns[i] == alias) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                function getColumnIndex(alias) {
+                    var columns = getSelectedColumnAliases();
+                    var index = 0;
+                    for (var i = 0; i < columns.length; i++) {
+                        if (columns[i] == alias) {
+                            return index;
+                        }
+                        index++;
+                    }
+                    return -1;
+                }
+
+                function addColumnToList(alias) {
+                    var html = '<tr data-alias="' + alias + '">' +
+                        '<td><i class="icon-navigation handle"></i></td>' +
+                        '<td>' + getColumnName(alias) + '</td><td><button type="button" class="remove">Remove</button></td>' +
+                        '</tr>';
+                    $('tbody', containerConfigColumnList).append(html);
+                }
+
+                function addColumnToField(alias) {
+                    if (containerConfigHiddenField.val() == '') {
+                        containerConfigHiddenField.val(alias)
+                    } else {
+                        var columns = getSelectedColumnAliases();
+                        columns.push(alias);
+                        containerConfigHiddenField.val(columns.join());
+                    }
+                }
+
+                function removeColumn(alias) {
+                    var index = getColumnIndex(alias);
+                    removeColumnFromList(index);
+                    removeColumnFromField(index);
+                }
+
+                function removeColumnFromList(index) {
+                    $('tbody tr:eq(' + index + ')', containerConfigColumnList).fadeOut(300, function() { 
+                        $(this).remove(); 
+                    })
+                }
+
+                function removeColumnFromField(index) {
+                    var columns = getSelectedColumnAliases();
+                    columns.splice(index, 1);
+                    containerConfigHiddenField.val(columns.join());
+                }
+
+                function bindRemoveLinks() {
+                    $(".remove", containerConfigColumnList).off('click').on('click', function (e) {
+                        e.preventDefault();
+                        var alias = $(this).closest('tr').attr('data-alias');
+                        removeColumn(alias);
+                    });
+                }
+
+                function saveColumnSortOrder() {
+                    var columns = [];
+                    $('tbody tr', containerConfigColumnList).each(function (index) {
+                        var tr = $(this);
+                        columns.push(tr.attr('data-alias'));
+                    });
+                    containerConfigHiddenField.val(columns.join());
+                }
+                
+                isContainerCheckBox.on("change", function () {
+                    showHideContainerConfig();
+                });
+
+                containerConfigAddColumnSelect.on('change', function () {
+                    var ddl = $(this);
+                    if (ddl.val() != '') {
+                        addColumn();
+                        ddl.prop('selectedIndex', 0);
+                    }
+                });
+
+                showHideContainerConfig('hide');
+                loadColumnListFromHiddenField();
+
+                $('tbody', containerConfigColumnList).sortable({
+                    containment: 'parent',
+                    tolerance: 'pointer',
+                    update: function (event, ui) {
+                        saveColumnSortOrder();
+                    }
+                });
+            });
+        </script>
+
+        <div id="container-config-panel">
+            <cc2:PropertyPanel ID="pp_containerConfigPageSize" runat="server">
+                <asp:TextBox ID="txtContainerConfigPageSize" CssClass="guiInputText guiInputStandardSize" runat="server" type="number" min="1" max="100"></asp:TextBox>        
+            </cc2:PropertyPanel> 
+
+            <cc2:PropertyPanel ID="pp_containerConfigAdditionalColumns" runat="server">
+                <asp:DropDownList ID="ddlContainerConfigAdditionalColumnsChooser" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:DropDownList>   
+                <table id="container-config-column-list">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Selected columns</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <asp:TextBox ID="txtContainerConfigAdditionalColumns" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>   
+            </cc2:PropertyPanel> 
+
+            <cc2:PropertyPanel ID="pp_containerConfigOrderBy" runat="server">
+                <asp:DropDownList ID="ddlContainerConfigOrderBy" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:DropDownList>   
+            </cc2:PropertyPanel> 
+                    
+            <cc2:PropertyPanel ID="pp_containerConfigOrderDirection" runat="server">
+                <asp:DropDownList ID="ddlContainerConfigOrderDirection" CssClass="guiInputText guiInputStandardSize" runat="server">
+                    <asp:ListItem Value="asc">Ascending</asp:ListItem>
+                    <asp:ListItem Value="desc">Descending</asp:ListItem>
+                </asp:DropDownList>        
+            </cc2:PropertyPanel> 
+
+            <cc2:PropertyPanel ID="pp_allowBulkPublish" runat="server">
+                <asp:DropDownList ID="ddlContainerConfigAllowBulkPublish" CssClass="guiInputText guiInputStandardSize" runat="server">
+                    <asp:ListItem Value="1">Yes</asp:ListItem>
+                    <asp:ListItem Value="0">No</asp:ListItem>
+                </asp:DropDownList>       
+            </cc2:PropertyPanel>    
+            
+            <cc2:PropertyPanel ID="pp_allowBulkUnpublish" runat="server">
+                <asp:DropDownList ID="ddlContainerConfigAllowBulkUnpublish" CssClass="guiInputText guiInputStandardSize" runat="server">
+                    <asp:ListItem Value="1">Yes</asp:ListItem>
+                    <asp:ListItem Value="0">No</asp:ListItem>
+                </asp:DropDownList>           
+            </cc2:PropertyPanel>
+            
+            <cc2:PropertyPanel ID="pp_allowBulkDelete" runat="server">
+                <asp:DropDownList ID="ddlContainerConfigAllowBulkDelete" CssClass="guiInputText guiInputStandardSize" runat="server">
+                    <asp:ListItem Value="1">Yes</asp:ListItem>
+                    <asp:ListItem Value="0">No</asp:ListItem>
+                </asp:DropDownList>       
+            </cc2:PropertyPanel>
+        </div>
+
     </cc2:Pane>
 
     <cc2:Pane ID="Pane5" runat="server">

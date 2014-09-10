@@ -7,30 +7,23 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Routing;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
 using Umbraco.Web.UI.Controls;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
 using Umbraco.Core.IO;
-using umbraco.presentation;
 using umbraco.BasePages;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 using PropertyType = Umbraco.Core.Models.PropertyType;
+using Umbraco.Web.Models.ContentEditing;
+using Newtonsoft.Json;
 
 namespace umbraco.controls
 {
@@ -114,6 +107,14 @@ namespace umbraco.controls
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
 
             pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser);
+
+            pp_containerConfigPageSize.Text = ui.Text("editcontenttype", "containerConfigPageSize", Security.CurrentUser);
+            pp_containerConfigAdditionalColumns.Text = ui.Text("editcontenttype", "containerConfigAdditionalColumns", Security.CurrentUser);
+            pp_containerConfigOrderBy.Text = ui.Text("editcontenttype", "containerConfigOrderBy", Security.CurrentUser);
+            pp_containerConfigOrderDirection.Text = ui.Text("editcontenttype", "containerConfigOrderDirection", Security.CurrentUser);
+            pp_allowBulkPublish.Text = ui.Text("editcontenttype", "allowBulkPublish", Security.CurrentUser);
+            pp_allowBulkUnpublish.Text = ui.Text("editcontenttype", "allowBulkUnpublish", Security.CurrentUser);
+            pp_allowBulkDelete.Text = ui.Text("editcontenttype", "allowBulkDelete", Security.CurrentUser);
             
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
@@ -299,12 +300,20 @@ namespace umbraco.controls
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
                     _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
-                        _contentType.ContentTypeItem.Icon = tb_icon.Value;
+                    _contentType.ContentTypeItem.Icon = tb_icon.Value;
                     _contentType.ContentTypeItem.Description = description.Text;
                     //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
                     _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
-                        _contentType.ContentTypeItem.IsContainer = cb_isContainer.Checked;
-
+                    _contentType.ContentTypeItem.IsContainer = cb_isContainer.Checked;
+                    if (cb_isContainer.Checked)
+                    {
+                        _contentType.ContentTypeItem.ContainerConfig = GetProvidedContainerConfigAsJsonString();
+                    }
+                    else
+                    {
+                        _contentType.ContentTypeItem.ContainerConfig = string.Empty;
+                    }
+                    
                     int i = 0;
                     var ids = SaveAllowedChildTypes();
                     _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
@@ -401,6 +410,49 @@ namespace umbraco.controls
 
             //execute the async tasks
             Page.ExecuteRegisteredAsyncTasks();
+        }
+
+        /// <summary>
+        /// Helper to retrive the strongly typed container configuration from the persisted JSON string
+        /// </summary>
+        /// <returns>Container configuration as JSON string</returns>
+        private ContentTypeContainerConfiguration GetContentTypeContainerConfigurationFromJsonString(string config)
+        {
+            return JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(config);
+        }
+
+        /// <summary>
+        /// Helper to parse the container configuration provided by the form fields into a JSON string for persistance
+        /// </summary>
+        /// <returns>Container configuration as JSON string</returns>
+        private string GetProvidedContainerConfigAsJsonString()
+        {
+            // Create configuation from form fields
+            var containerConfig = new ContentTypeContainerConfiguration
+            {
+                AdditionalColumnAliases = txtContainerConfigAdditionalColumns.Text,
+                OrderBy = ddlContainerConfigOrderBy.SelectedItem.Value,
+                OrderDirection = ddlContainerConfigOrderDirection.SelectedItem.Value,
+                AllowBulkPublish = ddlContainerConfigAllowBulkPublish.SelectedIndex == 0,
+                AllowBulkUnpublish = ddlContainerConfigAllowBulkUnpublish.SelectedIndex == 0,
+                AllowBulkDelete = ddlContainerConfigAllowBulkDelete.SelectedIndex == 0,
+            };
+
+            int pageSize;
+            if (!int.TryParse(txtContainerConfigPageSize.Text, out pageSize))
+            {
+                pageSize = 10;
+            }
+
+            containerConfig.PageSize = pageSize;
+            
+            // Serialize the object ignoring nulls so the calculated properties are not persisted
+            return JsonConvert.SerializeObject(containerConfig, 
+                Formatting.None, 
+                new JsonSerializerSettings 
+                { 
+                    NullValueHandling = NullValueHandling.Ignore
+                });
         }
 
         /// <summary>
@@ -609,8 +661,63 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 DualAllowedContentTypes.Value = chosenContentTypeIDs;
             }
 
+            // Set up options for columns and order by
+            ddlContainerConfigOrderBy.Items.Add(new ListItem(string.Empty, string.Empty));
+            ddlContainerConfigOrderBy.Items.Add(new ListItem("Node name", "Name"));
+            ddlContainerConfigOrderBy.Items.Add(new ListItem("Last edited on", "UpdateDate"));
+            ddlContainerConfigOrderBy.Items.Add(new ListItem("Last updated by", "Updator"));
+            ddlContainerConfigOrderBy.Items.Add(new ListItem("Created on", "CreateDate"));
+            ddlContainerConfigOrderBy.Items.Add(new ListItem("Created by", "Owner"));
+
+            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Select a column...", string.Empty));
+            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Last edited on", "UpdateDate"));
+            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Last updated by", "Updator"));
+            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Created on", "CreateDate"));
+            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("Created by", "Owner"));
+            ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem("---", string.Empty));
+
+            // - get properties from allowed document types (i.e. those that might appear in the list view)
+            var allPropertiesOfAllowedContentTypes = Services.ContentTypeService
+                .GetAllContentTypes(_contentType.AllowedChildContentTypeIDs)
+                .SelectMany(x => x.PropertyTypes)
+                .ToList();
+            foreach (var property in allPropertiesOfAllowedContentTypes)
+            {
+                ddlContainerConfigAdditionalColumnsChooser.Items.Add(new ListItem(property.Name, property.Alias));
+            }
+            
+            // Populate controls with values
             allowAtRoot.Checked = _contentType.AllowAtRoot;
             cb_isContainer.Checked = _contentType.IsContainerContentType;
+
+            ddlContainerConfigOrderBy.SelectedIndex = -1;
+            ddlContainerConfigOrderDirection.SelectedIndex = -1;
+            ddlContainerConfigAllowBulkPublish.SelectedIndex = -1;
+            ddlContainerConfigAllowBulkUnpublish.SelectedIndex = -1;
+            ddlContainerConfigAllowBulkDelete.SelectedIndex = -1;
+
+            if (_contentType.IsContainerContentType && !string.IsNullOrEmpty(_contentType.ContainerConfig))
+            {
+                var containerConfig = GetContentTypeContainerConfigurationFromJsonString(_contentType.ContainerConfig);
+                txtContainerConfigPageSize.Text = containerConfig.PageSize.ToString();
+                txtContainerConfigAdditionalColumns.Text = containerConfig.AdditionalColumnAliases;
+                ddlContainerConfigOrderBy.Items.FindByValue(containerConfig.OrderBy).Selected = true;
+                ddlContainerConfigOrderDirection.Items.FindByValue(containerConfig.OrderDirection).Selected = true;
+                ddlContainerConfigAllowBulkPublish.SelectedIndex = containerConfig.AllowBulkPublish ? 0 : 1;
+                ddlContainerConfigAllowBulkUnpublish.SelectedIndex = containerConfig.AllowBulkUnpublish ? 0 : 1;
+                ddlContainerConfigAllowBulkDelete.SelectedIndex = containerConfig.AllowBulkDelete ? 0 : 1;
+            }
+            else
+            {
+                // Set defaults matching original hard-coded values unless config has been provided
+                txtContainerConfigPageSize.Text = "10";
+                txtContainerConfigAdditionalColumns.Text = "UpdateDate,Updator";
+                ddlContainerConfigOrderBy.Items.FindByValue("UpdateDate").Selected = true;
+                ddlContainerConfigOrderDirection.Items.FindByValue("desc").Selected = true;
+                ddlContainerConfigAllowBulkPublish.SelectedIndex = 0;
+                ddlContainerConfigAllowBulkUnpublish.SelectedIndex = 0;
+                ddlContainerConfigAllowBulkDelete.SelectedIndex = 0;
+            }
         }
 
         private int[] SaveAllowedChildTypes()
@@ -1433,7 +1540,29 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected global::umbraco.uicontrols.PropertyPanel pp_newTab;
 
         protected global::umbraco.uicontrols.PropertyPanel pp_isContainer;
-        protected global::System.Web.UI.WebControls.CheckBox cb_isContainer;    
+        protected global::System.Web.UI.WebControls.CheckBox cb_isContainer;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigPageSize;
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigPageSize;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigAdditionalColumns;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAdditionalColumnsChooser;
+        protected global::System.Web.UI.WebControls.TextBox txtContainerConfigAdditionalColumns;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderBy;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderBy;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_containerConfigOrderDirection;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigOrderDirection;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowBulkPublish;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAllowBulkPublish;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowBulkUnpublish;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAllowBulkUnpublish;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowBulkDelete;
+        protected global::System.Web.UI.WebControls.DropDownList ddlContainerConfigAllowBulkDelete;  
 
         /// <summary>
         /// txtNewTab control.

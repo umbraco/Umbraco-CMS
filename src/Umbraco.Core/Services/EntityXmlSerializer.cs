@@ -305,7 +305,8 @@ namespace Umbraco.Core.Services
                                     new XElement("Thumbnail", contentType.Thumbnail),
                                     new XElement("Description", contentType.Description),
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
-                                    new XElement("IsListView", contentType.IsContainer.ToString()));
+                                    new XElement("IsListView", contentType.IsContainer.ToString()),
+                                    new XElement("ContainerConfig", contentType.ContainerConfig.ToString()));
 
             var masterContentType = contentType.CompositionAliases().FirstOrDefault();
             if (masterContentType != null)

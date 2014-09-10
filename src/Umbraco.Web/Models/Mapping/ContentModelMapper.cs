@@ -48,6 +48,9 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.ContentTypeName,
                       expression => expression.MapFrom(content => content.ContentType.Name))
                   .ForMember(
+                      dto => dto.IsContainer,
+                      expression => expression.MapFrom(content => content.ContentType.IsContainer))
+                  .ForMember(
                       dto => dto.IsChildOfListView,
                       expression => expression.MapFrom(content => content.Parent().ContentType.IsContainer))
                   .ForMember(

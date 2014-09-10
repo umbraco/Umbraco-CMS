@@ -60,12 +60,13 @@ namespace umbraco.cms.businesslogic
         /// <param name="thumbnail"></param>
         /// <param name="masterContentType"></param>
         /// <param name="isContainer"></param>
+        /// <param name="containerConfig">containerConfig</param>
         /// <remarks>
         /// This is like creating a ContentType node using optimized mode but this lets you set
         /// all of the properties that are initialized normally from the database.
         /// This is used for performance reasons.
         /// </remarks>
-        internal ContentType(int id, string alias, string icon, string thumbnail, int? masterContentType, bool? isContainer)
+        internal ContentType(int id, string alias, string icon, string thumbnail, int? masterContentType, bool? isContainer, string containerConfig)
             : base(id, true)
         {
             _alias = alias;
@@ -77,6 +78,8 @@ namespace umbraco.cms.businesslogic
 
             if (isContainer.HasValue)
                 _isContainerContentType = isContainer.Value;
+
+            _containerConfig = containerConfig;
         }
 
         internal ContentType(IContentTypeComposition contentType) : base(contentType)
@@ -90,7 +93,7 @@ namespace umbraco.cms.businesslogic
 
         protected internal const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
-                allowAtRoot, isContainer, Alias,icon,thumbnail,description 
+                allowAtRoot, isContainer, containerConfig, Alias,icon,thumbnail,description 
             FROM umbracoNode INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
             WHERE nodeObjectType = @nodeObjectType";
 
@@ -250,6 +253,7 @@ namespace umbraco.cms.businesslogic
         private string _thumbnail;
         List<int> m_masterContentTypes;
         private bool _isContainerContentType;
+        private string _containerConfig;
         private List<int> _allowedChildContentTypeIDs;
         private List<TabI> _virtualTabs;
 
@@ -426,6 +430,32 @@ namespace umbraco.cms.businesslogic
                 else
                 {
                     ContentTypeItem.IsContainer = _isContainerContentType;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get or Sets the container configuration of the Content Type for types defined as containers
+        /// </summary>
+        public string ContainerConfig
+        {
+            get { return _containerConfig; }
+            set
+            {
+                _containerConfig = value;
+
+                //This switches between using new vs. legacy api.
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (ContentTypeItem == null)
+                {
+                    SqlHelper.ExecuteNonQuery(
+                                          "update cmsContentType set containerConfig = @containerConfig where nodeId = @id",
+                                          SqlHelper.CreateParameter("@containerConfig", value),
+                                          SqlHelper.CreateParameter("@id", Id));
+                }
+                else
+                {
+                    ContentTypeItem.ContainerConfig = _containerConfig;
                 }
             }
         }
@@ -1106,6 +1136,7 @@ namespace umbraco.cms.businesslogic
             _alias = contentType.Alias;
             _iconurl = contentType.Icon;
             _isContainerContentType = contentType.IsContainer;
+            _containerConfig = contentType.ContainerConfig;
             _allowAtRoot = contentType.AllowedAsRoot;
             _thumbnail = contentType.Thumbnail;
             _description = contentType.Description;
@@ -1119,6 +1150,7 @@ namespace umbraco.cms.businesslogic
             _alias = dr.GetString("Alias");
             _iconurl = dr.GetString("icon");
             _isContainerContentType = dr.GetBoolean("isContainer");
+            _containerConfig = dr.GetString("containerConfig");
             _allowAtRoot = dr.GetBoolean("allowAtRoot");
 
             if (!dr.IsNull("thumbnail"))
@@ -1164,7 +1196,7 @@ namespace umbraco.cms.businesslogic
             }
 
             // TODO: Load master content types
-            using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
+            using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, containerConfig, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
                 )
             {
                 if (dr.Read())

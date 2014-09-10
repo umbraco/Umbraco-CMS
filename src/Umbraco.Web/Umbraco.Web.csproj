@@ -295,6 +295,7 @@
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
+    <Compile Include="Editors\ContentAndMediaTypeBaseController.cs" />
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
@@ -317,6 +318,7 @@
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
+    <Compile Include="Models\ContentEditing\ContentTypeContainerConfiguration.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\DetachedContent.cs" />

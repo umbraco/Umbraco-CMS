@@ -12,6 +12,7 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.Editors
 {
@@ -23,8 +24,8 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
-    [PluginController("UmbracoApi")]    
-    public class ContentTypeController : UmbracoAuthorizedJsonController
+    [PluginController("UmbracoApi")]
+    public class ContentTypeController : ContentAndMediaTypeBaseController
     {
         private ICultureDictionary _cultureDictionary;
 
