@@ -29,46 +29,112 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         items: []
     };
 
+    // Set "default default" options (i.e. those if no container configuration has been saved)
     $scope.options = {
         pageSize: 10,
         pageNumber: 1,
         filter: '',
-        orderBy: 'UpdateDate',
-        orderDirection: "desc"
+        orderBy: 'updateDate',
+        orderDirection: "desc",
+        allowBulkPublish: true,
+        allowBulkUnpublish: true,
+        allowBulkDelete: true,
+        additionalColumns: [
+                { alias: 'UpdateDate', header: 'Last edited', localizationKey: 'defaultdialogs_lastEdited' },
+                { alias: 'Updator', header: 'Last edited', localizationKey: 'content_updatedBy' }
+            ]
     };
 
+    // Retrieve the container configuration for the content type and set options before presenting initial view
+    contentTypeResource.getContainerConfig($routeParams.id)
+        .then(function (config) {
+            if (typeof config.pageSize !== 'undefined') {
+                $scope.options.pageSize = config.pageSize;
+            }
+            if (typeof config.additionalColumns !== 'undefined') {
+                $scope.options.additionalColumns = config.additionalColumns;
+            }
+            if (typeof config.orderBy !== 'undefined') {
+                $scope.options.orderBy = config.orderBy;
+            }
+            if (typeof config.orderDirection !== 'undefined') {
+                $scope.options.orderDirection = config.orderDirection;
+            }
+            if (typeof config.allowBulkPublish !== 'undefined') {
+                $scope.options.allowBulkPublish = config.allowBulkPublish;
+            }
+            if (typeof config.allowBulkUnpublish !== 'undefined') {
+                $scope.options.allowBulkUnpublish = config.allowBulkUnpublish;
+            }
+            if (typeof config.allowBulkDelete !== 'undefined') {
+                $scope.options.allowBulkDelete = config.allowBulkDelete;
+            }
+
+            $scope.initView();
+        });
 
     $scope.next = function () {
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
             $scope.options.pageNumber++;
             $scope.reloadView($scope.contentId);
+
+            saveLastPageNumber();
         }
     };
 
     $scope.goToPage = function (pageNumber) {
         $scope.options.pageNumber = pageNumber + 1;
         $scope.reloadView($scope.contentId);
+
+        saveLastPageNumber();
     };
 
-    $scope.sort = function (field) {
+    $scope.sort = function (field, allow) {
+        if (allow) {
+            $scope.options.orderBy = field;
 
-        $scope.options.orderBy = field;
+            if ($scope.options.orderDirection === "desc") {
+                $scope.options.orderDirection = "asc";
+            } else {
+                $scope.options.orderDirection = "desc";
+            }
 
-
-        if ($scope.options.orderDirection === "desc") {
-            $scope.options.orderDirection = "asc";
-        } else {
-            $scope.options.orderDirection = "desc";
+            $scope.reloadView($scope.contentId);
         }
-
-
-        $scope.reloadView($scope.contentId);
     };
 
     $scope.prev = function () {
         if ($scope.options.pageNumber > 1) {
             $scope.options.pageNumber--;
             $scope.reloadView($scope.contentId);
+
+            saveLastPageNumber();
+        }
+    };
+
+    saveLastPageNumber = function () {
+        // Saves the last page number into rootScope, so we can retrieve it when returning to the list and
+        // re-present the correct page
+        $rootScope.lastListViewPageViewed = {
+            contentId: $scope.contentId,
+            pageNumber: $scope.options.pageNumber
+        };
+    };
+
+    $scope.initView = function () {
+        if ($routeParams.id) {
+            $scope.pagination = new Array(10);
+            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+
+            $scope.contentId = $routeParams.id;
+            $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
+
+            // If we have a last page number saved, go straight to that one
+            if ($rootScope.lastListViewPageViewed && $rootScope.lastListViewPageViewed.contentId == $scope.contentId) {
+                $scope.goToPage($rootScope.lastListViewPageViewed.pageNumber - 1);
+            } else {
+                $scope.reloadView($scope.contentId);
+            }
         }
     };
 
@@ -78,9 +144,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.reloadView = function (id) {
         contentResource.getChildren(id, $scope.options).then(function (data) {
-
             $scope.listViewResultSet = data;
-            $scope.pagination = [];            
+            $scope.pagination = [];
 
             for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
                 $scope.pagination[i] = { index: i, name: i + 1 };
@@ -91,6 +156,65 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             }
 
         });
+    };
+
+    $scope.getColumnName = function (index) {
+        return $scope.options.additionalColumns[index].header;
+    };
+
+    $scope.getColumnLocalizationKey = function (index) {
+        return $scope.options.additionalColumns[index].localizationKey;
+    };
+
+    $scope.getPropertyValue = function (alias, result) {
+
+        // Camel-case the alias
+        alias = alias.charAt(0).toLowerCase() + alias.slice(1);
+
+        // First try to pull the value directly from the alias (e.g. updatedBy)        
+        var value = result[alias];
+
+        // If this returns an object, look for the name property of that (e.g. owner.name)
+        if (value === Object(value)) {
+            value = value['name'];
+        }
+
+        // If we've got nothing yet, look at a user defined property
+        if (typeof value === 'undefined') {
+            value = $scope.getCustomPropertyValue(alias, result.properties);
+        }
+
+        // If we have a date, format it
+        if (isDate(value)) {
+            value = value.substring(0, value.length - 3);
+        }
+
+        // Return what we've got
+        return value;
+
+    };
+
+    isDate = function (val) {
+        return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
+    };
+
+    $scope.getCustomPropertyValue = function (alias, properties) {
+        var value = '';
+        var index = 0;
+        var foundAlias = false;
+        for (var i = 0; i < properties.length; i++) {            
+            if (properties[i].alias == alias) {
+                foundAlias = true;
+                break;
+            }
+            index++;
+        }
+
+        if (foundAlias) {
+            value = properties[index].value;
+        }
+
+        return value;
     };
 
     //assign debounce method to the search to limit the queries
@@ -235,16 +359,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 });
         }
     };
-
-    if ($routeParams.id) {
-        $scope.pagination = new Array(10);
-        $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
-        $scope.reloadView($routeParams.id);
-
-        $scope.contentId = $routeParams.id;
-        $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
-
-    }
 
 }
 

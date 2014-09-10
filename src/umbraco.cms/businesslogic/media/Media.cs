@@ -361,7 +361,8 @@ namespace umbraco.cms.businesslogic.media
                 , dr.GetString("description")
                 , null
                 , dr.GetInt("contentTypeId")
-                , dr.GetBoolean("isContainer"));
+                , dr.GetBoolean("isContainer")
+                , dr.GetString("containerConfig"));
         } 
         #endregion
 
@@ -383,10 +384,10 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, This method is no longer needed", false)]
         private void SetupMediaForTree(Guid uniqueId, int level, int parentId, int user, string path,
                                           string text, DateTime createDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                            string contentTypeDesc, int? masterContentType, int contentTypeId, bool isContainer)
+                                            string contentTypeDesc, int? masterContentType, int contentTypeId, bool isContainer, string containerConfig)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType, isContainer);
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType, isContainer, containerConfig);
             ContentTypeIcon = icon;
         }
 

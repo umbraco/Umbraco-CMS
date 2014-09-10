@@ -29,6 +29,7 @@ namespace Umbraco.Core.Models
         private int _creatorId;
         private bool _allowedAsRoot;
         private bool _isContainer;
+        private string _containerConfig;
         private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _propertyTypes;
@@ -72,6 +73,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.CreatorId);
         private static readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
         private static readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
+        private static readonly PropertyInfo ContainerConfigSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.ContainerConfig);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
@@ -300,6 +302,23 @@ namespace Umbraco.Core.Models
                     _isContainer = value;
                     return _isContainer;
                 }, _isContainer, IsContainerSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets a JSON string defining the configuration for this ContentType if set as a container
+        /// </summary>
+        [DataMember]
+        public virtual string ContainerConfig
+        {
+            get { return _containerConfig; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _containerConfig = value;
+                    return _containerConfig;
+                }, _containerConfig, ContainerConfigSelector);
             }
         }
 

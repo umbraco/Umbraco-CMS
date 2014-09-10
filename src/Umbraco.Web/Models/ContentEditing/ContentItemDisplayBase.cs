@@ -20,6 +20,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public string ContentTypeName { get; set; }
 
         /// <summary>
+        /// Indicates if the content is configured as a list view container
+        /// </summary>
+        [DataMember(Name = "isContainer")]
+        public bool IsContainer { get; set; }
+
+        /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]

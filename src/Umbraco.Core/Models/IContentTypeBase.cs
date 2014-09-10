@@ -44,6 +44,11 @@ namespace Umbraco.Core.Models
         bool IsContainer { get; set; }
 
         /// <summary>
+        /// Gets or Sets a JSON string defining the configuration for this ContentType if set as a container
+        /// </summary>
+        string ContainerConfig { get; set; }
+
+        /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }

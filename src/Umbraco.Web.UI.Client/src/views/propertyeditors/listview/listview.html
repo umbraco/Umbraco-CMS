@@ -23,17 +23,17 @@
                 </ul>
             </div>
             
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish">
                 <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
                     <localize key="actions_publish">Publish</localize>
                 </a>
             </div>
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish">
                 <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
                     <localize key="actions_unpublish">Unpublish</localize>
                 </a>
             </div>
-            <div class="btn-group" ng-show="isAnythingSelected()">
+            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="options.allowBulkDelete">
                 <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
                     <localize key="actions_delete">Delete</localize>
                 </a>
@@ -45,16 +45,23 @@
             <thead>
                 <tr>
                     <td style="width: 35px">
-                        <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()"></td>
-                    <td><a href="#" ng-click="sort('Name')" prevent-default>
-                        <localize key="general_name">Name</localize>
-                        <i class="icon-sort"></i></a></td>
-                    <td><a href="#" ng-click="sort('UpdateDate')" prevent-default>
-                        <localize key="defaultdialogs_lastEdited">Last edited</localize>
-                        <i class="icon-sort"></i></a></td>
-                    <td><a href="#" ng-click="sort('Owner')" prevent-default>
-                        <localize key="content_updatedBy">Updated by</localize>
-                        <i class="icon-sort"></i></a></td>
+                        <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()">
+                    </td>
+                    <td>
+                        <a href="#" ng-click="sort('Name', true)" prevent-default>
+                            <localize key="general_name">Name</localize>
+                            <i class="icon-sort"></i>
+                        </a>
+                    </td>
+
+                    <td ng-repeat="column in options.additionalColumns">
+                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'no-sort':!column.allowSorting}" prevent-default>
+                            <localize ng-if="getColumnLocalizationKey($index) !==''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>
+                            <span ng-if="getColumnLocalizationKey($index) === ''">{{getColumnName($index)}}</span>
+                            <i class="icon-sort"></i>
+                        </a>
+                    </td>
+
                     <td>
                         <form class="pull-right" novalidate>
                             <i class="icon-search"></i>
@@ -78,27 +85,23 @@
 
                     <td>
                         <i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
-
                         <input type="checkbox" ng-model="result.selected">
                     </td>
                     <td>
                         <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a>
                     </td>
-                    <td>
-                        {{result.updateDate|date:'medium'}}
-                        <!--<<span class="label label-success">Publish</span>-->
+
+                    <td ng-repeat="column in options.additionalColumns">
+                        {{getPropertyValue(column.alias, result)}}
                     </td>
-                    <td>
-                        {{result.owner.name}}
-                        <!--<span class="label">Admin</span>-->
-                    </td>
+
                     <td></td>
                 </tr>
             </tbody>
 
             <tfoot ng-show="pagination.length > 1">
                 <tr>
-                    <th colspan="5">
+                    <th colspan="{{options.additionalColumns.length + 3}}">
                         <div class="pull-left">
                         </div>
                         <div class="pagination pagination-right">
