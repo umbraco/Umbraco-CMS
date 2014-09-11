@@ -62,6 +62,13 @@
                         </a>
                     </td>
 
+                  <!-- <td ng-repeat="property in includeProperties">
+                        <a href="#" ng-click="sort('{{property.sortBy}}')" prevent-default ng-hide="!property.sortBy">
+                        {{property.label}}
+                        <i class="icon-sort"></i></a>
+                        <span ng-hide="property.sortBy">{{property.label}}</span>
+                    </td> -->
+  
                     <td>
                         <form class="pull-right" novalidate>
                             <i class="icon-search"></i>
@@ -95,6 +102,13 @@
                         {{getPropertyValue(column.alias, result)}}
                     </td>
 
+                    </td>
+                    <td ng-repeat="property in includeProperties">
+                        {{result[property.value]}}
+
+                        <div ng-repeat="props in result.properties | filter: { alias: property.value }">
+                            {{props.value}}
+                        </div>
                     <td></td>
                 </tr>
             </tbody>

@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -31,11 +31,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     // Set "default default" options (i.e. those if no container configuration has been saved)
     $scope.options = {
-        pageSize: 10,
+        pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: 1,
         filter: '',
-        orderBy: 'updateDate',
-        orderDirection: "desc",
+        orderBy: $scope.model.config.orderBy ? $scope.model.config.orderBy : 'UpdateDate',
+        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc"
+        //orderBy: 'updateDate',
+        //orderDirection: "desc",
         allowBulkPublish: true,
         allowBulkUnpublish: true,
         allowBulkDelete: true,
@@ -360,6 +362,19 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     };
 
+        $scope.includeProperties = $scope.model.config.includeProperties ? _.map($scope.model.config.includeProperties, function (i) {
+            if (!i.label)
+                i.label = i.value.replace(/([A-Z]?[a-z]+)/g, '$1 ').trim(' ');
+            if (typeof (i.isProperty) == "undefined")
+                i.isProperty = !i.value.match("contentTypeAlias|createDate|icon|owner|published|sortOrder|updateDat|updator");
+            if (!i.isProperty && !i.sortBy)
+                i.sortBy = i.value.substring(0, 1).toUpperCase() + i.value.slice(1);
+            // TODO: Add sort logic for custom properties.
+            //else if (!i.sortBy)
+            //        ;
+            return i;
+        }) : {};
 }
+
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);
