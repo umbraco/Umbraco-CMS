@@ -333,6 +333,37 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Get_All_With_Many_Version()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {                
+                var result = repository.GetAll().ToArray();
+                foreach (var content in result)
+                {
+                    content.ChangePublishedState(PublishedState.Saved);
+                    repository.AddOrUpdate(content);
+                }
+                unitOfWork.Commit();
+                foreach (var content in result)
+                {
+                    content.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(content);
+                }
+                unitOfWork.Commit();
+
+                //re-get
+
+                var result2 = repository.GetAll().ToArray();
+
+                Assert.AreEqual(result.Count(), result2.Count());
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetPagedResultsByQuery_ForFirstPage_On_ContentRepository()
         {
             // Arrange

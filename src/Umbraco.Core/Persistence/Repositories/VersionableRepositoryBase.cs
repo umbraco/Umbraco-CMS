@@ -218,154 +218,66 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
         }
-        
-        /// <summary>
-        /// This is a fix for U4-1407 - when property types are added to a content type - the property of the entity are not actually created
-        /// and we get YSODs
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="versionId"></param>
-        /// <param name="contentType"></param>
-        /// <param name="createDate"></param>
-        /// <param name="updateDate"></param>
-        /// <returns></returns>
-        protected PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentTypeComposition contentType, DateTime createDate, DateTime updateDate)
-        {
-            var sql = new Sql();
-            sql.Select("cmsPropertyData.*, cmsDataTypePreValues.id as preValId, cmsDataTypePreValues.value, cmsDataTypePreValues.sortorder, cmsDataTypePreValues.alias, cmsDataTypePreValues.datatypeNodeId")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-
-                .LeftOuterJoin<DataTypePreValueDto>()
-                .On<PropertyTypeDto, DataTypePreValueDto>(left => left.DataTypeId, right => right.DataTypeNodeId)
-
-                .Where<PropertyDataDto>(x => x.NodeId == id)
-                .Where<PropertyDataDto>(x => x.VersionId == versionId);
-
-            var allData = Database.Fetch<dynamic>(sql);
-
-            var propertyDataDtos = allData.Select(x => new PropertyDataDto
-            {
-                Date = x.dataDate,
-                Id = x.id,
-                Integer = x.dataInt,
-                NodeId = x.contentNodeId,
-                Text = x.dataNtext,
-                VarChar = x.dataNvarchar,
-                VersionId = x.versionId,
-                PropertyTypeId = x.propertytypeid,
-                //NOTE: This get's used for nothing so we don't need to map it
-                //PropertyTypeDto = new PropertyTypeDto()
-            }).Distinct();
-
-            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
-            var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
-
-            var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
-            foreach (var property in newProperties)
-            {
-                var propertyDataDto = new PropertyDataDto { NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
-                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-
-                property.Version = versionId;
-                property.Id = primaryKey;
-            }
-
-            foreach (var property in properties)
-            {
-                //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-                var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
-                var tagSupport = TagExtractor.GetAttribute(editor);
-
-                if (tagSupport != null)
-                {
-
-                    //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-
-                    var preValData = allData.Where(x => x.propertytypeid == property.PropertyTypeId && x.preValId != null)
-                        .Select(x => new DataTypePreValueDto
-                        {
-                            Alias = x.alias,
-                            DataTypeNodeId = x.datatypeNodeId,
-                            Id = x.preValId,
-                            SortOrder = x.sortorder,
-                            Value = x.value
-                        })
-                        .Distinct()
-                        .ToArray();
-
-                    var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-
-                    var preVals = new PreValueCollection(asDictionary);
-
-                    var contentPropData = new ContentPropertyData(property.Value,
-                        preVals,
-                        new Dictionary<string, object>());
-
-                    TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
-                }
-            }
-
-
-            return new PropertyCollection(properties); 
-        }
-
+      
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
-            Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>[] documentDefs)
+            Sql docSql,
+            params DocumentDefinition[] documentDefs)
         {
-
             if (documentDefs.Length <= 0) return new Dictionary<int, PropertyCollection>();
 
-            //FIXME: we need to split on 2100 max SQL server parameters
-            // since there will be 2 params per single row it will be half that amount
-            if ((documentDefs.Length / 2) > 2000)
-                throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
+            //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use 
+            // the statement to go get the property data for all of the items by using an inner join
+            var parsedOriginalSql = "SELECT {0} " + docSql.SQL.Substring(docSql.SQL.IndexOf("FROM", StringComparison.Ordinal));
+            //now remove everything from an Orderby clause and beyond
+            if (parsedOriginalSql.InvariantContains("ORDER BY "))
+            {
+                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.IndexOf("ORDER BY ", System.StringComparison.Ordinal));
+            }
 
-            var sql = new Sql();
-            sql.Select("cmsPropertyData.*, cmsDataTypePreValues.id as preValId, cmsDataTypePreValues.value, cmsDataTypePreValues.sortorder, cmsDataTypePreValues.alias, cmsDataTypePreValues.datatypeNodeId")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+            var propSql = new Sql(@"SELECT cmsPropertyData.*
+FROM cmsPropertyData
+INNER JOIN cmsPropertyType
+ON cmsPropertyData.propertytypeid = cmsPropertyType.id
+INNER JOIN 
+	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
+ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
+LEFT OUTER JOIN cmsDataTypePreValues
+ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments);
 
-                .LeftOuterJoin<DataTypePreValueDto>()
-                .On<PropertyTypeDto, DataTypePreValueDto>(left => left.DataTypeId, right => right.DataTypeNodeId)
-                
-                .Where("cmsPropertyData.contentNodeId IN (@nodeIds) AND cmsPropertyData.versionId IN (@versionIds)",
-                    new { nodeIds = documentDefs.Select(x => x.Item1), versionIds = documentDefs.Select(x => x.Item2) });
+            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql);
 
-            var allData = Database.Fetch<dynamic>(sql);
+            //This is a lazy access call to get all prevalue data for the data types that make up all of these properties which we use
+            // below if any property requires tag support
+            var allPreValues = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
+            {
+                var preValsSql = new Sql(@"SELECT DISTINCT
+cmsDataTypePreValues.id as preValId, cmsDataTypePreValues.value, cmsDataTypePreValues.sortorder, cmsDataTypePreValues.alias, cmsDataTypePreValues.datatypeNodeId
+FROM cmsDataTypePreValues
+INNER JOIN cmsPropertyType
+ON cmsDataTypePreValues.datatypeNodeId = cmsPropertyType.dataTypeId
+INNER JOIN 
+	(" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
+ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
+
+                return Database.Fetch<DataTypePreValueDto>(preValsSql);
+            });
 
             var result = new Dictionary<int, PropertyCollection>();
 
             foreach (var def in documentDefs)
             {
-                var propertyDataDtos = allData.Select(x => new PropertyDataDto
-                {
-                    Date = x.dataDate,
-                    Id = x.id,
-                    Integer = x.dataInt,
-                    NodeId = x.contentNodeId,
-                    Text = x.dataNtext,
-                    VarChar = x.dataNvarchar,
-                    VersionId = x.versionId,
-                    PropertyTypeId = x.propertytypeid,
-                    //NOTE: This get's used for nothing so we don't need to map it
-                    //PropertyTypeDto = new PropertyTypeDto()
-                })
-                    .Where(x => x.NodeId == def.Item1)
-                    .Distinct();
+                var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
 
-                var propertyFactory = new PropertyFactory(def.Item3, def.Item2, def.Item1, def.Item4, def.Item5);
+                var propertyFactory = new PropertyFactory(def.Composition, def.Version, def.Id, def.CreateDate, def.VersionDate);
                 var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
 
                 var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
                 foreach (var property in newProperties)
                 {
-                    var propertyDataDto = new PropertyDataDto { NodeId = def.Item1, PropertyTypeId = property.PropertyTypeId, VersionId = def.Item2 };
+                    var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
                     int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
 
-                    property.Version = def.Item2;
+                    property.Version = def.Version;
                     property.Id = primaryKey;
                 }
 
@@ -377,18 +289,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     if (tagSupport != null)
                     {
-
                         //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-
-                        var preValData = allData.Where(x => x.propertytypeid == property.PropertyTypeId && x.preValId != null)
-                            .Select(x => new DataTypePreValueDto
-                            {
-                                Alias = x.alias,
-                                DataTypeNodeId = x.datatypeNodeId,
-                                Id = x.preValId,
-                                SortOrder = x.sortorder,
-                                Value = x.value
-                            })
+                        var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
                             .Distinct()
                             .ToArray();
                             
@@ -404,10 +306,31 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                 }
 
-                result.Add(def.Item1, new PropertyCollection(properties));
+                result.Add(def.Id, new PropertyCollection(properties));
             }
 
             return result;
+        }
+
+        public class DocumentDefinition
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+            /// </summary>
+            public DocumentDefinition(int id, Guid version, DateTime versionDate, DateTime createDate, IContentTypeComposition composition)
+            {
+                Id = id;
+                Version = version;
+                VersionDate = versionDate;
+                CreateDate = createDate;
+                Composition = composition;
+            }
+
+            public int Id { get; set; }
+            public Guid Version { get; set; }
+            public DateTime VersionDate { get; set; }
+            public DateTime CreateDate { get; set; }
+            public IContentTypeComposition Composition { get; set; }
         }
         
     }

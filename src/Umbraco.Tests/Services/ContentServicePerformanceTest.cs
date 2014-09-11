@@ -38,7 +38,13 @@ namespace Umbraco.Tests.Services
         public void Retrieving_All_Content_In_Site()
         {
             //NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
-            // the old way takes 143795ms, the new above way takes: 14249ms that is a 90% savings of processing and sql calls!
+            // the old way takes 143795ms, the new above way takes: 
+            // 14249ms 
+            //
+            // ... NOPE, made some new changes, it is now....
+            // 5290ms  !!!!!!
+            //
+            // that is a 96% savings of processing and sql calls!
 
             var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");                        
             var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "test2");

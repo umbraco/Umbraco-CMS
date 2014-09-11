@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var content = CreateMediaFromDto(dto, dto.VersionId);
+            var content = CreateMediaFromDto(dto, dto.VersionId, sql);
 
             return content;
         }
@@ -77,10 +77,6 @@ namespace Umbraco.Core.Persistence.Repositories
             if (ids.Any())
             {
                 sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
-            }
-            else
-            {
-                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                   
             }
 
             return ProcessQuery(sql);
@@ -164,7 +160,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MediaFactory(mediaType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            media.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, mediaType, media.CreateDate, media.UpdateDate);
+            var properties = GetPropertyCollection(sql, new DocumentDefinition(dto.NodeId, dto.VersionId, media.UpdateDate, media.CreateDate, mediaType));
+
+            media.Properties = properties[dto.NodeId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -450,19 +448,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 .ToArray();
 
             //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
+            var docDefs = dtos.Select(dto => new DocumentDefinition(
                 dto.NodeId,
                 dto.VersionId,
-                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
+                dto.VersionDate,
                 dto.ContentDto.NodeDto.CreateDate,
-                dto.VersionDate))
+                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId)))
                 .ToArray();
 
-            var propertyData = GetPropertyCollection(docDefs);
+            var propertyData = GetPropertyCollection(sql, docDefs);
 
             return dtos.Select(dto => CreateMediaFromDto(
                 dto,
-                dto.VersionId,
                 contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
                 propertyData[dto.NodeId]));
         } 
@@ -497,21 +494,43 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Private method to create a media object from a ContentDto
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="contentType"></param>
         /// <param name="propCollection"></param>
         /// <returns></returns>
-        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId,
-            IMediaType contentType = null,
-            Models.PropertyCollection propCollection = null)
+        private IMedia CreateMediaFromDto(ContentVersionDto dto,
+            IMediaType contentType,
+            PropertyCollection propCollection)
         {
-            contentType = contentType ?? _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
+            var media = factory.BuildEntity(dto);
+
+            media.Properties = propCollection;
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
+            return media;
+        }
+
+        /// <summary>
+        /// Private method to create a media object from a ContentDto
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="versionId"></param>
+        /// <param name="docSql"></param>
+        /// <returns></returns>
+        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId, Sql docSql)
+        {
+            var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
 
             var factory = new MediaFactory(contentType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
-            
-            media.Properties = propCollection ??
-                GetPropertyCollection(dto.NodeId, versionId, contentType, media.CreateDate, media.UpdateDate);
+
+            var docDef = new DocumentDefinition(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
+
+            var properties = GetPropertyCollection(docSql, docDef);
+
+            media.Properties = properties[dto.NodeId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

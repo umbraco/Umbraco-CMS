@@ -75,13 +75,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where(GetBaseWhereClause(), new { Id = id })
                 .Where<DocumentDto>(x => x.Newest)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
+            
             var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
 
-            var content = CreateContentFromDto(dto, dto.ContentVersionDto.VersionId);
+            var content = CreateContentFromDto(dto, dto.ContentVersionDto.VersionId, sql);
 
             return content;
         }
@@ -93,10 +93,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where("umbracoNode.id in (@ids)", new {ids = ids});
             }
-            else
-            {
-                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);                
-            }
+
+            //we only want the newest ones with this method
+            sql.Where<DocumentDto>(x => x.Newest);
 
             return ProcessQuery(sql);
         }
@@ -178,8 +177,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (dto == null)
                 return null;
-            
-            var content = CreateContentFromDto(dto, versionId);
+
+            var content = CreateContentFromDto(dto, versionId, sql);
 
             return content;
         }
@@ -525,7 +524,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 else
                 {
-                    yield return CreateContentFromDto(dto, dto.VersionId);    
+                    yield return CreateContentFromDto(dto, dto.VersionId, sql);
                 }
             }
         }
@@ -731,9 +730,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
             //content types
+            //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
+            //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var templates = _templateRepository.GetAll(
                 dtos
                     .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
@@ -741,19 +742,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 .ToArray();
 
             //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new Tuple<int, Guid, IContentTypeComposition, DateTime, DateTime>(
+            var docDefs = dtos.Select(dto => new DocumentDefinition(
                 dto.NodeId,
                 dto.VersionId,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
+                dto.ContentVersionDto.VersionDate,
                 dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                dto.ContentVersionDto.VersionDate))
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId)))
                 .ToArray();
 
-            var propertyData = GetPropertyCollection(docDefs);
+            var propertyData = GetPropertyCollection(sql, docDefs);
 
             return dtos.Select(dto => CreateContentFromDto(
                 dto,
-                dto.ContentVersionDto.VersionId,
                 contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
                 templates.FirstOrDefault(tem => tem.Id == (dto.TemplateId.HasValue ? dto.TemplateId.Value : -1)),
                 propertyData[dto.NodeId]));
@@ -763,18 +763,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="versionId"></param>
         /// <param name="contentType"></param>
         /// <param name="template"></param>
         /// <param name="propCollection"></param>
         /// <returns></returns>
-        private IContent CreateContentFromDto(DocumentDto dto, Guid versionId, 
-            IContentType contentType = null,
-            ITemplate template = null,
-            Models.PropertyCollection propCollection = null)
+        private IContent CreateContentFromDto(DocumentDto dto, 
+            IContentType contentType,
+            ITemplate template,
+            Models.PropertyCollection propCollection)
         {
-            contentType = contentType ?? _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-
             var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
             var content = factory.BuildEntity(dto);
 
@@ -784,8 +781,39 @@ namespace Umbraco.Core.Persistence.Repositories
                 content.Template = template ?? _templateRepository.Get(dto.TemplateId.Value);
             }
 
-            content.Properties = propCollection ?? 
-                GetPropertyCollection(dto.NodeId, versionId, contentType, content.CreateDate, content.UpdateDate);
+            content.Properties = propCollection;
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)content).ResetDirtyProperties(false);
+            return content;
+        }
+
+        /// <summary>
+        /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="versionId"></param>
+        /// <param name="docSql"></param>
+        /// <returns></returns>
+        private IContent CreateContentFromDto(DocumentDto dto, Guid versionId, Sql docSql)
+        {
+            var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
+            var content = factory.BuildEntity(dto);
+
+            //Check if template id is set on DocumentDto, and get ITemplate if it is.
+            if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+            {
+                content.Template = _templateRepository.Get(dto.TemplateId.Value);
+            }
+
+            var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
+
+            var properties = GetPropertyCollection(docSql, docDef);
+
+            content.Properties = properties[dto.NodeId];
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

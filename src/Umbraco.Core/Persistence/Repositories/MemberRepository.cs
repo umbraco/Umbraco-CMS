@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            return BuildFromDto(dtos);
+            return BuildFromDto(dtos, sql);
         }
 
         protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            return BuildFromDtos(dtos);
+            return BuildFromDtos(dtos, sql);
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            return BuildFromDtos(dtos);
+            return BuildFromDtos(dtos, sql);
         }
 
         #endregion
@@ -439,7 +439,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            return BuildFromDto(dtos);
+            return BuildFromDto(dtos, sql);
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
@@ -523,7 +523,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            return BuildFromDtos(dtos);
+            return BuildFromDtos(dtos, sql);
         }
 
         public bool Exists(string username)
@@ -640,7 +640,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(previewExists, content, xml));
         }
 
-        private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
+        private IMember BuildFromDto(List<MemberReadOnlyDto> dtos, Sql docSql)
         {
             if (dtos == null || dtos.Any() == false)
                 return null;
@@ -657,18 +657,22 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberReadOnlyFactory(memberTypes);
             var member = factory.BuildEntity(dto);
 
-            member.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, member.ContentType, dto.CreateDate, dto.UpdateDate);
+            var properties = GetPropertyCollection(docSql, new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, member.ContentType));
+
+            member.Properties = properties[dto.NodeId];
 
             return member;
         }
 
-        private IEnumerable<IMember> BuildFromDtos(List<MemberReadOnlyDto> dtos)
+        private IEnumerable<IMember> BuildFromDtos(List<MemberReadOnlyDto> dtos, Sql docSql)
         {
             if (dtos == null || dtos.Any() == false)
                 return Enumerable.Empty<IMember>();
 
             //We assume that there won't exist a lot of MemberTypes, so the following should be fairly fast
             var memberTypes = new Dictionary<string, IMemberType>();
+            
+            //TODO: We should do an SQL 'IN' here
             var memberTypeList = _memberTypeRepository.GetAll();
             memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
 
@@ -677,7 +681,11 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var dto in dtos)
             {
                 var entity = factory.BuildEntity(dto);
-                entity.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, entity.ContentType, dto.CreateDate, dto.UpdateDate);
+
+                var properties = GetPropertyCollection(docSql,new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, entity.ContentType));
+
+                entity.Properties = properties[dto.NodeId];
+                
                 entities.Add(entity);
             }
             return entities;
