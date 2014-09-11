@@ -6,7 +6,7 @@
 	    "icon": "icon-article"
 	},
 	{
-	    "name": "Media",
+	    "name": "Image",
 	    "alias": "media",
 	    "view": "media",
 	    "icon": "icon-picture"
@@ -29,7 +29,7 @@
         "view": "textstring",
         "icon": "icon-coin",
         "config": {
-            "style": "font-size: 36px; font-weight: bold",
+            "style": "font-size: 36px; line-height: 45px; font-weight: bold",
             "markup": "<h1>#value#</h1>"
         }
     },

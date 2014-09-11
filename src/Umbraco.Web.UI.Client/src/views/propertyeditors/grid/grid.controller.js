@@ -111,6 +111,42 @@ angular.module("umbraco")
 
         }
 
+        // *********************************************
+        // Add items overlay menu
+        // *********************************************
+        $scope.overlayMenu = {
+            show: false,
+            style: {},
+            area: undefined,
+            key: undefined
+        };
+
+        $scope.addItemOverlay = function(event, area, index, key){
+            $scope.overlayMenu.area = area;
+            $scope.overlayMenu.index = index;
+            $scope.overlayMenu.style = {};
+            $scope.overlayMenu.key = key;
+
+            //todo calculate position...
+            var offset = $(event.target).offset();
+            var height = $(window).height();
+            var width = $(window).width();
+
+            if((height-offset.top) < 250){
+                $scope.overlayMenu.style.bottom = 0;
+                $scope.overlayMenu.style.top = "initial";
+            }else if(offset.top < 300){
+                $scope.overlayMenu.style.top = 190;
+            }
+
+            $scope.overlayMenu.show = true;
+        };
+
+        $scope.closeItemOverlay = function(){
+            $scope.currentControl = undefined;
+            $scope.overlayMenu.show = false;
+            $scope.overlayMenu.key = undefined;
+        };
 
         // *********************************************
         // Template management functions
@@ -254,6 +290,8 @@ angular.module("umbraco")
         })();
 
         $scope.addControl = function (editor, cell, index){
+            $scope.closeItemOverlay();
+
             var newControl = {
                 value: null,
                 editor: editor
@@ -386,6 +424,7 @@ angular.module("umbraco")
 
                     //set width
                     area.$percentage = $scope.percentage(area.grid);
+                    area.$uniqueId = $scope.setUniqueId();
 
                     //set editor permissions
                     if(!area.allowed || area.allowAll === true){
