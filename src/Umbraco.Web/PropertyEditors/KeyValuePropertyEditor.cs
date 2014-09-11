@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.KeyValueListAlias, "Key/Value List", "keyvaluelist", ValueType = "TEXT")]
+    [PropertyEditor(Constants.PropertyEditors.KeyValueListAlias, "Key/Value List", "keyvaluelist", ValueType = "JSON")]
     public class KeyValuePropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()

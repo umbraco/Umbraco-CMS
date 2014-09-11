@@ -1,7 +1,7 @@
 ﻿function KeyValueListController($scope) {
 
     if (!$scope.model.value) {
-        $scope.model.value = { asd: "AS" };
+        $scope.model.value = {  };
     }
     $scope.value = _.map($scope.model.value, function (v, k) {
         return { key: k, value: v };
