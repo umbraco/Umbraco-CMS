@@ -6,7 +6,7 @@
 {
     string macroAlias = Model.value.macroAlias.ToString();
     ViewDataDictionary parameters = new ViewDataDictionary();
-    foreach (dynamic mpd in Model.value.marcoParamsDictionary)
+    foreach (dynamic mpd in Model.value.macroParamsDictionary)
     {
         parameters.Add(mpd.Name, mpd.Value);
     }

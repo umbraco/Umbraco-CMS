@@ -10,7 +10,7 @@ angular.module("umbraco")
                     $scope.control.value = {
                             syntax: data.syntax,
                             macroAlias: data.macroAlias,
-                            marcoParamsDictionary: data.macroParamsDictionary
+                            macroParamsDictionary: data.macroParamsDictionary
                     };
                         
                     $scope.setPreview(data);

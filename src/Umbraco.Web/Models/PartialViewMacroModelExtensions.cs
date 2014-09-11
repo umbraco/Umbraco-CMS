@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models
     public static class PartialViewMacroModelExtensions
     {
         /// <summary>
-        /// Attempt to get a Marco parameter from a PartialViewMacroModel and return a default value otherwise
+        /// Attempt to get a Macro parameter from a PartialViewMacroModel and return a default value otherwise
         /// </summary>
         /// <param name="partialViewMacroModel"></param>
         /// <param name="parameterAlias"></param>
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models
         }
 
         /// <summary> 
-        /// Attempt to get a Marco parameter from a PartialViewMacroModel
+        /// Attempt to get a Macro parameter from a PartialViewMacroModel
         /// </summary>
         /// <param name="partialViewMacroModel"></param>
         /// <param name="parameterAlias"></param>
