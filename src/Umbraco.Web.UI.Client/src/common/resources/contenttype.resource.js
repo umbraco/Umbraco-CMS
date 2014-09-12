@@ -72,34 +72,23 @@ function contentTypeResource($q, $http, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentTypeResource#getContainerConfig
+         * @name umbraco.resources.contentTypeResource#getAllPropertyTypeAliases
          * @methodOf umbraco.resources.contentTypeResource
          *
          * @description
-         * Returns a JSON structure for configuration of the container content type
-         *
-         * ##usage
-         * <pre>
-         * contentTypeResource.getContainerConfig(1234)
-         *    .then(function(config) {
-         *      $scope.options = {
-         *         pageSize: config.pageSize,
-         *      };
-         *    });
-         * </pre> 
-         * @param {Int} contentId id of the content item to retrive the container config for
+         * Returns a list of defined property type aliases
+         *        
          * @returns {Promise} resourcePromise object.
          *
          */
-        getContainerConfig: function (contentId) {
+        getAllPropertyTypeAliases: function () {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "GetContainerConfig",
-                       [{ contentId: contentId }])),
-               'Failed to retrieve container config data for content id ' + contentId);
+                       "GetAllPropertyTypeAliases")),
+               'Failed to retrieve property type aliases');
         }
 
     };
