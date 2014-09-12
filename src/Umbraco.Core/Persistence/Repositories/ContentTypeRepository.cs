@@ -86,6 +86,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 : Enumerable.Empty<IContentType>();
         }
 
+        /// <summary>
+        /// Gets all property type aliases.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllPropertyTypeAliases()
+        {
+            return Database.Fetch<string>("SELECT DISTINCT Alias FROM cmsPropertyType ORDER BY Alias");
+        }
+
         #region Overrides of PetaPocoRepositoryBase<int,IContentType>
 
         protected override Sql GetBaseQuery(bool isCount)

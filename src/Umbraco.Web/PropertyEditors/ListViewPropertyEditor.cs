@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -18,28 +19,37 @@ namespace Umbraco.Web.PropertyEditors
 
         public override IDictionary<string, object> DefaultPreValues
         {
-            get {
+            get
+            {
                 return new Dictionary<string, object>
                 {
                     {"pageSize", "10"},
                     {"orderBy", "SortOrder"},
-                    {"orderDirection", "asc"}
+                    {"orderDirection", "asc"},
+                    {
+                        "includeProperties", new[]
+                        {
+                            new {alias = "_UpdateDate", header = "Last edited", isSystem = 1},
+                            new {alias = "_Updater", header = "Last edited by", isSystem = 1}
+                        }
+                    }
                 };
             }
         }
 
         internal class ListViewPreValueEditor : PreValueEditor
         {
+
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
-            [PreValueField("orderBy", "Order By", "textstring", Description = "SortOrder, Name, UpdateDate, CreateDate, ContentTypeAlias, UpdateDate, Updator or Owner")]
+            [PreValueField("orderBy", "Order By", "textstring", Description = "SortOrder, Name, UpdateDate, CreateDate, ContentTypeAlias, UpdateDate, Updater or Owner")]
             public int OrderBy { get; set; }
 
-            [PreValueField("orderDirection", "Order By", "views/propertyeditors/listview/orderDirection.prevalues.html")]
+            [PreValueField("orderDirection", "Order By", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
 
-            [PreValueField("includeProperties", "Include Properties", "multivalues", Description = "Extra properties by name or custom properties by alias to include")]
+            [PreValueField("includeProperties", "Include Properties", "views/propertyeditors/listview/includeproperties.prevalues.html")]
             public int IncludeProperties { get; set; }
         }
 

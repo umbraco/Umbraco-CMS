@@ -10,6 +10,12 @@ namespace Umbraco.Core.Services
     public interface IContentTypeService : IService
     {
         /// <summary>
+        /// Gets all property type aliases.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetAllPropertyTypeAliases();
+
+        /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
         /// </summary>
         /// <param name="original">

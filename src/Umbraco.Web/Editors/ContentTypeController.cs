@@ -46,6 +46,16 @@ namespace Umbraco.Web.Editors
         {
         }
 
+
+        /// <summary>
+        /// Gets all user defined properties.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllPropertyTypeAliases()
+        {
+            return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
+        }
+
         /// <summary>
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
