@@ -43,9 +43,9 @@ namespace Umbraco.Web.Strategies.Migrations
                     .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                     .Where<NodeDto>(x => x.Path.StartsWith("-1"));
 
-                var uow = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+                
 
-                var dtos = uow.Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                var dtos = e.MigrationContext.Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
                 var toUpdate = new List<DocumentDto>();
                 var versionGroup = dtos.GroupBy(x => x.NodeId);
                 foreach (var grp in versionGroup)
@@ -69,12 +69,12 @@ namespace Umbraco.Web.Strategies.Migrations
                 }
 
                 //Commit the updated entries for the cmsDocument table
-                using (var transaction = uow.Database.GetTransaction())
+                using (var transaction = e.MigrationContext.Database.GetTransaction())
                 {
                     //Loop through the toUpdate
                     foreach (var dto in toUpdate)
                     {
-                        uow.Database.Update(dto);
+                        e.MigrationContext.Database.Update(dto);
                     }
 
                     transaction.Complete();
