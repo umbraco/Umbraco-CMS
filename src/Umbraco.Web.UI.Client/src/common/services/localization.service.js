@@ -49,18 +49,19 @@ angular.module('umbraco.services')
 
             //helper to tokenize and compile a localization string
             tokenize: function(value,scope) {
-                    if(value){
-                        var localizer = value.split(':');
-                        var retval = {tokens: undefined, key: localizer[0].substring(0)};
-                        if(localizer.length > 1){
-                            retval.tokens = localizer[1].split(',');
-                            for (var x = 0; x < retval.tokens.length; x++) {
-                                retval.tokens[x] = scope.$eval(retval.tokens[x]);
-                            }
+                if (value) {
+                    var localizer = value.split(':');
+                    var retval = { tokens: undefined, key: localizer[0].substring(0) };
+                    if (localizer.length > 1) {
+                        retval.tokens = localizer[1].split(',');
+                        for (var x = 0; x < retval.tokens.length; x++) {
+                            retval.tokens[x] = scope.$eval(retval.tokens[x]);
                         }
-
-                        return retval;
                     }
+
+                    return retval;
+                }
+                return value;
             },
 
             // checks the dictionary for a localized resource string
