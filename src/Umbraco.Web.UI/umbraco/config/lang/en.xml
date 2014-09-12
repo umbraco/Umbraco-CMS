@@ -84,7 +84,6 @@
     <key alias="macroInsert">Insert macro</key>
     <key alias="pictureInsert">Insert picture</key>
     <key alias="relations">Edit relations</key>
-    <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>
@@ -255,13 +254,6 @@
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="hasListView">Enable list view</key>
-    <key alias="containerConfigPageSize"><![CDATA[Page size<br/><small>Number of entries per page when selected for display in list view.</small>]]></key>
-    <key alias="containerConfigAdditionalColumns"><![CDATA[Additional columns<br/><small>Select the additional columns displayed after the node name.</small>]]></key>
-    <key alias="containerConfigOrderBy"><![CDATA[Order by<br/><small>The default order for the list.</small>]]></key>
-    <key alias="containerConfigOrderDirection"><![CDATA[Order direction<br/><small>The direction of the default order for the list.</small>]]></key>
-    <key alias="allowBulkPublish"><![CDATA[Allow bulk publish<br/><small>Indicates if bulk publishing is allowed when defined as a list view</small>]]></key>
-    <key alias="allowBulkUnpublish"><![CDATA[Allow bulk unpublish<br/><small>Indicates if bulk unpublishing is allowed when defined as a list view</small>]]></key>
-    <key alias="allowBulkDelete"><![CDATA[Allow bulk delete<br/><small>Indicates if bulk deletion is allowed when defined as a list view</small>]]></key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>

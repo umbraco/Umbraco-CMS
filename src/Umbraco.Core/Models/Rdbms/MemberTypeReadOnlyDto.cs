@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -62,10 +61,6 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("isContainer")]
         public bool IsContainer { get; set; }
-
-        [Column("containerConfig")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string ContainerConfig { get; set; }
 
         [Column("allowAtRoot")]
         public bool AllowAtRoot { get; set; }

@@ -32,7 +32,6 @@ namespace Umbraco.Core.Persistence.Factories
                                          NodeId = entity.Id,
                                          AllowAtRoot = entity.AllowedAsRoot,
                                          IsContainer = entity.IsContainer,
-                                         ContainerConfig = entity.ContainerConfig,
                                          NodeDto = BuildNodeDto(entity)
                                      };
             return contentTypeDto;

@@ -37,7 +37,6 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreatorId = dto.NodeDto.UserId.Value,
                                       AllowedAsRoot = dto.AllowAtRoot,
                                       IsContainer = dto.IsContainer,
-                                      ContainerConfig = dto.ContainerConfig,
                                       Trashed = dto.NodeDto.Trashed
                                   };
             //on initial construction we don't want to have dirty properties tracked
@@ -57,7 +56,6 @@ namespace Umbraco.Core.Persistence.Factories
                                          NodeId = entity.Id,
                                          AllowAtRoot = entity.AllowedAsRoot,
                                          IsContainer = entity.IsContainer,
-                                         ContainerConfig = entity.ContainerConfig,
                                          NodeDto = BuildNodeDto(entity)
                                      };
             return contentTypeDto;

@@ -23,7 +23,6 @@ namespace Umbraco.Core.Persistence.Factories
                                  Icon = dto.Icon,
                                  Id = dto.NodeId,
                                  IsContainer = dto.IsContainer,
-                                 ContainerConfig = dto.ContainerConfig,
                                  Key = dto.UniqueId.Value,
                                  Level = dto.Level,
                                  Name = dto.Text,

@@ -423,16 +423,7 @@ namespace Umbraco.Core.Services
             //NOTE IsListView is a new property in the package xml so we need to verify it exists before using it.
             var isListView = infoElement.Element("IsListView");
             if (isListView != null)
-            {
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
-
-                //NOTE ContainerConfig is a new property in the package xml so we need to verify it exists before using it.
-                var containerConfig = infoElement.Element("ContainerConfig");
-                if (containerConfig != null)
-                {
-                    contentType.ContainerConfig = containerConfig.Value;
-                }
-            }
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));

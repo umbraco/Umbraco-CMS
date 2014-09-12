@@ -93,7 +93,7 @@ namespace umbraco.cms.businesslogic.web
                                      Content.UpdateDate, Content.UpdateDate, Content.ContentType.Icon, hasChildren,
                                      Content.ContentType.Alias, Content.ContentType.Thumbnail,
                                      Content.ContentType.Description, null, Content.ContentType.Id,
-                                     templateId, Content.ContentType.IsContainer, Content.ContentType.ContainerConfig);
+                                     templateId, Content.ContentType.IsContainer);
 
                 var tmpReleaseDate = Content.ReleaseDate.HasValue ? Content.ReleaseDate.Value : new DateTime();
                 var tmpExpireDate = Content.ExpireDate.HasValue ? Content.ExpireDate.Value : new DateTime();
@@ -1493,11 +1493,10 @@ namespace umbraco.cms.businesslogic.web
                 , dr.GetString("alias")
                 , dr.GetString("thumbnail")
                 , dr.GetString("description")
-                , null
+                     , null
                 , dr.GetInt("contentTypeId")
-                , dr.GetInt("templateId")
-                , dr.GetBoolean("isContainer")
-                , dr.GetString("containerConfig"));
+                     , dr.GetInt("templateId")
+                     , dr.GetBoolean("isContainer"));
 
             if (!dr.IsNull("releaseDate"))
                 _release = dr.GetDateTime("releaseDate");
@@ -1517,7 +1516,7 @@ namespace umbraco.cms.businesslogic.web
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId, bool isContainer, string containerConfig)
+                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId, bool isContainer)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, creator, path, text, createDate, hasChildren);
 
@@ -1525,7 +1524,7 @@ namespace umbraco.cms.businesslogic.web
             _published = publish;
             _updated = updateDate;
             _template = templateId;
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, null, isContainer, containerConfig);
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, null, isContainer);
             ContentTypeIcon = icon;
             VersionDate = versionDate;
         }

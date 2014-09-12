@@ -35,38 +35,6 @@ function mediaTypeResource($q, $http, umbRequestHelper) {
                        "GetAllowedChildren",
                        [{ contentId: mediaId }])),
                'Failed to retrieve allowed types for media id ' + mediaId);
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.mediaTypeResource#getContainerConfig
-         * @methodOf umbraco.resources.mediaTypeResource
-         *
-         * @description
-         * Returns a JSON structure for configuration of the container content type
-         *
-         * ##usage
-         * <pre>
-         * mediaTypeResource.getContainerConfig(1234)
-         *    .then(function(config) {
-         *      $scope.options = {
-         *         pageSize: config.pageSize,
-         *      };
-         *    });
-         * </pre> 
-         * @param {Int} contentId id of the content item to retrive the container config for
-         * @returns {Promise} resourcePromise object.
-         *
-         */
-        getContainerConfig: function (contentId) {
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "mediaTypeApiBaseUrl",
-                       "GetContainerConfig",
-                       [{ contentId: contentId }])),
-               'Failed to retrieve container config data for media id ' + contentId);
         }
 
     };
