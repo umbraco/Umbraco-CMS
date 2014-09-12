@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IContent>>())
                   .ForMember(
-                      dto => dto.Updator,
+                      dto => dto.Updater,
                       expression => expression.ResolveUsing<CreatorResolver>())
                   .ForMember(
                       dto => dto.Icon,
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IContent>>())
                 .ForMember(
-                    dto => dto.Updator,
+                    dto => dto.Updater,
                     expression => expression.ResolveUsing<CreatorResolver>())
                 .ForMember(
                     dto => dto.Icon,
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IContent>>())
-                .ForMember(display => display.Updator, expression => expression.Ignore())
+                .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Icon, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore());
 

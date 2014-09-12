@@ -691,7 +691,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     return "cmsDocument.text";
                 case "Owner":
                     return "umbracoNode.nodeUser";
-                case "Updator":
+                case "Updater":
                     return "cmsDocument.documentUser";
                 default:
                     return orderBy;
@@ -706,7 +706,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 case "Owner":
                     return "CreatorId";
-                case "Updator":
+                case "Updater":
                     return "WriterId";
                 default:
                     return orderBy;

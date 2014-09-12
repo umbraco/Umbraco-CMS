@@ -79,7 +79,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Published, expression => expression.Ignore())
-                .ForMember(display => display.Updator, expression => expression.Ignore())
+                .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
 
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IMember>>())
                 .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)

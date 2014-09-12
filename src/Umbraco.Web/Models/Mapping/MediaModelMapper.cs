@@ -45,7 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.Notifications, expression => expression.Ignore())
                   .ForMember(display => display.Errors, expression => expression.Ignore())
                   .ForMember(display => display.Published, expression => expression.Ignore())
-                  .ForMember(display => display.Updator, expression => expression.Ignore())
+                  .ForMember(display => display.Updater, expression => expression.Ignore())
                   .ForMember(display => display.Alias, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                   .AfterMap(AfterMap);
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
 
             //FROM IMedia TO ContentItemDto<IMedia>
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
                 .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
         }
