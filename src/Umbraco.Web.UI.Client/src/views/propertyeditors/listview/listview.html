@@ -54,10 +54,9 @@
                         </a>
                     </td>
 
-                    <td ng-repeat="column in options.additionalColumns">
-                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'no-sort':!column.allowSorting}" prevent-default>
-                            <localize ng-if="getColumnLocalizationKey($index) !==''" key="{{getColumnLocalizationKey($index)}}">{{getColumnName($index)}}</localize>
-                            <span ng-if="getColumnLocalizationKey($index) === ''">{{getColumnName($index)}}</span>
+                    <td ng-repeat="column in options.includeProperties">
+                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'no-sort':!column.allowSorting}" prevent-default>                          
+                            <span ng-bind="column.header"></span>
                             <i class="icon-sort"></i>
                         </a>
                     </td>
@@ -95,27 +94,22 @@
                         <input type="checkbox" ng-model="result.selected">
                     </td>
                     <td>
-                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}" href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}">{{result.name}}</a>
+                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}"                            
+                           href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}"
+                           ng-bind="result.name"></a>
                     </td>
 
-                    <td ng-repeat="column in options.additionalColumns">
-                        {{getPropertyValue(column.alias, result)}}
+                    <td ng-repeat="column in options.includeProperties">
+                        <span>{{result[column.alias]}}</span>
                     </td>
-
-                    </td>
-                    <td ng-repeat="property in includeProperties">
-                        {{result[property.value]}}
-
-                        <div ng-repeat="props in result.properties | filter: { alias: property.value }">
-                            {{props.value}}
-                        </div>
+                    
                     <td></td>
                 </tr>
             </tbody>
 
             <tfoot ng-show="pagination.length > 1">
                 <tr>
-                    <th colspan="{{options.additionalColumns.length + 3}}">
+                    <th colspan="{{options.includeProperties.length + 3}}">
                         <div class="pull-left">
                         </div>
                         <div class="pagination pagination-right">
@@ -128,7 +122,7 @@
 
                                 <li ng-repeat="pgn in pagination track by $index"
                                     ng-class="{active:$index + 1 == options.pageNumber}">
-                                    <a href="#" ng-click="goToPage($index)" prevent-default>{{$index + 1}}</a>
+                                    <a href="#" ng-click="goToPage($index)" prevent-default ng-bind="$index + 1"></a>
                                 </li>
 
                                 <li ng-class="{disabled:options.pageNumber >= listViewResultSet.totalPages}">

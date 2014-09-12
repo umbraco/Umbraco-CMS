@@ -29,8 +29,8 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         "includeProperties", new[]
                         {
-                            new {alias = "_UpdateDate", header = "Last edited", isSystem = 1},
-                            new {alias = "_Updater", header = "Last edited by", isSystem = 1}
+                            new {alias = "updateDate", header = "Last edited", isSystem = 1},
+                            new {alias = "updater", header = "Last edited by", isSystem = 1}
                         }
                     }
                 };
@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
             public int OrderDirection { get; set; }
 
             [PreValueField("includeProperties", "Include Properties", "views/propertyeditors/listview/includeproperties.prevalues.html")]
-            public int IncludeProperties { get; set; }
+            public object IncludeProperties { get; set; }
         }
 
 
