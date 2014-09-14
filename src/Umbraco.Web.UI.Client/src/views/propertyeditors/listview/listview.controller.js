@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -30,11 +30,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     $scope.options = {
-        pageSize: 10,
+        pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: 1,
         filter: '',
-        orderBy: 'UpdateDate',
-        orderDirection: "desc"
+        orderBy: $scope.model.config.orderBy ? $scope.model.config.orderBy : 'UpdateDate',
+        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc"
     };
 
 
@@ -80,7 +80,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         contentResource.getChildren(id, $scope.options).then(function (data) {
 
             $scope.listViewResultSet = data;
-            $scope.pagination = [];            
+            $scope.pagination = [];
 
             for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
                 $scope.pagination[i] = { index: i, name: i + 1 };
@@ -239,6 +239,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     if ($routeParams.id) {
         $scope.pagination = new Array(10);
         $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+        $scope.includeProperties = $scope.model.config.includeProperties ? _.map($scope.model.config.includeProperties, function (i) {
+            if (!i.label)
+                i.label = i.value.replace(/([A-Z]?[a-z]+)/g, '$1 ').trim(' ');
+            if (typeof (i.isProperty) == "undefined")
+                i.isProperty = !i.value.match("contentTypeAlias|createDate|icon|owner|published|sortOrder|updateDat|updator");
+            if (!i.isProperty && !i.sortBy)
+                i.sortBy = i.value.substring(0, 1).toUpperCase() + i.value.slice(1);
+            // TODO: Add sort logic for custom properties.
+            //else if (!i.sortBy)
+            //        ;
+            return i;
+        }) : {};
         $scope.reloadView($routeParams.id);
 
         $scope.contentId = $routeParams.id;
@@ -247,5 +259,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     }
 
 }
+
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);

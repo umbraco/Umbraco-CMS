@@ -55,6 +55,12 @@
                     <td><a href="#" ng-click="sort('Owner')" prevent-default>
                         <localize key="content_updatedBy">Updated by</localize>
                         <i class="icon-sort"></i></a></td>
+                    <td ng-repeat="property in includeProperties">
+                        <a href="#" ng-click="sort('{{property.sortBy}}')" prevent-default ng-hide="!property.sortBy">
+                        {{property.label}}
+                        <i class="icon-sort"></i></a>
+                        <span ng-hide="property.sortBy">{{property.label}}</span>
+                    </td>
                     <td>
                         <form class="pull-right" novalidate>
                             <i class="icon-search"></i>
@@ -91,6 +97,13 @@
                     <td>
                         {{result.owner.name}}
                         <!--<span class="label">Admin</span>-->
+                    </td>
+                    <td ng-repeat="property in includeProperties">
+                        {{result[property.value]}}
+
+                        <div ng-repeat="props in result.properties | filter: { alias: property.value }">
+                            {{props.value}}
+                        </div>
                     </td>
                     <td></td>
                 </tr>
