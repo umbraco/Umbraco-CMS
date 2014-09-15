@@ -332,6 +332,38 @@ ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
             public DateTime CreateDate { get; set; }
             public IContentTypeComposition Composition { get; set; }
         }
-        
+
+        protected virtual string GetDatabaseFieldNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the database field names.
+            switch (orderBy.ToUpperInvariant())
+            {
+                case "NAME":
+                    return "cmsDocument.text";
+                case "OWNER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
+                    return "umbracoNode.nodeUser";
+                default:
+                    return orderBy;
+            }
+        }
+
+        protected virtual string GetEntityPropertyNameForOrderBy(string orderBy)
+        {
+            // Translate the passed order by field (which were originally defined for in-memory object sorting
+            // of ContentItemBasic instances) to the IMedia property names.
+            switch (orderBy.ToUpperInvariant())
+            {
+                case "OWNER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
+                    return "CreatorId";
+                case "UPDATER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
+                    return "WriterId";
+                default:
+                    return orderBy;
+            }
+        }
     }
 }

@@ -420,7 +420,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .AsQueryable();
 
                 // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetIMediaPropertyNameForOrderBy(orderBy);
+                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
                 if (orderDirection == Direction.Ascending)
                 {
                     result = media.OrderBy(orderByProperty);
@@ -462,32 +462,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 dto,
                 contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
                 propertyData[dto.NodeId]));
-        } 
-
-        private string GetDatabaseFieldNameForOrderBy(string orderBy)
-        {
-            // Translate the passed order by field (which were originally defined for in-memory object sorting
-            // of ContentItemBasic instances) to the database field names.
-            switch (orderBy)
-            {
-                case "Name":
-                    return "umbracoNode.text";
-                default:
-                    return "umbracoNode.sortOrder";
-            }
-        }
-
-        private string GetIMediaPropertyNameForOrderBy(string orderBy)
-        {
-            // Translate the passed order by field (which were originally defined for in-memory object sorting
-            // of ContentItemBasic instances) to the IMedia property names.
-            switch (orderBy)
-            {
-                case "Name":
-                    return "Name";
-                default:
-                    return "SortOrder";
-            }
         }
 
         /// <summary>

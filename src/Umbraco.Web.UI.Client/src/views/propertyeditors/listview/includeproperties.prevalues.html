@@ -1,8 +1,8 @@
-﻿<div class="umb-editor" ng-controller="Umbraco.PrevalueEditors.ListViewController">
+﻿<div class="umb-editor" ng-controller="Umbraco.PrevalueEditors.IncludePropertiesListViewController">
     <div class="control-group">
-        
-        <select ng-model="selectedField">            
-            <option ng-repeat="field in systemFields" value="_system_{{field.value}}">{{field.name}}</option>           
+
+        <select ng-model="selectedField">
+            <option ng-repeat="field in systemFields" value="_system_{{field.value}}">{{field.name}}</option>
             <option class="select-dash" disabled="disabled">----</option>
             <option ng-repeat="alias in propertyAliases" value="{{alias}}">{{alias}}</option>
         </select>
@@ -26,14 +26,18 @@
                         <i class="icon icon-navigation handle"></i>
                     </td>
                     <td>
-                        <span class="alias-value" ng-if="!val.isSystem">{{val.alias}}</span> 
+                        <span class="alias-value" ng-if="!val.isSystem">{{val.alias}}</span>
                         <span class="alias-value" ng-if="val.isSystem == 1">
                             {{val.alias}}
-                        </span> 
+                        </span>
                         <em ng-show="val.isSystem == 1"><small>(system field)</small></em>
                     </td>
                     <td>
-                        <input type="text" ng-model="val.header" ng-if="!val.isSystem" />
+                        <ng-form name="headerForm" ng-if="!val.isSystem">
+                            <input type="text" name="header" ng-model="val.header" required />
+                            <span class="help-inline" val-msg-for="header" val-toggle-msg="required">Required</span>
+                        </ng-form>
+                        
                         <span ng-if="val.isSystem">
                             <localize key="{{getLocalizedKey(val.alias)}}">{{val.alias}}</localize>
                         </span>

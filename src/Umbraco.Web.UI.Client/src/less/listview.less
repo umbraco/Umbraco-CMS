@@ -44,7 +44,8 @@
   position: absolute;
   top: 8px;
   left:5px;
-  color: @gray
+  color: @gray;
+  cursor:pointer;
 }
 
 .umb-listview table input[type="text"] {
@@ -82,18 +83,25 @@
   color: @black
 }
 
-.umb-listview table a.no-sort {
+.umb-listview table thead a {
     cursor: default;
 }
-.umb-listview table a.no-sort:hover {
+.umb-listview table thead a:hover {
     text-decoration: none;
+}
+
+.umb-listview table thead a.sortable {
+    cursor: pointer;
+}
+.umb-listview table thead a.sortable span:hover {
+    text-decoration: underline;
 }
 
 .umb-listview .icon-star {
   color: @grayLight
 }
 
-.umb-listview .selected i.icon, .umb-listview tr:hover i.icon{display: none}
+.umb-listview .selected i.icon, .umb-listview tbody tr:hover i.icon{display: none}
 .umb-listview .selected input[type="checkbox"], 
 .umb-listview tr:hover input[type="checkbox"]{display: inline-block !important;}
 .umb-listview .inactive{color: @grayLight;}

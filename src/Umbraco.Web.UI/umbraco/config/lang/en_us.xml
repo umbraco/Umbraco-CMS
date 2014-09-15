@@ -117,6 +117,7 @@
     <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
   </area>
   <area alias="content">
+    <key alias="isPublished" version="7.2">Is Published</key>
     <key alias="about">About this page</key>
     <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(how would you describe the picture over the phone)</key>

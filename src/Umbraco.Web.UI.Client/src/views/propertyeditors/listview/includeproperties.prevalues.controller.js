@@ -7,14 +7,21 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
     $scope.propertyAliases = [];
     $scope.selectedField = null;
     $scope.systemFields = [
-        { value: "updateDate", name: "Last edited" },
-        { value: "updater", name: "Updated by" },
-        { value: "createDate", name: "Created" },
-        { value: "owner", name: "Created by" }
+        { value: "sortOrder" },
+        { value: "updateDate" },
+        { value: "updater" },
+        { value: "createDate" },
+        { value: "owner" },
+        { value: "published"},
+        { value: "contentTypeAlias" }
     ];
 
     $scope.getLocalizedKey = function(alias) {
         switch (alias) {
+            case "name":
+                return "general_name";
+            case "sortOrder":
+                return "general_sort";
             case "updateDate":
                 return "content_updateDate";
             case "updater":
@@ -23,6 +30,11 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                 return "content_createDate";
             case "owner":
                 return "content_createBy";
+            case "published":
+                return "content_isPublished";
+            case "contentTypeAlias":
+                //NOTE: This will just be 'Document' type even if it's for media/members since this is just a pre-val editor and we don't have a key for 'Content Type Alias'
+                return "content_documentType";
         }
         return alias;
     }
@@ -66,7 +78,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
             
             // Get the new and old index for the moved element (using the text as the identifier)
             var newIndex = ui.item.index();
-            var movedAlias = $('.alias-value', ui.item).text();
+            var movedAlias = $('.alias-value', ui.item).text().trim();
             var originalIndex = getAliasIndexByText(movedAlias);
 
             // Move the element in the model
@@ -114,4 +126,4 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
 }
 
 
-angular.module("umbraco").controller("Umbraco.PrevalueEditors.ListViewController", includePropsPreValsController);
+angular.module("umbraco").controller("Umbraco.PrevalueEditors.IncludePropertiesListViewController", includePropsPreValsController);

@@ -24,11 +24,12 @@ namespace Umbraco.Web.PropertyEditors
                 return new Dictionary<string, object>
                 {
                     {"pageSize", "10"},
-                    {"orderBy", "SortOrder"},
+                    {"orderBy", "sortOrder"},
                     {"orderDirection", "asc"},
                     {
                         "includeProperties", new[]
                         {
+                            new {alias = "sortOrder", header = "Sort order", isSystem = 1},
                             new {alias = "updateDate", header = "Last edited", isSystem = 1},
                             new {alias = "updater", header = "Last edited by", isSystem = 1}
                         }
@@ -43,10 +44,10 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
-            [PreValueField("orderBy", "Order By", "textstring", Description = "SortOrder, Name, UpdateDate, CreateDate, ContentTypeAlias, UpdateDate, Updater or Owner")]
+            [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html")]
             public int OrderBy { get; set; }
 
-            [PreValueField("orderDirection", "Order By", "views/propertyeditors/listview/orderdirection.prevalues.html")]
+            [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
 
             [PreValueField("includeProperties", "Include Properties", "views/propertyeditors/listview/includeproperties.prevalues.html")]

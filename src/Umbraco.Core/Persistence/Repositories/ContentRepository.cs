@@ -680,43 +680,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return result;
         }
-
-        private string GetDatabaseFieldNameForOrderBy(string orderBy)
-        {
-            // Translate the passed order by field (which were originally defined for in-memory object sorting
-            // of ContentItemBasic instances) to the database field names.
-            switch (orderBy.ToUpperInvariant())
-            {
-                case "NAME":
-                    return "cmsDocument.text";
-                case "OWNER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "umbracoNode.nodeUser";
-                case "UPDATER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "cmsDocument.documentUser";
-                default:
-                    return orderBy;
-            }
-        }
-
-        private string GetEntityPropertyNameForOrderBy(string orderBy)
-        {
-            // Translate the passed order by field (which were originally defined for in-memory object sorting
-            // of ContentItemBasic instances) to the IContent property names.
-            switch (orderBy.ToUpperInvariant())
-            {
-                case "OWNER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "CreatorId";
-                case "UPDATER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return "WriterId";
-                default:
-                    return orderBy;
-            }
-        }
-
+        
         #endregion
 
         #region IRecycleBinRepository members
@@ -727,6 +691,21 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
+        {
+            var result = base.GetDatabaseFieldNameForOrderBy(orderBy);
+            if (result == orderBy)
+            {
+                switch (orderBy.ToUpperInvariant())
+                {                    
+                    case "UPDATER":
+                        //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
+                        return "cmsDocument.documentUser";                 
+                }
+            }
+            return result;
+        }
 
         private IEnumerable<IContent> ProcessQuery(Sql sql)
         {

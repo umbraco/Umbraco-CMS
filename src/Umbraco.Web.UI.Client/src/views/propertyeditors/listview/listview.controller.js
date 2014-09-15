@@ -10,7 +10,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     }
 
     //Now we need to check if this is for media or content because that will depend on the resources we use
+    //TODO: Check for members!!
     var contentResource, contentTypeResource;
+    
     if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
         contentResource = $injector.get('mediaResource');
         contentTypeResource = $injector.get('mediaTypeResource');
@@ -33,8 +35,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: 1,
         filter: '',
-        orderBy: $scope.model.config.orderBy ? $scope.model.config.orderBy : 'updateDate',
-        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc",
+        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'updateDate').trim(),
+        orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
         includeProperties: $scope.model.config.includeProperties ? $scope.model.config.includeProperties : [
             { alias: 'updateDate', header: 'Last edited', isSystem : 1 },
             { alias: 'updater', header: 'Last edited by', isSystem: 1 }
@@ -46,8 +48,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function(e, i) {
+        
         if (e.isSystem) {
-            e.allowSorting = true;
+
+            //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
+            // to do that, we'd need to update the base query for content to include the content type alias column
+            // which requires another join and would be slower.
+            if (e.alias != "contentTypeAlias") {
+                e.allowSorting = true;
+            }
+            
             //localize the header
             var key = getLocalizedKey(e.alias);
             localizationService.localize(key).then(function (v) {
@@ -55,6 +65,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             });
         }
     });
+
+    $scope.isSortDirection = function (col, direction) {
+        return $scope.options.orderBy.toUpperCase() == col.toUpperCase() && $scope.options.orderDirection == direction;
+    }
 
     $scope.next = function() {
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
@@ -121,25 +135,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             }
 
         });
-    };
-
-    function getCustomPropertyValue(alias, properties) {
-        var value = '';
-        var index = 0;
-        var foundAlias = false;
-        for (var i = 0; i < properties.length; i++) {
-            if (properties[i].alias == alias) {
-                foundAlias = true;
-                break;
-            }
-            index++;
-        }
-
-        if (foundAlias) {
-            value = properties[index].value;
-        }
-
-        return value;
     };
 
     //assign debounce method to the search to limit the queries
@@ -285,6 +280,24 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     };
 
+    function getCustomPropertyValue(alias, properties) {
+        var value = '';
+        var index = 0;
+        var foundAlias = false;
+        for (var i = 0; i < properties.length; i++) {
+            if (properties[i].alias == alias) {
+                foundAlias = true;
+                break;
+            }
+            index++;
+        }
+
+        if (foundAlias) {
+            value = properties[index].value;
+        }
+
+        return value;
+    };
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
     function setPropertyValues(result) {
@@ -295,7 +308,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             // First try to pull the value directly from the alias (e.g. updatedBy)        
             var value = result[alias];
-
+            
             // If this returns an object, look for the name property of that (e.g. owner.name)
             if (value === Object(value)) {
                 value = value['name'];
@@ -319,7 +332,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     function isDate(val) {
-        return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
+        if (angular.isString(val)) {
+            return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
+        }
+        return false;
     };
 
     //function saveLastPageNumber() {
@@ -354,6 +370,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     function getLocalizedKey(alias) {
 
         switch (alias) {
+            case "sortOrder":
+                return "general_sort";
             case "updateDate":
                 return "content_updateDate";
             case "updater":
@@ -362,6 +380,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 return "content_createDate";
             case "owner":
                 return "content_createBy";
+            case "published":
+                return "content_isPublished";
+            case "contentTypeAlias":
+                //TODO: Check for members
+                return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
         }
         return alias;
     }
