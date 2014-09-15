@@ -42,6 +42,10 @@ namespace Umbraco.Core.Models
                 // leading underscores which we don't want in this case.
                 // see : http://issues.umbraco.org/issue/U4-3968
 
+                //TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
+                // .ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase)
+                // Need to ask Stephen
+
                 SetPropertyValueAndDetectChanges(o =>
                 {
                     _alias = value == "_umbracoSystemDefaultProtectType" 

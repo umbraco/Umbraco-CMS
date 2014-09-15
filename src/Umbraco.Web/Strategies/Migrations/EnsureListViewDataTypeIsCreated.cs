@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -11,10 +13,11 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Strategies.Migrations
 {
     /// <summary>
-    /// Once the migration runner is run, this will ensure that the built in system list view data type exists if the 
+    /// Once the migration runner is run, this will ensure that the content types that are flagged as list views,
+    /// have the special readonly list view property type on the readonly tab. This will ensure that the built in system list view data type exists if the 
     /// current version is less than 7.2 (because previous to 7.2 we didn't ship with the system created list view data type)
     /// </summary>
-    public class EnsureListViewDataTypeIsCreated : ApplicationEventHandler
+    public class EnsureAllListViewContentTypesHaveListViewPropertyType : ApplicationEventHandler
     {
         /// <summary>
         /// Ensure this is run when not configured
@@ -48,56 +51,100 @@ namespace Umbraco.Web.Strategies.Migrations
 
             if (e.ConfiguredVersion <= target720)
             {
-                var exists = e.MigrationContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id=1037");
-                if (exists > 0) return;
+                EnsureListViewDataTypeCreated(e);
 
-                using (var transaction = e.MigrationContext.Database.GetTransaction())
-                {
-                    //Turn on identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+                var services = ApplicationContext.Current.Services;
 
-                    e.MigrationContext.Database
-                        .Insert("umbracoNode", "id", false, new NodeDto
-                        {
-                            NodeId = 1037,
-                            Trashed = false,
-                            ParentId = -1,
-                            UserId = 0,
-                            Level = 1,
-                            Path = "-1,1037",
-                            SortOrder = 2,
-                            UniqueId = new Guid("C0808DD3-8133-4E4B-8CE8-E2BEA84A96A4"),
-                            Text = "List View",
-                            NodeObjectType = new Guid(Constants.ObjectTypes.DataType),
-                            CreateDate = DateTime.Now
-                        });
+                var contentTypes = services.ContentTypeService.GetAllContentTypes().Where(x => x.IsContainer);                                
+                services.ContentTypeService.Save(AddListView(contentTypes));
 
-                    //Turn off identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+                var mediaTypes = services.ContentTypeService.GetAllMediaTypes().Where(x => x.IsContainer);
+                services.ContentTypeService.Save(AddListView(mediaTypes));
 
-                    //Turn on identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
-
-                    e.MigrationContext.Database
-                        .Insert("cmsDataType", "pk", false, new DataTypeDto
-                        {
-                            PrimaryKey = 19,
-                            DataTypeId = 1037,
-                            PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias,
-                            DbType = "Nvarchar"
-                        });
-
-                    //Turn off identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
-
-                    transaction.Complete();
-                }
-
+                var memberTypes = services.MemberTypeService.GetAll().Where(x => x.IsContainer);
+                services.MemberTypeService.Save(AddListView(memberTypes));
             }
         }
+
+        private void EnsureListViewDataTypeCreated(Core.Events.MigrationEventArgs e)
+        {
+            var exists = e.MigrationContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id=1037");
+            if (exists > 0) return;
+
+            using (var transaction = e.MigrationContext.Database.GetTransaction())
+            {
+                //Turn on identity insert if db provider is not mysql
+                if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
+                    e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+
+                e.MigrationContext.Database
+                    .Insert("umbracoNode", "id", false, new NodeDto
+                    {
+                        NodeId = 1037,
+                        Trashed = false,
+                        ParentId = -1,
+                        UserId = 0,
+                        Level = 1,
+                        Path = "-1,1037",
+                        SortOrder = 2,
+                        UniqueId = new Guid("C0808DD3-8133-4E4B-8CE8-E2BEA84A96A4"),
+                        Text = "List View",
+                        NodeObjectType = new Guid(Constants.ObjectTypes.DataType),
+                        CreateDate = DateTime.Now
+                    });
+
+                //Turn off identity insert if db provider is not mysql
+                if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
+                    e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+
+                //Turn on identity insert if db provider is not mysql
+                if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
+                    e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
+
+                e.MigrationContext.Database
+                    .Insert("cmsDataType", "pk", false, new DataTypeDto
+                    {
+                        PrimaryKey = 19,
+                        DataTypeId = 1037,
+                        PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias,
+                        DbType = "Nvarchar"
+                    });
+
+                //Turn off identity insert if db provider is not mysql
+                if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
+                    e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
+
+                transaction.Complete();
+            }
+        }
+
+        private static List<T> AddListView<T>(IEnumerable<T> contentTypes)
+            where T: IContentTypeBase
+        {
+            var toSave = new List<T>();
+            foreach (var contentType in contentTypes)
+            {
+                if (contentType.PropertyGroups.Contains(Constants.Conventions.PropertyGroups.ListViewGroupName) == false)
+                {
+                    contentType.PropertyGroups.Add(new PropertyGroup
+                    {
+                        Name = Constants.Conventions.PropertyGroups.ListViewGroupName,                       
+                        SortOrder = contentType.PropertyGroups.Any() ?  contentType.PropertyGroups.Max(x => x.SortOrder) + 1 : 1,
+                        PropertyTypes = new PropertyTypeCollection(new[]
+                        {
+                            new PropertyType(Constants.PropertyEditors.ListViewAlias, DataTypeDatabaseType.Nvarchar)
+                            {
+                                Alias = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
+                                Name = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
+                                DataTypeDefinitionId = 1037
+                            }
+                        })
+                    });
+                    toSave.Add(contentType);
+                }
+            }
+            return toSave;
+        }
     }
+
 }

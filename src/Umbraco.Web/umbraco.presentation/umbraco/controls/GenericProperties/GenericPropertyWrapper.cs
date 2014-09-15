@@ -10,7 +10,13 @@ namespace umbraco.controls.GenericProperties
     /// </summary>
     public class GenericPropertyWrapper : System.Web.UI.WebControls.PlaceHolder
     {
-        private readonly bool _allowModification;
+        private readonly bool _allowNameEdit = true;
+        private readonly bool _allowDataTypeEdit = true;
+        private readonly bool _allowAliasEdit = true;
+        private readonly bool _allowTabEdit = true;
+        private readonly bool _allowValidationEdit = true;
+        private readonly bool _allowDescEdit = true;
+        private readonly bool _allowDelete = true;
 
         private GenericProperty _gp;
         private cms.businesslogic.ContentType.TabI[] _tabs;
@@ -55,7 +61,24 @@ namespace umbraco.controls.GenericProperties
 
         public GenericPropertyWrapper(bool allowModification)
         {
-            _allowModification = allowModification;
+            if (allowModification == false)
+            {
+                _allowAliasEdit = false;
+                _allowValidationEdit = false;
+                _allowDelete = false;
+                _allowDataTypeEdit = false;
+            }
+        }
+
+        public GenericPropertyWrapper(bool allowNameEdit, bool allowDataTypeEdit, bool allowAliasEdit, bool allowTabEdit, bool allowValidationEdit, bool allowDescEdit, bool allowDelete)
+        {
+            _allowNameEdit = allowNameEdit;
+            _allowDataTypeEdit = allowDataTypeEdit;
+            _allowAliasEdit = allowAliasEdit;
+            _allowTabEdit = allowTabEdit;
+            _allowValidationEdit = allowValidationEdit;
+            _allowDescEdit = allowDescEdit;
+            _allowDelete = allowDelete;
         }
 
         public void UpdateEditControl()
@@ -82,11 +105,18 @@ namespace umbraco.controls.GenericProperties
         {
             base.OnInit(e);
             var u = (GenericProperty)Page.LoadControl(SystemDirectories.Umbraco + "/controls/genericProperties/GenericProperty.ascx");
-            u.AllowPropertyEdit = _allowModification;
+            
+            u.AllowAliasEdit = _allowAliasEdit;
+            u.AllowDataTypeEdit = _allowDataTypeEdit;
+            u.AllowDelete = _allowDelete;
+            u.AllowDescriptionEdit = _allowDescEdit;
+            u.AllowNameEdit = _allowNameEdit;
+            u.AllowTabEdit = _allowTabEdit;
+            u.AllowValidationEdit = _allowValidationEdit;
 
             u.ID = ID + "_control";
 
-            if (_allowModification)
+            if (_allowDelete)
             {
                 u.Delete += GenericPropertyWrapper_Delete;
             }

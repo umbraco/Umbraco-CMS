@@ -88,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
             
             if (media.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddContainerView(display, "media");
+                TabsAndPropertiesResolver.AddListView(display, "media");
             }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display);

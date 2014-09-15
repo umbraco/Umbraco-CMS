@@ -127,7 +127,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (content.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddContainerView(display, "content");
+                TabsAndPropertiesResolver.AddListView(display, "content");
             }
 
             TabsAndPropertiesResolver.MapGenericProperties(

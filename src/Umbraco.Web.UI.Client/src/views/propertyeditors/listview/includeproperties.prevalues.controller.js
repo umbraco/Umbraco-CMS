@@ -10,7 +10,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         { value: "updateDate", name: "Last edited" },
         { value: "updater", name: "Updated by" },
         { value: "createDate", name: "Created" },
-        { value: "creator", name: "Created by" }
+        { value: "owner", name: "Created by" }
     ];
 
     $scope.getLocalizedKey = function(alias) {
@@ -21,7 +21,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                 return "content_updatedBy";
             case "createDate":
                 return "content_createDate";
-            case "creator":
+            case "owner":
                 return "content_createBy";
         }
         return alias;

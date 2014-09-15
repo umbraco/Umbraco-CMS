@@ -28,7 +28,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         totalPages: 0,
         items: []
     };
-    
+
     $scope.options = {
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: 1,
@@ -55,34 +55,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             });
         }
     });
-
-    //// Retrieve the container configuration for the content type and set options before presenting initial view
-    //contentTypeResource.getContainerConfig($routeParams.id)
-    //    .then(function(config) {
-    //        if (typeof config.pageSize !== 'undefined') {
-    //            $scope.options.pageSize = config.pageSize;
-    //        }
-    //        if (typeof config.additionalColumns !== 'undefined') {
-    //            $scope.options.additionalColumns = config.additionalColumns;
-    //        }
-    //        if (typeof config.orderBy !== 'undefined') {
-    //            $scope.options.orderBy = config.orderBy;
-    //        }
-    //        if (typeof config.orderDirection !== 'undefined') {
-    //            $scope.options.orderDirection = config.orderDirection;
-    //        }
-    //        if (typeof config.allowBulkPublish !== 'undefined') {
-    //            $scope.options.allowBulkPublish = config.allowBulkPublish;
-    //        }
-    //        if (typeof config.allowBulkUnpublish !== 'undefined') {
-    //            $scope.options.allowBulkUnpublish = config.allowBulkUnpublish;
-    //        }
-    //        if (typeof config.allowBulkDelete !== 'undefined') {
-    //            $scope.options.allowBulkDelete = config.allowBulkDelete;
-    //        }
-
-    //        $scope.initView();
-    //    });
 
     $scope.next = function() {
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
@@ -313,18 +285,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     };
 
-    $scope.includeProperties = $scope.model.config.includeProperties ? _.map($scope.model.config.includeProperties, function(i) {
-        if (!i.label)
-            i.label = i.value.replace(/([A-Z]?[a-z]+)/g, '$1 ').trim(' ');
-        if (typeof (i.isProperty) == "undefined")
-            i.isProperty = !i.value.match("contentTypeAlias|createDate|icon|owner|published|sortOrder|updateDate|updater");
-        if (!i.isProperty && !i.sortBy)
-            i.sortBy = i.value.substring(0, 1).toUpperCase() + i.value.slice(1);
-        // TODO: Add sort logic for custom properties.
-        //else if (!i.sortBy)
-        //        ;
-        return i;
-    }) : {};
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
     function setPropertyValues(result) {
@@ -400,7 +360,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 return "content_updatedBy";
             case "createDate":
                 return "content_createDate";
-            case "creator":
+            case "owner":
                 return "content_createBy";
         }
         return alias;

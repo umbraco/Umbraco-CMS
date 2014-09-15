@@ -95,9 +95,15 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
+                //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
+                // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
+                // which is used internally
+
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
+                    _alias = value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
+                        ? value 
+                        : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
                     return _alias;
                 }, _alias, AliasSelector);
             }

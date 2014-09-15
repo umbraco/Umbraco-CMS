@@ -663,7 +663,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .AsQueryable();
 
                 // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetIContentPropertyNameForOrderBy(orderBy);
+                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
                 if (orderDirection == Direction.Ascending)
                 {
                     result = content.OrderBy(orderByProperty);
@@ -685,28 +685,32 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             // Translate the passed order by field (which were originally defined for in-memory object sorting
             // of ContentItemBasic instances) to the database field names.
-            switch (orderBy)
+            switch (orderBy.ToUpperInvariant())
             {
-                case "Name":
+                case "NAME":
                     return "cmsDocument.text";
-                case "Owner":
+                case "OWNER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
-                case "Updater":
+                case "UPDATER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "cmsDocument.documentUser";
                 default:
                     return orderBy;
             }
         }
 
-        private string GetIContentPropertyNameForOrderBy(string orderBy)
+        private string GetEntityPropertyNameForOrderBy(string orderBy)
         {
             // Translate the passed order by field (which were originally defined for in-memory object sorting
             // of ContentItemBasic instances) to the IContent property names.
-            switch (orderBy)
+            switch (orderBy.ToUpperInvariant())
             {
-                case "Owner":
+                case "OWNER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "CreatorId";
-                case "Updater":
+                case "UPDATER":
+                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "WriterId";
                 default:
                     return orderBy;

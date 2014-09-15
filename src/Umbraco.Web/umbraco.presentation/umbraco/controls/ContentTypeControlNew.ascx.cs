@@ -29,6 +29,7 @@ using umbraco.controls.GenericProperties;
 using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.BasePages;
+using Constants = Umbraco.Core.Constants;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 using PropertyType = Umbraco.Core.Models.PropertyType;
 
@@ -743,7 +744,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 var propertyGroupId = tab.Id;
 
                 var propSort = new HtmlInputHidden();
-                propSort.ID = "propSort_" + propertyGroupId.ToString() + "_Content";
+                propSort.ID = "propSort_" + propertyGroupId + "_Content";
                 PropertyTypes.Controls.Add(propSort);
                 _sortLists.Add(propSort);
 
@@ -756,12 +757,13 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         //If the PropertyType doesn't belong on this ContentType skip it and continue to the next one
                         if (pt.ContentTypeId != _contentType.Id) continue;
 
-                        var gpw = GetPropertyWrapperForPropertyType(pt);
+                        cms.businesslogic.datatype.DataTypeDefinition[] filteredDtds;
+                        var gpw = GetPropertyWrapperForPropertyType(pt, dtds, out filteredDtds);
                         gpw.ID = "gpw_" + pt.Id;
                         gpw.PropertyType = pt;
                         gpw.Tabs = tabs;
                         gpw.TabId = propertyGroupId;
-                        gpw.DataTypeDefinitions = dtds;
+                        gpw.DataTypeDefinitions = filteredDtds;
                         gpw.Delete += gpw_Delete;
                         gpw.FullId = "t_" + propertyGroupId + "_Contents_" + +pt.Id;
 
@@ -808,7 +810,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 //But seriously, if it's not on a tab the tabId is 0, it's a lot easier to read IMO
                 //if (pt.ContentTypeId == _contentType.Id && pt.TabId == 0)
                 {
-                    var gpw = GetPropertyWrapperForPropertyType(pt);
+                    cms.businesslogic.datatype.DataTypeDefinition[] filteredDtds;
+                    var gpw = GetPropertyWrapperForPropertyType(pt, dtds, out filteredDtds);
 
                     // Changed by duckie, was:
                     // gpw.ID = "gpw_" + editPropertyType.Alias;
@@ -817,7 +820,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     gpw.PropertyType = pt;
                     gpw.Tabs = tabs;
-                    gpw.DataTypeDefinitions = dtds;
+                    gpw.DataTypeDefinitions = filteredDtds;
                     gpw.Delete += new EventHandler(gpw_Delete);
                     gpw.FullId = "t_general_Contents_" + pt.Id;
 
@@ -857,8 +860,25 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         /// allowed to be editable.
         /// </summary>
         /// <returns></returns>
-        private GenericPropertyWrapper GetPropertyWrapperForPropertyType(cms.businesslogic.propertytype.PropertyType pt)
+        private GenericPropertyWrapper GetPropertyWrapperForPropertyType(
+            cms.businesslogic.propertytype.PropertyType pt,
+            cms.businesslogic.datatype.DataTypeDefinition[] allDtds,
+            out cms.businesslogic.datatype.DataTypeDefinition[] filteredDefinitions)
         {
+            filteredDefinitions = allDtds;
+
+            //special case if this is a list view, if so, filter the dtd's to only include other list view types,
+            // don't allow editing of anything except for the tab and data type
+            if (pt.Alias == Constants.Conventions.PropertyTypes.ListViewPropertyAlias)
+            {
+                //filter the dtds to only list view
+                filteredDefinitions = allDtds.Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.ListViewAlias).ToArray();
+
+                var gpw = new GenericPropertyWrapper(false, true, false, true, false, false, false);
+                return gpw;
+            }
+
+            //not editable if any of the built in member types
             if (_contentType.ContentTypeItem is IMemberType)
             {
                 var builtInAliases = global::Umbraco.Core.Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
@@ -866,6 +886,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 return gpw;
             }
 
+            //not editable if prefixed with the special internal prefix
+            if (pt.Alias.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix))
+            {
+                var gpw = new GenericPropertyWrapper(false);
+                return gpw;
+            }
+
+            //the rest are editable
             return new GenericPropertyWrapper();
         }
 
