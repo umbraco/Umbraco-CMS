@@ -58,6 +58,7 @@
      float:right;
  }
  
+
  // general layout components
  // -------------------------
  .usky-grid  .tb {
@@ -124,6 +125,9 @@
      border: 1px dashed rgba(0,0,0,0);
 }
 
+.usky-grid .tb:hover .usky-row{
+    border-bottom:1px dashed rgba(182, 182, 182, 0.3);
+}
 
 /*.usky-grid .selectedRow {
      border: 1px solid rgba(182, 182, 182, 0.3);
@@ -146,8 +150,13 @@
     position: absolute;
     bottom: 0;
     top: 0;
-    left: 0;
     right: 0;
+    width: 150px;
+    opacity: 0.3;
+}
+
+.usky-grid .cell-tools:hover{
+    opacity: 1;
 }
 
 .usky-grid  .cell-tools-add {
@@ -157,36 +166,19 @@
     left: 0;
     right: 0;
     z-index: 500;
+    opacity: 0.3;
 }
 
-.usky-grid .cell-tools-add-single i{
-     font-size: 85px;
-     color: @grayLight;
-     display: block;
-     line-height: 55px;
-     margin-bottom: 10px;
+.usky-grid  .usky-control:hover .cell-tools-add{
+    opacity: 1;
 }
 
-.usky-grid .cell-tools-add-single a:hover i{color: @gray;}
-
-.usky-grid .cell-tools-add-single a{text-decoration:  none;}
-
-.usky-grid .cell-tools-add-single p{
-     display: none;
-}
-
-.usky-grid .single-editor-rte p{
-     display: block;
-}
-.usky-grid .single-editor-rte i, .usky-grid .single-editor-rte div{
-     display: none;
-}
 
 .usky-grid  .cell-tools-remove {
     display:inline-block;
     position: absolute;
-    top: -20px;
-    right: -20px;
+    top: 0px;
+    right: 5px;
     text-align: right;
     z-index: 500;
 }
@@ -199,8 +191,8 @@
 .usky-grid  .cell-tools-move {
     display:inline-block;
     position: absolute;
-    top: 20px;
-    right: -20px;
+    top: 40px;
+    right: 5px;
     z-index: 500;
     cursor: move
 }
@@ -216,17 +208,20 @@
     position:relative;
     display:block;
     
+    /*
     border: 1px dashed rgba(255, 0, 0, .0);     
     border-bottom-width: 1px;
+    */
 
     -webkit-background-clip: padding-box; /* for Safari */
     background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+
+    margin: 10px 0 0 0;
 }
 
 .usky-grid  .usky-control:hover{
     /*border: 1px solid rgba(182, 182, 182, 0.3);*/
-    border-bottom: 1px solid rgba(182, 182, 182, 0.3);
-
+    //border-bottom: 1px solid rgba(182, 182, 182, 0.3);
 }
 
 .usky-grid  .usky-control-placeholder:hover{
@@ -234,15 +229,17 @@
     border-bottom:1px solid rgba(182, 182, 182, 0.0) !important;
 }
 
-.usky-grid .removingControl{
+.usky-grid .warnhighlight{
      border: 1px dashed @red !important;
 }
 
-.usky-grid .movingControl{
+.usky-grid .infohighlight{
      border: 1px dashed @blue !important;
 }
 
-
+.usky-grid .usky-control-inner{
+    min-height: 60px;    
+}
 
 
 
@@ -262,6 +259,7 @@
     border:1px solid rgba(182, 182, 182, 0.3);
     height: 50px;
 }
+
 .usky-grid  .usky-control-placeholder:hover .placeholder{
     border:1px solid rgba(182, 182, 182, 0.8);
 }
@@ -301,7 +299,6 @@
      border: none;
      background: #fff;
      outline: none;
-     width: 98%;
      resize: none;
      color: @gray;
  }
@@ -320,17 +317,6 @@
      resize: none;
      font-style: italic;
 }
-
-
- 
-
- 
- 
- 
-
- 
-
-
  
  .usky-grid  .cellPanelRte {
      min-height:60px;
@@ -501,12 +487,24 @@
  }
 
  .usky-grid .usky-control{
-     margin: 15px 30px 0px 10px;
+     margin: 10px 0 0 0;
      padding: 5px;
  }
  
  .usky-grid .usky-templates-columns{
      margin-top: 30px;
+ }
+
+ .usky-grid .usky-row-inner{
+    margin-right: 45px;
+    border: 1px dashed transparent;
+ }
+
+ .usky-grid .usky-control-inner{
+    padding: 5px;
+    margin-right: 45px;
+    margin-bottom: 10px;
+    border: 1px dashed transparent;
  }
 
 
@@ -597,6 +595,69 @@
      overflow: hidden;
  }
 
+
+ /**************************************************************************************************/
+ /* overlay */
+ /**************************************************************************************************/
+ .usky-grid  .cell-tools-menu{
+     position: absolute;
+     width: 360px;
+     height: 380px;
+     overflow: auto;
+     border: 1px solid #ccc;
+     margin-top: -190px;
+     margin-left: -150px;
+     background: white;
+     padding: 7px;
+     top: 0;
+     left: 50%;
+
+     z-index: 666;
+     -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+ }
+
+
+ .usky-grid .cell-tools-menu h5{
+     border-bottom: 1px solid #d9d9d9;
+     color: #999;
+     padding: 10px;
+     margin-top: 0;
+ }
+
+ .usky-grid .elements{
+     display: block;
+     padding: 0;
+     margin: 0;
+ }
+
+ .usky-grid .elements li{
+     display: inline-block;
+     width: 90px;
+     height: 80px;
+     margin: 5px;
+     padding: 5px;
+     overflow: hidden;
+     font-size: 11px;
+ }
+
+ .usky-grid .elements li:hover, .usky-grid .elements li:hover *{
+     background: #2e8aea;
+     color: white;
+ }
+
+ .usky-grid .elements a{
+     color: #222;
+     text-decoration: none;
+ }
+
+ .usky-grid .elements i{
+     font-size: 30px;
+     line-height: 50px;
+     color: #999;
+     display: block
+ }
 
 
  /**************************************************************************************************/

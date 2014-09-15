@@ -95,10 +95,12 @@ namespace umbraco
             {
                 var attributeValueSplit = (attributeValue).Split(',');
 
-                //before proceeding, we don't want to process anything here unless each item starts/ends with a [ ]
+                // before proceeding, we don't want to process anything here unless each item starts/ends with a [ ]
                 // this is because the attribute value could actually just be a json array like [1,2,3] which we don't want to parse
-
-                if (attributeValueSplit.All(x =>
+                //
+                // however, the last one can be a literal, must take care of this!
+                // so here, don't check the last one, which can be just anything
+                if (attributeValueSplit.Take(attributeValueSplit.Length - 1).All(x =>
                     //must end with [
                     x.EndsWith("]") &&
                     //must start with [ and a special char

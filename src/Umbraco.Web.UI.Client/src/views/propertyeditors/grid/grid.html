@@ -43,18 +43,17 @@
                          class="usky-row"
                          ng-mouseover="setCurrentRow(row)"
                          ng-mouseleave="disableCurrentRow()"
-                         ng-class="{removingControl:currentRemoveControl == row, movingControl:currentMovedRow == row, selectedRow:currentRow == row && currentControl === null}">
+                         ng-class="{'selectedControl':currentRow == row && currentControl === null}">
 
                         <!-- Row tool -->
-                        <div class="row-tools" ng-animate="'fade'"
-                             ng-if="currentRow == row && currentControl === null">
+                        <div class="row-tools" ng-animate="'fade'" ng-if="currentRow == row && currentControl === null">
 
                             <!-- delete row -->
                             <div class="cell-tools-remove">
                                 <div class="iconBox"
                                      ng-click="deletePrompt = true"
                                      ng-mouseover="setCurrentRemoveControl(row)"
-                                     ng-mouseleave="disableCurrentRemoveControl(row)">
+                                     ng-mouseover="disableCurrentRemoveControl(row)">
 
                                     <span ng-if="deletePrompt">
                                         Are you sure?
@@ -75,9 +74,8 @@
                         </div>
 
                         <!-- row container -->
-                        <div ng-class="{last:$index==model.value.length-1,first:$first}"
-                             class="{{row.cssClass}} mainContainer">
-
+                        <div class="{{row.cssClass}} mainContainer usky-row-inner"
+                             ng-class="{last:$last,first:$first,warnhighlight:currentRemoveControl == row, infohighlight:currentMovedRow == row}">
                             <div class="mainTb">
                                 <div class="tb">
                                     <div class="tr">
@@ -96,65 +94,55 @@
                                                      ng-init="singleEditor = area.$allowedEditors[0]"
                                                      class="cell-tools-add-single single-editor-{{singleEditor.alias}}">
 
-                                                    <a href ng-click="addControl(singleEditor, area)">
-                                                        <i class="icon {{singleEditor.icon}}"></i>
-                                                        <div class="help-text">{{singleEditor.name}}</div>
-                                                    </a>
+                                                     <div class="help-text" style="margin-bottom: 15px">
+                                                            To start, click the <i class=" icon {{singleEditor.icon}} blue">
+                                                        </i> below and add your first {{singleEditor.name}}
+                                                     </div><br/>
 
-                                                    <p class="placeholder" ng-if="area.$allowsRTE" ng-click="addControl(singleEditor, area)">
-                                                        Start writing here...
-                                                    </p>
+                                                     <div class="iconBox">
+                                                        <a href ng-click="addControl(singleEditor, area)">
+                                                            <i class="icon {{singleEditor.icon}}"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
+
 
                                                 <div ng-if="!area.allowed || area.allowed.length > 1">
 
-                                                    <p class="placeholder" ng-if="area.$allowsRTE" ng-click="addTinyMce(area)">
-                                                        Start writing here...
-                                                    </p>
+                                                    <div class="help-text" style="margin-bottom: 15px">
+                                                           To start, click the <i class=" icon icon-add blue">
+                                                       </i> below and add your first element
+                                                    </div><br/>
 
-                                                    <div class="cell-tools-add">
-                                                        <div class="iconBox"
-                                                             ng-repeat="editor in area.$allowedEditors track by editor.alias"
-                                                             ng-click="addControl(editor,area)">
-                                                            <i class="icon {{editor.icon}}"></i>
+
+                                                    <div class="cell-tools-add" 
+                                                        ng-if="!currentToolsControl" 
+                                                        ng-animate="'fade'">
+                                                        
+                                                        <div class="iconBox">
+                                                            <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
+                                                                <i class=" icon icon-add"></i>
+                                                            </a>
                                                         </div>
+
+                                                        <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
+
                                                     </div>
                                                 </div>
+
                                             </div>
 
                                             <!-- Controls in cell -->
                                             <div ng-repeat="control in area.controls"
-                                                 ng-class="{last:$last,
-                                                            movingControl:currentMovedControl == control,
-                                                            removingControl:currentRemoveControl == control,
-                                                            toolsControl:currentToolsControl == control,
-                                                            selectedControl:currentControl == control}"
                                                  ng-mouseover="setCurrentControl(control)"
                                                  ng-mouseleave="disableCurrentControl(control)"
+                                                 ng-animate="'fade'"
                                                  class="usky-control">
 
                                                 <!-- Filled cell tools -->
                                                 <div class="cell-tools"
                                                      ng-animate="'fade'"
-                                                     ng-if="control && ( currentControl == control)">
-
-                                                    <div class="cell-tools-add"
-                                                         ng-if="area.max === undefined || area.max < area.controls.length"
-                                                         ng-mouseover="setCurrentToolsControl(control)"
-                                                         ng-mouseleave="disableCurrentToolsControl(control)">
-
-                                                        <div class="iconBox"
-                                                             ng-repeat="editor in area.$allowedEditors"
-                                                             ng-click="addControl(editor,area, control.$index)"
-                                                             ng-show="(currentToolsControl == control)">
-                                                            <i class="icon {{editor.icon}}"></i>
-                                                        </div>
-
-                                                        <div class="iconBox"
-                                                             ng-if="currentToolsControl != control">
-                                                            <i class=" icon icon-add"></i>
-                                                        </div>
-                                                    </div>
+                                                     ng-show="control && (currentControl == control)">
 
                                                     <!-- delete cell -->
                                                     <div class="cell-tools-remove">
@@ -163,14 +151,12 @@
                                                              ng-mouseover="setCurrentRemoveControl(control)"
                                                              ng-mouseleave="disableCurrentRemoveControl(control)">
 
-                                                            <span ng-if="deletePrompt">
-                                                                Are you sure?
-                                                                <a href style="text-decoration: underline" ng-click="removeControl(area, $parent.$index)">Yes</a>
-                                                            </span>
+                                                                <span ng-show="deletePrompt">
+                                                                    Are you sure?
+                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)">Yes</a>
+                                                                </span>
 
-
-                                                            <i ng-if="!deletePrompt" class="icon icon-trash"></i>
-
+                                                                <i ng-show="!deletePrompt" class="icon icon-trash"></i>
                                                         </div>
                                                     </div>
 
@@ -185,10 +171,29 @@
 
                                                 </div>
 
-                                                <!-- Redering the editor for specific control -->
-                                                <div ng-if="control && control.$editorPath"
-                                                     ng-include="control.$editorPath"
-                                                     class="usky-cell usky-cell-{{control.editor.view}}">
+                                                <div class="usky-control-inner" ng-class="{last:$last,
+                                                               infohighlight:currentMovedControl == control,
+                                                               warnhighlight:currentRemoveControl == control,
+                                                               selectedControl:currentControl == control}">
+                                                    <!-- Redering the editor for specific control -->
+                                                    <div ng-if="control && control.$editorPath"
+                                                         ng-include="control.$editorPath"
+                                                         class="usky-cell usky-cell-{{control.editor.view}}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- add stuff -->
+                                                <div class="cell-tools-add" 
+                                                    ng-if="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)" 
+                                                    ng-animate="'fade'">
+                                                    
+                                                    <div class="iconBox">
+                                                        <a href ng-click="addItemOverlay($event, area, control.$index, control.$uniqueId)">
+                                                            <i class=" icon icon-add"></i>
+                                                        </a>
+                                                    </div>
+
+                                                    <div ng-if="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
                                                 </div>
 
                                             </div>
