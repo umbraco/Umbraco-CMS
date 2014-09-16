@@ -141,6 +141,9 @@ AND umbracoNode.nodeObjectType = @objectType",
 
             var propertyFactory = new PropertyGroupFactory(nodeDto.NodeId);
 
+            //If the entity is a container, ensure that the container property and group are there
+            EnsureListViewProperty(entity);
+
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
@@ -271,6 +274,9 @@ AND umbracoNode.id <> @id",
                                         SortOrder = allowedContentType.SortOrder
                                     });
             }
+
+            //If the entity is a container, ensure that the container property and group are there
+            EnsureListViewProperty(entity);
 
             if (((ICanBeDirty) entity).IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
             {
@@ -471,6 +477,54 @@ AND umbracoNode.id <> @id",
                                         LogHelper.Error<ContentTypeBaseRepository<TEntity>>(message, exception);
                                         throw exception;
                                     });
+        }
+
+        private void EnsureListViewProperty(IContentTypeComposition entity)
+        {
+            //If the entity is a container, ensure that the container property and group are there, otherwise if it is not a container,
+            // ensure to remove the built in props/tab
+
+            if (entity.IsContainer == false)
+            {
+                if (entity.PropertyTypeExists(Constants.PropertyEditors.ListViewAlias))
+                {
+                    entity.RemovePropertyType(Constants.PropertyEditors.ListViewAlias);
+                }
+                if (entity.PropertyGroups.Contains(Constants.Conventions.PropertyGroups.ListViewGroupName))
+                {
+                    entity.RemovePropertyGroup(Constants.Conventions.PropertyGroups.ListViewGroupName);
+                }
+            }            
+            else if (entity.PropertyTypeExists(Constants.PropertyEditors.ListViewAlias) == false)
+            {
+                PropertyGroup group;
+                if (entity.PropertyGroups.Contains(Constants.Conventions.PropertyGroups.ListViewGroupName))
+                {
+                    group = entity.PropertyGroups[Constants.Conventions.PropertyGroups.ListViewGroupName];
+                }
+                else 
+                {
+                    group = new PropertyGroup
+                    {
+                        Name = Constants.Conventions.PropertyGroups.ListViewGroupName,
+                        SortOrder = entity.PropertyGroups.Any() ? entity.PropertyGroups.Max(x => x.SortOrder) + 1 : 1
+                    };
+                }
+
+                group.PropertyTypes = new PropertyTypeCollection(new[]
+                        {
+                            new PropertyType(Constants.PropertyEditors.ListViewAlias, DataTypeDatabaseType.Nvarchar)
+                            {
+                                Alias = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
+                                Name = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
+                                DataTypeDefinitionId = 1037
+                            }
+                        });
+
+                entity.PropertyGroups.Add(group);
+
+            }
+            
         }
 
         /// <summary>
