@@ -10,11 +10,13 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -61,11 +63,20 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
+            var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
-            return BuildFromDto(dtos, sql);
+            if (dto == null)
+                return null;
+
+            var content = CreateMemberFromDto(dto, dto.ContentVersionDto.VersionId, sql);
+
+            return content;
+
+            //var dtos =
+            //    Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+            //        new PropertyDataRelator().Map, sql);
+
+            //return BuildFromDto(dtos, sql);
         }
 
         protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
@@ -73,33 +84,72 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             if (ids.Any())
             {
-                var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
-                sql.Where(statement);
+                sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
+            return ProcessQuery(sql);
 
-            return BuildFromDtos(dtos, sql);
+            //var sql = GetBaseQuery(false);
+            //if (ids.Any())
+            //{
+            //    var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
+            //    sql.Where(statement);
+            //}
+            //sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            //var dtos =
+            //    Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+            //        new PropertyDataRelator().Map, sql);
+
+            //return BuildFromDtos(dtos, sql);
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
         {
-            var sqlSubquery = GetSubquery();
-            var translator = new SqlTranslator<IMember>(sqlSubquery, query);
-            var subquery = translator.Translate();
-            var sql = GetBaseQuery(false)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-                .OrderBy<NodeDto>(x => x.SortOrder);
+            var baseQuery = GetBaseQuery(false);
 
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
+            //check if the query is based on properties or not
+            var query1 = query as Query<IMember>;
+            if (query1 == null)
+                throw new Exception("Query cannot be null");
+            var wheres = query1.WhereClauses();
+            //this is a pretty rudimentary check but wil work, we just need to know if this query requires property
+            // level queries
+            if (wheres.Any(x => x.Contains("cmsPropertyType")))
+            {
+                var sqlWithProps = GetNodeIdQueryWithPropertyData();
+                var translator = new SqlTranslator<IMember>(sqlWithProps, query);
+                var sql = translator.Translate();
 
-            return BuildFromDtos(dtos, sql);
+                baseQuery.Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments))
+                    .OrderBy<NodeDto>(x => x.SortOrder);
+
+                return ProcessQuery(baseQuery);    
+            }
+            else
+            {
+                var translator = new SqlTranslator<IMember>(baseQuery, query);
+                var sql = translator.Translate()
+                    .OrderBy<NodeDto>(x => x.SortOrder);
+
+                return ProcessQuery(sql);    
+            }
+
+            
+
+            //var sqlSubquery = GetSubquery();
+            //var translator = new SqlTranslator<IMember>(sqlSubquery, query);
+            //var subquery = translator.Translate();
+            //var sql = GetBaseQuery(false)
+            //    .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
+            //    .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+            //    .OrderBy<NodeDto>(x => x.SortOrder);
+
+            //var dtos =
+            //    Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+            //        new PropertyDataRelator().Map, sql);
+
+            //return BuildFromDtos(dtos, sql);
         }
 
         #endregion
@@ -109,38 +159,50 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-
-            if (isCount)
-            {
-                sql.Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                    .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-                return sql;
-            }
-
-            sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
-                "cmsContentVersion.VersionDate", "cmsContentVersion.LanguageLocale", "cmsMember.Email",
-                "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid", 
-                "cmsPropertyData.dataDate", "cmsPropertyData.dataInt", "cmsPropertyData.dataNtext", "cmsPropertyData.dataNvarchar",
-                "cmsPropertyType.id", "cmsPropertyType.Alias", "cmsPropertyType.Description",
-                "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
-                "cmsPropertyType.helpText", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
-                "cmsPropertyType.dataTypeId", "cmsDataType.propertyEditorAlias", "cmsDataType.dbType")
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
+            sql.Select(isCount ? "COUNT(*)" : "*")
+                .From<MemberDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)                
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)                
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
+
+            //var sql = new Sql();
+
+            //if (isCount)
+            //{
+            //    sql.Select("COUNT(*)")
+            //        .From<NodeDto>()
+            //        .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            //        .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+            //        .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            //        .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            //        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            //    return sql;
+            //}
+
+            //sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
+            //    "cmsContentVersion.VersionDate", "cmsContentVersion.LanguageLocale", "cmsMember.Email",
+            //    "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid", 
+            //    "cmsPropertyData.dataDate", "cmsPropertyData.dataInt", "cmsPropertyData.dataNtext", "cmsPropertyData.dataNvarchar",
+            //    "cmsPropertyType.id", "cmsPropertyType.Alias", "cmsPropertyType.Description",
+            //    "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
+            //    "cmsPropertyType.helpText", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
+            //    "cmsPropertyType.dataTypeId", "cmsDataType.propertyEditorAlias", "cmsDataType.dbType")
+            //    .From<NodeDto>()
+            //    .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            //    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+            //    .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            //    .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            //    .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+            //    .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+            //    .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+            //    .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
+            //    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            //return sql;
         }
 
         protected override string GetBaseWhereClause()
@@ -148,7 +210,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return "umbracoNode.id = @Id";
         }
 
-        protected Sql GetSubquery()
+        protected Sql GetNodeIdQueryWithPropertyData()
         {
             var sql = new Sql();
             sql.Select("DISTINCT(umbracoNode.id)")
@@ -162,16 +224,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-            return sql;
-        }
-
-        protected Sql GetMemberGroupSubquery()
-        {
-            var sql = new Sql();
-            sql.Select("DISTINCT(cmsMember2MemberGroup.Member)")
-                .From<Member2MemberGroupDto>()
-                .InnerJoin<NodeDto>().On<NodeDto, Member2MemberGroupDto>(left => left.NodeId, right => right.MemberGroup)
-                .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.MemberGroup));
             return sql;
         }
 
@@ -432,14 +484,37 @@ namespace Umbraco.Core.Persistence.Repositories
         public override IMember GetByVersion(Guid versionId)
         {
             var sql = GetBaseQuery(false);
-            sql.Where<ContentVersionDto>(x => x.VersionId == versionId);
+            sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
+            var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
-            return BuildFromDto(dtos, sql);
+            if (dto == null)
+                return null;
+
+            var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+
+            var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
+            var media = factory.BuildEntity(dto);
+
+            var properties = GetPropertyCollection(sql, new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType));
+
+            media.Properties = properties[dto.NodeId];
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
+            return media;
+
+            //var sql = GetBaseQuery(false);
+            //sql.Where<ContentVersionDto>(x => x.VersionId == versionId);
+            //sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            //var dtos =
+            //    Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+            //        new PropertyDataRelator().Map, sql);
+
+            //return BuildFromDto(dtos, sql);
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
@@ -512,18 +587,22 @@ namespace Umbraco.Core.Persistence.Repositories
             var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
+            
             var subQuery = new Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
 
             var sql = GetBaseQuery(false)
+                //TODO: This is NOT great!, do an inner join!
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments))
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
+            
+            return ProcessQuery(sql);
 
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
+            //var dtos =
+            //    Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+            //        new PropertyDataRelator().Map, sql);
 
-            return BuildFromDtos(dtos, sql);
+            //return BuildFromDtos(dtos, sql);
         }
 
         public bool Exists(string username)
@@ -539,14 +618,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public int GetCountByQuery(IQuery<IMember> query)
         {
-            var sqlSubquery = GetSubquery();
-            var translator = new SqlTranslator<IMember>(sqlSubquery, query);
-            var subquery = translator.Translate();
-            //get the COUNT base query
-            var sql = GetBaseQuery(true)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments));
+            var sqlWithProps = GetNodeIdQueryWithPropertyData();
+            var translator = new SqlTranslator<IMember>(sqlWithProps, query);
+            var sql = translator.Translate();
 
-            return Database.ExecuteScalar<int>(sql);
+            //get the COUNT base query
+            var fullSql = GetBaseQuery(true)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments));
+            
+            return Database.ExecuteScalar<int>(fullSql);
         }
 
         /// <summary>
@@ -559,70 +639,132 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IMember, string>> orderBy)
+        public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string filter = "")
         {
             if (orderBy == null) throw new ArgumentNullException("orderBy");
 
-            var sql = new Sql();
-            sql.Select("*").From<MemberDto>();
+            // Get base query
+            var sqlClause = GetBaseQuery(false);
 
-            Sql resultQuery;
-            if (query != null)
+            if (query == null) query = new Query<IMember>();
+            var translator = new SqlTranslator<IMember>(sqlClause, query);
+            var sql = translator.Translate();
+
+            // Apply filter
+            if (string.IsNullOrEmpty(filter) == false)
             {
-                var translator = new SqlTranslator<IMember>(sql, query);
-                resultQuery = translator.Translate();
+                //TODO: Maybe other filters?
+                sql = sql.Where("cmsMember.LoginName LIKE @0", "%" + filter + "%");
+            }
+
+            // Apply order according to parameters
+            if (string.IsNullOrEmpty(orderBy) == false)
+            {
+                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy( orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sql = sql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sql = sql.OrderByDescending(orderByParams);
+                }
+            }
+
+            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            // So we'll modify the SQL.
+            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsMember.nodeId");
+
+            // Get page of results and total count
+            IEnumerable<IMember> result;
+            var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            if (totalRecords > 0)
+            {
+                // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
+                // methods OrderBy or OrderByDescending)
+                var content = GetAll(pagedResult.Items
+                    .DistinctBy(x => x.NodeId)
+                    .Select(x => x.NodeId).ToArray())
+                    .Cast<Member>()
+                    .AsQueryable();
+
+                // Now we need to ensure this result is also ordered by the same order by clause
+                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
+                if (orderDirection == Direction.Ascending)
+                {
+                    result = content.OrderBy(orderByProperty);
+                }
+                else
+                {
+                    result = content.OrderByDescending(orderByProperty);
+                }
             }
             else
             {
-                resultQuery = sql;
+                result = Enumerable.Empty<IMember>();
             }
-            
-            //get the referenced column name
-            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-            //now find the mapped column name
-            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IMember));
-            var mappedField = mapper.Map(expressionMember.Name);
-            if (mappedField.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
-            }
-            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
-            resultQuery.OrderBy(string.Format("({0})", mappedField));
-            
-            var result = GetPagedResultsByQuery<MemberDto>(resultQuery, pageIndex, pageSize, out totalRecords, 
-                dtos => dtos.Select(x => x.NodeId).ToArray());
-            
-            //now we need to ensure this result is also ordered by the same order by clause
-            return result.OrderBy(orderBy.Compile());
+
+            return result;
         }
 
-        public IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
-            Sql sql, int pageIndex, int pageSize, out int totalRecords,
-            Func<IEnumerable<TDto>, int[]> resolveIds)
-        {
-            //If a max size is passed in, just do a normal get all!
-            if (pageSize == int.MaxValue)
-            {
-                var result = GetAll().ToArray();
-                totalRecords = result.Count();
-                return result;
-            }
+        //public IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
+        //    Sql sql, int pageIndex, int pageSize, out int totalRecords,
+        //    Func<IEnumerable<TDto>, int[]> resolveIds)
+        //{
+        //    ////If a max size is passed in, just do a normal get all!
+        //    //if (pageSize == int.MaxValue)
+        //    //{
+        //    //    var result = GetAll().ToArray();
+        //    //    totalRecords = result.Count();
+        //    //    return result;
+        //    //}
 
-            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
+        //    //// Get base query
+        //    //var sqlClause = GetBaseQuery(false);
+        //    //var translator = new SqlTranslator<IContent>(sqlClause, query);
+        //    //var sql = translator.Translate()
+        //    //                    .Where<DocumentDto>(x => x.Newest);
 
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+        //    //// Apply filter
+        //    //if (!string.IsNullOrEmpty(filter))
+        //    //{
+        //    //    sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
+        //    //}
 
-            //now that we have the member dto's we need to construct true members from the list.
-            if (totalRecords == 0)
-            {
-                return Enumerable.Empty<IMember>();
-            }
-            return GetAll(resolveIds(pagedResult.Items)).ToArray();
-        }
+        //    //// Apply order according to parameters
+        //    //if (!string.IsNullOrEmpty(orderBy))
+        //    //{
+        //    //    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+        //    //    if (orderDirection == Direction.Ascending)
+        //    //    {
+        //    //        sql = sql.OrderBy(orderByParams);
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        sql = sql.OrderByDescending(orderByParams);
+        //    //    }
+        //    //}
+
+        //    var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
+
+        //    totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+
+        //    //now that we have the member dto's we need to construct true members from the list.
+        //    if (totalRecords == 0)
+        //    {
+        //        return Enumerable.Empty<IMember>();
+        //    }
+        //    return GetAll(resolveIds(pagedResult.Items)).ToArray();
+        //}
 
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
         {
@@ -640,55 +782,155 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(previewExists, content, xml));
         }
 
-        private IMember BuildFromDto(List<MemberReadOnlyDto> dtos, Sql docSql)
+        protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
         {
-            if (dtos == null || dtos.Any() == false)
-                return null;
-            var dto = dtos.First();
+            //Some custom ones
+            switch (orderBy.ToUpperInvariant())
+            {
+                case "EMAIL":
+                    return "cmsMember.Email";
+                case "LOGINNAME":
+                    return "cmsMember.LoginName";
+            }
 
-            var memberTypes = new Dictionary<string, IMemberType>
-                              {
-                                  {
-                                      dto.ContentTypeAlias,
-                                      _memberTypeRepository.Get(dto.ContentTypeId)
-                                  }
-                              };
+            return base.GetDatabaseFieldNameForOrderBy(orderBy);
+        }
 
-            var factory = new MemberReadOnlyFactory(memberTypes);
+        protected override string GetEntityPropertyNameForOrderBy(string orderBy)
+        {
+            //Some custom ones
+            switch (orderBy.ToUpperInvariant())
+            {
+                case "LOGINNAME":
+                    return "Username";
+            }
+
+            return base.GetEntityPropertyNameForOrderBy(orderBy);
+        }
+
+        private IEnumerable<IMember> ProcessQuery(Sql sql)
+        {
+            //NOTE: This doesn't allow properties to be part of the query
+            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            //content types
+            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
+                .ToArray();
+
+            //Go get the property data for each document
+            var docDefs = dtos.Select(dto => new DocumentDefinition(
+                dto.NodeId,
+                dto.ContentVersionDto.VersionId,
+                dto.ContentVersionDto.VersionDate,
+                dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId)))
+                .ToArray();
+
+            var propertyData = GetPropertyCollection(sql, docDefs);
+
+            return dtos.Select(dto => CreateMemberFromDto(
+                dto,
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
+                propertyData[dto.NodeId]));
+        }
+
+        /// <summary>
+        /// Private method to create a member object from a MemberDto
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="contentType"></param>
+        /// <param name="propCollection"></param>
+        /// <returns></returns>
+        private IMember CreateMemberFromDto(MemberDto dto,
+            IMemberType contentType,
+            PropertyCollection propCollection)
+        {
+            var factory = new MemberFactory(contentType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
             var member = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(docSql, new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, member.ContentType));
+            member.Properties = propCollection;
 
-            member.Properties = properties[dto.NodeId];
-
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)member).ResetDirtyProperties(false);
             return member;
         }
 
-        private IEnumerable<IMember> BuildFromDtos(List<MemberReadOnlyDto> dtos, Sql docSql)
+        /// <summary>
+        /// Private method to create a member object from a MemberDto
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="versionId"></param>
+        /// <param name="docSql"></param>
+        /// <returns></returns>
+        private IMember CreateMemberFromDto(MemberDto dto, Guid versionId, Sql docSql)
         {
-            if (dtos == null || dtos.Any() == false)
-                return Enumerable.Empty<IMember>();
+            var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            //We assume that there won't exist a lot of MemberTypes, so the following should be fairly fast
-            var memberTypes = new Dictionary<string, IMemberType>();
-            
-            //TODO: We should do an SQL 'IN' here
-            var memberTypeList = _memberTypeRepository.GetAll();
-            memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
+            var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.ContentVersionDto.NodeId);
+            var member = factory.BuildEntity(dto);
 
-            var entities = new List<IMember>();
-            var factory = new MemberReadOnlyFactory(memberTypes);
-            foreach (var dto in dtos)
-            {
-                var entity = factory.BuildEntity(dto);
+            var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
 
-                var properties = GetPropertyCollection(docSql,new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, entity.ContentType));
+            var properties = GetPropertyCollection(docSql, docDef);
 
-                entity.Properties = properties[dto.NodeId];
-                
-                entities.Add(entity);
-            }
-            return entities;
+            member.Properties = properties[dto.ContentVersionDto.NodeId];
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)member).ResetDirtyProperties(false);
+            return member;
         }
+
+        //private IMember BuildFromDto(List<MemberReadOnlyDto> dtos, Sql docSql)
+        //{
+        //    if (dtos == null || dtos.Any() == false)
+        //        return null;
+        //    var dto = dtos.First();
+
+        //    var memberTypes = new Dictionary<string, IMemberType>
+        //                      {
+        //                          {
+        //                              dto.ContentTypeAlias,
+        //                              _memberTypeRepository.Get(dto.ContentTypeId)
+        //                          }
+        //                      };
+
+        //    var factory = new MemberReadOnlyFactory(memberTypes);
+        //    var member = factory.BuildEntity(dto);
+
+        //    var properties = GetPropertyCollection(docSql, new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, member.ContentType));
+
+        //    member.Properties = properties[dto.NodeId];
+
+        //    return member;
+        //}
+
+        //private IEnumerable<IMember> BuildFromDtos(List<MemberReadOnlyDto> dtos, Sql docSql)
+        //{
+        //    if (dtos == null || dtos.Any() == false)
+        //        return Enumerable.Empty<IMember>();
+
+        //    //We assume that there won't exist a lot of MemberTypes, so the following should be fairly fast
+        //    var memberTypes = new Dictionary<string, IMemberType>();
+            
+        //    //TODO: We should do an SQL 'IN' here
+        //    var memberTypeList = _memberTypeRepository.GetAll();
+        //    memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
+
+        //    var entities = new List<IMember>();
+        //    var factory = new MemberReadOnlyFactory(memberTypes);
+        //    foreach (var dto in dtos)
+        //    {
+        //        var entity = factory.BuildEntity(dto);
+
+        //        var properties = GetPropertyCollection(docSql,new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, entity.ContentType));
+
+        //        entity.Properties = properties[dto.NodeId];
+                
+        //        entities.Add(entity);
+        //    }
+        //    return entities;
+        //}
     }
 }

@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
             /* Internal experiment */
             CacheMap<Member, PropertyDataDto>(src => src.DateTimePropertyValue, dto => dto.Date);
-            CacheMap<Member, PropertyDataDto>(src => src.IntegerropertyValue, dto => dto.Integer);
+            CacheMap<Member, PropertyDataDto>(src => src.IntegerPropertyValue, dto => dto.Integer);
             CacheMap<Member, PropertyDataDto>(src => src.BoolPropertyValue, dto => dto.Integer);
             CacheMap<Member, PropertyDataDto>(src => src.LongStringPropertyValue, dto => dto.Text);
             CacheMap<Member, PropertyDataDto>(src => src.ShortStringPropertyValue, dto => dto.VarChar);

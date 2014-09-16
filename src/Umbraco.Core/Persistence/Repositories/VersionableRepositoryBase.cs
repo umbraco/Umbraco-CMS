@@ -218,7 +218,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
         }
-      
+
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
             Sql docSql,
             params DocumentDefinition[] documentDefs)
@@ -340,7 +340,7 @@ ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
             switch (orderBy.ToUpperInvariant())
             {
                 case "NAME":
-                    return "cmsDocument.text";
+                    return "umbracoNode.text";
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";

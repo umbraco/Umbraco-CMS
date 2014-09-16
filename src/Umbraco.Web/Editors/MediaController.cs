@@ -142,7 +142,7 @@ namespace Umbraco.Web.Editors
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                children = Services.MediaService.GetPagedChildren(id, pageNumber, pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
+                children = Services.MediaService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
             }
             else
             {

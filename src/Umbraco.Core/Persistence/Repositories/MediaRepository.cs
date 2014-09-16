@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return ProcessQuery(sqlClause);
+            return ProcessQuery(sql);
         }
 
         #endregion
@@ -365,29 +365,31 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Gets paged media results
         /// </summary>
         /// <param name="query">Query to excute</param>
-        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageIndex">Page number</param>
         /// <param name="pageSize">Page size</param>
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, int pageNumber, int pageSize, out int totalRecords,
+        public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
             // Get base query
             var sqlClause = GetBaseQuery(false);
+
+            if (query == null) query = new Query<IMedia>();
             var translator = new SqlTranslator<IMedia>(sqlClause, query);
             var sql = translator.Translate();
 
             // Apply filter
-            if (!string.IsNullOrEmpty(filter))
+            if (string.IsNullOrEmpty(filter) == false)
             {
                 sql = sql.Where("umbracoNode.text LIKE @0", "%" + filter + "%");
             }
 
             // Apply order according to parameters
-            if (!string.IsNullOrEmpty(orderBy))
+            if (string.IsNullOrEmpty(orderBy) == false)
             {
                 var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
                 if (orderDirection == Direction.Ascending)
@@ -407,7 +409,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // Get page of results and total count
             IEnumerable<IMedia> result;
-            var pagedResult = Database.Page<ContentVersionDto>(pageNumber, pageSize, modifiedSQL, sql.Arguments);
+            var pagedResult = Database.Page<ContentVersionDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
             if (totalRecords > 0)
             {

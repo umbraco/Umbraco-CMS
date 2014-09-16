@@ -568,7 +568,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         internal string ShortStringPropertyValue { get; set; }
         [IgnoreDataMember]
-        internal int IntegerropertyValue { get; set; }
+        internal int IntegerPropertyValue { get; set; }
         [IgnoreDataMember]
         internal bool BoolPropertyValue { get; set; }
         [IgnoreDataMember]

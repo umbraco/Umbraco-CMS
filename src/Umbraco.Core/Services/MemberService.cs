@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -283,39 +284,30 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var sql = new Sql()
-                    .Select("*")
-                    .From<NodeDto>()
-                    .Where<NodeDto>(dto => dto.NodeObjectType == new Guid(Constants.ObjectTypes.Member));
+                var query = new Query<IMember>();
                 
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        sql.Where<NodeDto>(dto => dto.Text.Equals(displayNameToMatch));
+                        query.Where(member => member.Name.Equals(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        sql.Where<NodeDto>(dto => dto.Text.Contains(displayNameToMatch));                        
+                        query.Where(member => member.Email.Contains(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        sql.Where<NodeDto>(dto => dto.Text.StartsWith(displayNameToMatch));
+                        query.Where(member => member.Email.StartsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        sql.Where<NodeDto>(dto => dto.Text.EndsWith(displayNameToMatch));
+                        query.Where(member => member.Email.EndsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        sql.Where<NodeDto>(dto => dto.Text.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));                        
+                        query.Where(member => member.Email.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));                      
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                sql.OrderBy<NodeDto>(dto => dto.Text);
-
-                var result = repository.GetPagedResultsByQuery<NodeDto>(sql, pageIndex, pageSize, out totalRecords,
-                    dtos => dtos.Select(x => x.NodeId).ToArray());
-
-                //ensure this result is sorted correct just in case
-                return result.OrderBy(x => x.Name);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending);
             }
         }
 
@@ -356,7 +348,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize,  out totalRecords, "Email", Direction.Ascending);
             }
         }
 
@@ -397,7 +389,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending);
             }
         }
 
@@ -477,35 +469,35 @@ namespace Umbraco.Core.Services
                             Query<IMember>.Builder.Where(
                                 x =>
                                 ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                                ((Member)x).IntegerropertyValue == value);
+                                ((Member)x).IntegerPropertyValue == value);
                         break;
                     case ValuePropertyMatchType.GreaterThan:
                         query =
                             Query<IMember>.Builder.Where(
                                 x =>
                                 ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                                ((Member)x).IntegerropertyValue > value);
+                                ((Member)x).IntegerPropertyValue > value);
                         break;
                     case ValuePropertyMatchType.LessThan:
                         query =
                             Query<IMember>.Builder.Where(
                                 x =>
                                 ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                                ((Member)x).IntegerropertyValue < value);
+                                ((Member)x).IntegerPropertyValue < value);
                         break;
                     case ValuePropertyMatchType.GreaterThanOrEqualTo:
                         query =
                             Query<IMember>.Builder.Where(
                                 x =>
                                 ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                                ((Member)x).IntegerropertyValue >= value);
+                                ((Member)x).IntegerPropertyValue >= value);
                         break;
                     case ValuePropertyMatchType.LessThanOrEqualTo:
                         query =
                             Query<IMember>.Builder.Where(
                                 x =>
                                 ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                                ((Member)x).IntegerropertyValue <= value);
+                                ((Member)x).IntegerPropertyValue <= value);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
@@ -591,6 +583,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
+                //TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
                 var members = repository.GetByQuery(query);
                 return members;
             }
@@ -662,7 +655,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending);
             }
         }
 

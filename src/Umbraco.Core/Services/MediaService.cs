@@ -394,22 +394,22 @@ namespace Umbraco.Core.Services
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <param name="pageNumber">Page number</param>
+        /// <param name="pageIndex">Page index (zero based)</param>
         /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirections">Direction to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedChildren(int id, int pageNumber, int pageSize, out int totalChildren,
+        public IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            Mandate.ParameterCondition(pageNumber > 0, "pageSize");
+            Mandate.ParameterCondition(pageIndex > 0, "pageSize");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IMedia>.Builder.Where(x => x.ParentId == id);
-                var medias = repository.GetPagedResultsByQuery(query, pageNumber, pageSize, out totalChildren, orderBy, orderDirection, filter);
+                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
 
                 return medias;
             }

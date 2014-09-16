@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                children = Services.ContentService.GetPagedChildren(id, pageNumber, pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
+                children = Services.ContentService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
             }
             else
             {
