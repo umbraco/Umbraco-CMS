@@ -11,6 +11,7 @@ using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace umbraco.presentation.webservices
@@ -34,12 +35,20 @@ namespace umbraco.presentation.webservices
             //check if this is the same app id as the one passed in, if it is, then we will ignore
             // the request - we will have to assume that the cache refeshing has already been applied to the server
             // that executed the request.
-            if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+            if (appId.IsNullOrWhiteSpace() == false && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
             {
+                var hashedAppId = (NetworkHelper.MachineName + HttpRuntime.AppDomainAppId).ToMd5();
+
                 //we can only check this in full trust. if it's in medium trust we'll just end up with 
                 // the server refreshing it's cache twice.
-                if (HttpRuntime.AppDomainAppId == appId)
+                if (hashedAppId == appId)
                 {
+                    LogHelper.Debug<CacheRefresher>(
+                        "The passed in hashed appId equals the current server's hashed appId, cache refreshing will be ignored for this request as it will have already executed for this server (server: {0} , appId: {1} , hash: {2})",
+                        () => NetworkHelper.MachineName,
+                        () => HttpRuntime.AppDomainAppId,
+                        () => hashedAppId);
+
                     return;
                 }
             }
