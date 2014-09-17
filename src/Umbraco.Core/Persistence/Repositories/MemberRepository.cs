@@ -497,7 +497,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberFactory(memberType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            var properties = GetPropertyCollection(sql, new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType));
+            var properties = GetPropertyCollection(sql, new[] { new DocumentDefinition(dto.NodeId, dto.ContentVersionDto.VersionId, media.UpdateDate, media.CreateDate, memberType) });
 
             media.Properties = properties[dto.NodeId];
 
@@ -648,124 +648,99 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            if (orderBy == null) throw new ArgumentNullException("orderBy");
-
-            // Get base query
-            var sqlClause = GetBaseQuery(false);
-
-            if (query == null) query = new Query<IMember>();
-            var translator = new SqlTranslator<IMember>(sqlClause, query);
-            var sql = translator.Translate();
-
-            // Apply filter
-            if (string.IsNullOrEmpty(filter) == false)
-            {
+            return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+                "SELECT cmsMember.nodeId",
                 //TODO: Maybe other filters?
-                sql = sql.Where("cmsMember.LoginName LIKE @0", "%" + filter + "%");
-            }
+                () => new Tuple<string, object[]>("AND (cmsMember.LoginName LIKE @0", new object[] { "%" + filter + "%)" })
+                , ProcessQuery, orderBy, orderDirection, filter);
 
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
-            {
-                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy( orderBy) };
-                if (orderDirection == Direction.Ascending)
-                {
-                    sql = sql.OrderBy(orderByParams);
-                }
-                else
-                {
-                    sql = sql.OrderByDescending(orderByParams);
-                }
-            }
+            //if (orderBy == null) throw new ArgumentNullException("orderBy");
 
-            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
-            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
-            // So we'll modify the SQL.
-            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsMember.nodeId");
+            //// Get base query
+            //var sqlBase = GetBaseQuery(false);
 
-            // Get page of results and total count
-            IEnumerable<IMember> result;
-            var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            if (totalRecords > 0)
-            {
-                // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
-                // methods OrderBy or OrderByDescending)
-                var content = GetAll(pagedResult.Items
-                    .DistinctBy(x => x.NodeId)
-                    .Select(x => x.NodeId).ToArray())
-                    .Cast<Member>()
-                    .AsQueryable();
+            //if (query == null) query = new Query<IMember>();
+            //var translator = new SqlTranslator<IMember>(sqlBase, query);
+            //var sqlQuery = translator.Translate();
 
-                // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-                if (orderDirection == Direction.Ascending)
-                {
-                    result = content.OrderBy(orderByProperty);
-                }
-                else
-                {
-                    result = content.OrderByDescending(orderByProperty);
-                }
-            }
-            else
-            {
-                result = Enumerable.Empty<IMember>();
-            }
+            //Func<Sql, string, Sql> getFilteredSql = (sql, additionalFilter) =>
+            //{
+            //    //copy to var so that the original isn't changed
+            //    var filteredSql = new Sql(sql.SQL, sql.Arguments);
+            //    // Apply filter
+            //    if (string.IsNullOrEmpty(filter) == false)
+            //    {
+            //        //TODO: Maybe other filters?
+            //        filteredSql.Append("AND (cmsMember.LoginName LIKE @0", "%" + filter + "%)");
+            //    }
+            //    if (string.IsNullOrEmpty(additionalFilter) == false)
+            //    {
+            //        filteredSql.Append("AND (" + additionalFilter + ")");
+            //    }
+            //    return filteredSql;
+            //};
 
-            return result;
+            //Func<Sql, Sql> getSortedSql = sql =>
+            //{
+            //    //copy to var so that the original isn't changed
+            //    var sortedSql = new Sql(sql.SQL, sql.Arguments);
+            //    // Apply order according to parameters
+            //    if (string.IsNullOrEmpty(orderBy) == false)
+            //    {
+            //        var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };                    
+            //        if (orderDirection == Direction.Ascending)
+            //        {
+            //            sortedSql.OrderBy(orderByParams);
+            //        }
+            //        else
+            //        {
+            //            sortedSql.OrderByDescending(orderByParams);   
+            //        }
+            //        return sortedSql;
+            //    }
+            //    return sortedSql;
+            //};
+
+            //// Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            //// but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            //// So we'll modify the SQL.
+            //var sqlNodeIds = new Sql(sqlQuery.SQL.Replace("SELECT *", "SELECT cmsMember.nodeId"), sqlQuery.Arguments);
+
+            //var sqlNodeIdsWithSort = getSortedSql(
+            //    getFilteredSql(sqlNodeIds, null));
+
+            //// Get page of results and total count
+            //IEnumerable<IMember> result;
+            //var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
+            //totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            //if (totalRecords > 0)
+            //{
+            //    var fullQuery = getSortedSql(
+            //        getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlNodeIds.SQL)));
+
+            //    var content = ProcessQuery(fullQuery)
+            //        .Cast<Member>()
+            //        .AsQueryable();
+
+            //    // Now we need to ensure this result is also ordered by the same order by clause
+            //    var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
+            //    if (orderDirection == Direction.Ascending)
+            //    {
+            //        result = content.OrderBy(orderByProperty);
+            //    }
+            //    else
+            //    {
+            //        result = content.OrderByDescending(orderByProperty);
+            //    }
+            //}
+            //else
+            //{
+            //    result = Enumerable.Empty<IMember>();
+            //}
+
+            //return result;
         }
-
-        //public IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
-        //    Sql sql, int pageIndex, int pageSize, out int totalRecords,
-        //    Func<IEnumerable<TDto>, int[]> resolveIds)
-        //{
-        //    ////If a max size is passed in, just do a normal get all!
-        //    //if (pageSize == int.MaxValue)
-        //    //{
-        //    //    var result = GetAll().ToArray();
-        //    //    totalRecords = result.Count();
-        //    //    return result;
-        //    //}
-
-        //    //// Get base query
-        //    //var sqlClause = GetBaseQuery(false);
-        //    //var translator = new SqlTranslator<IContent>(sqlClause, query);
-        //    //var sql = translator.Translate()
-        //    //                    .Where<DocumentDto>(x => x.Newest);
-
-        //    //// Apply filter
-        //    //if (!string.IsNullOrEmpty(filter))
-        //    //{
-        //    //    sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
-        //    //}
-
-        //    //// Apply order according to parameters
-        //    //if (!string.IsNullOrEmpty(orderBy))
-        //    //{
-        //    //    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-        //    //    if (orderDirection == Direction.Ascending)
-        //    //    {
-        //    //        sql = sql.OrderBy(orderByParams);
-        //    //    }
-        //    //    else
-        //    //    {
-        //    //        sql = sql.OrderByDescending(orderByParams);
-        //    //    }
-        //    //}
-
-        //    var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
-
-        //    totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-
-        //    //now that we have the member dto's we need to construct true members from the list.
-        //    if (totalRecords == 0)
-        //    {
-        //        return Enumerable.Empty<IMember>();
-        //    }
-        //    return GetAll(resolveIds(pagedResult.Items)).ToArray();
-        //}
-
+        
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
         {
             var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
@@ -823,8 +798,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 dto.ContentVersionDto.VersionId,
                 dto.ContentVersionDto.VersionDate,
                 dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId)))
-                .ToArray();
+                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId)));
 
             var propertyData = GetPropertyCollection(sql, docDefs);
 
@@ -872,7 +846,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
 
-            var properties = GetPropertyCollection(docSql, docDef);
+            var properties = GetPropertyCollection(docSql, new[] { docDef });
 
             member.Properties = properties[dto.ContentVersionDto.NodeId];
 
@@ -881,56 +855,5 @@ namespace Umbraco.Core.Persistence.Repositories
             ((Entity)member).ResetDirtyProperties(false);
             return member;
         }
-
-        //private IMember BuildFromDto(List<MemberReadOnlyDto> dtos, Sql docSql)
-        //{
-        //    if (dtos == null || dtos.Any() == false)
-        //        return null;
-        //    var dto = dtos.First();
-
-        //    var memberTypes = new Dictionary<string, IMemberType>
-        //                      {
-        //                          {
-        //                              dto.ContentTypeAlias,
-        //                              _memberTypeRepository.Get(dto.ContentTypeId)
-        //                          }
-        //                      };
-
-        //    var factory = new MemberReadOnlyFactory(memberTypes);
-        //    var member = factory.BuildEntity(dto);
-
-        //    var properties = GetPropertyCollection(docSql, new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, member.ContentType));
-
-        //    member.Properties = properties[dto.NodeId];
-
-        //    return member;
-        //}
-
-        //private IEnumerable<IMember> BuildFromDtos(List<MemberReadOnlyDto> dtos, Sql docSql)
-        //{
-        //    if (dtos == null || dtos.Any() == false)
-        //        return Enumerable.Empty<IMember>();
-
-        //    //We assume that there won't exist a lot of MemberTypes, so the following should be fairly fast
-        //    var memberTypes = new Dictionary<string, IMemberType>();
-            
-        //    //TODO: We should do an SQL 'IN' here
-        //    var memberTypeList = _memberTypeRepository.GetAll();
-        //    memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
-
-        //    var entities = new List<IMember>();
-        //    var factory = new MemberReadOnlyFactory(memberTypes);
-        //    foreach (var dto in dtos)
-        //    {
-        //        var entity = factory.BuildEntity(dto);
-
-        //        var properties = GetPropertyCollection(docSql,new DocumentDefinition(dto.NodeId, dto.VersionId, dto.UpdateDate, dto.CreateDate, entity.ContentType));
-
-        //        entity.Properties = properties[dto.NodeId];
-                
-        //        entities.Add(entity);
-        //    }
-        //    return entities;
-        //}
     }
 }

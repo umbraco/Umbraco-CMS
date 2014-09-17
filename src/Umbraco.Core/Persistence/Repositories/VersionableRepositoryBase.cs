@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -219,11 +223,106 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
+            string nodeIdSelect,
+            Func<Tuple<string, object[]>> defaultFilter,
+            Func<Sql, IEnumerable<TEntity>> processQuery,
+            string orderBy, 
+            Direction orderDirection, 
+            string filter = "")
+        {
+            if (orderBy == null) throw new ArgumentNullException("orderBy");
+
+            // Get base query
+            var sqlBase = GetBaseQuery(false);
+
+            if (query == null) query = new Query<TEntity>();
+            var translator = new SqlTranslator<TEntity>(sqlBase, query);
+            var sqlQuery = translator.Translate();
+
+            Func<Sql, string, Sql> getFilteredSql = (sql, additionalFilter) =>
+            {
+                //copy to var so that the original isn't changed
+                var filteredSql = new Sql(sql.SQL, sql.Arguments);
+                // Apply filter
+                if (string.IsNullOrEmpty(filter) == false)
+                {
+                    var f = defaultFilter();
+                    filteredSql.Append(f.Item1, f.Item2);
+                }
+                if (string.IsNullOrEmpty(additionalFilter) == false)
+                {
+                    filteredSql.Append("AND (" + additionalFilter + ")");
+                }
+                return filteredSql;
+            };
+
+            Func<Sql, Sql> getSortedSql = sql =>
+            {
+                //copy to var so that the original isn't changed
+                var sortedSql = new Sql(sql.SQL, sql.Arguments);
+                // Apply order according to parameters
+                if (string.IsNullOrEmpty(orderBy) == false)
+                {
+                    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                    if (orderDirection == Direction.Ascending)
+                    {
+                        sortedSql.OrderBy(orderByParams);
+                    }
+                    else
+                    {
+                        sortedSql.OrderByDescending(orderByParams);
+                    }
+                    return sortedSql;
+                }
+                return sortedSql;
+            };
+
+            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            // So we'll modify the SQL.
+            var sqlNodeIds = new Sql(sqlQuery.SQL.Replace("SELECT *", nodeIdSelect), sqlQuery.Arguments);
+
+            var sqlNodeIdsWithSort = getSortedSql(
+                getFilteredSql(sqlNodeIds, null));
+
+            // Get page of results and total count
+            IEnumerable<TEntity> result;
+            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            if (totalRecords > 0)
+            {
+                var fullQuery = getSortedSql(
+                    getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlNodeIds.SQL)));
+
+                var content = processQuery(fullQuery)
+                    //.Cast<Member>()
+                    .AsQueryable();
+
+                // Now we need to ensure this result is also ordered by the same order by clause
+                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
+                if (orderDirection == Direction.Ascending)
+                {
+                    result = content.OrderBy(orderByProperty);
+                }
+                else
+                {
+                    result = content.OrderByDescending(orderByProperty);
+                }
+            }
+            else
+            {
+                result = Enumerable.Empty<TEntity>();
+            }
+
+            return result;
+        }
+
         protected IDictionary<int, PropertyCollection> GetPropertyCollection(
             Sql docSql,
-            params DocumentDefinition[] documentDefs)
+            IEnumerable<DocumentDefinition> documentDefs)
         {
-            if (documentDefs.Length <= 0) return new Dictionary<int, PropertyCollection>();
+            if (documentDefs.Any() == false) return new Dictionary<int, PropertyCollection>();
 
             //we need to parse the original SQL statement and reduce the columns to just cmsContent.nodeId, cmsContentVersion.VersionId so that we can use 
             // the statement to go get the property data for all of the items by using an inner join
@@ -231,7 +330,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //now remove everything from an Orderby clause and beyond
             if (parsedOriginalSql.InvariantContains("ORDER BY "))
             {
-                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.IndexOf("ORDER BY ", System.StringComparison.Ordinal));
+                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.IndexOf("ORDER BY ", StringComparison.Ordinal));
             }
 
             var propSql = new Sql(@"SELECT cmsPropertyData.*
@@ -264,49 +363,62 @@ ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
 
             var result = new Dictionary<int, PropertyCollection>();
 
-            foreach (var def in documentDefs)
+            var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
+
+            using (DisposableTimer.DebugDuration<VersionableRepositoryBase<TId, TEntity>>(
+                () => "Building properties for each document", () => "Finished building properties"))
             {
-                var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
+                foreach (var def in documentDefs)
+                {                    
+                    var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
 
-                var propertyFactory = new PropertyFactory(def.Composition, def.Version, def.Id, def.CreateDate, def.VersionDate);
-                var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
+                    var propertyFactory = new PropertyFactory(def.Composition, def.Version, def.Id, def.CreateDate, def.VersionDate);
+                    var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
 
-                var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
-                foreach (var property in newProperties)
-                {
-                    var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
-                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-
-                    property.Version = def.Version;
-                    property.Id = primaryKey;
-                }
-
-                foreach (var property in properties)
-                {
-                    //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-                    var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
-                    var tagSupport = TagExtractor.GetAttribute(editor);
-
-                    if (tagSupport != null)
+                    var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
+                    foreach (var property in newProperties)
                     {
-                        //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-                        var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
-                            .Distinct()
-                            .ToArray();
-                            
-                        var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+                        var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
+                        int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
 
-                        var preVals = new PreValueCollection(asDictionary);
-
-                        var contentPropData = new ContentPropertyData(property.Value,
-                            preVals,
-                            new Dictionary<string, object>());
-
-                        TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                        property.Version = def.Version;
+                        property.Id = primaryKey;
                     }
-                }
 
-                result.Add(def.Id, new PropertyCollection(properties));
+                    foreach (var property in properties)
+                    {
+                        //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
+                        var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+                        
+                        var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias) 
+                            ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
+                            : TagExtractor.GetAttribute(editor);
+
+                        if (tagSupport != null)
+                        {
+                            //add to local cache so we don't need to reflect next time for this property editor alias
+                            propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
+
+                            //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
+                            var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
+                                .Distinct()
+                                .ToArray();
+
+                            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+
+                            var preVals = new PreValueCollection(asDictionary);
+
+                            var contentPropData = new ContentPropertyData(property.Value,
+                                preVals,
+                                new Dictionary<string, object>());
+
+                            TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                        }
+                    }
+                    
+
+                    result.Add(def.Id, new PropertyCollection(properties));
+                }
             }
 
             return result;

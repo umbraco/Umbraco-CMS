@@ -796,7 +796,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var docDef = new DocumentDefinition(dto.NodeId, versionId, content.UpdateDate, content.CreateDate, contentType);
 
-            var properties = GetPropertyCollection(docSql, docDef);
+            var properties = GetPropertyCollection(docSql, new[] { docDef });
 
             content.Properties = properties[dto.NodeId];
 
