@@ -22,6 +22,10 @@
 			/// </summary>
 			public const int RecycleBinMedia = -21;
 
+		    public const int DefaultContentListViewDataTypeId = 1037;
+            public const int DefaultMediaListViewDataTypeId = 1038;
+            public const int DefaultMembersListViewDataTypeId = 1039;
+
 		}
 	}
 }
