@@ -292,16 +292,16 @@ namespace Umbraco.Core.Services
                         query.Where(member => member.Name.Equals(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Email.Contains(displayNameToMatch));
+                        query.Where(member => member.Name.Contains(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Email.StartsWith(displayNameToMatch));
+                        query.Where(member => member.Name.StartsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Email.EndsWith(displayNameToMatch));
+                        query.Where(member => member.Name.EndsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));                      
+                        query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));                      
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");

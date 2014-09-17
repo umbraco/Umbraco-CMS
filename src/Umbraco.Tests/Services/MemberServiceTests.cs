@@ -447,6 +447,23 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Find_By_Name_Starts_With()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+            
+            var customMember = MockedMember.CreateSimpleMember(memberType, "Bob", "hello@test.com", "hello", "hello");
+            ServiceContext.MemberService.Save(customMember);
+
+            int totalRecs;
+            var found = ServiceContext.MemberService.FindMembersByDisplayName("B", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+
+            Assert.AreEqual(1, found.Count());
+        }
+
+        [Test]
         public void Find_By_Email_Starts_With()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
