@@ -621,73 +621,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 "SELECT cmsDocument.nodeId",
                 ProcessQuery, orderBy, orderDirection,
                 filter.IsNullOrWhiteSpace()
-                    ? (Func<string>)null
-                    : () => "AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')");
 
-            //// Get base query
-            //var sqlClause = GetBaseQuery(false);
+                //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
+                // what we always require for a paged result, so we'll ensure it's included in the filter
 
-            //if (query == null) query = new Query<IContent>();
-            //var translator = new SqlTranslator<IContent>(sqlClause, query);
-            //var sql = translator.Translate()
-            //                    .Where<DocumentDto>(x => x.Newest);
+                    ? new Func<string>(() => "AND (cmsDocument.newest = 1)")
+                    : new Func<string>(() => "AND (cmsDocument.newest = 1) AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')"));
 
-            //// Apply filter
-            //if (string.IsNullOrEmpty(filter) == false)
-            //{
-            //    sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
-            //}
-
-            //// Apply order according to parameters
-            //if (string.IsNullOrEmpty(orderBy) == false)
-            //{
-            //    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-            //    if (orderDirection == Direction.Ascending)
-            //    {
-            //        sql = sql.OrderBy(orderByParams);
-            //    }
-            //    else
-            //    {
-            //        sql = sql.OrderByDescending(orderByParams);
-            //    }
-            //}
-
-            //// Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
-            //// but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
-            //// So we'll modify the SQL.
-            //var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
-
-            //// Get page of results and total count
-            //IEnumerable<IContent> result;
-            //var pagedResult = Database.Page<DocumentDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
-            //totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            //if (totalRecords > 0)
-            //{
-            //    // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
-            //    // methods OrderBy or OrderByDescending)
-            //    var content = GetAll(pagedResult.Items
-            //        .DistinctBy(x => x.NodeId)
-            //        .Select(x => x.NodeId).ToArray())
-            //        .Cast<Content>()
-            //        .AsQueryable();
-
-            //    // Now we need to ensure this result is also ordered by the same order by clause
-            //    var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-            //    if (orderDirection == Direction.Ascending)
-            //    {
-            //        result = content.OrderBy(orderByProperty);
-            //    }
-            //    else
-            //    {
-            //        result = content.OrderByDescending(orderByProperty);
-            //    }
-            //}
-            //else
-            //{
-            //    result = Enumerable.Empty<IContent>();
-            //}
-
-            //return result;
         }
         
         #endregion
@@ -721,6 +661,9 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
+            //nothing found
+            if (dtos.Any() == false) return Enumerable.Empty<IContent>();
+
             //content types
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
@@ -733,28 +676,34 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select(x => x.TemplateId.Value).ToArray())
                 .ToArray();
 
-            //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new DocumentDefinition(
-                dto.NodeId,
-                dto.VersionId,
-                dto.ContentVersionDto.VersionDate,
-                dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId)))
+            var dtosWithContentTypes = dtos
+                //This select into and null check are required because we don't have a foreign damn key on the contentType column
+                // http://issues.umbraco.org/issue/U4-5503
+                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId) })
+                .Where(x => x.contentType != null)
                 .ToArray();
+
+            //Go get the property data for each document
+            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
+                d.dto.NodeId,
+                d.dto.VersionId,
+                d.dto.ContentVersionDto.VersionDate,
+                d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                d.contentType));
 
             var propertyData = GetPropertyCollection(sql, docDefs);
 
-            return dtos.Select(dto => CreateContentFromDto(
-                dto,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
-                templates.FirstOrDefault(tem => tem.Id == (dto.TemplateId.HasValue ? dto.TemplateId.Value : -1)),
-                propertyData[dto.NodeId]));
+            return dtosWithContentTypes.Select(d => CreateContentFromDto(
+                d.dto,
+                contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
+                templates.FirstOrDefault(tem => tem.Id == (d.dto.TemplateId.HasValue ? d.dto.TemplateId.Value : -1)),
+                propertyData[d.dto.NodeId]));
         }
 
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="d"></param>
         /// <param name="contentType"></param>
         /// <param name="template"></param>
         /// <param name="propCollection"></param>
@@ -784,7 +733,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="d"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>

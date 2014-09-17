@@ -226,7 +226,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// A helper method for inheritors to get the paged results by query in a way that minimizes queries
         /// </summary>
-        /// <typeparam name="TDto">The type of the dto.</typeparam>
+        /// <typeparam name="TDto">The type of the d.</typeparam>
         /// <typeparam name="TContentBase">The 'true' entity type (i.e. Content, Member, etc...)</typeparam>
         /// <param name="query">The query.</param>
         /// <param name="pageIndex">Index of the page.</param>
@@ -312,6 +312,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlCount, out sqlPage);
                 //we now need to finalize/parse this query so that the args are built in to it, we know the args will only be two for this operation
                 sqlPage = sqlPage.Replace("@0", args[0].ToString()).Replace("@1", args[1].ToString());
+                //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId
+                var nodeIdSelectParts = nodeIdSelect.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                sqlPage = sqlPage.Replace("SELECT *", 
+                    //This ensures we only take the field name of the node id select and not the table name - since the resulting select
+                    // will ony work with the field name.
+                    "SELECT " + nodeIdSelectParts[nodeIdSelectParts.Length - 1]);
 
                 var fullQuery = getSortedSql(
                     getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlPage)));
@@ -386,60 +392,56 @@ ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
 
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
 
-            using (DisposableTimer.DebugDuration<VersionableRepositoryBase<TId, TEntity>>(
-                () => "Building properties for each document", () => "Finished building properties"))
+            foreach (var def in documentDefs)
             {
-                foreach (var def in documentDefs)
-                {                    
-                    var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
+                var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
 
-                    var propertyFactory = new PropertyFactory(def.Composition, def.Version, def.Id, def.CreateDate, def.VersionDate);
-                    var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
+                var propertyFactory = new PropertyFactory(def.Composition, def.Version, def.Id, def.CreateDate, def.VersionDate);
+                var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
 
-                    var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
-                    foreach (var property in newProperties)
-                    {
-                        var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
-                        int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
+                foreach (var property in newProperties)
+                {
+                    var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
+                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
 
-                        property.Version = def.Version;
-                        property.Id = primaryKey;
-                    }
-
-                    foreach (var property in properties)
-                    {
-                        //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-                        var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
-                        
-                        var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias) 
-                            ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
-                            : TagExtractor.GetAttribute(editor);
-
-                        if (tagSupport != null)
-                        {
-                            //add to local cache so we don't need to reflect next time for this property editor alias
-                            propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
-
-                            //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-                            var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
-                                .Distinct()
-                                .ToArray();
-
-                            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-
-                            var preVals = new PreValueCollection(asDictionary);
-
-                            var contentPropData = new ContentPropertyData(property.Value,
-                                preVals,
-                                new Dictionary<string, object>());
-
-                            TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
-                        }
-                    }
-                    
-
-                    result.Add(def.Id, new PropertyCollection(properties));
+                    property.Version = def.Version;
+                    property.Id = primaryKey;
                 }
+
+                foreach (var property in properties)
+                {
+                    //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
+                    var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+
+                    var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
+                        ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
+                        : TagExtractor.GetAttribute(editor);
+
+                    if (tagSupport != null)
+                    {
+                        //add to local cache so we don't need to reflect next time for this property editor alias
+                        propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
+
+                        //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
+                        var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
+                            .Distinct()
+                            .ToArray();
+
+                        var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+
+                        var preVals = new PreValueCollection(asDictionary);
+
+                        var contentPropData = new ContentPropertyData(property.Value,
+                            preVals,
+                            new Dictionary<string, object>());
+
+                        TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                    }
+                }
+
+
+                result.Add(def.Id, new PropertyCollection(properties));
             }
 
             return result;

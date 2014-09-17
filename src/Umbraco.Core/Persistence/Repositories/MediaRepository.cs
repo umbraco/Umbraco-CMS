@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -375,69 +376,13 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            // Get base query
-            var sqlClause = GetBaseQuery(false);
+            return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
+                "SELECT cmsContentVersion.contentId",
+                ProcessQuery, orderBy, orderDirection,
+                filter.IsNullOrWhiteSpace()
+                    ? (Func<string>)null
+                    : () => "AND (umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')");
 
-            if (query == null) query = new Query<IMedia>();
-            var translator = new SqlTranslator<IMedia>(sqlClause, query);
-            var sql = translator.Translate();
-
-            // Apply filter
-            if (string.IsNullOrEmpty(filter) == false)
-            {
-                sql = sql.Where("umbracoNode.text LIKE @0", "%" + filter + "%");
-            }
-
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
-            {
-                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-                if (orderDirection == Direction.Ascending)
-                {
-                    sql = sql.OrderBy(orderByParams);
-                }
-                else
-                {
-                    sql = sql.OrderByDescending(orderByParams);
-                }
-            }
-
-            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
-            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
-            // So we'll modify the SQL.
-            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsContentVersion.contentId");
-
-            // Get page of results and total count
-            IEnumerable<IMedia> result;
-            var pagedResult = Database.Page<ContentVersionDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            if (totalRecords > 0)
-            {
-                // Parse out node Ids and load media (we need the cast here in order to be able to call the IQueryable extension
-                // methods OrderBy or OrderByDescending)
-                var media = GetAll(pagedResult.Items
-                    .DistinctBy(x => x.NodeId)
-                    .Select(x => x.NodeId).ToArray())
-                    .Cast<Umbraco.Core.Models.Media>()
-                    .AsQueryable();
-
-                // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-                if (orderDirection == Direction.Ascending)
-                {
-                    result = media.OrderBy(orderByProperty);
-                }
-                else
-                {
-                    result = media.OrderByDescending(orderByProperty);
-                }
-            }
-            else
-            {
-                result = Enumerable.Empty<IMedia>();
-            }
-
-            return result;
         }
 
         private IEnumerable<IMedia> ProcessQuery(Sql sql)
@@ -449,27 +394,34 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _mediaTypeRepository.GetAll(dtos.Select(x => x.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
+            var dtosWithContentTypes = dtos
+                //This select into and null check are required because we don't have a foreign damn key on the contentType column
+                // http://issues.umbraco.org/issue/U4-5503
+                .Select(x => new { dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentDto.ContentTypeId) })
+                .Where(x => x.contentType != null)
+                .ToArray();
+
             //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new DocumentDefinition(
-                dto.NodeId,
-                dto.VersionId,
-                dto.VersionDate,
-                dto.ContentDto.NodeDto.CreateDate,
-                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId)))
+            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
+                d.dto.NodeId,
+                d.dto.VersionId,
+                d.dto.VersionDate,
+                d.dto.ContentDto.NodeDto.CreateDate,
+                d.contentType))
                 .ToArray();
 
             var propertyData = GetPropertyCollection(sql, docDefs);
 
-            return dtos.Select(dto => CreateMediaFromDto(
-                dto,
-                contentTypes.First(ct => ct.Id == dto.ContentDto.ContentTypeId),
-                propertyData[dto.NodeId]));
+            return dtosWithContentTypes.Select(d => CreateMediaFromDto(
+                d.dto,
+                contentTypes.First(ct => ct.Id == d.dto.ContentDto.ContentTypeId),
+                propertyData[d.dto.NodeId]));
         }
 
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="d"></param>
         /// <param name="contentType"></param>
         /// <param name="propCollection"></param>
         /// <returns></returns>
@@ -491,7 +443,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a media object from a ContentDto
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="d"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>

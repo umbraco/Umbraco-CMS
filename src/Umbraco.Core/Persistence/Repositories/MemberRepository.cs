@@ -707,26 +707,33 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
+            var dtosWithContentTypes = dtos
+                //This select into and null check are required because we don't have a foreign damn key on the contentType column
+                // http://issues.umbraco.org/issue/U4-5503
+                .Select(x => new {dto = x, contentType = contentTypes.FirstOrDefault(ct => ct.Id == x.ContentVersionDto.ContentDto.ContentTypeId)})
+                .Where(x => x.contentType != null)
+                .ToArray();
+
             //Go get the property data for each document
-            var docDefs = dtos.Select(dto => new DocumentDefinition(
-                dto.NodeId,
-                dto.ContentVersionDto.VersionId,
-                dto.ContentVersionDto.VersionDate,
-                dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId)));
+            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
+                d.dto.NodeId,
+                d.dto.ContentVersionDto.VersionId,
+                d.dto.ContentVersionDto.VersionDate,
+                d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                d.contentType));
 
             var propertyData = GetPropertyCollection(sql, docDefs);
 
-            return dtos.Select(dto => CreateMemberFromDto(
-                dto,
-                contentTypes.First(ct => ct.Id == dto.ContentVersionDto.ContentDto.ContentTypeId),
-                propertyData[dto.NodeId]));
+            return dtosWithContentTypes.Select(d => CreateMemberFromDto(
+                d.dto,
+                contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
+                propertyData[d.dto.NodeId]));
         }
 
         /// <summary>
         /// Private method to create a member object from a MemberDto
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="d"></param>
         /// <param name="contentType"></param>
         /// <param name="propCollection"></param>
         /// <returns></returns>
@@ -748,7 +755,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a member object from a MemberDto
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="d"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>

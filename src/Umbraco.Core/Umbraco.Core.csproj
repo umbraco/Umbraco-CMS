@@ -481,9 +481,7 @@
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\PropertyTags.cs" />
-    <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
-    <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeGroupReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeReadOnlyDto.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
@@ -529,7 +527,6 @@
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ModelFactoryConfiguration.cs" />
     <Compile Include="Persistence\Factories\MemberFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
@@ -783,7 +780,6 @@
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
-    <Compile Include="Persistence\Relators\PropertyDataRelator.cs" />
     <Compile Include="Persistence\Relators\PropertyTypePropertyGroupRelator.cs" />
     <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
