@@ -30,8 +30,15 @@ app.config(function ($routeProvider) {
                                 userService.getCurrentUser({ broadcastEvent: true }).then(function(user) {
                                     //is auth, check if we allow or reject
                                     if (isRequired) {
-                                        //this will resolve successfully so the route will continue
-                                        deferred.resolve(true);
+                                        // U4-5430, Benjamin Howarth
+                                        // We need to change the current route params if the user only has access to a single section
+                                        // To do this we need to grab the current user's allowed sections, then reject the promise with the correct path.
+                                        if (user.allowedSections.indexOf($route.current.params.section) > -1) {
+                                            //this will resolve successfully so the route will continue
+                                            deferred.resolve(true);
+                                        } else {
+                                            deferred.reject({ path: "/" + user.allowedSections[0] });
+                                        }
                                     }
                                     else {
                                         deferred.reject({ path: "/" });
