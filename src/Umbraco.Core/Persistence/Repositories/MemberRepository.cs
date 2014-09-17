@@ -648,97 +648,12 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+            return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
                 "SELECT cmsMember.nodeId",
-                //TODO: Maybe other filters?
-                () => new Tuple<string, object[]>("AND (cmsMember.LoginName LIKE @0", new object[] { "%" + filter + "%)" })
-                , ProcessQuery, orderBy, orderDirection, filter);
-
-            //if (orderBy == null) throw new ArgumentNullException("orderBy");
-
-            //// Get base query
-            //var sqlBase = GetBaseQuery(false);
-
-            //if (query == null) query = new Query<IMember>();
-            //var translator = new SqlTranslator<IMember>(sqlBase, query);
-            //var sqlQuery = translator.Translate();
-
-            //Func<Sql, string, Sql> getFilteredSql = (sql, additionalFilter) =>
-            //{
-            //    //copy to var so that the original isn't changed
-            //    var filteredSql = new Sql(sql.SQL, sql.Arguments);
-            //    // Apply filter
-            //    if (string.IsNullOrEmpty(filter) == false)
-            //    {
-            //        //TODO: Maybe other filters?
-            //        filteredSql.Append("AND (cmsMember.LoginName LIKE @0", "%" + filter + "%)");
-            //    }
-            //    if (string.IsNullOrEmpty(additionalFilter) == false)
-            //    {
-            //        filteredSql.Append("AND (" + additionalFilter + ")");
-            //    }
-            //    return filteredSql;
-            //};
-
-            //Func<Sql, Sql> getSortedSql = sql =>
-            //{
-            //    //copy to var so that the original isn't changed
-            //    var sortedSql = new Sql(sql.SQL, sql.Arguments);
-            //    // Apply order according to parameters
-            //    if (string.IsNullOrEmpty(orderBy) == false)
-            //    {
-            //        var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };                    
-            //        if (orderDirection == Direction.Ascending)
-            //        {
-            //            sortedSql.OrderBy(orderByParams);
-            //        }
-            //        else
-            //        {
-            //            sortedSql.OrderByDescending(orderByParams);   
-            //        }
-            //        return sortedSql;
-            //    }
-            //    return sortedSql;
-            //};
-
-            //// Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
-            //// but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
-            //// So we'll modify the SQL.
-            //var sqlNodeIds = new Sql(sqlQuery.SQL.Replace("SELECT *", "SELECT cmsMember.nodeId"), sqlQuery.Arguments);
-
-            //var sqlNodeIdsWithSort = getSortedSql(
-            //    getFilteredSql(sqlNodeIds, null));
-
-            //// Get page of results and total count
-            //IEnumerable<IMember> result;
-            //var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
-            //totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            //if (totalRecords > 0)
-            //{
-            //    var fullQuery = getSortedSql(
-            //        getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlNodeIds.SQL)));
-
-            //    var content = ProcessQuery(fullQuery)
-            //        .Cast<Member>()
-            //        .AsQueryable();
-
-            //    // Now we need to ensure this result is also ordered by the same order by clause
-            //    var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-            //    if (orderDirection == Direction.Ascending)
-            //    {
-            //        result = content.OrderBy(orderByProperty);
-            //    }
-            //    else
-            //    {
-            //        result = content.OrderByDescending(orderByProperty);
-            //    }
-            //}
-            //else
-            //{
-            //    result = Enumerable.Empty<IMember>();
-            //}
-
-            //return result;
+                ProcessQuery, orderBy, orderDirection,
+                filter.IsNullOrWhiteSpace()
+                    ? (Func<string>) null
+                    : () => "AND (cmsMember.LoginName LIKE '%" + filter + "%')");
         }
         
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)

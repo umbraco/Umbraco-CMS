@@ -223,13 +223,29 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
+        /// <summary>
+        /// A helper method for inheritors to get the paged results by query in a way that minimizes queries
+        /// </summary>
+        /// <typeparam name="TDto">The type of the dto.</typeparam>
+        /// <typeparam name="TContentBase">The 'true' entity type (i.e. Content, Member, etc...)</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="pageIndex">Index of the page.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <param name="totalRecords">The total records.</param>
+        /// <param name="nodeIdSelect">The SQL select statement fragment to return the node id from the query</param>
+        /// <param name="defaultFilter">A callback to create the default filter to be applied if there is one</param>
+        /// <param name="processQuery">A callback to process the query result</param>
+        /// <param name="orderBy">The order by column</param>
+        /// <param name="orderDirection">The order direction.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">orderBy</exception>
+        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto,TContentBase>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
             string nodeIdSelect,
-            Func<Tuple<string, object[]>> defaultFilter,
             Func<Sql, IEnumerable<TEntity>> processQuery,
             string orderBy, 
-            Direction orderDirection, 
-            string filter = "")
+            Direction orderDirection,
+            Func<string> defaultFilter = null)
+            where TContentBase : class, IAggregateRoot, TEntity
         {
             if (orderBy == null) throw new ArgumentNullException("orderBy");
 
@@ -245,10 +261,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 //copy to var so that the original isn't changed
                 var filteredSql = new Sql(sql.SQL, sql.Arguments);
                 // Apply filter
-                if (string.IsNullOrEmpty(filter) == false)
+                if (defaultFilter != null)
                 {
-                    var f = defaultFilter();
-                    filteredSql.Append(f.Item1, f.Item2);
+                    filteredSql.Append(defaultFilter());
                 }
                 if (string.IsNullOrEmpty(additionalFilter) == false)
                 {
@@ -283,8 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // So we'll modify the SQL.
             var sqlNodeIds = new Sql(sqlQuery.SQL.Replace("SELECT *", nodeIdSelect), sqlQuery.Arguments);
 
-            var sqlNodeIdsWithSort = getSortedSql(
-                getFilteredSql(sqlNodeIds, null));
+            var sqlNodeIdsWithSort = getSortedSql(getFilteredSql(sqlNodeIds, null));
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -292,11 +306,18 @@ namespace Umbraco.Core.Persistence.Repositories
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
             if (totalRecords > 0)
             {
+                //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
+                var args = new object[0];
+                string sqlCount, sqlPage;
+                Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlCount, out sqlPage);
+                //we now need to finalize/parse this query so that the args are built in to it, we know the args will only be two for this operation
+                sqlPage = sqlPage.Replace("@0", args[0].ToString()).Replace("@1", args[1].ToString());
+
                 var fullQuery = getSortedSql(
-                    getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlNodeIds.SQL)));
+                    getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlPage)));
 
                 var content = processQuery(fullQuery)
-                    //.Cast<Member>()
+                    .Cast<TContentBase>()
                     .AsQueryable();
 
                 // Now we need to ensure this result is also ordered by the same order by clause
@@ -330,7 +351,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //now remove everything from an Orderby clause and beyond
             if (parsedOriginalSql.InvariantContains("ORDER BY "))
             {
-                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.IndexOf("ORDER BY ", StringComparison.Ordinal));
+                parsedOriginalSql = parsedOriginalSql.Substring(0, parsedOriginalSql.LastIndexOf("ORDER BY ", StringComparison.Ordinal));
             }
 
             var propSql = new Sql(@"SELECT cmsPropertyData.*

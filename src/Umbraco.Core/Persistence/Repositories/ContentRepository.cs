@@ -617,70 +617,77 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            // Get base query
-            var sqlClause = GetBaseQuery(false);
+            return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
+                "SELECT cmsDocument.nodeId",
+                ProcessQuery, orderBy, orderDirection,
+                filter.IsNullOrWhiteSpace()
+                    ? (Func<string>)null
+                    : () => "AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')");
 
-            if (query == null) query = new Query<IContent>();
-            var translator = new SqlTranslator<IContent>(sqlClause, query);
-            var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Newest);
+            //// Get base query
+            //var sqlClause = GetBaseQuery(false);
 
-            // Apply filter
-            if (string.IsNullOrEmpty(filter) == false)
-            {
-                sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
-            }
+            //if (query == null) query = new Query<IContent>();
+            //var translator = new SqlTranslator<IContent>(sqlClause, query);
+            //var sql = translator.Translate()
+            //                    .Where<DocumentDto>(x => x.Newest);
 
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
-            {
-                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-                if (orderDirection == Direction.Ascending)
-                {
-                    sql = sql.OrderBy(orderByParams);
-                }
-                else
-                {
-                    sql = sql.OrderByDescending(orderByParams);
-                }
-            }
+            //// Apply filter
+            //if (string.IsNullOrEmpty(filter) == false)
+            //{
+            //    sql = sql.Where("cmsDocument.text LIKE @0", "%" + filter + "%");
+            //}
 
-            // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
-            // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
-            // So we'll modify the SQL.
-            var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
+            //// Apply order according to parameters
+            //if (string.IsNullOrEmpty(orderBy) == false)
+            //{
+            //    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+            //    if (orderDirection == Direction.Ascending)
+            //    {
+            //        sql = sql.OrderBy(orderByParams);
+            //    }
+            //    else
+            //    {
+            //        sql = sql.OrderByDescending(orderByParams);
+            //    }
+            //}
 
-            // Get page of results and total count
-            IEnumerable<IContent> result;
-            var pagedResult = Database.Page<DocumentDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
-            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            if (totalRecords > 0)
-            {
-                // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
-                // methods OrderBy or OrderByDescending)
-                var content = GetAll(pagedResult.Items
-                    .DistinctBy(x => x.NodeId)
-                    .Select(x => x.NodeId).ToArray())
-                    .Cast<Content>()
-                    .AsQueryable();
+            //// Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
+            //// but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
+            //// So we'll modify the SQL.
+            //var modifiedSQL = sql.SQL.Replace("SELECT *", "SELECT cmsDocument.nodeId");
 
-                // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-                if (orderDirection == Direction.Ascending)
-                {
-                    result = content.OrderBy(orderByProperty);
-                }
-                else
-                {
-                    result = content.OrderByDescending(orderByProperty);
-                }
-            }
-            else
-            {
-                result = Enumerable.Empty<IContent>();
-            }
+            //// Get page of results and total count
+            //IEnumerable<IContent> result;
+            //var pagedResult = Database.Page<DocumentDto>(pageIndex + 1, pageSize, modifiedSQL, sql.Arguments);
+            //totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+            //if (totalRecords > 0)
+            //{
+            //    // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
+            //    // methods OrderBy or OrderByDescending)
+            //    var content = GetAll(pagedResult.Items
+            //        .DistinctBy(x => x.NodeId)
+            //        .Select(x => x.NodeId).ToArray())
+            //        .Cast<Content>()
+            //        .AsQueryable();
 
-            return result;
+            //    // Now we need to ensure this result is also ordered by the same order by clause
+            //    var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
+            //    if (orderDirection == Direction.Ascending)
+            //    {
+            //        result = content.OrderBy(orderByProperty);
+            //    }
+            //    else
+            //    {
+            //        result = content.OrderByDescending(orderByProperty);
+            //    }
+            //}
+            //else
+            //{
+            //    result = Enumerable.Empty<IContent>();
+            //}
+
+            //return result;
         }
         
         #endregion

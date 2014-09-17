@@ -140,49 +140,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test, NUnit.Framework.Ignore]
-        public void MemberRepository_Can_Perform_GetByQuery_With_Property_Value()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
-            {
-
-                // Act
-                var query = Query<IMember>.Builder.Where(x => ((Member) x).ShortStringPropertyValue.EndsWith("piquet_h"));
-                var result = repository.GetByQuery(query);
-
-                // Assert
-                Assert.That(result.Any(x => x == null), Is.False);
-                Assert.That(result.Count(), Is.EqualTo(1));
-                Assert.That(result.First().Id, Is.EqualTo(1341));
-            }
-        }
-
-        [Test, NUnit.Framework.Ignore]
-        public void MemberRepository_Can_Perform_GetByQuery_With_Property_Alias_And_Value()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            MemberTypeRepository memberTypeRepository;
-            MemberGroupRepository memberGroupRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
-            {
-
-                // Act
-                var query = Query<IMember>.Builder.Where(x => ((Member) x).LongStringPropertyValue.Contains("1095") && ((Member) x).PropertyTypeAlias == "headshot");
-                var result = repository.GetByQuery(query);
-
-                // Assert
-                Assert.That(result.Any(x => x == null), Is.False);
-                Assert.That(result.Count(), Is.EqualTo(5));
-            }
-        }
-
         [Test]
         public void Can_Persist_Member()
         {
