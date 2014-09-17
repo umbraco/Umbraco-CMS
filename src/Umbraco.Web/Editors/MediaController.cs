@@ -78,7 +78,7 @@ namespace Umbraco.Web.Editors
             var mapped = Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
-            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == "umbContainerView");
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
             mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
             return mapped;
         }

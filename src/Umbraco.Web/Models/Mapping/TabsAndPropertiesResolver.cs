@@ -121,57 +121,32 @@ namespace Umbraco.Web.Models.Mapping
              where TPersisted : IContentBase
         {
 
-            var listViewProp = display.Properties.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyTypes.ListViewPropertyAlias);
+            var listViewTab = new Tab<ContentPropertyDisplay>();
+            listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
+            listViewTab.Label = ui.Text("content", "childItems");
+            listViewTab.Id = 25;
+            listViewTab.IsActive = true;
 
-            //check if the list view property is already there (it should be with 7.2+)
-            if (listViewProp != null)
+            var listViewProperties = new List<ContentPropertyDisplay>();
+            listViewProperties.Add(new ContentPropertyDisplay
             {
-                //ensure label is hidden
-                listViewProp.HideLabel = true;
-                listViewProp.Value = null;
-                listViewProp.Label = "";
-
-                var defaultViewTab = display.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
-                if (defaultViewTab != null)
-                {
-                    //it's the default one, so localize the name
-                    defaultViewTab.Label = ui.Text("content", "childItems");
-                }
-            }
-            else 
-            {
-                //something is a bit strange with the data, there should def be a list view property but seeing as there is not, we'll put a warning
-                // in the log and create one dynamically like we did pre 7.2
-
-                LogHelper.Warn<TabsAndPropertiesResolver>("No list view property type was found on the content item, a dynamic one will be created. Since 7.2.0 there should be a real list view property type on a list view content type");
-                
-                var listViewTab = new Tab<ContentPropertyDisplay>();
-                listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
-                listViewTab.Label = ui.Text("content", "childItems");
-                listViewTab.Id = 25;
-                listViewTab.IsActive = true;
-
-                var listViewProperties = new List<ContentPropertyDisplay>();
-                listViewProperties.Add(new ContentPropertyDisplay
-                {
-                    Alias = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
-                    Label = "",
-                    Value = null,
-                    View = "listview",
-                    HideLabel = true,
-                    Config = new Dictionary<string, object>
+                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Label = "",
+                Value = null,
+                View = "listview",
+                HideLabel = true,
+                Config = new Dictionary<string, object>
                     {
                         {"entityType", entityType}
                     }
-                });
-                listViewTab.Properties = listViewProperties;
+            });
+            listViewTab.Properties = listViewProperties;
 
-                //Is there a better way?
-                var tabs = new List<Tab<ContentPropertyDisplay>>();
-                tabs.Add(listViewTab);
-                tabs.AddRange(display.Tabs);
-                display.Tabs = tabs;
-            }
+            //Is there a better way?
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
+            tabs.Add(listViewTab);
+            tabs.AddRange(display.Tabs);
+            display.Tabs = tabs;
 
         }
 
