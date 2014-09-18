@@ -130,7 +130,7 @@ namespace Umbraco.Web.Models.Mapping
                 case "media":
                     dtdId = Constants.System.DefaultMediaListViewDataTypeId;
                     break;
-                case "members":
+                case "member":
                     dtdId = Constants.System.DefaultMembersListViewDataTypeId;
                     break;
                 default:

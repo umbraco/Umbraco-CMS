@@ -42,7 +42,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
     $scope.removeField = function(e) {
         $scope.model.value = _.reject($scope.model.value, function (x) {
             return x.alias === e.alias;
-        });
+        }); 
     }
 
     //now we'll localize these strings, for some reason the directive doesn't work inside of the select group with an ng-model declared
@@ -50,6 +50,16 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         var key = $scope.getLocalizedKey(e.value);
         localizationService.localize(key).then(function (v) {
             e.name = v;
+
+            switch (e.value) {
+                case "updater":
+                    e.name += " (Content only)";
+                    break;
+                case "published":
+                    e.name += " (Content only)";
+                    break;
+            }
+
         });
     });
 

@@ -659,6 +659,21 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                if (memberTypeAlias == null)
+                {
+                    return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);    
+                }
+                var query = new Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);    
+            }
+        }
+
         /// <summary>
         /// Gets the count of Members by an optional MemberType alias
         /// </summary>

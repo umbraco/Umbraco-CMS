@@ -10,8 +10,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
     //setup scope vars
     $scope.defaultButton = null;
-    $scope.subButtons = [];
-    $scope.nav = navigationService;
+    $scope.subButtons = [];    
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
 

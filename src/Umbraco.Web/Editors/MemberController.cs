@@ -18,8 +18,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -68,6 +70,60 @@ namespace Umbraco.Web.Editors
         protected MembershipScenario MembershipScenario
         {
             get { return Services.MemberService.GetMembershipScenario(); }
+        }
+
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMember>> GetPagedResults(            
+            int pageNumber = 1,
+            int pageSize = 100,
+            string orderBy = "Name",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "",
+            string memberTypeAlias = null)
+        {
+            int totalChildren;
+            IMember[] children;
+            if (pageNumber > 0 && pageSize > 0)
+            {
+                children = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
+            }
+            else
+            {
+                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+            }
+
+            if (totalChildren == 0)
+            {
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMember>>(0, 0, 0);
+            }
+
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMember>>(totalChildren, pageNumber, pageSize);
+            pagedResult.Items = children
+                .Select(Mapper.Map<IMember, ContentItemBasic<ContentPropertyBasic, IMember>>);
+
+            return pagedResult;
+        }
+
+        /// <summary>
+        /// Returns a display node with a list view to render members
+        /// </summary>
+        /// <param name="listName"></param>
+        /// <returns></returns>
+        public MemberListDisplay GetListNodeDisplay(string listName)
+        {
+            var display = new MemberListDisplay
+            {
+                ContentTypeAlias = listName,
+                ContentTypeName = listName,
+                Id = listName,
+                IsContainer = true,
+                Name = listName,
+                Path = "-1," + listName,
+                ParentId = -1
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "member", Services.DataTypeService);
+
+            return display;
         }
 
         /// <summary>

@@ -11,6 +11,11 @@ namespace Umbraco.Core
 		/// </summary>
 		public static class Conventions
 		{
+		    public static class DataTypes
+		    {
+		        public const string ListViewPrefix = "List View - ";
+		    }
+
 		    public static class PropertyGroups
 		    {
 		        public const string ListViewGroupName = "umbContainerView";

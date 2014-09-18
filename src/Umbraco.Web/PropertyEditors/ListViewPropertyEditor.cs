@@ -44,13 +44,15 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
-            [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html")]
+            [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
+                Description = "The default sort order for the list")]
             public int OrderBy { get; set; }
 
             [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
 
-            [PreValueField("includeProperties", "Include Properties", "views/propertyeditors/listview/includeproperties.prevalues.html")]
+            [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html", 
+                Description = "The properties that will be displayed for each column")]
             public object IncludeProperties { get; set; }
         }
 

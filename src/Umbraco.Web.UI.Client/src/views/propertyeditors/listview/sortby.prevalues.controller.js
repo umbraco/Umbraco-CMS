@@ -15,6 +15,15 @@ function sortByPreValsController($rootScope, $scope, localizationService) {
     _.each($scope.sortByFields, function (e, i) {
         localizationService.localize(e.key).then(function (v) {
             e.name = v;
+
+            switch (e.value) {
+                case "Updater":
+                    e.name += " (Content only)";
+                    break;
+                case "Published":
+                    e.name += " (Content only)";
+                    break;
+            }
         });
     });
 

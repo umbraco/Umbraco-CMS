@@ -7,8 +7,9 @@
 
         <umb-header>
 
-            <div class="span7">
+            <div class="span7">                
                 <umb-content-name
+                    ng-disabled="content.isSystem == 1"
                     placeholder="@placeholders_entername"
                     ng-model="content.name"/>
             </div>

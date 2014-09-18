@@ -9,19 +9,35 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         return;
     }
 
-    //Now we need to check if this is for media or content because that will depend on the resources we use
-    //TODO: Check for members!!
-    var contentResource, contentTypeResource;
+    //Now we need to check if this is for media, members or content because that will depend on the resources we use
+    var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback;
     
-    if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
-        contentResource = $injector.get('mediaResource');
-        contentTypeResource = $injector.get('mediaTypeResource');
-        $scope.entityType = "media";
+    if ($scope.model.config.entityType && $scope.model.config.entityType === "member") {
+        contentResource = $injector.get('memberResource');
+        getContentTypesCallback = $injector.get('memberTypeResource').getTypes;
+        getListResultsCallback = contentResource.getPagedResults;
+        deleteItemCallback = contentResource.deleteByKey;
+        getIdCallback = function(selected) {
+            return selected.key;
+        }
+        $scope.entityType = "member";
     }
     else {
-        contentResource = $injector.get('contentResource');
-        contentTypeResource = $injector.get('contentTypeResource');
-        $scope.entityType = "content";
+        if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
+            contentResource = $injector.get('mediaResource');
+            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;            
+            $scope.entityType = "media";
+        }
+        else {
+            contentResource = $injector.get('contentResource');
+            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
+            $scope.entityType = "content";
+        }
+        getListResultsCallback = contentResource.getChildren;
+        deleteItemCallback = contentResource.deleteById;
+        getIdCallback = function (selected) {
+            return selected.id;
+        }
     }
 
     $scope.isNew = false;
@@ -116,7 +132,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     with simple values */
 
     $scope.reloadView = function(id) {
-        contentResource.getChildren(id, $scope.options).then(function(data) {
+        getListResultsCallback(id, $scope.options).then(function (data) {
             $scope.listViewResultSet = data;
 
             //update all values for display
@@ -196,7 +212,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             for (var i = 0; i < selected.length; i++) {
                 $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
-                contentResource.deleteById(selected[i].id).then(function(data) {
+                deleteItemCallback(getIdCallback(selected[i])).then(function (data) {
                     if (current === total) {
                         notificationsService.success("Bulk action", "Deleted " + total + "documents");
                         $scope.bulkStatus = "";
@@ -226,7 +242,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         for (var i = 0; i < selected.length; i++) {
             $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
 
-            contentResource.publishById(selected[i].id)
+            contentResource.publishById(getIdCallback(selected[i]))
                 .then(function(content) {
                     if (current == total) {
                         notificationsService.success("Bulk action", "Published " + total + "documents");
@@ -269,7 +285,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         for (var i = 0; i < selected.length; i++) {
             $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
 
-            contentResource.unPublish(selected[i].id)
+            contentResource.unPublish(getIdCallback(selected[i]))
                 .then(function(content) {
 
                     if (current == total) {
@@ -356,7 +372,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     function initView() {
         if ($routeParams.id) {
             $scope.pagination = new Array(10);
-            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+            $scope.listViewAllowedTypes = getContentTypesCallback($routeParams.id);
 
             $scope.contentId = $routeParams.id;
             $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";

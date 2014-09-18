@@ -7,6 +7,14 @@ using Umbraco.Core.Models.Membership;
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
+    /// A model representing a member list to be displayed in the back office
+    /// </summary>
+    [DataContract(Name = "content", Namespace = "")]
+    public class MemberListDisplay : ContentItemDisplayBase<ContentPropertyDisplay, IMember>
+    {
+    }
+
+    /// <summary>
     /// A model representing a member to be displayed in the back office
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
