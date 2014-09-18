@@ -59,6 +59,23 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
         }
 
+        public IEnumerable<DataTypeDisplay> GetAll()
+        {
+            var dataType = Services.DataTypeService.GetAllDataTypeDefinitions();
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return dataType
+                .Select(s => Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(s));
+        }
+        
+        public IEnumerable<ContentPropertyDisplay> GetAllPropertyEditors()
+        {
+            return PropertyEditorResolver.Current.PropertyEditors
+                .Select(s => Mapper.Map<PropertyEditor, ContentPropertyDisplay>(s));
+        }
+
         /// <summary>
         /// Deletes a data type wth a given ID
         /// </summary>

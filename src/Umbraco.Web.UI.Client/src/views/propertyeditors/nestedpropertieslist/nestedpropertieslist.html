@@ -1,0 +1,25 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.NestedPropertiesListController" class="umb-editor umb-nestedpropertieslist">
+    <div ui-sortable ng-model="value">
+    <div class="control-group" ng-repeat="item in value">
+    			<i class="icon icon-navigation handle"></i>
+       
+        <umb-property 
+            property="property"
+            ng-repeat="property in item">
+            <umb-editor model="property" ></umb-editor>
+        </umb-property>
+        
+        <a prevent-default href="" title="Remove this item"
+            ng-show="value.length > model.config.min"
+            ng-click="remove($index)">
+            <i class="icon icon-remove"></i>
+        </a>
+    </div>
+	</div>
+
+    <a prevent-default href="" title="Add another item"
+        ng-show="model.config.max <= 0 || value.length < model.config.max"
+        ng-click="add()">
+        <i class="icon icon-add"></i>
+    </a>
+</div>
