@@ -143,6 +143,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.reloadView($scope.contentId);
     }, 100);
 
+    $scope.enterSearch = function($event) {
+        $($event.target).next().focus();
+    }
+
     $scope.selectAll = function($event) {
         var checkbox = $event.target;
         if (!angular.isArray($scope.listViewResultSet.items)) {
