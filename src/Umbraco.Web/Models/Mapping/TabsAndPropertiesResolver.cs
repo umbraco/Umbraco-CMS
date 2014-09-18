@@ -7,6 +7,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 
@@ -117,9 +118,33 @@ namespace Umbraco.Web.Models.Mapping
         /// <typeparam name="TPersisted"></typeparam>
         /// <param name="display"></param>
         /// <param name="entityType">This must be either 'content' or 'media'</param>
-        internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType)
+        internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType, IDataTypeService dataTypeService)
              where TPersisted : IContentBase
         {
+            int dtdId;
+            switch (entityType)
+            {
+                case "content":
+                    dtdId = Constants.System.DefaultContentListViewDataTypeId;
+                    break;
+                case "media":
+                    dtdId = Constants.System.DefaultMediaListViewDataTypeId;
+                    break;
+                case "members":
+                    dtdId = Constants.System.DefaultMembersListViewDataTypeId;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("entityType does not match a required value");
+            }
+
+            var dt = dataTypeService.GetDataTypeDefinitionById(dtdId);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dtdId);
+
+            var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
+            if (editor == null)
+            {
+                throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
+            }
 
             var listViewTab = new Tab<ContentPropertyDisplay>();
             listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
@@ -127,18 +152,19 @@ namespace Umbraco.Web.Models.Mapping
             listViewTab.Id = 25;
             listViewTab.IsActive = true;
 
+            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
+            //add the entity type to the config
+            listViewConfig["entityType"] = entityType;
+
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
             {
                 Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                 Label = "",
                 Value = null,
-                View = "listview",
+                View = editor.ValueEditor.View,
                 HideLabel = true,
-                Config = new Dictionary<string, object>
-                    {
-                        {"entityType", entityType}
-                    }
+                Config = listViewConfig
             });
             listViewTab.Properties = listViewProperties;
 

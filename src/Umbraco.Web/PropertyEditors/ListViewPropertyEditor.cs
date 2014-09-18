@@ -24,14 +24,14 @@ namespace Umbraco.Web.PropertyEditors
                 return new Dictionary<string, object>
                 {
                     {"pageSize", "10"},
-                    {"orderBy", "sortOrder"},
+                    {"orderBy", "SortOrder"},
                     {"orderDirection", "asc"},
                     {
                         "includeProperties", new[]
                         {
                             new {alias = "sortOrder", header = "Sort order", isSystem = 1},
                             new {alias = "updateDate", header = "Last edited", isSystem = 1},
-                            new {alias = "updater", header = "Last edited by", isSystem = 1}
+                            new {alias = "owner", header = "Created by", isSystem = 1}
                         }
                     }
                 };
