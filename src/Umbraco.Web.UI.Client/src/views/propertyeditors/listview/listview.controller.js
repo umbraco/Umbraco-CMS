@@ -35,10 +35,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: 1,
         filter: '',
-        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'updateDate').trim(),
+        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
         orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
         includeProperties: $scope.model.config.includeProperties ? $scope.model.config.includeProperties : [
-            { alias: 'updateDate', header: 'Last edited', isSystem : 1 },
+            { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
             { alias: 'updater', header: 'Last edited by', isSystem: 1 }
         ],
         allowBulkPublish: true,

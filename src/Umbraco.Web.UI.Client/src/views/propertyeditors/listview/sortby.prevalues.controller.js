@@ -3,7 +3,7 @@ function sortByPreValsController($rootScope, $scope, localizationService) {
     $scope.sortByFields = [
         { value: "SortOrder", key: "general_sort" },
         { value: "Name", key: "general_name" },
-        { value: "UpdateDate", key: "content_updateDate" },
+        { value: "VersionDate", key: "content_updateDate" },
         { value: "Updater", key: "content_updatedBy" },
         { value: "CreateDate", key: "content_createDate" },
         { value: "Owner", key: "content_createBy" },
