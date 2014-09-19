@@ -6,22 +6,22 @@
 
  // Sortabel
  // -------------------------
- .usky-grid .ui-sortable-helper  {
-     border: dashed 1px #000;
-     background: #ccc;
-     opacity: 0.4;
-     height: 50px !important;
-     overflow: hidden;
-     padding: 5px;
- }
+.usky-grid .ui-sortable-helper{
+    -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+    -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+    box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
 
- .usky-grid .ui-sortable-helper *{
-     border: none !important;
-     background: none !important;
-     color: #999 !important;
-     padding: 0 !important;
-     margin: 0 !important;    
- }
+    border: solid 1px #ccc;
+    background: white !important;
+    height: 50px !important;
+    overflow: hidden;
+    padding: 5px;
+    z-index: 1000;
+}
+
+.usky-grid .ui-sortable-helper *{
+    display: none !important;
+}
 
  .usky-grid .ui-sortable-helper .cell-tools{
      display: none !important;
