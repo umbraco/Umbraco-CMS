@@ -866,18 +866,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             out cms.businesslogic.datatype.DataTypeDefinition[] filteredDefinitions)
         {
             filteredDefinitions = allDtds;
-
-            //special case if this is a list view, if so, filter the dtd's to only include other list view types,
-            // don't allow editing of anything except for the tab and data type
-            if (pt.Alias == Constants.Conventions.PropertyTypes.ListViewPropertyAlias)
-            {
-                //filter the dtds to only list view
-                filteredDefinitions = allDtds.Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.ListViewAlias).ToArray();
-
-                var gpw = new GenericPropertyWrapper(false, true, false, true, false, false, false);
-                return gpw;
-            }
-
+            
             //not editable if any of the built in member types
             if (_contentType.ContentTypeItem is IMemberType)
             {

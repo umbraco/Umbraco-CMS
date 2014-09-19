@@ -13,11 +13,9 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Strategies.Migrations
 {
     /// <summary>
-    /// Once the migration runner is run, this will ensure that the content types that are flagged as list views,
-    /// have the special readonly list view property type on the readonly tab. This will ensure that the built in system list view data type exists if the 
-    /// current version is less than 7.2 (because previous to 7.2 we didn't ship with the system created list view data type)
+    /// Creates the built in list view data types
     /// </summary>
-    public class EnsureAllListViewContentTypesHaveListViewPropertyType : ApplicationEventHandler
+    public class EnsureDefaultListViewDataTypesCreated : ApplicationEventHandler
     {
         /// <summary>
         /// Ensure this is run when not configured
@@ -52,17 +50,7 @@ namespace Umbraco.Web.Strategies.Migrations
             if (e.ConfiguredVersion <= target720)
             {
                 EnsureListViewDataTypeCreated(e);
-
-                var services = ApplicationContext.Current.Services;
-
-                var contentTypes = services.ContentTypeService.GetAllContentTypes().Where(x => x.IsContainer);                                
-                services.ContentTypeService.Save(AddListView(contentTypes));
-
-                var mediaTypes = services.ContentTypeService.GetAllMediaTypes().Where(x => x.IsContainer);
-                services.ContentTypeService.Save(AddListView(mediaTypes));
-
-                var memberTypes = services.MemberTypeService.GetAll().Where(x => x.IsContainer);
-                services.MemberTypeService.Save(AddListView(memberTypes));
+                
             }
         }
 
@@ -77,21 +65,9 @@ namespace Umbraco.Web.Strategies.Migrations
                 if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
                     e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
 
-                e.MigrationContext.Database
-                    .Insert("umbracoNode", "id", false, new NodeDto
-                    {
-                        NodeId = 1037,
-                        Trashed = false,
-                        ParentId = -1,
-                        UserId = 0,
-                        Level = 1,
-                        Path = "-1,1037",
-                        SortOrder = 2,
-                        UniqueId = new Guid("C0808DD3-8133-4E4B-8CE8-E2BEA84A96A4"),
-                        Text = "List View",
-                        NodeObjectType = new Guid(Constants.ObjectTypes.DataType),
-                        CreateDate = DateTime.Now
-                    });
+                e.MigrationContext.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = Constants.System.DefaultContentListViewDataTypeId, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,-95", SortOrder = 2, UniqueId = new Guid("C0808DD3-8133-4E4B-8CE8-E2BEA84A96A4"), Text = Constants.Conventions.DataTypes.ListViewPrefix + "Content", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
+                e.MigrationContext.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = Constants.System.DefaultMediaListViewDataTypeId, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,-96", SortOrder = 2, UniqueId = new Guid("3A0156C4-3B8C-4803-BDC1-6871FAA83FFF"), Text = Constants.Conventions.DataTypes.ListViewPrefix + "Media", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
+                e.MigrationContext.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = Constants.System.DefaultMembersListViewDataTypeId, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,-97", SortOrder = 2, UniqueId = new Guid("AA2C52A0-CE87-4E65-A47C-7DF09358585D"), Text = Constants.Conventions.DataTypes.ListViewPrefix + "Members", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });                                    
 
                 //Turn off identity insert if db provider is not mysql
                 if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
@@ -101,14 +77,9 @@ namespace Umbraco.Web.Strategies.Migrations
                 if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
                     e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
 
-                e.MigrationContext.Database
-                    .Insert("cmsDataType", "pk", false, new DataTypeDto
-                    {
-                        PrimaryKey = 19,
-                        DataTypeId = 1037,
-                        PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias,
-                        DbType = "Nvarchar"
-                    });
+                e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 26, DataTypeId = Constants.System.DefaultContentListViewDataTypeId, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 27, DataTypeId = Constants.System.DefaultMediaListViewDataTypeId, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 28, DataTypeId = Constants.System.DefaultMembersListViewDataTypeId, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });            
 
                 //Turn off identity insert if db provider is not mysql
                 if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
@@ -118,33 +89,6 @@ namespace Umbraco.Web.Strategies.Migrations
             }
         }
 
-        private static List<T> AddListView<T>(IEnumerable<T> contentTypes)
-            where T: IContentTypeBase
-        {
-            var toSave = new List<T>();
-            foreach (var contentType in contentTypes)
-            {
-                if (contentType.PropertyGroups.Contains(Constants.Conventions.PropertyGroups.ListViewGroupName) == false)
-                {
-                    contentType.PropertyGroups.Add(new PropertyGroup
-                    {
-                        Name = Constants.Conventions.PropertyGroups.ListViewGroupName,                       
-                        SortOrder = contentType.PropertyGroups.Any() ?  contentType.PropertyGroups.Max(x => x.SortOrder) + 1 : 1,
-                        PropertyTypes = new PropertyTypeCollection(new[]
-                        {
-                            new PropertyType(Constants.PropertyEditors.ListViewAlias, DataTypeDatabaseType.Nvarchar)
-                            {
-                                Alias = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
-                                Name = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
-                                DataTypeDefinitionId = 1037
-                            }
-                        })
-                    });
-                    toSave.Add(contentType);
-                }
-            }
-            return toSave;
-        }
     }
 
 }

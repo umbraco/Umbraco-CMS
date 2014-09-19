@@ -84,6 +84,7 @@
     <key alias="macroInsert">Insert macro</key>
     <key alias="pictureInsert">Insert picture</key>
     <key alias="relations">Edit relations</key>
+    <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>

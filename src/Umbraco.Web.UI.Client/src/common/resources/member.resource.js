@@ -23,7 +23,65 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        getPagedResults: function (memberTypeAlias, options) {
+
+            if (memberTypeAlias === 'all-members') {
+                memberTypeAlias = null;
+            }
+
+            var defaults = {
+                pageSize: 25,
+                pageNumber: 1,
+                filter: '',
+                orderDirection: "Ascending",
+                orderBy: "LoginName"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+            //change asc/desct
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else if (options.orderDirection === "desc") {
+                options.orderDirection = "Descending";
+            }
+
+            var params = [
+                { pageNumber: options.pageNumber },
+                { pageSize: options.pageSize },
+                { orderBy: options.orderBy },
+                { orderDirection: options.orderDirection },
+                { filter: options.filter }
+            ];
+            if (memberTypeAlias != null) {
+                params.push({ memberTypeAlias: memberTypeAlias });
+            }
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "memberApiBaseUrl",
+                       "GetPagedResults",
+                       params)),
+               'Failed to retrieve member paged result');
+        },
       
+        getListNode: function (listName) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "memberApiBaseUrl",
+                       "GetListNodeDisplay",
+                       [{ listName: listName }])),
+               'Failed to retrieve data for member list ' + listName);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.memberResource#getByKey

@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -9,21 +9,44 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         return;
     }
 
-    //Now we need to check if this is for media or content because that will depend on the resources we use
-    //TODO: Check for members!!
-    var contentResource, contentTypeResource;
+    //Now we need to check if this is for media, members or content because that will depend on the resources we use
+    var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback, createEditUrlCallback;
     
-    if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
-        contentResource = $injector.get('mediaResource');
-        contentTypeResource = $injector.get('mediaTypeResource');
-        $scope.entityType = "media";
+    if ($scope.model.config.entityType && $scope.model.config.entityType === "member") {
+        $scope.entityType = "member";
+        contentResource = $injector.get('memberResource');
+        getContentTypesCallback = $injector.get('memberTypeResource').getTypes;
+        getListResultsCallback = contentResource.getPagedResults;
+        deleteItemCallback = contentResource.deleteByKey;
+        getIdCallback = function(selected) {
+            return selected.key;
+        };
+        createEditUrlCallback = function(item) {
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.key + "?page=" + $scope.options.pageNumber + "&listName=" + $scope.contentId;
+        };
     }
     else {
-        contentResource = $injector.get('contentResource');
-        contentTypeResource = $injector.get('contentTypeResource');
-        $scope.entityType = "content";
+        if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
+            $scope.entityType = "media";
+            contentResource = $injector.get('mediaResource');
+            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;                        
+        }
+        else {
+            $scope.entityType = "content";
+            contentResource = $injector.get('contentResource');
+            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;            
+        }
+        getListResultsCallback = contentResource.getChildren;
+        deleteItemCallback = contentResource.deleteById;
+        getIdCallback = function(selected) {
+            return selected.id;
+        };
+        createEditUrlCallback = function(item) {
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id + "?page=" + $scope.options.pageNumber;
+        };
     }
 
+    $scope.pagination = [];
     $scope.isNew = false;
     $scope.actionInProgress = false;
     $scope.listViewResultSet = {
@@ -33,12 +56,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.options = {
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: 1,
+        pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: '',
-        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'updateDate').trim(),
+        orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
         orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
         includeProperties: $scope.model.config.includeProperties ? $scope.model.config.includeProperties : [
-            { alias: 'updateDate', header: 'Last edited', isSystem : 1 },
+            { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
             { alias: 'updater', header: 'Last edited by', isSystem: 1 }
         ],
         allowBulkPublish: true,
@@ -53,7 +76,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
             // to do that, we'd need to update the base query for content to include the content type alias column
-            // which requires another join and would be slower.
+            // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
             if (e.alias != "contentTypeAlias") {
                 e.allowSorting = true;
             }
@@ -74,16 +97,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
             $scope.options.pageNumber++;
             $scope.reloadView($scope.contentId);
-
-            //saveLastPageNumber();
+            //TODO: this would be nice but causes the whole view to reload
+            //$location.search("page", $scope.options.pageNumber);
         }
     };
 
     $scope.goToPage = function(pageNumber) {
         $scope.options.pageNumber = pageNumber + 1;
         $scope.reloadView($scope.contentId);
-
-        //saveLastPageNumber();
+        //TODO: this would be nice but causes the whole view to reload
+        //$location.search("page", $scope.options.pageNumber);
     };
 
     $scope.sort = function(field, allow) {
@@ -105,8 +128,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if ($scope.options.pageNumber > 1) {
             $scope.options.pageNumber--;
             $scope.reloadView($scope.contentId);
-
-            //saveLastPageNumber();
+            //TODO: this would be nice but causes the whole view to reload
+            //$location.search("page", $scope.options.pageNumber);
         }
     };
     
@@ -116,7 +139,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     with simple values */
 
     $scope.reloadView = function(id) {
-        contentResource.getChildren(id, $scope.options).then(function(data) {
+        getListResultsCallback(id, $scope.options).then(function (data) {
             $scope.listViewResultSet = data;
 
             //update all values for display
@@ -124,14 +147,47 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 setPropertyValues(e);
             });
 
-            $scope.pagination = [];
-
-            for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
-                $scope.pagination[i] = { index: i, name: i + 1 };
-            }
-
             if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
+            }
+
+            $scope.pagination = [];
+
+            //list 10 pages as per normal
+            if ($scope.listViewResultSet.totalPages <= 10) {
+                for (var i = 0; i < $scope.listViewResultSet.totalPages; i++) {
+                    $scope.pagination.push({
+                        val: (i + 1),
+                        isActive: $scope.options.pageNumber == (i + 1)
+                    });
+                }
+            }
+            else {
+                //if there is more than 10 pages, we need to do some fancy bits
+
+                //get the max index to start
+                var maxIndex = $scope.listViewResultSet.totalPages - 10;
+                //set the start, but it can't be below zero
+                var start = Math.max($scope.options.pageNumber - 5, 0);
+                //ensure that it's not too far either
+                start = Math.min(maxIndex, start);
+
+                for (var i = start; i < (10 + start) ; i++) {
+                    $scope.pagination.push({
+                        val: (i + 1),
+                        isActive: $scope.options.pageNumber == (i + 1)
+                    });
+                }
+
+                //now, if the start is greater than 0 then '1' will not be displayed, so do the elipses thing
+                if (start > 0) {
+                    $scope.pagination.unshift({ name: "First", val: 1, isActive: false }, {val: "...",isActive: false});
+                }
+
+                //same for the end
+                if (start < maxIndex) {
+                    $scope.pagination.push({ val: "...", isActive: false }, { name: "Last", val: $scope.listViewResultSet.totalPages, isActive: false });
+                }
             }
 
         });
@@ -142,6 +198,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.options.pageNumber = 1;
         $scope.reloadView($scope.contentId);
     }, 100);
+
+    $scope.enterSearch = function($event) {
+        $($event.target).next().focus();
+    }
 
     $scope.selectAll = function($event) {
         var checkbox = $event.target;
@@ -192,7 +252,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             for (var i = 0; i < selected.length; i++) {
                 $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
-                contentResource.deleteById(selected[i].id).then(function(data) {
+                deleteItemCallback(getIdCallback(selected[i])).then(function (data) {
                     if (current === total) {
                         notificationsService.success("Bulk action", "Deleted " + total + "documents");
                         $scope.bulkStatus = "";
@@ -222,7 +282,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         for (var i = 0; i < selected.length; i++) {
             $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
 
-            contentResource.publishById(selected[i].id)
+            contentResource.publishById(getIdCallback(selected[i]))
                 .then(function(content) {
                     if (current == total) {
                         notificationsService.success("Bulk action", "Published " + total + "documents");
@@ -265,7 +325,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         for (var i = 0; i < selected.length; i++) {
             $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
 
-            contentResource.unPublish(selected[i].id)
+            contentResource.unPublish(getIdCallback(selected[i]))
                 .then(function(content) {
 
                     if (current == total) {
@@ -301,6 +361,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
     function setPropertyValues(result) {
+
+        //set the edit url
+        result.editPath = createEditUrlCallback(result);
 
         _.each($scope.options.includeProperties, function (e, i) {
 
@@ -338,32 +401,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         return false;
     };
 
-    //function saveLastPageNumber() {
-    //    //TODO: Fix this up, we don't want to use $rootScope
-
-    //    // Saves the last page number into rootScope, so we can retrieve it when returning to the list and
-    //    // re-present the correct page
-    //    $rootScope.lastListViewPageViewed = {
-    //        contentId: $scope.contentId,
-    //        pageNumber: $scope.options.pageNumber
-    //    };
-    //};
-
     function initView() {
         if ($routeParams.id) {
-            $scope.pagination = new Array(10);
-            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+            $scope.listViewAllowedTypes = getContentTypesCallback($routeParams.id);
 
             $scope.contentId = $routeParams.id;
             $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
 
-            //// If we have a last page number saved, go straight to that one
-            //if ($rootScope.lastListViewPageViewed && $rootScope.lastListViewPageViewed.contentId == $scope.contentId) {
-            //    $scope.goToPage($rootScope.lastListViewPageViewed.pageNumber - 1);
-            //}
-            //else {
             $scope.reloadView($scope.contentId);
-            //}
         }
     };
 
@@ -385,6 +430,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             case "contentTypeAlias":
                 //TODO: Check for members
                 return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
+            case "email":
+                return "general_email";
+            case "username":
+                return "general_username";
         }
         return alias;
     }

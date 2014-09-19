@@ -24,14 +24,14 @@ namespace Umbraco.Web.PropertyEditors
                 return new Dictionary<string, object>
                 {
                     {"pageSize", "10"},
-                    {"orderBy", "sortOrder"},
+                    {"orderBy", "SortOrder"},
                     {"orderDirection", "asc"},
                     {
                         "includeProperties", new[]
                         {
                             new {alias = "sortOrder", header = "Sort order", isSystem = 1},
                             new {alias = "updateDate", header = "Last edited", isSystem = 1},
-                            new {alias = "updater", header = "Last edited by", isSystem = 1}
+                            new {alias = "owner", header = "Created by", isSystem = 1}
                         }
                     }
                 };
@@ -44,13 +44,15 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
-            [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html")]
+            [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
+                Description = "The default sort order for the list")]
             public int OrderBy { get; set; }
 
             [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
 
-            [PreValueField("includeProperties", "Include Properties", "views/propertyeditors/listview/includeproperties.prevalues.html")]
+            [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html", 
+                Description = "The properties that will be displayed for each column")]
             public object IncludeProperties { get; set; }
         }
 

@@ -18,8 +18,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -68,6 +70,71 @@ namespace Umbraco.Web.Editors
         protected MembershipScenario MembershipScenario
         {
             get { return Services.MemberService.GetMembershipScenario(); }
+        }
+
+        public PagedResult<MemberBasic> GetPagedResults(            
+            int pageNumber = 1,
+            int pageSize = 100,
+            string orderBy = "Name",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "",
+            string memberTypeAlias = null)
+        {
+            int totalRecords;
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+            }
+
+            if (MembershipScenario == MembershipScenario.NativeUmbraco)
+            {
+                var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
+                if (totalRecords == 0)
+                {
+                    return new PagedResult<MemberBasic>(0, 0, 0);
+                }
+                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize);
+                pagedResult.Items = members
+                    .Select(Mapper.Map<IMember, MemberBasic>);
+                return pagedResult;
+            }
+            else
+            {
+                var members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
+                if (totalRecords == 0)
+                {
+                    return new PagedResult<MemberBasic>(0, 0, 0);
+                }
+                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize);
+                pagedResult.Items = members
+                    .Cast<MembershipUser>()
+                    .Select(Mapper.Map<MembershipUser, MemberBasic>);
+                return pagedResult;
+            }
+            
+        }
+
+        /// <summary>
+        /// Returns a display node with a list view to render members
+        /// </summary>
+        /// <param name="listName"></param>
+        /// <returns></returns>
+        public MemberListDisplay GetListNodeDisplay(string listName)
+        {
+            var display = new MemberListDisplay
+            {
+                ContentTypeAlias = listName,
+                ContentTypeName = listName,
+                Id = listName,
+                IsContainer = true,
+                Name = listName == "all-members" ? "All Members" : listName,
+                Path = "-1," + listName,
+                ParentId = -1
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "member", Services.DataTypeService);
+
+            return display;
         }
 
         /// <summary>
@@ -501,6 +568,7 @@ namespace Umbraco.Web.Editors
                         contentItem.IsApproved,
                         Guid.NewGuid(), //since it's the umbraco provider, the user key here doesn't make any difference
                         out status);
+                    
                     break;
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                     //We are using a custom membership provider, we'll create an empty IMember first to get the unique id to use
@@ -535,10 +603,7 @@ namespace Umbraco.Web.Editors
                         contentItem.IsApproved,
                         newKey, 
                         out status);
-
-                    //we need to set the key back on the PersistedContent property so that the display model is returned correctly
-                    contentItem.PersistedContent.Key = newKey;
-
+                    
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -548,6 +613,10 @@ namespace Umbraco.Web.Editors
             switch (status)
             {
                 case MembershipCreateStatus.Success:
+
+                    //map the key back
+                    contentItem.Key = membershipUser.ProviderUserKey.TryConvertTo<Guid>().Result;
+                    contentItem.PersistedContent.Key = contentItem.Key;
 
                     //if the comments are there then we need to save them
                     if (contentItem.Comments.IsNullOrWhiteSpace() == false)

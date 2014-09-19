@@ -11,9 +11,9 @@ namespace Umbraco.Core
 		/// </summary>
 		public static class Conventions
 		{
-		    public static class PropertyTypes
+		    public static class DataTypes
 		    {
-		        public const string ListViewPropertyAlias = Constants.PropertyEditors.InternalGenericPropertiesPrefix + "containerView";
+		        public const string ListViewPrefix = "List View - ";
 		    }
 
 		    public static class PropertyGroups

@@ -8,8 +8,7 @@
  */
 function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState) {
 
-    //setup scope vars
-    $scope.nav = navigationService;
+    //setup scope vars    
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
 

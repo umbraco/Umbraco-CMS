@@ -27,6 +27,13 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<PreValueField, PreValueFieldDisplay>()
                 .ForMember(x => x.Value, expression => expression.Ignore());
 
+            var systemIds = new[]
+            {
+                Constants.System.DefaultContentListViewDataTypeId, 
+                Constants.System.DefaultMediaListViewDataTypeId, 
+                Constants.System.DefaultMembersListViewDataTypeId
+            };
+
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
@@ -35,7 +42,8 @@ namespace Umbraco.Web.Models.Mapping
                     definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
 
             //gets a list of PreValueFieldDisplay objects from the data type definition
             config.CreateMap<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>()

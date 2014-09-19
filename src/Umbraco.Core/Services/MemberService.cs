@@ -659,6 +659,21 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                if (memberTypeAlias == null)
+                {
+                    return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);    
+                }
+                var query = new Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);    
+            }
+        }
+
         /// <summary>
         /// Gets the count of Members by an optional MemberType alias
         /// </summary>
@@ -1311,7 +1326,15 @@ namespace Umbraco.Core.Services
 
             memType.PropertyGroups.Add(propGroup);
 
-            return new Member(name, email, username, password, memType);
+            var member = new Member(name, email, username, password, memType);
+
+            //we've assigned ids to the property types and groups but we also need to assign fake ids to the properties themselves.
+            foreach (var property in member.Properties)
+            {
+                property.Id = --identity;
+            }
+
+            return member;
         }
     }
 }

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function MemberDeleteController($scope, memberResource, treeService, navigationService) {
+function MemberDeleteController($scope, memberResource, treeService, navigationService, editorState, $location, $routeParams) {
 
     $scope.performDelete = function() {
 
@@ -16,9 +16,13 @@ function MemberDeleteController($scope, memberResource, treeService, navigationS
         memberResource.deleteByKey($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
-            //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             
+            //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
+            if (editorState.current && editorState.current.key == $scope.currentNode.id) {
+                $location.path("/member/member/list/" + ($routeParams.listName ? $routeParams.listName : 'all-members'));
+            }
+
             navigationService.hideMenu();
         });
 

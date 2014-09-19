@@ -306,6 +306,8 @@
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TuningController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Models\ContentEditing\MemberBasic.cs" />
+    <Compile Include="Models\ContentEditing\MemberListDisplay.cs" />
     <Compile Include="Models\TemplateQuery\ContentTypeModel.cs" />
     <Compile Include="Models\TemplateQuery\PropertyModel.cs" />
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />

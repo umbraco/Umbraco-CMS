@@ -13,7 +13,9 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         { value: "createDate" },
         { value: "owner" },
         { value: "published"},
-        { value: "contentTypeAlias" }
+        { value: "contentTypeAlias" },
+        { value: "email" },
+        { value: "username" }
     ];
 
     $scope.getLocalizedKey = function(alias) {
@@ -35,6 +37,10 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
             case "contentTypeAlias":
                 //NOTE: This will just be 'Document' type even if it's for media/members since this is just a pre-val editor and we don't have a key for 'Content Type Alias'
                 return "content_documentType";
+            case "email":
+                return "general_email";
+            case "username":
+                return "general_username";
         }
         return alias;
     }
@@ -42,7 +48,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
     $scope.removeField = function(e) {
         $scope.model.value = _.reject($scope.model.value, function (x) {
             return x.alias === e.alias;
-        });
+        }); 
     }
 
     //now we'll localize these strings, for some reason the directive doesn't work inside of the select group with an ng-model declared
@@ -50,6 +56,22 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         var key = $scope.getLocalizedKey(e.value);
         localizationService.localize(key).then(function (v) {
             e.name = v;
+
+            switch (e.value) {
+                case "updater":
+                    e.name += " (Content only)";
+                    break;
+                case "published":
+                    e.name += " (Content only)";
+                    break;
+                case "email":
+                    e.name += " (Members only)";
+                    break;
+                case "username":
+                    e.name += " (Members only)";
+                    break;
+            }
+
         });
     });
 

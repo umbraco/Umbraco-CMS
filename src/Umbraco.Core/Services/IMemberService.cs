@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
@@ -10,6 +12,21 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMemberService : IMembershipMemberService
     {
+        /// <summary>
+        /// Gets a list of paged <see cref="IMember"/> objects
+        /// </summary>
+        /// <remarks>An <see cref="IMember"/> can be of type <see cref="IMember"/> </remarks>
+        /// <param name="pageIndex">Current page index</param>
+        /// <param name="pageSize">Size of the page</param>
+        /// <param name="totalRecords">Total number of records found (out)</param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="memberTypeAlias"></param>
+        /// <param name="filter"></param>
+        /// <returns><see cref="IEnumerable{T}"/></returns>
+        IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
+        
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
         /// </summary>

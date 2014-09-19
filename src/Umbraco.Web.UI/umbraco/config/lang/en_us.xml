@@ -68,8 +68,7 @@
   <area alias="buttons">
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
-    <key alias="somethingElse">Do something else</key>
-    
+    <key alias="somethingElse">Do something else</key>    
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
     <key alias="formFieldInsert">Insert form field</key>
@@ -87,6 +86,7 @@
     <key alias="macroInsert">Insert macro</key>
     <key alias="pictureInsert">Insert picture</key>
     <key alias="relations">Edit relations</key>
+    <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>

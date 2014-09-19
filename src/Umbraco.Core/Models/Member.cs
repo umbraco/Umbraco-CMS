@@ -543,7 +543,10 @@ namespace Umbraco.Core.Models
             base.AddingEntity();
 
             if (Key == Guid.Empty)
+            {
                 Key = Guid.NewGuid();
+                ProviderUserKey = Key;
+            }
         }
 
         /// <summary>

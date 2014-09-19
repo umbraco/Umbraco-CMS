@@ -496,6 +496,8 @@ ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
                 case "UPDATER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "WriterId";
+                case "VERSIONDATE":
+                    return "UpdateDate";
                 default:
                     return orderBy;
             }

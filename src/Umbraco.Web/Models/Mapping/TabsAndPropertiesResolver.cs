@@ -7,6 +7,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 
@@ -117,61 +118,61 @@ namespace Umbraco.Web.Models.Mapping
         /// <typeparam name="TPersisted"></typeparam>
         /// <param name="display"></param>
         /// <param name="entityType">This must be either 'content' or 'media'</param>
-        internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType)
+        internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType, IDataTypeService dataTypeService)
              where TPersisted : IContentBase
         {
-
-            var listViewProp = display.Properties.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyTypes.ListViewPropertyAlias);
-
-            //check if the list view property is already there (it should be with 7.2+)
-            if (listViewProp != null)
+            int dtdId;
+            switch (entityType)
             {
-                //ensure label is hidden
-                listViewProp.HideLabel = true;
-                listViewProp.Value = null;
-                listViewProp.Label = "";
-
-                var defaultViewTab = display.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
-                if (defaultViewTab != null)
-                {
-                    //it's the default one, so localize the name
-                    defaultViewTab.Label = ui.Text("content", "childItems");
-                }
+                case "content":
+                    dtdId = Constants.System.DefaultContentListViewDataTypeId;
+                    break;
+                case "media":
+                    dtdId = Constants.System.DefaultMediaListViewDataTypeId;
+                    break;
+                case "member":
+                    dtdId = Constants.System.DefaultMembersListViewDataTypeId;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("entityType does not match a required value");
             }
-            else 
+
+            var dt = dataTypeService.GetDataTypeDefinitionById(dtdId);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dtdId);
+
+            var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
+            if (editor == null)
             {
-                //something is a bit strange with the data, there should def be a list view property but seeing as there is not, we'll put a warning
-                // in the log and create one dynamically like we did pre 7.2
-
-                LogHelper.Warn<TabsAndPropertiesResolver>("No list view property type was found on the content item, a dynamic one will be created. Since 7.2.0 there should be a real list view property type on a list view content type");
-                
-                var listViewTab = new Tab<ContentPropertyDisplay>();
-                listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
-                listViewTab.Label = ui.Text("content", "childItems");
-                listViewTab.Id = 25;
-                listViewTab.IsActive = true;
-
-                var listViewProperties = new List<ContentPropertyDisplay>();
-                listViewProperties.Add(new ContentPropertyDisplay
-                {
-                    Alias = Constants.Conventions.PropertyTypes.ListViewPropertyAlias,
-                    Label = "",
-                    Value = null,
-                    View = "listview",
-                    HideLabel = true,
-                    Config = new Dictionary<string, object>
-                    {
-                        {"entityType", entityType}
-                    }
-                });
-                listViewTab.Properties = listViewProperties;
-
-                //Is there a better way?
-                var tabs = new List<Tab<ContentPropertyDisplay>>();
-                tabs.Add(listViewTab);
-                tabs.AddRange(display.Tabs);
-                display.Tabs = tabs;
+                throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
             }
+
+            var listViewTab = new Tab<ContentPropertyDisplay>();
+            listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
+            listViewTab.Label = ui.Text("content", "childItems");
+            listViewTab.Id = 25;
+            listViewTab.IsActive = true;
+
+            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
+            //add the entity type to the config
+            listViewConfig["entityType"] = entityType;
+
+            var listViewProperties = new List<ContentPropertyDisplay>();
+            listViewProperties.Add(new ContentPropertyDisplay
+            {
+                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Label = "",
+                Value = null,
+                View = editor.ValueEditor.View,
+                HideLabel = true,
+                Config = listViewConfig
+            });
+            listViewTab.Properties = listViewProperties;
+
+            //Is there a better way?
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
+            tabs.Add(listViewTab);
+            tabs.AddRange(display.Tabs);
+            display.Tabs = tabs;
 
         }
 

@@ -103,9 +103,7 @@
                     <div ng-repeat="category in propertyCategories" ng-show="hasEditor(configItem.editors, category)">
                         <h4 class="panel-title">{{category}}</h4>
                         <div class="tuning-panel-container">
-                            <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category"
-                                 ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
-
+                            <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category" ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
                         </div>
                     </div>
                 </div>

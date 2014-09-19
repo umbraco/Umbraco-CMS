@@ -72,7 +72,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                   .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                       new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                  .AfterMap(AfterMap);
+                  .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -108,7 +108,7 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <param name="content"></param>
         /// <param name="display"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display)
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (content.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "content");
+                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
             }
 
             TabsAndPropertiesResolver.MapGenericProperties(
