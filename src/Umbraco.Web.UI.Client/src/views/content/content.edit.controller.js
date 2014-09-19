@@ -119,13 +119,16 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
 
-        //If this is a child of a list view then we can't actually sync the real tree
         if (!$scope.content.isChildOfListView) {
             navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 $scope.currentNode = syncArgs.node;
             });
         }
         else if (initialLoad === true) {
+
+            //it's a child item, just sync the ui node to the parent
+            navigationService.syncTree({ tree: "content", path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
+            
             //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
             // from the server so that we can load in the actions menu.
             umbRequestHelper.resourcePromise(

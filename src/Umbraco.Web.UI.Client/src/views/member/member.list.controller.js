@@ -11,13 +11,7 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
-
-    //build a path to sync the tree with
-    function buildTreePath(data) {
-        var path = data.name[0].toLowerCase() + "," + data.key;
-        return path;
-    }
-
+    
     //we are editing so get the content item from the server
     memberResource.getListNode($routeParams.id)
         .then(function (data) {
@@ -26,9 +20,7 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
 
             editorState.set($scope.content);
 
-            var path = buildTreePath(data);
-
-            navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "member", path: data.path.split(",") }).then(function (syncArgs) {
                 $scope.currentNode = syncArgs.node;
             });
 

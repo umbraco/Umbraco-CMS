@@ -17,10 +17,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         : null;
 
     //build a path to sync the tree with
-    //TODO: Sync it to the member's member type, if the prev path was not passed in
-    function buildTreePath(data) {    
-        var path = data.name[0].toLowerCase() + "," + data.key;
-        return path;
+    function buildTreePath(data) {
+        return $routeParams.listName ? "-1," + $routeParams.listName : "-1";
     }
 
     if ($routeParams.create) {
@@ -71,9 +69,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     
                     var path = buildTreePath(data);
 
-                    navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    //sync the tree (only for ui purposes)
+                    navigationService.syncTree({ tree: "member", path: path.split(",") });
 
                     //in one particular special case, after we've created a new item we redirect back to the edit
                     // route but there might be server validation errors in the collection which we need to display
@@ -109,11 +106,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     
                     var path = buildTreePath(data);
 
-                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    //sync the tree (only for ui purposes)
+                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true });
 
-                }, function (err) {
+            }, function (err) {
                     
                     contentEditingHelper.handleSaveError({
                         redirectOnFailure: false,
