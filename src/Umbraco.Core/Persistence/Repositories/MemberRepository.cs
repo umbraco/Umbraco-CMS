@@ -227,9 +227,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Update entity with correct values
             entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
-            ((IUmbracoEntity)entity).Path = nodeDto.Path;
-            ((IUmbracoEntity)entity).SortOrder = sortOrder;
-            ((IUmbracoEntity)entity).Level = level;
+            entity.Path = nodeDto.Path;
+            entity.SortOrder = sortOrder;
+            entity.Level = level;
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;

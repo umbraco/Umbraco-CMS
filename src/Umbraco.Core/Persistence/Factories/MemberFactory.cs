@@ -49,6 +49,7 @@ namespace Umbraco.Core.Persistence.Factories
                 UpdateDate = dto.ContentVersionDto.VersionDate,
                 Version = dto.ContentVersionDto.VersionId
             };
+            member.ProviderUserKey = member.Key;
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             member.ResetDirtyProperties(false);

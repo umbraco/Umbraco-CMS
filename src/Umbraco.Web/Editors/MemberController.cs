@@ -568,6 +568,7 @@ namespace Umbraco.Web.Editors
                         contentItem.IsApproved,
                         Guid.NewGuid(), //since it's the umbraco provider, the user key here doesn't make any difference
                         out status);
+                    
                     break;
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                     //We are using a custom membership provider, we'll create an empty IMember first to get the unique id to use
@@ -602,10 +603,7 @@ namespace Umbraco.Web.Editors
                         contentItem.IsApproved,
                         newKey, 
                         out status);
-
-                    //we need to set the key back on the PersistedContent property so that the display model is returned correctly
-                    contentItem.PersistedContent.Key = newKey;
-
+                    
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -615,6 +613,10 @@ namespace Umbraco.Web.Editors
             switch (status)
             {
                 case MembershipCreateStatus.Success:
+
+                    //map the key back
+                    contentItem.Key = membershipUser.ProviderUserKey.TryConvertTo<Guid>().Result;
+                    contentItem.PersistedContent.Key = contentItem.Key;
 
                     //if the comments are there then we need to save them
                     if (contentItem.Comments.IsNullOrWhiteSpace() == false)

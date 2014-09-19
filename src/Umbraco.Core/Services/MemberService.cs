@@ -1326,7 +1326,15 @@ namespace Umbraco.Core.Services
 
             memType.PropertyGroups.Add(propGroup);
 
-            return new Member(name, email, username, password, memType);
+            var member = new Member(name, email, username, password, memType);
+
+            //we've assigned ids to the property types and groups but we also need to assign fake ids to the properties themselves.
+            foreach (var property in member.Properties)
+            {
+                property.Id = --identity;
+            }
+
+            return member;
         }
     }
 }
