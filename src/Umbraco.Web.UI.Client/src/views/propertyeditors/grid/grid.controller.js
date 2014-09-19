@@ -19,6 +19,14 @@ angular.module("umbraco")
             cursor: "move",
             placeholder: 'ui-sortable-placeholder',
             handle: '.cell-tools-move',
+            forcePlaceholderSize: true,
+            tolerance: "pointer",
+            zIndex: 999999999999999999,
+            scrollSensitivity: 100,
+            cursorAt: {
+                top: 45,
+                left: 90
+            },
 
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
@@ -31,11 +39,13 @@ angular.module("umbraco")
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                     tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
-            }
+            }   
 
         };
 
+        var notIncludedRte = [];
         var cancelMove = false;
+
         $scope.sortableOptionsCell = {
 
             distance: 10,
@@ -44,12 +54,16 @@ angular.module("umbraco")
             handle: '.cell-tools-move',
             connectWith: ".usky-cell",
             forcePlaceholderSize: true,
+            tolerance:"pointer",
+            zIndex: 999999999999999999,
+            scrollSensitivity: 100,
+            cursorAt: {
+                top: 45,
+                left: 90
+            },
 
             over: function (event, ui) {
-
                 allowedEditors = $(event.target).scope().area.allowed;
-
-                console.info(allowedEditors)
 
                 if ($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) {
                     ui.placeholder.hide();
@@ -68,45 +82,41 @@ angular.module("umbraco")
                         ui.item.sortable.cancel();
                     }
                     ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
-                        tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-                        tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                        if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
+                            notIncludedRte.splice(0, 0, $(this).attr('id'));
+                        }
                     });
                 }
                 else {
-
-                    console.info("sender");
-
-                    var notIncludedRte = [];
-
-                    ui.item.find('.mceNoEditor').each(function () {
-                        notIncludedRte.splice(0, 0, $(this).attr('id'));
-                    });
-
                     $(event.target).find('.mceNoEditor').each(function () {
                         if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
-                            tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-                            tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                            notIncludedRte.splice(0, 0, $(this).attr('id'));
                         }
                     });
-
                 }
 
             },
 
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
+                    notIncludedRte = []
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'))
                 });
             },
 
             stop: function (e, ui) {
                 ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
-                    var id = $(this).attr('id')
-                    tinyMCE.execCommand('mceRemoveEditor', false, id);
-                    $timeout(function () {
-                        tinyMCE.execCommand('mceAddEditor', false, id);                  
-                    }, 200, false); 
+                    if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
+                        notIncludedRte.splice(0, 0, $(this).attr('id'));
+                    }
                 });
+                $timeout(function () {
+                    _.forEach(notIncludedRte, function (id) {
+                        tinyMCE.execCommand('mceRemoveEditor', false, id);
+                        tinyMCE.execCommand('mceAddEditor', false, id);
+                        console.info("stop " + id);
+                    });
+                }, 500, false);
             }
 
         }
@@ -175,6 +185,8 @@ angular.module("umbraco")
         };
 
         $scope.setCurrentMovedRow = function (Row) {
+            $scope.currentRow = null;
+            $scope.currentRemoveControl = null;
             $scope.currentMovedRow = Row;
         };
 
@@ -266,6 +278,8 @@ angular.module("umbraco")
         };
 
         $scope.setCurrentMovedControl = function (Control) {
+            $scope.currentRow = null;
+            $scope.currentRemoveControl = null;
             $scope.currentMovedControl = Control;
         };
 

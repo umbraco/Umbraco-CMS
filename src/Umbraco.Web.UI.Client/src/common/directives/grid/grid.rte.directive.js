@@ -9,7 +9,7 @@ angular.module("umbraco")
                 onBlur: '&',
                 configuration:"="
             },
-            template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" id=\"{{uniqueId}}\"></textarea>",
+            template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
             link: function (scope, element, attrs) {
 
@@ -96,7 +96,6 @@ angular.module("umbraco")
                                 menubar: false,
                                 statusbar: false,
                                 relative_urls: false,
-                                autoresize_min_height: 30,
                                 toolbar: toolbar,
                                 content_css: stylesheets.join(','),
                                 style_formats: styleFormats
@@ -117,6 +116,7 @@ angular.module("umbraco")
 
                                 //enable browser based spell checking
                                 editor.on('init', function (e) {
+
                                     editor.getBody().setAttribute('spellcheck', true);
 
                                     //hide toolbar by default
@@ -128,7 +128,7 @@ angular.module("umbraco")
                                         if(scope.value === null){
                                             editor.focus();
                                         }
-                                    }, 500);
+                                    }, 400);
                                     
                                 });
 
