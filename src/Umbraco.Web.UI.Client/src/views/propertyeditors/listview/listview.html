@@ -87,8 +87,8 @@
                         <input type="checkbox" ng-model="result.selected" no-dirty-check>
                     </td>
                     <td>
-                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}"                            
-                           href="#/{{entityType}}/{{entityType}}/edit/{{result.id}}"
+                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}"
+                           href="#{{result.editPath}}"
                            ng-bind="result.name"></a>
                     </td>
 

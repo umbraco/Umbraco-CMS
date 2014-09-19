@@ -12,9 +12,13 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
 
+    $scope.listViewPath = ($routeParams.page && $routeParams.listName)
+        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
+        : null;
+
     //build a path to sync the tree with
-    function buildTreePath(data) {
-        //TODO: Will this work for the 'other' list ?
+    //TODO: Sync it to the member's member type, if the prev path was not passed in
+    function buildTreePath(data) {    
         var path = data.name[0].toLowerCase() + "," + data.key;
         return path;
     }

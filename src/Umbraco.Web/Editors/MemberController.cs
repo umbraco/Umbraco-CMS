@@ -116,7 +116,7 @@ namespace Umbraco.Web.Editors
                 ContentTypeName = listName,
                 Id = listName,
                 IsContainer = true,
-                Name = listName,
+                Name = listName == "all-members" ? "All Members" : listName,
                 Path = "-1," + listName,
                 ParentId = -1
             };

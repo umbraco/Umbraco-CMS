@@ -54,6 +54,10 @@ namespace Umbraco.Web.Trees
                                 queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
+
+            //There is no menu for any of these nodes
+            nodes.ForEach(x => x.MenuUrl = null);
+
             return nodes;
         }
 
@@ -125,8 +129,6 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
-
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), false);    
 
             return menu;
         }

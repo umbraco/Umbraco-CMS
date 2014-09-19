@@ -48,6 +48,12 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 $scope.loaded = true;
                 $scope.content = data;
                 
+                if (data.isChildOfListView) {
+                    $scope.listViewPath = ($routeParams.page)
+                        ? "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page
+                        : "/media/media/edit/" + data.parentId;
+                }
+
                 editorState.set($scope.content);
 
                 //in one particular special case, after we've created a new item we redirect back to the edit

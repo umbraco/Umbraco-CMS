@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -10,34 +10,40 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     }
 
     //Now we need to check if this is for media, members or content because that will depend on the resources we use
-    var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback;
+    var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback, createEditUrlCallback;
     
     if ($scope.model.config.entityType && $scope.model.config.entityType === "member") {
+        $scope.entityType = "member";
         contentResource = $injector.get('memberResource');
         getContentTypesCallback = $injector.get('memberTypeResource').getTypes;
         getListResultsCallback = contentResource.getPagedResults;
         deleteItemCallback = contentResource.deleteByKey;
         getIdCallback = function(selected) {
             return selected.key;
-        }
-        $scope.entityType = "member";
+        };
+        createEditUrlCallback = function(item) {
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.key + "?page=" + $scope.options.pageNumber + "&listName=" + $scope.contentId;
+        };
     }
     else {
         if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
-            contentResource = $injector.get('mediaResource');
-            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;            
             $scope.entityType = "media";
+            contentResource = $injector.get('mediaResource');
+            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;                        
         }
         else {
-            contentResource = $injector.get('contentResource');
-            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
             $scope.entityType = "content";
+            contentResource = $injector.get('contentResource');
+            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;            
         }
         getListResultsCallback = contentResource.getChildren;
         deleteItemCallback = contentResource.deleteById;
-        getIdCallback = function (selected) {
+        getIdCallback = function(selected) {
             return selected.id;
-        }
+        };
+        createEditUrlCallback = function(item) {
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id + "?page=" + $scope.options.pageNumber;
+        };
     }
 
     $scope.isNew = false;
@@ -49,7 +55,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.options = {
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: 1,
+        pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: '',
         orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
         orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
@@ -69,7 +75,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
             // to do that, we'd need to update the base query for content to include the content type alias column
-            // which requires another join and would be slower.
+            // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
             if (e.alias != "contentTypeAlias") {
                 e.allowSorting = true;
             }
@@ -90,16 +96,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
             $scope.options.pageNumber++;
             $scope.reloadView($scope.contentId);
-
-            //saveLastPageNumber();
+            //TODO: this would be nice but causes the whole view to reload
+            //$location.search("page", $scope.options.pageNumber);
         }
     };
 
     $scope.goToPage = function(pageNumber) {
         $scope.options.pageNumber = pageNumber + 1;
         $scope.reloadView($scope.contentId);
-
-        //saveLastPageNumber();
+        //TODO: this would be nice but causes the whole view to reload
+        //$location.search("page", $scope.options.pageNumber);
     };
 
     $scope.sort = function(field, allow) {
@@ -121,8 +127,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if ($scope.options.pageNumber > 1) {
             $scope.options.pageNumber--;
             $scope.reloadView($scope.contentId);
-
-            //saveLastPageNumber();
+            //TODO: this would be nice but causes the whole view to reload
+            //$location.search("page", $scope.options.pageNumber);
         }
     };
     
@@ -321,6 +327,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
     function setPropertyValues(result) {
+
+        //set the edit url
+        result.editPath = createEditUrlCallback(result);
 
         _.each($scope.options.includeProperties, function (e, i) {
 

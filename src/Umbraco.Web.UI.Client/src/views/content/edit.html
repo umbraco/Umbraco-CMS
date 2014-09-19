@@ -39,16 +39,16 @@
 
 
                     <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
+                        
+                        <div class="btn-group" ng-show="listViewPath">
+                            <a class="btn" href="#{{listViewPath}}">
+                                <localize key="buttons_returnToList">Return to list</localize>
+                            </a>
+                        </div>
 
                         <div class="btn-group" ng-show="content.template">
                             <a class="btn" ng-click="preview(content)">
                                 <localize key="buttons_showPage">Preview page</localize>
-                            </a>
-                        </div>
-
-                        <div class="btn-group" ng-show="content.isChildOfListView">
-                            <a class="btn" href="#/content/content/edit/{{content.parentId}}">
-                                <localize key="buttons_returnToList">Return to list</localize>
                             </a>
                         </div>
 
