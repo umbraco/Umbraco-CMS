@@ -367,17 +367,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         return false;
     };
 
-    //function saveLastPageNumber() {
-    //    //TODO: Fix this up, we don't want to use $rootScope
-
-    //    // Saves the last page number into rootScope, so we can retrieve it when returning to the list and
-    //    // re-present the correct page
-    //    $rootScope.lastListViewPageViewed = {
-    //        contentId: $scope.contentId,
-    //        pageNumber: $scope.options.pageNumber
-    //    };
-    //};
-
     function initView() {
         if ($routeParams.id) {
             $scope.pagination = new Array(10);
@@ -386,13 +375,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.contentId = $routeParams.id;
             $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
 
-            //// If we have a last page number saved, go straight to that one
-            //if ($rootScope.lastListViewPageViewed && $rootScope.lastListViewPageViewed.contentId == $scope.contentId) {
-            //    $scope.goToPage($rootScope.lastListViewPageViewed.pageNumber - 1);
-            //}
-            //else {
             $scope.reloadView($scope.contentId);
-            //}
         }
     };
 
@@ -414,6 +397,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             case "contentTypeAlias":
                 //TODO: Check for members
                 return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
+            case "email":
+                return "general_email";
+            case "username":
+                return "general_username";
         }
         return alias;
     }

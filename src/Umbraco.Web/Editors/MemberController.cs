@@ -72,7 +72,7 @@ namespace Umbraco.Web.Editors
             get { return Services.MemberService.GetMembershipScenario(); }
         }
 
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMember>> GetPagedResults(            
+        public PagedResult<MemberBasic> GetPagedResults(            
             int pageNumber = 1,
             int pageSize = 100,
             string orderBy = "Name",
@@ -80,27 +80,38 @@ namespace Umbraco.Web.Editors
             string filter = "",
             string memberTypeAlias = null)
         {
-            int totalChildren;
-            IMember[] children;
-            if (pageNumber > 0 && pageSize > 0)
-            {
-                children = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
-            }
-            else
+            int totalRecords;
+            if (pageNumber <= 0 || pageSize <= 0)
             {
                 throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
             }
 
-            if (totalChildren == 0)
+            if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
-                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMember>>(0, 0, 0);
+                var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
+                if (totalRecords == 0)
+                {
+                    return new PagedResult<MemberBasic>(0, 0, 0);
+                }
+                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize);
+                pagedResult.Items = members
+                    .Select(Mapper.Map<IMember, MemberBasic>);
+                return pagedResult;
             }
-
-            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMember>>(totalChildren, pageNumber, pageSize);
-            pagedResult.Items = children
-                .Select(Mapper.Map<IMember, ContentItemBasic<ContentPropertyBasic, IMember>>);
-
-            return pagedResult;
+            else
+            {
+                var members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
+                if (totalRecords == 0)
+                {
+                    return new PagedResult<MemberBasic>(0, 0, 0);
+                }
+                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize);
+                pagedResult.Items = members
+                    .Cast<MembershipUser>()
+                    .Select(Mapper.Map<MembershipUser, MemberBasic>);
+                return pagedResult;
+            }
+            
         }
 
         /// <summary>

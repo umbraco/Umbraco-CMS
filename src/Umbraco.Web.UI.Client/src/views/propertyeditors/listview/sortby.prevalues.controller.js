@@ -8,7 +8,9 @@ function sortByPreValsController($rootScope, $scope, localizationService) {
         { value: "CreateDate", key: "content_createDate" },
         { value: "Owner", key: "content_createBy" },
         { value: "ContentTypeAlias", key: "content_documentType" },
-        { value: "Published", key: "content_isPublished" }
+        { value: "Published", key: "content_isPublished" },
+        { value: "Email", key: "general_email" },
+        { value: "Username", key: "general_username" }
     ];
     
     //now we'll localize these strings, for some reason the directive doesn't work inside of the select group with an ng-model declared
@@ -22,6 +24,12 @@ function sortByPreValsController($rootScope, $scope, localizationService) {
                     break;
                 case "Published":
                     e.name += " (Content only)";
+                    break;
+                case "Email":
+                    e.name += " (Members only)";
+                    break;
+                case "Username":
+                    e.name += " (Members only)";
                     break;
             }
         });
