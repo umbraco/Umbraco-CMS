@@ -87,14 +87,21 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                var member = _provider.GetUser(id, false);
+                object providerId = id;
+                Guid asGuid;
+                if (Guid.TryParse(id, out asGuid))
+                {
+                    providerId = asGuid;
+                }
+
+                var member = _provider.GetUser(providerId, false);
                 if (member == null)
                 {
                     throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                 }
 
                 var node = CreateTreeNode(
-                    member.ProviderUserKey.ToString(),
+                    member.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N"),
                     "-1",
                     queryStrings,
                     member.UserName,
@@ -131,46 +138,6 @@ namespace Umbraco.Web.Trees
 
             return nodes;
         }
-
-        ///// <summary>
-        ///// Allows for developers to override this in case their provider does some funky stuff to search
-        ///// </summary>
-        ///// <param name="letter"></param>
-        ///// <returns></returns>
-        ///// <remarks>
-        ///// We're going to do a special check here - for active dir provider or sql provider
-        ///// </remarks>
-        //protected virtual MembershipUserCollection FindUsersByName(char letter)
-        //{
-        //    int total;
-        //    if (_provider is SqlMembershipProvider)
-        //    {
-        //        //this provider uses the % syntax
-        //        return _provider.FindUsersByName(letter + "%", 0, 9999, out total);
-        //    }
-        //    else
-        //    {
-        //        //the AD provider - and potentially all other providers will use the asterisk syntax.
-        //        return _provider.FindUsersByName(letter + "*", 0, 9999, out total);
-        //    }
-
-        //}
-
-        ///// <summary>
-        ///// We'll see if it is a GUID, if so we'll ensure to format it without hyphens
-        ///// </summary>
-        ///// <param name="providerUserKey"></param>
-        ///// <returns></returns>
-        //private string GetNodeIdForCustomProvider(object providerUserKey)
-        //{
-        //    if (providerUserKey == null) throw new ArgumentNullException("providerUserKey");
-        //    var guidAttempt = providerUserKey.TryConvertTo<Guid>();
-        //    if (guidAttempt.Success)
-        //    {
-        //        return guidAttempt.Result.ToString("N");
-        //    }
-        //    return providerUserKey.ToString();
-        //}
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
