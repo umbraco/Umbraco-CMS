@@ -128,12 +128,11 @@ angular.module("Umbraco.canvasdesigner")
                 angular.forEach(folder.children, function (child) {
                     child.isFolder = child.contentTypeAlias == "Folder" ? true : false;
                     if (!child.isFolder) {
-                        angular.forEach(child.properties, function (property) {
-                            // TODO, resolve with thumbnail
-                            if (property.alias = "umbracoFile" && property.value.src)
+                        angular.forEach(child.properties, function (property) {       
+                            if (property.alias == "umbracoFile" && property.value)
                             {
-                                child.thumbnail = property.value.src;
-                                child.image = property.value.src;
+                                child.thumbnail = mediaHelper.resolveFile(child, true);
+                                child.image = property.value;
                             }
                         })
                     }

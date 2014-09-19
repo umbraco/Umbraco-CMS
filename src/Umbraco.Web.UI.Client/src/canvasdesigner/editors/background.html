@@ -40,8 +40,8 @@
                 <li>
                     <ul class="media-items">
                         <li ng-repeat="child in currentFolder.children | orderBy:'isFolder':true">
-                            <div ng-if="!child.isFolder" class=" media-preview" ng-class="{selected:selectedMedia.id == child.id}" ng-click="selectMedia(child)" style="background-image: url({{ child.thumbnail }})"></div>
-                            <div ng-if="child.isFolder" class=" media-preview" ng-click="selectMedia(child)">
+                            <div ng-if="!child.isFolder" class="media-preview" ng-class="{selected:selectedMedia.id == child.id}" ng-click="selectMedia(child)" style="background-image: url({{ child.thumbnail }})"></div>
+                            <div ng-if="child.isFolder" class="media-preview" ng-click="selectMedia(child)">
                                 <i class="icon icon-folder folder"><p class="folder-name">{{child.name}}</p></i>
                             </div>
                         </li>
