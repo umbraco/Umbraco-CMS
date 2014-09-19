@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
@@ -11,6 +14,7 @@ using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using System.Linq;
 using Umbraco.Core.Security;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -123,6 +127,14 @@ namespace Umbraco.Web.Models.Mapping
         private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display)
         {
             var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            //map the tree node url
+            if (HttpContext.Current != null)
+            {
+                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
+                display.TreeNodeUrl = url;
+            }
 
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,

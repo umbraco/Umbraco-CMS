@@ -276,6 +276,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {object} treeNode the node to remove
          */
         removeNode: function(treeNode) {
+            if (!angular.isFunction(treeNode.parent)) {
+                return;
+            }
+
             if (treeNode.parent() == null) {
                 throw "Cannot remove a node that doesn't have a parent";
             }

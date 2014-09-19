@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Web.Http;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Trees;
@@ -35,6 +40,72 @@ namespace Umbraco.Web.Trees
 
         private readonly MembershipProvider _provider;
         private readonly bool _isUmbracoProvider;
+
+        /// <summary>
+        /// Gets an individual tree node
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        [HttpQueryStringFilter("queryStrings")]
+        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
+        {   
+            var node = GetSingleTreeNode(id, queryStrings);
+
+            //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
+            node.AdditionalData["treeAlias"] = TreeAlias;
+            return node;
+        }
+
+        protected TreeNode GetSingleTreeNode(string id, FormDataCollection queryStrings)
+        {
+            if (_isUmbracoProvider)
+            {
+                Guid asGuid;
+                if (Guid.TryParse(id, out asGuid) == false)
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
+
+                var member = Services.MemberService.GetByKey(asGuid);
+                if (member == null)
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
+
+                var node = CreateTreeNode(
+                    member.Key.ToString("N"),
+                    "-1",
+                    queryStrings,
+                    member.Name,
+                    "icon-user",
+                    false);
+
+                node.AdditionalData.Add("contentType", member.ContentTypeAlias);
+
+                return node;
+            }
+            else
+            {
+                var member = _provider.GetUser(id, false);
+                if (member == null)
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
+
+                var node = CreateTreeNode(
+                    member.ProviderUserKey.ToString(),
+                    "-1",
+                    queryStrings,
+                    member.UserName,
+                    "icon-user",
+                    false);
+
+                return node;    
+            }
+
+            
+        }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
@@ -129,6 +200,9 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
+
+            //add delete option for all members
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
 
             return menu;
         }

@@ -6,7 +6,7 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
     
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
@@ -71,6 +71,14 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     //sync the tree (only for ui purposes)
                     navigationService.syncTree({ tree: "member", path: path.split(",") });
+
+                    //it's the initial load of the editor, we need to get the tree node 
+                    // from the server so that we can load in the actions menu.
+                    umbRequestHelper.resourcePromise(
+                        $http.get(data.treeNodeUrl),
+                        'Failed to retrieve data for child node ' + data.key).then(function (node) {
+                            $scope.currentNode = node;
+                        });
 
                     //in one particular special case, after we've created a new item we redirect back to the edit
                     // route but there might be server validation errors in the collection which we need to display
