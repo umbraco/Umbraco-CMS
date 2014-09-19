@@ -11,6 +11,9 @@
                placeholder="@placeholders_entername"
                ng-model="content.name"/>
             </div>
+            <div class="umb-headline-editor-wrapper span7" ng-if="content.membershipScenario != 0">
+                <h1>{{content.name}}</h1>
+            </div>
 
             <div class="span5">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
