@@ -69,8 +69,6 @@ namespace Umbraco.Web.UI.JavaScript
                 ManifestParser.MergeJArrays(umbracoInit, m.JavaScriptInitialize);
             }
 
-            
-
             //merge in the additional ones specified if there are any
             if (additionalJsFiles != null)
             {
