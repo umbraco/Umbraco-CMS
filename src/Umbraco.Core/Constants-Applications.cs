@@ -41,6 +41,11 @@
 			/// Application alias for the users section.
 			/// </summary>
 			public const string Users = "users";
+
+            /// <summary>
+            /// Application alias for the users section.
+            /// </summary>
+            public const string Forms = "forms";
 		}
 
         /// <summary>

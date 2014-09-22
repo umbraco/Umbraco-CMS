@@ -16,6 +16,44 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
+
+
+function FormsController($scope, $route, packageResource) {
+    $scope.installForms = function(){
+        $scope.state = "Installng package";
+        packageResource
+            .fetch("6DA629D5-177A-4ACE-875B-A06B13CCEC48")
+            .then(function(pack){
+              $scope.state = "importing";  
+              return packageResource.import(pack);  
+            }, $scope.error)
+            .then(function(pack){
+              $scope.state = "Installing";  
+              return packageResource.installFiles(pack); 
+            }, $scope.error)
+            .then(function(pack){
+              $scope.state = "Restarting, please hold...";  
+              return packageResource.installData(pack);  
+            }, $scope.error)
+            .then(function(pack){
+              $scope.state = "All done, your browser will now refresh";  
+              return packageResource.cleanUp(pack);  
+            }, $scope.error)
+            .then($scope.complete, $scope.error);
+    };
+
+    $scope.complete = function(result){
+        $route.reload();
+    };
+
+    $scope.error = function(err){
+        $scope.state = undefined;
+        $scope.error = err;
+    };
+}
+
+angular.module("umbraco").controller("Umbraco.Dashboard.FormsDashboardController", FormsController);
+
 function startupLatestEditsController($scope) {
     
 }
