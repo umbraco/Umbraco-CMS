@@ -59,7 +59,7 @@ namespace Umbraco.Core.Strings
         {
             foreach (var node in UmbracoConfig.For.UmbracoSettings().RequestHandler.CharCollection)
             {
-                if (node.Char.IsNullOrWhiteSpace() == false)
+                if(string.IsNullOrEmpty(node.Char) == false)
                     _urlReplaceCharacters[node.Char] = node.Replacement;
             }
         }
