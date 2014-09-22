@@ -11,6 +11,8 @@
 
     'lib/angular/angular-ui-sortable.js',
 
+    'lib/angular/tmhDynamicLocale.js',
+
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',
     'lib/jquery/jquery.upload/js/load-image.min.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
