@@ -133,17 +133,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<TEntity> GetAll(params TId[] ids)
         {
-            //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct()
-                //don't query by anything that is a default of T (like a zero)
-                //TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
-                //.Where(x => Equals(x, default(TId)) == false)
-                .ToArray();
-
             if (ids.Length > 2000)
             {
                 throw new InvalidOperationException("Cannot perform a query with more than 2000 parameters");
             }
+
+            TEntity[] entityCollection = {};
 
             if (ids.Any())
             {
@@ -153,6 +148,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
                     return entities.Select(x => (TEntity)x);
+
+                if (ids.Any())
+                {
+                    entityCollection = PerformGetAll(ids)
+                        //ensure we don't include any null refs in the returned collection!
+                        .WhereNotNull()
+                        .ToArray();
+
+                    //We need to put a threshold here! IF there's an insane amount of items
+                    // coming back here we don't want to chuck it all into memory, this added cache here
+                    // is more for convenience when paging stuff temporarily
+
+                    if (entityCollection.Length > 100) return entityCollection;
+
+                    foreach (var entity in entityCollection.Where(entity => entity != null))
+                    {
+                        _cache.Save(typeof(TEntity), entity);
+                    }
+                }                
             }
             else
             {
@@ -166,25 +180,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     if(allEntities.Count() == totalCount)
                         return allEntities.Select(x => (TEntity)x);
-                }
-            }
-
-            var entityCollection = PerformGetAll(ids)
-                //ensure we don't include any null refs in the returned collection!
-                .WhereNotNull()
-                .ToArray();
-
-            //We need to put a threshold here! IF there's an insane amount of items
-            // coming back here we don't want to chuck it all into memory, this added cache here
-            // is more for convenience when paging stuff temporarily
-
-            if (entityCollection.Length > 100) return entityCollection;
-
-            foreach (var entity in entityCollection)
-            {
-                if (entity != null)
-                {
-                    _cache.Save(typeof(TEntity), entity);
                 }
             }
 
