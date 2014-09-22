@@ -314,7 +314,8 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
 
     var hideUmbracoPreviewBadge = function () {
         var iframe = (document.getElementById("resultFrame").contentWindow || document.getElementById("resultFrame").contentDocument);
-        iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
+        if(iframe.document.getElementById("umbracoPreviewBadge"))
+			iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
     }
 
     $scope.openIntelTuning = function () {
@@ -439,7 +440,8 @@ var app = angular.module("umbraco.tuning", ['spectrumcolorpicker', 'ui.slider', 
         link: function (scope, element, attr) {
             element.load(function () {
                 var iframe = (element.context.contentWindow || element.context.contentDocument);
-                iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
+                if(iframe.document.getElementById("umbracoPreviewBadge"))
+					iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
                 if (!document.getElementById("resultFrame").contentWindow.refrechLayout) {
                     scope.frameLoaded = true;
                     scope.$apply();
