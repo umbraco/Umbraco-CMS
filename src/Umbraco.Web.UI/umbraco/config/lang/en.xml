@@ -36,6 +36,11 @@
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="defaultValue">Default value</key>
+    <key alias="exportContourForm">Export form</key>
+    <key alias="importContourForm">Import form</key>
+    <key alias="archiveContourForm">Archive form</key>
+    <key alias="unarchiveContourForm">Unarchive form</key>
+    <key alias="defaultValue">Default value</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
@@ -668,11 +673,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">
-      <![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]>
-    </key>
+    ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>
@@ -733,6 +736,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
     <key alias="help" version="7.0">Help</key>
+    <key alias="forms">Forms</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -938,6 +942,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Templates</key>
     <key alias="xslt">XSLT Files</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>

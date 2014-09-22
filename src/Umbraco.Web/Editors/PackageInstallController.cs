@@ -40,8 +40,8 @@ namespace Umbraco.Web.Editors
             PackageInstallModel p = new PackageInstallModel();
             p.PackageGuid = Guid.Parse(packageGuid);
             p.RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66");
-            //p.ZipFilePath = path;
-            p.ZipFilePath = Path.Combine("temp", "package.umb");
+            p.ZipFilePath = path;
+            //p.ZipFilePath = Path.Combine("temp", "package.umb");
             return p;
         }
 
