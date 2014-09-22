@@ -85,6 +85,20 @@ namespace Umbraco.Web.Strategies.Migrations
                 if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
                     e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
 
+                //Turn on identity insert if db provider is not mysql
+                if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
+                    e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataTypePreValues"))));
+
+                //defaults for the member list
+                e.MigrationContext.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -1, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "10" });
+                e.MigrationContext.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -2, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "Name" });
+                e.MigrationContext.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -3, Alias = "orderDirection", SortOrder = 3, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "asc" });
+                e.MigrationContext.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -4, Alias = "includeProperties", SortOrder = 4, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "[{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]" });
+
+                //Turn off identity insert if db provider is not mysql
+                if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
+                    e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataTypePreValues"))));
+
                 transaction.Complete();
             }
         }
