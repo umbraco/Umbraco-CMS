@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -10,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents a data type that is being edited
     /// </summary>
     [DataContract(Name = "dataType", Namespace = "")]
-    public class DataTypeDisplay : EntityBasic, INotificationModel
+    public class DataTypeDisplay : DataTypeBasic, INotificationModel
     {
         public DataTypeDisplay()
         {
@@ -35,12 +34,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
-        
-        /// <summary>
-        /// Whether or not this is a system data type, in which case it cannot be deleted
-        /// </summary>
-        [DataMember(Name = "isSystem")]
-        [ReadOnly(true)]
-        public bool IsSystemDataType { get; set; }
+       
     }
 }

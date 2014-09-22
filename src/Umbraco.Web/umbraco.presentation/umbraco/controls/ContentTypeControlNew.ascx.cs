@@ -49,6 +49,15 @@ namespace umbraco.controls
         public bool HideStructure { get; set; }
         public Func<DocumentType, DocumentType> DocumentTypeCallback { get; set; }
 
+        protected string ContentTypeAlias
+        {
+            get { return _contentType.Alias; }
+        }
+        protected int ContentTypeId
+        {
+            get { return _contentType.Id; }
+        }
+
         // "Tab" tab
         protected uicontrols.Pane Pane8;
 

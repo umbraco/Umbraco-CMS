@@ -6,10 +6,17 @@ using umbraco.interfaces;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataType"/> and <see cref="IDataTypeDefinition"/>
+    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/> 
     /// </summary>
     public interface IDataTypeService : IService
     {
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its Name
+        /// </summary>
+        /// <param name="name">Name of the <see cref="IDataTypeDefinition"/></param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        IDataTypeDefinition GetDataTypeDefinitionByName(string name);
+
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Id
         /// </summary>

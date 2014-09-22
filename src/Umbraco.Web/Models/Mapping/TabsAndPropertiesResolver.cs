@@ -118,14 +118,17 @@ namespace Umbraco.Web.Models.Mapping
         /// <typeparam name="TPersisted"></typeparam>
         /// <param name="display"></param>
         /// <param name="entityType">This must be either 'content' or 'media'</param>
+        /// <param name="dataTypeService"></param>
         internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType, IDataTypeService dataTypeService)
              where TPersisted : IContentBase
         {
             int dtdId;
+            var customDtdName = Constants.Conventions.DataTypes.ListViewPrefix + display.ContentTypeAlias;
             switch (entityType)
             {
                 case "content":
                     dtdId = Constants.System.DefaultContentListViewDataTypeId;
+                    
                     break;
                 case "media":
                     dtdId = Constants.System.DefaultMediaListViewDataTypeId;
@@ -137,8 +140,11 @@ namespace Umbraco.Web.Models.Mapping
                     throw new ArgumentOutOfRangeException("entityType does not match a required value");
             }
 
-            var dt = dataTypeService.GetDataTypeDefinitionById(dtdId);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dtdId);
+            //first try to get the custom one if there is one
+            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName) 
+                ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
+
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
 
             var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
             if (editor == null)

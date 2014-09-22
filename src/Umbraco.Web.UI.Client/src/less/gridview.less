@@ -1,27 +1,36 @@
 // Gridview
 // -------------------------
 
- 
+ .mceContentBody{
+         overflow-y:hidden!important;
+      }
+
+ IFRAME {overflow:hidden;}  
 
 
  // Sortabel
  // -------------------------
-.usky-grid .ui-sortable-helper{
-    -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-    -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-    box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+ .usky-grid .ui-sortable-helper  {
+     border: dashed 1px #000 !important;
+     background: #ccc;
+     opacity: 0.4;
+     height: 80px !important;
+     width: 160px !important;
+     overflow: hidden;
+     padding: 5px;
+     border-radius:50px;
+     -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+ }
 
-    border: solid 1px #ccc;
-    background: white !important;
-    height: 50px !important;
-    overflow: hidden;
-    padding: 5px;
-    z-index: 1000;
-}
-
-.usky-grid .ui-sortable-helper *{
-    display: none !important;
-}
+ .usky-grid .ui-sortable-helper *{
+     border: none !important;
+     background: none !important;
+     color: #999 !important;
+     padding: 0 !important;
+     margin: 0 !important;    
+ }
 
  .usky-grid .ui-sortable-helper .cell-tools{
      display: none !important;

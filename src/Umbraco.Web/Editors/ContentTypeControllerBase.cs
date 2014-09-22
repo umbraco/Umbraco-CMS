@@ -4,10 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
+using AutoMapper;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -20,7 +23,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Constructor
         /// </summary>
-        public ContentTypeControllerBase()
+        protected ContentTypeControllerBase()
             : this(UmbracoContext.Current)
         {            
         }
@@ -29,91 +32,42 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        public ContentTypeControllerBase(UmbracoContext umbracoContext)
+        protected ContentTypeControllerBase(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
         }
 
-        /// <summary>
-        /// Returns the container configuration JSON structure for the content item id passed in
-        /// </summary>
-        /// <param name="contentId"></param>
-        public ContentTypeContainerConfiguration GetContainerConfig(int contentId)
+        public DataTypeBasic GetAssignedListViewDataType(int contentTypeId)
         {
-            //var contentItem = Services.ContentService.GetById(contentId);            
-            //if (contentItem == null)
-            //{
-            //    throw new HttpResponseException(HttpStatusCode.NotFound);
-            //}
+            var objectType = Services.EntityService.GetObjectType(contentTypeId);
 
-            //if (!string.IsNullOrEmpty(contentItem.ContentType.ContainerConfig))
-            //{
-            //    var containerConfig = JsonConvert.DeserializeObject<ContentTypeContainerConfiguration>(contentItem.ContentType.ContainerConfig);
-            //    containerConfig.AdditionalColumns = new List<ContentTypeContainerConfiguration.AdditionalColumnDetail>();
-
-            //    // Populate the column headings and localization keys                
-            //    if (!string.IsNullOrEmpty(containerConfig.AdditionalColumnAliases))
-            //    {
-            //        // Find all the properties for doc types that might be in the list
-            //        var allowedContentTypeIds = contentItem.ContentType.AllowedContentTypes
-            //            .Select(x => x.Id.Value)
-            //            .ToArray();
-            //        var allPropertiesOfAllowedContentTypes = Services.ContentTypeService
-            //            .GetAllContentTypes(allowedContentTypeIds)
-            //            .SelectMany(x => x.PropertyTypes)
-            //            .ToList();
-
-            //        foreach (var alias in containerConfig.AdditionalColumnAliases.Split(','))
-            //        {
-            //            var column = new ContentTypeContainerConfiguration.AdditionalColumnDetail
-            //            {
-            //                Alias = alias,     
-            //                LocalizationKey = string.Empty,
-            //                AllowSorting = true,
-            //            };
-
-            //            // Try to find heading from custom property (getting the name from the alias)
-            //            // - need to look in children of the current content's content type
-            //            var property = allPropertiesOfAllowedContentTypes
-            //                .FirstOrDefault(x => x.Alias == alias.ToFirstLower());
-            //            if (property != null)
-            //            {
-            //                column.Header = property.Name;
-            //                column.AllowSorting = false;    // can't sort on custom property columns
-            //            }
-            //            else if (alias == "UpdateDate")
-            //            {
-            //                // Special case to restore hard-coded column titles
-            //                column.Header = "Last edited";
-            //                column.LocalizationKey = "defaultdialogs_lastEdited";
-            //            }
-            //            else if (alias == "Updater")
-            //            {
-            //                // Special case to restore hard-coded column titles (2)
-            //                column.Header = "Updated by";
-            //                column.LocalizationKey = "content_updatedBy";
-            //            }
-            //            else if (alias == "Owner")
-            //            {
-            //                // Special case to restore hard-coded column titles (3)
-            //                column.Header = "Created by";
-            //                column.LocalizationKey = "content_createBy";
-            //            }
-            //            else
-            //            {
-            //                // For others just sentence case the alias and camel case for the key
-            //                column.Header = alias.ToFirstUpper().SplitPascalCasing();
-            //                column.LocalizationKey = "content_" + alias.ToFirstLower();
-            //            }
-
-            //            containerConfig.AdditionalColumns.Add(column);
-            //        }
-            //    }
-
-            //    return containerConfig;
-            //}
-
-            return null;
+            switch (objectType)
+            {
+                case UmbracoObjectTypes.MemberType:     
+                    var memberType = Services.MemberTypeService.Get(contentTypeId);
+                    var dtMember = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + memberType.Alias);
+                    return dtMember == null
+                        ? Mapper.Map<IDataTypeDefinition, DataTypeBasic>(
+                            Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + "Member"))
+                        : Mapper.Map<IDataTypeDefinition, DataTypeBasic>(dtMember);
+                case UmbracoObjectTypes.MediaType:                
+                    var mediaType = Services.ContentTypeService.GetMediaType(contentTypeId);
+                    var dtMedia = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + mediaType.Alias);
+                    return dtMedia == null
+                        ? Mapper.Map<IDataTypeDefinition, DataTypeBasic>(
+                            Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + "Media"))
+                        : Mapper.Map<IDataTypeDefinition, DataTypeBasic>(dtMedia);
+                case UmbracoObjectTypes.DocumentType:
+                    var docType = Services.ContentTypeService.GetContentType(contentTypeId);
+                    var dtDoc = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + docType.Alias);
+                    return dtDoc == null
+                        ? Mapper.Map<IDataTypeDefinition, DataTypeBasic>(
+                            Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + "Content"))
+                        : Mapper.Map<IDataTypeDefinition, DataTypeBasic>(dtDoc);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
+    
     }
 }

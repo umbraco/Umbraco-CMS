@@ -764,7 +764,6 @@ AND umbracoNode.id <> @id",
                 out IDictionary<int, IEnumerable<AssociatedTemplate>> associatedTemplates,
                 out IDictionary<int, IEnumerable<int>> parentContentTypeIds)
             {
-                Mandate.That(contentTypeIds.Any(), () => new InvalidOperationException("must be at least one content type id specified"));
                 Mandate.ParameterNotNull(db, "db");
 
                 //ensure they are unique
@@ -799,8 +798,9 @@ AND umbracoNode.id <> @id",
                         ON Template.nodeId = cmsDocumentType.templateNodeId
                         LEFT JOIN cmsContentType2ContentType as ParentTypes
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId	
-                        WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
-                        AND (umbracoNode.id IN (@contentTypeIds))";
+                        WHERE (umbracoNode.nodeObjectType = @nodeObjectType)";
+                if(contentTypeIds.Any())                        
+                    sql = sql + " AND (umbracoNode.id IN (@contentTypeIds))";
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
                 if ((contentTypeIds.Length - 1) > 2000)
@@ -969,10 +969,12 @@ AND umbracoNode.id <> @id",
                         INNER JOIN cmsDataType as DT
                         ON PT.dataTypeId = DT.[nodeId]
                         LEFT JOIN cmsPropertyTypeGroup as PG
-                        ON PG.[id] = PT.propertyTypeGroupId
-                        WHERE (PT.contentTypeId in (@contentTypeIds))
+                        ON PG.[id] = PT.propertyTypeGroupId";
 
-                        ORDER BY (PG.id)";
+                if(contentTypeIds.Any())                        
+                    sql = sql + " WHERE (PT.contentTypeId in (@contentTypeIds))";
+                
+                sql = sql + " ORDER BY (PG.id)";
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
                 // Since there are 2 groups of params, it will be half!

@@ -34,6 +34,11 @@ namespace Umbraco.Web.Models.Mapping
                 Constants.System.DefaultMembersListViewDataTypeId
             };
 
+            config.CreateMap<IDataTypeDefinition, DataTypeBasic>()                
+                .ForMember(x => x.Icon, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
+
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(

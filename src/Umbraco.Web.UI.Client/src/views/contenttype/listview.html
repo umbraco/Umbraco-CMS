@@ -1,0 +1,43 @@
+<div class="umb-panel" ng-controller=" Umbraco.Editors.ContentType.ListViewController">
+
+    <div class="umb-panel-body no-header with-footer compact">
+
+        <h5><localize key="editcontenttype_customizeListView">Customize list view</localize> {{currentNode.name}}</h5>
+
+        <umb-pane>
+            <umb-control-group label="@editcontenttype_currentListView">
+                <strong>{{listViewName}}</strong>
+                <em ng-if="isSystem">&nbsp;(<localize key="general_default">default</localize>)</em>
+                <br/>
+                <a href="#/developer/datatype/edit/{{dataTypeId}}" class="text-info">
+                    <localize key="general_edit">Edit</localize>
+                </a>
+            </umb-control-group>
+             
+            <umb-control-group ng-if="isSystem == 1">
+                <div>
+                    <button class="btn" type="button" ng-click="createCustom()">
+                        <localize key="editcontenttype_createListView">Create custom list view</localize>
+                    </button>
+                </div>
+            </umb-control-group>
+
+            <umb-control-group ng-if="isSystem == 0">
+                <button class="btn btn-warning" type="button" ng-click="removeCustom()">
+                    <localize key="editcontenttype_removeListView">Remove custom list view</localize>
+                </button>
+            </umb-control-group>
+            
+        </umb-pane>
+
+    </div>
+    <div class="umb-panel-footer">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+                <a href ng-click="close()" class="btn btn-link">
+                    <localize key="general_close">Close</localize>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

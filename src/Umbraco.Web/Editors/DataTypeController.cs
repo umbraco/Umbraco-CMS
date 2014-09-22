@@ -33,6 +33,12 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
+        public DataTypeDisplay GetByName(string name)
+        {
+            var dataType = Services.DataTypeService.GetDataTypeDefinitionByName(name);
+            return dataType == null ? null : Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
+        }
+
         /// <summary>
         /// Gets the content json for the content id
         /// </summary>
