@@ -78,8 +78,39 @@
         </cc2:PropertyPanel>
         
         <cc2:PropertyPanel ID="pp_isContainer" runat="server" Text="Container<br/><small>A container type doesn't display children in the tree, but as a grid instead</small>">
-            <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" /><br />            
+            <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" />  
+            
+             <%if (cb_isContainer.Checked) { %>
+            <p id="container-config-panel">
+                <a href="#">Configure list view...</a>
+            </p>        
+                <%--Scripting to show hide the button if the doc type is already configured to be a list view--%>
+                <script type="text/javascript">            
+                    $(document).ready(function () {
+                        $("#<%= cb_isContainer.ClientID %>").on("change", function () {
+                            if ($(this).is(":checked")) {
+                                $("#container-config-panel").slideDown();
+                            }
+                            else {       
+                                $("#container-config-panel").slideUp();
+                            }
+                        });
+
+                        $("#container-config-panel a").click(function() {
+                            UmbClientMgr.openAngularModalWindow({
+                                contentTypeAlias: "<%=ContentTypeAlias%>",
+                                contentTypeId: "<%=ContentTypeId%>",
+                                template: "views/contenttype/listview.html"
+                            });
+                        });
+                    });
+
+                </script>
+
+            <%} %>       
+
         </cc2:PropertyPanel>   
+
     </cc2:Pane>
 
     <cc2:Pane ID="Pane5" runat="server">

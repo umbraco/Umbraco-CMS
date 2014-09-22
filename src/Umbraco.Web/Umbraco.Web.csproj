@@ -306,6 +306,7 @@
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TuningController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\MemberBasic.cs" />
     <Compile Include="Models\ContentEditing\MemberListDisplay.cs" />
     <Compile Include="Models\TemplateQuery\ContentTypeModel.cs" />
@@ -320,7 +321,6 @@
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
-    <Compile Include="Models\ContentEditing\ContentTypeContainerConfiguration.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\DetachedContent.cs" />

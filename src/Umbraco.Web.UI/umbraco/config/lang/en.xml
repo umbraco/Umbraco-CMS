@@ -256,6 +256,10 @@
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="hasListView">Enable list view</key>
+    <key alias="customizeListView" version="7.2">Customize list view</key>
+    <key alias="currentListView" version="7.2">Current list view</key>
+    <key alias="createListView" version="7.2">Create custom list view</key>
+    <key alias="removeListView" version="7.2">Remove custom list view</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>
