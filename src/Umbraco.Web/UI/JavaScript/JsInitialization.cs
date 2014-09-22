@@ -56,10 +56,20 @@ namespace Umbraco.Web.UI.JavaScript
 
         public JArray GetJavascriptInitializationArray(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
+            //Add correct angular locale
+            var s = new Security.WebSecurity(new HttpContextWrapper(HttpContext.Current), ApplicationContext.Current);
+            if (s != null && s.CurrentUser != null)
+            {
+                string locale = s.CurrentUser.Language;
+                umbracoInit.Add(string.Format("lib/angular/1.1.5/i18n/angular-locale_{0}.js", locale));
+            }
+
             foreach (var m in _parser.GetManifests())
             {
                 ManifestParser.MergeJArrays(umbracoInit, m.JavaScriptInitialize);
             }
+
+            
 
             //merge in the additional ones specified if there are any
             if (additionalJsFiles != null)
