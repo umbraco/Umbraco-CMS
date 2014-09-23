@@ -14,6 +14,27 @@ namespace Umbraco.Tests.Persistence.Querying
     {
 
         [Test]
+        public void Generates_Sql_Parameter_Where_Clause_Single_Constant()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.NodeId == 2);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[id] = (@0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual(2, sql.Arguments[0]);
+        }
+
+        [Test]
+        public void Generates_Sql_Parameter_Where_Clause_And_Constant()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.NodeId != 2 && x.NodeId != 3);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[id] <> (@0) AND [umbracoNode].[id] <> (@1))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(2, sql.Arguments.Length);
+            Assert.AreEqual(2, sql.Arguments[0]);
+            Assert.AreEqual(3, sql.Arguments[0]);
+        }
+
+        [Test]
         public void Can_Select_From_With_Type()
         {
             var expected = new Sql();

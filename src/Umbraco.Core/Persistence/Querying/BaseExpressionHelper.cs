@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -9,6 +10,13 @@ namespace Umbraco.Core.Persistence.Querying
     /// </summary>
     internal class BaseExpressionHelper
     {
+        protected List<object> SqlParameters = new List<object>();
+
+        public object[] GetSqlParameters()
+        {
+            return SqlParameters.ToArray();
+        }
+
         protected string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
         {
             switch (verb)
@@ -44,54 +52,54 @@ namespace Umbraco.Core.Persistence.Querying
             }
         }
 
-        public virtual string GetQuotedValue(object value, Type fieldType, Func<object, string> escapeCallback = null, Func<Type, bool> shouldQuoteCallback = null)
-        {
-            if (value == null) return "NULL";
+        //public virtual string GetQuotedValue(object value, Type fieldType, Func<object, string> escapeCallback = null, Func<Type, bool> shouldQuoteCallback = null)
+        //{
+        //    if (value == null) return "NULL";
 
-            if (escapeCallback == null)
-            {
-                escapeCallback = EscapeParam;
-            }
-            if (shouldQuoteCallback == null)
-            {
-                shouldQuoteCallback = ShouldQuoteValue;
-            }
+        //    if (escapeCallback == null)
+        //    {
+        //        escapeCallback = EscapeParam;
+        //    }
+        //    if (shouldQuoteCallback == null)
+        //    {
+        //        shouldQuoteCallback = ShouldQuoteValue;
+        //    }
 
-            if (!fieldType.UnderlyingSystemType.IsValueType && fieldType != typeof(string))
-            {
-                //if (TypeSerializer.CanCreateFromString(fieldType))
-                //{
-                //    return "'" + escapeCallback(TypeSerializer.SerializeToString(value)) + "'";
-                //}
+        //    if (!fieldType.UnderlyingSystemType.IsValueType && fieldType != typeof(string))
+        //    {
+        //        //if (TypeSerializer.CanCreateFromString(fieldType))
+        //        //{
+        //        //    return "'" + escapeCallback(TypeSerializer.SerializeToString(value)) + "'";
+        //        //}
 
-                throw new NotSupportedException(
-                    string.Format("Property of type: {0} is not supported", fieldType.FullName));
-            }
+        //        throw new NotSupportedException(
+        //            string.Format("Property of type: {0} is not supported", fieldType.FullName));
+        //    }
 
-            if (fieldType == typeof(int))
-                return ((int)value).ToString(CultureInfo.InvariantCulture);
+        //    if (fieldType == typeof(int))
+        //        return ((int)value).ToString(CultureInfo.InvariantCulture);
 
-            if (fieldType == typeof(float))
-                return ((float)value).ToString(CultureInfo.InvariantCulture);
+        //    if (fieldType == typeof(float))
+        //        return ((float)value).ToString(CultureInfo.InvariantCulture);
 
-            if (fieldType == typeof(double))
-                return ((double)value).ToString(CultureInfo.InvariantCulture);
+        //    if (fieldType == typeof(double))
+        //        return ((double)value).ToString(CultureInfo.InvariantCulture);
 
-            if (fieldType == typeof(decimal))
-                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+        //    if (fieldType == typeof(decimal))
+        //        return ((decimal)value).ToString(CultureInfo.InvariantCulture);
 
-            if (fieldType == typeof(DateTime))
-            {
-                return "'" + escapeCallback(((DateTime)value).ToIsoString()) + "'";
-            }
+        //    if (fieldType == typeof(DateTime))
+        //    {
+        //        return "'" + escapeCallback(((DateTime)value).ToIsoString()) + "'";
+        //    }
 
-            if (fieldType == typeof(bool))
-                return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
+        //    if (fieldType == typeof(bool))
+        //        return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
 
-            return shouldQuoteCallback(fieldType)
-                       ? "'" + escapeCallback(value) + "'"
-                       : value.ToString();
-        }
+        //    return shouldQuoteCallback(fieldType)
+        //               ? "'" + escapeCallback(value) + "'"
+        //               : value.ToString();
+        //}
 
         public virtual string EscapeParam(object paramValue)
         {

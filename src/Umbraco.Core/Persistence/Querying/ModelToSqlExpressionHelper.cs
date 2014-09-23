@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Querying
     internal class ModelToSqlExpressionHelper<T> : BaseExpressionHelper
     {
         private string sep = " ";
-        private BaseMapper _mapper;
+        private readonly BaseMapper _mapper;
 
         public ModelToSqlExpressionHelper()
         {
@@ -88,7 +88,11 @@ namespace Umbraco.Core.Persistence.Querying
                 if (m.Expression != null)
                 {
                     string r = VisitMemberAccess(m);
-                    return string.Format("{0}={1}", r, GetQuotedTrueValue());
+
+                    SqlParameters.Add(1);
+                    return string.Format("{0}=@{1}", r, SqlParameters.Count - 1);
+
+                    //return string.Format("{0}={1}", r, GetQuotedTrueValue());
                 }
 
             }
@@ -105,7 +109,11 @@ namespace Umbraco.Core.Persistence.Querying
                 if (m != null && m.Expression != null)
                 {
                     string r = VisitMemberAccess(m);
-                    left = string.Format("{0}={1}", r, GetQuotedTrueValue());
+
+                    SqlParameters.Add(1);
+                    left = string.Format("{0}=@{1}", r, SqlParameters.Count - 1);
+
+                    //left = string.Format("{0}={1}", r, GetQuotedTrueValue());
                 }
                 else
                 {
@@ -115,7 +123,11 @@ namespace Umbraco.Core.Persistence.Querying
                 if (m != null && m.Expression != null)
                 {
                     string r = VisitMemberAccess(m);
-                    right = string.Format("{0}={1}", r, GetQuotedTrueValue());
+
+                    SqlParameters.Add(1);
+                    right = string.Format("{0}=@{1}", r, SqlParameters.Count - 1);
+
+                    //right = string.Format("{0}={1}", r, GetQuotedTrueValue());
                 }
                 else
                 {
@@ -132,11 +144,11 @@ namespace Umbraco.Core.Persistence.Querying
             else if (operand == "<>" && right == "null") operand = "is not";
             else if (operand == "=" || operand == "<>")
             {
-                if (IsTrueExpression(right)) right = GetQuotedTrueValue();
-                else if (IsFalseExpression(right)) right = GetQuotedFalseValue();
+                //if (IsTrueExpression(right)) right = GetQuotedTrueValue();
+                //else if (IsFalseExpression(right)) right = GetQuotedFalseValue();
 
-                if (IsTrueExpression(left)) left = GetQuotedTrueValue();
-                else if (IsFalseExpression(left)) left = GetQuotedFalseValue();
+                //if (IsTrueExpression(left)) left = GetQuotedTrueValue();
+                //else if (IsFalseExpression(left)) left = GetQuotedFalseValue();
 
             }
 
@@ -168,7 +180,11 @@ namespace Umbraco.Core.Persistence.Querying
             var lambda = Expression.Lambda<Func<object>>(member);
             var getter = lambda.Compile();
             object o = getter();
-            return GetQuotedValue(o, o != null ? o.GetType() : null);
+
+            SqlParameters.Add(o);
+            return string.Format("(@{0})", SqlParameters.Count - 1);
+
+            //return GetQuotedValue(o, o != null ? o.GetType() : null);
 
         }
 
@@ -181,7 +197,11 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 var getter = lambda.Compile();
                 object o = getter();
-                return GetQuotedValue(o, o.GetType());
+
+                SqlParameters.Add(o);
+                return string.Format("(@{0})", SqlParameters.Count - 1);
+
+                //return GetQuotedValue(o, o.GetType());
             }
             catch (System.InvalidOperationException)
             { // FieldName ?
@@ -205,26 +225,31 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (c.Value == null)
                 return "null";
-            if (c.Value is bool)
-            {
-                object o = GetQuotedValue(c.Value, c.Value.GetType());
-                return string.Format("({0}={1})", GetQuotedTrueValue(), o);
-            }
-            return GetQuotedValue(c.Value, c.Value.GetType());
+
+            SqlParameters.Add(c.Value);
+            return string.Format("(@{0})", SqlParameters.Count - 1);
+
+            //if (c.Value is bool)
+            //{
+            //    object o = GetQuotedValue(c.Value, c.Value.GetType());
+            //    return string.Format("({0}={1})", GetQuotedTrueValue(), o);
+            //}
+            //return GetQuotedValue(c.Value, c.Value.GetType());
         }
 
         protected virtual string VisitUnary(UnaryExpression u)
         {
-            switch (u.NodeType)
-            {
-                case ExpressionType.Not:
-                    string o = Visit(u.Operand);
-                    if (IsFieldName(o)) o = o + "=" + GetQuotedValue(true, typeof(bool));
-                    return "NOT (" + o + ")";
-                default:
-                    return Visit(u.Operand);
-            }
+            //switch (u.NodeType)
+            //{
+            //    case ExpressionType.Not:
+            //        string o = Visit(u.Operand);
+            //        if (IsFieldName(o)) o = o + "=" + GetQuotedValue(true, typeof(bool));
+            //        return "NOT (" + o + ")";
+            //    default:
+            //        return Visit(u.Operand);
+            //}
 
+            return Visit(u.Operand);
         }
 
         protected virtual string VisitMethodCall(MethodCallExpression m)
@@ -316,18 +341,30 @@ namespace Umbraco.Core.Persistence.Querying
                     {
                         if (e.GetType().ToString() != "System.Collections.Generic.List`1[System.Object]")
                         {
+                            SqlParameters.Add(e);
+
                             sIn.AppendFormat("{0}{1}",
                                          sIn.Length > 0 ? "," : "",
-                                                        GetQuotedValue(e, e.GetType()));
+                                                        string.Format("@{0}", SqlParameters.Count - 1));
+
+                            //sIn.AppendFormat("{0}{1}",
+                            //             sIn.Length > 0 ? "," : "",
+                            //                            GetQuotedValue(e, e.GetType()));
                         }
                         else
                         {
                             var listArgs = e as IList<Object>;
                             foreach (Object el in listArgs)
                             {
+                                SqlParameters.Add(el);
+
                                 sIn.AppendFormat("{0}{1}",
                                          sIn.Length > 0 ? "," : "",
-                                                        GetQuotedValue(el, el.GetType()));
+                                                        string.Format("@{0}", SqlParameters.Count - 1));
+
+                                //sIn.AppendFormat("{0}{1}",
+                                //         sIn.Length > 0 ? "," : "",
+                                //                        GetQuotedValue(el, el.GetType()));
                             }
                         }
                     }
@@ -342,12 +379,15 @@ namespace Umbraco.Core.Persistence.Querying
                 case "ToString":
                     return r.ToString();
                 default:
-                    var s2 = new StringBuilder();
-                    foreach (Object e in args)
-                    {
-                        s2.AppendFormat(",{0}", GetQuotedValue(e, e.GetType()));
-                    }
-                    return string.Format("{0}({1}{2})", m.Method.Name, r, s2.ToString());
+
+                    return r.ToString();
+
+                    //var s2 = new StringBuilder();
+                    //foreach (Object e in args)
+                    //{
+                    //    s2.AppendFormat(",{0}", GetQuotedValue(e, e.GetType()));
+                    //}
+                    //return string.Format("{0}({1}{2})", m.Method.Name, r, s2.ToString());
             }
         }
 
@@ -443,44 +483,44 @@ namespace Umbraco.Core.Persistence.Querying
             return string.Format("\"{0}\"", name);
         }
 
-        private string GetQuotedTrueValue()
-        {
-            return GetQuotedValue(true, typeof(bool));
-        }
+        //private string GetQuotedTrueValue()
+        //{
+        //    return GetQuotedValue(true, typeof(bool));
+        //}
 
-        private string GetQuotedFalseValue()
-        {
-            return GetQuotedValue(false, typeof(bool));
-        }
+        //private string GetQuotedFalseValue()
+        //{
+        //    return GetQuotedValue(false, typeof(bool));
+        //}
 
-        public virtual string GetQuotedValue(object value, Type fieldType)
-        {
-            return GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
-        }
+        //public virtual string GetQuotedValue(object value, Type fieldType)
+        //{
+        //    return GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
+        //}
 
-        private string GetTrueExpression()
-        {
-            object o = GetQuotedTrueValue();
-            return string.Format("({0}={1})", o, o);
-        }
+        //private string GetTrueExpression()
+        //{
+        //    object o = GetQuotedTrueValue();
+        //    return string.Format("({0}={1})", o, o);
+        //}
 
-        private string GetFalseExpression()
-        {
+        //private string GetFalseExpression()
+        //{
 
-            return string.Format("({0}={1})",
-                GetQuotedTrueValue(),
-                GetQuotedFalseValue());
-        }
+        //    return string.Format("({0}={1})",
+        //        GetQuotedTrueValue(),
+        //        GetQuotedFalseValue());
+        //}
 
-        private bool IsTrueExpression(string exp)
-        {
-            return (exp == GetTrueExpression());
-        }
+        //private bool IsTrueExpression(string exp)
+        //{
+        //    return (exp == GetTrueExpression());
+        //}
 
-        private bool IsFalseExpression(string exp)
-        {
-            return (exp == GetFalseExpression());
-        }
+        //private bool IsFalseExpression(string exp)
+        //{
+        //    return (exp == GetFalseExpression());
+        //}
 
         protected bool IsFieldName(string quotedExp)
         {
