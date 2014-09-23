@@ -306,8 +306,8 @@
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
-    <Compile Include="Editors\TuningController.cs" />
-    <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Editors\CanvasDesignerController.cs" />
+    <Compile Include="CanvasTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\MemberBasic.cs" />
@@ -379,7 +379,7 @@
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
-    <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\CanvasPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
@@ -506,7 +506,7 @@
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplateTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="TuningUtility.cs" />
+    <Compile Include="CanvasDesignerUtility.cs" />
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />

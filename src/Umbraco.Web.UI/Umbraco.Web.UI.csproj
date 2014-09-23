@@ -537,7 +537,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
-    <Content Include="Config\grid.editors.config.js" />
+    <Content Include="Config\canvas.editors.config.js" />
     <Content Include="Umbraco\Install\Legacy\loadStarterKits.ascx" />
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
@@ -2073,13 +2073,13 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Views\Partials\Grid\bootstrap3.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\embed.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\macro.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\media.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\rte.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\textstring.cshtml" />
-    <Content Include="Views\Partials\Grid\bootstrap2.cshtml" />
+    <Content Include="Views\Partials\Canvas\bootstrap3.cshtml" />
+    <Content Include="Views\Partials\Canvas\Editors\embed.cshtml" />
+    <Content Include="Views\Partials\Canvas\Editors\macro.cshtml" />
+    <Content Include="Views\Partials\Canvas\Editors\media.cshtml" />
+    <Content Include="Views\Partials\Canvas\Editors\rte.cshtml" />
+    <Content Include="Views\Partials\Canvas\Editors\textstring.cshtml" />
+    <Content Include="Views\Partials\Canvas\bootstrap2.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>

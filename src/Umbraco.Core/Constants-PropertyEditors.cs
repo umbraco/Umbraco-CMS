@@ -133,7 +133,7 @@ namespace Umbraco.Core
             /// <summary>
             /// Alias for the grid datatype.
             /// </summary>
-            public const string GridAlias = "Umbraco.Grid";
+            public const string CanvasAlias = "Umbraco.Canvas";
 
 
             /// <summary>

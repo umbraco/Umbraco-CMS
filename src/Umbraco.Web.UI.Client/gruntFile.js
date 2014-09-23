@@ -143,16 +143,16 @@ module.exports = function (grunt) {
       bower: {
         files: [
                 {
-                  dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', 
-                  src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js' 
+                  dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js',
+                  src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js'
                 },
                 {
-                  dest: '<%= distdir %>/lib/lazyload/lazyload.min.js', 
+                  dest: '<%= distdir %>/lib/lazyload/lazyload.min.js',
                   src: 'bower_components/rgrove-lazyload/lazyload.js'
                 }
               ]
       },
-      
+
 
       installer: {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
@@ -160,12 +160,12 @@ module.exports = function (grunt) {
 
       tuning: {
           files: [
-              { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/preview/editors', src: '**/*.html', expand: true, cwd: 'src/tuning/editors' },
-              { dest: '<%= distdir %>/assets/less', src: '**/*.less', expand: true, cwd: 'src/tuning/editors' },
-              { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
-              { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
-              { dest: '<%= distdir %>/js', src: 'tuning.front.js', expand: true, cwd: 'src/tuning' }
+              { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/canvasdesigner' },
+              { dest: '<%= distdir %>/preview/editors', src: '**/*.html', expand: true, cwd: 'src/canvasdesigner/editors' },
+              { dest: '<%= distdir %>/assets/less', src: '**/*.less', expand: true, cwd: 'src/canvasdesigner/editors' },
+              { dest: '<%= distdir %>/js', src: 'canvasdesigner.config.js', expand: true, cwd: 'src/canvasdesigner/config' },
+              { dest: '<%= distdir %>/js', src: 'canvasdesigner.palettes.js', expand: true, cwd: 'src/canvasdesigner/config' },
+              { dest: '<%= distdir %>/js', src: 'canvasdesigner.front.js', expand: true, cwd: 'src/canvasdesigner' }
           ]
       },
 
@@ -193,7 +193,7 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
               { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
-      },      
+      },
       packages: {
         files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
@@ -230,8 +230,8 @@ module.exports = function (grunt) {
           }
         },
         tuningJs: {
-            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/editors/*.js', 'src/tuning/lib/*.js'],
-            dest: '<%= distdir %>/js/tuning.panel.js'
+            src: ['src/canvasdesigner/canvasdesigner.global.js', 'src/canvasdesigner/canvasdesigner.controller.js', 'src/canvasdesigner/editors/*.js', 'src/canvasdesigner/lib/*.js'],
+            dest: '<%= distdir %>/js/canvasdesigner.panel.js'
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
@@ -321,8 +321,8 @@ module.exports = function (grunt) {
       },
       tuning: {
           files: {
-              '<%= distdir %>/assets/css/tuning.panelStyles.css':
-              ['src/less/tuning.panelStyles.less', 'src/less/helveticons.less']
+              '<%= distdir %>/assets/css/canvasdesigner.panelStyles.css':
+              ['src/less/canvasdesigner.panelStyles.less', 'src/less/helveticons.less']
           },
           options: {
               compile: true
@@ -361,7 +361,7 @@ module.exports = function (grunt) {
           tasks: ['watch-installer', 'timestamp'],
       },
       tuning: {
-          files: ['src/tuning/**/*.*'],
+          files: ['src/canvasdesigner/**/*.*'],
           tasks: ['watch-tuning', 'timestamp'],
       },
       html: {

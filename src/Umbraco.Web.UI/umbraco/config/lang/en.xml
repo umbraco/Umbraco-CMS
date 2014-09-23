@@ -744,6 +744,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="users">Users</key>
     <key alias="help" version="7.0">Help</key>
     <key alias="forms">Forms</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
