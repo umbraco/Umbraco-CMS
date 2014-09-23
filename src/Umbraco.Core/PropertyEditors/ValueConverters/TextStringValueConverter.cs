@@ -10,9 +10,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
+        private readonly static string[] PropertyTypeAliases =
+        {
+            Constants.PropertyEditors.TextboxAlias,
+            Constants.PropertyEditors.TextboxMultipleAlias
+        };
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return Constants.PropertyEditors.TextboxAlias.Equals(propertyType.PropertyEditorAlias);
+            return PropertyTypeAliases.Contains(propertyType.PropertyEditorAlias);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
