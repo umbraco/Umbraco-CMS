@@ -206,6 +206,8 @@ var outlineSelectedHide = function () {
 
 var initCanvasdesignerPanel = function () {
 
+    $('link[data-title="canvasdesignerCss"]').attr('disabled', 'disabled');
+
     // First load the canvasdesigner config from file
     if (!canvasdesignerConfig) {
         console.info("canvasdesigner config not found");

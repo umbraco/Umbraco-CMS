@@ -1333,7 +1333,7 @@ namespace Umbraco.Web
                                  @"<script type=""text/javascript"">var pageId = '{2}'</script>" +
                                  @"<script src=""/umbraco/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
 
-            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />";
+            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
 
             // Get page value
             int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
