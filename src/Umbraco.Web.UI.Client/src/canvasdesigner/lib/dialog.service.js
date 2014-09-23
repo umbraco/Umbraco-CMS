@@ -38,7 +38,7 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
             // Save original value for cancel action
             var originalDialogItem = angular.copy(dialog.dialogItem);
 
-            dialog.element = $(".float-right-menu");
+            dialog.element = $(".float-panel");
 
 
             /************************************/
@@ -98,7 +98,7 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
         },
 
         close: function() {
-            var modal = $(".float-right-menu");
+            var modal = $(".float-panel");
             modal.removeClass("selected")
         }
 

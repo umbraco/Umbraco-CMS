@@ -9,22 +9,15 @@ var refrechIntelTuning = function (name) {
     var scope = angular.element($("#tuningPanel")).scope();
 
     if (scope.schemaFocus != name.toLowerCase()) {
-
         var notFound = true;
         $.each(scope.tuningModel.configs, function (indexConfig, config) {
             if (config.name && name.toLowerCase() == config.name.toLowerCase()) {
-                notFound = false
+                scope.currentSelected = config;
             }
         });
-
-        if (notFound) {
-            scope.schemaFocus = "body";
-        }
-        else {
-            scope.schemaFocus = name.toLowerCase();
-        }
-
     }
+
+    scope.clearSelectedCategory();
 
     scope.closeFloatPanels();
 

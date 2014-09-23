@@ -119,7 +119,13 @@ var initIntelTuning = function (tuningModel) {
 
 }
 
-var outlinePosition = function (target) {
+var refrechOutlinePosition = function(schema) {
+    outlinePosition($(schema));
+}
+
+var outlinePosition = function (oTarget) {
+
+    var target = oTarget;
 
     if (target.length > 0 && target.attr('tuning-over') != undefined && target.attr('tuning-over') != '') {
 
@@ -148,9 +154,18 @@ var outlinePosition = function (target) {
     }
 }
 
-var outlineSelected = function () {
+var refrechOutlineSelected = function (schema) {
+    outlineSelected($(schema));
+}
+
+var outlineSelected = function (oTarget) {
 
     var target = currentTarget;
+
+    if (oTarget) {
+        currentTarget = oTarget;
+        target = oTarget;
+    }
 
     if (target && target.length > 0 && target.attr('tuning-over') != undefined && target.attr('tuning-over') != '') {
 
@@ -192,11 +207,8 @@ var outlineSelectedHide = function () {
 var initTuningPanel = function () {
 
     // First load the tuning config from file
-    if (tuningConfig) {
-        //console.info("Tuning config from file is loaded");
-    }
-    else {
-        //console.info("tuning config not found");
+    if (!tuningConfig) {
+        console.info("tuning config not found");
     }
 
     // Add tuning from HTML 5 data tags
@@ -205,7 +217,6 @@ var initTuningPanel = function () {
         var tagSchema = $(value).data("schema") ? $(value).data("schema") : $(value)[0].nodeName.toLowerCase();
         var tagSelector = $(value).data("selector") ? $(value).data("selector") : tagSchema;
         var tagEditors = $(value).data("editors"); //JSON.parse(...);
-
         tuningConfig.configs.splice(tuningConfig.configs.length, 0, {
             name: tagName,
             schema: tagSchema,
@@ -213,17 +224,17 @@ var initTuningPanel = function () {
             editors: tagEditors
         });
     });
-    //console.info("HTML5 tags");
 
     // For each editor config create a composite alias
     $.each(tuningConfig.configs, function (configIndex, config) {
-        $.each(config.editors, function (editorIndex, editor) {
-            var clearSchema = config.schema.replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
-            var clearEditor = JSON.stringify(editor).replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
-            editor.alias = clearSchema + clearEditor;
-        });
+        if (config.editors) {
+            $.each(config.editors, function (editorIndex, editor) {
+                var clearSchema = config.schema.replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+                var clearEditor = JSON.stringify(editor).replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+                editor.alias = clearSchema + clearEditor;
+            });
+        }
     });
-    //console.info("Alias tags");
 
     // Create or update the less file
     $.ajax({
@@ -267,7 +278,7 @@ $(function () {
     if (parent.setFrameIsLoaded) {
 
         // Overlay background-color: rgba(28, 203, 255, 0.05);
-        $("body").append("<div class=\"tuning-overlay\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9999; border: 1px solid #2ebdff; border-radius: 3px; \"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
+        $("body").append("<div class=\"tuning-overlay\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9999; border: 1px solid #2ebdff; border-radius: 3px; \"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px 0 6px; font-size: 10px; line-height: 17px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
         $("body").append("<div class=\"tuning-overlay-selected\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9998; border: 2px solid #2ebdff; border-radius: 3px;\"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
 
         // Set event for any body click

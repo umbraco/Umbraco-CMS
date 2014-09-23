@@ -8,7 +8,10 @@
 
 </head>
 
-<body id="tuningPanel" ng-mouseover="outlinePositionHide()" ng-class="{ rightOpen: showStyleEditor && !showDevicesPreview }" ng-controller="Umbraco.canvasdesignerController">
+ 
+<body id="tuningPanel" ng-mouseover="outlinePositionHide()" ng-class="{ leftOpen: (showStyleEditor || showPalettePicker) && !showDevicesPreview }" ng-controller="Umbraco.tuningController">
+
+
 
     <div class="wait" ng-show="!frameLoaded"></div>
 
@@ -16,7 +19,7 @@
         <iframe id="resultFrame" ng-src="{{pageUrl}}" frameborder="0" iframe-is-loaded></iframe>
     </div>
 
-    <div class="tuning" ng-init="showDevicesPreview = true; showPalettePicker = true">
+    <div class="tuning" ng-init="showDevicesPreview = true; showPalettePicker = true" ng-mouseenter="positionSelectedHide()">
 
         <div class="fix-left-menu selected">
 
@@ -55,7 +58,7 @@
 
         </div>
 
-        <div class="float-left-menu" ng-class="{selected: !showDevicesPreview && showPalettePicker}">
+        <div class="main-panel" ng-class="{selected: !showDevicesPreview && ( showPalettePicker || showStyleEditor )}">
 
             <div class="header">
                 <h3>Palette Style</h3>
@@ -92,22 +95,40 @@
 
         </div>
 
-        <div class="fix-right-menu devices-preview" ng-class="{selected: !showDevicesPreview && showStyleEditor}">
+        <div class="main-panel" ng-class="{selected: !showDevicesPreview && showStyleEditor}">
 
-            <div ng-repeat="configItem in tuningModel.configs" ng-show="schemaFocus.toLowerCase() == configItem.name.toLowerCase()" on-finish-render-filters>
-
+            <div ng-show="!currentSelected">
                 <div class="header">
-                    <h3>{{configItem.name}}</h3>
+                    <h3>Select</h3>
                 </div>
                 <div class="content">
-                    <div ng-repeat="category in propertyCategories" ng-show="hasEditor(configItem.editors, category)">
-                        <h4 class="panel-title">{{category}}</h4>
-                        <div class="tuning-panel-container">
-                            <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category" ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
+                    <ul class="samples">
+                        <li ng-repeat="configItem in tuningModel.configs" ng-mousemove="refrechOutlinePosition(configItem)" ng-click="setCurrentSelected(configItem)">
+                            {{configItem.name}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div ng-repeat="configItem in tuningModel.configs" ng-show="currentSelected && currentSelected.name.toLowerCase() == configItem.name.toLowerCase()" on-finish-render-filters>
+                <div class="header">
+                    <h3><i class="icon icon-list" ng-click="outlineSelectedHide()"></i> {{configItem.name}}</h3>
+                </div>
+                <div class="content">
+                    <div class="editor-category" ng-repeat="category in getCategories(configItem)" ng-show="hasEditor(configItem.editors, category)">
+                        <h4 class="panel-title" ng-click="setSelectedCategory(category)">
+                            {{category}}
+                            <i class="icon icon-add small right" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
+                            <i class="icon icon-remove small right" ng-hide="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
+                        </h4>
+                        <div class="tuning-panel-container" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)">
+                            <div class="tuning-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category">
+                                <h5>{{item.name}} <i class="icon icon-help-alt"></i></h5>
+                                <div ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="btn-group">
@@ -124,7 +145,7 @@
 
         </div>
 
-        <div class="float-right-menu devices-preview"></div>
+        <div class="float-panel"></div>
 
     </div>
 

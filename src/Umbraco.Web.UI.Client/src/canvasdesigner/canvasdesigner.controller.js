@@ -10,9 +10,8 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     $scope.isOpen = false;
     $scope.frameLoaded = false;
     $scope.enableTuning = 0;
-    $scope.schemaFocus = "body";
-    $scope.settingIsOpen = 'previewDevice';
-    $scope.propertyCategories = [];
+    //$scope.schemaFocus = "body";
+    //$scope.settingIsOpen = 'previewDevice';
     $scope.googleFontFamilies = {};
     $scope.pageId = $location.search().id;
     $scope.pageUrl = "../dialogs/Preview.aspx?id=" + $location.search().id;
@@ -46,38 +45,42 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     var updateConfigValue = function (data) {
 
         var fonts = [];
+
         $.each($scope.tuningModel.configs, function (indexConfig, config) {
-            $.each(config.editors, function (indexItem, item) {
+            if (config.editors) {
+                $.each(config.editors, function (indexItem, item) {
 
-                /* try to get value */
-                try {
+                    /* try to get value */
+                    try {
 
-                    if (item.values) {
-                        angular.forEach(Object.keys(item.values), function (key, indexKey) {
-                            if (key != "''") {
-                                var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
-                                var newValue = eval("data." + propertyAlias.replace("@", ""));
-                                if (newValue == "''") {
-                                    newValue = "";
+                        if (item.values) {
+                            angular.forEach(Object.keys(item.values), function (key, indexKey) {
+                                if (key != "''") {
+                                    var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
+                                    var newValue = eval("data." + propertyAlias.replace("@", ""));
+                                    if (newValue == "''") {
+                                        newValue = "";
+                                    }
+                                    item.values[key] = newValue;
                                 }
-                                item.values[key] = newValue;
-                            }
-                        });
-                    }
-
-                    // TODO: special init for font family picker
-                    if (item.type == "googlefontpicker") {
-                        if (item.values.fontType == 'google' && item.values.fontFamily + item.values.fontWeight && $.inArray(item.values.fontFamily + ":" + item.values.fontWeight, fonts) < 0) {
-                            fonts.splice(0, 0, item.values.fontFamily + ":" + item.values.fontWeight);
+                            })
                         }
+
+                        // TODO: special init for font family picker
+                        if (item.type == "googlefontpicker") {
+                            if (item.values.fontType == 'google' && item.values.fontFamily + item.values.fontWeight && $.inArray(item.values.fontFamily + ":" + item.values.fontWeight, fonts) < 0) {
+                                fonts.splice(0, 0, item.values.fontFamily + ":" + item.values.fontWeight);
+                            }
+                        }
+
+                    }
+                    catch (err) {
+                        console.info("Style parameter not found " + item.alias);
                     }
 
-                }
-                catch (err) {
-                    console.info("Style parameter not found " + item.alias);
-                }
+                });
+            }
 
-            });
         });
 
         // Load google font
@@ -116,30 +119,39 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
             angular.forEach($scope.tuningModel.configs, function (config, indexConfig) {
 
                 // Get currrent selected element
-                if ($scope.schemaFocus && angular.lowercase($scope.schemaFocus) == angular.lowercase(config.name)) {
-                    $scope.currentSelected = config.selector ? config.selector : config.schema;
+                // TODO
+                //if ($scope.schemaFocus && angular.lowercase($scope.schemaFocus) == angular.lowercase(config.name)) {
+                //    $scope.currentSelected = config.selector ? config.selector : config.schema;
+                //}
+
+                if (config.editors) {
+                    angular.forEach(config.editors, function (item, indexItem) {
+
+                        // Add new style
+                        if (item.values) {
+                            angular.forEach(Object.keys(item.values), function (key, indexKey) {
+                                var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
+                                var value = eval("item.values." + key);
+                                parameters.splice(parameters.length + 1, 0, "'@" + propertyAlias + "':'" + value + "'");
+                            })
+                        }
+                    });
                 }
 
-                angular.forEach(config.editors, function (item, indexItem) {
-
-                    // Add new style
-                    if (item.values) {
-                        angular.forEach(Object.keys(item.values), function (key, indexKey) {
-                            var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
-                            var value = eval("item.values." + key);
-                            parameters.splice(parameters.length + 1, 0, "'@" + propertyAlias + "':'" + value + "'");
-                        })
-                    }
-                })
             });
 
             // Refrech page style
             refreshFrontStyles(parameters);
 
             // Refrech layout of selected element
-            if ($scope.currentSelected) {
-                setSelectedSchema();
-            }
+            //$timeout(function () {
+            $scope.positionSelectedHide();
+                if ($scope.currentSelected) {
+                    refrechOutlineSelected($scope.currentSelected);
+                }
+            //}, 200);
+
+
 
         }
     }
@@ -157,27 +169,28 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
         var parameters = [];
         $.each($scope.tuningModel.configs, function (indexConfig, config) {
-            $.each(config.editors, function (indexItem, item) {
+            if (config.editors) {
+                $.each(config.editors, function (indexItem, item) {
 
-                if (item.values) {
-                    angular.forEach(Object.keys(item.values), function (key, indexKey) {
-                        var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
-                        var value = eval("item.values." + key);
-                        parameters.splice(parameters.length + 1, 0, "@" + propertyAlias + ":" + value + ";");
-                    })
+                    if (item.values) {
+                        angular.forEach(Object.keys(item.values), function (key, indexKey) {
+                            var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
+                            var value = eval("item.values." + key);
+                            parameters.splice(parameters.length + 1, 0, "@" + propertyAlias + ":" + value + ";");
+                        })
 
-                    // TODO: special init for font family picker
-                    if (item.type == "googlefontpicker" && item.values.fontFamily) {
-                        var variant = item.values.fontWeight != "" || item.values.fontStyle != "" ? ":" + item.values.fontWeight + item.values.fontStyle : "";
-                        var gimport = "@import url('http://fonts.googleapis.com/css?family=" + item.values.fontFamily + variant + "');";
-                        if ($.inArray(gimport, parameters) < 0) {
-                            parameters.splice(0, 0, gimport);
+                        // TODO: special init for font family picker
+                        if (item.type == "googlefontpicker" && item.values.fontFamily) {
+                            var variant = item.values.fontWeight != "" || item.values.fontStyle != "" ? ":" + item.values.fontWeight + item.values.fontStyle : "";
+                            var gimport = "@import url('http://fonts.googleapis.com/css?family=" + item.values.fontFamily + variant + "');";
+                            if ($.inArray(gimport, parameters) < 0) {
+                                parameters.splice(0, 0, gimport);
+                            }
                         }
                     }
 
-                }
-
-            })
+                });
+            }
         });
 
         var resultParameters = { parameters: parameters.join(""), pageId: $scope.pageId, inherited: inherited };
@@ -225,16 +238,18 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
         var parameters = [];
         $.each($scope.tuningModel.configs, function (indexConfig, config) {
-            $.each(config.editors, function (indexItem, item) {
-                if (item.values) {
-                    angular.forEach(Object.keys(item.values), function (key, indexKey) {
-                        var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
-                        var value = eval("item.values." + key);
-                        value = (value !== 0 && (value === undefined || value === "")) ? "''" : value;
-                        parameters.splice(parameters.length + 1, 0, "\"" + propertyAlias + "\":" + " \"" + value + "\"");
-                    });
-                }
-            });
+            if (config.editors) {
+                $.each(config.editors, function (indexItem, item) {
+                    if (item.values) {
+                        angular.forEach(Object.keys(item.values), function (key, indexKey) {
+                            var propertyAlias = key.toLowerCase() + item.alias.toLowerCase();
+                            var value = eval("item.values." + key);
+                            var value = (value != 0 && (value == undefined || value == "")) ? "''" : value;
+                            parameters.splice(parameters.length + 1, 0, "\"" + propertyAlias + "\":" + " \"" + value + "\"");
+                        })
+                    }
+                });
+            }
         });
 
         $(".btn-group").append("<textarea>{name:\"\", color1:\"\", color2:\"\", color3:\"\", color4:\"\", color5:\"\", data:{" + parameters.join(",") + "}}</textarea>");
@@ -266,8 +281,9 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     $scope.openStyleEditor = function () {
         $scope.showStyleEditor = true;
         $scope.showPalettePicker = false;
-        $scope.openIntelTuning();
-    };
+        $scope.outlineSelectedHide()
+        $scope.openIntelTuning()
+    }
 
     // Remove value from field
     $scope.removeField = function (field) {
@@ -295,6 +311,38 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $scope.$apply();
     };
 
+    $scope.setCurrentSelected = function(item) {
+        $scope.currentSelected = item;
+        $scope.clearSelectedCategory();
+        refrechOutlineSelected($scope.currentSelected);
+    }
+
+    /* Editor categories */
+
+    $scope.getCategories = function (item) {
+
+        var propertyCategories = [];
+
+        $.each(item.editors, function (indexItem, editor) {
+            if (editor.category) {
+                if ($.inArray(editor.category, propertyCategories) < 0) {
+                    propertyCategories.splice( propertyCategories.length + 1, 0, editor.category);
+                }
+            }
+        });
+
+        return propertyCategories;
+
+    }
+
+    $scope.setSelectedCategory = function (item) {
+        $scope.selectedCategory = item;
+    }
+
+    $scope.clearSelectedCategory = function () {
+        $scope.selectedCategory = "";
+    }
+
     /*****************************************************************************/
     /* Call function into the front-end   */
     /*****************************************************************************/
@@ -302,11 +350,6 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     var loadGoogleFontInFront = function (font) {
         if (document.getElementById("resultFrame").contentWindow.getFont)
             document.getElementById("resultFrame").contentWindow.getFont(font);
-    };
-
-    var setSelectedSchema = function () {
-        if (document.getElementById("resultFrame").contentWindow.outlineSelected)
-            document.getElementById("resultFrame").contentWindow.outlineSelected();
     };
 
     var refreshFrontStyles = function (parameters) {
@@ -323,12 +366,6 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     $scope.openIntelTuning = function () {
         if (document.getElementById("resultFrame").contentWindow.initIntelTuning)
             document.getElementById("resultFrame").contentWindow.initIntelTuning($scope.tuningModel);
-
-        // Refrech layout of selected element
-        if ($scope.currentSelected) {
-            setSelectedSchema();
-        }
-
     };
 
     $scope.closeIntelTuning = function () {
@@ -337,11 +374,28 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $scope.outlineSelectedHide();
     };
 
+    var refrechOutlineSelected = function (config) {
+        var schema = config.selector ? config.selector : config.schema;
+        if (document.getElementById("resultFrame").contentWindow.refrechOutlineSelected)
+            document.getElementById("resultFrame").contentWindow.refrechOutlineSelected(schema);
+    }
+
     $scope.outlineSelectedHide = function () {
+        $scope.currentSelected = null;
         if (document.getElementById("resultFrame").contentWindow.outlineSelectedHide)
             document.getElementById("resultFrame").contentWindow.outlineSelectedHide();
-        $scope.schemaFocus = "body";
     };
+
+    $scope.refrechOutlinePosition = function (config) {
+        var schema = config.selector ? config.selector : config.schema;
+        if (document.getElementById("resultFrame").contentWindow.refrechOutlinePosition)
+            document.getElementById("resultFrame").contentWindow.refrechOutlinePosition(schema);
+    }
+
+    $scope.positionSelectedHide = function () {
+        if (document.getElementById("resultFrame").contentWindow.outlinePositionHide)
+            document.getElementById("resultFrame").contentWindow.outlinePositionHide();
+    }
 
 
 
@@ -393,19 +447,6 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     $scope.$watch("enableTuning", function () {
         $timeout(function () {
             if ($scope.enableTuning > 0) {
-
-                $.each($scope.tuningModel.configs, function (indexConfig, config) {
-                    $.each(config.editors, function (indexItem, item) {
-
-                        /* get distinct dategoryies */
-                        if (item.category) {
-                            if ($.inArray(item.category, $scope.propertyCategories) < 0) {
-                                $scope.propertyCategories.splice($scope.propertyCategories.length + 1, 0, item.category);
-                            }
-                        }
-
-                    });
-                });
 
                 $scope.$watch('ngRepeatFinished', function (ngRepeatFinishedEvent) {
                     $timeout(function () {

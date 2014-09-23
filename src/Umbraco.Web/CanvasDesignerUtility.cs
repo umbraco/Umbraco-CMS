@@ -132,37 +132,40 @@ namespace Umbraco.Web
             dynamic tuningConfigs = Newtonsoft.Json.Linq.JObject.Parse(configs.ToString());
             foreach (var configuration in tuningConfigs.configs)
             {
-                foreach (var editorItem in configuration.editors)
+                if (configuration.editors != null)
                 {
-
-                    var type = (editorItem.type != null && !string.IsNullOrEmpty(editorItem.type.ToString())) ? editorItem.type.ToString() : string.Empty;
-                    var alias = (editorItem.alias != null && !string.IsNullOrEmpty(editorItem.alias.ToString())) ? editorItem.alias.ToString() : string.Empty;
-                    var schema = (configuration.schema != null && !string.IsNullOrEmpty(configuration.schema.ToString())) ? configuration.schema.ToString() : alias;
-                    schema = (editorItem.schema != null && !string.IsNullOrEmpty(editorItem.schema.ToString())) ? editorItem.schema.ToString() : schema;
-
-                    if (string.IsNullOrEmpty(GetStyleBlock(lessContent, "lessParam-" + alias)))
+                    foreach (var editorItem in configuration.editors)
                     {
 
-                        // read the less model file
-                        var lessModelPath = string.Format("/Umbraco/assets/less/{0}.less", type);
-                        var lessModel = string.Empty;
-                        if (System.IO.File.Exists(HttpContext.Current.Server.MapPath(lessModelPath)))
+                        var type = (editorItem.type != null && !string.IsNullOrEmpty(editorItem.type.ToString())) ? editorItem.type.ToString() : string.Empty;
+                        var alias = (editorItem.alias != null && !string.IsNullOrEmpty(editorItem.alias.ToString())) ? editorItem.alias.ToString() : string.Empty;
+                        var schema = (configuration.schema != null && !string.IsNullOrEmpty(configuration.schema.ToString())) ? configuration.schema.ToString() : alias;
+                        schema = (editorItem.schema != null && !string.IsNullOrEmpty(editorItem.schema.ToString())) ? editorItem.schema.ToString() : schema;
+
+                        if (string.IsNullOrEmpty(GetStyleBlock(lessContent, "lessParam-" + alias)))
                         {
-                            using (System.IO.StreamReader sr = new System.IO.StreamReader(HttpContext.Current.Server.MapPath(lessModelPath)))
+
+                            // read the less model file
+                            var lessModelPath = string.Format("/Umbraco/assets/less/{0}.less", type);
+                            var lessModel = string.Empty;
+                            if (System.IO.File.Exists(HttpContext.Current.Server.MapPath(lessModelPath)))
                             {
-                                lessModel = sr.ReadToEnd();
+                                using (System.IO.StreamReader sr = new System.IO.StreamReader(HttpContext.Current.Server.MapPath(lessModelPath)))
+                                {
+                                    lessModel = sr.ReadToEnd();
+                                }
                             }
+
+                            lessContent = lessContent + Environment.NewLine + lessModel
+                                .Replace("-ALIAS-", alias.ToLower())
+                                .Replace("-SCHEMA-", schema);
+
+                            foreach (var parameter in editorItem)
+                            {
+                                lessContent = lessContent.Replace("-" + parameter.Name.ToString().ToUpper() + "-", parameter.Value.ToString());
+                            }
+
                         }
-
-                        lessContent = lessContent + Environment.NewLine + lessModel
-                            .Replace("-ALIAS-", alias.ToLower())
-                            .Replace("-SCHEMA-", schema);
-
-                        foreach (var parameter in editorItem)
-                        {
-                            lessContent = lessContent.Replace("-" + parameter.Name.ToString().ToUpper() + "-", parameter.Value.ToString());
-                        }
-
                     }
                 }
             }
