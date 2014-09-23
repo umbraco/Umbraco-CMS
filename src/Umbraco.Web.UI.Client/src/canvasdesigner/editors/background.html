@@ -1,18 +1,15 @@
 ﻿
 <div ng-controller="Umbraco.canvasdesigner.background">
 
-    <h5>{{item.name}}</h5>
+    <div class="box-slider">
+        <spectrum colorselected="item.values.color"></spectrum>
+    </div>    
 
     <div class="box-slider">
         <div class="imagePickerPreview" ng-click="open(item.values)" style="background-image:{{ item.values.imageorpattern }}">
             <i ng-if="item.values.imageorpattern == ''" class="icon icon-picture"></i>
             <i ng-if="item.values.imageorpattern != ''" class="icon icon-delete" ng-click="item.values.imageorpattern = ''"></i>
         </div>
-    </div>
-
-    <div class="box-slider">
-        <spectrum colorselected="item.values.color"></spectrum>
-        <!--<i ng-if="item.values.color != ''" ng-click="item.values.color = ''" class="icon icon-delete colorPickerDelete"></i>-->
     </div>
 
 </div>

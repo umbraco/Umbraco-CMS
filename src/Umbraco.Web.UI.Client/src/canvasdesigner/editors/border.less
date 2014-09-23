@@ -28,31 +28,31 @@
 
 /***start-lessStyle--ALIAS-***/
 
-.all-ALIAS- () when  (@bordersize-ALIAS- > 0) {
+.all-ALIAS- () when  (isnumber(@bordersize-ALIAS-)) {
     border: @bordersize-ALIAS- + 0px;
     border-color:@bordercolor-ALIAS-;
     border-style:@bordertype-ALIAS-;
 }
 
-.left-ALIAS- () when  (@leftbordersize-ALIAS- > 0) {
+.left-ALIAS- () when  (isnumber(@leftbordersize-ALIAS-)) {
     border-left: @leftbordersize-ALIAS- + 0px;
     border-left-color:@leftbordercolor-ALIAS-;
     border-left-style:@leftbordertype-ALIAS-;
 }
 
-.right-ALIAS- () when  (@rightbordersize-ALIAS- > 0) {
+.right-ALIAS- () when  (isnumber(@rightbordersize-ALIAS-)) {
     border-right: @rightbordersize-ALIAS- + 0px;
     border-right-color:@rightbordercolor-ALIAS-;
     border-right-style:@rightbordertype-ALIAS-;
 }
 
-.top-ALIAS- () when  (@topbordersize-ALIAS- > 0) {
+.top-ALIAS- () when  (isnumber(@topbordersize-ALIAS-)) {
     border-top: @topbordersize-ALIAS- + 0px;
     border-top-color:@topbordercolor-ALIAS-;
     border-top-style:@topbordertype-ALIAS-;
 }
 
-.bottom-ALIAS- () when  (@bottombordersize-ALIAS- > 0) {
+.bottom-ALIAS- () when  (isnumber(@bottombordersize-ALIAS-)) {
     border-bottom: @bottombordersize-ALIAS- + 0px;
     border-bottom-color:@bottombordercolor-ALIAS-;
     border-bottom-style:@bottombordertype-ALIAS-;

@@ -1,13 +1,12 @@
 ﻿
 <div ng-controller="Umbraco.canvasdesigner.googlefontpicker">
 
-    <span class="field-title">{{item.name}}:</span>
     <div class="box-slider">
         <div class="fontFamilyPickerPreview" ng-click="open(item.values)" ng-style="setStyleVariant()">
             <span>Aa</span>
             {{ item.values.fontFamily }}
+            <i ng-if="item.values.fontFamily != ''" ng-click="item.values.fontFamily = ''" class="icon icon-delete fontPickerDelete"></i>
         </div>
-        <i ng-if="item.values.fontFamily != ''" ng-click="item.values.fontFamily = ''" class="icon icon-delete fontPickerDelete"></i>
     </div>
 
 </div>

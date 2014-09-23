@@ -1,8 +1,6 @@
 ﻿
 <div ng-controller="Umbraco.canvasdesigner.border" class="bordereditor">
 
-    <h5>{{item.name}}</h5>
-
     <div class="box-slider">
         <ul class="box-preview">
             <li ng-repeat="border in borderList" class="border-{{border}}" ng-class="{selected: selectedBorder.name == border}" ng-click="setselectedBorder(border)"></li>
