@@ -3,14 +3,14 @@
 /* Global function and variable for panel/page com  */
 /*********************************************************************************************************/
 
-/* Called for every tuning-over rollover */
-var refrechIntelTuning = function (name) {
+/* Called for every canvasdesigner-over rollover */
+var refrechIntelCanvasdesigner = function (name) {
 
-    var scope = angular.element($("#tuningPanel")).scope();
+    var scope = angular.element($("#canvasdesignerPanel")).scope();
 
     if (scope.schemaFocus != name.toLowerCase()) {
         var notFound = true;
-        $.each(scope.tuningModel.configs, function (indexConfig, config) {
+        $.each(scope.canvasdesignerModel.configs, function (indexConfig, config) {
             if (config.name && name.toLowerCase() == config.name.toLowerCase()) {
                 scope.currentSelected = config;
             }
@@ -26,20 +26,20 @@ var refrechIntelTuning = function (name) {
 }
 
 /* Called when the iframe is first loaded */
-var setFrameIsLoaded = function (tuningConfig, tuningPalette) {
+var setFrameIsLoaded = function (canvasdesignerConfig, canvasdesignerPalette) {
 
-    var scope = angular.element($("#tuningPanel")).scope();
+    var scope = angular.element($("#canvasdesignerPanel")).scope();
 
-    scope.tuningModel = tuningConfig;
-    scope.tuningPalette = tuningPalette;
-    scope.enableTuning++;
+    scope.canvasdesignerModel = canvasdesignerConfig;
+    scope.canvasdesignerPalette = canvasdesignerPalette;
+    scope.enableCanvasdesigner++;
     scope.$apply();
 }
 
 /* Iframe body click */
 var iframeBodyClick = function () {
 
-    var scope = angular.element($("#tuningPanel")).scope();
+    var scope = angular.element($("#canvasdesignerPanel")).scope();
 
     scope.closeFloatPanels();
 }

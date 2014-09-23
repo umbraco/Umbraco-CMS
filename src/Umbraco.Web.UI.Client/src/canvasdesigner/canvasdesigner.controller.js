@@ -1,6 +1,6 @@
 
 /*********************************************************************************************************/
-/* tuning panel app and controller */
+/* Canvasdesigner panel app and controller */
 /*********************************************************************************************************/
 
 var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services'])
@@ -9,9 +9,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
     $scope.isOpen = false;
     $scope.frameLoaded = false;
-    $scope.enableTuning = 0;
-    //$scope.schemaFocus = "body";
-    //$scope.settingIsOpen = 'previewDevice';
+    $scope.enableCanvasdesigner = 0;
     $scope.googleFontFamilies = {};
     $scope.pageId = $location.search().id;
     $scope.pageUrl = "../dialogs/Preview.aspx?id=" + $location.search().id;
@@ -26,7 +24,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     ];
     $scope.previewDevice = $scope.devices[0];
 
-    var apiController = "/Umbraco/Api/CanvasDesigner/";
+    var apiController = "/Umbraco/Api/Canvasdesigner/";
 
     /*****************************************************************************/
     /* Preview devices */
@@ -41,12 +39,12 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     /* UI designer managment */
     /*****************************************************************************/
 
-    // Update all tuningConfig's values from data
+    // Update all Canvasdesigner config's values from data
     var updateConfigValue = function (data) {
 
         var fonts = [];
 
-        $.each($scope.tuningModel.configs, function (indexConfig, config) {
+        $.each($scope.canvasdesignerModel.configs, function (indexConfig, config) {
             if (config.editors) {
                 $.each(config.editors, function (indexItem, item) {
 
@@ -93,8 +91,8 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
     };
 
-    // Load parameters from GetLessParameters and init data of the tuning config
-    $scope.initTuning = function () {
+    // Load parameters from GetLessParameters and init data of the Canvasdesigner config
+    $scope.initCanvasdesigner = function () {
 
         $http.get(apiController + 'Load', { params: { pageId: $scope.pageId } })
             .success(function (data) {
@@ -109,14 +107,14 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
     };
 
-    // Refresh all less parameters for every changes watching tuningModel
-    var refreshtuning = function () {
+    // Refresh all less parameters for every changes watching canvasdesignerModel
+    var refreshCanvasdesigner = function () {
 
         var parameters = [];
 
-        if ($scope.tuningModel) {
+        if ($scope.canvasdesignerModel) {
 
-            angular.forEach($scope.tuningModel.configs, function (config, indexConfig) {
+            angular.forEach($scope.canvasdesignerModel.configs, function (config, indexConfig) {
 
                 // Get currrent selected element
                 // TODO
@@ -164,11 +162,11 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $scope.saveLessParameters(true);
     }
 
-    // Save all parameter in tuningParameters.less file
+    // Save all parameter in CanvasdesignerParameters.less file
     $scope.saveLessParameters = function (inherited) {
 
         var parameters = [];
-        $.each($scope.tuningModel.configs, function (indexConfig, config) {
+        $.each($scope.canvasdesignerModel.configs, function (indexConfig, config) {
             if (config.editors) {
                 $.each(config.editors, function (indexItem, item) {
 
@@ -211,12 +209,12 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
     }
 
-    // Delete current page tuning
-    $scope.deleteTuning = function () {
+    // Delete current page Canvasdesigner
+    $scope.deleteCanvasdesigner = function () {
         $('.btn-default-delete').attr("disabled", true);
         $http.get(apiController + 'Delete', { params: { pageId: $scope.pageId } })
         .success(function (data) {
-            $scope.enableTuning++;
+            $scope.enableCanvasdesigner++;
             $scope.pageUrl = $scope.pageUrl + "&n=123456";
             $('.btn-default-delete').attr("disabled", false);
         })
@@ -227,17 +225,17 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     /* Preset design */
     /*****************************************************************************/
 
-    // Refresh with selected tuning palette
-    $scope.refreshtuningByPalette = function (palette) {
+    // Refresh with selected Canvasdesigner palette
+    $scope.refreshCanvasdesignerByPalette = function (palette) {
         updateConfigValue(palette.data);
-        refreshtuning();
+        refreshCanvasdesigner();
     };
 
     // Hidden botton to make preset from the current settings
     $scope.makePreset = function () {
 
         var parameters = [];
-        $.each($scope.tuningModel.configs, function (indexConfig, config) {
+        $.each($scope.canvasdesignerModel.configs, function (indexConfig, config) {
             if (config.editors) {
                 $.each(config.editors, function (indexItem, item) {
                     if (item.values) {
@@ -262,27 +260,27 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
     $scope.openPreviewDevice = function () {
         $scope.showDevicesPreview = true;
-        $scope.closeIntelTuning();
+        $scope.closeIntelCanvasdesigner();
     }
 
     $scope.closePreviewDevice = function(){
         $scope.showDevicesPreview = false;
         if ($scope.showStyleEditor) {
-            $scope.openIntelTuning();
+            $scope.openIntelCanvasdesigner();
         }
     }
 
     $scope.openPalettePicker = function () {
         $scope.showPalettePicker = true;
         $scope.showStyleEditor = false;
-        $scope.closeIntelTuning();
+        $scope.closeIntelCanvasdesigner();
     };
 
     $scope.openStyleEditor = function () {
         $scope.showStyleEditor = true;
         $scope.showPalettePicker = false;
         $scope.outlineSelectedHide()
-        $scope.openIntelTuning()
+        $scope.openIntelCanvasdesigner()
     }
 
     // Remove value from field
@@ -363,14 +361,14 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 			iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
     };
 
-    $scope.openIntelTuning = function () {
-        if (document.getElementById("resultFrame").contentWindow.initIntelTuning)
-            document.getElementById("resultFrame").contentWindow.initIntelTuning($scope.tuningModel);
+    $scope.openIntelCanvasdesigner = function () {
+        if (document.getElementById("resultFrame").contentWindow.initIntelCanvasdesigner)
+            document.getElementById("resultFrame").contentWindow.initIntelCanvasdesigner($scope.canvasdesignerModel);
     };
 
-    $scope.closeIntelTuning = function () {
-        if (document.getElementById("resultFrame").contentWindow.closeIntelTuning)
-            document.getElementById("resultFrame").contentWindow.closeIntelTuning($scope.tuningModel);
+    $scope.closeIntelCanvasdesigner = function () {
+        if (document.getElementById("resultFrame").contentWindow.closeIntelCanvasdesigner)
+            document.getElementById("resultFrame").contentWindow.closeIntelCanvasdesigner($scope.canvasdesignerModel);
         $scope.outlineSelectedHide();
     };
 
@@ -396,8 +394,6 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         if (document.getElementById("resultFrame").contentWindow.outlinePositionHide)
             document.getElementById("resultFrame").contentWindow.outlinePositionHide();
     }
-
-
 
     /*****************************************************************************/
     /* Google font loader, TODO: put together from directive, front and back */
@@ -443,19 +439,19 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $scope.googleFontFamilies = data;
     });
 
-    // watch framLoaded, only if iframe page have EnableTuning()
-    $scope.$watch("enableTuning", function () {
+    // watch framLoaded, only if iframe page have enableCanvasdesigner()
+    $scope.$watch("enableCanvasdesigner", function () {
         $timeout(function () {
-            if ($scope.enableTuning > 0) {
+            if ($scope.enableCanvasdesigner > 0) {
 
                 $scope.$watch('ngRepeatFinished', function (ngRepeatFinishedEvent) {
                     $timeout(function () {
-                        $scope.initTuning();
+                        $scope.initCanvasdesigner();
                     }, 200);
                 });
 
-                $scope.$watch('tuningModel', function () {
-                    refreshtuning();
+                $scope.$watch('canvasdesignerModel', function () {
+                    refreshCanvasdesigner();
                 }, true);
 
             }

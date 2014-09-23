@@ -9,16 +9,16 @@ module.exports = function (grunt) {
 
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs', 'karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning','copy:tuning', 'copy:assets', 'copy:vs']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:canvasdesigner','copy:vs', 'karma:unit']);
+  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner','copy:canvasdesigner', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
-  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'copy:vs']);
+  grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:tuning', 'bower', 'copy']);
+  grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
     //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
     grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'copy']);
 
@@ -158,7 +158,7 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
 
-      tuning: {
+      canvasdesigner: {
           files: [
               { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/canvasdesigner' },
               { dest: '<%= distdir %>/preview/editors', src: '**/*.html', expand: true, cwd: 'src/canvasdesigner/editors' },
@@ -229,7 +229,7 @@ module.exports = function (grunt) {
               footer: "\n\n})();"
           }
         },
-        tuningJs: {
+        canvasdesignerJs: {
             src: ['src/canvasdesigner/canvasdesigner.global.js', 'src/canvasdesigner/canvasdesigner.controller.js', 'src/canvasdesigner/editors/*.js', 'src/canvasdesigner/lib/*.js'],
             dest: '<%= distdir %>/js/canvasdesigner.panel.js'
         },
@@ -319,10 +319,10 @@ module.exports = function (grunt) {
           compile: true
         }
       },
-      tuning: {
+      canvasdesigner: {
           files: {
-              '<%= distdir %>/assets/css/canvasdesigner.panelStyles.css':
-              ['src/less/canvasdesigner.panelStyles.less', 'src/less/helveticons.less']
+              '<%= distdir %>/assets/css/canvasdesigner.css':
+              ['src/less/canvasdesigner.less', 'src/less/helveticons.less']
           },
           options: {
               compile: true
@@ -360,9 +360,9 @@ module.exports = function (grunt) {
           files: ['src/installer/**/*.*'],
           tasks: ['watch-installer', 'timestamp'],
       },
-      tuning: {
+      canvasdesigner: {
           files: ['src/canvasdesigner/**/*.*'],
-          tasks: ['watch-tuning', 'timestamp'],
+          tasks: ['watch-canvasdesigner', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],

@@ -1,9 +1,9 @@
 
 /*********************************************************************************************************/
-/* Tuning setting panel config */
+/* Canvasdesigner setting panel config */
 /*********************************************************************************************************/
 
-var tuningConfig = {
+var canvasdesignerConfig = {
     configs: [{
         name: "Body",
         schema: "body",

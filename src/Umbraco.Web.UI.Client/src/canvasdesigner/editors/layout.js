@@ -1,11 +1,11 @@
 ﻿
 /*********************************************************************************************************/
-/* slider editor */
+/* Layout */
 /*********************************************************************************************************/
 
-angular.module("umbraco.tuning")
+angular.module("Umbraco.canvasdesigner")
 
-.controller("Umbraco.tuning.layout", function ($scope) {
+.controller("Umbraco.canvasdesigner.layout", function ($scope) {
 
     if (!$scope.item.values) {
         $scope.item.values = {

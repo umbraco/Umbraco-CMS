@@ -1312,19 +1312,19 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region tuning
+        #region canvasdesigner
         
         public HtmlString EnableCanvasDesigner()
         {
             return EnableCanvasDesigner(string.Empty, string.Empty);
         }
 
-        public HtmlString EnableCanvasDesigner(string tuningConfigPath)
+        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
         {
-            return EnableCanvasDesigner(tuningConfigPath, string.Empty);
+            return EnableCanvasDesigner(canvasdesignerConfigPath, string.Empty);
         }
 
-        public HtmlString EnableCanvasDesigner(string tuningConfigPath, string tuningPalettesPath)
+        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
         {
 
             string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
@@ -1343,13 +1343,13 @@ namespace Umbraco.Web
 
             if (UmbracoContext.Current.InPreviewMode)
             {
-                tuningConfigPath = !string.IsNullOrEmpty(tuningConfigPath) ? tuningConfigPath : "/umbraco/js/canvasdesigner.config.js";
-                tuningPalettesPath = !string.IsNullOrEmpty(tuningPalettesPath) ? tuningConfigPath : "/umbraco/js/canvasdesigner.palettes.js";
+                canvasdesignerConfigPath = !string.IsNullOrEmpty(canvasdesignerConfigPath) ? canvasdesignerConfigPath : "/umbraco/js/canvasdesigner.config.js";
+                canvasdesignerPalettesPath = !string.IsNullOrEmpty(canvasdesignerPalettesPath) ? canvasdesignerConfigPath : "/umbraco/js/canvasdesigner.palettes.js";
                 
                 if (!string.IsNullOrEmpty(cssPath))
                     result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
 
-                result = result + string.Format(previewLink, tuningConfigPath, tuningPalettesPath, pageId);
+                result = result + string.Format(previewLink, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
             }
             else
             {

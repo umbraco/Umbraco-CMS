@@ -15,12 +15,12 @@
 
     <div ng-controller="googlefontdialog.controller">
 
-        <div class="modal-header tuning-fontfamilypicker">
+        <div class="modal-header canvasdesigner-fontfamilypicker">
             <select class="font-list" ng-model="selectedFont" ng-change="showFontPreview(selectedFont)" ng-options="font as font.fontFamily group by font.fontType for font in fonts"></select>
             <select class="variant-list" ng-model="selectedFont.variant" ng-change="showFontPreview(selectedFont,selectedFont.variant)" ng-options="variant for variant in selectedFont.variants" />
         </div>
 
-        <div class="modal-body tuning-fontfamilypicker">
+        <div class="modal-body canvasdesigner-fontfamilypicker">
             <span class="show" ng-style="setStyleVariant()">Aa Bb Cc 1 2 3 4&hellip; <br />The quick brown fox jumps over the lazy dog&hellip;</span>
         </div>
 

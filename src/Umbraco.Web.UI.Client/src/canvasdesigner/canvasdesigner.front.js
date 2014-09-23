@@ -13,7 +13,7 @@ var refrechLayout = function (parameters) {
     eval(string);
 }
 
-/* Fonts loaded in the tuning panel need to be loaded independently in
+/* Fonts loaded in the Canvasdesigner panel need to be loaded independently in
  * the content iframe to allow live previewing.
  */
 var webFontScriptLoaded = false;
@@ -47,14 +47,14 @@ var getFont = function (font) {
     }
 }
 
-var closeIntelTuning = function (tuningModel) {
+var closeIntelCanvasdesigner = function (canvasdesignerModel) {
 
-    if (tuningModel) {
+    if (canvasdesignerModel) {
 
-        $.each(tuningModel.configs, function (indexConfig, config) {
+        $.each(canvasdesignerModel.configs, function (indexConfig, config) {
             if (config.schema) {
                 $(config.schema).unbind();
-                $(config.schema).removeAttr("tuning-over");
+                $(config.schema).removeAttr("canvasdesigner-over");
             }
         });
 
@@ -72,41 +72,41 @@ var initBodyClickEvent = function () {
     });
 }
 
-var initIntelTuning = function (tuningModel) {
+var initIntelCanvasdesigner = function (canvasdesignerModel) {
 
-    if (tuningModel) {
+    if (canvasdesignerModel) {
 
-        // Add tuning-over attr for each schema from config
-        $.each(tuningModel.configs, function (indexConfig, config) {
+        // Add canvasdesigner-over attr for each schema from config
+        $.each(canvasdesignerModel.configs, function (indexConfig, config) {
             var schema = config.selector ? config.selector : config.schema;
             if (schema) {
-                $(schema).attr("tuning-over", config.name);
+                $(schema).attr("canvasdesigner-over", config.name);
                 $(schema).css("cursor", "default");
             }
         });
 
-        // Outline tuning-over
+        // Outline canvasdesigner-over
         $(document).mousemove(function (e) {
 
             e.stopPropagation();
 
             var target = $(e.target);
-            while (target.length > 0 && (target.attr('tuning-over') == undefined || target.attr('tuning-over') == '')) {
+            while (target.length > 0 && (target.attr('canvasdesigner-over') == undefined || target.attr('canvasdesigner-over') == '')) {
                 target = target.parent();
             }
 
-            if (target.attr('tuning-over') != undefined && target.attr('tuning-over') != '') {
+            if (target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
                 target.unbind();
                 outlinePosition(target);
                 target.click(function (e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    //console.info(target.attr('tuning-over'));
+                    //console.info(target.attr('canvasdesigner-over'));
 
                     currentTarget = target;
                     outlineSelected();
 
-                    parent.refrechIntelTuning(target.attr('tuning-over'), target);
+                    parent.refrechIntelCanvasdesigner(target.attr('canvasdesigner-over'), target);
                     return false;
                 });
             }
@@ -127,7 +127,7 @@ var outlinePosition = function (oTarget) {
 
     var target = oTarget;
 
-    if (target.length > 0 && target.attr('tuning-over') != undefined && target.attr('tuning-over') != '') {
+    if (target.length > 0 && target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
 
         var localname = target[0].localName;
         var height = $(target).outerHeight();
@@ -138,14 +138,14 @@ var outlinePosition = function (oTarget) {
         var posX = position.left;
         //+ $(window).scrollLeft();
 
-        $(".tuning-overlay").css('display', 'block');
-        $(".tuning-overlay").css('left', posX);
-        $(".tuning-overlay").css('top', posY);
-        $(".tuning-overlay").css('width', width + "px");
-        $(".tuning-overlay").css('height', height + "px");
+        $(".canvasdesigner-overlay").css('display', 'block');
+        $(".canvasdesigner-overlay").css('left', posX);
+        $(".canvasdesigner-overlay").css('top', posY);
+        $(".canvasdesigner-overlay").css('width', width + "px");
+        $(".canvasdesigner-overlay").css('height', height + "px");
 
         //console.info("element select " + localname);
-        $(".tuning-overlay span").html(target.attr('tuning-over'));
+        $(".canvasdesigner-overlay span").html(target.attr('canvasdesigner-over'));
 
     }
     else {
@@ -167,7 +167,7 @@ var outlineSelected = function (oTarget) {
         target = oTarget;
     }
 
-    if (target && target.length > 0 && target.attr('tuning-over') != undefined && target.attr('tuning-over') != '') {
+    if (target && target.length > 0 && target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
 
         var localname = target[0].localName;
         var height = $(target).outerHeight();
@@ -178,14 +178,14 @@ var outlineSelected = function (oTarget) {
         var posX = position.left;
         //+ $(window).scrollLeft();
 
-        $(".tuning-overlay-selected").css('display', 'block');
-        $(".tuning-overlay-selected").css('left', posX);
-        $(".tuning-overlay-selected").css('top', posY);
-        $(".tuning-overlay-selected").css('width', width + "px");
-        $(".tuning-overlay-selected").css('height', height + "px");
+        $(".canvasdesigner-overlay-selected").css('display', 'block');
+        $(".canvasdesigner-overlay-selected").css('left', posX);
+        $(".canvasdesigner-overlay-selected").css('top', posY);
+        $(".canvasdesigner-overlay-selected").css('width', width + "px");
+        $(".canvasdesigner-overlay-selected").css('height', height + "px");
 
         //console.info("element select " + localname);
-        $(".tuning-overlay-selected span").html(target.attr('tuning-over'));
+        $(".canvasdesigner-overlay-selected span").html(target.attr('canvasdesigner-over'));
 
     }
     else {
@@ -196,28 +196,28 @@ var outlineSelected = function (oTarget) {
 }
 
 var outlinePositionHide = function () {
-    $(".tuning-overlay").css('display', "none");
+    $(".canvasdesigner-overlay").css('display', "none");
 }
 
 var outlineSelectedHide = function () {
     currentTarget = undefined;
-    $(".tuning-overlay-selected").css('display', "none");
+    $(".canvasdesigner-overlay-selected").css('display', "none");
 }
 
-var initTuningPanel = function () {
+var initCanvasdesignerPanel = function () {
 
-    // First load the tuning config from file
-    if (!tuningConfig) {
-        console.info("tuning config not found");
+    // First load the canvasdesigner config from file
+    if (!canvasdesignerConfig) {
+        console.info("canvasdesigner config not found");
     }
 
-    // Add tuning from HTML 5 data tags
-    $("[data-tuning]").each(function (index, value) {
-        var tagName = $(value).data("tuning") ? $(value).data("tuning") : $(value)[0].nodeName.toLowerCase();
+    // Add canvasdesigner from HTML 5 data tags
+    $("[data-canvasdesigner]").each(function (index, value) {
+        var tagName = $(value).data("canvasdesigner") ? $(value).data("canvasdesigner") : $(value)[0].nodeName.toLowerCase();
         var tagSchema = $(value).data("schema") ? $(value).data("schema") : $(value)[0].nodeName.toLowerCase();
         var tagSelector = $(value).data("selector") ? $(value).data("selector") : tagSchema;
         var tagEditors = $(value).data("editors"); //JSON.parse(...);
-        tuningConfig.configs.splice(tuningConfig.configs.length, 0, {
+        canvasdesignerConfig.configs.splice(canvasdesignerConfig.configs.length, 0, {
             name: tagName,
             schema: tagSchema,
             selector: tagSelector,
@@ -226,7 +226,7 @@ var initTuningPanel = function () {
     });
 
     // For each editor config create a composite alias
-    $.each(tuningConfig.configs, function (configIndex, config) {
+    $.each(canvasdesignerConfig.configs, function (configIndex, config) {
         if (config.editors) {
             $.each(config.editors, function (editorIndex, editor) {
                 var clearSchema = config.schema.replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
@@ -245,7 +245,7 @@ var initTuningPanel = function () {
             alert(err.responseText)
         },
         data: {
-            config: JSON.stringify(tuningConfig),
+            config: JSON.stringify(canvasdesignerConfig),
             pageId: pageId
         },
         success: function (data) {
@@ -265,7 +265,7 @@ var initTuningPanel = function () {
 
                 // Init panel
                 if (parent.setFrameIsLoaded) {
-                    parent.setFrameIsLoaded(tuningConfig, tuningPalette);
+                    parent.setFrameIsLoaded(canvasdesignerConfig, canvasdesignerPalette);
                 }
             });
         }
@@ -278,14 +278,14 @@ $(function () {
     if (parent.setFrameIsLoaded) {
 
         // Overlay background-color: rgba(28, 203, 255, 0.05);
-        $("body").append("<div class=\"tuning-overlay\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9999; border: 1px solid #2ebdff; border-radius: 3px; \"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px 0 6px; font-size: 10px; line-height: 17px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
-        $("body").append("<div class=\"tuning-overlay-selected\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9998; border: 2px solid #2ebdff; border-radius: 3px;\"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
+        $("body").append("<div class=\"canvasdesigner-overlay\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9999; border: 1px solid #2ebdff; border-radius: 3px; \"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px 0 6px; font-size: 10px; line-height: 17px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
+        $("body").append("<div class=\"canvasdesigner-overlay-selected\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9998; border: 2px solid #2ebdff; border-radius: 3px;\"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
 
         // Set event for any body click
         initBodyClickEvent()
 
-        // Init tuning panel
-        initTuningPanel();
+        // Init canvasdesigner panel
+        initCanvasdesignerPanel();
     }
 
 });

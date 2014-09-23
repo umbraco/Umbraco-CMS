@@ -26,7 +26,7 @@ angular.module("Umbraco.canvasdesigner")
         var modalInstance = $modal.open({
             scope: $scope,
             templateUrl: 'myModalContent.html',
-            controller: 'tuning.mediapickercontroller',
+            controller: 'canvasdesigner.mediapickercontroller',
             resolve: {
                 items: function () {
                     return field.imageorpattern;

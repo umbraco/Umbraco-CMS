@@ -73,14 +73,14 @@ namespace Umbraco.Web
 
         }
 
-        // Get inherited pageId with tuning
+        // Get inherited pageId with canvasdesigner
         internal static int GetParentOrSelfTunedPageId(string[] path, bool preview) 
         {
 
-            string styleTuning = preview ? @"{0}{1}.less" : "{0}{1}.css";
+            string styleCanvasdesigner = preview ? @"{0}{1}.less" : "{0}{1}.css";
             foreach (var page in path.OrderByDescending(r => path.IndexOf(r)))
             {
-                string stylePath = HttpContext.Current.Server.MapPath(string.Format(styleTuning, canvasdesignerStylePath, page));
+                string stylePath = HttpContext.Current.Server.MapPath(string.Format(styleCanvasdesigner, canvasdesignerStylePath, page));
                 if (System.IO.File.Exists(stylePath))
                 {
                     return int.Parse(page);
@@ -96,12 +96,12 @@ namespace Umbraco.Web
         // Get stylesheet path for current page
         internal static string GetStylesheetPath(string[] path, bool preview)
         {
-            string styleTuning = preview ? @"{0}{1}.less" : "{0}{1}.css";
+            string styleCanvasdesigner = preview ? @"{0}{1}.less" : "{0}{1}.css";
 
             int tunedPageId = GetParentOrSelfTunedPageId(path, preview);
 
             if (tunedPageId >0)
-                return string.Format(styleTuning, canvasdesignerStylePath, tunedPageId);
+                return string.Format(styleCanvasdesigner, canvasdesignerStylePath, tunedPageId);
             else
                 return string.Empty;
         }
@@ -129,8 +129,8 @@ namespace Umbraco.Web
 
             // Parse the config file
             // for each config read and add less script in global less
-            dynamic tuningConfigs = Newtonsoft.Json.Linq.JObject.Parse(configs.ToString());
-            foreach (var configuration in tuningConfigs.configs)
+            dynamic canvasdesignerConfigs = Newtonsoft.Json.Linq.JObject.Parse(configs.ToString());
+            foreach (var configuration in canvasdesignerConfigs.configs)
             {
                 if (configuration.editors != null)
                 {
@@ -189,13 +189,13 @@ namespace Umbraco.Web
             //// If less file exist, Load its  content
             //string lessContent = string.Empty;
             //using (System.IO.StreamReader sr = new System.IO.StreamReader(System.IO.File.Exists(HttpContext.Current.Server.MapPath(lessPath)) 
-            //    ? HttpContext.Current.Server.MapPath(lessPath) : tuningDefaultLessPath))
+            //    ? HttpContext.Current.Server.MapPath(lessPath) : canvasdesignerDefaultLessPath))
             //{
             //    lessContent = sr.ReadToEnd();
             //}
 
             //// Update with grid row style needs
-            //string[] gridRows = TuningUtility.GetGridRows(pageId);
+            //string[] gridRows = CanvasdesignerUtility.GetGridRows(pageId);
             //string parametersToAdd = string.Empty;
             //string styleToAdd = string.Empty;
             //foreach (var gridRow in gridRows)
@@ -211,7 +211,7 @@ namespace Umbraco.Web
             //    Directory.CreateDirectory(frontBasePath);
 
             //// Save less file
-            //if (string.IsNullOrEmpty(lessPath)) lessPath = string.Format("{0}{1}.less", tuningStylePath, pageId);
+            //if (string.IsNullOrEmpty(lessPath)) lessPath = string.Format("{0}{1}.less", canvasdesignerStylePath, pageId);
             //lessContent = lessContent + Environment.NewLine + parametersToAdd;
             //using (System.IO.StreamWriter file = new System.IO.StreamWriter(HttpContext.Current.Server.MapPath(lessPath)))
             //{
@@ -280,7 +280,7 @@ namespace Umbraco.Web
 
         }
 
-        // Delete tuning style
+        // Delete canvasdesigner style
         internal static void DeleteStyle(int pageId)
         {
 

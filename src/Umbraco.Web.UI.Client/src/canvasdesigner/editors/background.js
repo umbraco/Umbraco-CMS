@@ -37,7 +37,7 @@ angular.module("Umbraco.canvasdesigner")
 
 })
 
-.controller('tuning.mediaPickerModal', function ($scope, $http, mediaResource, umbRequestHelper, entityResource, mediaHelper) {
+.controller('canvasdesigner.mediaPickerModal', function ($scope, $http, mediaResource, umbRequestHelper, entityResource, mediaHelper) {
 
     if (mediaHelper && mediaHelper.registerFileResolver) {
         mediaHelper.registerFileResolver("Umbraco.UploadField", function (property, entity, thumbnail) {

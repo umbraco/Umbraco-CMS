@@ -16,9 +16,9 @@
 
 <script type="text/ng-template" id="mediaPickerModal.html">
 
-    <div ng-controller="tuning.mediaPickerModal">
+    <div ng-controller="canvasdesigner.mediaPickerModal">
 
-        <div class="modal-header bodyTuningImagePicker ng-scope">
+        <div class="modal-header bodyCanvasdesignerImagePicker ng-scope">
             <ul class="breadcrumb">
                 <li ng-if="startNodeId == -1">
                     <a href="" ng-click="gotoFolder()">Media</a>
@@ -32,8 +32,8 @@
             </ul>
         </div>
 
-        <div class="modal-body bodyTuningImagePicker">
-            <ul class="tuningImagePicker">
+        <div class="modal-body bodyCanvasdesignerImagePicker">
+            <ul class="canvasdesignerImagePicker">
                 <li>
                     <ul class="media-items">
                         <li ng-repeat="child in currentFolder.children | orderBy:'isFolder':true">
