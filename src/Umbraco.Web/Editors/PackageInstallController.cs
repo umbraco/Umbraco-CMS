@@ -30,14 +30,16 @@ namespace Umbraco.Web.Editors
         {
             //Default path
             string path = Path.Combine("packages", packageGuid + ".umb");
-            if (!File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))))
+            if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
             {
                 //our repo guid
-                var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66");
-                path = our.fetch(packageGuid);
+                using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
+                {
+                    path = our.fetch(packageGuid);    
+                }
             }
             
-            PackageInstallModel p = new PackageInstallModel();
+            var p = new PackageInstallModel();
             p.PackageGuid = Guid.Parse(packageGuid);
             p.RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66");
             //p.ZipFilePath = path;
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            global::umbraco.cms.businesslogic.packager.Installer ins = new global::umbraco.cms.businesslogic.packager.Installer();
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, ins.Import(model.ZipFilePath));
             model.Id = ins.CreateManifest( IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid.ToString(), model.RepositoryGuid.ToString());
             return model;
@@ -57,7 +59,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
-            global::umbraco.cms.businesslogic.packager.Installer ins = new global::umbraco.cms.businesslogic.packager.Installer();
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
             return model;
@@ -67,7 +69,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
-            global::umbraco.cms.businesslogic.packager.Installer ins = new global::umbraco.cms.businesslogic.packager.Installer();
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallBusinessLogic(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
             return model;
@@ -77,7 +79,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel CleanUp(PackageInstallModel model)
         {
-            global::umbraco.cms.businesslogic.packager.Installer ins = new global::umbraco.cms.businesslogic.packager.Installer();
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
             return model;
