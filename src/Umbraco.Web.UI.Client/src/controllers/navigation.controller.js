@@ -3,10 +3,10 @@
  * @ngdoc controller
  * @name Umbraco.NavigationController
  * @function
- * 
+ *
  * @description
  * Handles the section area of the app
- * 
+ *
  * @param {navigationService} navigationService A reference to the navigationService
  */
 function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper) {
@@ -31,6 +31,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.menuDialogTitle = null;
     $scope.menuActions = [];
     $scope.menuNode = null;
+
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.showNavigation = appState.getGlobalState("showNavigation");
 
@@ -69,6 +70,16 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         }
         if (args.key === "currentNode") {
             $scope.menuNode = args.value;
+        }
+    });
+
+    //Listen for section state changes
+    eventsService.on("appState.treeState.changed", function (e, args) {
+        var f = args;
+        if(args.value.root && args.value.root.children.length === 0){
+            $rootScope.emptySection = true;
+        }else{
+            $rootScope.emptySection = false;
         }
     });
 
@@ -124,8 +135,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.enterTree = function (event) {
         treeActive = true;
     };
-    
-    // Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again    
+
+    // Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
     $scope.leaveTree = function(event) {
         //this is a hack to handle IE touch events which freaks out due to no mouse events so the tree instantly shuts down
         if (!event) {

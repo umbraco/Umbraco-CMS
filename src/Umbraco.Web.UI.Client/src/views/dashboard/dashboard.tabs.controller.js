@@ -1,7 +1,7 @@
 function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
     $scope.videos = [];
     $scope.init = function(url){
-        var proxyUrl = "dashboard/feedproxy.aspx?url=" + url; 
+        var proxyUrl = "dashboard/feedproxy.aspx?url=" + url;
         $http.get(proxyUrl).then(function(data){
               var feed = $(data.data);
               $('item', feed).each(function (i, item) {
@@ -9,7 +9,7 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
                   video.thumbnail = $(item).find('thumbnail').attr('url');
                   video.title = $("title", item).text();
                   video.link = $("guid", item).text();
-                  $scope.videos.push(video);      
+                  $scope.videos.push(video);
               });
         });
     };
@@ -22,28 +22,28 @@ function FormsController($scope, $route, packageResource) {
     $scope.installForms = function(){
         $scope.state = "Installng package";
         packageResource
-            .fetch("6DA629D5-177A-4ACE-875B-A06B13CCEC48")
+            .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack){
-              $scope.state = "importing";  
-              return packageResource.import(pack);  
+              $scope.state = "importing";
+              return packageResource.import(pack);
             }, $scope.error)
             .then(function(pack){
-              $scope.state = "Installing";  
-              return packageResource.installFiles(pack); 
+              $scope.state = "Installing";
+              return packageResource.installFiles(pack);
             }, $scope.error)
             .then(function(pack){
-              $scope.state = "Restarting, please hold...";  
-              return packageResource.installData(pack);  
+              $scope.state = "Restarting, please hold...";
+              return packageResource.installData(pack);
             }, $scope.error)
             .then(function(pack){
-              $scope.state = "All done, your browser will now refresh";  
-              return packageResource.cleanUp(pack);  
+              $scope.state = "All done, your browser will now refresh";
+              return packageResource.cleanUp(pack);
             }, $scope.error)
             .then($scope.complete, $scope.error);
     };
 
     $scope.complete = function(result){
-        $route.reload();
+        window.location.reload();
     };
 
     $scope.error = function(err){
@@ -55,7 +55,7 @@ function FormsController($scope, $route, packageResource) {
 angular.module("umbraco").controller("Umbraco.Dashboard.FormsDashboardController", FormsController);
 
 function startupLatestEditsController($scope) {
-    
+
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
@@ -81,7 +81,7 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
             mediaResource.getChildren(-1)
                 .then(function(data) {
                     $scope.images = data.items;
-                });    
+                });
         };
 
         $scope.$on('fileuploadstop', function(event, files){
@@ -98,7 +98,7 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
             });
         });
 
-        // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted! 
+        // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted!
         $scope.$on('fileuploaddragover', function(event, files) {
             if (!$scope.dragClearTimeout) {
                 $scope.$apply(function() {
@@ -112,7 +112,7 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
                 $scope.dragClearTimeout = null;
             }, 300);
         });
-        
+
         //init load
         $scope.loadChildren();
 }
@@ -152,11 +152,11 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, currentUserR
                 }
 
                 formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-                
+
             }, function (err) {
-                
+
                 formHelper.handleError(err);
-                
+
             });
         }
     };

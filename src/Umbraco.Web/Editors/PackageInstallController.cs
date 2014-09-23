@@ -42,8 +42,8 @@ namespace Umbraco.Web.Editors
             var p = new PackageInstallModel();
             p.PackageGuid = Guid.Parse(packageGuid);
             p.RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66");
-            //p.ZipFilePath = path;
-            p.ZipFilePath = Path.Combine("temp", "package.umb");
+            p.ZipFilePath = path;
+            //p.ZipFilePath = Path.Combine("temp", "package.umb");
             return p;
         }
 
@@ -82,6 +82,16 @@ namespace Umbraco.Web.Editors
             var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration();
+            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+
+            //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
+            //these bits are super old, but cant find another way to do this currently
+            global::umbraco.cms.presentation.Trees.TreeDefinitionCollection.Instance.ReRegisterTrees();
+            global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
+
+
             return model;
         }
 
