@@ -967,9 +967,9 @@ AND umbracoNode.id <> @id",
                                 PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyType as PT
                         INNER JOIN cmsDataType as DT
-                        ON PT.dataTypeId = DT.[nodeId]
+                        ON PT.dataTypeId = DT.nodeId
                         LEFT JOIN cmsPropertyTypeGroup as PG
-                        ON PG.[id] = PT.propertyTypeGroupId";
+                        ON PG.id = PT.propertyTypeGroupId";
 
                 if(contentTypeIds.Any())                        
                     sql = sql + " WHERE (PT.contentTypeId in (@contentTypeIds))";
