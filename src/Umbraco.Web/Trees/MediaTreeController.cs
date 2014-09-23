@@ -58,14 +58,6 @@ namespace Umbraco.Web.Trees
             get { return Security.CurrentUser.StartMediaId; }
         }
 
-        protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
-        {
-            var nodes = new TreeNodeCollection();
-            var entities = GetChildEntities(id);
-            nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));
-            return nodes;
-        }
-
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
         /// </summary>
