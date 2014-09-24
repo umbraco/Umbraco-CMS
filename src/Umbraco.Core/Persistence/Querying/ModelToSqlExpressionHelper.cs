@@ -48,10 +48,10 @@ namespace Umbraco.Core.Persistence.Querying
 
         }
     
-        protected bool IsFieldName(string quotedExp)
-        {
-            //Not entirely sure this is reliable, but its better then simply returning true
-            return quotedExp.LastIndexOf("'", StringComparison.InvariantCultureIgnoreCase) + 1 != quotedExp.Length;
-        }
+        //protected bool IsFieldName(string quotedExp)
+        //{
+        //    //Not entirely sure this is reliable, but its better then simply returning true
+        //    return quotedExp.LastIndexOf("'", StringComparison.InvariantCultureIgnoreCase) + 1 != quotedExp.Length;
+        //}
     }
 }

@@ -13,6 +13,61 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class PetaPocoSqlTests : BaseUsingSqlCeSyntax
     {
+        //x => 
+
+        [Test]
+        public void Where_Clause_With_Starts_With_By_Variable()
+        {
+            var content = new NodeDto() {NodeId = 123, Path = "-1,123"};
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Path.StartsWith(content.Path) && x.NodeId != content.NodeId);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0) AND [umbracoNode].[id] <> @1)", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(2, sql.Arguments.Length);
+            Assert.AreEqual(content.Path + "%", sql.Arguments[0]);
+            Assert.AreEqual(content.NodeId, sql.Arguments[1]);
+        }
+
+        [Test]
+        public void Where_Clause_With_Not_Starts_With()
+        {
+            var level = 1;
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Level == level && !x.Path.StartsWith("-20"));
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[level] = @0 AND NOT (upper([umbracoNode].[path]) LIKE upper(@1)))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(2, sql.Arguments.Length);
+            Assert.AreEqual(level, sql.Arguments[0]);
+            Assert.AreEqual("-20%", sql.Arguments[1]);
+        }
+
+        [Test]
+        public void Where_Clause_With_Equals_Clause()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Text.Equals("Hello@world.com"));
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) = upper(@0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual("Hello@world.com", sql.Arguments[0]);
+        }
+
+        [Test]
+        public void Where_Clause_With_False_Boolean()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => !x.Trashed);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (NOT ([umbracoNode].[trashed] = @0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual(true, sql.Arguments[0]);
+        }
+
+        [Test]
+        public void Where_Clause_With_Boolean()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Trashed);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual(true, sql.Arguments[0]);
+        }
 
         [Test]
         public void Where_Clause_With_ToUpper()

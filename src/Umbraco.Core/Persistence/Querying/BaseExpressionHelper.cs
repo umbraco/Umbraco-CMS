@@ -12,8 +12,6 @@ namespace Umbraco.Core.Persistence.Querying
 {
     internal abstract class BaseExpressionHelper<T> : BaseExpressionHelper
     {
-        private string sep = " ";
-
         protected abstract string VisitMemberAccess(MemberExpression m);
 
         protected internal virtual string Visit(Expression exp)
@@ -77,16 +75,16 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitLambda(LambdaExpression lambda)
         {
-            if (lambda.Body.NodeType == ExpressionType.MemberAccess && sep == " ")
+            if (lambda.Body.NodeType == ExpressionType.MemberAccess)
             {
-                MemberExpression m = lambda.Body as MemberExpression;
+                var m = lambda.Body as MemberExpression;
 
                 if (m.Expression != null)
                 {
+                    //This deals with members that are boolean (i.e. x => IsTrashed )
                     string r = VisitMemberAccess(m);
-
-                    SqlParameters.Add(1);
-                    return string.Format("{0}=@{1}", r, SqlParameters.Count - 1);
+                    SqlParameters.Add(true);
+                    return string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
 
                     //return string.Format("{0}={1}", r, GetQuotedTrueValue());
                 }
@@ -98,7 +96,7 @@ namespace Umbraco.Core.Persistence.Querying
         protected virtual string VisitBinary(BinaryExpression b)
         {
             string left, right;
-            var operand = BindOperant(b.NodeType);   //sep= " " ??
+            var operand = BindOperant(b.NodeType); 
             if (operand == "AND" || operand == "OR")
             {
                 MemberExpression m = b.Left as MemberExpression;
@@ -107,7 +105,7 @@ namespace Umbraco.Core.Persistence.Querying
                     string r = VisitMemberAccess(m);
 
                     SqlParameters.Add(1);
-                    left = string.Format("{0}=@{1}", r, SqlParameters.Count - 1);
+                    left = string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
 
                     //left = string.Format("{0}={1}", r, GetQuotedTrueValue());
                 }
@@ -121,7 +119,7 @@ namespace Umbraco.Core.Persistence.Querying
                     string r = VisitMemberAccess(m);
 
                     SqlParameters.Add(1);
-                    right = string.Format("{0}=@{1}", r, SqlParameters.Count - 1);
+                    right = string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
 
                     //right = string.Format("{0}={1}", r, GetQuotedTrueValue());
                 }
@@ -154,7 +152,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case "COALESCE":
                     return string.Format("{0}({1},{2})", operand, left, right);
                 default:
-                    return left + sep + operand + sep + right;
+                    return left + " " + operand + " " + right;
             }
         }
 
@@ -230,21 +228,26 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitUnary(UnaryExpression u)
         {
-            //switch (u.NodeType)
-            //{
-            //    case ExpressionType.Not:
-            //        string o = Visit(u.Operand);
+            switch (u.NodeType)
+            {
+                case ExpressionType.Not:
+                    var o = Visit(u.Operand);
 
-            //        if (IsFieldName(o))
-            //            o = o + "=" + GetQuotedValue(true, typeof(bool));
+                    //use a Not equal operator instead of <> since we don't know that <> works in all sql servers
 
-            //        return "NOT (" + o + ")";
-            //    default:
-            //        return Visit(u.Operand);
-            //}
-
-            return Visit(u.Operand);
-
+                    switch (u.Operand.NodeType)
+                    {
+                        case ExpressionType.MemberAccess:
+                            //In this case it wil be a false property , i.e. x => !Trashed
+                            SqlParameters.Add(true);
+                            return string.Format("NOT ({0} = @0)", o);                            
+                        default:
+                            //In this case it could be anything else, such as: x => !x.Path.StartsWith("-20")
+                            return string.Format("NOT ({0})", o);                            
+                    }
+                default:
+                    return Visit(u.Operand);
+            }
         }
 
         protected virtual string VisitNewArray(NewArrayExpression na)
@@ -346,12 +349,29 @@ namespace Umbraco.Core.Persistence.Querying
 
                     var r = Visit(m.Object);
 
+                    string compareValue;
+
+                    if (m.Arguments[0].NodeType != ExpressionType.Constant)
+                    {
+                        //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
+                        // So we'll go get the value:
+                        var member = Expression.Convert(m.Arguments[0], typeof (object));
+                        var lambda = Expression.Lambda<Func<object>>(member);
+                        var getter = lambda.Compile();
+                        compareValue = getter().ToString();
+                    }
+                    else
+                    {
+                        compareValue = m.Arguments[0].ToString();
+                    }
+
                     //special case, if it is 'Contains' and the member that Contains is being called on is not a string, then
                     // we should be doing an 'In' clause - but we currently do not support this
                     if (m.Arguments[0].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
                     {
                         throw new NotSupportedException("An array Contains method is not supported");
                     }
+
 
                     //default column type
                     var colType = TextColumnType.NVarchar;
@@ -367,7 +387,7 @@ namespace Umbraco.Core.Persistence.Querying
                         }
                     }
 
-                    return HandleStringComparison(r, m.Arguments[0].ToString(), m.Method.Name, colType);
+                    return HandleStringComparison(r, compareValue, m.Method.Name, colType);
                 //case "Substring":
                 //    var startIndex = Int32.Parse(args[0].ToString()) + 1;
                 //    if (args.Count == 2)

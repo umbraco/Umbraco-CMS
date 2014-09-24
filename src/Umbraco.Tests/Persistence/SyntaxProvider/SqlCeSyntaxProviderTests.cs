@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
 FROM [cmsContentXml]
 INNER JOIN [umbracoNode]
 ON [cmsContentXml].[nodeId] = [umbracoNode].[id]
-WHERE ([umbracoNode].[nodeObjectType] = 'b796f64c-1f99-4ffb-b886-4bf4bc011a9c')) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "), sql.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
+WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "), sql.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
         }
 
         [NUnit.Framework.Ignore("This doesn't actually test anything")]

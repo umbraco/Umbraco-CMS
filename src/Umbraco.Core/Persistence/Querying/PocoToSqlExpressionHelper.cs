@@ -53,12 +53,10 @@ namespace Umbraco.Core.Persistence.Querying
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
         }
-
         
-
-        protected bool IsFieldName(string quotedExp)
-        {
-            return true;
-        }
+        //protected bool IsFieldName(string quotedExp)
+        //{
+        //    return true;
+        //}
     }
 }
