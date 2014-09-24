@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence
 
         public static Sql OrderByDescending(this Sql sql, params object[] columns)
         {
-            return sql.Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString() + " DESC").ToArray())));
+            return sql.Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x + " DESC").ToArray())));
         }
     }
 }

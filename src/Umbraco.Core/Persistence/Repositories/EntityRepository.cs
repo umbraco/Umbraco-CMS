@@ -193,7 +193,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {
-            var wheres = string.Join(" AND ", ((Query<IUmbracoEntity>) query).WhereClauses());
+            //TODO: We need to fix all of this and how it handles parameters!
+
+            var wheres = string.Join(" AND ", query.GetWhereClauses());
+
             var sqlClause = GetBase(false, false, sql1 => sql1.Where(wheres));
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var sql = translator.Translate().Append(GetGroupBy(false, false));
@@ -208,10 +211,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
+            //TODO: We need to fix all of this and how it handles parameters!
+
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
 
-            var wheres = string.Join(" AND ", ((Query<IUmbracoEntity>)query).WhereClauses());
+            var wheres = string.Join(" AND ", query.GetWhereClauses());
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql1 => sql1.Where(wheres), objectTypeId);
             

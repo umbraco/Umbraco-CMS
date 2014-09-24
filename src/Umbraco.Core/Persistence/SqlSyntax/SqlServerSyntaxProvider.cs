@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// Represents an SqlSyntaxProvider for Sql Server
     /// </summary>
     [SqlSyntaxProviderAttribute("System.Data.SqlClient")]
-    public class SqlServerSyntaxProvider : SqlSyntaxProviderBase<SqlServerSyntaxProvider>
+    public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
         public SqlServerSyntaxProvider()
         {
@@ -33,91 +32,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// Gets/sets the version of the current SQL server instance
         /// </summary>
         internal Lazy<SqlServerVersionName> VersionName { get; set; }
-
-        public override string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEqualComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for = comparison with NText columns but allows this syntax
-                    return string.Format("{0} LIKE '{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        public override string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnStartsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '{1}%'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        public override string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEndsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '%{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        public override string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '%{1}%'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        public override string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        public override string GetQuotedTableName(string tableName)
-        {
-            return string.Format("[{0}]", tableName);
-        }
-
-        public override string GetQuotedColumnName(string columnName)
-        {
-            return string.Format("[{0}]", columnName);
-        }
-
-        public override string GetQuotedName(string name)
-        {
-            return string.Format("[{0}]", name);
-        }
+        
+        
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
         {
@@ -218,12 +134,11 @@ order by T.name, I.name");
             get { return "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]"; }
         }
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
-
+        
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}', 'COLUMN'"; } }
 
-        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
+        
     }
 }
