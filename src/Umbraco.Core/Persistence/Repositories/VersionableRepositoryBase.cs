@@ -256,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlQuery = translator.Translate();
 
-            Func<Sql, string, Sql> getFilteredSql = (sql, additionalFilter) =>
+            Func<Sql, string, object[], Sql> getFilteredSql = (sql, additionalFilter, additionalFilterArgs) =>
             {
                 //copy to var so that the original isn't changed
                 var filteredSql = new Sql(sql.SQL, sql.Arguments);
@@ -267,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 if (string.IsNullOrEmpty(additionalFilter) == false)
                 {
-                    filteredSql.Append("AND (" + additionalFilter + ")");
+                    filteredSql.Append("AND (" + additionalFilter + ")", additionalFilterArgs);
                 }
                 return filteredSql;
             };
@@ -298,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // So we'll modify the SQL.
             var sqlNodeIds = new Sql(sqlQuery.SQL.Replace("SELECT *", nodeIdSelect), sqlQuery.Arguments);
 
-            var sqlNodeIdsWithSort = getSortedSql(getFilteredSql(sqlNodeIds, null));
+            var sqlNodeIdsWithSort = getSortedSql(getFilteredSql(sqlNodeIds, null, new object[0]));
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -307,20 +307,22 @@ namespace Umbraco.Core.Persistence.Repositories
             if (totalRecords > 0)
             {
                 //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
-                var args = new object[0];
-                string sqlCount, sqlPage;
-                Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlCount, out sqlPage);
-                //we now need to finalize/parse this query so that the args are built in to it, we know the args will only be two for this operation
-                sqlPage = sqlPage.Replace("@0", args[0].ToString()).Replace("@1", args[1].ToString());
+                var args = sqlNodeIds.Arguments;
+                string sqlStringCount, sqlStringPage;
+                Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
+                
+                //we now need to finalize/parse this query so that the args are built in to it, we know the args will only be two for this operation                
+                //sqlPage = sqlPage.Replace("@0", args[0].ToString()).Replace("@1", args[1].ToString());
+
                 //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId
                 var nodeIdSelectParts = nodeIdSelect.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
-                sqlPage = sqlPage.Replace("SELECT *", 
+                sqlStringPage = sqlStringPage.Replace("SELECT *", 
                     //This ensures we only take the field name of the node id select and not the table name - since the resulting select
                     // will ony work with the field name.
                     "SELECT " + nodeIdSelectParts[nodeIdSelectParts.Length - 1]);
 
                 var fullQuery = getSortedSql(
-                    getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlPage)));
+                    getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlStringPage), args));
 
                 var content = processQuery(fullQuery)
                     .Cast<TContentBase>()
