@@ -187,12 +187,13 @@ namespace Umbraco.Core.Persistence.Querying
                 object o = getter();
 
                 SqlParameters.Add(o);
-                return string.Format("(@{0})", SqlParameters.Count - 1);
+                return string.Format("@{0}", SqlParameters.Count - 1);
 
                 //return GetQuotedValue(o, o.GetType());
             }
             catch (InvalidOperationException)
-            { // FieldName ?
+            { 
+                // FieldName ?
                 List<Object> exprs = VisitExpressionList(nex.Arguments);
                 var r = new StringBuilder();
                 foreach (Object e in exprs)
@@ -217,7 +218,7 @@ namespace Umbraco.Core.Persistence.Querying
                 return "null";
 
             SqlParameters.Add(c.Value);
-            return string.Format("(@{0})", SqlParameters.Count - 1);
+            return string.Format("@{0}", SqlParameters.Count - 1);
 
             //if (c.Value is bool)
             //{
@@ -306,27 +307,29 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitMethodCall(MethodCallExpression m)
         {
-            List<Object> args = this.VisitExpressionList(m.Arguments);
-
-            Object r;
-            if (m.Object != null)
-                r = Visit(m.Object);
-            else
-            {
-                r = args[0];
-                args.RemoveAt(0);
-            }
-
-            //TODO: We should probably add the same logic we've done for ModelToSqlExpressionHelper with checking for:
-            // InvariantStartsWith, InvariantEndsWith, SqlWildcard, etc...
-            // since we should be able to easily handle that with the Poco objects too.
+            //List<Object> args = this.VisitExpressionList(m.Arguments);
+            //Object r;
+            //if (m.Object != null)
+            //{
+            //    r = Visit(m.Object);
+            //}
+            //else
+            //{
+            //    //TODO: I have no idea what this does and if it's ever used.
+            //    var args = VisitExpressionList(m.Arguments);
+            //    r = args[0];
+            //    args.RemoveAt(0);
+            //}
 
             switch (m.Method.Name)
             {
+                case "ToString":
+                    SqlParameters.Add(m.Object.ToString());
+                    return string.Format("@{0}", SqlParameters.Count - 1);
                 case "ToUpper":
-                    return string.Format("upper({0})", r);
+                    return string.Format("upper({0})", Visit(m.Object));
                 case "ToLower":
-                    return string.Format("lower({0})", r);
+                    return string.Format("lower({0})", Visit(m.Object));
                 case "SqlWildcard":
                 case "StartsWith":
                 case "EndsWith":
@@ -341,39 +344,44 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantContains":
                 case "InvariantEquals":
 
-                    //default
+                    var r = Visit(m.Object);
+
+                    //special case, if it is 'Contains' and the member that Contains is being called on is not a string, then
+                    // we should be doing an 'In' clause - but we currently do not support this
+                    if (m.Arguments[0].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
+                    {
+                        throw new NotSupportedException("An array Contains method is not supported");
+                    }
+
+                    //default column type
                     var colType = TextColumnType.NVarchar;
-                    //then check if this arg has been passed in
+
+                    //then check if the col type argument has been passed to the current method (this will be the case for methods like
+                    // SqlContains and other Sql methods)
                     if (m.Arguments.Count > 1)
                     {
-                        //special case, if it is 'Contains' and the member that Contains is being called on is not a string, then
-                        // we should be doing an 'In' clause - but we currently do not support this, nor is it very necessary
-                        if (TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
-                        {
-                            throw new NotSupportedException("An array Contains method is not supported");
-                        }
-
                         var colTypeArg = m.Arguments.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
                         if (colTypeArg != null)
                         {
                             colType = (TextColumnType)((ConstantExpression)colTypeArg).Value;
                         }
                     }
-                    return HandleStringComparison(r.ToString(), args[0].ToString(), m.Method.Name, colType);
-                case "Substring":
-                    var startIndex = Int32.Parse(args[0].ToString()) + 1;
-                    if (args.Count == 2)
-                    {
-                        var length = Int32.Parse(args[1].ToString());
-                        return string.Format("substring({0} from {1} for {2})",
-                                         r,
-                                         startIndex,
-                                         length);
-                    }
-                    else
-                        return string.Format("substring({0} from {1})",
-                                         r,
-                                         startIndex);
+
+                    return HandleStringComparison(r, m.Arguments[0].ToString(), m.Method.Name, colType);
+                //case "Substring":
+                //    var startIndex = Int32.Parse(args[0].ToString()) + 1;
+                //    if (args.Count == 2)
+                //    {
+                //        var length = Int32.Parse(args[1].ToString());
+                //        return string.Format("substring({0} from {1} for {2})",
+                //                         r,
+                //                         startIndex,
+                //                         length);
+                //    }
+                //    else
+                //        return string.Format("substring({0} from {1})",
+                //                         r,
+                //                         startIndex);
                 //case "Round":
                 //case "Floor":
                 //case "Ceiling":
@@ -421,8 +429,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //case "As":
                 //    return string.Format("{0} As {1}", r,
                 //                                GetQuotedColumnName(RemoveQuoteFromAlias(RemoveQuote(args[0].ToString()))));
-                case "ToString":
-                    return r.ToString();
+                
                 default:
 
                     throw new ArgumentOutOfRangeException("No logic supported for " + m.Method.Name);
@@ -494,7 +501,7 @@ namespace Umbraco.Core.Persistence.Querying
     /// <summary>
     /// Logic that is shared with the expression helpers
     /// </summary>
-    internal class BaseExpressionHelper
+    internal class BaseExpressionHelper 
     {
         protected List<object> SqlParameters = new List<object>();
 
@@ -612,16 +619,12 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string RemoveQuote(string exp)
         {
-            if (exp.StartsWith("'") && exp.EndsWith("'"))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
-        }
-
-        protected virtual string RemoveQuoteFromAlias(string exp)
-        {
+            //if (exp.StartsWith("'") && exp.EndsWith("'"))
+            //{
+            //    exp = exp.Remove(0, 1);
+            //    exp = exp.Remove(exp.Length - 1, 1);
+            //}
+            //return exp;
 
             if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
                 &&
@@ -632,5 +635,18 @@ namespace Umbraco.Core.Persistence.Querying
             }
             return exp;
         }
+
+        //protected virtual string RemoveQuoteFromAlias(string exp)
+        //{
+
+        //    if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
+        //        &&
+        //        (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
+        //    {
+        //        exp = exp.Remove(0, 1);
+        //        exp = exp.Remove(exp.Length - 1, 1);
+        //    }
+        //    return exp;
+        //}
     }
 }

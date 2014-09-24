@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Querying
             object o = getter();
 
             SqlParameters.Add(o);
-            return string.Format("(@{0})", SqlParameters.Count - 1);
+            return string.Format("@{0}", SqlParameters.Count - 1);
 
             //return GetQuotedValue(o, o != null ? o.GetType() : null);
 

@@ -14,34 +14,63 @@ namespace Umbraco.Tests.Persistence.Querying
     public class PetaPocoSqlTests : BaseUsingSqlCeSyntax
     {
 
+        [Test]
+        public void Where_Clause_With_ToUpper()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Text.ToUpper() == "hello".ToUpper());
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) = upper(@0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual("hello", sql.Arguments[0]);
+        }
 
         [Test]
-        public void Generates_Sql_Parameter_Where_Clause_Single_Constant()
+        public void Where_Clause_With_ToString()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Text == 1.ToString());
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[text] = @0)", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual("1", sql.Arguments[0]);
+        }
+
+        [Test]
+        public void Where_Clause_With_Wildcard()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Text.StartsWith("D"));
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[text]) LIKE upper(@0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual("D%", sql.Arguments[0]);
+        }
+
+        [Test]
+        public void Where_Clause_Single_Constant()
         {
             var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.NodeId == 2);
 
-            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[id] = (@0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[id] = @0)", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(1, sql.Arguments.Length);
             Assert.AreEqual(2, sql.Arguments[0]);
         }
 
         [Test]
-        public void Generates_Sql_Parameter_Where_Clause_And_Constant()
+        public void Where_Clause_And_Constant()
         {
             var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.NodeId != 2 && x.NodeId != 3);
 
-            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[id] <> (@0) AND [umbracoNode].[id] <> (@1))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[id] <> @0 AND [umbracoNode].[id] <> @1)", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(2, sql.Arguments.Length);
             Assert.AreEqual(2, sql.Arguments[0]);
             Assert.AreEqual(3, sql.Arguments[1]);
         }
 
         [Test]
-        public void Generates_Sql_Parameter_Where_Clause_Or_Constant()
+        public void Where_Clause_Or_Constant()
         {
             var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Text == "hello" || x.NodeId == 3);
 
-            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[text] = (@0) OR [umbracoNode].[id] = (@1))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[text] = @0 OR [umbracoNode].[id] = @1)", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(2, sql.Arguments.Length);
             Assert.AreEqual("hello", sql.Arguments[0]);
             Assert.AreEqual(3, sql.Arguments[1]);
@@ -112,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Use_Where_Predicate()
         {
             var expected = new Sql();
-            expected.Select("*").From("[cmsContent]").Where("[cmsContent].[nodeId] = (@0)", 1045);
+            expected.Select("*").From("[cmsContent]").Where("[cmsContent].[nodeId] = @0", 1045);
 
             var sql = new Sql();
             sql.Select("*").From<ContentDto>().Where<ContentDto>(x => x.NodeId == 1045);
@@ -128,8 +157,8 @@ namespace Umbraco.Tests.Persistence.Querying
             var expected = new Sql();
             expected.Select("*")
                 .From("[cmsContent]")
-                .Where("[cmsContent].[nodeId] = (@0)", 1045)
-                .Where("[cmsContent].[contentType] = (@0)", 1050);
+                .Where("[cmsContent].[nodeId] = @0", 1045)
+                .Where("[cmsContent].[contentType] = @0", 1050);
 
             var sql = new Sql();
             sql.Select("*")

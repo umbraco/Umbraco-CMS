@@ -122,7 +122,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType)
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return string.Format("upper({0}) like upper(@{1})", column, paramIndex);
+            return string.Format("upper({0}) LIKE upper(@{1})", column, paramIndex);
         }
 
         [Obsolete("Use the overload with the parameter index instead")]
@@ -136,28 +136,28 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return string.Format("upper({0}) like '{1}%'", column, value.ToUpper());
+            return string.Format("upper({0}) LIKE '{1}%'", column, value.ToUpper());
         }
 
         [Obsolete("Use the overload with the parameter index instead")]
         public virtual string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return string.Format("upper({0}) like '%{1}'", column, value.ToUpper());
+            return string.Format("upper({0}) LIKE '%{1}'", column, value.ToUpper());
         }
 
         [Obsolete("Use the overload with the parameter index instead")]
         public virtual string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return string.Format("upper({0}) like '%{1}%'", column, value.ToUpper());
+            return string.Format("upper({0}) LIKE '%{1}%'", column, value.ToUpper());
         }
 
         [Obsolete("Use the overload with the parameter index instead")]
         public virtual string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return string.Format("upper({0}) like '{1}'", column, value.ToUpper());
+            return string.Format("upper({0}) LIKE '{1}'", column, value.ToUpper());
         }
 
         public virtual string GetQuotedTableName(string tableName)
