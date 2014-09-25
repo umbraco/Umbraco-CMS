@@ -1832,8 +1832,23 @@ namespace Umbraco.Core.Persistence
 			// Create factory function that can convert a IDataReader record into a POCO
 			public Delegate GetFactory(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
 			{
+
+                //TODO: It would be nice to remove the irrelevant SQL parts - for a mapping operation anything after the SELECT clause isn't required. 
+                // This would ensure less duplicate entries that get cached, currently both of these queries would be cached even though they are
+                // returning the same structured data:
+                // SELECT * FROM MyTable ORDER BY MyColumn
+                // SELECT * FROM MyTable ORDER BY MyColumn DESC
+    
+                //Create a hashed key, we don't want to store so much string data in memory
+                var combiner = new HashCodeCombiner();
+                combiner.AddCaseInsensitiveString(sql);
+                combiner.AddCaseInsensitiveString(connString);
+                combiner.AddObject(ForceDateTimesToUtc);
+                combiner.AddInt(firstColumn);
+                combiner.AddInt(countColumns);
+
 				// Check cache
-				var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
+                var key = combiner.GetCombinedHashCode();
 				RWLock.EnterReadLock();
 				try
 				{
