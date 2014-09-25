@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Tests.Persistence.Querying
 {
@@ -14,6 +15,17 @@ namespace Umbraco.Tests.Persistence.Querying
     public class PetaPocoSqlTests : BaseUsingSqlCeSyntax
     {
         //x => 
+
+        [Test]
+        public void Where_Clause_With_Starts_With_Additional_Parameters()
+        {
+            var content = new NodeDto() { NodeId = 123, Path = "-1,123" };
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Path.SqlStartsWith(content.Path, TextColumnType.NVarchar));
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (upper([umbracoNode].[path]) LIKE upper(@0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual(content.Path + "%", sql.Arguments[0]);        
+        }
 
         [Test]
         public void Where_Clause_With_Starts_With_By_Variable()

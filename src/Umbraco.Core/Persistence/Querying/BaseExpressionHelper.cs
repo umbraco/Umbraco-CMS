@@ -310,29 +310,34 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitMethodCall(MethodCallExpression m)
         {
-            //List<Object> args = this.VisitExpressionList(m.Arguments);
-            //Object r;
-            //if (m.Object != null)
-            //{
-            //    r = Visit(m.Object);
-            //}
-            //else
-            //{
-            //    //TODO: I have no idea what this does and if it's ever used.
-            //    var args = VisitExpressionList(m.Arguments);
-            //    r = args[0];
-            //    args.RemoveAt(0);
-            //}
+            //Here's what happens with a MethodCallExpression:
+            //  If a method is called that contains a single argument, 
+            //      then m.Object is the object on the left hand side of the method call, example:
+            //      x.Path.StartsWith(content.Path)
+            //          m.Object = x.Path
+            //          and m.Arguments.Length == 1, therefor m.Arguments[0] == content.Path
+            //  If a method is called that contains multiple arguments, then m.Object == null and the 
+            //      m.Arguments collection contains the left hand side of the method call, example:
+            //      x.Path.SqlStartsWith(content.Path, TextColumnType.NVarchar)
+            //          m.Object == null
+            //          m.Arguments.Length == 3, therefor, m.Arguments[0] == x.Path, m.Arguments[1] == content.Path, m.Arguments[2] == TextColumnType.NVarchar 
+            // So, we need to cater for these scenarios.
+
+            var objectForMethod = m.Object ?? m.Arguments[0];
+            var visitedObjectForMethod = Visit(objectForMethod);
+            var methodArgs = m.Object == null 
+                ? m.Arguments.Skip(1).ToArray() 
+                : m.Arguments.ToArray();
 
             switch (m.Method.Name)
             {
                 case "ToString":
-                    SqlParameters.Add(m.Object.ToString());
+                    SqlParameters.Add(objectForMethod.ToString());
                     return string.Format("@{0}", SqlParameters.Count - 1);
                 case "ToUpper":
-                    return string.Format("upper({0})", Visit(m.Object));
+                    return string.Format("upper({0})", visitedObjectForMethod);
                 case "ToLower":
-                    return string.Format("lower({0})", Visit(m.Object));
+                    return string.Format("lower({0})", visitedObjectForMethod);
                 case "SqlWildcard":
                 case "StartsWith":
                 case "EndsWith":
@@ -346,48 +351,45 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantEndsWith":
                 case "InvariantContains":
                 case "InvariantEquals":
-
-                    var r = Visit(m.Object);
-
+                    
                     string compareValue;
 
-                    if (m.Arguments[0].NodeType != ExpressionType.Constant)
+                    if (methodArgs[0].NodeType != ExpressionType.Constant)
                     {
                         //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                         // So we'll go get the value:
-                        var member = Expression.Convert(m.Arguments[0], typeof (object));
+                        var member = Expression.Convert(methodArgs[0], typeof(object));
                         var lambda = Expression.Lambda<Func<object>>(member);
                         var getter = lambda.Compile();
                         compareValue = getter().ToString();
                     }
                     else
                     {
-                        compareValue = m.Arguments[0].ToString();
+                        compareValue = methodArgs[0].ToString();
                     }
 
                     //special case, if it is 'Contains' and the member that Contains is being called on is not a string, then
                     // we should be doing an 'In' clause - but we currently do not support this
-                    if (m.Arguments[0].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
+                    if (methodArgs[0].Type != typeof(string) && TypeHelper.IsTypeAssignableFrom<IEnumerable>(methodArgs[0].Type))
                     {
                         throw new NotSupportedException("An array Contains method is not supported");
                     }
-
 
                     //default column type
                     var colType = TextColumnType.NVarchar;
 
                     //then check if the col type argument has been passed to the current method (this will be the case for methods like
                     // SqlContains and other Sql methods)
-                    if (m.Arguments.Count > 1)
+                    if (methodArgs.Length > 1)
                     {
-                        var colTypeArg = m.Arguments.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
+                        var colTypeArg = methodArgs.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
                         if (colTypeArg != null)
                         {
                             colType = (TextColumnType)((ConstantExpression)colTypeArg).Value;
                         }
                     }
 
-                    return HandleStringComparison(r, compareValue, m.Method.Name, colType);
+                    return HandleStringComparison(visitedObjectForMethod, compareValue, m.Method.Name, colType);
                 //case "Substring":
                 //    var startIndex = Int32.Parse(args[0].ToString()) + 1;
                 //    if (args.Count == 2)

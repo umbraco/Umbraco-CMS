@@ -195,9 +195,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //TODO: We need to fix all of this and how it handles parameters!
 
-            var wheres = string.Join(" AND ", query.GetWhereClauses());
+            var wheres = query.GetWhereClauses().ToArray();
 
-            var sqlClause = GetBase(false, false, sql1 => sql1.Where(wheres));
+            var sqlClause = GetBase(false, false, sql1 =>
+            {
+                //adds the additional filters
+                foreach (var whereClause in wheres)
+                {
+                    sql1.Where(whereClause.Item1, whereClause.Item2);
+                }
+            });
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var sql = translator.Translate().Append(GetGroupBy(false, false));
 
@@ -211,14 +218,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
-            //TODO: We need to fix all of this and how it handles parameters!
 
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
 
-            var wheres = string.Join(" AND ", query.GetWhereClauses());
+            var wheres = query.GetWhereClauses().ToArray();
 
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql1 => sql1.Where(wheres), objectTypeId);
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql1 =>
+            {
+                //adds the additional filters
+                foreach (var whereClause in wheres)
+                {
+                    sql1.Where(whereClause.Item1, whereClause.Item2);    
+                }
+                
+            }, objectTypeId);
             
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
@@ -227,7 +241,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (isMedia)
             {
-                var mediaSql = GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), sql => sql.Where(wheres));
+                var mediaSql = GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), sql =>
+                {
+                    //adds the additional filters
+                    foreach (var whereClause in wheres)
+                    {
+                        sql.Where(whereClause.Item1, whereClause.Item2);
+                    }
+                });
 
                 //treat media differently for now 
                 //TODO: We should really use this methodology for Content/Members too!! since it includes properties and ALL of the dynamic db fields
