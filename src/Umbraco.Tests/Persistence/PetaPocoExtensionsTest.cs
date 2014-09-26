@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -71,6 +72,29 @@ namespace Umbraco.Tests.Persistence
 
             Assert.AreEqual(1, allByteResults.Count());
             Assert.AreEqual(1, totalKeys.Count());
+        }
+
+        [Test]
+        public void Verify_Memory_Expires()
+        {
+            Database.PocoData.SlidingExpirationSeconds = 2;
+
+            var managedCache = new Database.ManagedCache();
+
+            int id1, id2, id3;
+            string alias;
+            CreateStuff(out id1, out id2, out id3, out alias);
+            QueryStuff(id1, id2, id3, alias);
+
+            var count1 = managedCache.GetCache().GetCount();
+            Console.WriteLine("Keys = " + count1);
+            Assert.Greater(count1, 0);
+            
+            Thread.Sleep(10000);
+
+            var count2 = managedCache.GetCache().GetCount();
+            Console.WriteLine("Keys = " + count2);
+            Assert.Less(count2, count1);
         }
 
         private void QueryStuff(int id1, int id2, int id3, string alias1)

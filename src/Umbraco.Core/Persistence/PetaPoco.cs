@@ -1704,13 +1704,16 @@ namespace Umbraco.Core.Persistence
             }
 
             static readonly ObjectCache ObjectCache = new MemoryCache("NPoco");
+            
         }
 
         public class PocoData
         {
             //USE ONLY FOR TESTING
             internal static bool UseLongKeys = false;
-
+            //USE ONLY FOR TESTING - default is one hr
+            internal static int SlidingExpirationSeconds = 3600;
+            
 			public static PocoData ForObject(object o, string primaryKeyName)
 			{
 				var t = o.GetType();
@@ -2078,7 +2081,7 @@ namespace Umbraco.Core.Persistence
                 {
                     //sliding expiration of 1 hr, if the same key isn't used in this 
                     // timeframe it will be removed from the cache
-                    SlidingExpiration = new TimeSpan(1,0,0)
+                    SlidingExpiration = new TimeSpan(0, 0, SlidingExpirationSeconds)
                 });
                 return (value ?? newValue).Value; // Lazy<T> handles the locking itself
 
@@ -2170,7 +2173,7 @@ namespace Umbraco.Core.Persistence
 			public TableInfo TableInfo { get; private set; }
 			public Dictionary<string, PocoColumn> Columns { get; private set; }
             static System.Threading.ReaderWriterLockSlim InnerLock = new System.Threading.ReaderWriterLockSlim();
-
+            
             /// <summary>
             /// Returns a report of the current cache being utilized by PetaPoco
             /// </summary>
