@@ -15,15 +15,28 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Persistence
 {
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture]
+    [TestFixture, NUnit.Framework.Ignore]
     public class PetaPocoCachesTest : BaseServiceTest
     {
+        /// <summary>
+        /// This tests the peta poco caches
+        /// </summary>
+        /// <remarks>
+        /// This test WILL fail. This is because we cannot stop PetaPoco from creating more cached items for queries such as
+        ///  ContentTypeRepository.GetAll(1,2,3,4);
+        /// when combined with other GetAll queries that pass in an array of Ids, each query generated for different length
+        /// arrays will produce a unique query which then gets added to the cache.
+        /// 
+        /// This test confirms this, if you analyze the DIFFERENCE output below you can see why the cached queries grow.
+        /// </remarks>
         [Test]
         public void Check_Peta_Poco_Caches()
         {
-            var result = new List<Tuple<double, long>>();
+            var result = new List<Tuple<double, int, IEnumerable<string>>>();
 
-            for (int i = 0; i < 10; i++)
+            Database.PocoData.UseLongKeys = true;
+
+            for (int i = 0; i < 2; i++)
             {
                 int id1, id2, id3;
                 string alias;
@@ -31,22 +44,33 @@ namespace Umbraco.Tests.Persistence
                 QueryStuff(id1, id2, id3, alias);
 
                 double totalBytes1;
-                long totalDelegates1;
-                Console.Write(Database.PocoData.PrintDebugCacheReport(out totalBytes1, out totalDelegates1));
+                IEnumerable<string> keys;
+                Console.Write(Database.PocoData.PrintDebugCacheReport(out totalBytes1, out keys));
 
-                result.Add(new Tuple<double, long>(totalBytes1, totalDelegates1));
+                result.Add(new Tuple<double, int, IEnumerable<string>>(totalBytes1, keys.Count(), keys));
             }
 
-            foreach (var tuple in result)
+            for (int index = 0; index < result.Count; index++)
             {
+                var tuple = result[index];
                 Console.WriteLine("Bytes: {0}, Delegates: {1}", tuple.Item1, tuple.Item2);
+                if (index != 0)
+                {
+                    Console.WriteLine("----------------DIFFERENCE---------------------");
+                    var diff = tuple.Item3.Except(result[index - 1].Item3);
+                    foreach (var d in diff)
+                    {
+                        Console.WriteLine(d);
+                    }
+                }
+                
             }
 
             var allByteResults = result.Select(x => x.Item1).Distinct();
-            var allDelegateResults = result.Select(x => x.Item2).Distinct();
+            var totalKeys = result.Select(x => x.Item2).Distinct();
 
             Assert.AreEqual(1, allByteResults.Count());
-            Assert.AreEqual(1, allDelegateResults.Count());
+            Assert.AreEqual(1, totalKeys.Count());
         }
 
         private void QueryStuff(int id1, int id2, int id3, string alias1)

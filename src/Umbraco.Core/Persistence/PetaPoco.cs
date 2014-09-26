@@ -1707,7 +1707,10 @@ namespace Umbraco.Core.Persistence
         }
 
         public class PocoData
-		{
+        {
+            //USE ONLY FOR TESTING
+            internal static bool UseLongKeys = false;
+
 			public static PocoData ForObject(object o, string primaryKeyName)
 			{
 				var t = o.GetType();
@@ -1848,6 +1851,8 @@ namespace Umbraco.Core.Persistence
 				return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
 			}
 
+
+
 			// Create factory function that can convert a IDataReader record into a POCO
 			public Delegate GetFactory(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
 			{
@@ -1857,16 +1862,24 @@ namespace Umbraco.Core.Persistence
                 // returning the same structured data:
                 // SELECT * FROM MyTable ORDER BY MyColumn
                 // SELECT * FROM MyTable ORDER BY MyColumn DESC
-    
-                //Create a hashed key, we don't want to store so much string data in memory
-                var combiner = new HashCodeCombiner();
-                combiner.AddCaseInsensitiveString(sql);
-                combiner.AddCaseInsensitiveString(connString);
-                combiner.AddObject(ForceDateTimesToUtc);
-                combiner.AddInt(firstColumn);
-                combiner.AddInt(countColumns);
 
-                var key = combiner.GetCombinedHashCode();
+			    string key;
+			    if (UseLongKeys)
+			    {
+                    key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
+			    }
+			    else
+			    {
+                    //Create a hashed key, we don't want to store so much string data in memory
+                    var combiner = new HashCodeCombiner();
+                    combiner.AddCaseInsensitiveString(sql);
+                    combiner.AddCaseInsensitiveString(connString);
+                    combiner.AddObject(ForceDateTimesToUtc);
+                    combiner.AddInt(firstColumn);
+                    combiner.AddInt(countColumns);
+                    key = combiner.GetCombinedHashCode();
+			    }
+                
 
 			    var objectCache = _managedCache.GetCache();
 
@@ -2162,47 +2175,38 @@ namespace Umbraco.Core.Persistence
             /// Returns a report of the current cache being utilized by PetaPoco
             /// </summary>
             /// <returns></returns>
-		    public static string PrintDebugCacheReport(out double totalBytes, out long totalPocoDelegates)
+		    public static string PrintDebugCacheReport(out double totalBytes, out IEnumerable<string> allKeys)
             {
                 var managedCache = new ManagedCache();
-                totalBytes = 0.0;
+
                 var sb = new StringBuilder();
                 sb.AppendLine("m_PocoDatas:");
                 foreach (var pocoData in m_PocoDatas)
                 {
                     sb.AppendFormat("\t{0}\n", pocoData.Key);
-                    
-                    //calc bytes in utf16 (since that is how .net stores strings) based on the strings being stored
-                    // in memory
-                    var strBytes = new StringBuilder();
-                    strBytes
-                        .Append(string.Join("", pocoData.Value.QueryColumns))
-                        .Append(pocoData.Value.TableInfo.PrimaryKey)
-                        .Append(pocoData.Value.TableInfo.SequenceName)
-                        .Append(pocoData.Value.TableInfo.TableName)
-                        .Append(string.Join("", pocoData.Value.Columns.Keys))
-                        .Append(string.Join("", pocoData.Value.Columns.Values.Select(x => x.ColumnName)));
-
-                    var bytes = Encoding.Unicode.GetByteCount(strBytes.ToString());
-                    totalBytes += bytes;
-
-                    //utf16 little endian
-                    sb.AppendFormat("\t\tString bytes:{0}\n", bytes);
-                    sb.AppendFormat("\t\tTable:{0} - Col count:{1}\n", pocoData.Value.TableInfo.TableName, pocoData.Value.QueryColumns.Length);
-              
+                    sb.AppendFormat("\t\tTable:{0} - Col count:{1}\n", pocoData.Value.TableInfo.TableName, pocoData.Value.QueryColumns.Length);              
                 }
-                
-                sb.AppendFormat("\tTotal byte count:{0}\n", totalBytes);
+
                 var cache = managedCache.GetCache();
-                totalPocoDelegates = cache.GetCount();
-                sb.AppendFormat("\tTotal Poco data count:{0}\n", totalPocoDelegates);
+                allKeys = cache.Select(x => x.Key).ToArray();
+
+                sb.AppendFormat("\tTotal Poco data count:{0}\n", allKeys.Count());
+
+                var keys = string.Join("", cache.Select(x => x.Key));
+                //Bytes in .Net are stored as utf-16 = unicode little endian
+                totalBytes = Encoding.Unicode.GetByteCount(keys);
+
+                sb.AppendFormat("\tTotal byte for keys:{0}\n", totalBytes);
+                
                 sb.AppendLine("\tAll Poco cache items:");
 
                 foreach (var item in cache)
                 {
-                    sb.AppendFormat("\t\t{0} = {1}\n", item.Key, item.Value);
+                    sb.AppendFormat("\t\t Key -> {0}\n", item.Key);
+                    sb.AppendFormat("\t\t Value -> {0}\n", item.Value);
                 }
 
+                sb.AppendLine("-------------------END REPORT------------------------");
                 return sb.ToString();
             }
 		}
