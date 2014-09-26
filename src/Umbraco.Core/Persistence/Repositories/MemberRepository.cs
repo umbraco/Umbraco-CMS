@@ -91,14 +91,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var baseQuery = GetBaseQuery(false);
 
             //check if the query is based on properties or not
-            var query1 = query as Query<IMember>;
-            if (query1 == null)
-                throw new Exception("Query cannot be null");
 
-            var wheres = query1.WhereClauses();
+            var wheres = query.GetWhereClauses();
             //this is a pretty rudimentary check but wil work, we just need to know if this query requires property
             // level queries
-            if (wheres.Any(x => x.Contains("cmsPropertyType")))
+            if (wheres.Any(x => x.Item1.Contains("cmsPropertyType")))
             {
                 var sqlWithProps = GetNodeIdQueryWithPropertyData();
                 var translator = new SqlTranslator<IMember>(sqlWithProps, query);

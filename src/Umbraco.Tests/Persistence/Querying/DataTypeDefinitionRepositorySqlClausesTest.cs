@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Select("*")
                 .From("[cmsDataType]")
                 .InnerJoin("[umbracoNode]").On("[cmsDataType].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = '30a2a501-1978-4ddb-a57b-f7efed43ba3c'");
+                .Where("[umbracoNode].[nodeObjectType] = @0", new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"));
 
             var sql = new Sql();
             sql.Select("*")
@@ -29,6 +29,12 @@ namespace Umbraco.Tests.Persistence.Querying
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
+
+            Assert.AreEqual(expected.Arguments.Length, sql.Arguments.Length);
+            for (int i = 0; i < expected.Arguments.Length; i++)
+            {
+                Assert.AreEqual(expected.Arguments[i], sql.Arguments[i]);
+            }
 
             Console.WriteLine(sql.SQL);
         }
