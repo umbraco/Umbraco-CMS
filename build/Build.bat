@@ -23,6 +23,7 @@ RD ..\src\Umbraco.Web.UI.Client\build /Q /S
 ECHO Removing existing built files to make sure everything is clean as a whistle
 RMDIR /Q /S _BuildOutput
 DEL /F /Q UmbracoCms.*.zip
+DEL /F /Q UmbracoExamine.*.zip
 DEL /F /Q UmbracoCms.*.nupkg
 DEL /F /Q webpihash.txt
 
