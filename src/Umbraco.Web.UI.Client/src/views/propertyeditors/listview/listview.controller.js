@@ -250,11 +250,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.bulkStatus = "Starting with delete";
             var current = 1;
 
+            var pluralSuffix = total == 1 ? "" : "s";
+
             for (var i = 0; i < selected.length; i++) {
-                $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
+                $scope.bulkStatus = "Deleted item " + current + " out of " + total + " item" + pluralSuffix;
                 deleteItemCallback(getIdCallback(selected[i])).then(function (data) {
                     if (current === total) {
-                        notificationsService.success("Bulk action", "Deleted " + total + "documents");
+                        notificationsService.success("Bulk action", "Deleted " + total + " item" + pluralSuffix);
                         $scope.bulkStatus = "";
                         $scope.reloadView($scope.contentId);
                         $scope.actionInProgress = false;
@@ -279,13 +281,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.bulkStatus = "Starting with publish";
         var current = 1;
 
+        var pluralSuffix = total == 1 ? "" : "s";
+
         for (var i = 0; i < selected.length; i++) {
-            $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
+            $scope.bulkStatus = "Publishing " + current + " out of " + total + " document" + pluralSuffix;
 
             contentResource.publishById(getIdCallback(selected[i]))
                 .then(function(content) {
                     if (current == total) {
-                        notificationsService.success("Bulk action", "Published " + total + "documents");
+                        notificationsService.success("Bulk action", "Published " + total + " document" + pluralSuffix);
                         $scope.bulkStatus = "";
                         $scope.reloadView($scope.contentId);
                         $scope.actionInProgress = false;
@@ -322,14 +326,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.bulkStatus = "Starting with publish";
         var current = 1;
 
+        var pluralSuffix = total == 1 ? "" : "s";
+
         for (var i = 0; i < selected.length; i++) {
-            $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
+            $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " document" + pluralSuffix;
 
             contentResource.unPublish(getIdCallback(selected[i]))
                 .then(function(content) {
 
                     if (current == total) {
-                        notificationsService.success("Bulk action", "Published " + total + "documents");
+                        notificationsService.success("Bulk action", "Unpublished " + total + " document" + pluralSuffix);
                         $scope.bulkStatus = "";
                         $scope.reloadView($scope.contentId);
                         $scope.actionInProgress = false;
