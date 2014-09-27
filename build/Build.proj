@@ -76,6 +76,7 @@
     <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
     <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
     <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
+    <BuildZipExaminePDFName>UmbracoExamine.PDF.0.6.0.zip</BuildZipExaminePDFName>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
@@ -153,13 +154,21 @@
     <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22" />
   </Target>
 
-  <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
+  <Target Name="ZipWebApp" DependsOnTargets="ZipUmbracoExaminePDF" >
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
 
     <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22" />
     <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22" />
 
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
+  </Target>
+  
+  <Target Name="ZipUmbracoExaminePDF" DependsOnTargets="CreateSystemFolders" >
+    <Message Text="Starting to zip to $(buildDate)-$(BuildZipExaminePDFName)" Importance="high" />
+
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipExaminePDFName)%22 %22$(ExaminePDFPath)*%22" />
+
+    <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipExaminePDFName)" Importance="high" />
   </Target>
 
   <Target Name="CreateSystemFolders" DependsOnTargets="CopyBelleBuild" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
@@ -223,7 +232,7 @@
  <!-- Copy the config files and rename them to *.config.transform -->
  <Target Name="CopyTransformedConfig"  DependsOnTargets="CopyXmlDocumentation">
     <ItemGroup>
-     <ConfigFiles Include="$(WebAppFolder)config\*.config" />
+     <ConfigFiles Include="$(WebAppFolder)config\*.config;$(WebAppFolder)config\*.js" />
 	 <WebConfigTransformFile Include="$(WebAppFolder)Web.config" />
    </ItemGroup>
    

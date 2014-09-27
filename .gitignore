@@ -51,6 +51,7 @@ _BuildOutput/*
 build/UmbracoCms.AllBinaries*zip
 build/UmbracoCms.WebPI*zip
 build/UmbracoCms*zip
+build/UmbracoExamine.PDF*zip
 build/*.nupkg
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
@@ -121,3 +122,4 @@ src/Umbraco.Web.UI.Client/bower_components/*
 #Ignore Rule for output of generated documentation files from Grunt docserve
 src/Umbraco.Web.UI.Client/docs/api
 src/*.boltdata/
+
