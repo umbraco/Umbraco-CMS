@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence
             var expresionist = new PocoToSqlExpressionHelper<T>();
             string whereExpression = expresionist.Visit(predicate);
 
-            return sql.Where(whereExpression);
+            return sql.Where(whereExpression, expresionist.GetSqlParameters());
         }
 
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence
 
         public static Sql OrderByDescending(this Sql sql, params object[] columns)
         {
-            return sql.Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString() + " DESC").ToArray())));
+            return sql.Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x + " DESC").ToArray())));
         }
     }
 }

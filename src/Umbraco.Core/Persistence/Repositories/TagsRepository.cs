@@ -160,6 +160,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         //TODO: Consider caching implications.
 
+        //TODO: We need to add lookups for parentId or path! (i.e. get content in tag group that are descendants of x)
+
 
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string tagGroup)
         {

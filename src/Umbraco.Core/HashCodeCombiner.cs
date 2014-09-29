@@ -34,6 +34,12 @@ namespace Umbraco.Core
 			AddInt(d.GetHashCode());
 		}
 
+        internal void AddString(string s)
+        {
+            if (s != null)
+                AddInt((StringComparer.InvariantCulture).GetHashCode(s));
+        }
+
 		internal void AddCaseInsensitiveString(string s)
 		{
 			if (s != null)
