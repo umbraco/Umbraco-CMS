@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoExamine.PDF</id>
-        <version>0.6.0</version>
+        <version>0.7.0</version>
         <authors>Umbraco HQ</authors>
         <owners>Umbraco HQ</owners>
         <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>

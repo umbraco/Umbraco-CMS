@@ -23,10 +23,5 @@ using System.Security;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("8933a78d-8414-4c72-a74d-76aa7fb0e9ad")]
 
-//NOTE: WE cannot make change the major version to be the same as Umbraco because of backwards compatibility, however we 
-// will make the minor version the same as the umbraco version 
-[assembly: AssemblyVersion("0.6.0.*")]
-[assembly: AssemblyFileVersion("0.6.0.*")]
-
-//Unfortunately itextsharp does not natively support full trust
-//[assembly: AllowPartiallyTrustedCallers]
+[assembly: AssemblyVersion("0.7.0.*")]
+[assembly: AssemblyFileVersion("0.7.0.*")]
