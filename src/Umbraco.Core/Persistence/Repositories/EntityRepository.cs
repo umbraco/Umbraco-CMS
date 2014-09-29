@@ -301,7 +301,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //this will add any dataNvarchar property to the output which can be added to the additional properties
 
             var joinSql = new Sql()
-                .Select("contentNodeId, versionId, dataNvarchar, dataNtext, propertyEditorAlias, alias as propertyTypeAlias")
+                .Select("contentNodeId, versionId, dataNvarchar, dataNtext, controlId, alias as propertyTypeAlias")
                 .From<PropertyDataDto>()
                 .InnerJoin<NodeDto>()
                 .On<PropertyDataDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
