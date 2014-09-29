@@ -27,7 +27,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                 }
             }
 
-            $element.find("div:first").datetimepicker("hide");
+            $element.find("div:first").datetimepicker("hide", 0);
         });
     }
 

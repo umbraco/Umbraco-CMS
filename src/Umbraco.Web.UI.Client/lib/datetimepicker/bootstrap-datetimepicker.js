@@ -152,7 +152,13 @@
           this._attachDatePickerEvents();
     },
 
-    hide: function() {
+    hide: function (hideOnlyIfInViewMode) {
+
+      // Ignore if hideOnlyIfInViewMode parameter passed and we aren't currently in the requested view mode
+      if (hideOnlyIfInViewMode != undefined && hideOnlyIfInViewMode != this.viewMode) {
+        return;
+      }
+
       // Ignore event if in the middle of a picker transition
       var collapse = this.widget.find('.collapse')
       for (var i = 0; i < collapse.length; i++) {
