@@ -47,6 +47,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.Published, expression => expression.Ignore())
                   .ForMember(display => display.Updator, expression => expression.Ignore())
                   .ForMember(display => display.Alias, expression => expression.Ignore())
+                  .ForMember(display => display.IsContainer, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                   .AfterMap(AfterMap);
 

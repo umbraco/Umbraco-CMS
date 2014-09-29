@@ -22,12 +22,12 @@
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-3876
         /// </remarks>
-        public static string GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery)
+        public static Sql GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery)
         {
-            return string.Format(@"DELETE FROM {0} WHERE {1} IN (SELECT {1} FROM ({2}) x)",
-                                    sqlProvider.GetQuotedTableName(tableName),
-                                    sqlProvider.GetQuotedColumnName(columnName),
-                                    subQuery.SQL);
+            return new Sql(string.Format(@"DELETE FROM {0} WHERE {1} IN (SELECT {1} FROM ({2}) x)",
+                sqlProvider.GetQuotedTableName(tableName),
+                sqlProvider.GetQuotedColumnName(columnName),
+                subQuery.SQL), subQuery.Arguments);
         }
     }
 }
