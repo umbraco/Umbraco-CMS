@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence
             var expresionist = new PocoToSqlExpressionHelper<T>();
             string whereExpression = expresionist.Visit(predicate);
 
-            return sql.Where(whereExpression);
+            return sql.Where(whereExpression, expresionist.GetSqlParameters());
         }
 
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)

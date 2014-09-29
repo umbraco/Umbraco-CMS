@@ -402,6 +402,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IMedia> GetDescendants(int id)
         {
             var media = GetById(id);
+            if (media == null)
+            {
+                return Enumerable.Empty<IMedia>();
+            }
             return GetDescendants(media);
         }
 

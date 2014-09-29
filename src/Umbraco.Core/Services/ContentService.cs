@@ -484,6 +484,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetDescendants(int id)
         {
             var content = GetById(id);
+            if (content == null)
+            {
+                return Enumerable.Empty<IContent>();
+            }
             return GetDescendants(content);
         }
 

@@ -188,6 +188,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="updateDate"></param>
         /// <returns></returns>
         protected PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentTypeComposition contentType, DateTime createDate, DateTime updateDate)
+                
+
         {
             var sql = new Sql();
             sql.Select("*")
