@@ -83,7 +83,6 @@ namespace Umbraco.Web.Editors
 
             // Get parameters
             var parameters = HttpContext.Current.Request["parameters"];
-            var parametersGrid = HttpContext.Current.Request["parametersGrid"];
             var pageId = int.Parse(HttpContext.Current.Request["pageId"]);
             var inherited = Boolean.Parse(HttpContext.Current.Request["inherited"]);
 

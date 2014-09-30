@@ -181,43 +181,6 @@ namespace Umbraco.Web
                 file.Write(lessContent);
             }
 
-
-
-
-            //string lessPath = GetStylesheetPath(path, true);
-
-            //// If less file exist, Load its  content
-            //string lessContent = string.Empty;
-            //using (System.IO.StreamReader sr = new System.IO.StreamReader(System.IO.File.Exists(HttpContext.Current.Server.MapPath(lessPath)) 
-            //    ? HttpContext.Current.Server.MapPath(lessPath) : canvasdesignerDefaultLessPath))
-            //{
-            //    lessContent = sr.ReadToEnd();
-            //}
-
-            //// Update with grid row style needs
-            //string[] gridRows = CanvasdesignerUtility.GetGridRows(pageId);
-            //string parametersToAdd = string.Empty;
-            //string styleToAdd = string.Empty;
-            //foreach (var gridRow in gridRows)
-            //{
-            //    if (string.IsNullOrEmpty(GetStyleBlock(lessContent, "gridStyle-" + "gridrow_" + gridRow))) 
-            //    {
-            //        parametersToAdd += NewGridRowBlock(gridRow);
-            //    }
-            //}
-
-            //// Create front directory if necesary
-            //if (!Directory.Exists(frontBasePath))
-            //    Directory.CreateDirectory(frontBasePath);
-
-            //// Save less file
-            //if (string.IsNullOrEmpty(lessPath)) lessPath = string.Format("{0}{1}.less", canvasdesignerStylePath, pageId);
-            //lessContent = lessContent + Environment.NewLine + parametersToAdd;
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(HttpContext.Current.Server.MapPath(lessPath)))
-            //{
-            //    file.Write(lessContent);
-            //}
-
             return lessPath;
 
         }
@@ -284,9 +247,14 @@ namespace Umbraco.Web
         internal static void DeleteStyle(int pageId)
         {
 
+            // Get inherited tuned pageId and path
+            var contentService = ApplicationContext.Current.Services.ContentService;
+            IContent content = contentService.GetById(pageId);
+            int inheritedTunedPageId = CanvasDesignerUtility.GetParentOrSelfTunedPageId(content.Path.Split(','), true);
+
             // Path to the less and css files
-            string newResultLessPath = HttpContext.Current.Server.MapPath(string.Format(resultLessPath, pageId));
-            string newResultCssPath = HttpContext.Current.Server.MapPath(string.Format(resultCssPath, pageId));
+            string newResultLessPath = HttpContext.Current.Server.MapPath(string.Format(resultLessPath, inheritedTunedPageId));
+            string newResultCssPath = HttpContext.Current.Server.MapPath(string.Format(resultCssPath, inheritedTunedPageId));
 
             // Delete all style file for this page
             System.IO.File.Delete(newResultLessPath);
