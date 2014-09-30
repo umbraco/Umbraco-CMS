@@ -74,7 +74,21 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string filter = "");
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets descendants of a <see cref="IMedia"/> object by its Id

@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
@@ -617,16 +618,26 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
+
+            //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
+            // what we always require for a paged result, so we'll ensure it's included in the filter
+
+            var args = new List<object>();
+            var sbWhere = new StringBuilder("AND (cmsDocument.newest = 1)");
+            
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                sbWhere.Append(" AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                args.Add("%" + filter + "%");
+            }          
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
+
+
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 "SELECT cmsDocument.nodeId",
                 ProcessQuery, orderBy, orderDirection,
-                filter.IsNullOrWhiteSpace()
-
-                //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
-                // what we always require for a paged result, so we'll ensure it's included in the filter
-
-                    ? new Func<string>(() => "AND (cmsDocument.newest = 1)")
-                    : new Func<string>(() => "AND (cmsDocument.newest = 1) AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')"));
+                filterCallback);
 
         }
         

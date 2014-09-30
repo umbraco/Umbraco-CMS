@@ -264,8 +264,8 @@ namespace UmbracoExamine
         /// <param name="type"></param>
         protected override void PerformIndexAll(string type)
         {
-            //TODO: Fix all of this up, the whole xpath thing is horrible and was made sooooooooo long ago to only work with published content
-            // but not it's being used for all content types and is really bad for performance.
+            //NOTE: the logic below is ONLY used for published content, for media and members and non-published content, this method is overridden
+            // and we query directly against the umbraco service layer.
 
             if (!SupportedTypes.Contains(type))
                 return;
@@ -275,7 +275,7 @@ namespace UmbracoExamine
             var sb = new StringBuilder();
 
             //create the xpath statement to match node type aliases if specified
-            if (IndexerData.IncludeNodeTypes.Count() > 0)
+            if (IndexerData.IncludeNodeTypes.Any())
             {
                 sb.Append("(");
                 foreach (var field in IndexerData.IncludeNodeTypes)
@@ -328,6 +328,9 @@ namespace UmbracoExamine
         /// <returns>Either the Content or Media xml. If the type is not of those specified null is returned</returns>
         protected virtual XDocument GetXDocument(string xPath, string type)
         {
+            //TODO: We need to get rid of this! it will now only ever be called for published content - but we're keeping the other
+            // logic here for backwards compatibility in case inheritors are calling this for some reason.
+
             if (type == IndexTypes.Content)
             {
                 if (this.SupportUnpublishedContent)

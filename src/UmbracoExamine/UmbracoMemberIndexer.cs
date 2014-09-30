@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using Examine.LuceneEngine.Config;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using UmbracoExamine.Config;
 using Examine.LuceneEngine;
@@ -25,11 +26,29 @@ namespace UmbracoExamine
     public class UmbracoMemberIndexer : UmbracoContentIndexer
     {
 
+        private readonly IMemberService _memberService;
+        private readonly IDataTypeService _dataTypeService;
+
         /// <summary>
         /// Default constructor
         /// </summary>
         public UmbracoMemberIndexer()
             : base() { }
+
+	    /// <summary>
+	    /// Constructor to allow for creating an indexer at runtime
+	    /// </summary>
+	    /// <param name="indexerData"></param>
+	    /// <param name="indexPath"></param>
+	    /// <param name="dataService"></param>
+	    /// <param name="analyzer"></param>
+	    [Obsolete("Use the overload that specifies the Umbraco services")]
+	    public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
+	        : base(indexerData, indexPath, dataService, analyzer, async)
+	    {
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _memberService = ApplicationContext.Current.Services.MemberService;
+	    }
 
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
@@ -37,10 +56,19 @@ namespace UmbracoExamine
         /// <param name="indexerData"></param>
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
-		
-		public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-            : base(indexerData, indexPath, dataService, analyzer, async) { }
+        /// <param name="async"></param>
+	    public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
+            IDataTypeService dataTypeService,
+            IMemberService memberService,
+            Analyzer analyzer, bool async)
+	        : base(indexerData, indexPath, dataService, analyzer, async)
+	    {
+            _dataTypeService = dataTypeService;
+            _memberService = memberService;
+	    }
 
         /// <summary>
         /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
@@ -83,23 +111,39 @@ namespace UmbracoExamine
 	    protected override void PerformIndexAll(string type)
 	    {
             //This only supports members
-            if (!SupportedTypes.Contains(type))
+            if (SupportedTypes.Contains(type) == false)
                 return;
 
             //Re-index all members in batches of 5000
-            IEnumerable<IMember> members;
+            IMember[] members;
             const int pageSize = 5000;
             var pageIndex = 0;
-            do
-            {
-                int total;
-                members = ApplicationContext.Current.Services.MemberService.GetAll(pageIndex, pageSize, out total);
 
-                AddNodesToIndex(GetSerializedMembers(members), type);
-
-                pageIndex++;
-
-            } while (members.Count() == pageSize);
+	        if (IndexerData.IncludeNodeTypes.Any())
+	        {
+                //if there are specific node types then just index those
+                foreach (var nodeType in IndexerData.IncludeNodeTypes)
+	            {
+                    do
+                    {
+                        int total;
+                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType).ToArray();
+                        AddNodesToIndex(GetSerializedMembers(members), type);
+                        pageIndex++;
+                    } while (members.Length == pageSize);
+	            }
+	        }
+	        else
+	        {
+                //no node types specified, do all members
+                do
+                {
+                    int total;
+                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+                    AddNodesToIndex(GetSerializedMembers(members), type);
+                    pageIndex++;
+                } while (members.Length == pageSize);
+	        }
 	    }
 
 	    private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
@@ -107,7 +151,7 @@ namespace UmbracoExamine
             var serializer = new EntityXmlSerializer();
             foreach (var member in members)
             {
-                yield return serializer.Serialize(ApplicationContext.Current.Services.DataTypeService, member);
+                yield return serializer.Serialize(_dataTypeService, member);
             }
 	    } 
 

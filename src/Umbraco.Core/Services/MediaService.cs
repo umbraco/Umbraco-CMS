@@ -408,10 +408,45 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMedia>.Builder.Where(x => x.ParentId == id);
+                var query = Query<IMedia>.Builder;
+                //if the id is -1, then just get all
+                if (id > 0)
+                {
+                    query.Where(x => x.ParentId == id);
+                }
                 var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
 
                 return medias;
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalChildren">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        {
+            Mandate.ParameterCondition(pageIndex >= 0, "pageSize");
+            Mandate.ParameterCondition(pageSize > 0, "pageSize");
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+
+                var query = Query<IMedia>.Builder;
+                //if the id is -1, then just get all
+                if (id > 0)
+                {
+                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                }
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+
+                return contents;
             }
         }
 

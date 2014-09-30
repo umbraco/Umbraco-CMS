@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -571,13 +572,21 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            var args = new List<object>();
+            var sbWhere = new StringBuilder();
+            Func<Tuple<string, object[]>> filterCallback = null;
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                sbWhere.Append("AND ((umbracoNode. " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ") " +
+                                "OR (cmsMember.LoginName LIKE @0" + args.Count + "))");
+                args.Add("%" + filter + "%");
+                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
+            }           
+
             return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
                 "SELECT cmsMember.nodeId",
                 ProcessQuery, orderBy, orderDirection,
-                filter.IsNullOrWhiteSpace()
-                    ? (Func<string>) null
-                    : () => "AND ((umbracoNode. " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%') " +
-                                "OR (cmsMember.LoginName LIKE '%" + filter + "%'))");
+                filterCallback);
         }
         
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)

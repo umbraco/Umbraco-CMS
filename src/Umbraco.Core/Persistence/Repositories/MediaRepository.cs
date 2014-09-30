@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
@@ -376,12 +377,20 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            var args = new List<object>();
+            var sbWhere = new StringBuilder();
+            Func<Tuple<string, object[]>> filterCallback = null;
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                sbWhere.Append("AND (umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                args.Add("%" + filter + "%");
+                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
+            }
+
             return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
                 "SELECT cmsContentVersion.contentId",
                 ProcessQuery, orderBy, orderDirection,
-                filter.IsNullOrWhiteSpace()
-                    ? (Func<string>)null
-                    : () => "AND (umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')");
+                filterCallback);
 
         }
 

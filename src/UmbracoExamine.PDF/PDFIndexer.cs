@@ -232,17 +232,19 @@ namespace UmbracoExamine.PDF
 
                 try
                 {
-                    var reader = new PdfReader(pdfPath);
-
-                    for (int i = 1; i <= reader.NumberOfPages; i++)
+                    using (var reader = new PdfReader(pdfPath))
                     {
-                        var result =
-                            ExceptChars(
-                                PdfTextExtractor.GetTextFromPage(reader, i, new SimpleTextExtractionStrategy()),
-                                UnsupportedRange,
-                                ReplaceWithSpace);
-                        output.Write(result);
+                        for (int i = 1; i <= reader.NumberOfPages; i++)
+                        {
+                            var result =
+                                ExceptChars(
+                                    PdfTextExtractor.GetTextFromPage(reader, i, new SimpleTextExtractionStrategy()),
+                                    UnsupportedRange,
+                                    ReplaceWithSpace);
+                            output.Write(result);
+                        }
                     }
+                    
                 }
                 catch (Exception ex)
                 {

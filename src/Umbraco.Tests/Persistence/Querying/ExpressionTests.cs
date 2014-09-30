@@ -13,6 +13,20 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class ExpressionTests : BaseUsingSqlCeSyntax
     {
+    //    [Test]
+    //    public void Can_Query_With_Content_Type_Alias()
+    //    {
+    //        //Arrange
+    //        Expression<Func<IMedia, bool>> predicate = content => content.ContentType.Alias == "Test";
+    //        var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IContent>();
+    //        var result = modelToSqlExpressionHelper.Visit(predicate);
+
+    //        Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+
+    //        Assert.AreEqual("[cmsContentType].[alias] = @0", result);
+    //        Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
+    //    }
+
         [Test]
         public void Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
         {

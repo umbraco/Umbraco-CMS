@@ -246,7 +246,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Sql, IEnumerable<TEntity>> processQuery,
             string orderBy, 
             Direction orderDirection,
-            Func<string> defaultFilter = null)
+            Func<Tuple<string, object[]>> defaultFilter = null)
             where TContentBase : class, IAggregateRoot, TEntity
         {
             if (orderBy == null) throw new ArgumentNullException("orderBy");
@@ -265,7 +265,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 // Apply filter
                 if (defaultFilter != null)
                 {
-                    filteredSql.Append(defaultFilter());
+                    var filterResult = defaultFilter();
+                    filteredSql.Append(filterResult.Item1, filterResult.Item2);
                 }
                 if (string.IsNullOrEmpty(additionalFilter) == false)
                 {

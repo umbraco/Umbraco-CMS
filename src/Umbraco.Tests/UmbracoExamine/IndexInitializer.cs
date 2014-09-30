@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Mime;
 using Examine;
 using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
+using Moq;
+using Umbraco.Core.Services;
 using UmbracoExamine;
 using UmbracoExamine.Config;
 using UmbracoExamine.DataServices;
 using UmbracoExamine.PDF;
+using IContentService = UmbracoExamine.DataServices.IContentService;
+using IMediaService = UmbracoExamine.DataServices.IMediaService;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -20,11 +25,36 @@ namespace Umbraco.Tests.UmbracoExamine
 		public static UmbracoContentIndexer GetUmbracoIndexer(
             Lucene.Net.Store.Directory luceneDir, 
             Analyzer analyzer = null,
-            IDataService dataService = null)
+            IDataService dataService = null,
+            Umbraco.Core.Services.IContentService contentService = null,
+            Umbraco.Core.Services.IMediaService mediaService = null,
+            IDataTypeService dataTypeService = null,
+            IContentTypeService contentTypeService = null,
+            IMemberService memberService = null)
 		{
             if (dataService == null)
             {
                 dataService = new TestDataService();
+            }
+		    if (contentService == null)
+		    {
+                contentService = Mock.Of<Umbraco.Core.Services.IContentService>();
+		    }
+            if (mediaService == null)
+            {
+                mediaService = Mock.Of<Umbraco.Core.Services.IMediaService>();
+            }
+            if (dataTypeService == null)
+            {
+                dataTypeService = Mock.Of<IDataTypeService>();
+            }
+            if (contentTypeService == null)
+            {
+                contentTypeService = Mock.Of<IContentTypeService>();
+            }
+            if (memberService == null)
+            {
+                memberService = Mock.Of<IMemberService>();
             }
 
             if (analyzer == null)
@@ -38,6 +68,10 @@ namespace Umbraco.Tests.UmbracoExamine
 		    var i = new UmbracoContentIndexer(indexCriteria,
 		                                      luceneDir, //custom lucene directory
                                               dataService,
+                                              contentService,
+                                              mediaService,
+                                              dataTypeService,
+                                              contentTypeService,
 		                                      analyzer,
 		                                      false);
 

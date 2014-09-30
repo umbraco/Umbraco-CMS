@@ -7,7 +7,9 @@ namespace UmbracoExamine.DataServices
 {
     public interface IContentService 
     {
+        [Obsolete("This should no longer be used, latest content will be indexed by using the IContentService directly")]
         XDocument GetLatestContentByXPath(string xpath);
+
         XDocument GetPublishedContentByXPath(string xpath);
 
         /// <summary>
