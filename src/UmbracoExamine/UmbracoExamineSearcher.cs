@@ -45,7 +45,7 @@ namespace UmbracoExamine
             }
         }
 
-        [SecuritySafeCritical]
+        
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
             if (name == null) throw new ArgumentNullException("name");
@@ -67,7 +67,7 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="indexPath"></param>
         /// <param name="analyzer"></param>
-		[SecuritySafeCritical]
+		
 		public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
             : base(indexPath, analyzer)
         {
@@ -78,7 +78,7 @@ namespace UmbracoExamine
 		/// </summary>
 		/// <param name="luceneDirectory"></param>
 		/// <param name="analyzer"></param>
-		[SecuritySafeCritical]
+		
 		public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
 			: base(luceneDirectory, analyzer)
 		{
@@ -95,7 +95,7 @@ namespace UmbracoExamine
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
         /// <returns></returns>
-        [SecuritySafeCritical]
+        
         protected bool CanInitialize()
         {
             //check the DisableInitializationCheck and ensure that it is not set to true

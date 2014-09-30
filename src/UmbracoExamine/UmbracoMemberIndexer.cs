@@ -1,17 +1,21 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Security;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Examine.LuceneEngine.Config;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using UmbracoExamine.Config;
-using umbraco.cms.businesslogic.member;
 using Examine.LuceneEngine;
 using System.Collections.Generic;
 using Examine;
 using System.IO;
 using UmbracoExamine.DataServices;
 using Lucene.Net.Analysis;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace UmbracoExamine
 {
@@ -34,7 +38,7 @@ namespace UmbracoExamine
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
         /// <param name="analyzer"></param>
-		[SecuritySafeCritical]
+		
 		public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
             : base(indexerData, indexPath, dataService, analyzer, async) { }
 
@@ -72,23 +76,45 @@ namespace UmbracoExamine
             }
         }
 
-		[SecuritySafeCritical]
-        protected override XDocument GetXDocument(string xPath, string type)
-        {
-            if (type == IndexTypes.Member)
-            {
-                Member[] rootMembers = Member.GetAll;
-                var xmlMember = XDocument.Parse("<member></member>");
-                foreach (Member member in rootMembers)
-                {
-                    xmlMember.Root.Add(GetMemberItem(member.Id));
-                }
-                var result = ((IEnumerable)xmlMember.XPathEvaluate(xPath)).Cast<XElement>();
-                return result.ToXDocument(); 
-            }
+	    /// <summary>
+	    /// Reindex all members
+	    /// </summary>
+	    /// <param name="type"></param>
+	    protected override void PerformIndexAll(string type)
+	    {
+            //This only supports members
+            if (!SupportedTypes.Contains(type))
+                return;
 
-            return null;
-        }
+            //Re-index all members in batches of 5000
+            IEnumerable<IMember> members;
+            const int pageSize = 5000;
+            var pageIndex = 0;
+            do
+            {
+                int total;
+                members = ApplicationContext.Current.Services.MemberService.GetAll(pageIndex, pageSize, out total);
+
+                //AddNodesToIndex(GetSerializedMembers(members), type);
+
+                pageIndex++;
+
+            } while (members.Count() == pageSize);
+	    }
+
+	    private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
+        {
+            var serializer = new EntityXmlSerializer();
+            foreach (var member in members)
+            {
+                yield return serializer.Serialize(ApplicationContext.Current.Services.DataTypeService, member);
+            }
+	    } 
+
+	    protected override XDocument GetXDocument(string xPath, string type)
+	    {
+	        throw new NotSupportedException();
+	    }
         
         protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
         {
@@ -123,7 +149,6 @@ namespace UmbracoExamine
             }
         }
 
-		[SecuritySafeCritical]
         private static XElement GetMemberItem(int nodeId)
         {
 			//TODO: Change this so that it is not using the LegacyLibrary, just serialize manually!

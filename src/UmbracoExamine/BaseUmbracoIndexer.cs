@@ -42,14 +42,12 @@ namespace UmbracoExamine
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
         /// <param name="analyzer"></param>
-        [SecuritySafeCritical]
         protected BaseUmbracoIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
             : base(indexerData, indexPath, analyzer, async)
         {
             DataService = dataService;
         }
 
-		[SecuritySafeCritical]
 		protected BaseUmbracoIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
 			: base(indexerData, luceneDirectory, analyzer, async)
 		{
@@ -96,7 +94,6 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="name"></param>
         /// <param name="config"></param>
-        [SecuritySafeCritical]
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {           
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
@@ -217,7 +214,6 @@ namespace UmbracoExamine
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
         /// <returns></returns>
-        [SecuritySafeCritical]
         protected bool CanInitialize()
         {
             //check the DisableInitializationCheck and ensure that it is not set to true
@@ -268,6 +264,9 @@ namespace UmbracoExamine
         /// <param name="type"></param>
         protected override void PerformIndexAll(string type)
         {
+            //TODO: Fix all of this up, the whole xpath thing is horrible and was made sooooooooo long ago to only work with published content
+            // but not it's being used for all content types and is really bad for performance.
+
             if (!SupportedTypes.Contains(type))
                 return;
 
@@ -360,11 +359,9 @@ namespace UmbracoExamine
             XDocument xDoc = GetXDocument(xPath, type);
             if (xDoc != null)
             {
-                XElement rootNode = xDoc.Root;
+                var rootNode = xDoc.Root;
 
-                IEnumerable<XElement> children = rootNode.Elements();
-
-                AddNodesToIndex(children, type);
+                AddNodesToIndex(rootNode.Elements(), type);
             }
 
         }
