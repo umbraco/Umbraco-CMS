@@ -24,16 +24,30 @@ namespace Umbraco.Core.Sync
 
             if (status == CurrentServerEnvironmentStatus.Single)
             {
-                //if it's a single install, then the base url has to be the first url registered
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                //if it's a single install, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
+                if (GlobalSettings.UseSSL)
+                {
+                    return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
+                else
+                {
+                    return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
             }
 
             var servers = UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers.ToArray();
 
             if (servers.Any() == false)
             {
-                //cannot be determined, then the base url has to be the first url registered
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
+                if (GlobalSettings.UseSSL)
+                {
+                    return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
+                else
+                {
+                    return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
             }
 
             foreach (var server in servers)
@@ -58,8 +72,15 @@ namespace Umbraco.Core.Sync
                 }                
             }
 
-            //cannot be determined, then the base url has to be the first url registered
-            return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
+            if (GlobalSettings.UseSSL)
+            {
+                return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            }
+            else
+            {
+                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            }
         }
 
         /// <summary>
