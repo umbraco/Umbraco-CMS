@@ -526,12 +526,21 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region User/Profile methods
+        
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
         public static IProfile GetCreatorProfile(this IMedia media)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
+        /// </summary>
+        public static IProfile GetCreatorProfile(this IMedia media, IUserService userService)
+        {
+            return userService.GetProfileById(media.CreatorId);
         }
 
         /// <summary>
@@ -543,12 +552,29 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Creator of this content item.
+        /// </summary>
+        public static IProfile GetCreatorProfile(this IContentBase content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId);
+        }
+
+        /// <summary>
         /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
         public static IProfile GetWriterProfile(this IContent content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
         }
+
+        /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Writer of this content.
+        /// </summary>
+        public static IProfile GetWriterProfile(this IContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId);
+        }
+
         #endregion
 
         /// <summary>

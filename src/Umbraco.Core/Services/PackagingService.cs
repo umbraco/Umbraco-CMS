@@ -37,6 +37,7 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
+        private readonly IUserService userService;
 
 
         public PackagingService(IContentService contentService,
@@ -46,6 +47,7 @@ namespace Umbraco.Core.Services
             IDataTypeService dataTypeService,
             IFileService fileService,
             ILocalizationService localizationService,
+            IUserService userService,
             RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider uowProvider)
         {
@@ -82,7 +84,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_contentService, _dataTypeService, content, deep);
+            var xml = exporter.Serialize(_contentService, _dataTypeService, userService, content, deep);
 
             if(raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
@@ -1218,7 +1220,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_mediaService, _dataTypeService, media, deep);
+            var xml = exporter.Serialize(_mediaService, _dataTypeService, userService, media, deep);
 
             if(raiseEvents)
                 ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);

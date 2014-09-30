@@ -31,6 +31,7 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
+        private readonly IUserService _userService;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
@@ -61,9 +62,10 @@ namespace Umbraco.Core.Services
             _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
             _dataTypeService = new DataTypeService(provider, repositoryFactory);
+            _userService = new UserService(provider, repositoryFactory);
         }
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService)
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService, IUserService userService)
         {
             if (provider == null) throw new ArgumentNullException("provider");
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
@@ -72,6 +74,7 @@ namespace Umbraco.Core.Services
             _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
             _dataTypeService = dataTypeService;
+            _userService = userService;
         }
 
         public int Count(string contentTypeAlias = null)
@@ -253,7 +256,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
                 //Generate a new preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 uow.Commit();
             }
 
@@ -305,7 +308,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
                 //Generate a new preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 uow.Commit();
             }
 
@@ -927,7 +930,7 @@ namespace Umbraco.Core.Services
 
                             repository.AddOrUpdate(content);
                             //add or update preview
-                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                         }
                     }
                     else
@@ -937,7 +940,7 @@ namespace Umbraco.Core.Services
                             content.WriterId = userId;
                             repository.AddOrUpdate(content);
                             //add or update preview
-                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                         }
                     }
 
@@ -1275,7 +1278,7 @@ namespace Umbraco.Core.Services
 
                     repository.AddOrUpdate(copy);
                     //add or update a preview
-                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                     uow.Commit();
 
 
@@ -1366,7 +1369,7 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(content);
                 //add or update a preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                 uow.Commit();
             }
 
@@ -1432,13 +1435,13 @@ namespace Umbraco.Core.Services
 
                         repository.AddOrUpdate(content);
                         //add or update a preview
-                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                     }
 
                     foreach (var content in shouldBePublished)
                     {
                         //Create and Save ContentXml DTO
-                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                     }
 
                     uow.Commit();
@@ -1525,7 +1528,7 @@ namespace Umbraco.Core.Services
                     // change how this method calls "Save" as it needs to save using an internal method
                     using (var uow = _uowProvider.GetUnitOfWork())
                     {
-                        var xml = _entitySerializer.Serialize(this, _dataTypeService, content);
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, content);
 
                         var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
                         var exists =
@@ -1586,7 +1589,7 @@ namespace Umbraco.Core.Services
                 var xmlItems = new List<ContentXmlDto>();
                 foreach (var c in list)
                 {
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, c);
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, c);
                     xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                 }
 
@@ -1704,9 +1707,9 @@ namespace Umbraco.Core.Services
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);
                         //add or update a preview
-                        repository.AddOrUpdatePreviewXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                        repository.AddOrUpdatePreviewXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                         //add or update the published xml
-                        repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                        repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                         updated.Add(item.Result.ContentItem);
                     }
 
@@ -1813,12 +1816,12 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
                     if (published)
                     {
                         //Content Xml
-                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                     }
 
                     uow.Commit();
@@ -1880,7 +1883,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, c));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
 
                     uow.Commit();
                 }
