@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Examine.LuceneEngine;
+using Examine.LuceneEngine.Providers;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -282,7 +283,7 @@ namespace Umbraco.Web.Editors
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = (LuceneSearcher)ExamineManager.Instance.SearchProviderCollection[searcher];
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
@@ -374,7 +375,8 @@ namespace Umbraco.Web.Editors
             
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
             
-            var result = internalSearcher.Search(raw);
+            //limit results to 200 to avoid huge over processing (CPU)
+            var result = internalSearcher.Search(raw, 200);
 
             switch (entityType)
             {

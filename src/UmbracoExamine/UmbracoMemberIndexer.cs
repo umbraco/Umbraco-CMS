@@ -95,7 +95,7 @@ namespace UmbracoExamine
                 int total;
                 members = ApplicationContext.Current.Services.MemberService.GetAll(pageIndex, pageSize, out total);
 
-                //AddNodesToIndex(GetSerializedMembers(members), type);
+                AddNodesToIndex(GetSerializedMembers(members), type);
 
                 pageIndex++;
 
