@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("value")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(2500)]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Value { get; set; }
 
         [Column("sortorder")]
