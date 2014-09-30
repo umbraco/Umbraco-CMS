@@ -1,11 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--<link href="/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css" type="text/css" rel="stylesheet" />-->
+    <title>Umbraco Canvas Designer</title>
     <link href="/Umbraco/assets/css/canvasdesigner.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
-
 </head>
 
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-class="{ leftOpen: (showStyleEditor || showPalettePicker) && !showDevicesPreview }" ng-controller="Umbraco.canvasdesignerController">
@@ -49,10 +48,6 @@
                 </li>
             </ul>
 
-            <!--<div class="help">
-                <div class="display-i"><i class="icon icon-help-alt"></i><span></span></div>
-            </div>-->
-
         </div>
 
         <div class="main-panel" ng-class="{selected: !showDevicesPreview && ( showPalettePicker || showStyleEditor )}">
@@ -86,7 +81,7 @@
                 <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
                     <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
                     <li><a ng-click="deleteCanvasdesigner();opendropdown = false">Reset page style</a></li>
-                    <!--<li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>-->
+                    <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
                 </ul>
             </div>
 
@@ -107,7 +102,8 @@
                 </div>
             </div>
 
-            <div ng-repeat="configItem in canvasdesignerModel.configs" ng-show="currentSelected && currentSelected.name.toLowerCase() == configItem.name.toLowerCase()" on-finish-render-filters>
+            <div ng-repeat="configItem in canvasdesignerModel.configs" ng-show="currentSelected && currentSelected.name.toLowerCase() == configItem.name.toLowerCase()
+                 && currentSelected.schema.toLowerCase() == configItem.schema.toLowerCase()" on-finish-render-filters>
                 <div class="header">
                     <h3><i class="icon icon-list" ng-click="outlineSelectedHide()"></i> {{configItem.name}}</h3>
                 </div>
@@ -136,7 +132,7 @@
                 <ul class="dropdown-menu" ng-init="opendropdown = false" ng-show="opendropdown">
                     <li><a ng-click="createStyle();opendropdown = false">Create Page Style</a></li>
                     <li><a ng-click="deleteCanvasdesigner();opendropdown = false">Reset page style</a></li>
-                    <!--<li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>-->
+                    <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
                 </ul>
             </div>
 
@@ -152,7 +148,6 @@
 
     <script src="/umbraco/lib/lazyload/lazyload.min.js"></script>
     <script src="/umbraco/js/canvasdesigner.loader.js"></script>
-
 
 </body>
 
