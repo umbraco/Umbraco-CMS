@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.EntityBase;
@@ -370,9 +372,9 @@ INNER JOIN
 	(" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
 LEFT OUTER JOIN cmsDataTypePreValues
-ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments);
+ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arguments); 
 
-            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql);
+            var allPropertyData = Database.Fetch<PropertyDataDto>(propSql); 
 
             //This is a lazy access call to get all prevalue data for the data types that make up all of these properties which we use
             // below if any property requires tag support
@@ -387,63 +389,70 @@ INNER JOIN
 	(" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
 ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
 
-                return Database.Fetch<DataTypePreValueDto>(preValsSql);
+                return Database.Fetch<DataTypePreValueDto>(preValsSql); 
             });
 
             var result = new Dictionary<int, PropertyCollection>();
 
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
 
-            foreach (var def in documentDefs)
+            //iterate each definition grouped by it's content type - this will mean less property type iterations while building 
+            // up the property collections
+            foreach (var compositionGroup in documentDefs.GroupBy(x => x.Composition))
             {
-                var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
+                var compositionProperties = compositionGroup.Key.CompositionPropertyTypes.ToArray();
 
-                var propertyFactory = new PropertyFactory(def.Composition, def.Version, def.Id, def.CreateDate, def.VersionDate);
-                var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
-
-                var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
-                foreach (var property in newProperties)
+                foreach (var def in compositionGroup)
                 {
-                    var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
-                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                    var propertyDataDtos = allPropertyData.Where(x => x.NodeId == def.Id).Distinct();
 
-                    property.Version = def.Version;
-                    property.Id = primaryKey;
-                }
+                    var propertyFactory = new PropertyFactory(compositionProperties, def.Version, def.Id, def.CreateDate, def.VersionDate);
+                    var properties = propertyFactory.BuildEntity(propertyDataDtos.ToArray()).ToArray();                    
+                    
+                    var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
 
-                foreach (var property in properties)
-                {
-                    //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-                    var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
-
-                    var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
-                        ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
-                        : TagExtractor.GetAttribute(editor);
-
-                    if (tagSupport != null)
+                    foreach (var property in newProperties)
                     {
-                        //add to local cache so we don't need to reflect next time for this property editor alias
-                        propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
+                        var propertyDataDto = new PropertyDataDto { NodeId = def.Id, PropertyTypeId = property.PropertyTypeId, VersionId = def.Version };
+                        int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
 
-                        //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-                        var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
-                            .Distinct()
-                            .ToArray();
-
-                        var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-
-                        var preVals = new PreValueCollection(asDictionary);
-
-                        var contentPropData = new ContentPropertyData(property.Value,
-                            preVals,
-                            new Dictionary<string, object>());
-
-                        TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                        property.Version = def.Version;
+                        property.Id = primaryKey;
                     }
-                }
 
+                    foreach (var property in properties)
+                    {
+                        //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
+                        var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
 
-                result.Add(def.Id, new PropertyCollection(properties));
+                        var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
+                            ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
+                            : TagExtractor.GetAttribute(editor);
+
+                        if (tagSupport != null)
+                        {
+                            //add to local cache so we don't need to reflect next time for this property editor alias
+                            propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
+
+                            //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
+                            var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
+                                .Distinct()
+                                .ToArray();
+
+                            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+
+                            var preVals = new PreValueCollection(asDictionary);
+
+                            var contentPropData = new ContentPropertyData(property.Value,
+                                preVals,
+                                new Dictionary<string, object>());
+
+                            TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                        }
+                    }
+
+                    result.Add(def.Id, new PropertyCollection(properties));   
+                }                
             }
 
             return result;

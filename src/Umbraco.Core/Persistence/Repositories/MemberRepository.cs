@@ -243,7 +243,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
             // - this can occur if the member type doesn't contain the built-in properties that the
@@ -345,7 +345,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO ContentType for the Member entity
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);            
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);            
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
@@ -628,8 +628,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
             //content types
-            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
-                .ToArray();
+            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray()).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column
@@ -639,19 +638,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 .ToArray();
 
             //Go get the property data for each document
-            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
+            IEnumerable<DocumentDefinition> docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
                 d.dto.NodeId,
                 d.dto.ContentVersionDto.VersionId,
                 d.dto.ContentVersionDto.VersionDate,
                 d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                 d.contentType));
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(sql, docDefs); 
 
             return dtosWithContentTypes.Select(d => CreateMemberFromDto(
-                d.dto,
-                contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
-                propertyData[d.dto.NodeId]));
+                        d.dto,
+                        contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
+                        propertyData[d.dto.NodeId])); 
         }
 
         /// <summary>

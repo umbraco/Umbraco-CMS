@@ -1,6 +1,7 @@
 ﻿namespace Umbraco.Core.Persistence.Factories
 {
     //TODO: Not sure why we need this interface as it's never referenced in code.
+    //TODO: Delete this
 
     internal interface IEntityFactory<TEntity, TDto> 
         where TEntity : class

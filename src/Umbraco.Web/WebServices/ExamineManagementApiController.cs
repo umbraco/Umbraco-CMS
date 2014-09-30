@@ -10,6 +10,7 @@ using Examine.LuceneEngine.Providers;
 using Examine.Providers;
 using Lucene.Net.Search;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
 
@@ -121,6 +122,7 @@ namespace Umbraco.Web.WebServices
                 }
                 catch (Exception ex)
                 {
+                    LogHelper.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
                     var response = Request.CreateResponse(HttpStatusCode.Conflict);
                     response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
                     response.ReasonPhrase = "Could Not Rebuild";
