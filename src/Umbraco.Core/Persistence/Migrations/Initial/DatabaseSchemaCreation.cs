@@ -19,11 +19,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private static readonly Dictionary<int, Type> OrderedTables = new Dictionary<int, Type>
                                                                           {
                                                                               {0, typeof (NodeDto)},
-                                                                              {1, typeof (TemplateDto)},
-                                                                              {2, typeof (ContentDto)},
-                                                                              {3, typeof (ContentVersionDto)},
-                                                                              {4, typeof (DocumentDto)},
-                                                                              {5, typeof (ContentTypeDto)},
+                                                                              {1, typeof (ContentTypeDto)},
+                                                                              {2, typeof (TemplateDto)},
+                                                                              {3, typeof (ContentDto)},
+                                                                              {4, typeof (ContentVersionDto)},
+                                                                              {5, typeof (DocumentDto)},
+                                                                              
                                                                               {6, typeof (DocumentTypeDto)},
                                                                               {7, typeof (DataTypeDto)},
                                                                               {8, typeof (DataTypePreValueDto)},

@@ -35,10 +35,10 @@ namespace UmbracoExamine
     /// </summary>
     public class UmbracoContentIndexer : BaseUmbracoIndexer
     {
-        private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
         private readonly IDataTypeService _dataTypeService;
+        private readonly IUserService _userService;
 
         #region Constructors
 
@@ -51,7 +51,7 @@ namespace UmbracoExamine
             _contentService = ApplicationContext.Current.Services.ContentService;
             _mediaService = ApplicationContext.Current.Services.MediaService;
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            _userService = ApplicationContext.Current.Services.UserService;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace UmbracoExamine
             _contentService = ApplicationContext.Current.Services.ContentService;
             _mediaService = ApplicationContext.Current.Services.MediaService;
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            _userService = ApplicationContext.Current.Services.UserService;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace UmbracoExamine
             _contentService = ApplicationContext.Current.Services.ContentService;
             _mediaService = ApplicationContext.Current.Services.MediaService;
             _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            _userService = ApplicationContext.Current.Services.UserService;
         }
 
         /// <summary>
@@ -99,21 +99,21 @@ namespace UmbracoExamine
         /// <param name="contentService"></param>
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
-        /// <param name="contentTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="analyzer"></param>
         /// <param name="async"></param>
         public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
             IContentService contentService, 
             IMediaService mediaService,
             IDataTypeService dataTypeService,
-            IContentTypeService contentTypeService,
+            IUserService userService,
             Analyzer analyzer, bool async)
             : base(indexerData, luceneDirectory, dataService, analyzer, async)
         {
             _contentService = contentService;
             _mediaService = mediaService;
             _dataTypeService = dataTypeService;
-            _contentTypeService = contentTypeService;
+            _userService = userService;
         }
 
         #endregion
@@ -180,7 +180,7 @@ namespace UmbracoExamine
         /// An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
         /// </exception>
 
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        public override void Initialize(string name, NameValueCollection config)
         {
 
             //check if there's a flag specifying to support unpublished content,
@@ -255,7 +255,7 @@ namespace UmbracoExamine
 
         protected override void OnNodeIndexed(IndexedNodeEventArgs e)
         {
-            DataService.LogService.AddVerboseLog(e.NodeId, string.Format("Index created for node"));
+            DataService.LogService.AddVerboseLog(e.NodeId, string.Format("Index created for node {0}", e.NodeId));
             base.OnNodeIndexed(e);
         }
 
@@ -420,6 +420,7 @@ namespace UmbracoExamine
                 yield return serializer.Serialize(
                     _mediaService,
                     _dataTypeService,
+                    _userService,
                     m);
             }
         }
@@ -432,6 +433,7 @@ namespace UmbracoExamine
                 yield return serializer.Serialize(
                     _contentService,
                     _dataTypeService,
+                    _userService,
                     c);
             }
         }

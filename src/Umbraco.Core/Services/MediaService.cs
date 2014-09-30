@@ -33,6 +33,7 @@ namespace Umbraco.Core.Services
 
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
+        private readonly IUserService _userService;
 
         public MediaService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
@@ -44,13 +45,15 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
             _dataTypeService = new DataTypeService(provider, repositoryFactory);
+            _userService = new UserService(provider, repositoryFactory);
         }
 
-        public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IDataTypeService dataTypeService)
+        public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IDataTypeService dataTypeService, IUserService userService)
         {
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
             _dataTypeService = dataTypeService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -158,11 +161,11 @@ namespace Umbraco.Core.Services
                 media.CreatorId = userId;
                 repository.AddOrUpdate(media);
 
-                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 // generate preview for blame history?
                 if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                 {
-                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 }
 
                 uow.Commit();
@@ -214,11 +217,11 @@ namespace Umbraco.Core.Services
             {
                 media.CreatorId = userId;
                 repository.AddOrUpdate(media);
-                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 // generate preview for blame history?
                 if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                 {
-                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 }
 
                 uow.Commit();
@@ -921,11 +924,11 @@ namespace Umbraco.Core.Services
             {
                 media.CreatorId = userId;
                 repository.AddOrUpdate(media);
-                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 // generate preview for blame history?
                 if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                 {
-                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                 }
 
                 uow.Commit();
@@ -960,11 +963,11 @@ namespace Umbraco.Core.Services
                 {
                     media.CreatorId = userId;
                     repository.AddOrUpdate(media);
-                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                     // generate preview for blame history?
                     if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                     {
-                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                     }
                 }
 
@@ -1015,11 +1018,11 @@ namespace Umbraco.Core.Services
                     i++;
 
                     repository.AddOrUpdate(media);
-                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                    repository.AddOrUpdateContentXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                     // generate preview for blame history?
                     if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                     {
-                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, m));
+                        repository.AddOrUpdatePreviewXml(media, m => _entitySerializer.Serialize(this, _dataTypeService, _userService, m));
                     }
                 }
 
@@ -1073,7 +1076,7 @@ namespace Umbraco.Core.Services
                 var xmlItems = new List<ContentXmlDto>();
                 foreach (var c in list)
                 {
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, c);
+                    var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, c);
                     xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                 }
 
