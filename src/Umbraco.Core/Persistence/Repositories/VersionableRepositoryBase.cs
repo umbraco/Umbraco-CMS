@@ -381,14 +381,17 @@ ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arg
             // below if any property requires tag support
             var allPreValues = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
             {
-                var preValsSql = new Sql(@"SELECT DISTINCT
-cmsDataTypePreValues.id as preValId, cmsDataTypePreValues.value, cmsDataTypePreValues.sortorder, cmsDataTypePreValues.alias, cmsDataTypePreValues.datatypeNodeId
-FROM cmsDataTypePreValues
-INNER JOIN cmsPropertyType
-ON cmsDataTypePreValues.datatypeNodeId = cmsPropertyType.dataTypeId
-INNER JOIN 
-	(" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
-ON cmsPropertyType.contentTypeId = docData.contentType", docSql.Arguments);
+                var preValsSql = new Sql(@"SELECT a.id as preValId, a.value, a.sortorder, a.alias, a.datatypeNodeId
+FROM cmsDataTypePreValues a
+WHERE EXISTS(
+    SELECT DISTINCT b.id as preValIdInner
+    FROM cmsDataTypePreValues b
+	INNER JOIN cmsPropertyType
+	ON b.datatypeNodeId = cmsPropertyType.dataTypeId
+    INNER JOIN 
+	    (" + string.Format(parsedOriginalSql, "DISTINCT cmsContent.contentType") + @") as docData
+    ON cmsPropertyType.contentTypeId = docData.contentType
+    WHERE a.id = b.id)", docSql.Arguments);
 
                 return Database.Fetch<DataTypePreValueDto>(preValsSql); 
             });
