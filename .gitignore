@@ -122,4 +122,8 @@ src/Umbraco.Web.UI.Client/bower_components/*
 #Ignore Rule for output of generated documentation files from Grunt docserve
 src/Umbraco.Web.UI.Client/docs/api
 src/*.boltdata/
-
+/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.loader.js
+/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.palettes.js
+/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.panel.js
+/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.config.js
+/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.front.js
