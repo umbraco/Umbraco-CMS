@@ -10,7 +10,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// If umbracoUseSSL property in web.config is set to true, this filter will redirect any http access to https.
     /// </summary>
-    public class UmbracoUseSSL : RequireHttpsAttribute
+    public class UmbracoUseHttps : RequireHttpsAttribute
     {
         /// <summary>
         /// If umbracoUseSSL is true and we have a non-HTTPS request, handle redirect.
