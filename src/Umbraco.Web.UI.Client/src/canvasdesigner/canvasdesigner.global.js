@@ -4,18 +4,18 @@
 /*********************************************************************************************************/
 
 /* Called for every canvasdesigner-over rollover */
-var refrechIntelCanvasdesigner = function (name) {
+var refrechIntelCanvasdesigner = function (schema) {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 
-    if (scope.schemaFocus != name.toLowerCase()) {
-        var notFound = true;
+    //if (scope.schemaFocus != schema.toLowerCase()) {
+    //var notFound = true;
         $.each(scope.canvasdesignerModel.configs, function (indexConfig, config) {
-            if (config.name && name.toLowerCase() == config.name.toLowerCase()) {
+            if (config.schema && schema.toLowerCase() == config.schema.toLowerCase()) {
                 scope.currentSelected = config;
             }
         });
-    }
+    //}
 
     scope.clearSelectedCategory();
 

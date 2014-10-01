@@ -214,9 +214,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $('.btn-default-delete').attr("disabled", true);
         $http.get(apiController + 'Delete', { params: { pageId: $scope.pageId } })
         .success(function (data) {
-            $scope.enableCanvasdesigner++;
-            $scope.pageUrl = $scope.pageUrl + "&n=123456";
-            $('.btn-default-delete').attr("disabled", false);
+            location.reload();
         })
     }
 
@@ -488,4 +486,4 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
             });
         }
     };
-});
+})

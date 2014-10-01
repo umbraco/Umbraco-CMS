@@ -80,7 +80,8 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
         $.each(canvasdesignerModel.configs, function (indexConfig, config) {
             var schema = config.selector ? config.selector : config.schema;
             if (schema) {
-                $(schema).attr("canvasdesigner-over", config.name);
+                $(schema).attr("canvasdesigner-over", config.schema);
+                $(schema).attr("canvasdesigner-over-name", config.name);
                 $(schema).css("cursor", "default");
             }
         });
@@ -145,7 +146,7 @@ var outlinePosition = function (oTarget) {
         $(".canvasdesigner-overlay").css('height', height + "px");
 
         //console.info("element select " + localname);
-        $(".canvasdesigner-overlay span").html(target.attr('canvasdesigner-over'));
+        $(".canvasdesigner-overlay span").html(target.attr('canvasdesigner-over-name'));
 
     }
     else {
@@ -185,7 +186,7 @@ var outlineSelected = function (oTarget) {
         $(".canvasdesigner-overlay-selected").css('height', height + "px");
 
         //console.info("element select " + localname);
-        $(".canvasdesigner-overlay-selected span").html(target.attr('canvasdesigner-over'));
+        $(".canvasdesigner-overlay-selected span").html(target.attr('canvasdesigner-over-name'));
 
     }
     else {

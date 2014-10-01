@@ -1,22 +1,40 @@
 ﻿
 /************************************************************************/
-/* background -ALIAS- */
+/* grid row -ALIAS- */
 /************************************************************************/
 
 /***start-lessParam--ALIAS-***/
-@color-ALIAS-:'';
-@imageorpattern-ALIAS-:'';
+@fullsize-ALIAS-:false;
 /***end-lessParam--ALIAS-***/
 
 /***start-gridStyle--ALIAS-***/
--SCHEMA- {
-	background-color:@color-ALIAS-;
-    background-image: @imageorpattern-ALIAS-;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+
+.fullusky-container-ALIAS- () when  (@fullsize-ALIAS- = true) {
+    width:100%;
 }
+
+.fullusky-grid-cell-ALIAS- () when  (@fullsize-ALIAS- = true) {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.fullcolumn-ALIAS- () when  (@fullsize-ALIAS- = true) {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+-SCHEMA- .container {
+    .fullusky-container-ALIAS-
+}
+
+-SCHEMA- .usky-grid-cell {
+    .fullusky-grid-cell-ALIAS-
+}
+
+-SCHEMA- .column {
+    .fullcolumn-ALIAS-
+}
+
 /***end-gridStyle--ALIAS-***/ 
 
 
