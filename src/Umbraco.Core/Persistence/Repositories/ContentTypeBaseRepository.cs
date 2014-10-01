@@ -666,8 +666,8 @@ AND umbracoNode.id <> @id",
 		                        cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
                                 ParentTypes.parentContentTypeId as chtParentId,
-                                umbracoNode.createDate as nCreateDate, umbracoNode.[level] as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
-		                        umbracoNode.parentID as nParentId, umbracoNode.[path] as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode.[text] as nName, umbracoNode.trashed as nTrashed,
+                                umbracoNode.createDate as nCreateDate, umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
+		                        umbracoNode.parentID as nParentId, umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
 		                        umbracoNode.uniqueID as nUniqueId
                         FROM cmsContentType
                         INNER JOIN umbracoNode
@@ -774,8 +774,8 @@ AND umbracoNode.id <> @id",
 		                        cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
                                 ParentTypes.parentContentTypeId as chtParentId,
-                                umbracoNode.createDate as nCreateDate, umbracoNode.[level] as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
-		                        umbracoNode.parentID as nParentId, umbracoNode.[path] as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode.[text] as nName, umbracoNode.trashed as nTrashed,
+                                umbracoNode.createDate as nCreateDate, umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
+		                        umbracoNode.parentID as nParentId, umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
 		                        umbracoNode.uniqueID as nUniqueId,                                
 		                        Template.alias as tAlias, Template.nodeId as tId,Template.text as tText
                         FROM cmsContentType
