@@ -19,12 +19,14 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
+    [UmbracoUseSSL]
     public class BackOfficeController : UmbracoController
     {
         /// <summary>
