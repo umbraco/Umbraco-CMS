@@ -167,6 +167,21 @@ namespace Umbraco.Core.Services
             }
         }
 
+		/// <summary>
+		/// Gets the current Member by the HttpContext User
+		/// </summary>
+		/// <returns><see cref="IMember"/></returns>
+		public IMember GetCurrentMember() {
+			if (System.Web.HttpContext.Current == null || System.Web.HttpContext.Current.User == null || System.Web.HttpContext.Current.User.Identity == null || string.IsNullOrEmpty(System.Web.HttpContext.Current.User.Identity.Name))
+				return null;
+			if (!System.Web.HttpContext.Current.Request.IsAuthenticated)
+				return null;
+			if (ApplicationContext.Current == null)
+				return null;
+
+			return GetByUsername(System.Web.HttpContext.Current.User.Identity.Name);
+		}
+
         /// <summary>
         /// Gets a Member by the unique key
         /// </summary>

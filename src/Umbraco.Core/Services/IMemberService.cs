@@ -100,6 +100,12 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMember"/></returns>
         IMember GetById(int id);
 
+		/// <summary>
+		/// Gets the current Member by the HttpContext User
+		/// </summary>
+		/// <returns><see cref="IMember"/></returns>
+		IMember GetCurrentMember();
+
         /// <summary>
         /// Gets all Members for the specified MemberType alias
         /// </summary>
