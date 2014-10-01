@@ -548,7 +548,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     {
                         // Add this UmbracoProperty to the current additional data
                         Current.AdditionalData[p.PropertyAlias] = new UmbracoEntity.EntityProperty
-                        {
+                    {
                             PropertyEditorAlias = p.PropertyEditorAlias,
                             Value = p.NTextValue.IsNullOrWhiteSpace()
                                 ? p.NVarcharValue
@@ -567,7 +567,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var prev = Current;
 
                 // Setup the new current UmbracoEntity
-                
+
                 Current = _factory.BuildEntityFromDynamic(a);
 
                 if (p != null && p.PropertyAlias.IsNullOrWhiteSpace() == false)
