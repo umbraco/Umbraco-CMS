@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -939,8 +940,9 @@ AND umbracoNode.id <> @id",
                 // first part Gets all property groups including property type data even when no property type exists on the group
                 // second part Gets all property types including ones that are not on a group
                 // therefore the union of the two contains all of the property type and property group information we need
+                // NOTE: MySQL requires a SELECT * FROM the inner union in order to be able to sort . lame.
 
-                var sql = @"SELECT PG.contenttypeNodeId as contentTypeId,
+                var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,
                             PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptHelpText,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
                             PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
                             PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @" as pgText
@@ -957,7 +959,7 @@ AND umbracoNode.id <> @id",
                         )  as  PT
                         ON PT.ptGroupId = PG.id
                         WHERE (PG.contenttypeNodeId in (@contentTypeIds))
-                        
+                
                         UNION
 
                         SELECT  PT.contentTypeId as contentTypeId,
@@ -969,19 +971,19 @@ AND umbracoNode.id <> @id",
                         INNER JOIN cmsDataType as DT
                         ON PT.dataTypeId = DT.nodeId
                         LEFT JOIN cmsPropertyTypeGroup as PG
-                        ON PG.id = PT.propertyTypeGroupId";
+                        ON PG.id = PT.propertyTypeGroupId");
 
                 if(contentTypeIds.Any())                        
-                    sql = sql + " WHERE (PT.contentTypeId in (@contentTypeIds))";
-                
-                sql = sql + " ORDER BY (PG.id)";
+                    sqlBuilder.AppendLine(" WHERE (PT.contentTypeId in (@contentTypeIds))");
+
+                sqlBuilder.AppendLine(" ORDER BY (pgId)");
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
                 // Since there are 2 groups of params, it will be half!
                 if (((contentTypeIds.Length / 2) - 1) > 2000)
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
-                var result = db.Fetch<dynamic>(sql, new { contentTypeIds = contentTypeIds });
+                var result = db.Fetch<dynamic>(sqlBuilder.ToString(), new { contentTypeIds = contentTypeIds });
 
                 allPropertyGroupCollection = new Dictionary<int, PropertyGroupCollection>();
                 allPropertyTypeCollection = new Dictionary<int, PropertyTypeCollection>();
@@ -1016,7 +1018,7 @@ AND umbracoNode.id <> @id",
                                     Description = row.ptDesc,
                                     DataTypeDefinitionId = row.dtId,
                                     Id = row.ptId,
-                                    Mandatory = row.ptMandatory,
+                                    Mandatory = Convert.ToBoolean(row.ptMandatory),
                                     Name = row.ptName,
                                     PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
                                     SortOrder = row.ptSortOrder,
@@ -1045,7 +1047,7 @@ AND umbracoNode.id <> @id",
                             Description = row.ptDesc,
                             DataTypeDefinitionId = row.dtId,
                             Id = row.ptId,
-                            Mandatory = row.ptMandatory,
+                            Mandatory = Convert.ToBoolean(row.ptMandatory),
                             Name = row.ptName,
                             PropertyGroupId = null,
                             SortOrder = row.ptSortOrder,
