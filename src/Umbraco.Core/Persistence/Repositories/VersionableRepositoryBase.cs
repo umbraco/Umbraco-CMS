@@ -310,7 +310,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (totalRecords > 0)
             {
                 //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
-                var args = sqlNodeIds.Arguments;
+                var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
                 

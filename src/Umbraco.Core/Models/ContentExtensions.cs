@@ -530,6 +530,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
+        [Obsolete("Use the overload that declares the IUserService to use")]
         public static IProfile GetCreatorProfile(this IMedia media)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
@@ -546,6 +547,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this content item.
         /// </summary>
+        [Obsolete("Use the overload that declares the IUserService to use")]
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.CreatorId);
@@ -562,6 +564,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
+        [Obsolete("Use the overload that declares the IUserService to use")]
         public static IProfile GetWriterProfile(this IContent content)
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
@@ -720,14 +723,16 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region XML methods
+
         /// <summary>
         /// Creates the full xml representation for the <see cref="IContent"/> object and all of it's descendants
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="packagingService"></param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        internal static XElement ToDeepXml(this IContent content)
+        internal static XElement ToDeepXml(this IContent content, IPackagingService packagingService)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(content, true, raiseEvents: false);
+            return packagingService.Export(content, true, raiseEvents: false);
         }
 
         /// <summary>
@@ -735,9 +740,21 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content)
         {
             return ApplicationContext.Current.Services.PackagingService.Export(content, raiseEvents: false);
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="packagingService"></param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IContent content, IPackagingService packagingService)
+        {
+            return packagingService.Export(content, raiseEvents: false);
         }
 
         /// <summary>
@@ -745,19 +762,32 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="media"><see cref="IContent"/> to generate xml for</param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMedia media)
         {
             return ApplicationContext.Current.Services.PackagingService.Export(media, raiseEvents: false);
         }
 
         /// <summary>
+        /// Creates the xml representation for the <see cref="IMedia"/> object
+        /// </summary>
+        /// <param name="media"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="packagingService"></param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IMedia media, IPackagingService packagingService)
+        {
+            return packagingService.Export(media, raiseEvents: false);
+        }
+
+        /// <summary>
         /// Creates the full xml representation for the <see cref="IMedia"/> object and all of it's descendants
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to generate xml for</param>
+        /// <param name="packagingService"></param>
         /// <returns>Xml representation of the passed in <see cref="IMedia"/></returns>
-        internal static XElement ToDeepXml(this IMedia media)
+        internal static XElement ToDeepXml(this IMedia media, IPackagingService packagingService)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(media, true, raiseEvents: false);
+            return packagingService.Export(media, true, raiseEvents: false);
         }
 
         /// <summary>
@@ -766,6 +796,7 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
         /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IContent content, bool isPreview)
         {
             //TODO Do a proper implementation of this
@@ -774,13 +805,39 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates the xml representation for the <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="packagingService"></param>
+        /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IContent content, IPackagingService packagingService, bool isPreview)
+        {
+            //TODO Do a proper implementation of this
+            //If current IContent is published we should get latest unpublished version
+            return content.ToXml(packagingService);
+        }
+
+        /// <summary>
         /// Creates the xml representation for the <see cref="IMember"/> object
         /// </summary>
         /// <param name="member"><see cref="IMember"/> to generate xml for</param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        [Obsolete("Use the overload that declares the IPackagingService to use")]
         public static XElement ToXml(this IMember member)
         {
             return ((PackagingService)(ApplicationContext.Current.Services.PackagingService)).Export(member);
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IMember"/> object
+        /// </summary>
+        /// <param name="member"><see cref="IMember"/> to generate xml for</param>
+        /// <param name="packagingService"></param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IMember member, IPackagingService packagingService)
+        {
+            return ((PackagingService)(packagingService)).Export(member);
         }
         #endregion
     }

@@ -51,7 +51,7 @@ namespace Umbraco.Core.Models
 
             _parentId = new Lazy<int>(() => parentId);
             _name = name;
-            _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
+            _contentTypeId = contentType.Id;
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
             _additionalData = new Dictionary<string, object>();
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models
 
 			_parentId = new Lazy<int>(() => parent.Id);
             _name = name;
-			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
+			_contentTypeId = contentType.Id;
 			_properties = properties;
 			_properties.EnsurePropertyTypes(PropertyTypes);
             _additionalData = new Dictionary<string, object>();
@@ -234,7 +234,16 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int ContentTypeId
         {
-            get { return _contentTypeId; }
+            get
+            {
+                //There will be cases where this has not been updated to reflect the true content type ID.
+                //This will occur when inserting new content.
+                if (_contentTypeId == 0 && ContentTypeBase != null && ContentTypeBase.HasIdentity)
+                {
+                    _contentTypeId = ContentTypeBase.Id;
+                }
+                return _contentTypeId;
+            }
             protected set
             {
                 SetPropertyValueAndDetectChanges(o =>
