@@ -504,7 +504,6 @@
     <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Models\Trees\CreateChildEntity.cs" />
     <Compile Include="Models\Trees\MenuItemList.cs" />
-    <Compile Include="Trees\TemplateTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
     <Compile Include="CanvasDesignerUtility.cs" />
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
