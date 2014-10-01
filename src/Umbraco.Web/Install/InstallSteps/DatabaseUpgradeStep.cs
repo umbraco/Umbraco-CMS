@@ -9,7 +9,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.Upgrade,
+    [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
         "DatabaseUpgrade", 12, "")]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the preious one completed - because it has stored some information we need
+            //this step relies on the previous one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
             {
                 return false;

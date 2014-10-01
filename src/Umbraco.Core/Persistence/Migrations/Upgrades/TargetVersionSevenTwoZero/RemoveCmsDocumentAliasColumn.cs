@@ -1,4 +1,6 @@
+using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
 {
@@ -7,7 +9,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     {
         public override void Up()
         {
-            Delete.Column("alias").FromTable("cmsDocument");
+            var columns = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+
+            if (columns.Any(x => x.ColumnName.InvariantEquals("alias") && x.TableName.InvariantEquals("cmsDocument")))
+            {
+                Delete.Column("alias").FromTable("cmsDocument");    
+            }
         }
 
         public override void Down()
