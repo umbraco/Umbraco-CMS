@@ -207,13 +207,18 @@ angular.module("umbraco")
         };
 
         $scope.addRow = function (section, layout) {
+
             //copy the selected layout into the rows collection
             var row = angular.copy(layout);
+
+            // Init row value
             row = $scope.initRow(row);
 
+            // Push the new row 
             if(row){
                section.rows.push(row);
             }
+
         };
 
         $scope.removeRow = function (section, $index) {
@@ -460,6 +465,10 @@ angular.module("umbraco")
 
                 //set a disposable unique ID
                 original.$uniqueId = $scope.setUniqueId();
+
+                //set a no disposable unique ID (util for row styling)
+                original.id = !row.id ? $scope.setUniqueId() : row.id;
+
                 return original;
             }
 
