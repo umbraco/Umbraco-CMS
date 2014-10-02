@@ -1,7 +1,7 @@
 angular.module("umbraco")
 .controller("Umbraco.PropertyEditors.MarkdownEditorController",
 //inject umbracos assetsServce and dialog service
-function ($scope, assetsService, dialogService, $log, imageHelper) {
+function ($scope, assetsService, dialogService, $timeout) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
@@ -17,23 +17,28 @@ function ($scope, assetsService, dialogService, $log, imageHelper) {
             "lib/markdown/markdown.editor.js"
         ])
 		.then(function () {
-
+            
 		    //this function will execute when all dependencies have loaded
-		    var converter2 = new Markdown.Converter();
-		    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
-		    editor2.run();
+		    // but in the case that they've been previously loaded, we can only 
+		    // init the md editor after this digest because the DOM needs to be ready first
+		    // so run the init on a timeout
+            $timeout(function() {
+                var converter2 = new Markdown.Converter();
+                var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
+                editor2.run();
 
-		    //subscribe to the image dialog clicks
-		    editor2.hooks.set("insertImageDialog", function (callback) {
+                //subscribe to the image dialog clicks
+                editor2.hooks.set("insertImageDialog", function (callback) {
 
-		        dialogService.mediaPicker({ callback: function (data) {
-					callback(data.url);
-		        	}
-		        });
+                    dialogService.mediaPicker({
+                        callback: function (data) {
+                            callback(data.image);
+                        }
+                    });
 
-		        return true; // tell the editor that we'll take care of getting the image url
-		    });
-
+                    return true; // tell the editor that we'll take care of getting the image url
+                });
+            });
 		});
 
     //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
