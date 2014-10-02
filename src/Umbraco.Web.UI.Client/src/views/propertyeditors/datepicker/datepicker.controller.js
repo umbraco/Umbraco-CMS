@@ -26,6 +26,8 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                     $scope.model.value = e.localDate.toIsoDateString();
                 }
             }
+
+            $element.find("div:first").datetimepicker("hide", 0);
         });
     }
 
