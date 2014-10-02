@@ -9,6 +9,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         if (!$scope.model.config.startNodeId)
              $scope.model.config.startNodeId = -1;
 
+        if ($scope.model.config.filter)
+            $scope.model.config.filterArray = $scope.model.config.filter.split(',');
          
         function setupViewModel() {
             $scope.images = [];
@@ -54,8 +56,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
         $scope.add = function() {
+
             dialogService.mediaPicker({
                 startNodeId: $scope.model.config.startNodeId,
+                filter: $scope.model.config.filterArray,
                 multiPicker: multiPicker,
                 callback: function(data) {
                     

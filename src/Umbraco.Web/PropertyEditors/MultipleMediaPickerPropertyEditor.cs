@@ -23,7 +23,10 @@ namespace Umbraco.Web.PropertyEditors
             public bool MultiPicker { get; set; }
 
             [PreValueField("startNodeId", "Start node", "mediapicker")]
- 			public int StartNodeId { get; set; }
+            public int StartNodeId { get; set; }
+
+            [PreValueField("filter", "Allow items of type", "textstring", Description = "Seperate with comma")]
+            public string Filter { get; set; }
         }
     }
 }

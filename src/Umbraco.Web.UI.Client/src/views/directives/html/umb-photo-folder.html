@@ -2,6 +2,7 @@
     <div class="picrow" ng-repeat="row in rows">
 
         <div class="pic"
+            ng-show="!img.hide"
             ng-class="img.cssclass"
             ng-style="img.style" ng-repeat="img in row.images">
 
@@ -17,10 +18,10 @@
                 <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
             </a>
 
-            <a href ng-click="clickHandler(img, $event, true)" 
-                ng-if="img.isFolder" class="selector-overlay">
+            <a href ng-click="clickHandler(img, $event, true)"
+               ng-if="img.isFolder && !img.hideSelect" class="selector-overlay">
                 <localize key="buttons_select">Select</localize>
-			</a>
+            </a>
         </div>
     </div>
 </div>

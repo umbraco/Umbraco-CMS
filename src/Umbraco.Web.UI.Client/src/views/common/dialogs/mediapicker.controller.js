@@ -9,7 +9,7 @@ angular.module("umbraco")
             $scope.showDetails = dialogOptions.showDetails;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
-
+            $scope.filter = dialogOptions.filter ? dialogOptions.filter : [];
 
             $scope.options = {
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
@@ -69,6 +69,24 @@ angular.module("umbraco")
                     .then(function(data) {
                         $scope.searchTerm = "";
                         $scope.images = data.items ? data.items : [];
+
+                        // Hide types not in the filter list
+                        if ($scope.filter.length > 0) {
+                            angular.forEach(data.items, function (item, index) {
+
+                                // If item is a folder, always show but disable select if 
+                                // not in the filter list
+                                if (item.contentTypeAlias == "Folder") {
+                                    if ($scope.filter.indexOf("Folder") == -1) {
+                                        item.hideSelect = true;
+                                    }
+                                } else {
+                                    if ($scope.filter.indexOf(item.contentTypeAlias) == -1) {
+                                        item.hide = true;
+                                    }
+                                }
+                            });
+                        }
                     });
 
                 $scope.options.formData.currentFolder = folder.id;
@@ -85,6 +103,13 @@ angular.module("umbraco")
                 if (image.isFolder && !select) {
                     $scope.gotoFolder(image);
                 }else{
+
+                    if ($scope.filter.length > 0) {
+                        if ($scope.filter.indexOf(image.contentTypeAlias) == -1) {
+                            return;
+                        }
+                    }
+
                     eventsService.emit("dialogs.mediaPicker.select", image);
                     
                     //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
