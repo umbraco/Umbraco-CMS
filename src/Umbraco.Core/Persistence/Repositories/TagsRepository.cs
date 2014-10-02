@@ -486,6 +486,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         private static string GetTagSet(IEnumerable<ITag> tagsToInsert)
         {
+            //TODO: Fix this query, since this is going to be basically a unique query each time, this will cause some mem usage in peta poco,
+            // and surely there's a nicer way!
+            //TODO: When we fix, be sure to remove the @ symbol escape
+
             var array = tagsToInsert
                 .Select(tag =>
                     string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @"",
