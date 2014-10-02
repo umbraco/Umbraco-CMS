@@ -388,7 +388,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
-                "SELECT cmsContentVersion.contentId",
+                new Tuple<string, string>("cmsContentVersion", "contentId"),
                 ProcessQuery, orderBy, orderDirection,
                 filterCallback);
 

@@ -584,7 +584,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }           
 
             return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
-                "SELECT cmsMember.nodeId",
+                new Tuple<string, string>("cmsMember", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,
                 filterCallback);
         }
