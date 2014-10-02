@@ -203,13 +203,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //find the member by username
             var memberSql = new Sql();
             var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-            var escapedUsername = PetaPocoExtensions.EscapeAtSymbols(username);
+            
             memberSql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<MemberDto>()
                 .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where<MemberDto>(x => x.LoginName == escapedUsername);
+                .Where<MemberDto>(x => x.LoginName == username);
             var memberIdUsername = Database.Fetch<int?>(memberSql).FirstOrDefault();
             if (memberIdUsername.HasValue == false)
             {
@@ -280,6 +280,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void AssignRolesInternal(int[] memberIds, string[] roleNames)
         {
+            //ensure they're unique
+            memberIds = memberIds.Distinct().ToArray();
+
             //create the missing roles first
 
             var existingSql = new Sql()

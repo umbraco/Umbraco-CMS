@@ -130,9 +130,10 @@ namespace Umbraco.Tests.Services
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
             var user = ServiceContext.UserService.CreateUserWithIdentity("JohnDoe", "john@umbraco.io", userType);
-
+            var user2 = ServiceContext.UserService.CreateUserWithIdentity("john2@umbraco.io", "john2@umbraco.io", userType);
             Assert.IsTrue(ServiceContext.UserService.Exists("JohnDoe"));
             Assert.IsFalse(ServiceContext.UserService.Exists("notFound"));
+            Assert.IsTrue(ServiceContext.UserService.Exists("john2@umbraco.io"));
         }
 
         [Test]
