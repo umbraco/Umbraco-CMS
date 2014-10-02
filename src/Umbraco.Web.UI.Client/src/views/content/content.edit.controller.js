@@ -219,7 +219,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                 $scope.loaded = true;
                 $scope.content = data;
 
-                if (data.isChildOfListView) {
+                if (data.isChildOfListView && data.trashed === false) {
                     $scope.listViewPath = ($routeParams.page)
                         ? "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page
                         : "/content/content/edit/" + data.parentId;

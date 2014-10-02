@@ -86,6 +86,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
@@ -107,6 +108,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Username,
                     expression => expression.MapFrom(content => content.Username))
+                .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
