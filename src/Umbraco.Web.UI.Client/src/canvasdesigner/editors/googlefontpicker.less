@@ -10,12 +10,25 @@
 @fonttype-ALIAS-:'';
 /***end-lessParam--ALIAS-***/
 
-/***start-gridStyle--ALIAS-***/
--SCHEMA- {
-	font-family:@fontfamily-ALIAS-;
+/***start-fontfamilystyle--ALIAS-***/
+
+.fontfamily-ALIAS- () when not (@fontfamily-ALIAS- = '') {
+    font-family:@fontfamily-ALIAS-;
+}
+
+.fontweight-ALIAS- () when not (@fontweight-ALIAS- = '') {
     font-weight:@fontweight-ALIAS-;
+}
+
+.fontstyle-ALIAS- () when not  (@fontstyle-ALIAS- = '') {
     font-style:@fontstyle-ALIAS-;
 }
-/***end-gridStyle--ALIAS-***/ 
+
+-SCHEMA- {
+	.fontfamily-ALIAS-;
+    .fontweight-ALIAS-;
+    .fontstyle-ALIAS-;
+}
+/***end-fontfamilystyle--ALIAS-***/ 
 
     
