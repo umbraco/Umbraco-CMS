@@ -94,8 +94,9 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 	</div>
 
 	<div class="umb-panel-body with-footer">
-		<div style="overflow: hidden; margin-left: -20px; margin-right: -20px;">
-	        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" ng-hide="active() == 0"></div>
+		<div class="umb-loader-wrapper" style="position:relative; margin: 0px -20px;">
+	        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
+	        	ng-hide="active() == 0"></div>
         </div>
         <umb-photo-folder 
         	min-height="105" 

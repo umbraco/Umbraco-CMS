@@ -142,7 +142,7 @@
                     <p>
                         <asp:Button ID="bt_confirmUninstall" OnClick="confirmUnInstall" OnClientClick="$('#loadingbar').show()" Text="Confirm uninstall" CssClass="btn btn-primary" runat="server" />
                         <div id="loadingbar" style="display: none">
-                            <div style="overflow: hidden; margin-left: -100%; margin-right: -20px;">
+                            <div class="umb-loader-wrapper">
                                 <cc2:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
                             </div>
                         </div>
