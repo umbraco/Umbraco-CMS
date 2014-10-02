@@ -242,20 +242,32 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                 //get our angular navigation service
                 var injector = getRootInjector();
+
+                var rootScope = injector.get("$rootScope");
+                var angularHelper = injector.get("angularHelper");
                 var navService = injector.get("navigationService");
+                var locationService = injector.get("$location");
 
-                //if the path doesn't start with "/" or with the root path then 
-                //prepend the root path
-                if (!strLocation.startsWith("/")) {
-                    strLocation = this._rootPath + "/" + strLocation;
-                }
-                else if (strLocation.length >= this._rootPath.length
-                    && strLocation.substr(0, this._rootPath.length) != this._rootPath) {
-                    strLocation = this._rootPath + "/" + strLocation;
-                }
+                var self = this;
 
-                navService.loadLegacyIFrame(strLocation);
+                angularHelper.safeApply(rootScope, function() {
+                    if (strLocation.startsWith("#")) {
+                        locationService.path(strLocation.trimStart("#")).search("");
+                    }
+                    else {
+                        //if the path doesn't start with "/" or with the root path then 
+                        //prepend the root path
+                        if (!strLocation.startsWith("/")) {
+                            strLocation = self._rootPath + "/" + strLocation;
+                        }
+                        else if (strLocation.length >= self._rootPath.length
+                            && strLocation.substr(0, self._rootPath.length) != self._rootPath) {
+                            strLocation = self._rootPath + "/" + strLocation;
+                        }
 
+                        navService.loadLegacyIFrame(strLocation);
+                    }
+                });
             },
             
             getFakeFrame : function() {

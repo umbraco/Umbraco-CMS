@@ -251,6 +251,8 @@
   </area>
 
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">Allow at root</key>
+    <key alias="allowAtRootDesc" version="7.2">Only Content Types with this checked can be created at the root level of Content and Media trees</key>
     <key alias="allowedchildnodetypes">Allowed child node types</key>
     <key alias="contenttypecompositions">Document Type Compositions</key>
     <key alias="create">Create</key>
@@ -260,8 +262,9 @@
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="hasListView">Enable list view</key>
-    <key alias="customizeListView" version="7.2">Customize list view</key>
+    <key alias="hasListViewDesc" version="7.2">Configures the content item to show a sortable &amp; searchable list of its children, the children will not be shown in the tree</key>
     <key alias="currentListView" version="7.2">Current list view</key>
+    <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
   </area>
