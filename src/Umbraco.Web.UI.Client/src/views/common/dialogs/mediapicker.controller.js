@@ -104,12 +104,6 @@ angular.module("umbraco")
                     $scope.gotoFolder(image);
                 }else{
 
-                    if ($scope.filter.length > 0) {
-                        if ($scope.filter.indexOf(image.contentTypeAlias) == -1) {
-                            return;
-                        }
-                    }
-
                     eventsService.emit("dialogs.mediaPicker.select", image);
                     
                     //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
