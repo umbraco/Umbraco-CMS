@@ -520,10 +520,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
-            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
+
             sql.Select("COUNT(*)")
                 .From<MemberDto>()
-                .Where<MemberDto>(x => x.LoginName == escapedUserName);
+                .Where<MemberDto>(x => x.LoginName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
