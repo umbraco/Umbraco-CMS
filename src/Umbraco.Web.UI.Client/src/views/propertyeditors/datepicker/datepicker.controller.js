@@ -8,7 +8,6 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         pickDate: true,
         pickTime: true,
         pick12HourFormat: false,
-        autoclose: true,
         format: "yyyy-MM-dd hh:mm:ss"
     };
 
