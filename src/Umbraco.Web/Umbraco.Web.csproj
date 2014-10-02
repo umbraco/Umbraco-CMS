@@ -1853,7 +1853,7 @@
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
+    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
