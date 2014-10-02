@@ -5,6 +5,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
@@ -157,7 +158,7 @@ namespace umbraco.cms.businesslogic.Tags
             sql += " (";
             sql += " select NewTags.Id from ";
             sql += " " + TagSet + " ";
-            sql += " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.[Group] = TagSet.[Group]) ";
+            sql += " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + " = TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + ") ";
             sql += " ) as NewTagsSet ";
             sql += " on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.NodeId = " + string.Format("{0}", nodeId) + ") ";
             sql += " inner join  cmsTags as OldTags on (cmsTagRelationship.tagId = OldTags.Id) ";
@@ -166,10 +167,10 @@ namespace umbraco.cms.businesslogic.Tags
             SqlHelper.ExecuteNonQuery(sql);
 
             //adds any tags found in csv that aren't in cmsTag for that group
-            sql = "insert into cmsTags (Tag,[Group]) ";
-            sql += " select TagSet.[Tag], TagSet.[Group] from ";
+            sql = "insert into cmsTags (Tag," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @") ";
+            sql += " select TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Tag") + @", TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @" from ";
             sql += " " + TagSet + " ";
-            sql += " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet.[Group] = cmsTags.[Group])";
+            sql += " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + " = cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + ")";
             sql += " where cmsTags.Id is null ";
             SqlHelper.ExecuteNonQuery(sql);
 
@@ -179,7 +180,7 @@ namespace umbraco.cms.businesslogic.Tags
             sql += "( ";
             sql += "select NewTags.Id from  ";
             sql += " " + TagSet + " ";
-            sql += "inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.[Group] = TagSet.[Group]) ";
+            sql += "inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + " = TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + ") ";
             sql += ") as NewTagsSet ";
             sql += "left outer join cmsTagRelationship ";
             sql += "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.NodeId = " + string.Format("{0}", nodeId) + ") ";
@@ -217,7 +218,7 @@ namespace umbraco.cms.businesslogic.Tags
         /// <param name="group"></param>
         public static void RemoveTagsFromNode(int nodeId, string group)
         {
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND ([group] = @group));",
+            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND (" + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + " = @group));",
                SqlHelper.CreateParameter("@nodeId", nodeId),
                SqlHelper.CreateParameter("@group", group));
         }
@@ -241,7 +242,7 @@ namespace umbraco.cms.businesslogic.Tags
 
         public static int AddTag(string tag, string group)
         {
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTags(tag,[group]) VALUES (@tag,@group)",
+            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTags(tag," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + ") VALUES (@tag,@group)",
                 SqlHelper.CreateParameter("@tag", tag.Trim()),
                 SqlHelper.CreateParameter("@group", group));
             return GetTagId(tag, group);
@@ -250,7 +251,7 @@ namespace umbraco.cms.businesslogic.Tags
         public static int GetTagId(string tag, string group)
         {
             int retval = 0;
-            string sql = "SELECT id FROM cmsTags where tag=@tag AND [group]=@group;";
+            string sql = "SELECT id FROM cmsTags where tag=@tag AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + "=@group;";
             object result = SqlHelper.ExecuteScalar<object>(sql,
                 SqlHelper.CreateParameter("@tag", tag),
                 SqlHelper.CreateParameter("@group", group));
@@ -263,10 +264,10 @@ namespace umbraco.cms.businesslogic.Tags
 
         public static IEnumerable<Tag> GetTags(int nodeId, string group)
         {
-            var sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
+            var sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @", count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
                   INNER JOIN cmsTagRelationship ON cmsTagRelationShip.tagId = cmsTags.id
-                  WHERE cmsTags.[group] = @group AND cmsTagRelationship.nodeid = @nodeid
-                  GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
+                  WHERE cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @" = @group AND cmsTagRelationship.nodeid = @nodeid
+                  GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
             return ConvertSqlToTags(sql,
                 SqlHelper.CreateParameter("@group", group),
@@ -282,10 +283,10 @@ namespace umbraco.cms.businesslogic.Tags
         public static IEnumerable<Tag> GetTags(int nodeId)
         {
 
-            string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
+            string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @", count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
                         INNER JOIN cmsTagRelationShip ON cmsTagRelationShip.tagid = cmsTags.id
                         WHERE cmsTagRelationShip.nodeid = @nodeId
-                        GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
+                        GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
             return ConvertSqlToTags(sql, SqlHelper.CreateParameter("@nodeId", nodeId));
 
@@ -299,10 +300,10 @@ namespace umbraco.cms.businesslogic.Tags
         public static IEnumerable<Tag> GetTags(string group)
         {
 
-            string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
+            string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @", count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
                             INNER JOIN cmsTagRelationShip ON cmsTagRelationShip.tagid = cmsTags.id
-                            WHERE cmsTags.[group] = @group
-                            GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
+                            WHERE cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @" = @group
+                            GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
             return ConvertSqlToTags(sql, SqlHelper.CreateParameter("@group", group));
 
@@ -316,9 +317,9 @@ namespace umbraco.cms.businesslogic.Tags
         public static IEnumerable<Tag> GetTags()
         {
 
-            string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
+            string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @", count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
                             LEFT JOIN cmsTagRelationShip ON cmsTagRelationShip.tagid = cmsTags.id
-                            GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
+                            GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
             return ConvertSqlToTags(sql);
 
@@ -366,7 +367,7 @@ namespace umbraco.cms.businesslogic.Tags
         private static string GetSqlSet(string commaSeparatedArray, string group)
         {
             // create array
-            var array = commaSeparatedArray.Trim().Split(',').ToList().ConvertAll(tag => string.Format("select '{0}' as Tag, '{1}' as [Group]", tag.Replace("'", ""), group)).ToArray();
+            var array = commaSeparatedArray.Trim().Split(',').ToList().ConvertAll(tag => string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"), tag.Replace("'", ""), group)).ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
         }
         private static string GetSqlStringArray(string commaSeparatedArray)

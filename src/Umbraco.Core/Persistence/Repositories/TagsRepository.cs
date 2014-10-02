@@ -287,7 +287,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (withGrouping)
             {
-                sql = sql.Select("cmsTags.Id, cmsTags.Tag, cmsTags.[Group], Count(*) NodeCount");
+                sql = sql.Select("cmsTags.Id, cmsTags.Tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @", Count(*) NodeCount");
             }
             else
             {
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private Sql ApplyGroupByToTagsQuery(Sql sql)
         {
-            return sql.GroupBy(new string[] { "cmsTags.Id", "cmsTags.Tag", "cmsTags.[Group]" });
+            return sql.GroupBy(new string[] { "cmsTags.Id", "cmsTags.Tag", "cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @"" });
         }
 
         private IEnumerable<ITag> ExecuteTagsQuery(Sql sql)
@@ -440,7 +440,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                           " AND tagId IN ",
                                           "(SELECT id FROM cmsTags INNER JOIN ",
                                           tagSetSql,
-                                          " ON (TagSet.Tag = cmsTags.Tag and TagSet.[Group] = cmsTags.[Group]))");
+                                          " ON (TagSet.Tag = cmsTags.Tag and TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @" = cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @"))");
 
             Database.Execute(deleteSql);
         }
@@ -488,7 +488,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var array = tagsToInsert
                 .Select(tag =>
-                    string.Format("select '{0}' as Tag, '{1}' as [Group]",
+                    string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @"",
                         PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
                 .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
