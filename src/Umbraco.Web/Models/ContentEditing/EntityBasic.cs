@@ -28,6 +28,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
+        [DataMember(Name = "trashed")]
+        public bool Trashed { get; set; }
+
         /// <summary>
         /// This is the unique Id stored in the database - but could also be the unique id for a custom membership provider
         /// </summary>

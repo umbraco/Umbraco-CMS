@@ -3,7 +3,8 @@
          <div class="umb-panel-body no-header with-footer">
             <umb-pane>
                 <umb-control-group label="Url">
-                    <input id="url" class="umb-editor input-block-level" type="text" ng-model="form.url" ng-change="showPreview()" required/>
+                    <input id="url" class="umb-editor input-block-level" type="text" ng-model="form.url" ng-keyup="$event.keyCode == 13 ? showPreview() : null" required />
+                    <input type="button" ng-click="showPreview()" class="btn" value="Retrieve" />
                 </umb-control-group>
 
                 <div ng-show="form.supportsDimensions">    

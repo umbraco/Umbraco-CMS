@@ -255,7 +255,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     eventsService.emit("treeService.treeNodeLoadError", {error: reason } );
 
                     //stop show the loading indicator  
-                    node.loading = false;
+                    args.node.loading = false;
 
                     //tell notications about the error
                     notificationsService.error(reason);

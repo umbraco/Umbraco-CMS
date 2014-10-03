@@ -1,9 +1,11 @@
 <%@ Control Language="c#" AutoEventWireup="True" Codebehind="ContentTypeControlNew.ascx.cs"
   Inherits="Umbraco.Web.UI.Umbraco.Controls.ContentTypeControlNew" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
+<%@ Import Namespace="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cdf" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
-
+<cdf:JsInclude ID="JsInclude" runat="server" FilePath="Editors/EditContentType.js" PathNameAlias="UmbracoClient" />
 
 <cc1:TabView ID="TabView1" Height="392px" Width="552px" runat="server"></cc1:TabView>
 
@@ -12,7 +14,7 @@
 <asp:Panel ID="pnlTab" Style="text-align: left" runat="server">
 
   <cc2:Pane ID="PaneTabsInherited" runat="server" Visible="false">
-  <p><strong><%=umbraco.ui.GetText("settings", "contentTypeEnabled")%></strong><br /><%=umbraco.ui.GetText("settings", "contentTypeUses")%> <em><asp:Literal ID="tabsMasterContentTypeName" runat="server"></asp:Literal></em> <%=umbraco.ui.GetText("settings", "asAContentMasterType")%></p>
+  <p><strong><%=ui.GetText("settings", "contentTypeEnabled")%></strong><br /><%=umbraco.ui.GetText("settings", "contentTypeUses")%> <em><asp:Literal ID="tabsMasterContentTypeName" runat="server"></asp:Literal></em> <%=umbraco.ui.GetText("settings", "asAContentMasterType")%></p>
   </cc2:Pane>
   
   <cc2:Pane ID="Pane2" runat="server">
@@ -73,36 +75,72 @@
 
 <asp:Panel ID="pnlStructure" runat="server">
     <cc2:Pane ID="Pane6" runat="server">
-        <cc2:PropertyPanel ID="pp_Root" runat="server" Text="Allow at root <br/><small>Only Content Types with this checked can be created at the root level of Content and Media trees</small>">
+        <cc2:PropertyPanel ID="pp_Root" runat="server" 
+            Text='<%# ui.Text("editcontenttype", "allowAtRoot", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "allowAtRootDesc", Security.CurrentUser) + "</small>" %>'>
             <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />            
         </cc2:PropertyPanel>
         
-        <cc2:PropertyPanel ID="pp_isContainer" runat="server" Text="Container<br/><small>A container type doesn't display children in the tree, but as a grid instead</small>">
+        <cc2:PropertyPanel ID="pp_isContainer" runat="server" 
+            Text='<%# ui.Text("editcontenttype", "hasListView", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "hasListViewDesc", Security.CurrentUser) + "</small>" %>'>            
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" />  
             
              <%if (cb_isContainer.Checked) { %>
-            <p id="container-config-panel">
-                <a href="#">Configure list view...</a>
-            </p>        
-                <%--Scripting to show hide the button if the doc type is already configured to be a list view--%>
+                
+                <div id="containerConfigPanel">
+                    
+                    <div class="umb-pane">
+	                    <div class="umb-property">
+                            <div class="control-group umb-control-group">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label">
+                                        <%=ui.Text("editcontenttype", "currentListView", Security.CurrentUser) %>
+                                        <small><%=ui.Text("editcontenttype", "currentListViewDesc", Security.CurrentUser) %></small>
+                                    </label>
+
+                                    <div class="controls controls-row">
+                                        <strong></strong>
+                                        
+                                        <em style="display:none;">&nbsp;(<%=ui.Text("general", "default", Security.CurrentUser) %>)</em>
+                                        
+                                        <br/>
+                                        <a href="#" class="text-info">
+                                            <%=ui.Text("general", "edit", Security.CurrentUser) %>
+                                        </a>
+                                    </div>                                    
+                                    
+                                    <div class="controls controls-row">
+                                        <button id="createListView" class="btn" type="button" style="display: none;">
+                                            <%=ui.Text("editcontenttype", "createListView", Security.CurrentUser) %>
+                                        </button>
+                                        <button id="removeListView" class="btn btn-warning" type="button" style="display: none;">
+                                            <%=ui.Text("editcontenttype", "removeListView", Security.CurrentUser) %>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>        
+                
+                <%--Scripting to for configuring a list view--%>
                 <script type="text/javascript">            
                     $(document).ready(function () {
-                        $("#<%= cb_isContainer.ClientID %>").on("change", function () {
-                            if ($(this).is(":checked")) {
-                                $("#container-config-panel").slideDown();
-                            }
-                            else {       
-                                $("#container-config-panel").slideUp();
-                            }
-                        });
 
-                        $("#container-config-panel a").click(function() {
-                            UmbClientMgr.openAngularModalWindow({
-                                contentTypeAlias: "<%=ContentTypeAlias%>",
-                                contentTypeId: "<%=ContentTypeId%>",
-                                template: "views/contenttype/listview.html"
+                        var editor = new Umbraco.Editors.EditContentType({
+                            configPanel: $("#containerConfigPanel"),
+                            createListViewButton: $("#createListView"),
+                            removeListViewButton: $("#removeListView"),
+                            isContainerChk: $("#<%= cb_isContainer.ClientID %>"),
+                            contentTypeAlias: "<%=ContentTypeAlias%>",
+                            contentTypeId: <%=ContentTypeId%>,                            
+                            dataTypeServiceBaseUrl: "<%=DataTypeControllerUrl %>",
+                            contentTypeServiceBaseUrl: "<%=ContentTypeControllerUrl %>",
                             });
-                        });
+
+                        editor.init();
+
                     });
 
                 </script>

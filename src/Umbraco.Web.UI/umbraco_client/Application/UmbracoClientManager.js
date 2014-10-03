@@ -107,15 +107,19 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
                 }
                 else {
-                    //if the path doesn't start with "/" or with the root path then 
-                    //prepend the root path
-                    if (strLocation.substr(0, 1) != "/") {
-                        strLocation = this._rootPath + "/" + strLocation;
-                    }
-                    else if (strLocation.length >= this._rootPath.length
-                        && strLocation.substr(0, this._rootPath.length) != this._rootPath) {
-                        strLocation = this._rootPath + "/" + strLocation;
-                    }
+                    
+                    //its a hash change so process that like angular
+                    if (strLocation.substr(0, 1) !== "#") {                        
+                        if (strLocation.substr(0, 1) != "/") {
+                            //if the path doesn't start with "/" or with the root path then 
+                            //prepend the root path
+                            strLocation = this._rootPath + "/" + strLocation;
+                        }
+                        else if (strLocation.length >= this._rootPath.length
+                            && strLocation.substr(0, this._rootPath.length) != this._rootPath) {
+                            strLocation = this._rootPath + "/" + strLocation;
+                        }
+                    }                    
 
                     this._debug("contentFrame: parsed location: " + strLocation);
 

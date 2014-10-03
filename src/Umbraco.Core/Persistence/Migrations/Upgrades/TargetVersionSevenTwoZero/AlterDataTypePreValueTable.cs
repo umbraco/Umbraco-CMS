@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
         public override void Down()
         {
             //back to 2500 chars
-            Alter.Table("cmsDataTypePreValues").AlterColumn("userPassword").AsString(2500).Nullable();
+            Alter.Table("cmsDataTypePreValues").AlterColumn("value").AsString(2500).Nullable();
         }
     }
 }

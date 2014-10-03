@@ -223,5 +223,66 @@ namespace Umbraco.Tests.Services
             _childItemGuidId = childItem.Key;
             _childItemIntId = childItem.Id;
         }
+        
+        [Test]
+        public void Find_BaseData_Language()
+        {
+            // Arrange
+            var localizationService = ServiceContext.LocalizationService;
+            
+            // Act
+            var languages = localizationService.GetAllLanguages();
+
+            // Assert 
+            Assert.That(3, Is.EqualTo(languages.Count()));
+        }
+
+        [Test]
+        public void Save_Language_And_GetLanguageByIsoCode()
+        {
+            // Arrange
+            var localizationService = ServiceContext.LocalizationService;
+            var isoCode = "en-AU";
+            var language = new Core.Models.Language(isoCode);
+
+            // Act
+            localizationService.Save(language);
+            var result = localizationService.GetLanguageByIsoCode(isoCode);
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Test]
+        public void Save_Language_And_GetLanguageById()
+        {
+            var localizationService = ServiceContext.LocalizationService;
+            var isoCode = "en-AU";
+            var language = new Core.Models.Language(isoCode);
+
+            // Act
+            localizationService.Save(language);
+            var result = localizationService.GetLanguageById(language.Id);
+
+            // Assert
+            Assert.NotNull(result);
+        }
+
+        [Test]
+        public void Deleted_Language_Should_Not_Exist()
+        {
+            var localizationService = ServiceContext.LocalizationService;
+            var isoCode = "en-AU";
+            var language = new Core.Models.Language(isoCode);
+            localizationService.Save(language);
+
+            // Act
+            localizationService.Delete(language);
+            var result = localizationService.GetLanguageByIsoCode(isoCode);
+
+            // Assert
+            Assert.Null(result);
+        }
+
     }
 }

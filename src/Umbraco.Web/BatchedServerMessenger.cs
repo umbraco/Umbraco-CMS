@@ -249,7 +249,10 @@ namespace Umbraco.Web
                         var hashedAppId = string.Empty;
                         if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
                         {
-                            hashedAppId = (NetworkHelper.MachineName + HttpRuntime.AppDomainAppId).ToMd5();    
+                            var hasher = new HashCodeCombiner();
+                            hasher.AddCaseInsensitiveString(NetworkHelper.MachineName);
+                            hasher.AddCaseInsensitiveString(HttpRuntime.AppDomainAppId);
+                            hashedAppId = hasher.GetCombinedHashCode();
                         }
                         
                         asyncResultsList.Add(

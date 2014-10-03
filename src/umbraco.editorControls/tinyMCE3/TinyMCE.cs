@@ -574,7 +574,7 @@ namespace umbraco.editorControls.tinyMCE3
                                 appendValue = ", '" + cmd.Value + "'";
                             _mceButtons.Add(cmd.Priority, cmd.Command);
                             _buttons.Add(cmd.Priority,
-                                         new editorButton(cmd.Alias, ui.Text("buttons", cmd.Alias, null), cmd.Icon,
+                                         new editorButton(cmd.Alias, ui.Text("buttons", cmd.Alias), cmd.Icon,
                                                           "tinyMCE.execInstanceCommand('" + ClientID + "', '" +
                                                           cmd.Command + "', " + cmd.UserInterface + appendValue + ")"));
                         }

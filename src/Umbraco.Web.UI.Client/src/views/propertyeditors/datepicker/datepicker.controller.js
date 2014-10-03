@@ -14,6 +14,14 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
 
+    //hide picker if clicking on the document 
+    $scope.hidePicker = function () {
+        $element.find("div:first").datetimepicker("hide");
+    };
+    $(document).click(function (event) {
+        $scope.hidePicker();
+    });
+
     //handles the date changing via the api
     function applyDate(e) {
         angularHelper.safeApply($scope, function() {
@@ -25,6 +33,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                 else {
                     $scope.model.value = e.localDate.toIsoDateString();
                 }
+            }
+            
+            if (!$scope.model.config.pickTime) {
+                $element.find("div:first").datetimepicker("hide", 0);
             }
         });
     }

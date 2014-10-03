@@ -293,7 +293,6 @@ namespace Umbraco.Web.Security
                 return null;
             }
             var result = GetCurrentPersistedMember();
-            var provider = MPE.GetMembersMembershipProvider();
             return result == null ? null : new MemberPublishedContent(result).CreateModel();
         }
 

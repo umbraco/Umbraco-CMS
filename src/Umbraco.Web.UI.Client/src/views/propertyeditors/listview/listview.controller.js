@@ -143,9 +143,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.listViewResultSet = data;
 
             //update all values for display
-            _.each($scope.listViewResultSet.items, function(e, index) {
-                setPropertyValues(e);
-            });
+            if ($scope.listViewResultSet.items) {
+                _.each($scope.listViewResultSet.items, function (e, index) {
+                    setPropertyValues(e);
+                });
+            }
 
             if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;

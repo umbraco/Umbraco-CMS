@@ -532,10 +532,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
-            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
+
             sql.Select("COUNT(*)")
                 .From<MemberDto>()
-                .Where<MemberDto>(x => x.LoginName == escapedUserName);
+                .Where<MemberDto>(x => x.LoginName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
@@ -584,7 +584,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }           
 
             return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
-                "SELECT cmsMember.nodeId",
+                new Tuple<string, string>("cmsMember", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,
                 filterCallback);
         }

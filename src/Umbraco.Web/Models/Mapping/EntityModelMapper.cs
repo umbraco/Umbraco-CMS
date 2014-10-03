@@ -17,12 +17,14 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<UmbracoEntity, EntityBasic>()
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
 
             config.CreateMap<PropertyType, EntityBasic>()
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-box"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<PropertyGroup, EntityBasic>()
@@ -31,6 +33,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
                 //in v6 the 'alias' is it's lower cased name so we'll stick to that.
                 .ForMember(basic => basic.Alias, expression => expression.MapFrom(group => group.Name.ToLowerInvariant()))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IUser, EntityBasic>()
@@ -38,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
                 .ForMember(basic => basic.Alias, expression => expression.MapFrom(user => user.Username))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<SearchResult, EntityBasic>()
@@ -49,6 +53,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(x => x.ParentId, expression => expression.Ignore())
                   .ForMember(x => x.Alias, expression => expression.Ignore())
                   .ForMember(x => x.Path, expression => expression.Ignore())
+                  .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                   .ForMember(x => x.AdditionalData, expression => expression.Ignore())
                   .AfterMap((result, basic) =>
                       {

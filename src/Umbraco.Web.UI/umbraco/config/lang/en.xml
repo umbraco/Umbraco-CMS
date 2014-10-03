@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
-    <name>umbraco</name>
-    <link>http://umbraco.org</link>
+    <name>Umbraco</name>
+    <link>http://Umbraco.org</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Culture and Hostnames</key>
@@ -252,6 +252,8 @@
     <key alias="filter">Type to filter...</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">Allow at root</key>
+    <key alias="allowAtRootDesc" version="7.2">Only Content Types with this checked can be created at the root level of Content and Media trees</key>
     <key alias="allowedchildnodetypes">Allowed child node types</key>
     <key alias="contenttypecompositions">Document Type Compositions</key>
     <key alias="create">Create</key>
@@ -261,8 +263,9 @@
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="hasListView">Enable list view</key>
-    <key alias="customizeListView" version="7.2">Customize list view</key>
+    <key alias="hasListViewDesc" version="7.2">Configures the content item to show a sortable &amp; searchable list of its children, the children will not be shown in the tree</key>
     <key alias="currentListView" version="7.2">Current list view</key>
+    <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
   </area>
@@ -430,10 +433,10 @@
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
-              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
+              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              done.<br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -490,7 +493,7 @@
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
     <key alias="runwayHeader">You’ve just set up a clean Umbraco platform. What do you want to do next?</key>
@@ -526,7 +529,7 @@ You installed Runway, so why not see how your new website looks.]]></key>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
     <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
+        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>

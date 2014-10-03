@@ -122,8 +122,6 @@ namespace umbraco.controls
             pp_compositions.Text = ui.Text("contenttypecompositions", Security.CurrentUser);
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
-
-            pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser);
             
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
@@ -141,6 +139,8 @@ namespace umbraco.controls
                 lt_icon.Text = _contentType.IconUrl.TrimStart('.');
 
             checkTxtAliasJs.Text = string.Format("checkAlias('#{0}');", txtAlias.ClientID);
+
+            DataBind();
         }
         
         /// <summary>

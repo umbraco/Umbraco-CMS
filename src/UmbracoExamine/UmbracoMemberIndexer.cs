@@ -29,11 +29,14 @@ namespace UmbracoExamine
         private readonly IMemberService _memberService;
         private readonly IDataTypeService _dataTypeService;
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public UmbracoMemberIndexer()
-            : base() { }
+	    /// <summary>
+	    /// Default constructor
+	    /// </summary>
+	    public UmbracoMemberIndexer() : base()
+	    {
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _memberService = ApplicationContext.Current.Services.MemberService;
+	    }
 
 	    /// <summary>
 	    /// Constructor to allow for creating an indexer at runtime

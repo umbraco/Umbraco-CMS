@@ -225,6 +225,40 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Func<Tuple<string, object[]>> defaultFilter = null)
+        {
+            //copy to var so that the original isn't changed
+            var filteredSql = new Sql(sql.SQL, sql.Arguments);
+            // Apply filter
+            if (defaultFilter != null)
+            {
+                var filterResult = defaultFilter();
+                filteredSql.Append(filterResult.Item1, filterResult.Item2);
+            }
+            return filteredSql;
+        }
+
+        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy)
+        {
+            //copy to var so that the original isn't changed
+            var sortedSql = new Sql(sql.SQL, sql.Arguments);
+            // Apply order according to parameters
+            if (string.IsNullOrEmpty(orderBy) == false)
+            {
+                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                if (orderDirection == Direction.Ascending)
+                {
+                    sortedSql.OrderBy(orderByParams);
+                }
+                else
+                {
+                    sortedSql.OrderByDescending(orderByParams);
+                }
+                return sortedSql;
+            }
+            return sortedSql;
+        }
+
         /// <summary>
         /// A helper method for inheritors to get the paged results by query in a way that minimizes queries
         /// </summary>
@@ -234,7 +268,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pageIndex">Index of the page.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <param name="totalRecords">The total records.</param>
-        /// <param name="nodeIdSelect">The SQL select statement fragment to return the node id from the query</param>
+        /// <param name="nodeIdSelect">The tablename + column name for the SELECT statement fragment to return the node id from the query</param>
         /// <param name="defaultFilter">A callback to create the default filter to be applied if there is one</param>
         /// <param name="processQuery">A callback to process the query result</param>
         /// <param name="orderBy">The order by column</param>
@@ -242,7 +276,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">orderBy</exception>
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto,TContentBase>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
-            string nodeIdSelect,
+            Tuple<string, string> nodeIdSelect,
             Func<Sql, IEnumerable<TEntity>> processQuery,
             string orderBy, 
             Direction orderDirection,
@@ -257,51 +291,18 @@ namespace Umbraco.Core.Persistence.Repositories
             if (query == null) query = new Query<TEntity>();
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlQuery = translator.Translate();
-
-            Func<Sql, string, object[], Sql> getFilteredSql = (sql, additionalFilter, additionalFilterArgs) =>
-            {
-                //copy to var so that the original isn't changed
-                var filteredSql = new Sql(sql.SQL, sql.Arguments);
-                // Apply filter
-                if (defaultFilter != null)
-                {
-                    var filterResult = defaultFilter();
-                    filteredSql.Append(filterResult.Item1, filterResult.Item2);
-                }
-                if (string.IsNullOrEmpty(additionalFilter) == false)
-                {
-                    filteredSql.Append("AND (" + additionalFilter + ")", additionalFilterArgs);
-                }
-                return filteredSql;
-            };
-
-            Func<Sql, Sql> getSortedSql = sql =>
-            {
-                //copy to var so that the original isn't changed
-                var sortedSql = new Sql(sql.SQL, sql.Arguments);
-                // Apply order according to parameters
-                if (string.IsNullOrEmpty(orderBy) == false)
-                {
-                    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-                    if (orderDirection == Direction.Ascending)
-                    {
-                        sortedSql.OrderBy(orderByParams);
-                    }
-                    else
-                    {
-                        sortedSql.OrderByDescending(orderByParams);
-                    }
-                    return sortedSql;
-                }
-                return sortedSql;
-            };
-
+            
             // Note we can't do multi-page for several DTOs like we can multi-fetch and are doing in PerformGetByQuery, 
             // but actually given we are doing a Get on each one (again as in PerformGetByQuery), we only need the node Id.
             // So we'll modify the SQL.
-            var sqlNodeIds = new Sql(sqlQuery.SQL.Replace("SELECT *", nodeIdSelect), sqlQuery.Arguments);
-
-            var sqlNodeIdsWithSort = getSortedSql(getFilteredSql(sqlNodeIds, null, new object[0]));
+            var sqlNodeIds = new Sql(
+                sqlQuery.SQL.Replace("SELECT *", string.Format("SELECT {0}.{1}",nodeIdSelect.Item1, nodeIdSelect.Item2)), 
+                sqlQuery.Arguments);
+            
+            //get sorted and filtered sql
+            var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
+                GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
+                orderDirection, orderBy);
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -314,19 +315,29 @@ namespace Umbraco.Core.Persistence.Repositories
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<TDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
                 
-                //we now need to finalize/parse this query so that the args are built in to it, we know the args will only be two for this operation                
-                //sqlPage = sqlPage.Replace("@0", args[0].ToString()).Replace("@1", args[1].ToString());
+                //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId                
+                sqlStringPage = sqlStringPage
+                    .Replace("SELECT *",
+                        //This ensures we only take the field name of the node id select and not the table name - since the resulting select
+                        // will ony work with the field name.
+                        "SELECT " + nodeIdSelect.Item2);
 
-                //if this is for sql server, the sqlPage will start with a SELECT * but we don't want that, we only want to return the nodeId
-                var nodeIdSelectParts = nodeIdSelect.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
-                sqlStringPage = sqlStringPage.Replace("SELECT *", 
-                    //This ensures we only take the field name of the node id select and not the table name - since the resulting select
-                    // will ony work with the field name.
-                    "SELECT " + nodeIdSelectParts[nodeIdSelectParts.Length - 1]);
+                //We need to make this an inner join on the paged query
+                var splitQuery = sqlQuery.SQL.Split(new[] {"WHERE "}, StringSplitOptions.None);
+                var withInnerJoinSql = new Sql(splitQuery[0])
+                    .Append("INNER JOIN (")
+                    //join the paged query with the paged query arguments
+                    .Append(sqlStringPage, args)
+                    .Append(") temp ")
+                    .Append(string.Format("ON {0}.{1} = temp.{1}", nodeIdSelect.Item1, nodeIdSelect.Item2))
+                    //add the original where clause back with the original arguments
+                    .Where(splitQuery[1], sqlQuery.Arguments);
 
-                var fullQuery = getSortedSql(
-                    getFilteredSql(sqlQuery, string.Format("umbracoNode.id IN ({0})", sqlStringPage), args));
-
+                //get sorted and filtered sql
+                var fullQuery = GetSortedSqlForPagedResults(
+                    GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),                     
+                    orderDirection, orderBy);
+                
                 var content = processQuery(fullQuery)
                     .Cast<TContentBase>()
                     .AsQueryable();

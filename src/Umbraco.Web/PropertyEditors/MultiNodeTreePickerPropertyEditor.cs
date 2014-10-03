@@ -67,18 +67,22 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 //set the multiPicker val correctly depending on the maxNumber
-                var asNumber = result["maxNumber"].TryConvertTo<int>();
-                if (asNumber.Success)
+                if (result.ContainsKey("maxNumber"))
                 {
-                    if (asNumber.Result <= 1)
+                    var asNumber = result["maxNumber"].TryConvertTo<int>();
+                    if (asNumber.Success)
                     {
-                        result["multiPicker"] = "0";
-                    }
-                    else
-                    {
-                        result["multiPicker"] = "1";
-                    }
+                        if (asNumber.Result <= 1)
+                        {
+                            result["multiPicker"] = "0";
+                        }
+                        else
+                        {
+                            result["multiPicker"] = "1";
+                        }
+                    }    
                 }
+                
 
                 return result;
             }
