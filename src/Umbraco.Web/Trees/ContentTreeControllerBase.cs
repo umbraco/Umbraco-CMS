@@ -82,10 +82,15 @@ namespace Umbraco.Web.Trees
 
             var altStartId = string.Empty;
             if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
+            {
                 altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+            }
 
-            //check if a request has been made to render from a specific start node
-            if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+            // Check if a request has been made to render from a specific start node AND that we aren't already under the start node
+            if (string.IsNullOrEmpty(altStartId) == false && 
+                altStartId != "undefined" && 
+                altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture) &&
+                IsRequestedNodeUnderStartNode(id, altStartId) == false)
             {
                 id = altStartId;
 
@@ -114,6 +119,19 @@ namespace Umbraco.Web.Trees
             var entities = GetChildEntities(id);
             nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));
             return nodes;
+        }
+
+        /// <summary>
+        /// Checks to see if the requested Id for the root of the next level of the tree is under a custom defined start node
+        /// </summary>
+        /// <param name="requestedId">Requested node Id</param>
+        /// <param name="customStartNodeId">Custom defined start node Id</param>
+        /// <returns>True if requested node is under the start node</returns>
+        private bool IsRequestedNodeUnderStartNode(string requestedId, string customStartNodeId)
+        {
+            var requestedNode = Services.EntityService.Get(int.Parse(requestedId), UmbracoObjectType);
+            var customStartNode = Services.EntityService.Get(int.Parse(customStartNodeId), UmbracoObjectType);
+            return requestedNode.Level > customStartNode.Level;
         }
 
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
