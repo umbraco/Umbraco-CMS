@@ -366,10 +366,10 @@
 		]]></key>
     <key alias="databaseInstallDone"><![CDATA[Ваша База данных сконфигурирована для работы Umbraco %0%. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>База данных не найдена! Пожалуйста, проверьте настройки строки подключения ("connection string") в файле конфигурации "web.config"</p>
-		<p>Для настройки откройте файл "web.config" с помошью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "umbracoDbDSN"),
+		<p>Для настройки откройте файл "web.config" с помошью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "UmbracoDbDSN"),
 		затем сохраните файл.</p>
 		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
-		<a href="http://umbraco.org/redir/installWebConfig"
+		<a href="http://Umbraco.org/redir/installWebConfig"
 		target="_blank">Более подробно о внесении изменений в файл "web.config" расскзано здесь.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно распологать некоторой информацией о Вашем сервере базы данных
 		(строка подключения "connection string")<br />
@@ -398,7 +398,7 @@
 		и предложит сменить этот пароль в случае необходимости.</p>
 		]]></key>
     <key alias="greatStart">Для начального обзора возможностей системы рекомендуем посмотреть ознакомительные видеоматериалы</key>
-    <key alias="licenseText"><![CDATA[Нажимая кнопку <strong>Далее</strong> (или модифицируя вручную ключ "umbracoConfigurationStatus" в файле "web.config"), Вы принимаете лицензионное соглашение для данного программного обеспечения, расположенное ниже. Пожалуйста, обратите внимание, что инсталляционный пакет Umbraco отвечает двум различным типам лицензий: лицензии MIT на программные продукты с открытым исходным кодом в части ядра системы и свободной лицензии umbraco в части пользовательского интерфейса.]]></key>
+    <key alias="licenseText"><![CDATA[Нажимая кнопку <strong>Далее</strong> (или модифицируя вручную ключ "UmbracoConfigurationStatus" в файле "web.config"), Вы принимаете лицензионное соглашение для данного программного обеспечения, расположенное ниже. Пожалуйста, обратите внимание, что инсталляционный пакет Umbraco отвечает двум различным типам лицензий: лицензии MIT на программные продукты с открытым исходным кодом в части ядра системы и свободной лицензии Umbraco в части пользовательского интерфейса.]]></key>
     <key alias="None">Система не установлена.</key>
     <key alias="permissionsAffectedFolders">Затронутые файлы и папки</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Более подробно об установке разрешений для Umbraco рассказано здесь</key>
@@ -427,7 +427,7 @@
     <key alias="runwayFromScratchText"><![CDATA[
 		В настоящий момент Ваш сайт абсолютно пустой, что является наилучшим вариантом для старта
 		"с чистого листа", чтобы начать создавать свои собственные типы документов и шаблоны.
-		(<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Для разработчиков" и выберите пункт "Пакеты".
+		(<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Для разработчиков" и выберите пункт "Пакеты".
 		]]></key>
     <key alias="runwayHeader">Вы только что установили чистую платформу Umbraco. Какой шаг будет следующим?</key>
     <key alias="runwayInstalled">"Runway" установлен</key>
@@ -462,7 +462,7 @@
 		Получайте помощь от нашего замечательного сообщества пользователей, изучайте документацию или просматривайте наши свободно распространяемые видео-материалы о том, как создать собственный несложный сайт, как использовать расширения и пакеты, а также краткое руководство по терминологии Umbraco.]]></key>
     <key alias="theEndHeader">Система Umbraco %0% установлена и готова к работе</key>
     <key alias="theEndInstallFailed"><![CDATA[Для завершения процесса установки Вам необходимо
-		вручную модифицировать файл <strong>web.config</strong> и изменить значение ключа <strong>umbracoConfigurationStatus</strong> в секции <strong>AppSetting</strong>, установив его равным <strong>'%0%'</strong>.]]></key>
+		вручную модифицировать файл <strong>web.config</strong> и изменить значение ключа <strong>UmbracoConfigurationStatus</strong> в секции <strong>AppSetting</strong>, установив его равным <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Вы можете начать работу <strong>прямо сейчас</strong>,
 		воспользовавшись ссылкой "Начать работу с Umbraco". <br />Если Вы <strong>новичок в мире Umbraco</strong>, Вы сможете найти много полезных ссылок на ресурсы на странице "Начало работы".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Начните работу с Umbraco</h3>
@@ -484,8 +484,8 @@
     <key alias="renewSession">Обновите сейчас, чтобы сохранить сделанные изменения</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p>]]></key>
-    <key alias="topText">Рады приветствовать Вас в umbraco, укажите Ваши логин и пароль для входа в систему:</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p>]]></key>
+    <key alias="topText">Рады приветствовать Вас в Umbraco, укажите Ваши логин и пароль для входа в систему:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Панель управления</key>
@@ -819,7 +819,7 @@
 
 		Удачи!
 		
-		Генератор уведомлений umbraco.
+		Генератор уведомлений Umbraco.
 		]]></key>
     <key alias="mailSubject">[%0%] Задание по переводу %1%</key>
     <key alias="noTranslators">Пользователей-переводчиков не обнаружено. Пожалуйста, создайте пользователя с ролью переводчика, перед тем как отсылать содержимое на перевод</key>

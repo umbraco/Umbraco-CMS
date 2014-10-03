@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="fr" intName="French" localName="français" lcid="12" culture="fr-FR">
   <creator>
-    <name>The umbraco community</name>
-    <link>http://umbraco.org/documentation/language-files</link>
+    <name>The Umbraco community</name>
+    <link>http://Umbraco.org/documentation/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
@@ -545,7 +545,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="greeting6">Joyeux samedi</key>
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="timeout">La session a expiré</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Tableau de bord</key>
