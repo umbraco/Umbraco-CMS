@@ -23,7 +23,7 @@
                 <div class="notice">
                     <p><%= umbraco.ui.Text("sort", "sortPleaseWait") %></p>
                 </div>
-                <br />
+                
                 <div class="umb-loader-wrapper">
                     <cc1:ProgressBar ID="prog1" runat="server" Title="sorting.." />
                 </div>

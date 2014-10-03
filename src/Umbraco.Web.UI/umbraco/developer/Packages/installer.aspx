@@ -258,6 +258,7 @@
                         <div class="umb-loader-wrapper">
                             <cc1:ProgressBar runat="server" ID="_progbar1" />
                         </div>
+                        <br />
                         <em>Installing package, please wait...</em><br /><br />
                     </div>
                     <asp:Button ID="ButtonInstall" runat="server" Text="Install Package" CssClass="btn btn-primary" Enabled="False"
