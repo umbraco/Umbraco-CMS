@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="da" intName="Danish" localName="dansk" lcid="6" culture="da-DK">
   <creator>
-    <name>The umbraco community</name>
-    <link>http://umbraco.org/documentation/language-files</link>
+    <name>The Umbraco community</name>
+    <link>http://Umbraco.org/documentation/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Tilføj domæne</key>
@@ -137,7 +137,7 @@
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
     <key alias="dontShowAgain">- Skjul</key>
-    <key alias="nothinghappens">Hvis umbraco ikke starter, kan det skyldes at din browser ikke tillader pop-up vinduer</key>
+    <key alias="nothinghappens">Hvis Umbraco ikke starter, kan det skyldes at din browser ikke tillader pop-up vinduer</key>
     <key alias="openinnew">er åbnet i nyt vindue</key>
     <key alias="restart">Genstart</key>
     <key alias="visit">Besøg</key>
@@ -150,7 +150,7 @@
     <key alias="confirmdelete">Er du sikker på at du vil slette</key>
     <key alias="confirmdisable">Er du sikker på du vil deaktivere</key>
     <key alias="confirmEmptyTrashcan">Afkryds venligst denne boks for at bekræfte sletningen af %0% enhed(er)</key>
-    <key alias="confirmlogout">Er du sikker på at du vil forlade umbraco?</key>
+    <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>
     <key alias="editdictionary">Rediger ordbogs nøgle</key>
@@ -368,7 +368,7 @@
     <key alias="databaseInstall"><![CDATA[Tryk på <strong>installér</strong> knappen for at installere Umbraco %0% databasen]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
-<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="http://umbraco.org/redir/installWebConfig" target="_blank">Mere information om at redigere web.config her.</a></p>]]></key>
+<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "UmbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">Mere information om at redigere web.config her.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Tryk på <strong>Opgradér</strong> knappen for at opgradere din database til Umbraco %0%</p><p>Bare rolig - intet indhold vil blive slettet og alt vil stadig fungere bagefter!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din database er blevet opgraderet til den endelige version %0%.<br/>Tryk på <strong>Næste</strong> for at fortsætte.]]></key>
@@ -379,7 +379,7 @@
     <key alias="defaultUserPasswordChanged">Adgangskoden er blevet ændret!</key>
     <key alias="defaultUserText"><![CDATA[<p>Umbraco opretter en normalbruger med et login <strong>('admin')</strong> og en adgangskode <strong>('default')</strong>.</p> Det er <strong>vigtigt</strong> at adgangskoden bliver ændret til noget unikt.</p><p>Dette skridt vil kontrollere normalbrugerens adgangskode og foreslå om det er nødt til at blive ændret.</p>]]></key>
     <key alias="greatStart">Få en fremragende start, se vores videoer</key>
-    <key alias="licenseText">Ved at klikke på næste knappen (eller ved at ændre umbracoConfigurationStatus i web.config filen), accepterer du licensaftalen for denne software, som specificeret i boksen nedenfor. Bemærk venligst at denne Umbraco distribution består af to forskellige licenser, MIT's Open Source Licens for frameworket og Umbraco Freeware Licensen som dækker UI'en.</key>
+    <key alias="licenseText">Ved at klikke på næste knappen (eller ved at ændre UmbracoConfigurationStatus i web.config filen), accepterer du licensaftalen for denne software, som specificeret i boksen nedenfor. Bemærk venligst at denne Umbraco distribution består af to forskellige licenser, MIT's Open Source Licens for frameworket og Umbraco Freeware Licensen som dækker UI'en.</key>
     <key alias="None">Endnu ikke installeret</key>
     <key alias="permissionsAffectedFolders">Berørte filer og foldere</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Flere informationer om at opsætte rettigheder for Umbraco her</key>
@@ -396,7 +396,7 @@
     <key alias="permissionsSettingUpPermissions">Sætter folderrettigheder op</key>
     <key alias="permissionsText">Umbraco har behov for 'write/modify' adgang til bestemte foldere, for at kunne gemme filer som billeder og PDF'er. Umbraco gemmer også midlertidige data (eksempelvis cachen) for at forbedre ydelsen på dit website.</key>
     <key alias="runwayFromScratch">Jeg har lyst til at begynde på bar bund</key>
-    <key alias="runwayFromScratchText"><![CDATA[Dit website er helt tomt for øjeblikket, så det er perfekt hvis du ønsker at begynde på bar bund og oprette dine egne dokumenttyper og skabeloner. (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan stadig vælge at installere Runway senere. Gå venligst til Udvikler-sektionen og vælg Pakker.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Dit website er helt tomt for øjeblikket, så det er perfekt hvis du ønsker at begynde på bar bund og oprette dine egne dokumenttyper og skabeloner. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan stadig vælge at installere Runway senere. Gå venligst til Udvikler-sektionen og vælg Pakker.]]></key>
     <key alias="runwayHeader">Du har lige opsat en ren Umbraco-platform. Hvad ønsker du nu at gøre?</key>
     <key alias="runwayInstalled">Runway er installeret</key>
     <key alias="runwayInstalledText"><![CDATA[Du har fundamentet på plads. Vælg hvilke moduler du ønsker at installere ovenpå det.<br/>Dette er vores liste over anbefalede moduler. Kryds dem af du ønsker at installere eller se den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulde liste af moduler</a>  ]]></key>
@@ -413,7 +413,7 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Gennemse dit nye site</h3> Du installerede Runway, så hvorfor ikke se hvordan dit nye website ser ud.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Yderligere hjælpe og informationer</h3> Få hjælp fra vores prisvindende fællesskab, gennemse dokumentationen eller se nogle gratis videoer om hvordan du opsætter et simpelt site, hvordan du bruger pakker og en 'quick guide' til Umbraco terminologier]]></key>
     <key alias="theEndHeader">Umbraco %0% er installeret og klar til brug</key>
-    <key alias="theEndInstallFailed"><![CDATA[For at afslutte installationen er du nødt til manuelt at rette <strong>/web.config filen</strong> og opdatére 'AppSetting' feltet <strong>umbracoConfigurationStatus</strong> i bunden til <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[For at afslutte installationen er du nødt til manuelt at rette <strong>/web.config filen</strong> og opdatére 'AppSetting' feltet <strong>UmbracoConfigurationStatus</strong> i bunden til <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>komme igang med det samme</strong> ved at klikke på "Start Umbraco" knappen nedenfor.<br/>Hvis du er <strong>ny med Umbraco</strong>, kan du finde masser af ressourcer på vores 'getting started' sider.
 ]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Start Umbraco</h3>For at administrere dit website skal du blot åbne Umbraco administrationen og begynde at tilføje indhold, opdatere skabelonerne og stylesheets'ene eller tilføje ny funktionalitet.]]></key>
@@ -446,7 +446,7 @@
     <key alias="timeout">Din session er udløbet</key>
 
 
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
@@ -479,9 +479,9 @@ Gå til http://%4%/#/content/content/edit/%5% for at redigere.
 	
 Ha' en dejlig dag!
 		
-Mange hilsner fra umbraco robotten
+Mange hilsner fra Umbraco robotten
 		]]></key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Hej %0%</p> <p>Dette er en automatisk mail for at informere dig om at opgaven <strong>'%1%'</strong> er blevet udførtpå siden <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> af brugeren <strong>'%3%'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra umbraco robotten </p>]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>Hej %0%</p> <p>Dette er en automatisk mail for at informere dig om at opgaven <strong>'%1%'</strong> er blevet udførtpå siden <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> af brugeren <strong>'%3%'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra Umbraco robotten </p>]]></key>
     <key alias="mailSubject">[%0%] Notificering om %1% udført på %2%</key>
     <key alias="notifications">Notificeringer</key>
   </area>
@@ -507,19 +507,19 @@ Mange hilsner fra umbraco robotten
     <key alias="packageUpgradeDownload">Download opdatering fra opbevaringsbasen</key>
     <key alias="packageUpgradeHeader">Opdatér pakke</key>
     <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
-    <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra umbracos pakke opbevaringsbase.</key>
+    <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra Umbracos pakke opbevaringsbase.</key>
     <key alias="packageVersion">Pakke version</key>
     <key alias="viewPackageWebsite">Se pakkeudviklerens website</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Indsæt med fuld formattering (Anbefales ikke)</key>
-    <key alias="errorMessage">Den tekst du er ved at indsætte indeholder specialtegn eller formattering. Dette kan skyldes at du kopierer fra f.eks. Microsoft Word. umbraco kan fjerne denne specialformattering automatisk så indholdet er mere velegnet til visning på en webside.</key>
+    <key alias="errorMessage">Den tekst du er ved at indsætte indeholder specialtegn eller formattering. Dette kan skyldes at du kopierer fra f.eks. Microsoft Word. Umbraco kan fjerne denne specialformattering automatisk så indholdet er mere velegnet til visning på en webside.</key>
     <key alias="removeAll">Indsæt som ren tekst, dvs. fjern al formattering</key>
     <key alias="removeSpecialFormattering">Indsæt, men fjern formattering som ikke bør være på en webside (Anbefales)</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollebaseret beskyttelse</key>
-    <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via umbracos medlemsgrupper.</key>
+    <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
     <key alias="paAdvancedNoGroups"><![CDATA[Du skal oprette en medlemsgruppe før du kan bruge <br />rollebaseret godkendelse]]></key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
@@ -663,7 +663,7 @@ Mange hilsner fra umbraco robotten
     <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområdemarkering</key>
     <key alias="insertDictionaryItem">Indsæt ordbogselement</key>
     <key alias="insertMacro">Indsæt makro</key>
-    <key alias="insertPageField">Indsæt umbraco sidefelt</key>
+    <key alias="insertPageField">Indsæt Umbraco sidefelt</key>
     <key alias="mastertemplate">Master skabelon</key>
     <key alias="quickGuide">Lynguide til Umbracos skabelontags</key>
     <key alias="template">Skabelon</key>
@@ -705,7 +705,7 @@ Mange hilsner fra umbraco robotten
     <key alias="DownloadXmlDTD">Download XML DTD</key>
     <key alias="fields">Felter</key>
     <key alias="includeSubpages">Inkluder undersider</key>
-    <key alias="mailBody">Hej %0%. Dette er en automatisk mail sendt for at informere dig om at dokumentet '%1' har en forespørgsel omkring oversættelse til '%5%' af %2%. Gå til http://%3%/umbraco/translation/details.aspx?id=%4% for at redigere. Eller log ind i umbraco for at få en oversigt over dine oversættelsesopgaver: http://%3%/umbraco Hav en god dag! Mange hilsner umbraco-robotten</key>
+    <key alias="mailBody">Hej %0%. Dette er en automatisk mail sendt for at informere dig om at dokumentet '%1' har en forespørgsel omkring oversættelse til '%5%' af %2%. Gå til http://%3%/Umbraco/translation/details.aspx?id=%4% for at redigere. Eller log ind i Umbraco for at få en oversigt over dine oversættelsesopgaver: http://%3%/Umbraco Hav en god dag! Mange hilsner Umbraco-robotten</key>
     <key alias="mailSubject">[%0%] Oversættelsesopgave for %1%</key>
     <key alias="noTranslators">Ingen oversættelsesbrugere er fundet. Opret venligst en oversættelsesbruger før du begynder at sende indhold til oversættelse</key>
     <key alias="ownedTasks">Opgaver oprettet af dig</key>
@@ -776,7 +776,7 @@ Mange hilsner fra umbraco robotten
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Startnode i mediearkivet</key>
     <key alias="modules">Moduler</key>
-    <key alias="noConsole">Deaktivér adgang til umbraco</key>
+    <key alias="noConsole">Deaktivér adgang til Umbraco</key>
     <key alias="password">Adgangskode</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
