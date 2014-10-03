@@ -1125,7 +1125,7 @@ namespace Umbraco.Core
         /// <para>This is the legacy method, so we can't really change it, although it has issues (see unit tests).</para>
         /// <para>It does more than "converting the case", and also remove spaces, etc.</para>
         /// </remarks>
-        [Obsolete("This method should be removed. Use CleanString instead.")]
+        [Obsolete("This method should be removed. Use ToCleanString instead.")]
         public static string ConvertCase(this string phrase, StringAliasCaseType cases)
         {
             var helper = ShortStringHelper;
