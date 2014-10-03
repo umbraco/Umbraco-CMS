@@ -23,6 +23,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(entityBasic => entityBasic.Icon, expression => expression.UseValue("icon-settings-alt"))
                   .ForMember(dto => dto.ParentId, expression => expression.UseValue(-1))
                   .ForMember(dto => dto.Path, expression => expression.ResolveUsing(macro => "-1," + macro.Id))
+                  .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                   .ForMember(dto => dto.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IMacro, IEnumerable<MacroParameter>>()

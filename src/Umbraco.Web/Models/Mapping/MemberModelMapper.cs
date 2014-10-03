@@ -140,6 +140,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.AdditionalData, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore());
 
