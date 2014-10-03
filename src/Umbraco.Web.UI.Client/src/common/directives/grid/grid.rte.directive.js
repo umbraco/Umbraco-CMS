@@ -124,6 +124,9 @@ angular.module("umbraco.directives")
                                         .find(".mce-toolbar")
                                         .css("visibility", "hidden");
 
+                                    //force overflow to hidden to prevent no needed scroll
+                                    editor.getBody().style.overflow = "hidden";
+
                                     $timeout(function(){
                                         if(scope.value === null){
                                             editor.focus();
