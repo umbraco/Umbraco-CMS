@@ -19,6 +19,8 @@ angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
                     return promise;
                 }, function(originalResponse) {
                     // Intercept failed requests
+                    
+                    if (originalResponse.config.umbIgnoreErrors === true) return promise;
 
                     //A 401 means that the user is not logged in
                     if (originalResponse.status === 401) {
