@@ -29,7 +29,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         angularHelper.safeApply($scope, function() {
             // when a date is changed, update the model
             if (e.localDate) {
-                if ($scope.model.config.format == "yyyy-MM-dd hh:mm:ss") {
+                if ($scope.model.config.format == "YYYY-MM-DD HH:mm:ss") {
                     $scope.model.value = e.localDate.toIsoDateTimeString();
                 }
                 else {
