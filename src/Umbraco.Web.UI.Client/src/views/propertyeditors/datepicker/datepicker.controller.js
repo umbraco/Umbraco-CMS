@@ -4,8 +4,15 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     var config = {
         pickDate: true,
         pickTime: true,
-        pick12HourFormat: false,
-        format: "yyyy-MM-dd hh:mm:ss"
+		useSeconds: true,
+        format: "YYYY-MM-DD HH:mm:ss",
+		icons: {
+                    time: "icon-time",
+                    date: "icon-calendar",
+                    up: "icon-chevron-up",
+                    down: "icon-chevron-down"
+                }
+
     };
 
     //map the user config
