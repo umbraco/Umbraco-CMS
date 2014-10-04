@@ -124,7 +124,7 @@ angular.module('umbraco.mocks').
                         label: "Grid",
                         id: 8,
                         properties: [
-                        { alias: "grid", label: "Grid", view: "grid", value: "test", hideLabel: true }
+                        { alias: "canvas", label: "Grid", view: "canvas", value: "test", hideLabel: true }
                         ]
                     }, {
                         label: "Generic Properties",

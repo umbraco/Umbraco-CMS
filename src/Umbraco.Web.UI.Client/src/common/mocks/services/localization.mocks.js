@@ -1,4 +1,4 @@
-angular.module('Umbraco.mocks').
+angular.module('umbraco.mocks').
   factory('localizationMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
       
