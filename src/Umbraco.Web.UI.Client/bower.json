@@ -16,7 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "typeahead.js": "~0.10.2",
+    "typeahead.js": "~0.10.5",
     "ace-builds": "~1.1.3",
     "rgrove-lazyload": "*"
   }
