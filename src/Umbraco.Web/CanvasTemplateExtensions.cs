@@ -14,23 +14,23 @@ namespace Umbraco.Web
 {
     public static class CanvasTemplateExtensions
     {
-        public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
+        public static MvcHtmlString RenderCanvas(this IPublishedProperty property, string framework = "bootstrap3")
         {
             var view = "Canvas/" + framework;
             return new MvcHtmlString(renderPartialViewToString(view, property.Value));
         }
 
-        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem)
+        public static MvcHtmlString RenderCanvas(this IPublishedContent contentItem)
         {
-            return GetGridHtml(contentItem, "bodyText", "bootstrap3");
+            return RenderCanvas(contentItem, "bodyText", "bootstrap3");
         }
 
-        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias)
+        public static MvcHtmlString RenderCanvas(this IPublishedContent contentItem, string propertyAlias)
         {
-            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
+            return RenderCanvas(contentItem, propertyAlias, "bootstrap3");    
         }
 
-        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
+        public static MvcHtmlString RenderCanvas(this IPublishedContent contentItem, string propertyAlias, string framework)
         {
             var view = "Canvas/" + framework;
             var model =  contentItem.GetProperty(propertyAlias).Value;
