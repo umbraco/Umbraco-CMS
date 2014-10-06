@@ -90,16 +90,23 @@ angular.module("umbraco")
             };
 
             //configure the tags data source
-            //TODO: We'd like to be able to filter the shown list items to not show the tags that are currently
-            // selected but that is difficult, i've tried a number of things and also this link suggests we cannot do 
-            // it currently without a lot of hacking:
-            // http://stackoverflow.com/questions/21044906/twitter-typeahead-js-remove-datum-upon-selection
 
             //helper method to format the data for bloodhound
             function dataTransform(list) {
                 //transform the result to what bloodhound wants
-                return _.map(list, function (i) {
+                var tagList = _.map(list, function (i) {
                     return { value: i.text };
+                });
+                // remove current tags from the list
+                return $.grep(tagList, function (tag) {
+                    return ($.inArray(tag.value, $scope.currentTags) === -1);
+                });
+            }
+
+            // helper method to remove current tags
+            function removeCurrentTagsFromSuggestions(suggestions) {
+                return $.grep(suggestions, function (suggestion) {
+                    return ($.inArray(suggestion.value, $scope.currentTags) === -1);
                 });
             }
 
@@ -123,7 +130,7 @@ angular.module("umbraco")
                 }
             });
 
-            tagsHound.initialize();
+            tagsHound.initialize(true);
 
             //configure the type ahead
             $timeout(function () {
@@ -133,17 +140,25 @@ angular.module("umbraco")
                     //This causes some strangeness as it duplicates the textbox, best leave off for now.
                     hint: false,
                     highlight: true,
+                    cacheKey: new Date(),  // Force a cache refresh each time the control is initialized
                     minLength: 1
                 }, {
                     //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
                     // name = the data set name, we'll make this the tag group name
                     name: $scope.model.config.group,
                     displayKey: "value",
-                    source: tagsHound.ttAdapter(),
+                    //source: tagsHound.ttAdapter(),
+                    source: function (query, cb) {
+                        tagsHound.get(query, function (suggestions) {
+                            cb(removeCurrentTagsFromSuggestions(suggestions));
+                        });
+                    },
                 }).bind("typeahead:selected", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
                         $scope.tagToAdd = "";
+                        // clear the typed text
+                        $typeahead.typeahead('val', '');
                     });
 
                 }).bind("typeahead:autocompleted", function (obj, datum, name) {
@@ -158,6 +173,8 @@ angular.module("umbraco")
             });
 
             $scope.$on('$destroy', function () {
+                tagsHound.clearPrefetchCache();
+                tagsHound.clearRemoteCache();
                 $element.find('.tags-' + $scope.model.alias).typeahead('destroy');
                 delete tagsHound;
             });
