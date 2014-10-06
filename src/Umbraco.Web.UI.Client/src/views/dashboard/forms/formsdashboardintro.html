@@ -1,34 +1,60 @@
 <div ng-controller="Umbraco.Dashboard.FormsDashboardController">
-	<h3>Build flawless forms without a single line of code</h3>
-	<h5>Contour makes creating contact forms, entry forms and questionnaires just as easy as using Word. You won't need to write a single line of code.</h5>
-	<h5>Instead, you can create, edit and administer your forms via a user interface that is a fully integrated part of Umbraco.</h5>
 
-	<button class="btn" ng-click="installForms()">Download a free trial now</button>
+	<div style="max-width: 800px; text-align: center; margin: auto; padding: 20px">
+
+		<i style="font-size: 80px" class="icon icon-umb-contour"></i>
+
+		<h3>Umbraco Forms Preivew</h3>
+
+		<p><strong>Umbraco forms makes creating contact forms, entry forms and questionnaires just as easy as using Word. You won't need to write a single line of code.</strong></p>
+
+		<p>A new version of Umbraco Forms is coming. We've reimagined the entire product from ground up and would love
+			input from experienced users before we launch.</p>
+
+		<button class="btn publish" ng-hide="state" ng-click="installForms()">Install</button>
+
+		<br/>
+		<small>Preview version should not be used in production</small>
+		<br/>
+
+		<div style="width: 99%; overflow: hidden" ng-if="state">
+			<p>{{state}}...</p>
+			<div class="umb-loader"></div>
+		</div>
 
 
-	<div style="width: 99%; overflow: hidden" ng-if="state">
-		<p>{{state}}...</p>
-		<div class="umb-loader"></div>
+		<hr/>
+
+
+		<div class="row-fluid">
+			<div class="span4" style="padding: 10px; text-align: left">
+				<div class="thumbnail" style="height: 100px"></div>
+
+				<h4><i class="icon icon-thumb-up"></i>  Easy to use</h4>
+				<p>
+					Everything from simple contact forms to multiple page questionaries are possible to build in our visual form designer.
+				</p>
+			</div>
+
+			<div class="span4" style="padding: 10px; text-align: left">
+
+				<div class="thumbnail" style="height: 100px"></div>
+
+				<h4><i class="icon icon-code"></i>  In control</h4>
+				<p>
+					Markup matters, thats why you are in full control, if there's part you don't like, simply swap with one that fits.
+				</p>
+			</div>
+
+
+			<div class="span4" style="padding: 10px; text-align: left">
+				<div class="thumbnail" style="height: 100px"></div>
+				<h4><i class="icon icon-mindmap"></i> Connected and flexible</h4>
+				<p>Your form doesnt just collect entries, it can send it off to remote services, database, or simply to your inbox</p>
+			</div>
+
+		</div>
+
 	</div>
 
-	{{error}}
-	
-	<hr/>
-
-	<h3>Some of the great features</h3>
-
-	<div class="row-fluid">
-		<div class="span3">
-			<h4>Feature</h4>
-		</div>
-		<div class="span3">
-			<h4>Feature</h4>
-		</div>
-		<div class="span3">
-			<h4>Feature</h4>
-		</div>
-		<div class="span3">
-			<h4>Feature</h4>
-		</div>
-	</div>
 </div>
