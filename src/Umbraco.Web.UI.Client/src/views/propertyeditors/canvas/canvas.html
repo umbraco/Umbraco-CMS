@@ -184,7 +184,7 @@
 
                                                 <!-- add stuff -->
                                                 <div class="cell-tools-add"
-                                                    ng-if="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)"
+                                                    ng-show="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)"
                                                     ng-animate="'fade'">
 
                                                     <div class="iconBox">
@@ -193,7 +193,7 @@
                                                         </a>
                                                     </div>
 
-                                                    <div ng-if="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/canvas/dialogs/additem.html'"></div>
+                                                    <div ng-show="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/canvas/dialogs/additem.html'"></div>
                                                 </div>
 
                                             </div>
