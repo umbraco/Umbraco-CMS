@@ -8,7 +8,8 @@ var app = angular.module('umbraco', [
     'ngMobile',
     'ngSanitize',
     /*'ui.sortable',*/
-    'blueimp.fileupload'
+    'blueimp.fileupload',
+    'tmh.dynamicLocale'
 ]);
 
 /* For Angular 1.2: we need to load in Route, animate and touch seperately
