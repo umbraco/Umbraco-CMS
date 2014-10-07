@@ -104,6 +104,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         currentTarget: currentTarget,
                         onlyImages: true,
                         showDetails: true,
+                        startNodeId: Umbraco.Sys.ServerVariables.security.startMediaId,
                         callback: function (img) {
 
                             if (img) {

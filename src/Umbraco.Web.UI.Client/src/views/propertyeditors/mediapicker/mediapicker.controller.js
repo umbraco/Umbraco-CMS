@@ -7,7 +7,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
 
         if (!$scope.model.config.startNodeId)
-             $scope.model.config.startNodeId = -1;
+            $scope.model.config.startNodeId = Umbraco.Sys.ServerVariables.security.startMediaId;
 
          
         function setupViewModel() {
