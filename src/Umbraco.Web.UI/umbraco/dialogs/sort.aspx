@@ -19,7 +19,7 @@
     <div class="umb-dialog-body">
         <cc1:Pane runat="server">
 
-          <div id="loading" style="display: none; margin-bottom: 10px;">
+          <div id="loading" style="display: none; margin-bottom: 35px;">
                 <div class="notice">
                     <p><%= umbraco.ui.Text("sort", "sortPleaseWait") %></p>
                 </div>
