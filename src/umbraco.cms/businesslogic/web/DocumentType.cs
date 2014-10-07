@@ -6,13 +6,11 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using Umbraco.Core;
-using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -508,15 +506,6 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                if (MasterContentType != 0)
-                    ContentType.ParentId = MasterContentType;
-
-                /*foreach (var masterContentType in MasterContentTypes)
-                {
-                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(masterContentType);
-                    ContentType.AddContentType(contentType);
-                }*/
-
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId);
