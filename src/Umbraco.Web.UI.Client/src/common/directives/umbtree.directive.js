@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout) {
+function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService) {
 
     return {
         restrict: 'E',
@@ -141,18 +141,24 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
                             // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
 
-                            var startNodes = [Umbraco.Sys.ServerVariables.security.startContentId, Umbraco.Sys.ServerVariables.security.startMediaId];
-                            _.each(startNodes, function (i) {
-                                var found = _.find(args.path, function(p) {
-                                    return String(p) === String(i);
+                            userService.getCurrentUser().then(function(userData) {
+
+                                var startNodes = [userData.startContentId, userData.startMediaId];
+                                _.each(startNodes, function (i) {
+                                    var found = _.find(args.path, function (p) {
+                                        return String(p) === String(i);
+                                    });
+                                    if (found) {
+                                        args.path = args.path.splice(_.indexOf(args.path, found));
+                                    }
                                 });
-                                if (found) {
-                                    args.path = args.path.splice(_.indexOf(args.path, found));
-                                }
+
+
+                                loadPath(args.path, args.forceReload, args.activate);
+
                             });
+
                             
-                            
-                            loadPath(args.path, args.forceReload, args.activate);
 
                             return deferred.promise;
                         };
