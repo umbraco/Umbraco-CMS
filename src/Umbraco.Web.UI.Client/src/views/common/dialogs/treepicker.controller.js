@@ -52,7 +52,14 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 			if(dialogOptions.filter[0] === "{"){
 				dialogOptions.filterAdvanced = true;
 			}
+
+			$scope.dialogTreeEventHandler.bind("treeNodeExpanded", function (ev, args) {
+				if (angular.isArray(args.children)) {
+					performFiltering(args.children);
+				}
+			});
 		}
+
 
 		/** Method used for selecting a node */
 		function select(text, id, entity) {
@@ -191,31 +198,5 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		        c.find("i.umb-tree-icon").show();
 		    }
 		}
-	});
-
-	$scope.dialogTreeEventHandler.bind("treeNodeExpanded", function (ev, args) {
-
-	    //remove the custom startNodeId query string param, that is only meant to be used 1 time
-	    // for the initial tree structure loading.
-	    if (angular.isArray(args.children)) {
-	        for (var child in args.children) {
-	            var parts = args.children[child].childNodesUrl.split("&");
-	            var childNodesUrl = "";
-	            for (var p in parts) {
-	                if (!parts[p].startsWith("startNodeId")) {
-	                    childNodesUrl += parts[p] + "&";
-	                }
-	            }
-	            childNodesUrl = childNodesUrl.trimEnd("&");
-	            args.children[child].childNodesUrl = childNodesUrl;
-	        }	        
-	    }
-
-	    if (dialogOptions.filter) {
-	        if (angular.isArray(args.children)) {
-	            performFiltering(args.children);
-	        }
-	    }
-	    
 	});
 });
