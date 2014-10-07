@@ -234,7 +234,7 @@ angular.module('umbraco.services')
                                 Umbraco.Sys.ServerVariables["security"] = {
                                     startContentId: data.startContentId,
                                     startMediaId: data.startMediaId
-                                }
+                                };
                             }
 
                             if (args && args.broadcastEvent) {

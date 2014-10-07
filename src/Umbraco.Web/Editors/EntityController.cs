@@ -40,12 +40,12 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, int? startNodeId = null)
         {
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type);
+            return ExamineSearch(query, type, startNodeId);
         }
 
         /// <summary>
@@ -259,8 +259,10 @@ namespace Umbraco.Web.Editors
             return GetResultForAll(type, postFilter, postFilterParams);
         }
 
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType)
+        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, int? startNodeId = null)
         {
+            var sb = new StringBuilder();
+
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
             var fields = new[] { "id", "__NodeId" };
@@ -275,9 +277,22 @@ namespace Umbraco.Web.Editors
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
+                    if (Security.CurrentUser.StartMediaId > 0)
+                    {
+                        sb.Append("+__Path: \\-1\\," +
+                            (startNodeId.HasValue ? startNodeId.Value : Security.CurrentUser.StartMediaId) + 
+                            "\\,* ");
+                    }
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
+
+                    if (Security.CurrentUser.StartMediaId > 0)
+                    {
+                        sb.Append("+__Path: \\-1\\," +
+                            (startNodeId.HasValue ? startNodeId.Value : Security.CurrentUser.StartContentId) + 
+                            "\\,* ");
+                    }
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
@@ -289,7 +304,7 @@ namespace Umbraco.Web.Editors
             // the __nodeName will be boosted 10x without wildcards
             // then __nodeName will be matched normally with wildcards
             // the rest will be normal without wildcards
-            var sb = new StringBuilder();
+            
             
             //check if text is surrounded by single or double quotes, if so, then exact match
             var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
@@ -372,6 +387,7 @@ namespace Umbraco.Web.Editors
             //must match index type
             sb.Append(") +__IndexType:");
             sb.Append(type);
+
             
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
             

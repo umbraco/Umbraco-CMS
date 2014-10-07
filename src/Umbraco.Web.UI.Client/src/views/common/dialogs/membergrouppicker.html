@@ -1,19 +1,18 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.MemberGroupPickerController">
 	
-	<div class="umb-panel-body with-footer">
+    <div class="umb-panel-body with-footer no-header">
 
 
-		<div ng-hide="showSearch">
-				<umb-tree 
-				    section="member" 
-                    treealias="memberGroup"
-					hideheader="true" 
-				    hideoptions="true"
-                    isdialog="true"
-					eventhandler="dialogTreeEventHandler">
-				</umb-tree>
-		</div>
-	</div>
+        <div ng-hide="showSearch">
+            <umb-tree section="member"
+                      treealias="memberGroup"
+                      hideheader="true"
+                      hideoptions="true"
+                      isdialog="true"
+                      eventhandler="dialogTreeEventHandler">
+            </umb-tree>
+        </div>
+    </div>
 
 	<div class="umb-panel-footer" >
 			<div class="umb-el-wrap umb-panel-buttons">

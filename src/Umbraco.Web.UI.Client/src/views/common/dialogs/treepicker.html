@@ -1,5 +1,5 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.TreePickerController">
-    <div class="umb-panel-header" ng-hide="startNodeId > -1">
+    <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="form-search">
                 <i class="icon-search"></i>
@@ -11,7 +11,7 @@
             </div>
         </div>
     </div>
-    <div class="umb-panel-body with-footer" ng-class="{'no-header':startNodeId > -1}">
+    <div class="umb-panel-body with-footer">
         <div class="tab-content umb-control-group">
 
             <!-- Search results -->
@@ -24,7 +24,7 @@
                                     <a ng-class="{first:$first}" ng-click="selectResult(result)">
                                         <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
                                         {{result.name}}
-			                            <small class="search-subtitle" ng-show="result.subTitle">{{result.subTitle}}</small>
+                                        <small class="search-subtitle" ng-show="result.subTitle">{{result.subTitle}}</small>
                                     </a>
                                 </div>
                             </li>
@@ -34,15 +34,14 @@
             </div>
 
             <div ng-hide="showSearch">
-                <umb-tree
-                    section="{{section}}"
-                    treealias="{{treeAlias}}"
-                    hideheader="{{hideHeader}}"
-                    hideoptions="true"
-                    isdialog="true"
-                    customtreeparams="{{customTreeParams}}"
-                    eventhandler="dialogTreeEventHandler">
-				</umb-tree>
+                <umb-tree section="{{section}}"
+                          treealias="{{treeAlias}}"
+                          hideheader="{{hideHeader}}"
+                          hideoptions="true"
+                          isdialog="true"
+                          customtreeparams="{{customTreeParams}}"
+                          eventhandler="dialogTreeEventHandler">
+                </umb-tree>
             </div>
         </div>
     </div>
