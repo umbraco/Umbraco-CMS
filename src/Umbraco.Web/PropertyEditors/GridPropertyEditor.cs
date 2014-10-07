@@ -7,8 +7,8 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Core.Constants.PropertyEditors.CanvasAlias, "Canvas", "canvas", HideLabel=true,  IsParameterEditor = false, ValueType="JSON")]
-    public class CanvasPropertyEditor : PropertyEditor
+    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel=true,  IsParameterEditor = false, ValueType="JSON")]
+    public class GridPropertyEditor : PropertyEditor
     {
         /// <summary>
         /// Overridden to ensure that the value is validated
@@ -23,14 +23,14 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new canvasPreValueEditor();
+            return new gridPreValueEditor();
         }
 
     }
 
-    internal class canvasPreValueEditor : PreValueEditor
+    internal class gridPreValueEditor : PreValueEditor
     {
-        [PreValueField("items", "Canvas", "views/propertyeditors/canvas/canvas.prevalues.html", Description = "Canvas configuration")]
+        [PreValueField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
         public string Items { get; set; }
 
         [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]

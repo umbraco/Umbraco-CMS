@@ -1,8 +1,8 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.CanvasController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, canvasService, mediaResource, imageHelper, $timeout) {
+    .controller("Umbraco.PropertyEditors.GridController",
+    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout) {
 
-        // Canvas status variables
+        // Grid status variables
         $scope.currentRow = null;
         $scope.currentCell = null;
         $scope.currentToolsControl = null;
@@ -214,7 +214,7 @@ angular.module("umbraco")
             // Init row value
             row = $scope.initRow(row);
 
-            // Push the new row 
+            // Push the new row
             if(row){
                section.rows.push(row);
             }
@@ -490,13 +490,13 @@ angular.module("umbraco")
                     control.$editorPath = control.editor.view;
                 }else{
                     //use convention
-                    control.$editorPath = "views/propertyeditors/canvas/editors/" + control.editor.view + ".html";
+                    control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
                 }
             }
         };
 
 
-        canvasService.getGridEditors().then(function(response){
+        gridService.getGridEditors().then(function(response){
             $scope.availableEditors = response.data;
 
             $scope.contentReady = true;

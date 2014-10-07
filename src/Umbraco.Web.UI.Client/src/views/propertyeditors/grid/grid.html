@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.CanvasController" class="usky-grid">
+<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid">
 
 <div ng-if="contentReady">
     <!-- Template picker -->
@@ -125,7 +125,7 @@
                                                             </a>
                                                         </div>
 
-                                                        <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/canvas/dialogs/additem.html'"></div>
+                                                        <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
 
                                                     </div>
                                                 </div>
@@ -193,7 +193,7 @@
                                                         </a>
                                                     </div>
 
-                                                    <div ng-show="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/canvas/dialogs/additem.html'"></div>
+                                                    <div ng-show="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
                                                 </div>
 
                                             </div>
@@ -250,3 +250,6 @@
 </div>
 
 </div>
+
+
+

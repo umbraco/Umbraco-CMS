@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.Canvas.MediaController",
+    .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, $rootScope, $timeout, dialogService) {
 
     	$scope.setImage = function(){
@@ -21,3 +21,4 @@ angular.module("umbraco")
     		}
     	}, 200);
 });
+

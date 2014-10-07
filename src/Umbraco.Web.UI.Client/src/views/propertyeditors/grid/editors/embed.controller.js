@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.Canvas.EmbedController",
+    .controller("Umbraco.PropertyEditors.Grid.EmbedController",
     function ($scope, $rootScope, $timeout, dialogService) {
 
     	$scope.setEmbed = function(){
@@ -16,3 +16,4 @@ angular.module("umbraco")
     		}
     	}, 200);
 });
+

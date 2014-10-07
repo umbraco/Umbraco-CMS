@@ -307,7 +307,7 @@
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\CanvasDesignerController.cs" />
-    <Compile Include="CanvasTemplateExtensions.cs" />
+    <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\MemberBasic.cs" />
@@ -379,7 +379,7 @@
     <Compile Include="Mvc\NotFoundHandler.cs" />
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
-    <Compile Include="PropertyEditors\CanvasPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />

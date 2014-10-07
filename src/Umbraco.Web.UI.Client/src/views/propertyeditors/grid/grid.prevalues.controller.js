@@ -1,6 +1,6 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.CanvasPrevalueEditorController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, canvasService, imageHelper, $timeout) {
+    .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
+    function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, gridService, imageHelper, $timeout) {
 
         var emptyModel = {
             columns: 12,
@@ -76,7 +76,7 @@ angular.module("umbraco")
             $scope.model.value.templates.splice(index, 1);
         };
         $scope.closeTemplate = function(){
-           
+
            //clean-up
            _.forEach($scope.currentTemplate.sections, function(section, index){
                 if(section.grid <= 0){
@@ -140,7 +140,7 @@ angular.module("umbraco")
             $scope.model.value.layouts.splice(index, 1);
         };
         $scope.closeLayout = function(){
-           
+
            //clean-up
            _.forEach($scope.currentLayout.areas, function(area, index){
                 if(area.grid <= 0){
@@ -150,7 +150,7 @@ angular.module("umbraco")
 
            $scope.currentLayout = undefined;
         };
-        
+
 
         /****************
             area
@@ -187,14 +187,15 @@ angular.module("umbraco")
         $scope.scaleDown = function(section){
            var remove = (section.grid > 1) ? 1 : section.grid;
            section.grid = section.grid-remove;
-        };    
+        };
         $scope.toggleCollection = function(collection, toggle){
             if(toggle){
                 collection = [];
             }else{
                 delete collection;
             }
-        }
+        };
+        
         $scope.percentage = function(spans){
             return ((spans / $scope.model.value.columns) * 100).toFixed(1);
         };
@@ -226,12 +227,12 @@ angular.module("umbraco")
         /****************
             editors
         *****************/
-        canvasService.getGridEditors().then(function(response){
+        gridService.getGridEditors().then(function(response){
             $scope.editors = response.data;
         });
 
 
-        /* init grid data */  
+        /* init grid data */
         if (!$scope.model.value || $scope.model.value === "" || !$scope.model.value.templates) {
             $scope.model.value = emptyModel;
         } else {
@@ -240,4 +241,4 @@ angular.module("umbraco")
             }
         }
 
-    })
+    });

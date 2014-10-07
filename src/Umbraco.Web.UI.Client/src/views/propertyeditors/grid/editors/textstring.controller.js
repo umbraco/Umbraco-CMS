@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.Canvas.TextStringController",
+    .controller("Umbraco.PropertyEditors.Grid.TextStringController",
     function ($scope, $rootScope, $timeout, dialogService) {
 
         $scope.adjustSize = function(ev){
@@ -15,3 +15,4 @@ angular.module("umbraco")
         }
 
     });
+

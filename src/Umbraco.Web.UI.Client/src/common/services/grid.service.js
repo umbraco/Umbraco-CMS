@@ -1,7 +1,7 @@
 angular.module('umbraco.services')
-	.factory('canvasService', function ($http, $q){
+	.factory('gridService', function ($http, $q){
 
-		var configPath = "../config/canvas.editors.config.js";
+		var configPath = "../config/grid.editors.config.js";
         var service = {
 			getGridEditors: function () {
 				return $http.get(configPath);

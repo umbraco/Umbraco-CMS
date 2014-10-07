@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.Canvas.MacroController",
+    .controller("Umbraco.PropertyEditors.Grid.MacroController",
     function ($scope, $rootScope, $timeout, dialogService, macroResource, macroService,  $routeParams) {
 
         $scope.title = "Click to insert macro";
@@ -40,3 +40,4 @@ angular.module("umbraco")
             }
     	}, 200);
 });
+

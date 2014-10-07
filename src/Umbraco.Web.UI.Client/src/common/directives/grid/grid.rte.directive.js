@@ -1,5 +1,5 @@
-angular.module("umbraco")
-    .directive('canvasRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout) {
+angular.module("umbraco.directives")
+    .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout) {
         return {
             scope: {
                 uniqueId: '=',
@@ -75,7 +75,7 @@ angular.module("umbraco")
                                     }));
                             });
                         }else{
-                            stylesheets.push("views/propertyeditors/canvas/config/canvas.default.rtestyles.css");
+                            stylesheets.push("views/propertyeditors/grid/config/grid.default.rtestyles.css");
                             styleFormats = fallbackStyles;
                         }
 
