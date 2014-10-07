@@ -1,4 +1,7 @@
-//used for the media picker dialog
+
+//TODO: SD: Pretty sure we don't want this anymore and we should just be using the treepicker.html instead for all tree picking.
+
+//used for the content picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 	function ($scope, eventsService, entityResource, searchService, $log) {	
 	var dialogOptions = $scope.dialogOptions;
