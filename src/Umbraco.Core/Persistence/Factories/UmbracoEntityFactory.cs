@@ -99,11 +99,13 @@ namespace Umbraco.Core.Persistence.Factories
                 foreach (var propertyDto in dto.UmbracoPropertyDtos)
                 {
                     entity.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty
-                                                      {
-                                                          DataTypeControlId =
-                                                              propertyDto.DataTypeControlId,
-                                                          Value = propertyDto.UmbracoFile
-                                                      });
+                    {
+                        DataTypeControlId =
+                            propertyDto.DataTypeControlId,
+                        Value = propertyDto.NTextValue.IsNullOrWhiteSpace()
+                            ? propertyDto.NVarcharValue
+                            : propertyDto.NTextValue
+                    });
                 }
             }
 

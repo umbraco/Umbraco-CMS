@@ -77,6 +77,30 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Children_By_ParentId()
+        {
+            var service = ServiceContext.EntityService;
+
+            var entities = service.GetChildren(folderId);
+
+            Assert.That(entities.Any(), Is.True);
+            Assert.That(entities.Count(), Is.EqualTo(3));
+            Assert.That(entities.Any(x => x.Trashed), Is.False);
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Descendants_By_ParentId()
+        {
+            var service = ServiceContext.EntityService;
+
+            var entities = service.GetDescendents(folderId);
+
+            Assert.That(entities.Any(), Is.True);
+            Assert.That(entities.Count(), Is.EqualTo(4));
+            Assert.That(entities.Any(x => x.Trashed), Is.False);
+        }
+
+        [Test]
         public void EntityService_Throws_When_Getting_All_With_Invalid_Type()
         {
             var service = ServiceContext.EntityService;
@@ -129,7 +153,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll(UmbracoObjectTypes.Media);
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Count(), Is.EqualTo(3));
+            Assert.That(entities.Count(), Is.EqualTo(5));
             //Assert.That(entities.Any(x => ((UmbracoEntity)x).UmbracoFile != string.Empty), Is.True);
             Assert.That(
                 entities.Any(
@@ -139,6 +163,8 @@ namespace Umbraco.Tests.Services
         }
 
         private static bool _isSetup = false;
+
+        private int folderId;
 
         public override void CreateTestData()
         {
@@ -150,8 +176,9 @@ namespace Umbraco.Tests.Services
 
                 //Create and Save folder-Media -> 1050
                 var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
-                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);                
                 ServiceContext.MediaService.Save(folder, 0);
+                folderId = folder.Id;
 
                 //Create and Save image-Media -> 1051
                 var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
@@ -162,6 +189,12 @@ namespace Umbraco.Tests.Services
                 var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
                 var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
                 ServiceContext.MediaService.Save(file, 0);
+
+                var subfolder = MockedMedia.CreateMediaFolder(folderMediaType, folder.Id);
+                ServiceContext.MediaService.Save(subfolder, 0);
+                var subfolder2 = MockedMedia.CreateMediaFolder(folderMediaType, subfolder.Id);
+                ServiceContext.MediaService.Save(subfolder2, 0);
+                
             }
 
         }

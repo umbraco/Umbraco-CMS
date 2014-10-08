@@ -193,18 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {
-            //TODO: We need to fix all of this and how it handles parameters!
-
-            var wheres = query.GetWhereClauses().ToArray();
-
-            var sqlClause = GetBase(false, false, sql1 =>
-            {
-                //adds the additional filters
-                foreach (var whereClause in wheres)
-                {
-                    sql1.Where(whereClause.Item1, whereClause.Item2);
-                }
-            });
+            var sqlClause = GetBase(false, false, null);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var sql = translator.Translate().Append(GetGroupBy(false, false));
 
@@ -222,17 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
 
-            var wheres = query.GetWhereClauses().ToArray();
-
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql1 =>
-            {
-                //adds the additional filters
-                foreach (var whereClause in wheres)
-                {
-                    sql1.Where(whereClause.Item1, whereClause.Item2);    
-                }
-                
-            }, objectTypeId);
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
             
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
@@ -241,6 +220,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (isMedia)
             {
+                var wheres = query.GetWhereClauses().ToArray();
+
                 var mediaSql = GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), sql =>
                 {
                     //adds the additional filters
@@ -259,7 +240,8 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
-                var dtos = _work.Database.Fetch<dynamic>(entitySql.Append(GetGroupBy(isContent, false)));
+                var finalSql = entitySql.Append(GetGroupBy(isContent, false));
+                var dtos = _work.Database.Fetch<dynamic>(finalSql);
                 return dtos.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
             }
         }
@@ -362,10 +344,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var entitySql = new Sql()
                 .Select(columns.ToArray())
-                .From("umbracoNode umbracoNode")
-                .LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
-
-
+                .From("umbracoNode umbracoNode");
+                
             if (isContent || isMedia)
             {
                 entitySql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id")
@@ -377,6 +357,8 @@ namespace Umbraco.Core.Persistence.Repositories
                        "(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest")
                    .On("umbracoNode.id = latest.nodeId");
             }
+
+            entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
 
             if (customFilter != null)
             {
@@ -510,10 +492,16 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("controlId")]
             public Guid DataTypeControlId { get; set; }
 
-            [Column("umbracoFile")]
-            public string UmbracoFile { get; set; }
-        }
+            [Column("propertyTypeAlias")]
+            public string PropertyAlias { get; set; }
 
+            [Column("dataNvarchar")]
+            public string NVarcharValue { get; set; }
+
+            [Column("dataNtext")]
+            public string NTextValue { get; set; }
+        }
+        
         /// <summary>
         /// This is a special relator in that it is not returning a DTO but a real resolved entity and that it accepts
         /// a dynamic instance.
@@ -546,7 +534,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     Current.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty
                     {
                         DataTypeControlId = p.DataTypeControlId,
-                        Value = p.UmbracoFile
+                        Value = p.NTextValue.IsNullOrWhiteSpace()
+                                ? p.NVarcharValue
+                                : p.NTextValue
                     });
                     // Return null to indicate we're not done with this UmbracoEntity yet
                     return null;
@@ -568,7 +558,9 @@ namespace Umbraco.Core.Persistence.Repositories
                         new UmbracoEntity.UmbracoProperty
                             {
                                 DataTypeControlId = p.DataTypeControlId,
-                                Value = p.UmbracoFile
+                                Value = p.NTextValue.IsNullOrWhiteSpace()
+                                    ? p.NVarcharValue
+                                    : p.NTextValue
                             }
                     };
 
