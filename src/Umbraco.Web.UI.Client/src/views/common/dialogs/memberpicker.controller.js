@@ -30,6 +30,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
             }
         }
 
+
+        //TODO: This needs debounce!
         $scope.performSearch = function() {
             if ($scope.term) {
                 if ($scope.oldTerm !== $scope.term) {

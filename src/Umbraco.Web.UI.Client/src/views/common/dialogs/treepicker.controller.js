@@ -7,12 +7,20 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.section = dialogOptions.section;
 	    $scope.treeAlias = dialogOptions.treeAlias;
 	    $scope.multiPicker = dialogOptions.multiPicker;
-	    $scope.hideHeader = true; 
-	    $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
+	    $scope.hideHeader = true; 	    
 	    localizationService.localize("general_typeToSearch").then(function (value) {
 	        $scope.searchPlaceholderText = value;
 	    });
-	    $scope.selectedSearchResults = [];
+        $scope.searchInfo = {
+            selectedSearchResults: [],
+            searchStartNodeId: null,
+            searchStartNodeName: null,
+            showSearch: false,
+            term: null,
+            oldTerm: null,
+            results: []
+        }
+
 	    //create the custom query string param for this tree
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
 	    $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
@@ -59,8 +67,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	    function nodeSearchHandler(ev, args) {
             if (args.node.metaData.isContainer === true) {
-                $scope.showSearch = true;
-                $scope.searchSubHeader = args.node.name;
+                $scope.searchInfo.showSearch = true;
+                $scope.searchInfo.searchStartNodeName = args.node.name;
+                $scope.searchInfo.searchStartNodeId = args.node.id;
             }
         }
 
@@ -99,7 +108,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            if ($scope.multiPicker) {
 	                $scope.select(id);
 
-                    if (!$scope.searchSubHeader) {
+	                if (!$scope.searchInfo.searchStartNodeId) {
                         $scope.hideSearch();
                     }
 	            }
@@ -161,32 +170,34 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    };
 
         $scope.hideSearch = function() {
-            $scope.showSearch = false;
-            $scope.searchSubHeader = null;
-            $scope.term = "";
-            $scope.oldTerm = "";
-            $scope.results = [];
+            $scope.searchInfo.showSearch = false;
+            $scope.searchInfo.searchStartNodeName = null;
+            $scope.searchInfo.searchStartNodeId = null;
+            $scope.searchInfo.term = null;
+            $scope.searchInfo.oldTerm = null;            
+            $scope.searchInfo.results = [];
         }
 
 	    //handles the on key up for searching, but we don't want to over query so the result is debounced
 	    $scope.performSearch = _.debounce(function () {
 	        angularHelper.safeApply($scope, function() {
-	            if ($scope.term) {
-	                if ($scope.oldTerm !== $scope.term) {
-	                    $scope.results = [];
+	            if ($scope.searchInfo.term) {
+	                if ($scope.searchInfo.oldTerm !== $scope.searchInfo.term) {
+	                    $scope.searchInfo.results = [];
 
 	                    var searchArgs = {
-	                        term: $scope.term
+	                        term: $scope.searchInfo.term
 	                    };
-                        if (dialogOptions.startNodeId) {
-                            searchArgs["startNodeId"] = dialogOptions.startNodeId;
+                        //append a start node id, whether it's a global one, or based on a selected list view
+	                    if ($scope.searchInfo.searchStartNodeId || dialogOptions.startNodeId) {
+	                        searchArgs["startNodeId"] = $scope.searchInfo.searchStartNodeId ? $scope.searchInfo.searchStartNodeId : dialogOptions.startNodeId;
                         }
 	                    searcher(searchArgs).then(function (data) {
-	                        $scope.results = data;
+	                        $scope.searchInfo.results = data;
 	                    });
 
-	                    $scope.showSearch = true;
-	                    $scope.oldTerm = $scope.term;
+	                    $scope.searchInfo.showSearch = true;
+	                    $scope.searchInfo.oldTerm = $scope.searchInfo.term;
 	                }
 	            }
 	            else {

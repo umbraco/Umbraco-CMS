@@ -277,9 +277,9 @@ namespace Umbraco.Web.Editors
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    if (Security.CurrentUser.StartMediaId > 0)
+                    if (Security.CurrentUser.StartMediaId > 0 || startNodeId.HasValue)
                     {
-                        sb.Append("+__Path: \\-1\\," +
+                        sb.Append("+__Path: \\-1*\\," +
                             (startNodeId.HasValue ? startNodeId.Value : Security.CurrentUser.StartMediaId) + 
                             "\\,* ");
                     }
@@ -287,9 +287,9 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
-                    if (Security.CurrentUser.StartMediaId > 0)
+                    if (Security.CurrentUser.StartMediaId > 0 || startNodeId.HasValue)
                     {
-                        sb.Append("+__Path: \\-1\\," +
+                        sb.Append("+__Path: \\-1*\\," +
                             (startNodeId.HasValue ? startNodeId.Value : Security.CurrentUser.StartContentId) + 
                             "\\,* ");
                     }

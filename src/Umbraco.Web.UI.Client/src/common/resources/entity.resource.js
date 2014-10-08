@@ -263,14 +263,14 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type) {
+        search: function (query, type, startNodeId) {
             
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "Search",
-                       [{ query: query }, {type: type}])),
+                       [{ query: query }, { type: type }, { startNodeId: startNodeId }])),
                'Failed to retrieve entity data for query ' + query);
         },
         

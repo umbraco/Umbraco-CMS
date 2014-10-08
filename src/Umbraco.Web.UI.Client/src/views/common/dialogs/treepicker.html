@@ -2,25 +2,25 @@
     <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="form-search">
-                <i class="icon icon-search" ng-if="!showSearch"></i>
-                <a class="icon icon-delete" ng-if="showSearch" title="Cancel" ng-click="hideSearch()"></a>
+                <i class="icon icon-search" ng-if="!searchInfo.showSearch"></i>
+                <a class="icon icon-delete" ng-if="searchInfo.showSearch" title="Cancel" ng-click="hideSearch()"></a>
                 <input type="text"
-                    ng-model="term"
+                    ng-model="searchInfo.term"
                     class="umb-search-field search-query"
                     placeholder="{{searchPlaceholderText}}"
                     on-keyup="performSearch()"
-                    focus-when="{{showSearch}}">
-                <h4 ng-if="showSearch && searchSubHeader">
+                    focus-when="{{searchInfo.showSearch}}">
+                <h4 ng-if="searchInfo.showSearch && searchInfo.searchStartNodeName">
                     <small><localize key="general_search">Search</localize>:&nbsp;</small>
-                    {{searchSubHeader}}
+                    {{searchInfo.searchStartNodeName}}
                 </h4>
             </div>
         </div>        
     </div>
     <div class="umb-panel-body with-footer">
         
-        <div class="tab-content umb-control-group" ng-if="showSearch && selectedSearchResults.length > 0">
-            <div ng-if="showSearch">
+        <div class="tab-content umb-control-group" ng-if="searchInfo.showSearch && selectedSearchResults.length > 0">
+            <div ng-if="searchInfo.showSearch">
                 <ul class="umb-tree">
                     <li class="root">
                         <ul class="umb-search-group">
@@ -42,11 +42,11 @@
         <div class="tab-content umb-control-group">
 
             <!-- Search results -->
-            <div ng-if="showSearch">
+            <div ng-if="searchInfo.showSearch">
                 <ul class="umb-tree">
                     <li class="root">
                         <ul class="umb-search-group">
-                            <li ng-repeat="result in results">
+                            <li ng-repeat="result in searchInfo.results">
                                 <div style="padding-left: 20px">
                                     <a ng-class="{first:$first}" ng-click="selectResult(result)">
                                         <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
@@ -60,7 +60,7 @@
                 </ul>
             </div>
 
-            <div ng-hide="showSearch">
+            <div ng-hide="searchInfo.showSearch">
                 <umb-tree section="{{section}}"
                           treealias="{{treeAlias}}"
                           hideheader="{{hideHeader}}"
