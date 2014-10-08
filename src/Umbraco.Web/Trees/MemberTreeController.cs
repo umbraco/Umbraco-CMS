@@ -82,6 +82,7 @@ namespace Umbraco.Web.Trees
                     false);
 
                 node.AdditionalData.Add("contentType", member.ContentTypeAlias);
+                node.AdditionalData.Add("isContainer", true);
 
                 return node;
             }
@@ -135,6 +136,8 @@ namespace Umbraco.Web.Trees
 
             //There is no menu for any of these nodes
             nodes.ForEach(x => x.MenuUrl = null);
+            //All nodes are containers
+            nodes.ForEach(x => x.AdditionalData.Add("isContainer", true));
 
             return nodes;
         }

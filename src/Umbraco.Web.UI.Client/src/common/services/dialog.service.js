@@ -368,10 +368,12 @@ angular.module('umbraco.services')
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
-        contentPicker: function (options) {
-            options.template = 'views/common/dialogs/contentPicker.html';
-            options.show = true;
-            return openDialog(options);
+        contentPicker: function (options) {           
+
+            options.treeAlias = "content";
+            options.section = "content";
+
+            return this.treePicker(options);
         },
 
         /**
