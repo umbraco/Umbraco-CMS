@@ -82,10 +82,45 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        }
 	    }
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSearch", nodeSearchHandler);
+	    //wires up selection
+	    function nodeSelectHandler(ev, args) {
+	        args.event.preventDefault();
+	        args.event.stopPropagation();
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
+	        eventsService.emit("dialogs.treePickerController.select", args);
 
+	        if (args.node.filtered) {
+	            return;
+	        }
+
+	        //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
+	        //from the server in this method.
+	        select(args.node.name, args.node.id);
+
+	        toggleCheck(args.event, args.node);
+	    }
+
+        function toggleCheck(evt, node) {            
+            if ($scope.multiPicker) {
+                var c = $(evt.target.parentElement);
+                if (!node.selected) {
+                    node.selected = true;
+                    var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+                    var icon = c.find("i.umb-tree-icon");
+                    if (icon.length > 0) {
+                        icon.hide().after(temp);
+                    }
+                    else {
+                        c.prepend(temp);
+                    }
+                }
+                else {
+                    node.selected = false;
+                    c.find(".temporary").remove();
+                    c.find("i.umb-tree-icon").show();
+                }
+            }
+        }
 
 	    /** Method used for selecting a node */
 	    function select(text, id, entity) {
@@ -107,10 +142,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            
 	            if ($scope.multiPicker) {
 	                $scope.select(id);
-
-	                if (!$scope.searchInfo.searchStartNodeId) {
-                        $scope.hideSearch();
-                    }
 	            }
 	            else {
                     
@@ -153,20 +184,31 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            });
 	        }
 	    }
-
-
-
+        
 	    $scope.multiSubmit = function (result) {
 	        entityResource.getByIds(result, entityType).then(function (ents) {
 	            $scope.submit(ents);
 	        });
 	    };
-
-
+        
 	    /** method to select a search result */
-	    $scope.selectResult = function (result) {
+	    $scope.selectResult = function (evt, result) {
+	        result.selected = result.selected === true ? false : true;
+
 	        //since result = an entity, we'll pass it in so we don't have to go back to the server
 	        select(result.name, result.id, result);
+
+            if (result.selected) {
+                //add this to the list of selected search results so that when it's re-searched we 
+                // can show the checked boxes
+                $scope.searchInfo.selectedSearchResults.push(result.id);
+            }
+            else {
+                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function(itemId) {
+                    return itemId == result.id;
+                });
+            }
+	        
 	    };
 
         $scope.hideSearch = function() {
@@ -194,60 +236,29 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                         }
 	                    searcher(searchArgs).then(function (data) {
 	                        $scope.searchInfo.results = data;
+	                        //now we need to look in the already selected search results and 
+	                        // toggle the check boxes for those ones
+	                        _.each($scope.searchInfo.results, function(result) {
+	                            var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+	                                return result.id == selectedId;
+	                            });
+                                if (exists) {
+                                    result.selected = true;
+                                }
+	                        });
+                            
 	                    });
 
 	                    $scope.searchInfo.showSearch = true;
 	                    $scope.searchInfo.oldTerm = $scope.searchInfo.term;
 	                }
 	            }
-	            else {
-
-	                //if (!$scope.searchSubHeader) {
-	                //    $scope.hideSearch();
-	                //}
-	                
-	            }
 	        });
 	        
 	    }, 200);
 
-	    //wires up selection
-	    function nodeSelectHandler(ev, args) {
-	        args.event.preventDefault();
-	        args.event.stopPropagation();
-
-	        eventsService.emit("dialogs.treePickerController.select", args);
-
-	        if (args.node.filtered) {
-	            return;
-	        }
-
-	        //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
-	        //from the server in this method.
-	        select(args.node.name, args.node.id);
-
-	        //ui...
-	        if ($scope.multiPicker) {
-	            var c = $(args.event.target.parentElement);
-	            if (!args.node.selected) {
-	                args.node.selected = true;
-	                var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-	                var icon = c.find("i.umb-tree-icon");
-	                if (icon.length > 0) {
-	                    icon.hide().after(temp);
-	                }
-	                else {
-	                    c.prepend(temp);
-	                }
-	            }
-	            else {
-	                args.node.selected = false;
-	                c.find(".temporary").remove();
-	                c.find("i.umb-tree-icon").show();
-	            }
-	        }
-	    }
-
+	    $scope.dialogTreeEventHandler.bind("treeNodeSearch", nodeSearchHandler);
+	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 
 	    $scope.$on('$destroy', function () {
