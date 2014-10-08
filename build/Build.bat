@@ -4,7 +4,7 @@ IF NOT EXIST UmbracoVersion.txt (
 	GOTO :showerror
 ) 
 SET /p release=<UmbracoVersion.txt
-SET comment=alpha
+SET comment=beta
 SET version=%release%
 
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
