@@ -3,76 +3,81 @@
 
 //used for the content picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
-	function ($scope, eventsService, entityResource, searchService, $log) {	
-	var dialogOptions = $scope.dialogOptions;
-	$scope.dialogTreeEventHandler = $({});
-	$scope.results = [];
+	function ($scope, eventsService, entityResource, searchService, $log) {
+	    var dialogOptions = $scope.dialogOptions;
+	    $scope.dialogTreeEventHandler = $({});
+	    $scope.results = [];
 
-	$scope.selectResult = function(result){
-		entityResource.getById(result.id, "Document").then(function(ent){
-			if(dialogOptions && dialogOptions.multiPicker){
-				
-				$scope.showSearch = false;
-				$scope.results = [];
-				$scope.term = "";
-				$scope.oldTerm = undefined;
+	    $scope.selectResult = function (result) {
+	        entityResource.getById(result.id, "Document").then(function (ent) {
+	            if (dialogOptions && dialogOptions.multiPicker) {
 
-				$scope.select(ent);
-			}else{
-				$scope.submit(ent);
-			}
-		});
-	};
+	                $scope.showSearch = false;
+	                $scope.results = [];
+	                $scope.term = "";
+	                $scope.oldTerm = undefined;
 
-	$scope.performSearch = function(){
-		if($scope.term){
-			if($scope.oldTerm !== $scope.term){
-				$scope.results = [];
-			    searchService.searchContent({ term: $scope.term }).then(function(data) {
-			        $scope.results = data;
-			    });
-				$scope.showSearch = true;
-				$scope.oldTerm = $scope.term;
-			}
-		}else{
-			$scope.oldTerm = "";
-			$scope.showSearch = false;
-			$scope.results = [];
-		}
-	};
+	                $scope.select(ent);
+	            } else {
+	                $scope.submit(ent);
+	            }
+	        });
+	    };
 
+	    $scope.performSearch = function () {
+	        if ($scope.term) {
+	            if ($scope.oldTerm !== $scope.term) {
+	                $scope.results = [];
+	                searchService.searchContent({ term: $scope.term }).then(function (data) {
+	                    $scope.results = data;
+	                });
+	                $scope.showSearch = true;
+	                $scope.oldTerm = $scope.term;
+	            }
+	        } else {
+	            $scope.oldTerm = "";
+	            $scope.showSearch = false;
+	            $scope.results = [];
+	        }
+	    };
 
-	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
-		args.event.preventDefault();
-		args.event.stopPropagation();
+	    function nodeSelectHandler (ev, args) {
+	        args.event.preventDefault();
+	        args.event.stopPropagation();
 
-		eventsService.emit("dialogs.contentPicker.select", args);
-	    
-		if (dialogOptions && dialogOptions.multiPicker) {
+	        eventsService.emit("dialogs.contentPicker.select", args);
 
-		    var c = $(args.event.target.parentElement);
-		    if (!args.node.selected) {
-		        args.node.selected = true;
+	        if (dialogOptions && dialogOptions.multiPicker) {
 
-		        var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-		        var icon = c.find("i.umb-tree-icon");
-		        if (icon.length > 0) {
-		            icon.hide().after(temp);
-		        } else {
-		            c.prepend(temp);
-		        }
+	            var c = $(args.event.target.parentElement);
+	            if (!args.node.selected) {
+	                args.node.selected = true;
 
-		    } else {
-		        args.node.selected = false;
-		        c.find(".temporary").remove();
-		        c.find("i.umb-tree-icon").show();
-		    }
+	                var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+	                var icon = c.find("i.umb-tree-icon");
+	                if (icon.length > 0) {
+	                    icon.hide().after(temp);
+	                } else {
+	                    c.prepend(temp);
+	                }
 
-		    $scope.select(args.node);
+	            } else {
+	                args.node.selected = false;
+	                c.find(".temporary").remove();
+	                c.find("i.umb-tree-icon").show();
+	            }
 
-		} else {
-		    $scope.submit(args.node);
-		}
+	            $scope.select(args.node);
 
+	        } else {
+	            $scope.submit(args.node);
+	        }
+
+	    }
+
+	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+
+	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+	    });
 	});
-});

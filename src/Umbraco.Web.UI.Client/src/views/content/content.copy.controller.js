@@ -9,7 +9,7 @@ angular.module("umbraco")
 
 	    var node = dialogOptions.currentNode;
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", function (ev, args) {
+	    function nodeSelectHandler(ev, args) {
 	        args.event.preventDefault();
 	        args.event.stopPropagation();
 
@@ -32,7 +32,9 @@ angular.module("umbraco")
 	        $scope.target = args.node;
 	        $scope.selectedEl = c;
 
-	    });
+	    }
+
+	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 
 	    $scope.copy = function () {
 	        contentResource.copy({ parentId: $scope.target.id, id: node.id, relateToOriginal: $scope.relateToOriginal })
@@ -59,4 +61,8 @@ angular.module("umbraco")
                     $scope.error = err;
                 });
 	    };
+
+	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+	    });
 	});

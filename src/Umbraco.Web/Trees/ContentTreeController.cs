@@ -94,7 +94,11 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 
                 if (isContainer)
+                {
+                    node.AdditionalData.Add("isContainer", true);
                     node.SetContainerStyle();
+                }
+                    
 
                 if (entity.IsPublished == false)
                     node.SetNotPublishedStyle();

@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
-	function ($scope, entityResource, eventsService, $log, searchService, angularHelper) {
+	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService) {
 
 	    var dialogOptions = $scope.dialogOptions;
 	    $scope.dialogTreeEventHandler = $({});
@@ -9,7 +9,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.multiPicker = dialogOptions.multiPicker;
 	    $scope.hideHeader = true; 
 	    $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
-
+	    localizationService.localize("general_typeToSearch").then(function (value) {
+	        $scope.searchPlaceholderText = value;
+	    });
+	    $scope.selectedSearchResults = [];
 	    //create the custom query string param for this tree
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
 	    $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
@@ -52,13 +55,27 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        if (dialogOptions.filter[0] === "{") {
 	            dialogOptions.filterAdvanced = true;
 	        }
-
-	        $scope.dialogTreeEventHandler.bind("treeNodeExpanded", function (ev, args) {
-	            if (angular.isArray(args.children)) {
-	                performFiltering(args.children);
-	            }
-	        });
 	    }
+
+	    function nodeSearchHandler(ev, args) {
+            if (args.node.metaData.isContainer === true) {
+                $scope.showSearch = true;
+                $scope.searchSubHeader = args.node.name;
+            }
+        }
+
+	    function nodeExpandedHandler(ev, args) {            
+	        if (angular.isArray(args.children)) {	            
+	            //check filter
+	            if (dialogOptions.filter) {	             
+	                performFiltering(args.children);	             
+	            }
+	        }
+	    }
+
+	    $scope.dialogTreeEventHandler.bind("treeNodeSearch", nodeSearchHandler);
+
+	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
 
 	    /** Method used for selecting a node */
@@ -78,14 +95,22 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                $scope.submit(node);
 	            }
 	        } else {
-	            $scope.showSearch = false;
-	            $scope.results = [];
-	            $scope.term = "";
-	            $scope.oldTerm = undefined;
-
+	            
 	            if ($scope.multiPicker) {
 	                $scope.select(id);
-	            } else {
+
+                    if (!$scope.searchSubHeader) {
+                        $scope.hideSearch();
+                    }
+	            }
+	            else {
+
+	                $scope.results = [];
+	                $scope.term = "";
+	                $scope.oldTerm = undefined;
+
+	                $scope.hideSearch();
+
 	                //if an entity has been passed in, use it
 	                if (entity) {
 	                    $scope.submit(entity);
@@ -139,6 +164,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        select(result.name, result.id, result);
 	    };
 
+        $scope.hideSearch = function() {
+            $scope.showSearch = false;
+            $scope.searchSubHeader = null;
+        }
 
 	    //handles the on key up for searching, but we don't want to over query so the result is debounced
 	    $scope.performSearch = _.debounce(function () {
@@ -162,16 +191,20 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                }
 	            }
 	            else {
-	                $scope.oldTerm = "";
-	                $scope.showSearch = false;
-	                $scope.results = [];
+
+	                //if (!$scope.searchSubHeader) {
+	                //    $scope.oldTerm = "";
+	                //    $scope.hideSearch();
+	                //    $scope.results = [];
+	                //}
+	                
 	            }
 	        });
 	        
 	    }, 200);
 
 	    //wires up selection
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", function (ev, args) {
+	    function nodeSelectHandler(ev, args) {
 	        args.event.preventDefault();
 	        args.event.stopPropagation();
 
@@ -205,5 +238,13 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                c.find("i.umb-tree-icon").show();
 	            }
 	        }
+	    }
+
+	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+
+	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
+	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+	        $scope.dialogTreeEventHandler.unbind("treeNodeSearch", nodeSearchHandler);
 	    });
 	});

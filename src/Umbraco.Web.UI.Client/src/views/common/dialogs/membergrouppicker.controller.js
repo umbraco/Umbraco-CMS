@@ -34,8 +34,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
             }
         }
 
-
-        $scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args) {
+        function nodeSelectHandler(ev, args) {
             args.event.preventDefault();
             args.event.stopPropagation();
 
@@ -63,5 +62,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
                 }
             }
 
+        }
+
+        $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+
+        $scope.$on('$destroy', function () {
+            $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
         });
     });

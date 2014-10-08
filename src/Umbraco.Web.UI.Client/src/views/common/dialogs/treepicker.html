@@ -2,20 +2,47 @@
     <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="form-search">
-                <i class="icon-search"></i>
+                <i class="icon-search" ng-if="!showSearch"></i>
+                <a class="icon-delete" ng-if="showSearch" title="Cancel" ng-click="hideSearch()"></a>
                 <input type="text"
                     ng-model="term"
                     class="umb-search-field search-query"
-                    placeholder="Search..."
-                    on-keyup="performSearch()">
+                    placeholder="{{searchPlaceholderText}}"
+                    on-keyup="performSearch()"
+                    focus-when="{{showSearch}}">
+                <h4 ng-if="showSearch && searchSubHeader">
+                    <small><localize key="general_search">Search</localize>:&nbsp;</small>
+                    {{searchSubHeader}}
+                </h4>
             </div>
-        </div>
+        </div>        
     </div>
     <div class="umb-panel-body with-footer">
+        
+        <div class="tab-content umb-control-group" ng-if="showSearch && selectedSearchResults.length > 0">
+            <div ng-if="showSearch">
+                <ul class="umb-tree">
+                    <li class="root">
+                        <ul class="umb-search-group">
+                            <li ng-repeat="result in selectedSearchResults">
+                                <div style="padding-left: 20px">
+                                    <a ng-class="{first:$first}" ng-click="selectResult(result)">
+                                        <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
+                                        {{result.name}}
+                                        <small class="search-subtitle" ng-if="result.subTitle">{{result.subTitle}}</small>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         <div class="tab-content umb-control-group">
 
             <!-- Search results -->
-            <div ng-show="showSearch">
+            <div ng-if="showSearch">
                 <ul class="umb-tree">
                     <li class="root">
                         <ul class="umb-search-group">
@@ -24,7 +51,7 @@
                                     <a ng-class="{first:$first}" ng-click="selectResult(result)">
                                         <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
                                         {{result.name}}
-                                        <small class="search-subtitle" ng-show="result.subTitle">{{result.subTitle}}</small>
+                                        <small class="search-subtitle" ng-if="result.subTitle">{{result.subTitle}}</small>
                                     </a>
                                 </div>
                             </li>
@@ -56,7 +83,7 @@
 
                 <button
                     class="btn btn-primary"
-                    ng-show="dialogOptions.multiPicker"
+                    ng-if="dialogOptions.multiPicker"
                     ng-click="multiSubmit(dialogData.selection)">
                     <localize key="buttons_select">Select</localize>
                     ({{dialogData.selection.length}})
