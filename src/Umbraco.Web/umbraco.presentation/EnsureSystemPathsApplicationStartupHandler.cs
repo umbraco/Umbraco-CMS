@@ -16,7 +16,6 @@ namespace umbraco.presentation
         {
             base.ApplicationInitialized(umbracoApplication, applicationContext);
 
-            EnsurePathExists("~/App_Code");
             EnsurePathExists("~/App_Data");
             EnsurePathExists(SystemDirectories.AppPlugins);
             EnsurePathExists(SystemDirectories.Css);
