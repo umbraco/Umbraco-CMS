@@ -104,11 +104,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                     }
 	            }
 	            else {
-
-	                $scope.results = [];
-	                $scope.term = "";
-	                $scope.oldTerm = undefined;
-
+                    
 	                $scope.hideSearch();
 
 	                //if an entity has been passed in, use it
@@ -167,6 +163,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
         $scope.hideSearch = function() {
             $scope.showSearch = false;
             $scope.searchSubHeader = null;
+            $scope.term = "";
+            $scope.oldTerm = "";
+            $scope.results = [];
         }
 
 	    //handles the on key up for searching, but we don't want to over query so the result is debounced
@@ -193,9 +192,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            else {
 
 	                //if (!$scope.searchSubHeader) {
-	                //    $scope.oldTerm = "";
 	                //    $scope.hideSearch();
-	                //    $scope.results = [];
 	                //}
 	                
 	            }
