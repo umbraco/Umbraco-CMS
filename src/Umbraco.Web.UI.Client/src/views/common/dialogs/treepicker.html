@@ -14,26 +14,6 @@
     </div>
     <div class="umb-panel-body with-footer">
         
-        <div class="tab-content umb-control-group" ng-if="searchInfo.showSearch && selectedSearchResults.length > 0">
-            <div ng-if="searchInfo.showSearch">
-                <ul class="umb-tree">
-                    <li class="root">
-                        <ul class="umb-search-group">
-                            <li ng-repeat="result in selectedSearchResults">
-                                <div style="padding-left: 20px">
-                                    <a ng-class="{first:$first}" ng-click="selectResult(result)">
-                                        <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
-                                        {{result.name}}
-                                        <small class="search-subtitle" ng-if="result.subTitle">{{result.subTitle}}</small>
-                                    </a>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
         <div class="tab-content umb-control-group">
             
             <umb-tree-search-results 

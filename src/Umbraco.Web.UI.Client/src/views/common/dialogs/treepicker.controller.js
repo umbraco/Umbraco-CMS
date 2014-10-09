@@ -188,6 +188,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	    $scope.hideSearch = function () {
             
+	        //TODO: Move this to the treeService, we don't need a reference to the 'tree' the way this is working
+	        // because if we have a single node, that is all we need since we can traverse to the tree root in the treeService.
+            // this logic needs to be centralized so it can be used in other tree + search areas.
+
 	        if (tree) {
 
 	            //we need to ensure that any currently displayed nodes that get selected
