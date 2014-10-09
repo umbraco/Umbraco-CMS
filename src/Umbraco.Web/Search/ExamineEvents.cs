@@ -392,8 +392,12 @@ namespace Umbraco.Web.Search
         
         private static void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
+            var xml = sender.ToXml();
+            //add an icon attribute to get indexed
+            xml.Add(new XAttribute("icon", sender.ContentType.Icon));
+
             ExamineManager.Instance.ReIndexNode(
-                sender.ToXml(), IndexTypes.Media,
+                xml, IndexTypes.Media,
                 ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
 
                     //Index this item for all indexers if the media is not trashed, otherwise if the item is trashed
@@ -433,8 +437,12 @@ namespace Umbraco.Web.Search
 	    /// </param>
 	    private static void ReIndexForContent(IContent sender, bool isContentPublished)
 	    {
+            var xml = sender.ToXml();
+            //add an icon attribute to get indexed
+            xml.Add(new XAttribute("icon", sender.ContentType.Icon));
+
 	        ExamineManager.Instance.ReIndexNode(
-	            sender.ToXml(), IndexTypes.Content,
+                xml, IndexTypes.Content,
 	            ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
                     
 	                //Index this item for all indexers if the content is published, otherwise if the item is not published

@@ -70,7 +70,7 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="xpath"></param>
         /// <returns></returns>
-		
+        [Obsolete("This should no longer be used, latest content will be indexed by using the IContentService directly")]
 		public XDocument GetLatestContentByXPath(string xpath)
         {
             var xmlContent = XDocument.Parse("<content></content>");

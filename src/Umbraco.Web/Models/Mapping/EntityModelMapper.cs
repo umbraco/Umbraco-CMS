@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
+using UmbracoExamine;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<SearchResult, EntityBasic>()
                 //default to document icon
-                  .ForMember(x => x.Icon, expression => expression.UseValue("icon-document"))
+                  .ForMember(x => x.Icon, expression => expression.Ignore())
                   .ForMember(x => x.Id, expression => expression.MapFrom(result => result.Id))
                   .ForMember(x => x.Name, expression => expression.Ignore())
                   .ForMember(x => x.Key, expression => expression.Ignore())
@@ -57,6 +58,11 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(x => x.AdditionalData, expression => expression.Ignore())
                   .AfterMap((result, basic) =>
                       {
+                          //get the icon if there is one
+                          basic.Icon = result.Fields.ContainsKey(UmbracoContentIndexer.IconFieldName) 
+                              ? result.Fields[UmbracoContentIndexer.IconFieldName] 
+                              : "icon-document";
+
                           basic.Name = result.Fields.ContainsKey("nodeName") ? result.Fields["nodeName"] : "[no name]";
                           if (result.Fields.ContainsKey("__NodeKey"))
                           {

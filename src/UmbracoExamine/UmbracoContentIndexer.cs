@@ -125,6 +125,7 @@ namespace UmbracoExamine
         /// </summary>
         public const string IndexPathFieldName = "__Path";
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
+        public const string IconFieldName = "__Icon";
 
         /// <summary>
         /// The prefix added to a field when it is duplicated in order to store the original raw value.
@@ -417,11 +418,16 @@ namespace UmbracoExamine
             var serializer = new EntityXmlSerializer();
             foreach (var m in media)
             {
-                yield return serializer.Serialize(
+                var xml = serializer.Serialize(
                     _mediaService,
                     _dataTypeService,
                     _userService,
                     m);
+
+                //add a custom 'icon' attribute
+                xml.Add(new XAttribute("icon", m.ContentType.Icon));
+
+                yield return xml;
             }
         }
 
@@ -430,11 +436,16 @@ namespace UmbracoExamine
             var serializer = new EntityXmlSerializer();
             foreach (var c in content)
             {
-                yield return serializer.Serialize(
+                var xml = serializer.Serialize(
                     _contentService,
                     _dataTypeService,
                     _userService,
                     c);
+
+                //add a custom 'icon' attribute
+                xml.Add(new XAttribute("icon", c.ContentType.Icon));
+
+                yield return xml;
             }
         }
 
@@ -476,6 +487,7 @@ namespace UmbracoExamine
 
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
+
             //strip html of all users fields if we detect it has HTML in it. 
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
@@ -497,15 +509,21 @@ namespace UmbracoExamine
 
             base.OnGatheringNodeData(e);
 
-            //ensure the special path and node type alis fields is added to the dictionary to be saved to file
+            //ensure the special path and node type alias fields is added to the dictionary to be saved to file
             var path = e.Node.Attribute("path").Value;
             if (!e.Fields.ContainsKey(IndexPathFieldName))
                 e.Fields.Add(IndexPathFieldName, path);
 
-            //this needs to support both schemas so get the nodeTypeAlias if it exists, otherwise the name
+            //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
             var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
             if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
                 e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
+
+            //add icon 
+            var icon = (string)e.Node.Attribute("icon");
+            if (!e.Fields.ContainsKey(IconFieldName))
+                e.Fields.Add(IconFieldName, icon);  
+            
         }
 
         /// <summary>
@@ -535,6 +553,9 @@ namespace UmbracoExamine
 
             //adds the special node type alias property to the index
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
+
+            //icon
+            fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);
 
             return fields;
 
