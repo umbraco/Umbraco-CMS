@@ -5,12 +5,13 @@
 * @element ANY
 * @restrict E
 **/
-function treeSearchBox(localizationService) {
+function treeSearchBox(localizationService, searchService) {
     return {
         scope: {
             searchFrom: "@",
             searchFromName: "@",
             showSearch: "@",
+            section: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -33,14 +34,39 @@ function treeSearchBox(localizationService) {
                 scope.showSearch = "false";
             }
 
+            function performSearch() {
+                if (scope.term) {
+                    scope.results = [];
+
+                    var searchArgs = {
+                        term: scope.term
+                    };
+                    //append a start node context if there is one
+                    if (scope.searchFrom) {
+                        searchArgs["searchFrom"] = scope.searchFrom;
+                    }
+                    searcher(searchArgs).then(function (data) {
+                        scope.searchCallback(data);
+                    });
+                }
+            }
+
             scope.$watch("term", _.debounce(function(newVal, oldVal) {
                 scope.$apply(function() {
                     if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-                        scope.searchCallback(newVal);
+                        performSearch();
                     }
                 });
             }, 200));
 
+            var searcher = searchService.searchContent;
+            //search
+            if (scope.section === "member") {
+                searcher = searchService.searchMembers;             
+            }
+            else if (scope.section === "media") {
+                searcher = searchService.searchMedia;
+            }
         }
     };
 }

@@ -10,7 +10,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.multiPicker = dialogOptions.multiPicker;
 	    $scope.hideHeader = true; 	    	    
         $scope.searchInfo = {
-            searchFrom: null,
+            searchFrom: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
             results: []
@@ -20,8 +20,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
 	    $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
 
-	    //search defaults
-	    var searcher = searchService.searchContent;
 	    var entityType = "Document";
 	    
 
@@ -33,13 +31,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        dialogOptions.maxNumber = parseInt(dialogOptions.maxNumber, 10);
 	    }
 
-	    //search
 	    if (dialogOptions.section === "member") {
-	        searcher = searchService.searchMembers;
 	        entityType = "Member";            
 	    }
-	    else if (dialogOptions.section === "media") {
-	        searcher = searchService.searchMedia;
+	    else if (dialogOptions.section === "media") {	    
 	        entityType = "Media";
 	    }
 
@@ -223,40 +218,24 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        
 
             $scope.searchInfo.showSearch = false;
-            $scope.searchInfo.searchFromName = null;
+            $scope.searchInfo.searchFromName = dialogOptions.startNodeId;
             $scope.searchInfo.searchFrom = null;
             $scope.searchInfo.results = [];
         }
 
-	    //handles the on key up for searching, but we don't want to over query so the result is debounced
-	    $scope.performSearch = function(term) {
-	        if (term) {
-	            $scope.searchInfo.results = [];
+	    $scope.onSearchResults = function(results) {
+	        $scope.searchInfo.results = results;
 
-	            var searchArgs = {
-	                term: term
-	            };
-	            //append a start node id, whether it's a global one, or based on a selected list view
-	            if ($scope.searchInfo.searchFrom || dialogOptions.startNodeId) {
-	                searchArgs["searchFrom"] = $scope.searchInfo.searchFrom ? $scope.searchInfo.searchFrom : dialogOptions.startNodeId;
-	            }
-	            searcher(searchArgs).then(function (data) {
-	                $scope.searchInfo.results = data;
-	                //now we need to look in the already selected search results and 
-	                // toggle the check boxes for those ones
-	                _.each($scope.searchInfo.results, function (result) {
-	                    var exists = _.find($scope.dialogData.selection, function (selectedId) {
-	                        return result.id == selectedId;
-	                    });
-	                    if (exists) {
-	                        result.selected = true;
-	                    }
-	                });
-
+	        _.each($scope.searchInfo.results, function (result) {
+	            var exists = _.find($scope.dialogData.selection, function (selectedId) {
+	                return result.id == selectedId;
 	            });
+	            if (exists) {
+	                result.selected = true;
+	            }
+	        });
 
-	            $scope.searchInfo.showSearch = true;
-	        }
+	        $scope.searchInfo.showSearch = true;
 	    };
 
 	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
