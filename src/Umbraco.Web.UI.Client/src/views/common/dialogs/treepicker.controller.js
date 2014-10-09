@@ -63,7 +63,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        if (dialogOptions.filter[0] === "{") {
 	            dialogOptions.filterAdvanced = true;
 	        }
-	    }
+	    } 
 
 	    function nodeSearchHandler(ev, args) {
             if (args.node.metaData.isContainer === true) {
@@ -78,16 +78,17 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	            //TODO: Not only this but we need to ensure that any currently displayed nodes that get selected
                 // from the search get updated to have a check box!
-	            ////now we need to look in the already selected search results and 
-	            //// toggle the check boxes for those ones that are listed
-	            //_.each($scope.searchInfo.results, function (result) {
-	            //    var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
-	            //        return result.id == selectedId;
-	            //    });
-	            //    if (exists) {
-	            //        result.selected = true;
-	            //    }
-	            //});
+
+	            //now we need to look in the already selected search results and 
+	            // toggle the check boxes for those ones that are listed
+	            _.each(args.children, function (result) {
+	                var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+	                    return result.id == selectedId;
+	                });
+	                if (exists) {
+	                    result.selected = true;
+	                }
+	            });
 
 	            //check filter
 	            if (dialogOptions.filter) {	             
@@ -135,7 +136,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        else {
 	            
 	            if ($scope.multiPicker) {
-	                $scope.select(id);
+	                $scope.select(Number(id));
 	            }
 	            else {
                     
