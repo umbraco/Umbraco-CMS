@@ -19,7 +19,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             isdialog: '@',
             //Custom query string arguments to pass in to the tree as a string, example: "startnodeid=123&something=value"
             customtreeparams: '@',
-            eventhandler: '='
+            eventhandler: '=',
+            enablecheckboxes: '@',
+            enablelistviewsearch: '@'
         },
 
         compile: function(element, attrs) {
@@ -32,7 +34,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
             template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';

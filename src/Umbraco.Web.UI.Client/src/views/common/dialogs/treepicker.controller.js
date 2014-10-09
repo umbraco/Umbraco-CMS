@@ -74,7 +74,21 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
         }
 
 	    function nodeExpandedHandler(ev, args) {            
-	        if (angular.isArray(args.children)) {	            
+	        if (angular.isArray(args.children)) {
+
+	            //TODO: Not only this but we need to ensure that any currently displayed nodes that get selected
+                // from the search get updated to have a check box!
+	            ////now we need to look in the already selected search results and 
+	            //// toggle the check boxes for those ones that are listed
+	            //_.each($scope.searchInfo.results, function (result) {
+	            //    var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+	            //        return result.id == selectedId;
+	            //    });
+	            //    if (exists) {
+	            //        result.selected = true;
+	            //    }
+	            //});
+
 	            //check filter
 	            if (dialogOptions.filter) {	             
 	                performFiltering(args.children);	             
@@ -97,30 +111,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        //from the server in this method.
 	        select(args.node.name, args.node.id);
 
-	        toggleCheck(args.event, args.node);
+            //toggle checked state
+	        args.node.selected = args.node.selected === true ? false : true;
 	    }
-
-        function toggleCheck(evt, node) {            
-            if ($scope.multiPicker) {
-                var c = $(evt.target.parentElement);
-                if (!node.selected) {
-                    node.selected = true;
-                    var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-                    var icon = c.find("i.umb-tree-icon");
-                    if (icon.length > 0) {
-                        icon.hide().after(temp);
-                    }
-                    else {
-                        c.prepend(temp);
-                    }
-                }
-                else {
-                    node.selected = false;
-                    c.find(".temporary").remove();
-                    c.find("i.umb-tree-icon").show();
-                }
-            }
-        }
 
 	    /** Method used for selecting a node */
 	    function select(text, id, entity) {

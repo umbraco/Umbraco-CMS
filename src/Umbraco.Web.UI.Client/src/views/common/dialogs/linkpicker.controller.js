@@ -45,38 +45,24 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        args.event.stopPropagation();
 
 	        eventsService.emit("dialogs.linkPicker.select", args);
+            
+	        if ($scope.currentNode) {
+                //un-select if there's a current one selected
+	            $scope.currentNode.selected = false;
+	        }
 
-	        var c = $(args.event.target.parentElement);
+	        $scope.currentNode = args.node;
+	        $scope.currentNode.selected = true;
+	        $scope.target.id = args.node.id;
+	        $scope.target.name = args.node.name;
 
-	        //renewing
-	        if (args.node !== $scope.target) {
-	            if ($scope.selectedEl) {
-	                $scope.selectedEl.find(".temporary").remove();
-	                $scope.selectedEl.find("i.umb-tree-icon").show();
-	            }
-
-	            $scope.selectedEl = c;
-	            $scope.target.id = args.node.id;
-	            $scope.target.name = args.node.name;
-
-	            $scope.selectedEl.find("i.umb-tree-icon")
-                 .hide()
-                 .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
-
-	            if (args.node.id < 0) {
-	                $scope.target.url = "/";
-	            } else {
-	                contentResource.getNiceUrl(args.node.id).then(function (url) {
-	                    $scope.target.url = url;
-	                });
-	            }
-	        } else {
-	            $scope.target = undefined;
-	            //resetting
-	            if ($scope.selectedEl) {
-	                $scope.selectedEl.find(".temporary").remove();
-	                $scope.selectedEl.find("i.umb-tree-icon").show();
-	            }
+	        if (args.node.id < 0) {
+	            $scope.target.url = "/";
+	        }
+	        else {
+	            contentResource.getNiceUrl(args.node.id).then(function (url) {
+	                $scope.target.url = url;
+	            });
 	        }
 
 	        if (!angular.isUndefined($scope.target.isMedia)) {

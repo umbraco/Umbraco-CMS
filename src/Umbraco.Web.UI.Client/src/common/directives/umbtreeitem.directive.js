@@ -25,7 +25,6 @@ angular.module("umbraco.directives")
 
         scope: {
             section: '@',
-            cachekey: '@',
             eventhandler: '=',
             currentNode: '=',
             node: '=',
@@ -33,10 +32,13 @@ angular.module("umbraco.directives")
         },
 
         template: '<li ng-class="{\'current\': (node == currentNode)}" on-right-click="altSelect(node, $event)"><div ng-style="setTreePadding(node)" ng-class="node.stateCssClass" ng-class="{\'loading\': node.loading}" ng-swipe-right="options(this, node, $event)" >' +
-            '<ins ng-if="node.metaData.isContainer && node.metaData.isDialog" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' +
+            //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
+            '<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' +
             '<ins ng-if="node.hasChildren" style="width:18px;"></ins>' +
             '<ins ng-if="node.hasChildren" ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
-            '<i title="#{{node.routePath}}" class="{{node.cssClass}}"></i>' +
+            //NOTE: If the tree supports check boxes, render different markup
+            '<i ng-if="tree.enablecheckboxes == \'true\'" title="#{{node.routePath}}" ng-class="selectEnabledNodeClass(node)"></i>' +
+            '<i ng-if="!tree.enablecheckboxes || tree.enablecheckboxes == \'false\'" title="#{{node.routePath}}" class="{{node.cssClass}}"></i>' +
             '<a href ng-click="select(node, $event)" on-right-click="altSelect(node, $event)" ng-bind-html="node.name"></a>' +
             '<a href class="umb-options" ng-hide="!node.menuUrl" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
@@ -76,6 +78,10 @@ angular.module("umbraco.directives")
                     deleteAnimations = true;
                 }, 0, false);
             }
+
+            scope.selectEnabledNodeClass = function(node) {
+                return node.selected ? 'icon umb-tree-icon sprTree icon-check blue temporary' : node.cssClass;
+            };
 
             //add a method to the node which we can use to call to update the node data if we need to ,
             // this is done by sync tree, we don't want to add a $watch for each node as that would be crazy insane slow
