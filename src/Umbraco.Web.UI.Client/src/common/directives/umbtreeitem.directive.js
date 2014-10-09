@@ -79,8 +79,12 @@ angular.module("umbraco.directives")
                 }, 0, false);
             }
 
-            scope.selectEnabledNodeClass = function(node) {
-                return node.selected ? 'icon umb-tree-icon sprTree icon-check blue temporary' : node.cssClass;
+            scope.selectEnabledNodeClass = function (node) {
+                return node ?
+                    node.selected ?
+                    'icon umb-tree-icon sprTree icon-check blue temporary' :
+                    node.cssClass :
+                    '';
             };
 
             //add a method to the node which we can use to call to update the node data if we need to ,

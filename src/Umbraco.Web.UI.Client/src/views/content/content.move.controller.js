@@ -12,24 +12,13 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 
 		eventsService.emit("editors.content.moveController.select", args);
 	    
-		var c = $(args.event.target.parentElement);
-
-		if ($scope.selectedEl) {
-		    $scope.selectedEl.find(".temporary").remove();
-		    $scope.selectedEl.find("i.umb-tree-icon").show();
+		if ($scope.target) {
+		    //un-select if there's a current one selected
+		    $scope.target.selected = false;
 		}
-
-		var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-		var icon = c.find("i.umb-tree-icon");
-		if (icon.length > 0) {
-		    icon.hide().after(temp);
-		} else {
-		    c.prepend(temp);
-		}
-
 
 		$scope.target = args.node;
-		$scope.selectedEl = c;
+		$scope.target.selected = true;
 	});
 
 	$scope.move = function(){

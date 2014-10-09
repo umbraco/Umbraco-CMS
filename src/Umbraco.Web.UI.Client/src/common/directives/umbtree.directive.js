@@ -30,8 +30,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             var hideoptions = (attrs.hideoptions === 'true') ? "hide-options" : "";
             var template = '<ul class="umb-tree ' + hideoptions + '"><li class="root">';
             template += '<div ng-hide="hideheader">' +
-                '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)" on-right-click="altSelect(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
-                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
+                '<h5>' +
+                '<i ng-if="enablecheckboxes == \'true\'" ng-class="selectEnabledNodeClass(tree.root)"></i>' +
+                '<a href="#/{{section}}" ng-click="select(tree.root, $event)" on-right-click="altSelect(tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
+                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
             template += '<ul>' +
                 '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
@@ -296,6 +298,14 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                 }
 
+                scope.selectEnabledNodeClass = function (node) {
+                    return node ?
+                        node.selected ?
+                        'icon umb-tree-icon sprTree icon-check blue temporary' :
+                        '' :
+                        '';
+                };
+
                 /** method to set the current animation for the node. 
                  *  This changes dynamically based on if we are changing sections or just loading normal tree data. 
                  *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
@@ -350,8 +360,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   The tree doesnt know about this, so it raises an event to tell the parent controller
                   about it.
                 */
-                scope.options = function(e, n, ev) {
-                    emitEvent("treeOptionsClick", { element: e, node: n, event: ev });
+                scope.options = function(n, ev) {
+                    emitEvent("treeOptionsClick", { element: elem, node: n, event: ev });
                 };
 
                 /**
@@ -360,17 +370,17 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   and emits it as a treeNodeSelect element if there is a callback object
                   defined on the tree
                 */
-                scope.select = function (e, n, ev) {
+                scope.select = function (n, ev) {
                     //on tree select we need to remove the current node - 
                     // whoever handles this will need to make sure the correct node is selected
                     //reset current node selection
                     scope.currentNode = null;
 
-                    emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
+                    emitEvent("treeNodeSelect", { element: elem, node: n, event: ev });
                 };
 
-                scope.altSelect = function(e, n, ev) {
-                    emitEvent("treeNodeAltSelect", { element: e, tree: scope.tree, node: n, event: ev });
+                scope.altSelect = function(n, ev) {
+                    emitEvent("treeNodeAltSelect", { element: elem, tree: scope.tree, node: n, event: ev });
                 };
                 
                 //watch for section changes
