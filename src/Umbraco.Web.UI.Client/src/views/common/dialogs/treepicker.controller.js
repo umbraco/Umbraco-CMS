@@ -131,7 +131,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                };
 	                $scope.submit(node);
 	            }
-	        } else {
+	        }
+	        else {
 	            
 	            if ($scope.multiPicker) {
 	                $scope.select(id);
