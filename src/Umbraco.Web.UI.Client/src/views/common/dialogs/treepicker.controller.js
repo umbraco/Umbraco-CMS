@@ -2,6 +2,7 @@
 angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService) {
 
+	    var tree = null;
 	    var dialogOptions = $scope.dialogOptions;
 	    $scope.dialogTreeEventHandler = $({});
 	    $scope.section = dialogOptions.section;
@@ -76,9 +77,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    function nodeExpandedHandler(ev, args) {            
 	        if (angular.isArray(args.children)) {
 
-	            //TODO: Not only this but we need to ensure that any currently displayed nodes that get selected
-                // from the search get updated to have a check box!
-
 	            //now we need to look in the already selected search results and 
 	            // toggle the check boxes for those ones that are listed
 	            _.each(args.children, function (result) {
@@ -95,6 +93,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                performFiltering(args.children);	             
 	            }
 	        }
+	    }
+
+        //gets the tree object when it loads
+	    function treeLoadedHandler(ev, args) {
+	        tree = args.tree;
 	    }
 
 	    //wires up selection
@@ -206,7 +209,31 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        
 	    };
 
-        $scope.hideSearch = function() {
+	    $scope.hideSearch = function () {
+            
+	        if (tree) {
+
+	            //we need to ensure that any currently displayed nodes that get selected
+	            // from the search get updated to have a check box!
+                function checkChildren(children) {
+                    _.each(children, function (result) {
+                        var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+                            return result.id == selectedId;
+                        });
+                        if (exists) {
+                            result.selected = true;
+                        }
+
+                        //recurse
+                        if (result.children && result.children.length > 0) {
+                            checkChildren(result.children);
+                        }
+                    });
+                }
+                checkChildren(tree.root.children);
+	        }
+	        
+
             $scope.searchInfo.showSearch = false;
             $scope.searchInfo.searchFromName = null;
             $scope.searchInfo.searchFrom = null;
@@ -252,13 +279,15 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        
 	    }, 200);
 
+	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSearch", nodeSearchHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 
 	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
+	        $scope.dialogTreeEventHandler.unbind("treeNodeSearch", nodeSearchHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSearch", nodeSearchHandler);
 	    });
 	});
