@@ -8,16 +8,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.section = dialogOptions.section;
 	    $scope.treeAlias = dialogOptions.treeAlias;
 	    $scope.multiPicker = dialogOptions.multiPicker;
-	    $scope.hideHeader = true; 	    
-	    localizationService.localize("general_typeToSearch").then(function (value) {
-	        $scope.searchPlaceholderText = value;
-	    });
+	    $scope.hideHeader = true; 	    	    
         $scope.searchInfo = {
             searchFrom: null,
             searchFromName: null,
             showSearch: false,
-            term: null,
-            oldTerm: null,
             results: []
         }
 
@@ -194,18 +189,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	        //since result = an entity, we'll pass it in so we don't have to go back to the server
 	        select(result.name, result.id, result);
-
-            //if (result.selected) {
-            //    //add this to the list of selected search results so that when it's re-searched we 
-            //    // can show the checked boxes
-            //    $scope.searchInfo.selectedSearchResults.push(result.id);
-            //}
-            //else {
-            //    $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function(itemId) {
-            //        return itemId == result.id;
-            //    });
-            //}
-	        
 	    };
 
 	    $scope.hideSearch = function () {
@@ -242,47 +225,39 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
             $scope.searchInfo.showSearch = false;
             $scope.searchInfo.searchFromName = null;
             $scope.searchInfo.searchFrom = null;
-            $scope.searchInfo.term = null;
-            $scope.searchInfo.oldTerm = null;            
             $scope.searchInfo.results = [];
         }
 
 	    //handles the on key up for searching, but we don't want to over query so the result is debounced
-	    $scope.performSearch = _.debounce(function () {
-	        angularHelper.safeApply($scope, function() {
-	            if ($scope.searchInfo.term) {
-	                if ($scope.searchInfo.oldTerm !== $scope.searchInfo.term) {
-	                    $scope.searchInfo.results = [];
+	    $scope.performSearch = function(term) {
+	        if (term) {
+	            $scope.searchInfo.results = [];
 
-	                    var searchArgs = {
-	                        term: $scope.searchInfo.term
-	                    };
-                        //append a start node id, whether it's a global one, or based on a selected list view
-	                    if ($scope.searchInfo.searchFrom || dialogOptions.startNodeId) {
-	                        searchArgs["searchFrom"] = $scope.searchInfo.searchFrom ? $scope.searchInfo.searchFrom : dialogOptions.startNodeId;
-                        }
-	                    searcher(searchArgs).then(function (data) {
-	                        $scope.searchInfo.results = data;
-	                        //now we need to look in the already selected search results and 
-	                        // toggle the check boxes for those ones
-	                        _.each($scope.searchInfo.results, function(result) {
-	                            var exists = _.find($scope.dialogData.selection, function (selectedId) {
-	                                return result.id == selectedId;
-	                            });
-                                if (exists) {
-                                    result.selected = true;
-                                }
-	                        });
-                            
-	                    });
-
-	                    $scope.searchInfo.showSearch = true;
-	                    $scope.searchInfo.oldTerm = $scope.searchInfo.term;
-	                }
+	            var searchArgs = {
+	                term: term
+	            };
+	            //append a start node id, whether it's a global one, or based on a selected list view
+	            if ($scope.searchInfo.searchFrom || dialogOptions.startNodeId) {
+	                searchArgs["searchFrom"] = $scope.searchInfo.searchFrom ? $scope.searchInfo.searchFrom : dialogOptions.startNodeId;
 	            }
-	        });
-	        
-	    }, 200);
+	            searcher(searchArgs).then(function (data) {
+	                $scope.searchInfo.results = data;
+	                //now we need to look in the already selected search results and 
+	                // toggle the check boxes for those ones
+	                _.each($scope.searchInfo.results, function (result) {
+	                    var exists = _.find($scope.dialogData.selection, function (selectedId) {
+	                        return result.id == selectedId;
+	                    });
+	                    if (exists) {
+	                        result.selected = true;
+	                    }
+	                });
+
+	            });
+
+	            $scope.searchInfo.showSearch = true;
+	        }
+	    };
 
 	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSearch", nodeSearchHandler);

@@ -1,0 +1,17 @@
+<div>
+    <ul class="umb-tree">
+        <li class="root">
+            <ul class="umb-search-group">
+                <li ng-repeat="result in results">
+                    <div style="padding-left: 20px">
+                        <a ng-class="{first:$first}" ng-click="selectResultCallback($event, result)">
+                            <i class="icon umb-tree-icon sprTree {{result.selected ? 'icon-check blue temporary' : result.icon}}"></i>
+                            {{result.name}}
+                            <small class="search-subtitle" ng-if="result.subTitle">{{result.subTitle}}</small>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
