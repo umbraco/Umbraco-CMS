@@ -66,7 +66,16 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    }
 
 	    function nodeSearchHandler(ev, args) {
-            if (args.node.metaData.isContainer === true) {
+	        if (args.node.metaData.isContainer === true) {
+
+	            //extract the html required to populate the contextual header
+	            var treeNodeDiv = $(args.event.target.parentElement.parentElement).find("div").first();
+
+	            var newDiv = treeNodeDiv.clone().wrap('<div></div>').parent();
+	            newDiv.find("ins:first").removeClass("icon-navigation-right").addClass("icon-navigation-down");
+
+	            $scope.searchInfo.searchFromHtml = newDiv.html(); //outerHtml
+
                 $scope.searchInfo.showSearch = true;
                 $scope.searchInfo.searchFromName = args.node.name;
                 $scope.searchInfo.searchFrom = args.node.id;

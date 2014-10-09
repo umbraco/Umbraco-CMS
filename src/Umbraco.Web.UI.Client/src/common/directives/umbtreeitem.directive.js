@@ -33,7 +33,7 @@ angular.module("umbraco.directives")
 
         template: '<li ng-class="{\'current\': (node == currentNode)}" on-right-click="altSelect(node, $event)"><div ng-style="setTreePadding(node)" ng-class="node.stateCssClass" ng-class="{\'loading\': node.loading}" ng-swipe-right="options(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
-            '<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' +
+            '<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="icon-navigation-right" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' +
             '<ins ng-if="node.hasChildren" style="width:18px;"></ins>' +
             '<ins ng-show="node.hasChildren" ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
             //NOTE: If the tree supports check boxes, render different markup

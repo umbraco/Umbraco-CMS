@@ -1,7 +1,12 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.TreePickerController">
     <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
-            <div class="form-search">
+            
+            <div ng-if="searchInfo.showSearch && searchInfo.searchFromName" class="umb-tree hide-options umb-tree-node-search">
+                <div ng-bind-html="searchInfo.searchFromHtml"></div>
+            </div>
+
+            <div class="form-search">                
                 <i class="icon icon-search" ng-if="!searchInfo.showSearch"></i>
                 <a class="icon icon-arrow-left" ng-if="searchInfo.showSearch" title="Back" ng-click="hideSearch()"></a>
                 <input type="text"
@@ -9,11 +14,7 @@
                     class="umb-search-field search-query"
                     placeholder="{{searchPlaceholderText}}"
                     on-keyup="performSearch()"
-                    focus-when="{{searchInfo.showSearch}}">
-                <h4 ng-if="searchInfo.showSearch && searchInfo.searchFromName">
-                    <small><localize key="general_search">Search</localize>:&nbsp;</small>
-                    {{searchInfo.searchFromName}}
-                </h4>
+                    focus-when="{{searchInfo.showSearch}}">                
             </div>
         </div>        
     </div>
