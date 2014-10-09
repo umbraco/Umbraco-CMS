@@ -424,9 +424,11 @@ angular.module('umbraco.services')
          * @returns {Object} modal object
          */
         memberPicker: function (options) {
-            options.template = 'views/common/dialogs/memberPicker.html';
-            options.show = true;
-            return openDialog(options);
+            
+            options.treeAlias = "member";
+            options.section = "member";
+
+            return this.treePicker(options);
         },
 
         /**
@@ -497,6 +499,7 @@ angular.module('umbraco.services')
          * @param {Object} value value sent to the property editor
          * @returns {Object} modal object
          */
+        //TODO: Wtf does this do? I don't think anything!
         propertyDialog: function (options) {
             options.template = 'views/common/dialogs/property.html';
             options.show = true;

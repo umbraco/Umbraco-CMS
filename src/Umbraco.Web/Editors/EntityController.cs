@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Web.Http;
@@ -39,13 +40,25 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="type"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
+        /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, int? startNodeId = null)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
         {
+            //TODO: Should we restrict search results based on what app the user has access to?
+            // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
+
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, startNodeId);
+            return ExamineSearch(query, type, searchFrom);
         }
 
         /// <summary>
@@ -259,7 +272,16 @@ namespace Umbraco.Web.Editors
             return GetResultForAll(type, postFilter, postFilterParams);
         }
 
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, int? startNodeId = null)
+        /// <summary>
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="entityType"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
             var sb = new StringBuilder();
 
@@ -274,24 +296,30 @@ namespace Umbraco.Web.Editors
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName"};
+                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId)
+                    {
+                        sb.Append("+__NodeTypeAlias:");
+                        sb.Append(searchFrom);
+                        sb.Append(" ");
+                    }
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    if (Security.CurrentUser.StartMediaId > 0 || startNodeId.HasValue)
+                    if (Security.CurrentUser.StartMediaId > 0 || searchFrom != null)
                     {
-                        sb.Append("+__Path: \\-1*\\," +
-                            (startNodeId.HasValue ? startNodeId.Value : Security.CurrentUser.StartMediaId) + 
-                            "\\,* ");
+                        sb.Append("+__Path: \\-1*\\,");
+                        sb.Append((searchFrom ?? Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture)));
+                        sb.Append("\\,* ");
                     }
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
-                    if (Security.CurrentUser.StartMediaId > 0 || startNodeId.HasValue)
+                    if (Security.CurrentUser.StartMediaId > 0 || searchFrom != null)
                     {
-                        sb.Append("+__Path: \\-1*\\," +
-                            (startNodeId.HasValue ? startNodeId.Value : Security.CurrentUser.StartContentId) + 
-                            "\\,* ");
+                        sb.Append("+__Path: \\-1*\\,");
+                        sb.Append((searchFrom ?? Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture)));
+                        sb.Append("\\,* ");
                     }
                     break;
                 default:

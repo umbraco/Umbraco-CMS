@@ -13,8 +13,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    });
         $scope.searchInfo = {
             selectedSearchResults: [],
-            searchStartNodeId: null,
-            searchStartNodeName: null,
+            searchFrom: null,
+            searchFromName: null,
             showSearch: false,
             term: null,
             oldTerm: null,
@@ -28,7 +28,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    //search defaults
 	    var searcher = searchService.searchContent;
 	    var entityType = "Document";
-	    $scope.results = [];
+	    
 
 	    //min / max values
 	    if (dialogOptions.minNumber) {
@@ -41,7 +41,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    //search
 	    if (dialogOptions.section === "member") {
 	        searcher = searchService.searchMembers;
-	        entityType = "Member";
+	        entityType = "Member";            
 	    }
 	    else if (dialogOptions.section === "media") {
 	        searcher = searchService.searchMedia;
@@ -68,8 +68,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    function nodeSearchHandler(ev, args) {
             if (args.node.metaData.isContainer === true) {
                 $scope.searchInfo.showSearch = true;
-                $scope.searchInfo.searchStartNodeName = args.node.name;
-                $scope.searchInfo.searchStartNodeId = args.node.id;
+                $scope.searchInfo.searchFromName = args.node.name;
+                $scope.searchInfo.searchFrom = args.node.id;
             }
         }
 
@@ -213,8 +213,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
         $scope.hideSearch = function() {
             $scope.searchInfo.showSearch = false;
-            $scope.searchInfo.searchStartNodeName = null;
-            $scope.searchInfo.searchStartNodeId = null;
+            $scope.searchInfo.searchFromName = null;
+            $scope.searchInfo.searchFrom = null;
             $scope.searchInfo.term = null;
             $scope.searchInfo.oldTerm = null;            
             $scope.searchInfo.results = [];
@@ -231,8 +231,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                        term: $scope.searchInfo.term
 	                    };
                         //append a start node id, whether it's a global one, or based on a selected list view
-	                    if ($scope.searchInfo.searchStartNodeId || dialogOptions.startNodeId) {
-	                        searchArgs["startNodeId"] = $scope.searchInfo.searchStartNodeId ? $scope.searchInfo.searchStartNodeId : dialogOptions.startNodeId;
+	                    if ($scope.searchInfo.searchFrom || dialogOptions.startNodeId) {
+	                        searchArgs["searchFrom"] = $scope.searchInfo.searchFrom ? $scope.searchInfo.searchFrom : dialogOptions.startNodeId;
                         }
 	                    searcher(searchArgs).then(function (data) {
 	                        $scope.searchInfo.results = data;

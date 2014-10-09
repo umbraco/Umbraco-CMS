@@ -277,6 +277,8 @@ namespace Umbraco.Core
 				public const string DefaultAlias = "Member";
 
                 public const string SystemDefaultProtectType = "_umbracoSystemDefaultProtectType";
+
+			    public const string AllMembersListId = "all-members";
 			}
 
 			/// <summary>

@@ -10,9 +10,9 @@
                     placeholder="{{searchPlaceholderText}}"
                     on-keyup="performSearch()"
                     focus-when="{{searchInfo.showSearch}}">
-                <h4 ng-if="searchInfo.showSearch && searchInfo.searchStartNodeName">
+                <h4 ng-if="searchInfo.showSearch && searchInfo.searchFromName">
                     <small><localize key="general_search">Search</localize>:&nbsp;</small>
-                    {{searchInfo.searchStartNodeName}}
+                    {{searchInfo.searchFromName}}
                 </h4>
             </div>
         </div>        
