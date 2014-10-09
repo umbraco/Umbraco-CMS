@@ -13,7 +13,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        $scope.searchPlaceholderText = value;
 	    });
         $scope.searchInfo = {
-            selectedSearchResults: [],
             searchFrom: null,
             searchFromName: null,
             showSearch: false,
@@ -80,7 +79,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            //now we need to look in the already selected search results and 
 	            // toggle the check boxes for those ones that are listed
 	            _.each(args.children, function (result) {
-	                var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+	                var exists = _.find($scope.dialogData.selection, function (selectedId) {
 	                    return result.id == selectedId;
 	                });
 	                if (exists) {
@@ -196,16 +195,16 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        //since result = an entity, we'll pass it in so we don't have to go back to the server
 	        select(result.name, result.id, result);
 
-            if (result.selected) {
-                //add this to the list of selected search results so that when it's re-searched we 
-                // can show the checked boxes
-                $scope.searchInfo.selectedSearchResults.push(result.id);
-            }
-            else {
-                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function(itemId) {
-                    return itemId == result.id;
-                });
-            }
+            //if (result.selected) {
+            //    //add this to the list of selected search results so that when it's re-searched we 
+            //    // can show the checked boxes
+            //    $scope.searchInfo.selectedSearchResults.push(result.id);
+            //}
+            //else {
+            //    $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function(itemId) {
+            //        return itemId == result.id;
+            //    });
+            //}
 	        
 	    };
 
@@ -217,12 +216,18 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            // from the search get updated to have a check box!
                 function checkChildren(children) {
                     _.each(children, function (result) {
-                        var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+                        //check if the id is in the selection, if so ensure it's flagged as selected
+                        var exists = _.find($scope.dialogData.selection, function (selectedId) {
                             return result.id == selectedId;
                         });
                         if (exists) {
                             result.selected = true;
                         }
+                        else {
+                            //check if the node is selected, if its not found then unselect it
+                            result.selected = false;
+                        }
+                        
 
                         //recurse
                         if (result.children && result.children.length > 0) {
@@ -261,7 +266,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                        //now we need to look in the already selected search results and 
 	                        // toggle the check boxes for those ones
 	                        _.each($scope.searchInfo.results, function(result) {
-	                            var exists = _.find($scope.searchInfo.selectedSearchResults, function (selectedId) {
+	                            var exists = _.find($scope.dialogData.selection, function (selectedId) {
 	                                return result.id == selectedId;
 	                            });
                                 if (exists) {
