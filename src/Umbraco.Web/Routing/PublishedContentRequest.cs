@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="uri">The request <c>Uri</c>.</param>
 		/// <param name="routingContext">A routing context.</param>
-		internal PublishedContentRequest(Uri uri, RoutingContext routingContext)
+		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
 		{
 			if (uri == null) throw new ArgumentNullException("uri");
 			if (routingContext == null) throw new ArgumentNullException("routingContext");
