@@ -35,8 +35,6 @@ namespace Umbraco.Web.Mvc
             requestContext.RouteData.DataTokens.Add("umbraco-doc-request", umbracoContext.PublishedContentRequest);
             requestContext.RouteData.DataTokens.Add("umbraco-context", umbracoContext);
 
-            umbracoContext.PublishedContentRequest.ConfigureRequest();
-
             return new MvcHandler(requestContext);
         }
 
@@ -44,13 +42,7 @@ namespace Umbraco.Web.Mvc
 
         protected virtual void PreparePublishedContentRequest(PublishedContentRequest publishedContentRequest)
         {
-            //need to set the culture for this to work
-            if (publishedContentRequest.Culture == null)
-            {
-                //none specified so get the default
-                var defaultLanguage = global::umbraco.cms.businesslogic.language.Language.GetAllAsList().FirstOrDefault();
-                publishedContentRequest.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
-            }
+            publishedContentRequest.Prepare();
         }
     }
 }

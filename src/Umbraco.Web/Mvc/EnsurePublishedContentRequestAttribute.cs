@@ -138,19 +138,7 @@ namespace Umbraco.Web.Mvc
                 pcr.PublishedContent = (IPublishedContent) result;
             }
 
-            //need to set the culture for this to work
-            if (_culture.IsNullOrWhiteSpace())
-            {
-                //none specified so get the default
-                var defaultLanguage = Language.GetAllAsList().FirstOrDefault();
-                pcr.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
-            }
-            else
-            {
-                pcr.Culture = new CultureInfo(_culture);
-            }
-            
-            pcr.ConfigureRequest();
+            pcr.Prepare();
         }
 
     }
