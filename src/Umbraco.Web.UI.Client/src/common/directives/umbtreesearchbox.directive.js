@@ -8,7 +8,7 @@
 function treeSearchBox(localizationService, searchService) {
     return {
         scope: {
-            searchFrom: "@",
+            searchFromId: "@",
             searchFromName: "@",
             showSearch: "@",
             section: "@",
@@ -42,8 +42,8 @@ function treeSearchBox(localizationService, searchService) {
                         term: scope.term
                     };
                     //append a start node context if there is one
-                    if (scope.searchFrom) {
-                        searchArgs["searchFrom"] = scope.searchFrom;
+                    if (scope.searchFromId) {
+                        searchArgs["searchFrom"] = scope.searchFromId;
                     }
                     searcher(searchArgs).then(function (data) {
                         scope.searchCallback(data);

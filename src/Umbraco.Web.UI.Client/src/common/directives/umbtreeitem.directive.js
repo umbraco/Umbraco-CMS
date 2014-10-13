@@ -42,7 +42,7 @@ angular.module("umbraco.directives")
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
             //NOTE: If the tree supports check boxes, render different markup
             '<i ng-class="selectEnabledNodeClass(node)"></i>' +
-            '<i class="{{node.cssClass}}"></i>' +
+            '<i></i>' +
             '<a href ng-click="select(node, $event)" on-right-click="altSelect(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
             '<a href class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
@@ -88,13 +88,14 @@ angular.module("umbraco.directives")
                 
                 //add/remove 'i' depending on enablecheckboxes
                 if (tree.enablecheckboxes === "true") {
-                    element.find("i").eq(1).remove();
-                    element.find("i:first").attr("title", node.routePath);
+                    element.find("i").eq(1).remove();                    
                 }
                 else if (!tree.enablecheckboxes || tree.enablecheckboxes === 'false') {
                     element.find("i:first").remove();
-                    element.find("i").eq(1).attr("title", node.routePath);
+                    element.find("i:first").addClass(node.cssClass);
                 }
+                //now set the title on the remaining icon
+                element.find("i:first").attr("title", node.routePath);
 
                 element.find("a:first").html(node.name);
 
