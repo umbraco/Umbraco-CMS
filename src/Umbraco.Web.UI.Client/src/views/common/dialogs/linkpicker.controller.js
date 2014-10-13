@@ -11,7 +11,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	    $scope.dialogTreeEventHandler = $({});
 	    $scope.target = {};
 	    $scope.searchInfo = {
-	        searchFromId: dialogOptions.startNodeId,
+	        searchFromId: null,
 	        searchFromName: null,
 	        showSearch: false,
 	        results: [],
@@ -119,7 +119,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 	    $scope.hideSearch = function () {
 	        $scope.searchInfo.showSearch = false;
-	        $scope.searchInfo.searchFromId = dialogOptions.startNodeId;
+	        $scope.searchInfo.searchFromId = null;
 	        $scope.searchInfo.searchFromName = null;
 	        $scope.searchInfo.results = [];
 	    }
