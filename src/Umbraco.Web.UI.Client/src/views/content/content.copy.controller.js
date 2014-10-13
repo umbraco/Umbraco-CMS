@@ -1,5 +1,4 @@
-angular.module("umbraco")
-	.controller("Umbraco.Editors.Content.CopyController",
+angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	function ($scope, eventsService, contentResource, navigationService, appState, treeService, localizationService) {
 
 	    var dialogOptions = $scope.dialogOptions;
@@ -10,7 +9,7 @@ angular.module("umbraco")
 
 	    $scope.relateToOriginal = false;
 	    $scope.dialogTreeEventHandler = $({});
-
+	    $scope.busy = false;
 	    $scope.searchInfo = {
 	        searchFromId: null,
 	        searchFromName: null,
@@ -93,12 +92,14 @@ angular.module("umbraco")
         
 	    $scope.copy = function () {
 
-	        $scope.hideSearch();
+	        $scope.busy = true;
+	        $scope.error = false;
 
 	        contentResource.copy({ parentId: $scope.target.id, id: node.id, relateToOriginal: $scope.relateToOriginal })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
+                    $scope.busy = false;
 
                     //get the currently edited node (if any)
                     var activeNode = appState.getTreeState("selectedNode");
@@ -117,6 +118,7 @@ angular.module("umbraco")
                 }, function (err) {
                     $scope.success = false;
                     $scope.error = err;
+                    $scope.busy = false;
                 });
 	    };
 
