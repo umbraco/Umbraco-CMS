@@ -72,10 +72,10 @@ namespace Umbraco.Web.Models.Mapping
                                   basic.Key = key;
                               }
                           }
-                          if (result.Fields.ContainsKey("ParentID"))
+                          if (result.Fields.ContainsKey("parentID"))
                           {
                               int parentId;
-                              if (int.TryParse(result.Fields["ParentID"], out parentId))
+                              if (int.TryParse(result.Fields["parentID"], out parentId))
                               {
                                   basic.ParentId = parentId;
                               }

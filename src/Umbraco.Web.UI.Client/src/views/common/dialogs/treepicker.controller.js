@@ -10,15 +10,21 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.multiPicker = dialogOptions.multiPicker;
 	    $scope.hideHeader = true; 	    	    
         $scope.searchInfo = {
-            searchFrom: dialogOptions.startNodeId,
+            searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
-            results: []
+            results: [],
+            selectedSearchResults: []
         }
 
 	    //create the custom query string param for this tree
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
 	    $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
+
+	    var searchText = "Search...";
+	    localizationService.localize("general_search").then(function (value) {
+	        searchText = value + "...";
+	    });
 
 	    var entityType = "Document";
 	    
@@ -55,25 +61,57 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        }
 	    } 
 
-	    function nodeSearchHandler(ev, args) {
-            if (args.node.metaData.isContainer === true) {
-                $scope.searchInfo.showSearch = true;
-                $scope.searchInfo.searchFromName = args.node.name;
-                $scope.searchInfo.searchFrom = args.node.id;
-            }
-        }
-
 	    function nodeExpandedHandler(ev, args) {            
 	        if (angular.isArray(args.children)) {
 
-	            //now we need to look in the already selected search results and 
-	            // toggle the check boxes for those ones that are listed
-	            _.each(args.children, function (result) {
-	                var exists = _.find($scope.dialogData.selection, function (selectedId) {
-	                    return result.id == selectedId;
+                //iterate children
+	            _.each(args.children, function (child) {
+
+	                //check if any of the items are list views, if so we need to add some custom 
+	                // children: A node to activate the search, any nodes that have already been 
+	                // selected in the search
+	                if (child.metaData.isContainer) {
+	                    child.hasChildren = true;
+	                    child.children = [
+	                        {
+                                level: child.level + 1,
+	                            hasChildren: false,
+	                            name: searchText,
+	                            metaData: {
+	                                listViewNode: child,
+	                            },
+	                            cssClass: "icon umb-tree-icon sprTree icon-search",
+	                            cssClasses: ["not-published"]
+	                        }
+	                    ];
+	                    var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function(i) {
+	                        return i.parentId == child.id;
+	                    });
+	                    _.each(listViewResults, function(item) {
+	                        var parent = child;
+	                        child.children.unshift({
+	                            id: item.id,
+	                            name: item.name,
+	                            cssClass: "icon umb-tree-icon sprTree " + item.icon,
+	                            level: child.level + 1,
+	                            metaData: {
+	                                isSearchResult: true
+	                            },
+	                            hasChildren: false,
+	                            parent: function () {
+	                                return parent;
+	                            }
+	                        });
+	                    });
+	                }
+
+	                //now we need to look in the already selected search results and 
+	                // toggle the check boxes for those ones that are listed
+	                var exists = _.find($scope.searchInfo.selectedSearchResults, function (selected) {
+	                    return child.id == selected.id;
 	                });
 	                if (exists) {
-	                    result.selected = true;
+	                    child.selected = true;
 	                }
 	            });
 
@@ -93,19 +131,45 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    function nodeSelectHandler(ev, args) {
 	        args.event.preventDefault();
 	        args.event.stopPropagation();
+	        
+	        if (args.node.metaData.listViewNode) {
+	            //check if list view 'search' node was selected
 
-	        eventsService.emit("dialogs.treePickerController.select", args);
-
-	        if (args.node.filtered) {
-	            return;
+                $scope.searchInfo.showSearch = true;                
+                $scope.searchInfo.searchFromId = args.node.metaData.listViewNode.id;
+                $scope.searchInfo.searchFromName = args.node.metaData.listViewNode.name;
 	        }
+            else if (args.node.metaData.isSearchResult) {
+                //check if the item selected was a search result from a list view
 
-	        //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
-	        //from the server in this method.
-	        select(args.node.name, args.node.id);
+                //unselect
+                select(args.node.name, args.node.id);
 
-            //toggle checked state
-	        args.node.selected = args.node.selected === true ? false : true;
+                //remove it from the list view children
+                var listView = args.node.parent();
+	            listView.children = _.reject(listView.children, function(child) {
+	                return child.id == args.node.id;
+	            });
+
+                //remove it from the custom tracked search result list
+	            $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function (i) {
+	                return i.id == args.node.id;
+	            });
+	        }
+            else {
+                eventsService.emit("dialogs.treePickerController.select", args);
+
+                if (args.node.filtered) {
+                    return;
+                }
+
+                //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
+                //from the server in this method.
+                select(args.node.name, args.node.id);
+
+                //toggle checked state
+                args.node.selected = args.node.selected === true ? false : true;
+            }	        
 	    }
 
 	    /** Method used for selecting a node */
@@ -184,6 +248,16 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	        //since result = an entity, we'll pass it in so we don't have to go back to the server
 	        select(result.name, result.id, result);
+
+	        //add/remove to our custom tracked list of selected search results
+            if (result.selected) {
+                $scope.searchInfo.selectedSearchResults.push(result);
+            }
+            else {
+                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function(i) {
+                    return i.id == result.id;
+                });
+            }
 	    };
 
 	    $scope.hideSearch = function () {
@@ -197,23 +271,62 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            //we need to ensure that any currently displayed nodes that get selected
 	            // from the search get updated to have a check box!
                 function checkChildren(children) {
-                    _.each(children, function (result) {
+                    _.each(children, function (child) {
                         //check if the id is in the selection, if so ensure it's flagged as selected
-                        var exists = _.find($scope.dialogData.selection, function (selectedId) {
-                            return result.id == selectedId;
+                        var exists = _.find($scope.searchInfo.selectedSearchResults, function (selected) {
+                            return child.id == selected.id;
                         });
+                        //if the curr node exists in selected search results, ensure it's checked
                         if (exists) {
-                            result.selected = true;
+                            child.selected = true;
+                        }
+                        //if the curr node does not exist in the selected search result, and the curr node is a child of a list view search result
+                        else if (child.metaData.isSearchResult) {
+                            //if this tree node is under a list view it means that the node was added
+                            // to the tree dynamically under the list view that was searched, so we actually want to remove
+                            // it all together from the tree
+                            var listView = child.parent();
+                            listView.children = _.reject(listView.children, function(c) {
+                                return c.id == child.id;
+                            });
                         }
                         else {
-                            //check if the node is selected, if its not found then unselect it
-                            result.selected = false;
+                            //it's not part of any search result, uncheck it
+                            child.selected = false;
                         }
-                        
+
+                        //check if the current node is a list view and if so, check if there's any new results
+                        // that need to be added as child nodes to it based on search results selected
+                        if (child.metaData.isContainer) {
+                            var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function (i) {
+                                return i.parentId == child.id;
+                            });
+                            _.each(listViewResults, function (item) {
+                                var childExists = _.find(child.children, function(c) {
+                                    return c.id == item.id;
+                                });
+                                if (!childExists) {
+                                    var parent = child;
+                                    child.children.unshift({
+                                        id: item.id,
+                                        name: item.name,
+                                        cssClass: "icon umb-tree-icon sprTree " + item.icon,
+                                        level: child.level + 1,
+                                        metaData: {
+                                            isSearchResult: true
+                                        },
+                                        hasChildren: false,
+                                        parent: function () {
+                                            return parent;
+                                        }
+                                    });
+                                }                                
+                            });
+                        }
 
                         //recurse
-                        if (result.children && result.children.length > 0) {
-                            checkChildren(result.children);
+                        if (child.children && child.children.length > 0) {
+                            checkChildren(child.children);
                         }
                     });
                 }
@@ -221,9 +334,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        }
 	        
 
-            $scope.searchInfo.showSearch = false;
-            $scope.searchInfo.searchFromName = dialogOptions.startNodeId;
-            $scope.searchInfo.searchFrom = null;
+            $scope.searchInfo.showSearch = false;            
+            $scope.searchInfo.searchFromId = dialogOptions.startNodeId;
+            $scope.searchInfo.searchFromName = null;
             $scope.searchInfo.results = [];
         }
 
@@ -243,13 +356,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    };
 
 	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeSearch", nodeSearchHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 
 	    $scope.$on('$destroy', function () {
 	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSearch", nodeSearchHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	    });
