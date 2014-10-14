@@ -122,7 +122,9 @@ namespace umbraco.controls
             pp_compositions.Text = ui.Text("contenttypecompositions", Security.CurrentUser);
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
-            
+            pp_Root.Text = ui.Text("editcontenttype", "allowAtRoot", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "allowAtRootDesc", Security.CurrentUser) + "</small>";
+            pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "hasListViewDesc", Security.CurrentUser) + "</small>";
+
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
             {
@@ -140,7 +142,6 @@ namespace umbraco.controls
 
             checkTxtAliasJs.Text = string.Format("checkAlias('#{0}');", txtAlias.ClientID);
 
-            DataBind();
         }
         
         /// <summary>
@@ -1081,33 +1082,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 hasAlias = ct.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
             }
             return !hasAlias;
-        }
-
-        /// <summary>
-        /// Removes a PropertyType, but when???
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void dgGenericPropertiesOfTab_itemcommand(object sender, DataGridCommandEventArgs e)
-        {
-            // Delete propertytype from contenttype
-            if (e.CommandName == "Delete")
-            {
-                int propertyId = int.Parse(e.Item.Cells[0].Text);
-                string rawName = string.Empty;
-
-                var propertyType = _contentType.ContentTypeItem.PropertyTypes.FirstOrDefault(x => x.Id == propertyId);
-                if (propertyType != null && string.IsNullOrEmpty(propertyType.Alias) == false)
-                {
-                    rawName = propertyType.Name;
-                    _contentType.ContentTypeItem.RemovePropertyType(propertyType.Alias);
-                    _contentType.Save();
-                }
-
-                RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property ´" + rawName + "´ deleted"));
-       
-                BindDataGenericProperties(false);
-            }
         }
 
         /// <summary>

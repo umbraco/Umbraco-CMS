@@ -75,13 +75,11 @@
 
 <asp:Panel ID="pnlStructure" runat="server">
     <cc2:Pane ID="Pane6" runat="server">
-        <cc2:PropertyPanel ID="pp_Root" runat="server" 
-            Text='<%# ui.Text("editcontenttype", "allowAtRoot", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "allowAtRootDesc", Security.CurrentUser) + "</small>" %>'>
+        <cc2:PropertyPanel ID="pp_Root" runat="server">
             <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />            
         </cc2:PropertyPanel>
         
-        <cc2:PropertyPanel ID="pp_isContainer" runat="server" 
-            Text='<%# ui.Text("editcontenttype", "hasListView", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "hasListViewDesc", Security.CurrentUser) + "</small>" %>'>            
+        <cc2:PropertyPanel ID="pp_isContainer" runat="server">            
             <asp:CheckBox runat="server" ID="cb_isContainer" Text="Yes" />  
             
              <%if (cb_isContainer.Checked) { %>
