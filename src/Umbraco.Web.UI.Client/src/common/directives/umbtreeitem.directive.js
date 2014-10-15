@@ -35,14 +35,12 @@ angular.module("umbraco.directives")
         // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
 
         template: '<li ng-class="{\'current\': (node == currentNode)}" on-right-click="altSelect(node, $event)">' +
-            '<div ng-class="{\'loading\': node.loading}" ng-swipe-right="options(node, $event)" >' +
+            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' +            
             '<ins style="width:18px;"></ins>' +
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
-            //NOTE: If the tree supports check boxes, render different markup
-            '<i ng-class="selectEnabledNodeClass(node)"></i>' +
-            '<i></i>' +
+            '<i class="icon umb-tree-icon sprTree"></i>' +
             '<a href ng-click="select(node, $event)" on-right-click="altSelect(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
             '<a href class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
@@ -56,25 +54,23 @@ angular.module("umbraco.directives")
                 scope.searchAltText = value;
             });
 
-            //flag to enable/disable delete animations, default for an item is tru
+            //flag to enable/disable delete animations, default for an item is true
             var deleteAnimations = true;
 
-            /** Helper function to emit tree events */
+            // Helper function to emit tree events
             function emitEvent(eventName, args) {
                 if (scope.eventhandler) {
                     $(scope.eventhandler).trigger(eventName, args);
                 }
             }
 
-            /** updates the node's DOM/styles */
+            // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
                 
                 //get the first div element
                 element.children(":first")
                     //set the padding
-                    .css("padding-left", (node.level * 20) + "px")
-                    //set the class
-                    .addClass((node.cssClasses || []).join(" "));
+                    .css("padding-left", (node.level * 20) + "px");
 
                 //remove first 'ins' if there is no children
                 //show/hide last 'ins' depending on children
@@ -85,17 +81,10 @@ angular.module("umbraco.directives")
                 else {
                     element.find("ins").last().show();
                 }
-                
-                //add/remove 'i' depending on enablecheckboxes
-                if (tree.enablecheckboxes === "true") {
-                    element.find("i").eq(1).remove();                    
-                }
-                else if (!tree.enablecheckboxes || tree.enablecheckboxes === 'false') {
-                    element.find("i:first").remove();
-                    element.find("i:first").addClass(node.cssClass);
-                }
-                //now set the title on the remaining icon
-                element.find("i:first").attr("title", node.routePath);
+
+                var icon = element.find("i:first");
+                icon.addClass(node.cssClass);
+                icon.attr("title", node.routePath);
 
                 element.find("a:first").html(node.name);
 
@@ -108,7 +97,7 @@ angular.module("umbraco.directives")
                 }
             }
 
-            /** This will deleteAnimations to true after the current digest */
+            //This will deleteAnimations to true after the current digest
             function enableDeleteAnimations() {
                 //do timeout so that it re-enables them after this digest
                 $timeout(function () {
@@ -117,12 +106,21 @@ angular.module("umbraco.directives")
                 }, 0, false);
             }
 
-            scope.selectEnabledNodeClass = function (node) {
-                return node ?
-                    node.selected ?
-                    'icon umb-tree-icon sprTree icon-check blue temporary' :
-                    node.cssClass :
-                    '';
+            /** Returns the css classses assigned to the node (div element) */
+            scope.getNodeCssClass = function (node) {
+                if (!node) {
+                    return '';
+                }
+                var css = [];                
+                if (node.cssClasses) {
+                    _.each(node.cssClasses, function(c) {
+                        css.push(c);
+                    });
+                }
+                if (node.selected) {
+                    css.push("umb-tree-node-checked");
+                }
+                return css.join(" ");
             };
 
             //add a method to the node which we can use to call to update the node data if we need to ,
@@ -169,6 +167,9 @@ angular.module("umbraco.directives")
             *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
             */
             scope.animation = function () {
+                if (scope.node.showHideAnimation) {
+                    return scope.node.showHideAnimation;
+                }
                 if (deleteAnimations && scope.node.expanded) {
                     return { leave: 'tree-node-delete-leave' };
                 }

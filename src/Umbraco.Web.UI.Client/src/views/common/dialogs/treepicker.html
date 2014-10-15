@@ -17,22 +17,21 @@
         <div class="tab-content umb-control-group">
             
             <umb-tree-search-results 
-                ng-if="searchInfo.showSearch"
+                ng-if="searchInfo.showSearch"                                     
                 results="searchInfo.results"
                 select-result-callback="selectResult">
             </umb-tree-search-results>
 
-            <div ng-hide="searchInfo.showSearch">
-                <umb-tree 
-                    section="{{section}}"
-                    treealias="{{treeAlias}}"
-                    hideheader="{{hideHeader}}"
-                    hideoptions="true"
-                    isdialog="true"
-                    customtreeparams="{{customTreeParams}}"
-                    eventhandler="dialogTreeEventHandler"
-                    enablelistviewsearch="true"
-                    enablecheckboxes="{{multiPicker}}">
+            <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+                <umb-tree section="{{section}}"
+                          treealias="{{treeAlias}}"
+                          hideheader="{{hideHeader}}"
+                          hideoptions="true"
+                          isdialog="true"
+                          customtreeparams="{{customTreeParams}}"
+                          eventhandler="dialogTreeEventHandler"
+                          enablelistviewsearch="true"
+                          enablecheckboxes="{{multiPicker}}">
                 </umb-tree>
             </div>
         </div>

@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
-	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService) {
+	function ($scope, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService) {
 
 	    var tree = null;
 	    var dialogOptions = $scope.dialogOptions;
@@ -75,20 +75,25 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                    child.children = [
 	                        {
                                 level: child.level + 1,
-	                            hasChildren: false,
+                                hasChildren: false,
+                                parent: function () {
+                                    return child;
+                                },
 	                            name: searchText,
 	                            metaData: {
 	                                listViewNode: child,
 	                            },
-	                            cssClass: "icon umb-tree-icon sprTree icon-search",
+	                            cssClass: "icon-search",
 	                            cssClasses: ["not-published"]
 	                        }
 	                    ];
+                        //add base transition classes to this node
+	                    child.cssClasses.push("tree-node-slide-up");
+
 	                    var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function(i) {
 	                        return i.parentId == child.id;
 	                    });
 	                    _.each(listViewResults, function(item) {
-	                        var parent = child;
 	                        child.children.unshift({
 	                            id: item.id,
 	                            name: item.name,
@@ -99,7 +104,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                            },
 	                            hasChildren: false,
 	                            parent: function () {
-	                                return parent;
+	                                return child;
 	                            }
 	                        });
 	                    });
@@ -138,6 +143,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                 $scope.searchInfo.showSearch = true;                
                 $scope.searchInfo.searchFromId = args.node.metaData.listViewNode.id;
                 $scope.searchInfo.searchFromName = args.node.metaData.listViewNode.name;
+
+                //add transition classes
+	            var listViewNode = args.node.parent();
+	            listViewNode.cssClasses.push('tree-node-slide-up-hide-active');
 	        }
             else if (args.node.metaData.isSearchResult) {
                 //check if the item selected was a search result from a list view
@@ -258,14 +267,20 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                     return i.id == result.id;
                 });
             }
+
+	        //ensure the tree node in the tree is checked/unchecked if it already exists there
+	        if (tree) {	            
+	            var found = treeService.getDescendantNode(tree.root, result.id);
+                if (found) {
+                    found.selected = result.selected;
+                }
+	        }
+	        
 	    };
 
 	    $scope.hideSearch = function () {
-            
-	        //TODO: Move this to the treeService, we don't need a reference to the 'tree' the way this is working
-	        // because if we have a single node, that is all we need since we can traverse to the tree root in the treeService.
-            // this logic needs to be centralized so it can be used in other tree + search areas.
-
+            	    
+            //Traverse the entire displayed tree and update each node to sync with the selected search results
 	        if (tree) {
 
 	            //we need to ensure that any currently displayed nodes that get selected
@@ -290,14 +305,15 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                                 return c.id == child.id;
                             });
                         }
-                        else {
-                            //it's not part of any search result, uncheck it
-                            child.selected = false;
-                        }
-
+                        
                         //check if the current node is a list view and if so, check if there's any new results
                         // that need to be added as child nodes to it based on search results selected
                         if (child.metaData.isContainer) {
+
+                            child.cssClasses = _.reject(child.cssClasses, function(c) {
+                                return c === 'tree-node-slide-up-hide-active';
+                            });
+
                             var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function (i) {
                                 return i.parentId == child.id;
                             });

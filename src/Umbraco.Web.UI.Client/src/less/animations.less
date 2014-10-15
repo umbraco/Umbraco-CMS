@@ -145,3 +145,47 @@
 .tree-node-delete-leave * { 
     color:@red !important;
 }
+
+
+.tree-node-slide-up
+{ 
+    opacity:1;
+    top: 0px;
+    -webkit-transition: 700ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -moz-transition: 700ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -ms-transition: 700ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    -o-transition: 700ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;
+    transition: 700ms cubic-bezier(0.000, 0.000, 0.580, 1.000) all;    
+} 
+.tree-node-slide-up * {    
+    font-size:100%;
+    -webkit-transition:font-size 700ms;
+    -moz-transition:font-size 700ms;
+    -ms-transition:font-size 700ms;
+    -o-transition:font-size 700ms;
+    transition:font-size 700ms;    
+}
+.tree-node-slide-up.tree-node-slide-up-hide-active {
+    opacity: 0;
+    top: -100px;
+}
+.tree-node-slide-up.tree-node-slide-up-hide-active * {
+    font-size:120%;
+}
+
+.tree-fade-out-hide ,
+.tree-fade-out-show,
+.tree-fade-out-hide div:not(.tree-node-slide-up-hide-active),
+.tree-fade-out-show div:not(.tree-node-slide-up-hide-active) {    
+    -webkit-transition: 700ms cubic-bezier(0.075, 0.820, 0.165, 1.000) all;
+    -moz-transition: 700ms cubic-bezier(0.075, 0.820, 0.165, 1.000) all;
+    -ms-transition: 700ms cubic-bezier(0.075, 0.820, 0.165, 1.000) all;
+    -o-transition: 700ms cubic-bezier(0.075, 0.820, 0.165, 1.000) all;
+    transition: 700ms cubic-bezier(0.075, 0.820, 0.165, 1.000) all;
+}
+.tree-fade-out-show.tree-fade-out-show-active div:not(.tree-node-slide-up-hide-active){
+    opacity: 1;
+}
+.tree-fade-out-hide.tree-fade-out-hide-active div:not(.tree-node-slide-up-hide-active){
+    opacity: 0;
+}
