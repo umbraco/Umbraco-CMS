@@ -48,10 +48,14 @@ namespace Umbraco.Web.Trees
 
             var legacyItems = legacyTreeTypes
                 .Select(x =>
-                        new Tuple<Type, global::umbraco.businesslogic.TreeAttribute>(
+                        new Tuple<Type, global::umbraco.businesslogic.TreeAttribute, ObsoleteAttribute>(
                             x, 
-                            x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).SingleOrDefault()))
+                            x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).SingleOrDefault(),
+                            x.GetCustomAttributes<ObsoleteAttribute>(false).SingleOrDefault()))
+                //ensure that the legacy tree attribute exists
                 .Where(x => x.Item2 != null)
+                //ensure that it's not obsoleted, any obsoleted tree will not be auto added to the config
+                .Where(x => x.Item3 == null)
                 .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null
                     //make sure the legacy tree isn't added on top of the controller tree!        
                             && added.InvariantContains(x.Item2.Alias) == false)
