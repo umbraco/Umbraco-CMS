@@ -4,7 +4,8 @@
     <name>Kalle Ekstrand, Toxic Interactive Solutions AB</name>
     <link>http://www.toxic.se</link>
   </creator>
-  <area alias="actions">    
+  <area alias="actions">
+    <key alias="archiveContourForm">Arkivera formulär</key>
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
     <key alias="browse">Surfa på sidan</key>
@@ -15,8 +16,10 @@
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
-    <key alias="emptyTrashcan">Töm papperskorgen</key>    
+    <key alias="emptyTrashcan">Töm papperskorgen</key>
+    <key alias="exportContourForm">Exportera formulär</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
+    <key alias="importContourForm">Importera formulär</key>
     <key alias="importDocumentType">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
     <key alias="liveEdit">Redigera i Canvas</key>
@@ -34,6 +37,7 @@
     <key alias="sort">Sortera</key>
     <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
+    <key alias="unarchiveContourForm">Avarkivera formulär</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
   </area>
@@ -55,10 +59,8 @@
     <key alias="remove">Ta bort</key>
     <key alias="setDomains">Domäner</key>
     <key alias="setLanguage">Kultur</key>
-    <key alias="setLanguageHelp">
-      <![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
-     på befintlig nod.]]>
-    </key>
+    <key alias="setLanguageHelp"><![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
+     på befintlig nod.]]></key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
@@ -81,6 +83,7 @@
     <key alias="macroInsert">Infoga macro</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="relations">Ändra relation</key>
+    <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
     <key alias="saveAndPublish">Spara och publicera</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
@@ -121,6 +124,7 @@
     <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
+    <key alias="altTextOptional">Alternativ text (optionell)</key>
     <key alias="childItems">Underliggande noder</key>
     <key alias="clickToEdit">Klicka för att redigera detta objekt</key>
     <key alias="createBy">Skapad av</key>
@@ -130,9 +134,11 @@
     <key alias="documentType">Dokumenttyp</key>
     <key alias="editing">Redigering</key>
     <key alias="expireDate">Ta bort</key>
+    <key alias="isPublished">Är publicerad</key>
     <key alias="itemChanged">Detta objekt har ändrats efter publicering</key>
     <key alias="itemNotPublished">Detta objekt är inte publicerat</key>
     <key alias="lastPublished">Senast publicerat</key>
+    <key alias="listViewNoItems">Det finns inget att visa i listan</key>
     <key alias="mediaLinks">Länk till medieobjekt</key>
     <key alias="mediatype">Mediatyp</key>
     <key alias="membergroup">Medlemsgrupp</key>
@@ -230,12 +236,20 @@
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot">Tillåt i roten</key>
+    <key alias="allowAtRootDesc">Endast innehållstyper med denna markerad kan skapas i roten av innehåll samt media</key>
     <key alias="allowedchildnodetypes">Tillåtna typer för underliggande noder</key>
+    <key alias="contenttypecompositions">Dokumenttypssammansättning</key>
     <key alias="create">Skapa</key>
+    <key alias="createListView">Skapa en anpassad listvy</key>
+    <key alias="currentListView">Aktuell listvy</key>
+    <key alias="currentListViewDesc">Datatyp för markerad listvy</key>
     <key alias="deletetab">Ta bort flik</key>
     <key alias="description">Beskrivning</key>
     <key alias="hasListView">Aktivera listvy</key>
+    <key alias="hasListViewDesc">Konfigurerar innehållet till att visa en sorterbar &amp; sökbar lista av nodens barn, barnen kommer ej att visas i trädet.</key>
     <key alias="newtab">Ny flik</key>
+    <key alias="removeListView">Radera anpassad listvy</key>
     <key alias="tab">Flik</key>
     <key alias="thumbnail">Miniatyrbild</key>
   </area>
@@ -416,10 +430,8 @@
     <key alias="permissionsAffectedFolders">Berörda filer och mappar</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Här hittar du mer information om att sätta rättigheter för Umbraco</key>
     <key alias="permissionsAffectedFoldersText">Du måste ge ASP.NET ändra rättigheter till följande filer/mappar</key>
-    <key alias="permissionsAlmostPerfect">
-      <![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
-    <br /><br /> Du kan köra Umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja Umbraco fullt ut.]]>
-    </key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
+    <br /><br /> Du kan köra Umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja Umbraco fullt ut.]]></key>
     <key alias="permissionsHowtoResolve">Hur skall man lösa</key>
     <key alias="permissionsHowtoResolveLink">Klicka här för att läsa text-versionen</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Titta på vår <strong>video-självstudiekurs</strong> om hur du konfigurerar mapp-rättigheter för Umbraco eller läs text-versionen.]]></key>
@@ -603,13 +615,14 @@
     <key alias="editscript">Redigera script</key>
   </area>
   <area alias="sections">
+    <key alias="analytics">Analytics</key>
     <key alias="concierge">Concierge</key>
     <key alias="content">Innehåll</key>
-    <key alias="contour">Contour</key>
     <key alias="courier">Courier</key>
     <key alias="developer">Utvecklare</key>
+    <key alias="forms">Formulär</key>
     <key alias="help">Hjälp</key>
-    <key alias="installer">Umbraco Configuration Wizard</key>
+    <key alias="installer">Umbraco konfigurationsguide</key>
     <key alias="media">Media</key>
     <key alias="member">Medlemmar</key>
     <key alias="newsletters">Nyhetsbrev</key>
@@ -774,6 +787,7 @@
     <key alias="uploadTranslationXml">Ladda upp översättning i XML-format</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="analytics">Analytics</key>
     <key alias="cacheBrowser">Cacha webbläsare</key>
     <key alias="contentRecycleBin">Papperskorg</key>
     <key alias="createdPackages">Skapade paket</key>
