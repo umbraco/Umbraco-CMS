@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Migrations.Syntax.Delete.DefaultConstraint;
+using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions;
+using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
+using Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -16,13 +23,52 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
             //now that the controlId column is renamed and now a string we need to convert
             if (Context == null || Context.Database == null) return;
-
-            //"DF_cmsMacroProperty_macroPropertyHidden""
-            Delete.DefaultConstraint().OnTable("cmsMacroProperty").OnColumn("macroPropertyHidden");
             
+            //var cpt = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerTable(Context.Database);
+            //var di = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database);
+
+            if (Context.CurrentDatabaseProvider != DatabaseProviders.SqlServer)
+            {
+                Delete.DefaultConstraint().OnTable("cmsMacroProperty").OnColumn("macroPropertyHidden");
+            }
+            else
+            {
+                //If we are on SQLServer, we need to delete constraints by name, older versions of umbraco did not name these default constraints
+                // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
+                // http://issues.umbraco.org/issue/U4-4133
+                var sqlServerSyntaxProvider = new SqlServerSyntaxProvider();
+                var defaultConstraints = sqlServerSyntaxProvider.GetDefaultConstraintsPerColumn(Context.Database).Distinct();
+
+                //lookup the constraint we want to delete, normally would be called "DF_cmsMacroProperty_macroPropertyHidden" but 
+                // we cannot be sure with really old versions
+                var constraint = defaultConstraints
+                    .SingleOrDefault(x => x.Item1 == "cmsMacroProperty" && x.Item2 == "macroPropertyHidden");
+                if (constraint != null)
+                {
+                    Execute.Sql(string.Format("ALTER TABLE [{0}] DROP CONSTRAINT [{1}]", "cmsMacroProperty", constraint.Item3));
+                }
+            }
+
             Delete.Column("macroPropertyHidden").FromTable("cmsMacroProperty");
 
-            Delete.ForeignKey().FromTable("cmsMacroProperty").ForeignColumn("macroPropertyType").ToTable("cmsMacroPropertyType").PrimaryColumn("id");
+            if (Context.CurrentDatabaseProvider != DatabaseProviders.SqlServer)
+            {
+                Delete.ForeignKey().FromTable("cmsMacroProperty").ForeignColumn("macroPropertyType").ToTable("cmsMacroPropertyType").PrimaryColumn("id");
+            }
+            else
+            {
+                //If we are on SQLServer, we need to delete constraints by name, older versions of umbraco did not name these key constraints
+                // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
+                // http://issues.umbraco.org/issue/U4-4133
+
+                var keyConstraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct();
+                var constraint = keyConstraints
+                    .SingleOrDefault(x => x.Item1 == "cmsMacroProperty" && x.Item2 == "macroPropertyType" && x.Item3.InvariantStartsWith("PK_") == false);
+                if (constraint != null)
+                {
+                    Delete.ForeignKey(constraint.Item3).OnTable("cmsMacroProperty");
+                }
+            }
             
             Alter.Table("cmsMacroProperty").AddColumn("editorAlias").AsString(255).NotNullable().WithDefaultValue("");
 
@@ -46,7 +92,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //drop the column now
             Delete.Column("macroPropertyType").FromTable("cmsMacroProperty");
 
-            //drop the default constraing
+            //drop the default constraint
             Delete.DefaultConstraint().OnTable("cmsMacroProperty").OnColumn("editorAlias");
         }
 

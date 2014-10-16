@@ -30,6 +30,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 var dtSql = new Sql().Select("nodeId").From<DataTypeDto>().Where<DataTypeDto>(dto => dto.PropertyEditorAlias == Constants.PropertyEditors.RelatedLinksAlias);
                 var dataTypeIds = database.Fetch<int>(dtSql);
 
+                if (!dataTypeIds.Any()) return string.Empty;
+
                 var propertyData =
                     database.Fetch<PropertyDataDto>(
                         "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { dataTypeIds = dataTypeIds });

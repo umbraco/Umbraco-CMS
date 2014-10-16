@@ -32,8 +32,17 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// Gets/sets the version of the current SQL server instance
         /// </summary>
         internal Lazy<SqlServerVersionName> VersionName { get; set; }
-        
-        
+
+        /// <summary>
+        /// SQL Server stores default values assigned to columns as constraints, it also stores them with named values, this is the only
+        /// server type that does this, therefore this method doesn't exist on any other syntax provider
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(Database db)
+        {
+            var items = db.Fetch<dynamic>("SELECT TableName = t.Name,ColumnName = c.Name,dc.Name,dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id");
+            return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
+        } 
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
         {

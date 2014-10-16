@@ -25,19 +25,35 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         private void Initial()
         {
+            var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+
             //create a new col which we will make a foreign key, but first needs to be populated with data.
             Alter.Table("cmsTagRelationship").AddColumn("propertyTypeId").AsInt32().Nullable();
-            
-            //drop the foreign key on umbracoNode.  Must drop foreign key first before primary key can be removed in MySql.
 
-            Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("nodeId").ToTable("umbracoNode").PrimaryColumn("id");
+            //drop the foreign key on umbracoNode.  Must drop foreign key first before primary key can be removed in MySql.
+            if (Context.CurrentDatabaseProvider != DatabaseProviders.SqlServer)
+            {
+                Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("nodeId").ToTable("umbracoNode").PrimaryColumn("id");
+            }
+            else
+            {
+                //If we are on SQLServer, we need to delete constraints by name, older versions of umbraco did not name these key constraints
+                // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
+                // http://issues.umbraco.org/issue/U4-4133
+
+                var constraint = constraints
+                    .SingleOrDefault(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "nodeId" && x.Item3.InvariantStartsWith("PK_") == false);
+                if (constraint != null)
+                {
+                    Delete.ForeignKey(constraint.Item3).OnTable("cmsTagRelationship");
+                }
+            }
 
             //we need to drop the primary key, this is sql specific since MySQL has never had primary keys on this table
             // at least since 6.0 and the new installation way but perhaps it had them way back in 4.x so we need to check
             // it exists before trying to drop it.
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
-            {
-                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            {   
                 //this will let us know if this pk exists on this table
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantEquals("PRIMARY")) > 0)
                 {
