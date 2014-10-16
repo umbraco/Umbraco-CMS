@@ -365,6 +365,11 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("treeAlias", xmlTreeNode.TreeType);
             }
 
+            foreach (var appliedClass in xmlTreeNode.Style.AppliedClasses)
+            {
+                node.CssClasses.Add(appliedClass);
+            }
+
             //This is a special case scenario, we know that content/media works based on the normal Belle routing/editing so we'll ensure we don't
             // pass in the legacy JS handler so we do it the new way, for all other trees (Currently, this is a WIP), we'll render
             // the legacy js callback,.

@@ -307,6 +307,7 @@
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\CanvasDesignerController.cs" />
+    <Compile Include="Editors\UserController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />

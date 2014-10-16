@@ -80,7 +80,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             mainWindow: function() {
                 return top;
             },
-            mainTree: function() {
+            mainTree: function () {
+
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
                 var appState = injector.get("appState");
@@ -177,23 +178,33 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             appActions: function() {
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
-
-                var _actions = {};
-                _actions.openDashboard = function(section){
-                    navService.changeSection(section);
+                var localizationService = injector.get("localizationService");
+                var userResource = injector.get("userResource");                
+                //var appState = injector.get("appState");
+                var angularHelper = injector.get("angularHelper");
+                var $rootScope = injector.get("$rootScope");
+                
+                var actions = {
+                    openDashboard : function(section){
+                        navService.changeSection(section);
+                    },
+                    actionDisable: function () {
+                        localizationService.localize("defaultdialogs_confirmdisable").then(function (txtConfirmDisable) {
+                            var currentMenuNode = UmbClientMgr.mainTree().getActionNode();
+                            if (currentMenuNode) {
+                                if (confirm(txtConfirmDisable + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
+                                    angularHelper.safeApply($rootScope, function () {
+                                        userResource.disableUser(currentMenuNode.nodeId).then(function () {
+                                            UmbClientMgr.mainTree().syncTree("-1," + currentMenuNode.nodeId, true);
+                                        });
+                                    });
+                                }
+                            }
+                        });
+                    }
                 };
 
-                return _actions;
-                //throw "Not implemented!";
-
-                ////if the main window has no actions, we'll create some
-                //if (this._appActions == null) {
-                //    if (typeof this.mainWindow().appActions == 'undefined') {
-                //        this._appActions = new Umbraco.Application.Actions();
-                //    }
-                //    else this._appActions = this.mainWindow().appActions;
-                //}
-                //return this._appActions;
+                return actions;                
             },
             uiKeys: function() {
                 

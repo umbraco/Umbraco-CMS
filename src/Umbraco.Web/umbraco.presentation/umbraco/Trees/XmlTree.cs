@@ -381,9 +381,9 @@ namespace umbraco.cms.presentation.Trees
 				AppliedClasses = new List<string>();
 			}
 
-			private const string DimNodeCssClass = "dim";
-			private const string HighlightNodeCssClass = "overlay-new";
-			private const string SecureNodeCssClass = "overlay-protect";
+            private const string DimNodeCssClass = "not-published";
+            private const string HighlightNodeCssClass = "has-unpublished-version";
+            private const string SecureNodeCssClass = "protected";
 
 			internal List<string> AppliedClasses { get; private set; }
 
