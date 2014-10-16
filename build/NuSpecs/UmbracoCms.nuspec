@@ -16,6 +16,7 @@
         <tags>umbraco</tags>
         <dependencies>
             <dependency id="UmbracoCms.Core" version="[$version$]" />
+			<dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
         </dependencies>
     </metadata>
   <files>
