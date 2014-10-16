@@ -4,20 +4,12 @@ if ($project) {
 	$dateTime = Get-Date -Format yyyyMMdd-HHmmss
 	$backupPath = Join-Path (Split-Path $project.FullName -Parent) "\App_Data\NuGetBackup\$dateTime"
 	$copyLogsPath = Join-Path $backupPath "CopyLogs"
-	
+	$projectDestinationPath = Split-Path $project.FullName -Parent
+
 	# Create backup folder and logs folder if it doesn't exist yet
 	New-Item -ItemType Directory -Force -Path $backupPath
 	New-Item -ItemType Directory -Force -Path $copyLogsPath
 	
-	# Create a backup of original web.config
-	$projectDestinationPath = Split-Path $project.FullName -Parent
-	$webConfigSource = Join-Path $projectDestinationPath "Web.config"
-	Copy-Item $webConfigSource $backupPath -Force
-	
-	# Copy Web.config from package to project folder
-	$umbracoFilesPath = Join-Path $rootPath "UmbracoFiles\Web.config"
-	Copy-Item $umbracoFilesPath $projectDestinationPath -Force
-
 	# Copy umbraco and umbraco_files from package to project folder
 	# This is only done when these folders already exist because we 
 	# only want to do this for upgrades
@@ -41,6 +33,11 @@ if ($project) {
 		
 		robocopy $umbracoClientFolder $umbracoClientBackupPath /e /LOG:$copyLogsPath\UmbracoClientBackup.log
 		robocopy $umbracoClientFolderSource $umbracoClientFolder /is /it /e /LOG:$copyLogsPath\UmbracoClientCopy.log		
+	}
+
+	$installFolder = Join-Path $projectDestinationPath "Install"
+	if(Test-Path $umbracoFolder) {
+		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
 
 	# Open readme.txt file
