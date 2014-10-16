@@ -466,7 +466,11 @@ WHERE EXISTS(
                         }
                     }
 
-                    result.Add(def.Id, new PropertyCollection(properties));   
+                    if (result.ContainsKey(def.Id))
+                    {
+                        LogHelper.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
+                    }
+                    result[def.Id] = new PropertyCollection(properties);
                 }                
             }
 
