@@ -73,6 +73,5 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\System.Web.WebPages.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.WebPages.Deployment.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.Deployment.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.WebPages.Razor.dll) { Remove-Item $umbracoBinFolder\System.Web.WebPages.Razor.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\Test.dll) { Remove-Item $umbracoBinFolder\Test.dll -Force -Confirm:$false }
 	}
 }

@@ -10,6 +10,11 @@ if ($project) {
 	New-Item -ItemType Directory -Force -Path $backupPath
 	New-Item -ItemType Directory -Force -Path $copyLogsPath
 	
+	# Create a backup of original web.config
+	$projectDestinationPath = Split-Path $project.FullName -Parent
+	$webConfigSource = Join-Path $projectDestinationPath "Web.config"
+	Copy-Item $webConfigSource $backupPath -Force
+	
 	# Copy umbraco and umbraco_files from package to project folder
 	# This is only done when these folders already exist because we 
 	# only want to do this for upgrades
