@@ -8,16 +8,17 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisions spor</key>
     <key alias="browse">Gennemse elementer</key>
+	<key alias="changeDocType">Skift dokumenttype</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="createPackage">Opret pakke</key>
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="emptyTrashcan">Tøm papirkurv</key>
-    <key alias="exportDocumentType">Eksportér Dokumenttype</key>
+    <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="exportDocumentTypeAsCode">Eksportér til .NET</key>
     <key alias="exportDocumentTypeAsCode-Full">Eksportér til .NET</key>
-    <key alias="importDocumentType">Importér Dokumenttype</key>
+    <key alias="importDocumentType">Importér dokumenttype</key>
     <key alias="importPackage">Importér pakke</key>
     <key alias="liveEdit">Redigér i Canvas</key>
     <key alias="logout">Log af</key>
@@ -50,6 +51,9 @@
     <key alias="atViewingFor">For</key>
   </area>
   <area alias="buttons">
+	<key alias="select">Vælg</key>
+    <key alias="selectCurrentFolder">Vælg nuværende mappe</key>
+    <key alias="somethingElse">Gør noget andet</key>
     <key alias="bold">Fed</key>
     <key alias="deindent">Fortryd indryk afsnit</key>
     <key alias="formFieldInsert">Indsæt formularfelt</key>
@@ -77,7 +81,28 @@
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
   </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
+    <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
+    <key alias="contentRepublished">Indholdet er blevet genudgivet.</key>
+    <key alias="currentProperty">Nuværende egenskab</key>
+    <key alias="currentType">Nuværende type</key>
+    <key alias="docTypeCannotBeChanged">Du kan ikke skifte dokumenttype, da der ikke er andre gyldige dokumenttyper på denne placering.</key>
+    <key alias="docTypeChanged">Dokumenttype skiftet</key>
+    <key alias="mapProperties">Overfør egenskaber</key>
+    <key alias="mapToProperty">Overfør til egenskab</key>
+    <key alias="newTemplate">Ny skabelon</key>
+    <key alias="newType">Ny type</key>
+    <key alias="none">ingen</key>
+    <key alias="selectedContent">Indhold</key>
+    <key alias="selectNewDocType">Vælg ny dokumenttype</key>
+    <key alias="successMessage">Dokumenttypen på detvalgte indhold blev skiftet til [new type], og følgende egenskaber blev overført:</key>
+    <key alias="to">til</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
+    <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
+  </area>
   <area alias="content">
+	<key alias="isPublished" version="7.2">Udgivet</key>
     <key alias="about">Om siden</key>
     <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hvordan ville du f.eks. beskrive billedet via telefonen?)</key>
@@ -94,7 +119,9 @@
     <key alias="itemChanged">Dette punkt er ændret siden udgivelsen</key>
     <key alias="itemNotPublished">Dette punkt er endnu ikke udgivet</key>
     <key alias="lastPublished">Sidst udgivet</key>
+	<key alias="listViewNoItems" version="7.1.5">Der er ingen elementer at vise på listen.</key>
     <key alias="mediatype">Medietype</key>
+	<key alias="mediaLinks">Link til medie(r)</key>
     <key alias="membergroup">Medlemsgruppe</key>
     <key alias="memberrole">Rolle</key>
     <key alias="membertype">Medlemstype</key>
@@ -102,35 +129,36 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
+	<key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
     <key alias="publish">Udgivet</key>
-    <key alias="publishStatus">Udgivelses status</key>
+    <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
+	<key alias="unpublishDate">Dato for Fortryd udgivelse</key>
     <key alias="removeDate">Fjern dato</key>
     <key alias="sortDone">Sorteringrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
     <key alias="titleOptional">Titel (valgfri)</key>
+	<key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Fortryd udgivelse</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
     <key alias="urls">Link til dokument</key>
-
+	<key alias="memberof">Medlem af grupper(ne)</key>
+    <key alias="notmemberof">Ikke medlem af grupper(ne)</key>
     <key alias="childItems" version="7.0">Undersider</key>
     <key alias="target" version="7.0">Åben i vindue</key>
   </area>
-
   <area alias="media">
     <key alias="clickToUpload">Klik for at uploade</key>
     <key alias="dropFilesHere">Slip filerne her...</key>
   </area>
-  
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
-
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
   </area>
@@ -193,14 +221,31 @@
     <key alias="description">Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
     <key alias="displayName">Kulturnavn</key>
   </area>
+  <area alias="placeholders">
+    <key alias="username">Indtast dit brugernavn</key>
+    <key alias="password">Indtast dit kodeord</key>
+    <key alias="nameentity">Navngiv %0%...</key>
+    <key alias="entername">Indtast navn...</key>
+    <key alias="search">Søg...</key>
+    <key alias="filter">Filtrer...</key>
+  </area>
   <area alias="editcontenttype">
+	<key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
+    <key alias="allowAtRootDesc" version="7.2">Kun dokumenttyper med denne indstilling aktiveret oprettes i rodniveau under Inhold og Mediearkiv</key>
     <key alias="allowedchildnodetypes">Tilladte typer</key>
+	<key alias="contenttypecompositions">Sammensætning af dokumenttyper</key>
     <key alias="create">Opret</key>
     <key alias="deletetab">Slet fane</key>
     <key alias="description">Beskrivelse</key>
     <key alias="newtab">Ny fane</key>
     <key alias="tab">Fane</key>
     <key alias="thumbnail">Thumbnail</key>
+	<key alias="hasListView">Aktiver listevisning</key>
+    <key alias="hasListViewDesc" version="7.2">Viser undersider i en søgbar liste, undersider vises ikke i indholdstræet</key>
+    <key alias="currentListView" version="7.2">Nuværende listevisning</key>
+    <key alias="currentListViewDesc" version="7.2">Den aktive listevisningsdatatype</key>
+    <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
+    <key alias="removeListView" version="7.2">Fjern brugerdefineret listevisning</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Tilføj førværdi</key>
@@ -229,6 +274,7 @@
     <key alias="errorRegExpWithoutTab">%0% er ikke i et korrekt format</key>
   </area>
   <area alias="errors">
+	<key alias="dissallowedMediaType">Denne filttype er blevet deaktiveret af administratoren</key>
     <key alias="codemirroriewarning">OBS! Selvom CodeMirror er slået til i konfigurationen, så er den deaktiveret i Internet Explorer fordi den ikke er stabil nok.</key>
     <key alias="contentTypeAliasAndNameNotNull">Du skal udfylde både Alias &amp; Navn på den nye egenskabstype!</key>
     <key alias="filePermissionsError">Der mangler læse/skrive rettigheder til bestemte filer og mapper</key>
@@ -244,17 +290,8 @@
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
     <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
+	<key alias="missingPropertyEditorErrorMessage">Der er et problem med den datatype, der bruges til denn egenskab. Kontroller konfigurationen og prøv igen.</key>
   </area>
-
-  <area alias="placeholders">
-    <key alias="username">Indtast dit brugernavn</key>
-    <key alias="password">Indtast dit kodeord</key>
-    <key alias="nameentity">Navngiv %0%...</key>
-    <key alias="entername">Indtast navn...</key>
-    <key alias="search">Søg...</key>
-    <key alias="filter">Filtre...</key>
-  </area>
-
   <area alias="general">
     <key alias="about">Om</key>
     <key alias="action">Handling</key>
@@ -308,6 +345,7 @@
     <key alias="logout">Log ud</key>
     <key alias="macro">Makro</key>
     <key alias="move">Flyt</key>
+	<key alias="more">Mere</key>
     <key alias="name">Navn</key>
     <key alias="new">Ny</key>
     <key alias="next">Næste</key>
@@ -327,6 +365,7 @@
     <key alias="remaining">Mangler</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
+	<key alias="required" version="7.0">Påkrævet</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
     <key alias="search">Søg</key>
@@ -349,6 +388,8 @@
     <key alias="welcome">Velkommen...</key>
     <key alias="width">Bredde</key>
     <key alias="yes">Ja</key>
+    <key alias="folder">Mappe</key>
+    <key alias="searchResults">Søgeresultater</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -461,9 +502,11 @@
     <key alias="moveTo">Flyt til</key>
     <key alias="nodeSelected">er blevet valgt som roden for dit nye indhold, klik 'ok' nedenunder.</key>
     <key alias="noNodeSelected">Intet element valgt, vælg et element i listen ovenfor før der klikkes 'fortsæt'</key>
-    <key alias="notAllowedByContentType">Den nuværende node kan ikke lægges under denne pga. sin type</key>
-    <key alias="notAllowedByPath">Den nuværende node kan ikke ligge under en af dens undersider</key>
+    <key alias="notAllowedByContentType">Det nuværende element kan ikke lægges under denne pga. sin type</key>
+    <key alias="notAllowedByPath">Det nuværende element kan ikke ligge under en af dens undersider</key>
+	<key alias="notAllowedAtRoot">Dette element må ikke findes på rodniveau</key>
     <key alias="notValid">Denne handling er ikke tilladt fordi du ikke har de fornødne rettigheder på et eller flere af under-dokumenterne</key>
+	<key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
@@ -545,8 +588,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="publishAll">Publisér alle undersider</key>
     <key alias="publishHelp"><![CDATA[Klik <em>ok</em> for at udgive <strong>%0%</strong> og derved gøre indholdet offentligt tilgængeligt..<br/><br /> Du kan udgive denne side og dens undersider ved at klikke <em>Udgiv alle undersider</em> forneden]]></key>
   </area>
+  <area alias="colorpicker">
+    <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
+  </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Tilføj ekstern link</key>
+    <key alias="addExternal">Tilføj eksternt link</key>
     <key alias="addInternal">Tilføj internt link</key>
     <key alias="addlink">Tilføj</key>
     <key alias="caption">Billedtekst</key>
@@ -585,7 +631,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="help">Hjælp</key>
   </area>
   <area alias="settings">
-    <key alias="defaulttemplate">Standard skabelon</key>
+    <key alias="defaulttemplate">Standardskabelon</key>
     <key alias="dictionary editor egenskab">Ordbogsnøgle</key>
     <key alias="importDocumentTypeHelp">For at importere en dokumenttype, find ".udt"-filen på din computer ved at klikke på "Gennemse"-knappen og klik "Import" (Du vil blive bedt om bekræftelse på næste skærmbillede)</key>
     <key alias="newtabname">Ny titel på faneblad</key>
@@ -624,6 +670,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
+	<key alias="editMediaSaved">Medie gemt</key>
+    <key alias="editMediaSavedText">Medie gemt uden problemer</key>
     <key alias="editMemberSaved">Medlem gemt</key>
     <key alias="editStylesheetPropertySaved">Stylesheetegenskab gemt</key>
     <key alias="editStylesheetSaved">Stylesheet gemt</key>
