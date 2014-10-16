@@ -14,7 +14,11 @@
       <section name="dashBoard" type="Umbraco.Core.Configuration.Dashboard.DashboardSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </sectionGroup>
   </configSections>
-
+   
+  <appSettings>
+	<add key="ValidationSettings:UnobtrusiveValidationMode" value="None" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+  </appSettings>
+  
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
     <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <BaseRestExtensions configSource="config\BaseRestExtensions.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
