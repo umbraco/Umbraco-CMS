@@ -119,10 +119,21 @@ function start()
 		div = parent.document.createElement('div'),
 		td1 = '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">',
 		td2 = '<td style="font-size:11px;padding-right: 1em;">';
-	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tr>' + td1 + (isMac ? '&#8984;-F' : 'Ctrl-F</td>') + td2 + tinymce.translate('Start search') + '</td>' + td1 + (isMac ? '&#8984;-G' : 'Ctrl-G') + '</td>' + td2 + tinymce.translate('Find next') + '</td>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Find previous') + '</td></tr>' + '<tr>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Replace') + '</td>' + td1 + (isMac ? 'Shift-&#8984;-Alt-F' : 'Shift-Ctrl-R') +'</td>' + td2 + tinymce.translate('Replace all') + '</td></tr></table>';
+	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tbody>' + 
+	    '<tr><tr><td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Ctrl-F</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Start search</td>' +
+	    '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Ctrl-G</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Find next</td></tr>' + 
+	    '<tr><td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Shift-Ctrl-F</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Find previous</td>' +
+	    '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Shift-Ctrl-F</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Replace</td></tr>' +
+	    '<tr><td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Shift-Ctrl-R</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Replace all</td><td></td><td></td></tr>'+
+	    '</tbody></table>';
 	div.style.position = 'absolute';
 	div.style.left = '1em';
-	div.style.bottom = '.5em';
+	div.style.bottom = '.5em'; 
 	head.appendChild(div);
 	
 	// Set CodeMirror cursor to same position as cursor was in TinyMCE:
