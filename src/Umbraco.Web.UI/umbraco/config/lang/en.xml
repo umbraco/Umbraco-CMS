@@ -36,11 +36,6 @@
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="defaultValue">Default value</key>
-    <key alias="exportContourForm">Export form</key>
-    <key alias="importContourForm">Import form</key>
-    <key alias="archiveContourForm">Archive form</key>
-    <key alias="unarchiveContourForm">Unarchive form</key>
-    <key alias="defaultValue">Default value</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
