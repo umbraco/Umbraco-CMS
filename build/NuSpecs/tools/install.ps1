@@ -11,7 +11,6 @@ if ($project) {
 	New-Item -ItemType Directory -Force -Path $copyLogsPath
 	
 	# Create a backup of original web.config
-	$projectDestinationPath = Split-Path $project.FullName -Parent
 	$webConfigSource = Join-Path $projectDestinationPath "Web.config"
 	Copy-Item $webConfigSource $backupPath -Force
 	
