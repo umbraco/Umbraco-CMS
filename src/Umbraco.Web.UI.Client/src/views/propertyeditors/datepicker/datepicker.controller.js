@@ -18,9 +18,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     $scope.hidePicker = function () {
         $element.find("div:first").datetimepicker("hide");
     };
-    $(document).click(function (event) {
-        $scope.hidePicker();
-    });
+    $(document).bind("click", $scope.hidePicker);
 
     //handles the date changing via the api
     function applyDate(e) {
@@ -45,7 +43,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     userService.getCurrentUser().then(function (user) {
 
         assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css').then(function() {
-            var filesToLoad = ["lib/datetimepicker/bootstrap-datetimepicker.min.js"];
+            var filesToLoad = ["lib/datetimepicker/bootstrap-datetimepicker.js"];
 
             //if we support this custom culture, set it, then we'll need to load in that lang file
             if (_.contains(customLangs, user.locale)) {
@@ -65,10 +63,8 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                         .datetimepicker($scope.model.config)
                         .on("changeDate", applyDate);
 
-                    if ($scope.model.value) {
-                        //manually assign the date to the plugin
-                        $element.find("div:first").datetimepicker("setValue", $scope.model.value);
-                    }
+                    //manually assign the date to the plugin
+                    $element.find("div:first").datetimepicker("setValue", $scope.model.value ? $scope.model.value : null);
 
                     //Ensure to remove the event handler when this instance is destroyted
                     $scope.$on('$destroy', function () {
@@ -78,6 +74,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         });
 
         
+    });
+
+    //unbind doc click event!
+    $scope.$on('$destroy', function () {
+        $(document).unbind("click", $scope.hidePicker);
     });
 }
 
