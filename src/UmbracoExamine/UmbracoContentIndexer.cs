@@ -425,7 +425,11 @@ namespace UmbracoExamine
                     m);
 
                 //add a custom 'icon' attribute
-                xml.Add(new XAttribute("icon", m.ContentType.Icon));
+                if (m.ContentType.Icon.IsNullOrWhiteSpace() == false)
+                {
+                    xml.Add(new XAttribute("icon", m.ContentType.Icon));    
+                }
+                
 
                 yield return xml;
             }
@@ -555,7 +559,10 @@ namespace UmbracoExamine
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
 
             //icon
-            fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);
+            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            {
+                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
+            }
 
             return fields;
 
