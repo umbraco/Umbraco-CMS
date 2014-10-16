@@ -9,10 +9,9 @@ module.exports = function (grunt) {
 
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:canvasdesigner','copy:vs', 'karma:unit']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:canvasdesigner','copy:vs', 'karma:unit']);
   grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner','copy:canvasdesigner', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
-  grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
   grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
@@ -193,9 +192,6 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
               { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
-      },
-      packages: {
-        files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
     },
 
@@ -367,19 +363,7 @@ module.exports = function (grunt) {
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
         tasks:['watch-html','timestamp']
-      },
-
-        //SD: Removing package watching, we don't even use these anymore and they should be removed, the more watching we do the slower this gets
-      //packages: {
-      //    files: 'src/packages/**/*.*',
-      //    tasks: ['watch-packages', 'timestamp'],
-      //}
-
-        //SD: Removing watch docs, this gets run with the normal watching which we do not want
-      //docs: {
-      //    files: ['src/**/*.js', 'src/*.js'],
-      //    tasks: ['docs:api'],
-      //}
+      }
     },
 
 
