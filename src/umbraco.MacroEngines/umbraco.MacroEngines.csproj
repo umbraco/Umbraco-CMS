@@ -215,11 +215,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Umbraco.Web.UI\MacroScripts\Web.config">
-      <Link>Resources\Web.config</Link>
-    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <Content Include="Resources\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Strings.resx">

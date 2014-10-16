@@ -634,9 +634,6 @@
       <DependentUpon>Dashboard.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="MacroScripts\Web.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
