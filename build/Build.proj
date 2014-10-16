@@ -103,7 +103,6 @@
     <SystemFolders Include="$(WebAppFolder)Masterpages" />
     <SystemFolders Include="$(WebAppFolder)Scripts" />
     <SystemFolders Include="$(WebAppFolder)Css" />
-    <SystemFolders Include="$(WebAppFolder)MacroScripts" />
     <SystemFolders Include="$(WebAppFolder)Xslt" />
     <SystemFolders Include="$(WebAppFolder)UserControls" />
     <SystemFolders Include="$(WebAppFolder)Views" />
