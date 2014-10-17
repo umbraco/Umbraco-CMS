@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections xdt:Transform="InsertIfMissing" />
   <configSections>
     <section name="BaseRestExtensions" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <section name="FileSystemProviders" xdt:Locator="Match(name)" xdt:Transform="Remove" />
@@ -15,6 +16,7 @@
     </sectionGroup>
   </configSections>
    
+  <appSettings xdt:Transform="InsertIfMissing" />
   <appSettings>
 	<add key="ValidationSettings:UnobtrusiveValidationMode" value="None" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
   </appSettings>
@@ -39,13 +41,19 @@
   </system.data>
   <clientDependency xdt:Transform="RemoveAttributes(version)" />
 
-  <system.web xdt:Transform="InsertIfMissing">
-    <httpRuntime xdt:Transform="InsertIfMissing" />
-    <httpRuntime requestValidationMode="2.0" enableVersionHeader="false" targetFramework="4.5" xdt:Transform="SetAttributes(requestValidationMode,enableVersionHeader,targetFramework)" />
-	
-    <compilation xdt:Transform="InsertIfMissing">
-      <assemblies xdt:Transform="InsertIfMissing">
+  <system.web xdt:Transform="InsertIfMissing" />
+  <system.web>
+    <siteMap xdt:Transform="Remove" />
+	<membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
+	<roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
+	<profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>
+	<sessionState customProvider="DefaultSessionProvider" xdt:Locator="Match(customProvider)" xdt:Transform="Remove"/>  
+    <compilation xdt:Transform="InsertIfMissing" />
+    <compilation>
+      <assemblies xdt:Transform="InsertIfMissing" />
+      <assemblies>
         <add assembly="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
+        <add assembly="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
         <add assembly="System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <add assembly="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <add assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
@@ -59,11 +67,10 @@
         <add assembly="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
       </assemblies>
     </compilation>
-	
-    <compilation targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
-	
+
     <xhtmlConformance xdt:Transform="Remove" />
 	
+    <httpModules xdt:Transform="InsertIfMissing" />
     <httpModules>
       <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
@@ -72,20 +79,22 @@
       <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,umbraco" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </httpModules>
 	
+    <httpHandlers xdt:Transform="InsertIfMissing" />
     <httpHandlers>
       <add path="GoogleSpellChecker.ashx" xdt:Locator="Match(path)" xdt:Transform="Remove"  />
     </httpHandlers>
-    <siteMap xdt:Transform="Remove"  />
   </system.web>
 
-  <system.webServer xdt:Transform="InsertIfMissing">
+  <system.webServer xdt:Transform="InsertIfMissing" />
+  <system.webServer>
+    <modules xdt:Transform="InsertIfMissing" />
     <modules runAllManagedModulesForAllRequests="true" xdt:Transform="SetAttributes(runAllManagedModulesForAllRequests)">
       <remove name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <remove name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <remove name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <remove name="WebDAVModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <!-- Inserts it as the first element. Also see http://stackoverflow.com/a/19041487/5018 -->
-      <remove name="WebDAVModule" xdt:Locator="Match(name)" xdt:Transform="InsertBefore(/configuration/system.webServer/modules/*[1])" />
+      <remove name="WebDAVModule" xdt:Locator="Match(name)" xdt:Transform="Insert" />
 	  
       <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
@@ -94,6 +103,7 @@
       <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,umbraco" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </modules>
 	
+    <staticContent xdt:Transform="InsertIfMissing" />
     <staticContent>
       <remove fileExtension=".svg" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
       <mimeMap fileExtension=".svg" mimeType="image/svg+xml" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
@@ -111,15 +121,14 @@
 
   <system.codedom xdt:Transform="Remove" />
 
+  <runtime xdt:Transform="InsertIfMissing" />
   <runtime>
-    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-      <dependentAssembly xdt:Transform="Remove" xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')"></dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="SetAttributes()">
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Replace">
         <assemblyIdentity name="System.Net.Http" publicKeyToken="b03f5f7f11d50a3a" culture="neutral"/>
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0"/>
       </dependentAssembly>
-      <dependentAssembly xdt:Transform="Remove" xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')"></dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Replace">
         <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="6.0.0.0" />
       </dependentAssembly>
