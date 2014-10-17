@@ -291,8 +291,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //TODO: Fix this n+1 query!
                 var masterTemplate = Get(dto.Master.Value);
-                template.MasterTemplateAlias = masterTemplate.Alias;
-                template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
+                if (masterTemplate != null)
+                {
+                    template.MasterTemplateAlias = masterTemplate.Alias;
+                    template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);    
+                }
             }
 
             if (_viewsFileSystem.FileExists(csViewName))
