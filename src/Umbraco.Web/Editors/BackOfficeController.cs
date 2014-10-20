@@ -177,6 +177,10 @@ namespace Umbraco.Web.Editors
                                         controller => controller.GetDashboard(null))
                                 },
                                 {
+                                    "dictionaryApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DictionaryController>(
+                                        controller => controller.GetById(0))
+                                },
+                                {
                                     "logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>(
                                         controller => controller.GetEntityLog(0))
                                 },
