@@ -501,6 +501,7 @@
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
