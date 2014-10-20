@@ -133,7 +133,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public static PublishedContentType Get(PublishedItemType itemType, string alias)
         {
             var key = string.Format("PublishedContentType_{0}_{1}",
-                itemType == PublishedItemType.Content ? "content" : "media", alias.ToLowerInvariant());
+                itemType.ToString().ToLowerInvariant(), alias.ToLowerInvariant());
 
             var type = ApplicationContext.Current.ApplicationCache.StaticCache.GetCacheItem<PublishedContentType>(key,
                 () => CreatePublishedContentType(itemType, alias));
