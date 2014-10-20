@@ -25,7 +25,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
 
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser2app") && x.Item3.InvariantEquals("FK_umbracoUser2app_umbracoApp")))
                 {
-                    Delete.ForeignKey("FK_umbracoUser2app_umbracoApp").OnTable("umbracoUser2app");    
+                    Delete.ForeignKey("FK_umbracoUser2app_umbracoApp").OnTable("umbracoUser2app");
+                    //name this migration, this is a hack for DeleteAppTables to ensure it's not executed twice
+                    ((MigrationExpressionBase) Context.Expressions.Last()).Name = "FK_umbracoUser2app_umbracoApp";
                 }
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser2app") && x.Item3.InvariantEquals("FK_umbracoUser2app_umbracoUser")))
                 {
