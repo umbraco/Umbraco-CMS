@@ -150,7 +150,10 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			{
 				//we are editing a view (i.e. partial view)
 				OriginalFileName = HttpUtility.UrlDecode(Request.QueryString["file"]);
-                TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
+
+                //TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
+
+                TemplateTreeSyncPath = DeepLink.GetTreePathFromFilePath(OriginalFileName.TrimStart("MacroPartials/").TrimStart("Partials/"));
 			}
 			else
 			{

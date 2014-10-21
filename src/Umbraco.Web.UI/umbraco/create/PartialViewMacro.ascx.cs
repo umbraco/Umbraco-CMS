@@ -19,6 +19,10 @@ namespace Umbraco.Web.UI.Umbraco.Create
             DataBind();
 
             LoadTemplates(PartialViewTemplate);
+
+            // Enable new contect item in folders to place items in that folder.
+            if (Request["nodeType"] == "partialViewMacrosFolder")
+                FileName.Text = Request["nodeId"] + "/";
         }
 
         private static void LoadTemplates(ListControl list)

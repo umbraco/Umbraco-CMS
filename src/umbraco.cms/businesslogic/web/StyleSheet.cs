@@ -254,7 +254,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var e = new DeleteEventArgs();
             FireBeforeDelete(e);
-
+            
             if (!e.Cancel)
             {
                 File.Delete(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text)));
@@ -272,6 +272,13 @@ namespace umbraco.cms.businesslogic.web
 
         public void saveCssToFile()
         {
+            if (this.Text.Contains('/'))
+            {
+                var dir = string.Format("{0}/{1}", IOHelper.MapPath(SystemDirectories.Css), this.Text.Substring(0, this.Text.LastIndexOf('/')));
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+            }
+
             using (StreamWriter SW = File.CreateText(IOHelper.MapPath(string.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
             {
                 string tmpCss = this.Content ;
