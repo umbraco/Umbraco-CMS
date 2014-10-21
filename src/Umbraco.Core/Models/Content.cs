@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -363,7 +365,7 @@ namespace Umbraco.Core.Models
         /// Returns true if only the entity properties are direty
         /// </summary>
         /// <returns></returns>
-        internal bool IsEntityDirty()
+        public bool IsEntityDirty()
         {
             return base.IsDirty();
         }
@@ -372,9 +374,18 @@ namespace Umbraco.Core.Models
         /// Returns true if any of the properties are dirty
         /// </summary>
         /// <returns></returns>
-        internal bool IsAnyUserPropertyDirty()
+        public bool IsAnyUserPropertyDirty()
         {
             return Properties.Any(x => x.IsDirty());
+        }
+
+        /// <summary>
+        /// Returns a list of all dirty user defined properties
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetDirtyUserProperties()
+        {
+            return Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
         }
 
         /// <summary>

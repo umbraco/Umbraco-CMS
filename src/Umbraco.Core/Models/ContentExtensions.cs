@@ -43,6 +43,61 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Determines if the item should be persisted at all
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// In one particular case, a content item shouldn't be persisted:
+        /// * The item exists and is published
+        /// * A call to ContentService.Save is made
+        /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
+        /// 
+        /// In this case, there is no reason to make any database changes at all
+        /// </remarks>
+        internal static bool RequiresSaving(this IContent entity)
+        {
+            var publishedState = ((Content)entity).PublishedState;
+            return RequiresSaving(entity, publishedState);
+        }
+
+        /// <summary>
+        /// Determines if the item should be persisted at all
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedState"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// In one particular case, a content item shouldn't be persisted:
+        /// * The item exists and is published
+        /// * A call to ContentService.Save is made
+        /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
+        /// 
+        /// In this case, there is no reason to make any database changes at all
+        /// </remarks>
+        internal static bool RequiresSaving(this IContent entity, PublishedState publishedState)
+        {
+            var dirtyEntity = (ICanBeDirty)entity;
+            var publishedChanged = dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
+            //check if any user prop has changed
+            var propertyValueChanged = ((Content)entity).IsAnyUserPropertyDirty();
+            
+            //We need to know if any other property apart from Published was changed here
+            //don't create a new version if the published state has changed to 'Save' but no data has actually been changed
+            if (publishedChanged && entity.Published == false && propertyValueChanged == false)
+            {
+                //at this point we need to check if any non property value has changed that wasn't the published state
+                var changedProps = ((TracksChangesEntityBase)entity).GetDirtyProperties();
+                if (changedProps.Any(x => x != "Published") == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Determines if a new version should be created
         /// </summary>
         /// <param name="entity"></param>
@@ -76,9 +131,12 @@ namespace Umbraco.Core.Models
             var dirtyEntity = (ICanBeDirty)entity;
 
             //check if the published state has changed or the language
-            var contentChanged =
-                (dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished)
-                || dirtyEntity.IsPropertyDirty("Language");
+            var publishedChanged = dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
+            var langChanged = dirtyEntity.IsPropertyDirty("Language");
+            var contentChanged = publishedChanged || langChanged;
+
+            //check if any user prop has changed
+            var propertyValueChanged = ((Content)entity).IsAnyUserPropertyDirty();            
 
             //return true if published or language has changed
             if (contentChanged)
@@ -86,8 +144,6 @@ namespace Umbraco.Core.Models
                 return true;
             }
 
-            //check if any user prop has changed
-            var propertyValueChanged = ((Content)entity).IsAnyUserPropertyDirty();
             //check if any content prop has changed
             var contentDataChanged = ((Content)entity).IsEntityDirty();
 
@@ -134,7 +190,7 @@ namespace Umbraco.Core.Models
 
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
-            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
+            if (entity.IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
             {
                 return true;
             }

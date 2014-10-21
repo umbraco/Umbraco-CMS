@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -337,13 +338,20 @@ namespace Umbraco.Core.Persistence.Repositories
                 UpdatePropertyTags(entity, _tagRepository);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IContent entity)
         {
             var publishedState = ((Content) entity).PublishedState;
             
+            //check if we need to make any database changes at all
+            if (entity.RequiresSaving(publishedState) == false)
+            {
+                entity.ResetDirtyProperties();
+                return;
+            }
+
             //check if we need to create a new version
             bool shouldCreateNewVersion = entity.ShouldCreateNewVersion(publishedState);
             if (shouldCreateNewVersion)
@@ -363,7 +371,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -487,7 +495,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 ClearEntityTags(entity, _tagRepository);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
 

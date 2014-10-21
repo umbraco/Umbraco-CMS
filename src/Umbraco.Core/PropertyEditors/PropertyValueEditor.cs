@@ -169,7 +169,6 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
-
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
             var s = value as string;
             if (s != null)
@@ -194,7 +193,15 @@ namespace Umbraco.Core.PropertyEditors
                     // instead of int. Even though our db will not support this (will get truncated), we'll at least parse to this.
                     
                     valueType = typeof(long?);
-                    break;
+
+                    //if parsing is successful, we need to return as an Int, we're only dealing with long's here because of json.net, we actually
+                    //don't support long values and if we return a long value it will get set as a 'long' on the Property.Value (object) and then
+                    //when we compare the values for dirty tracking we'll be comparing an int -> long and they will not match.
+                    var result = value.TryConvertTo(valueType);
+                    return result.Success && result.Result != null
+                        ? Attempt<object>.Succeed((int)(long)result.Result) 
+                        : result;
+
                 case DataTypeDatabaseType.Date:
                     //ensure these are nullable so we can return a null if required
                     valueType = typeof(DateTime?);
