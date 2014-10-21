@@ -76,6 +76,7 @@ namespace umbraco
             xNode.Menu = new List<IAction>(new IAction[] { ActionDelete.Instance, ContextMenuSeperator.Instance, ActionNew.Instance, ContextMenuSeperator.Instance, ActionRefresh.Instance });
             xNode.Action = "javascript:void(0)";
             xNode.NodeType = "scriptsFolder";
+            xNode.Action = "javascript:void(0);";
         }
 
         protected override void OnRenderFileNode(ref XmlTreeNode xNode)

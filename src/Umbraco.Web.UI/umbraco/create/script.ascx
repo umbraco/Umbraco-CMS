@@ -3,7 +3,7 @@
 
 <input type="hidden" name="nodeType" value="-1"/>
 <cc1:Pane runat="server">
-    <cc1:PropertyPanel runat="server" Text="Name">
+    <cc1:PropertyPanel runat="server" Text="Name (use / to make folders)">
         <asp:TextBox ID="rename" runat="server" CssClass="bigInput input-large-type input-block-level"></asp:TextBox>
         <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
     </cc1:PropertyPanel>

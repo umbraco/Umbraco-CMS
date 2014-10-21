@@ -31,7 +31,17 @@ namespace Umbraco.Web.Trees
 		                    UmbClientMgr.contentFrame('Settings/Views/EditView.aspx?treeType=partialViewMacros&file=MacroPartials%2f' + id);
 					    }
 		                ");
-		}
+
+		}/// <summary>
+		/// Ensures that no folders can be added
+		/// </summary>
+		/// <param name="xNode"></param>
+        protected override void OnRenderFolderNode(ref XmlTreeNode xNode)
+        {
+            base.OnRenderFolderNode(ref xNode);
+
+            xNode.NodeType = "partialViewMacrosFolder";
+        }
 
 		protected override void ChangeNodeAction(XmlTreeNode xNode)
 		{
