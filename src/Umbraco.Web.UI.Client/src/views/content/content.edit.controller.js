@@ -13,6 +13,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     $scope.subButtons = [];    
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
+    $scope.isNew = $routeParams.create;
 
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 

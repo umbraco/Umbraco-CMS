@@ -46,7 +46,7 @@
                             </a>
                         </div>
 
-                        <div class="btn-group" ng-show="content.template">
+                        <div class="btn-group" ng-show="content.template && !isNew">
                             <a class="btn" ng-click="preview(content)">
                                 <localize key="buttons_showPage">Preview page</localize>
                             </a>
