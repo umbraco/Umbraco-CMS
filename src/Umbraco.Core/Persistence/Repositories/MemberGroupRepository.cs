@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
             
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         public IMemberGroup GetByName(string name)

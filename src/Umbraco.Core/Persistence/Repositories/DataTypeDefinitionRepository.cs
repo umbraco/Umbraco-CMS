@@ -195,7 +195,7 @@ WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("te
             dto.DataTypeId = nodeDto.NodeId;
             Database.Insert(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
@@ -216,7 +216,7 @@ AND umbracoNode.id <> @id",
             ((DataTypeDefinition)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -239,7 +239,7 @@ AND umbracoNode.id <> @id",
             Database.Update(nodeDto);
             Database.Update(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IDataTypeDefinition entity)

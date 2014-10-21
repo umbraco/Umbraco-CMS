@@ -267,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             UpdatePropertyTags(entity, _tagRepository);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMedia entity)
@@ -282,7 +282,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -349,7 +349,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             UpdatePropertyTags(entity, _tagRepository);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion

@@ -153,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(sectionDto);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IUser entity)
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion

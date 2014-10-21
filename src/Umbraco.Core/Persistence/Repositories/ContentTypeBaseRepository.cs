@@ -291,7 +291,7 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            if (((ICanBeDirty)entity).IsPropertyDirty("PropertyGroups") || 
+            if (entity.IsPropertyDirty("PropertyGroups") || 
                 entity.PropertyGroups.Any(x => x.IsDirty()))
             {
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
@@ -355,7 +355,7 @@ AND umbracoNode.id <> @id",
             }
 
             //If a Composition is removed we need to update/reset references to the PropertyGroups on that ContentType
-            if (((ICanBeDirty)entity).IsPropertyDirty("ContentTypeComposition") &&
+            if (entity.IsPropertyDirty("ContentTypeComposition") &&
                 compositionBase != null &&
                 compositionBase.RemovedContentTypeKeyTracker != null &&
                 compositionBase.RemovedContentTypeKeyTracker.Any())

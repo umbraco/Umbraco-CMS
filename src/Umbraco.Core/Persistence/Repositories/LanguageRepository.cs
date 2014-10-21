@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(ILanguage entity)
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion

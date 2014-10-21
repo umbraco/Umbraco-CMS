@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models.Membership
@@ -7,7 +8,7 @@ namespace Umbraco.Core.Models.Membership
     /// Defines the interface for a <see cref="User"/>
     /// </summary>
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
-    public interface IUser : IMembershipUser
+    public interface IUser : IMembershipUser, IRememberBeingDirty, ICanBeDirty
     {
         string Name { get; set; }
         int SessionTimeout { get; set; }

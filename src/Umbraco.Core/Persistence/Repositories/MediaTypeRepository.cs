@@ -152,7 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             PersistNewBaseContentType(dto, entity);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMediaType entity)
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ((MediaType)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             PersistUpdatedBaseContentType(dto, entity);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion

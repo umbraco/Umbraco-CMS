@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 translation.Key = entity.Key;
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IDictionaryItem entity)
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)

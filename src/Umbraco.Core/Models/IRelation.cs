@@ -3,7 +3,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public interface IRelation : IAggregateRoot
+    public interface IRelation : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Gets or sets the Parent Id of the Relation (Source)
