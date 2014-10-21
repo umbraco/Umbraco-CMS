@@ -14,12 +14,12 @@ namespace Umbraco.Web.WebApi
     {
         private const string ControllerKey = "controller";
         private readonly HttpConfiguration _configuration;
-        private readonly Lazy<IEnumerable<Type>> _duplicateControllerTypes;
+        private readonly Lazy<ConcurrentStack<NamespaceHttpControllerMetadata>> _duplicateControllerTypes;
 
         public NamespaceHttpControllerSelector(HttpConfiguration configuration) : base(configuration)
         {
             _configuration = configuration;
-            _duplicateControllerTypes = new Lazy<IEnumerable<Type>>(GetDuplicateControllerTypes);
+            _duplicateControllerTypes = new Lazy<ConcurrentStack<NamespaceHttpControllerMetadata>>(GetDuplicateControllerTypes);
         }
 
         public override HttpControllerDescriptor SelectController(HttpRequestMessage request)
@@ -52,14 +52,11 @@ namespace Umbraco.Web.WebApi
                 return base.SelectController(request);
 
             //see if this is in our cache
-            var found = _duplicateControllerTypes.Value
-                .Where(x => string.Equals(x.Name, controllerNameAsString + ControllerSuffix, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault(x => namespaces.Contains(x.Namespace));
-
+            var found = _duplicateControllerTypes.Value.FirstOrDefault(x => string.Equals(x.ControllerName, controllerNameAsString, StringComparison.OrdinalIgnoreCase) && namespaces.Contains(x.ControllerNamespace));
             if (found == null)
                 return base.SelectController(request);
 
-            return new HttpControllerDescriptor(_configuration, controllerNameAsString, found);
+            return found.Descriptor;
         }
 
         private ConcurrentStack<NamespaceHttpControllerMetadata> GetDuplicateControllerTypes()
