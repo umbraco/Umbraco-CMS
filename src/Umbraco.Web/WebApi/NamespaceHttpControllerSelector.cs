@@ -62,22 +62,62 @@ namespace Umbraco.Web.WebApi
             return new HttpControllerDescriptor(_configuration, controllerNameAsString, found);
         }
 
-        private IEnumerable<Type> GetDuplicateControllerTypes()
+        private ConcurrentStack<NamespaceHttpControllerMetadata> GetDuplicateControllerTypes()
         {
             var assembliesResolver = _configuration.Services.GetAssembliesResolver();
             var controllersResolver = _configuration.Services.GetHttpControllerTypeResolver();
             var controllerTypes = controllersResolver.GetControllerTypes(assembliesResolver);
 
-            //we have all controller types, so just store the ones with duplicate class names - we don't
-            // want to cache too much and the underlying selector caches everything else
+            var groupedByName = controllerTypes.GroupBy(
+                t => t.Name.Substring(0, t.Name.Length - ControllerSuffix.Length),
+                StringComparer.OrdinalIgnoreCase).Where(x => x.Count() > 1);
 
-            var duplicates = controllerTypes.GroupBy(x => x.Name)
-                .Where(x => x.Count() > 1)
-                .SelectMany(x => x)
-                .ToArray();
+            var duplicateControllers = groupedByName.ToDictionary(
+                g => g.Key,
+                g => g.ToLookup(t => t.Namespace ?? String.Empty, StringComparer.OrdinalIgnoreCase),
+                StringComparer.OrdinalIgnoreCase);
 
-            return duplicates;
+            var result = new ConcurrentStack<NamespaceHttpControllerMetadata>();
+
+            foreach (var controllerTypeGroup in duplicateControllers)
+            {
+                foreach (var controllerType in controllerTypeGroup.Value.SelectMany(controllerTypesGrouping => controllerTypesGrouping))
+                {
+                    result.Push(new NamespaceHttpControllerMetadata(controllerTypeGroup.Key, controllerType.Namespace,
+                        new HttpControllerDescriptor(_configuration, controllerTypeGroup.Key, controllerType)));
+                }
+            }
+
+            return result;
         }
-        
+
+        private class NamespaceHttpControllerMetadata
+        {
+            private readonly string _controllerName;
+            private readonly string _controllerNamespace;
+            private readonly HttpControllerDescriptor _descriptor;
+
+            public NamespaceHttpControllerMetadata(string controllerName, string controllerNamespace, HttpControllerDescriptor descriptor)
+            {
+                _controllerName = controllerName;
+                _controllerNamespace = controllerNamespace;
+                _descriptor = descriptor;
+            }
+
+            public string ControllerName
+            {
+                get { return _controllerName; }
+            }
+
+            public string ControllerNamespace
+            {
+                get { return _controllerNamespace; }
+            }
+
+            public HttpControllerDescriptor Descriptor
+            {
+                get { return _descriptor; }
+            }
+        }
     }
 }
