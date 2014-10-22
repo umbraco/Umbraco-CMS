@@ -9,7 +9,37 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentExtensionsTests : BaseUmbracoConfigurationTest
     {
-      
+
+        [Test]
+        public void Should_Persist_Values_When_Saving_After_Publishing_But_No_Data_Changed()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+            content.ChangePublishedState(PublishedState.Published);
+            content.ResetDirtyProperties(false);
+
+            //no version will be created if no data is changed
+            content.Properties.First().Value = "hello world";
+
+            content.ChangePublishedState(PublishedState.Saved);
+            Assert.IsTrue(content.RequiresSaving());
+        }
+
+        [Test]
+        public void Should_Not_Persist_Values_When_Saving_After_Publishing_But_No_Data_Changed()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+            content.ChangePublishedState(PublishedState.Published);
+            content.ResetDirtyProperties(false);
+
+            content.ChangePublishedState(PublishedState.Saved);
+            Assert.IsFalse(content.RequiresSaving());
+        }
 
         [Test]
         public void Should_Create_New_Version_When_Publishing()
@@ -32,6 +62,9 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
             content.ChangePublishedState(PublishedState.Published);
             content.ResetDirtyProperties(false);
+
+            //no version will be created if no data is changed
+            content.Properties.First().Value = "hello world";
 
             content.ChangePublishedState(PublishedState.Saved);
             Assert.IsTrue(content.ShouldCreateNewVersion());
@@ -83,7 +116,6 @@ namespace Umbraco.Tests.Models
             content.Properties.First().Value = "hello world";
             Assert.IsFalse(content.ShouldCreateNewVersion(PublishedState.Unpublished));
         }
-
 
         [Test]
         public void Should_Clear_Published_Flag_When_Newly_Published_Version()
