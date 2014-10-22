@@ -144,6 +144,16 @@ namespace Umbraco.Core.Persistence
             return new ScriptRepository(uow);
         }
 
+        internal virtual IPartialViewRepository CreatePartialViewRepository(IUnitOfWork uow)
+        {
+            return new PartialViewRepository(uow);
+        }
+
+        internal virtual IPartialViewMacroRepository CreatePartialViewMacroRepository(IUnitOfWork uow, IDatabaseUnitOfWork duow)
+        {
+            return new PartialViewMacroRepository(uow, CreateMacroRepository(duow));
+        }
+
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
             return new StylesheetRepository(uow, db);

@@ -1,8 +1,10 @@
 ﻿using System;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 using Umbraco.Web.UI;
 using umbraco.BasePages;
 using Umbraco.Core;
@@ -16,18 +18,10 @@ namespace umbraco
     public abstract class PartialViewTasksBase : LegacyDialogTask
     {
         private string _returnUrl = string.Empty;
+
         public override string ReturnUrl
         {
             get { return _returnUrl; }
-        }
-
-        protected abstract string CodeHeader { get; }
-
-        protected abstract string ParentFolderName { get; }
-
-        public override string AssignedApp
-        {
-            get { return string.Empty; }
         }
 
         protected virtual string EditViewFile
@@ -35,9 +29,9 @@ namespace umbraco
             get { return "Settings/Views/EditView.aspx"; }
         }
 
-        protected string BasePath
+        protected virtual bool IsPartialViewMacro
         {
-            get { return SystemDirectories.MvcViews + "/" + ParentFolderName.EnsureEndsWith('/'); }
+            get { return false; }
         }
 
         public override bool PerformSave()
@@ -49,39 +43,58 @@ namespace umbraco
             {
                 fileName += ".cshtml";
             }
-
-            var partialViewsFileSystem = new PhysicalFileSystem(BasePath);
-            var fullFilePath = partialViewsFileSystem.GetFullPath(fileName);
-
-            var model = new PartialView(fullFilePath)
-                        {
-                            FileName = fileName,
-                            SnippetName = snippetName,
-                            CreateMacro = ParentID == 1,
-                            CodeHeader = CodeHeader,
-                            ParentFolderName = ParentFolderName,
-                            EditViewFile = EditViewFile,
-                            BasePath = BasePath
-                        };
-
+            
+            var model = new PartialView(fileName);
             var fileService = (FileService)ApplicationContext.Current.Services.FileService;
-            var attempt = fileService.CreatePartialView(model);
 
-            _returnUrl = attempt.Result.ReturnUrl;
+            if (IsPartialViewMacro == false)
+            {
+                var attempt = fileService.CreatePartialView(model, snippetName, User.Id);
 
-            return attempt.Success;
+                //TODO: We currently need to hack this because we are using the same editor for views, partial views, partial view macros and 
+                // the editor is using normal UI whereas the partial view repo and these classes are using IFileSystem with relative references
+                // so the model.Path is a relative reference to the ~/Views/Partials folder, we need to ensure it's prefixed with "Partials/"
+
+                _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViews&file={0}", model.Path.TrimStart('/').EnsureStartsWith("Partials/"));
+                return attempt.Success;
+            }
+            else
+            {             
+                var attempt = fileService.CreatePartialViewMacro(model, ParentID == 1, snippetName, User.Id);
+
+                //TODO: We currently need to hack this because we are using the same editor for views, partial views, partial view macros and 
+                // the editor is using normal UI whereas the partial view repo and these classes are using IFileSystem with relative references
+                // so the model.Path is a relative reference to the ~/Views/Partials folder, we need to ensure it's prefixed with "MacroPartials/"
+
+                _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViewMacros&file={0}", model.Path.TrimStart('/').EnsureStartsWith("MacroPartials/"));
+                return attempt.Success;
+            }
+            
         }
 
         public override bool PerformDelete()
         {
-            var partialViewsFileSystem = new PhysicalFileSystem(BasePath);
-            var path = Alias.TrimStart('/');
-            var fullFilePath = partialViewsFileSystem.GetFullPath(path);
-            
-            var model = new PartialView(fullFilePath) { BasePath = BasePath, FileName = path };
-
             var fileService = (FileService)ApplicationContext.Current.Services.FileService;
-            return fileService.DeletePartialView(model, UmbracoEnsuredPage.CurrentUser.Id);
+            
+            if (IsPartialViewMacro == false)
+            {
+                if (Alias.Contains(".") == false)
+                {
+                    //there is no extension so we'll assume it's a folder
+                    fileService.DeletePartialViewFolder(Alias.TrimStart('/'));
+                    return true;
+                }
+                return fileService.DeletePartialView(Alias.TrimStart('/'), User.Id);
+            }
+
+            if (Alias.Contains(".") == false)
+            {
+                //there is no extension so we'll assume it's a folder
+                fileService.DeletePartialViewMacroFolder(Alias.TrimStart('/'));
+                return true;
+            }
+            return fileService.DeletePartialViewMacro(Alias.TrimStart('/'), User.Id);
         }
+
     }
 }

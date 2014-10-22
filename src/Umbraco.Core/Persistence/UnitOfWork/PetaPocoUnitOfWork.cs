@@ -43,7 +43,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             _operations.Enqueue(new Operation
             {
                 Entity = entity,
-                ProcessDate = DateTime.Now,
                 Repository = repository,
                 Type = TransactionType.Insert
             });
@@ -60,7 +59,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		        new Operation
 		        {
 		            Entity = entity,
-		            ProcessDate = DateTime.Now,
 		            Repository = repository,
 		            Type = TransactionType.Update
 		        });
@@ -77,7 +75,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		        new Operation
 		        {
 		            Entity = entity,
-		            ProcessDate = DateTime.Now,
 		            Repository = repository,
 		            Type = TransactionType.Delete
 		        });
@@ -156,12 +153,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			/// </summary>
 			/// <value>The entity.</value>
 			public IEntity Entity { get; set; }
-
-			/// <summary>
-			/// Gets or sets the process date.
-			/// </summary>
-			/// <value>The process date.</value>
-			public DateTime ProcessDate { get; set; }
 
 			/// <summary>
 			/// Gets or sets the repository.

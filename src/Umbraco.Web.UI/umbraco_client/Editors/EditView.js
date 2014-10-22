@@ -19,7 +19,10 @@
             //remove the last element
             subPath.pop();
             //add the new element
-            subPath.push(filePath.split("/")[1]);
+            var parts = filePath.split("/");
+            //remove the first bit which will either be "Partials" or "MacroPartials"
+            parts.shift();
+            subPath.push(parts.join("/"));
             this._opts.treeSyncPath = subPath.join();
         },
 
@@ -122,8 +125,9 @@
             }
             else {
                 //saving a partial view    
+                var actionName = this._opts.editorType === "PartialViewMacro" ? "SavePartialViewMacro" : "SavePartialView";
 
-                $.post(self._opts.restServiceLocation + "SavePartialView",
+                $.post(self._opts.restServiceLocation + actionName,
                     JSON.stringify({
                         filename: this._opts.nameTxtBox.val(),
                         oldName: this._opts.originalFileName,

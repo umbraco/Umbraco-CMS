@@ -399,7 +399,11 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\ChangePasswordColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IPartialViewMacroRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IPartialViewRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRecycleBinRepository.cs" />
+    <Compile Include="Persistence\Repositories\PartialViewMacroRepository.cs" />
+    <Compile Include="Persistence\Repositories\PartialViewRepository.cs" />
     <Compile Include="Persistence\SqlSyntax\MicrosoftSqlSyntaxProviderBase.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />

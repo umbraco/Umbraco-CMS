@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using umbraco.cms.helpers;
@@ -19,33 +20,34 @@ namespace umbraco.presentation.umbraco.create
 {
 	public partial class script : System.Web.UI.UserControl
 	{
-		protected void Page_Load(object sender, EventArgs e)
-		{
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
 			sbmt.Text = ui.Text("create");
+
+            // Enable new item in folders to place items in that folder.
+            if (Request["nodeType"] == "scriptsFolder")
+                rename.Text = Request["nodeId"].EnsureEndsWith('/');
 		}
 
-		private void sbmt_Click(object sender, System.EventArgs e)
+		protected void SubmitClick(object sender, System.EventArgs e)
 		{
+            int createFolder = 0;
+            if (scriptType.SelectedValue == "")
+            {
+                createFolder = 1;
+                ContainsValidator.Enabled = true;
+                Page.Validate();
+            }
+
 			if (Page.IsValid)
 			{
-				string path = helper.Request("nodeID");
-                string relativepath = path + "/";
-
-				if (path == "init")
-				{
-                    relativepath = "";
-				}
-
-				int createFolder = 0;
-				if (scriptType.SelectedValue == "")
-					createFolder = 1;
-
                 string returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
 					helper.Request("nodeType"),
 					createFolder,
-                    relativepath + "¤" + rename.Text + "¤" + scriptType.SelectedValue);
+                    rename.Text + '\u00A4' + scriptType.SelectedValue);
 
 				BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)
@@ -53,39 +55,71 @@ namespace umbraco.presentation.umbraco.create
 					.CloseModalWindow();
 
 			}
-
 		}
 
-		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
 		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
 			base.OnInit(e);
-		}
 
-		/// <summary>
-		///		Required method for Designer support - do not modify
-		///		the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-			this.sbmt.Click += new System.EventHandler(this.sbmt_Click);
-			this.Load += new System.EventHandler(this.Page_Load);
+		    ContainsValidator.Enabled = false;
 
             string[] fileTypes = UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes.ToArray();
 
             scriptType.Items.Add(new ListItem(ui.Text("folder"), ""));
-		    scriptType.Items.FindByText(ui.Text("folder")).Selected = true;
+            scriptType.Items.FindByText(ui.Text("folder")).Selected = true;
 
-			foreach (string str in fileTypes)
-			{
-				scriptType.Items.Add(new ListItem("." + str + " file", str));
-			}
+            foreach (string str in fileTypes)
+            {
+                scriptType.Items.Add(new ListItem("." + str + " file", str));
+            }
 		}
-		#endregion
+
+        /// <summary>
+        /// rename control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox rename;
+
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator EndsWithValidator;
+	    protected global::System.Web.UI.WebControls.RegularExpressionValidator ContainsValidator;
+
+        /// <summary>
+        /// scriptType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox scriptType;
+
+        /// <summary>
+        /// CreateMacroCheckBox control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox CreateMacroCheckBox;
+
+        /// <summary>
+        /// sbmt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button sbmt;
 
 	}
 }

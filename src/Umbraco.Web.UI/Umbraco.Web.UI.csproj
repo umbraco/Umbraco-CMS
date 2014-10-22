@@ -2508,7 +2508,6 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
-    <Folder Include="Umbraco\PartialViews\Templates\" />
     <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />

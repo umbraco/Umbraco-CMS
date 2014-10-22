@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,13 +30,12 @@ namespace Umbraco.Core.Persistence.Repositories
             if(FileSystem.FileExists(id) == false)
             {
                 return null;
-                //throw new Exception(string.Format("The file {0} was not found", id));
             }
 
-            string content = string.Empty;
+            string content;
             using (var stream = FileSystem.OpenFile(id))
             {
-                byte[] bytes = new byte[stream.Length];
+                var bytes = new byte[stream.Length];
                 stream.Position = 0;
                 stream.Read(bytes, 0, (int)stream.Length);
                 content = Encoding.UTF8.GetString(bytes);
@@ -48,12 +46,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
 
             var script = new Script(path)
-                             {
-                                 Content = content,
-                                 Key = path.EncodeAsGuid(),
-                                 CreateDate = created,
-                                 UpdateDate = updated
-                             };
+            {
+                //id can be the hash
+                Id = path.GetHashCode(),
+                Content = content,
+                Key = path.EncodeAsGuid(),
+                CreateDate = created,
+                UpdateDate = updated
+            };
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946

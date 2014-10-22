@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
@@ -23,24 +25,28 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IUnitOfWorkProvider _fileUowProvider;
         private readonly IDatabaseUnitOfWorkProvider _dataUowProvider;
-        private readonly IMacroService _macroService;
+
+        private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
+        private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService()
             : this(new RepositoryFactory())
         { }
 
         public FileService(RepositoryFactory repositoryFactory)
-            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory, new MacroService())
+            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
-        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory, IMacroService macroService)
+        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
         {
             _repositoryFactory = repositoryFactory;
-            _macroService = macroService;
             _fileUowProvider = fileProvider;
             _dataUowProvider = dataProvider;
         }
+
+
+        #region Stylesheets
 
         /// <summary>
         /// Gets a list of all <see cref="Stylesheet"/> objects
@@ -92,14 +98,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
-        /// <param name="name">Name incl. extension of the Stylesheet to delete</param>
+        /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId"></param>
-        public void DeleteStylesheet(string name, int userId = 0)
+        public void DeleteStylesheet(string path, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateStylesheetRepository(uow, _dataUowProvider.GetUnitOfWork()))
             {
-                var stylesheet = repository.Get(name);
+                var stylesheet = repository.Get(path);
+                if (stylesheet == null) return;
 
                 if (DeletingStylesheet.IsRaisedEventCancelled(new DeleteEventArgs<Stylesheet>(stylesheet), this))
                     return;
@@ -121,8 +128,10 @@ namespace Umbraco.Core.Services
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
             return stylesheet.IsValid() && stylesheet.IsFileValidCss();
-        }
+        } 
+        #endregion
 
+        #region Scripts
         /// <summary>
         /// Gets a list of all <see cref="Script"/> objects
         /// </summary>
@@ -173,14 +182,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
-        /// <param name="name">Name incl. extension of the Script to delete</param>
+        /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId"></param>
-        public void DeleteScript(string name, int userId = 0)
+        public void DeleteScript(string path, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateScriptRepository(uow))
             {
-                var script = repository.Get(name);
+                var script = repository.Get(path);
+                if (script == null) return;
 
                 if (DeletingScript.IsRaisedEventCancelled(new DeleteEventArgs<Script>(script), this))
                     return; ;
@@ -224,6 +234,10 @@ namespace Umbraco.Core.Services
             }
         }
 
+        #endregion
+
+
+        #region Templates
         /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
@@ -347,6 +361,7 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
             {
                 var template = repository.Get(alias);
+                if (template == null) return;
 
                 if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this))
                     return;
@@ -368,139 +383,311 @@ namespace Umbraco.Core.Services
         public bool ValidateTemplate(ITemplate template)
         {
             return template.IsValid();
+        } 
+        #endregion
+
+        #region Partial Views
+
+        internal IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
+        {
+            var snippetPath = IOHelper.MapPath(string.Format("{0}/PartialViewMacros/Templates/", SystemDirectories.Umbraco));
+            return Directory.GetFiles(snippetPath, "*.cshtml")
+                .Select(Path.GetFileNameWithoutExtension)
+                .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
+                .ToArray();
+        } 
+
+        internal void DeletePartialViewFolder(string folderPath)
+        {
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(uow))
+            {
+                ((PartialViewRepository)repository).DeleteFolder(folderPath);
+                uow.Commit();
+            }
         }
 
-        // TODO: Before making this public: How to get feedback in the UI when cancelled
-        internal Attempt<PartialView> CreatePartialView(PartialView partialView)
+        internal void DeletePartialViewMacroFolder(string folderPath)
         {
-            var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
-            var relativeFilePath = partialView.ParentFolderName.EnsureEndsWith('/') + partialViewsFileSystem.GetRelativePath(partialView.FileName);
-            partialView.ReturnUrl = string.Format(partialView.EditViewFile + "?file={0}", HttpUtility.UrlEncode(relativeFilePath));
+            var uow = _fileUowProvider.GetUnitOfWork();
+            var duow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(uow, duow))
+            {
+                ((PartialViewMacroRepository)repository).DeleteFolder(folderPath);
+                uow.Commit();
+            }
+        }
 
-            //return the link to edit the file if it already exists
-            if (partialViewsFileSystem.FileExists(partialView.Path))
-                return Attempt<PartialView>.Succeed(partialView);
+        internal PartialView GetPartialView(string path)
+        {
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(_fileUowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(path);
+            }
+        }
 
+        internal PartialView GetPartialViewMacro(string path)
+        {
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(
+                _fileUowProvider.GetUnitOfWork(),
+                _dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(path);
+            }
+        }
+
+        internal Attempt<PartialView> CreatePartialView(PartialView partialView, string snippetName = null, int userId = 0)
+        {
             if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<PartialView>(partialView, true, partialView.Alias, -1), this))
+                return Attempt<PartialView>.Fail();
+
+            if (snippetName.IsNullOrWhiteSpace() == false)
             {
-                // We have nowhere to return to, clear ReturnUrl
-                partialView.ReturnUrl = string.Empty;
-
-                var failureMessage = string.Format("Creating Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName));
-                LogHelper.Info<FileService>(failureMessage);
-
-                return Attempt<PartialView>.Fail(partialView, new ArgumentException(failureMessage));
-            }
-
-            //create the file
-            var snippetPathAttempt = partialView.TryGetSnippetPath(partialView.SnippetName);
-            if (snippetPathAttempt.Success == false)
-            {
-                throw new InvalidOperationException("Could not load template with name " + partialView.SnippetName);
-            }
-
-            using (var snippetFile = new StreamReader(partialViewsFileSystem.OpenFile(snippetPathAttempt.Result)))
-            {
-                var snippetContent = snippetFile.ReadToEnd().Trim();
-
-                //strip the @inherits if it's there
-                snippetContent = partialView.HeaderMatch.Replace(snippetContent, string.Empty);
-
-                var content = string.Format("{0}{1}{2}", partialView.CodeHeader, Environment.NewLine, snippetContent);
-
-                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+                //create the file
+                var snippetPathAttempt = TryGetSnippetPath(snippetName);
+                if (snippetPathAttempt.Success == false)
                 {
-                    partialViewsFileSystem.AddFile(partialView.Path, stream);
+                    throw new InvalidOperationException("Could not load snippet with name " + snippetName);
+                }
+
+                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+                {
+                    var snippetContent = snippetFile.ReadToEnd().Trim();
+
+                    //strip the @inherits if it's there
+                    snippetContent = StripPartialViewHeader(snippetContent);
+
+                    var content = string.Format("{0}{1}{2}", PartialViewHeader, Environment.NewLine, snippetContent);
+                    partialView.Content = content;
                 }
             }
 
-            if (partialView.CreateMacro)
-                CreatePartialViewMacro(partialView);
-            
-            CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(uow))
+            {
+                repository.AddOrUpdate(partialView);
+                uow.Commit();
+
+                CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save PartialView performed by user"), userId, -1);
 
             return Attempt<PartialView>.Succeed(partialView);
         }
 
-        internal void CreatePartialViewMacro(PartialView partialView)
+        internal Attempt<PartialView> CreatePartialViewMacro(PartialView partialView, bool createMacro, string snippetName = null, int userId = 0)
         {
-            var name = partialView.FileName.Substring(0, (partialView.FileName.LastIndexOf('.') + 1))
-                .Trim('.')
-                .SplitPascalCasing()
-                .ToFirstUpperInvariant();
+            if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<PartialView>(partialView, true, partialView.Alias, -1), this))
+                return Attempt<PartialView>.Fail();
 
-            var macro = new Macro(name, name) { ScriptPath = partialView.BasePath + partialView.FileName };
-            _macroService.Save(macro);
+            if (snippetName.IsNullOrWhiteSpace() == false)
+            {
+                //create the file
+                var snippetPathAttempt = TryGetSnippetPath(snippetName);
+                if (snippetPathAttempt.Success == false)
+                {
+                    throw new InvalidOperationException("Could not load snippet with name " + snippetName);
+                }
+
+                using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result)))
+                {
+                    var snippetContent = snippetFile.ReadToEnd().Trim();
+
+                    //strip the @inherits if it's there
+                    snippetContent = StripPartialViewHeader(snippetContent);
+
+                    var content = string.Format("{0}{1}{2}", PartialViewMacroHeader, Environment.NewLine, snippetContent);
+                    partialView.Content = content;
+                }
+            }
+
+            var uow = _fileUowProvider.GetUnitOfWork();
+            var duow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(uow, duow))
+            {
+                repository.AddOrUpdate(partialView);
+                
+                if (createMacro)
+                {
+                    var name = Path.GetFileNameWithoutExtension(partialView.Path)
+                        .SplitPascalCasing()
+                        .ToFirstUpperInvariant()
+                        .ToSafeAlias(false);
+
+                    repository.AddOrUpdate(new Macro(name, name) { ScriptPath = partialView.Path });
+                }
+
+                //commit both - ensure that the macro is created if one was added
+                uow.Commit();
+                duow.Commit();
+
+                CreatedPartialView.RaiseEvent(new NewEventArgs<PartialView>(partialView, false, partialView.Alias, -1), this);
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save PartialViewMacro performed by user"), userId, -1);
+
+            return Attempt<PartialView>.Succeed(partialView);           
         }
 
-        // TODO: Before making this public: How to get feedback in the UI when cancelled
-        internal bool DeletePartialView(PartialView partialView, int userId = 0)
+        internal bool DeletePartialView(string path, int userId = 0)
         {
-            var partialViewsFileSystem = new PhysicalFileSystem(partialView.BasePath);
-
-            if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<PartialView>(partialView), this))
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(uow))
             {
-                LogHelper.Info<FileService>(string.Format("Deleting Partial View {0} was cancelled by an event handler.", partialViewsFileSystem.GetFullPath(partialView.FileName)));
-                return false;
-            }
+                var partialView = repository.Get(path);
+                if (partialView == null)
+                    return true;
 
-            if (partialViewsFileSystem.FileExists(partialView.FileName))
-            {
-                partialViewsFileSystem.DeleteFile(partialView.FileName);
-                LogHelper.Info<FileService>(string.Format("Partial View file {0} deleted by user {1}", partialViewsFileSystem.GetFullPath(partialView.FileName), userId));
-            }
-            // TODO: does this ever even happen? I don't think folders show up in the tree currently. 
-            // Leaving this here as it was in the original PartialViewTasks code - SJ
-            else if (partialViewsFileSystem.DirectoryExists(partialView.FileName))
-            {
-                partialViewsFileSystem.DeleteDirectory(partialView.FileName, true);
-                LogHelper.Info<FileService>(string.Format("Partial View directory {0} deleted by user {1}", partialViewsFileSystem.GetFullPath(partialView.FileName), userId));
-            }
+                if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<PartialView>(partialView), this))
+                    return false;
 
-            DeletedPartialView.RaiseEvent(new DeleteEventArgs<PartialView>(partialView, false), this);
+                repository.Delete(partialView);
+                uow.Commit();
+
+                DeletedPartialView.RaiseEvent(new DeleteEventArgs<PartialView>(partialView, false), this);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete PartialView performed by user"), userId, -1);
+            }
 
             return true;
+
+        }
+
+        internal bool DeletePartialViewMacro(string path, int userId = 0)
+        {
+            var uow = _fileUowProvider.GetUnitOfWork();
+            var duow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(uow, duow))
+            {
+                var partialView = repository.Get(path);
+                if (partialView == null)
+                    return true;
+
+                if (DeletingPartialView.IsRaisedEventCancelled(new DeleteEventArgs<PartialView>(partialView), this))
+                    return false;
+
+                repository.Delete(partialView);
+                
+                //commit both (though in the case of deleting, there's no db changes)
+                uow.Commit();
+                duow.Commit();
+
+                DeletedPartialView.RaiseEvent(new DeleteEventArgs<PartialView>(partialView, false), this);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete PartialViewMacro performed by user"), userId, -1);
+            }
+
+            return true;
+
         }
 
         internal Attempt<PartialView> SavePartialView(PartialView partialView, int userId = 0)
         {
-            if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<PartialView>(partialView, true), this))
+            if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<PartialView>(partialView), this))
+                return Attempt<PartialView>.Fail();
+
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(uow))
             {
-                return Attempt<PartialView>.Fail(new ArgumentException("Save was cancelled by an event handler " + partialView.FileName));
-            }
-            
-            //Directory check.. only allow files in script dir and below to be edited
-            if (partialView.IsValid() == false)
-            {
-                return Attempt<PartialView>.Fail(
-                    new ArgumentException(string.Format("Illegal path: {0} or illegal file extension {1}",
-                        partialView.Path,
-                        partialView.FileName.Substring(partialView.FileName.LastIndexOf(".", StringComparison.Ordinal)))));
+                repository.AddOrUpdate(partialView);
+                uow.Commit();
+
+                SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView, false), this);
             }
 
-            //NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
-            // BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
-            // http://issues.umbraco.org/issue/U4-2118
-            //using (var sw = System.IO.File.CreateText(savePath))
+            Audit.Add(AuditTypes.Save, string.Format("Save PartialView performed by user"), userId, -1);
+
+            ////NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
+            //// BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
+            //// http://issues.umbraco.org/issue/U4-2118
+            ////using (var sw = System.IO.File.CreateText(savePath))
+            ////{
+            ////    sw.Write(val);
+            ////}
+
+            //System.IO.File.WriteAllText(partialView.Path, partialView.Content, Encoding.UTF8);
+            ////deletes the old file
+            //if (partialView.FileName != partialView.OldFileName)
             //{
-            //    sw.Write(val);
+            //    // Create a new PartialView class so that we can set the FileName of the file that needs deleting
+            //    var deletePartial = partialView;
+            //    deletePartial.FileName = partialView.OldFileName;
+            //    DeletePartialView(deletePartial, userId);
             //}
-            
-            System.IO.File.WriteAllText(partialView.Path, partialView.Content, Encoding.UTF8);
 
-            //deletes the old file
-            if (partialView.FileName != partialView.OldFileName)
-            {
-                // Create a new PartialView class so that we can set the FileName of the file that needs deleting
-                var deletePartial = partialView;
-                deletePartial.FileName = partialView.OldFileName;
-                DeletePartialView(deletePartial, userId);
-            }
-
-            SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView), this);
+            //SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView), this);
 
             return Attempt.Succeed(partialView);
         }
+
+        internal Attempt<PartialView> SavePartialViewMacro(PartialView partialView, int userId = 0)
+        {
+            if (SavingPartialView.IsRaisedEventCancelled(new SaveEventArgs<PartialView>(partialView), this))
+                return Attempt<PartialView>.Fail();
+            
+            var uow = _fileUowProvider.GetUnitOfWork();
+            var duow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(uow, duow))
+            {
+                repository.AddOrUpdate(partialView);
+
+                //commit both (though in the case of updating, there's no db changes)
+                uow.Commit();
+                duow.Commit();
+
+                SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView, false), this);
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save PartialViewMacro performed by user"), userId, -1);
+
+            ////NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
+            //// BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
+            //// http://issues.umbraco.org/issue/U4-2118
+            ////using (var sw = System.IO.File.CreateText(savePath))
+            ////{
+            ////    sw.Write(val);
+            ////}
+
+            //System.IO.File.WriteAllText(partialView.Path, partialView.Content, Encoding.UTF8);
+            ////deletes the old file
+            //if (partialView.FileName != partialView.OldFileName)
+            //{
+            //    // Create a new PartialView class so that we can set the FileName of the file that needs deleting
+            //    var deletePartial = partialView;
+            //    deletePartial.FileName = partialView.OldFileName;
+            //    DeletePartialView(deletePartial, userId);
+            //}
+
+            //SavedPartialView.RaiseEvent(new SaveEventArgs<PartialView>(partialView), this);
+
+            return Attempt.Succeed(partialView);
+        }
+
+        internal bool ValidatePartialView(PartialView partialView)
+        {
+            return partialView.IsValid();
+        }
+
+        internal string StripPartialViewHeader(string contents)
+        {
+            var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
+            return headerMatch.Replace(contents, string.Empty);
+        }
+
+        internal Attempt<string> TryGetSnippetPath(string fileName)
+        {
+            if (fileName.EndsWith(".cshtml") == false)
+            {
+                fileName += ".cshtml";
+            }
+
+            var snippetPath = IOHelper.MapPath(string.Format("{0}/PartialViewMacros/Templates/{1}", SystemDirectories.Umbraco, fileName));
+            return System.IO.File.Exists(snippetPath)
+                ? Attempt<string>.Succeed(snippetPath)
+                : Attempt<string>.Fail();
+        } 
+        #endregion
 
         //TODO Method to change name and/or alias of view/masterpage template
 
@@ -574,7 +761,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         internal static event TypedEventHandler<IFileService, SaveEventArgs<PartialView>> SavedPartialView;
-
+        
         /// <summary>
         /// Occurs before Create
         /// </summary>

@@ -516,6 +516,9 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\script.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\Language.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1323,13 +1326,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\nodeType.ascx.designer.cs">
       <DependentUpon>nodeType.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\script.ascx.cs">
-      <DependentUpon>script.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\script.ascx.designer.cs">
-      <DependentUpon>script.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1919,7 +1915,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\script.ascx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />

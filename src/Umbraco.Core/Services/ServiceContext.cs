@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
                 _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory.Value));
 
             if (_fileService == null)
-                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory.Value, _macroService.Value));
+                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory.Value));
 
             if (_localizationService == null)
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));

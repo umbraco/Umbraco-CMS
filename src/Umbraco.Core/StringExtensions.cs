@@ -361,7 +361,7 @@ namespace Umbraco.Core
         public static string EnsureStartsWith(this string input, string toStartWith)
         {
             if (input.StartsWith(toStartWith)) return input;
-            return toStartWith + input.TrimStart(toStartWith.ToArray()); // Ensure each char is removed first from input, e.g. ~/ plus /Path will equal ~/Path not ~//Path
+            return toStartWith + input.TrimStart(toStartWith);
         }
 
         public static string EnsureStartsWith(this string input, char value)
