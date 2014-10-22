@@ -5,6 +5,7 @@ using System.IO;
 namespace Umbraco.Core.IO
 {
     //TODO: There is no way to create a directory here without creating a file in a directory and then deleting it
+    //TODO: Should probably implement a rename?
 
 	public interface IFileSystem
     {
@@ -15,8 +16,7 @@ namespace Umbraco.Core.IO
         void DeleteDirectory(string path, bool recursive);
 
         bool DirectoryExists(string path);
-
-
+        
         void AddFile(string path, Stream stream);
 
         void AddFile(string path, Stream stream, bool overrideIfExists);
