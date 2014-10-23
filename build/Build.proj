@@ -260,14 +260,11 @@
   </Target>
 
   <!-- Unlike 2010, the VS2012 build targets file doesn't clean up the umbraco.presentation dir, do it manually -->
-  <!-- Also, it places umbraco.XmlSerializers.dll in the root, even though it's also in the bin folder. Kill! -->
   <Target Name="CleanupPresentation" DependsOnTargets="CompileProjects">
 	<ItemGroup>
 		<PresentationFolderToDelete Include="$(WebAppFolder)umbraco.presentation" />
-		<XmlSerializersDll Include="$(WebAppFolder)umbraco.XmlSerializers.dll" />
     </ItemGroup>
 	<RemoveDir Directories="@(PresentationFolderToDelete)" />
-    <Delete Files="@(XmlSerializersDll)" />
   </Target>
 
   <Target Name="CompileProjects" DependsOnTargets="CompileExternalExamineProjects">
