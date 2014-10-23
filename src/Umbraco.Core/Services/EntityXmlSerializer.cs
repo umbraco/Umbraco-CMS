@@ -83,7 +83,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// Exports an <see cref="IMember"/> item to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="dataTypeService"></param>
         /// <param name="member">Member to export</param>

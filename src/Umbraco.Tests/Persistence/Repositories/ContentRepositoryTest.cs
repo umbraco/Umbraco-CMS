@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -44,6 +45,118 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);            
             var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+
+                var contentType1 = MockedContentTypes.CreateSimpleContentType("Textpage1", "Textpage1");
+                contentTypeRepository.AddOrUpdate(contentType1);
+                var allCreated = new List<IContent>();
+
+                for (var i = 0; i < 100; i++)
+                {
+                    //These will be non-published so shouldn't show up
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 100; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                unitOfWork.Commit();
+
+                //now create some versions of this content - this shouldn't affect the xml structures saved
+                for (int i = 0; i < allCreated.Count; i++)
+                {
+                    allCreated[i].Name = "blah" + i;
+                    repository.AddOrUpdate(allCreated[i]);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures_For_Content_Type()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var contentType1 = MockedContentTypes.CreateSimpleContentType("Textpage1", "Textpage1");
+                var contentType2 = MockedContentTypes.CreateSimpleContentType("Textpage2", "Textpage2");
+                var contentType3 = MockedContentTypes.CreateSimpleContentType("Textpage3", "Textpage3");
+                contentTypeRepository.AddOrUpdate(contentType1);
+                contentTypeRepository.AddOrUpdate(contentType2);
+                contentTypeRepository.AddOrUpdate(contentType3);
+
+                var allCreated = new List<IContent>();
+
+                for (var i = 0; i < 30; i++)
+                {
+                    //These will be non-published so shouldn't show up
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);                 
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType2);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType3);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                unitOfWork.Commit();
+
+                //now create some versions of this content - this shouldn't affect the xml structures saved
+                for (int i = 0; i < allCreated.Count; i++)
+                {
+                    allCreated[i].Name = "blah" + i;
+                    repository.AddOrUpdate(allCreated[i]);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] { contentType1.Id, contentType2.Id });
+
+                Assert.AreEqual(60, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
         }
 
         [Test]

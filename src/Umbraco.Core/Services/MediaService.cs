@@ -637,7 +637,7 @@ namespace Umbraco.Core.Services
                 {
                     return;
                 }
-                
+
                 media.ParentId = parentId;
                 if (media.Trashed)
                 {
@@ -661,7 +661,7 @@ namespace Umbraco.Core.Services
                     var parentLevel = media.Level;
                     var parentTrashed = media.Trashed;
                     var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed, moveInfo);
-                    Save(updatedDescendants, userId,                         
+                    Save(updatedDescendants, userId,
                         //no events!
                         false);
                 }
@@ -708,7 +708,7 @@ namespace Umbraco.Core.Services
 
                 media.ChangeTrashedState(true, Constants.System.RecycleBinMedia);
                 repository.AddOrUpdate(media);
-                
+
                 //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                 foreach (var descendant in descendants)
                 {
@@ -1037,8 +1037,6 @@ namespace Umbraco.Core.Services
 
             return true;
         }
-        
-        //TODO: This needs to be put into the MediaRepository, all CUD logic!
 
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all media
@@ -1047,85 +1045,17 @@ namespace Umbraco.Core.Services
         /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
         /// for all media
         /// </param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal void RebuildXmlStructures(params int[] contentTypeIds)
+        public void RebuildXmlStructures(params int[] contentTypeIds)
         {
-            using (new WriteLock(Locker))
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
             {
-                var list = new List<IMedia>();
-
-                var uow = _uowProvider.GetUnitOfWork();
-
-                //First we're going to get the data that needs to be inserted before clearing anything, this 
-                //ensures that we don't accidentally leave the content xml table empty if something happens
-                //during the lookup process.
-
-                if (contentTypeIds.Any() == false)
-                {
-                    var rootMedia = GetRootMedia();
-                    foreach (var media in rootMedia)
-                    {
-                        list.Add(media);
-                        list.AddRange(GetDescendants(media));
-                    }
-                }
-                else
-                {
-                    list.AddRange(contentTypeIds.SelectMany(i => GetMediaOfMediaType(i).Where(media => media.Trashed == false)));
-                }
-
-                var xmlItems = new List<ContentXmlDto>();
-                foreach (var c in list)
-                {
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, c);
-                    xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
-                }
-
-                //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-                using (var tr = uow.Database.GetTransaction())
-                {
-                    if (contentTypeIds.Any() == false)
-                    {
-                        var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
-
-                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        uow.Database.Execute(deleteSql);
-                    }
-                    else
-                    {
-                        foreach (var id in contentTypeIds)
-                        {
-                            var id1 = id;
-                            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-                            var subQuery = new Sql()
-                                .Select("DISTINCT cmsContentXml.nodeId")
-                                .From<ContentXmlDto>()
-                                .InnerJoin<NodeDto>()
-                                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                                .InnerJoin<ContentDto>()
-                                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType)
-                                .Where<ContentDto>(dto => dto.ContentTypeId == id1);
-
-                            var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                            uow.Database.Execute(deleteSql);
-                        }
-                    }
-
-                    //bulk insert it into the database
-                    uow.Database.BulkInsertRecords(xmlItems, tr);
-
-                    tr.Complete();    
-                }
-
-                Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+                repository.RebuildXmlStructures(
+                    media => _entitySerializer.Serialize(this, _dataTypeService, _userService, media),
+                    contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
             }
+
+            Audit.Add(AuditTypes.Publish, "MediaService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
         }
 
         /// <summary>

@@ -77,6 +77,15 @@ namespace Umbraco.Core.Services
             _userService = userService;
         }
 
+        public int CountPublished(string contentTypeAlias = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.CountPublished();
+            }
+        }
+
         public int Count(string contentTypeAlias = null)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -1460,6 +1469,27 @@ namespace Umbraco.Core.Services
             return true;
         }
 
+        /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all documents
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all content
+        /// </param>
+        public void RebuildXmlStructures(params int[] contentTypeIds)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                repository.RebuildXmlStructures(
+                    content => _entitySerializer.Serialize(this, _dataTypeService, _userService, content),
+                    contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
+            }
+
+            Audit.Add(AuditTypes.Publish, "ContentService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+
+        }
+
         #region Internal Methods
 
         /// <summary>
@@ -1555,86 +1585,6 @@ namespace Umbraco.Core.Services
                 {
                     PerformMove(child, content.Id, userId, moveInfo);
                 }
-            }
-        }
-
-        //TODO: WE should make a base class for ContentService and MediaService to share! 
-        // currently we have this logic duplicated (nearly the same) for media types and soon to be member types
-
-        //TODO: This needs to be put into the ContentRepository, all CUD logic!
-
-        /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all documents
-        /// </summary>
-        /// <param name="contentTypeIds">
-        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
-        /// for all content
-        /// </param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        private void RebuildXmlStructures(params int[] contentTypeIds)
-        {
-            using (new WriteLock(Locker))
-            {
-                var list = new List<IContent>();
-
-                var uow = _uowProvider.GetUnitOfWork();
-
-                //First we're going to get the data that needs to be inserted before clearing anything, this 
-                //ensures that we don't accidentally leave the content xml table empty if something happens
-                //during the lookup process.
-
-                list.AddRange(contentTypeIds.Any() == false
-                    ? GetAllPublished()
-                    : contentTypeIds.SelectMany(GetPublishedContentOfContentType));
-
-                var xmlItems = new List<ContentXmlDto>();
-                foreach (var c in list)
-                {
-                    var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, c);
-                    xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
-                }
-
-                //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-                using (var tr = uow.Database.GetTransaction())
-                {
-                    if (contentTypeIds.Any() == false)
-                    {
-                        //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!) (based on inner join of cmsDocument)
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<DocumentDto>()
-                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
-
-                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        uow.Database.Execute(deleteSql);
-                    }
-                    else
-                    {
-                        foreach (var id in contentTypeIds)
-                        {
-                            //first we'll clear out the data from the cmsContentXml table for this type
-                            var id1 = id;
-                            var subQuery = new Sql()
-                                .Select("cmsDocument.nodeId")
-                                .From<DocumentDto>()
-                                .InnerJoin<ContentDto>()
-                                .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                                .Where<DocumentDto>(dto => dto.Published)
-                                .Where<ContentDto>(dto => dto.ContentTypeId == id1);
-
-                            var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                            uow.Database.Execute(deleteSql);
-                        }
-                    }
-
-                    //bulk insert it into the database
-                    uow.Database.BulkInsertRecords(xmlItems, tr);
-
-                    tr.Complete();
-                }
-
-                Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }
         }
 

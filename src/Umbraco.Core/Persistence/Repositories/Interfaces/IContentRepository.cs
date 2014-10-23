@@ -12,6 +12,15 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IContentRepository : IRepositoryVersionable<int, IContent>, IRecycleBinRepository<IContent>
     {
         /// <summary>
+        /// Get the count of published items
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
+        /// </remarks>
+        int CountPublished();
+
+        /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
         /// assigned to an entity with a list of user id & permission pairs.
         /// </summary>

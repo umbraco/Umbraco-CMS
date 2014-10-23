@@ -12,6 +12,16 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+        /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all documents
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all content
+        /// </param>
+        void RebuildXmlStructures(params int[] contentTypeIds);
+
+        int CountPublished(string contentTypeAlias = null);
         int Count(string contentTypeAlias = null);
         int CountChildren(int parentId, string contentTypeAlias = null);
         int CountDescendants(int parentId, string contentTypeAlias = null);
