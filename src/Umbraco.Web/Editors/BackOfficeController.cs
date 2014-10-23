@@ -232,6 +232,10 @@ namespace Umbraco.Web.Editors
                                 {
                                     "examineMgmtBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
                                         controller => controller.GetIndexerDetails())
+                                },
+                                {
+                                    "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
+                                        controller => controller.CheckContentXmlTable())
                                 }
                             }
                     },

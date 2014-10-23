@@ -19,6 +19,54 @@ namespace Umbraco.Web.WebServices
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
         /// <summary>
+        /// Checks if the member internal index is consistent with the data stored in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool CheckMembersInternalIndex()
+        {
+            var total = Services.MemberService.Count();
+
+            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"]
+                .CreateSearchCriteria().RawQuery("__IndexType:member");
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"].Search(criteria);
+
+            return total == totalIndexed.TotalItemCount;
+        }
+
+        /// <summary>
+        /// Checks if the media internal index is consistent with the data stored in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool CheckMediaInternalIndex()
+        {
+            var total = Services.MediaService.Count();
+
+            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
+                .CreateSearchCriteria().RawQuery("__IndexType:media");
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
+
+            return total == totalIndexed.TotalItemCount;
+        }
+
+        /// <summary>
+        /// Checks if the content internal index is consistent with the data stored in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool CheckContentInternalIndex()
+        {
+            var total = Services.ContentService.Count();
+
+            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
+                .CreateSearchCriteria().RawQuery("__IndexType:content");
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
+
+            return total == totalIndexed.TotalItemCount;
+        }
+
+        /// <summary>
         /// Get the details for indexers
         /// </summary>
         /// <returns></returns>

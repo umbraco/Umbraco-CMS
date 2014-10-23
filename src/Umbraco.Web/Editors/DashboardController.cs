@@ -9,9 +9,7 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
-    /// <summary>
-    /// The API controller used for getting entity objects, basic name, icon, id representation of any umbraco object
-    /// </summary>
+  
     [PluginController("UmbracoApi")]
     public class DashboardController : UmbracoAuthorizedJsonController
     {

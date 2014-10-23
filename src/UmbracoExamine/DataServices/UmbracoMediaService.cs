@@ -15,6 +15,7 @@ namespace UmbracoExamine.DataServices
     /// <summary>
     /// Data service used to query for media
     /// </summary>
+    [Obsolete("This should no longer be used, latest content will be indexed by using the IMediaService directly")]
 	public class UmbracoMediaService : IMediaService
 	{
 		private readonly ServiceContext _services;
@@ -39,7 +40,7 @@ namespace UmbracoExamine.DataServices
 		/// </summary>
 		/// <param name="xpath"></param>
 		/// <returns></returns>
-		
+        [Obsolete("This should no longer be used, latest content will be indexed by using the IMediaService directly")]
 		public XDocument GetLatestMediaByXpath(string xpath)
 		{
 			var xmlMedia = XDocument.Parse("<media></media>");
