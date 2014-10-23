@@ -307,6 +307,17 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $scope.$apply();
     };
 
+    $scope.clearHighlightedItems = function () {
+        $.each($scope.canvasdesignerModel.configs, function (indexConfig, config) {
+            config.highlighted = false;
+        });
+    }
+
+    $scope.setCurrentHighlighted = function (item) {
+        $scope.clearHighlightedItems();
+        item.highlighted = true;
+    }
+
     $scope.setCurrentSelected = function(item) {
         $scope.currentSelected = item;
         $scope.clearSelectedCategory();

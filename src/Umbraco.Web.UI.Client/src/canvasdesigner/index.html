@@ -95,7 +95,12 @@
                 </div>
                 <div class="content">
                     <ul class="samples">
-                        <li ng-repeat="configItem in canvasdesignerModel.configs" ng-mousemove="refreshOutlinePosition(configItem)" ng-click="setCurrentSelected(configItem)">
+                        <li ng-repeat="configItem in canvasdesignerModel.configs"
+                            ng-mousemove="refreshOutlinePosition(configItem)"
+                            ng-class="{hover: configItem.highlighted == true}"
+                            ng-mouseenter="setCurrentHighlighted(configItem)"
+                            ng-mouseleave="configItem.highlighted = false"
+                            ng-click="setCurrentSelected(configItem)">
                             {{configItem.name}}
                         </li>
                     </ul>

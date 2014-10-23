@@ -99,6 +99,9 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
             if (target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
                 target.unbind();
                 outlinePosition(target);
+                console.info(target.attr('canvasdesigner-over-name'));
+                parent.onMouseoverCanvasdesignerItem(target.attr('canvasdesigner-over-name'), target);
+
                 target.click(function (e) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -107,7 +110,7 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
                     currentTarget = target;
                     outlineSelected();
 
-                    parent.refreshIntelCanvasdesigner(target.attr('canvasdesigner-over'), target);
+                    parent.onClickCanvasdesignerItem(target.attr('canvasdesigner-over'), target);
                     return false;
                 });
             }
