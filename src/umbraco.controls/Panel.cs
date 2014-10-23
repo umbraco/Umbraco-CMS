@@ -109,7 +109,7 @@ namespace umbraco.uicontrols
             row.Controls.Add(rightcol);
 
             body.TagName = "div";
-            body.Attributes.Add("class", "umb-panel-body umb-scrollable row-fluid");
+            body.Attributes.Add("class", "umb-panel-body row-fluid");
 
             Width = Unit.Empty;
             Height = Unit.Empty;
