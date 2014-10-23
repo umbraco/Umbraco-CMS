@@ -14,12 +14,12 @@ namespace Umbraco.Web.WebApi
     {
         private const string ControllerKey = "controller";
         private readonly HttpConfiguration _configuration;
-        private readonly Lazy<ConcurrentStack<NamespaceHttpControllerMetadata>> _duplicateControllerTypes;
+        private readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptor>> _duplicateControllerTypes;
 
         public NamespaceHttpControllerSelector(HttpConfiguration configuration) : base(configuration)
         {
             _configuration = configuration;
-            _duplicateControllerTypes = new Lazy<ConcurrentStack<NamespaceHttpControllerMetadata>>(GetDuplicateControllerTypes);
+            _duplicateControllerTypes = new Lazy<ConcurrentDictionary<string, HttpControllerDescriptor>>(GetDuplicateControllerTypes);
         }
 
         public override HttpControllerDescriptor SelectController(HttpRequestMessage request)
@@ -52,14 +52,19 @@ namespace Umbraco.Web.WebApi
                 return base.SelectController(request);
 
             //see if this is in our cache
-            var found = _duplicateControllerTypes.Value.FirstOrDefault(x => string.Equals(x.ControllerName, controllerNameAsString, StringComparison.OrdinalIgnoreCase) && namespaces.Contains(x.ControllerNamespace));
-            if (found == null)
-                return base.SelectController(request);
+            foreach (var ns in namespaces)
+            {
+                HttpControllerDescriptor descriptor;
+                if (_duplicateControllerTypes.Value.TryGetValue(string.Format("{0}-{1}", controllerNameAsString, ns), out descriptor))
+                {
+                    return descriptor;
+                }
+            }
 
-            return found.Descriptor;
+            return base.SelectController(request);
         }
 
-        private ConcurrentStack<NamespaceHttpControllerMetadata> GetDuplicateControllerTypes()
+        private ConcurrentDictionary<string, HttpControllerDescriptor> GetDuplicateControllerTypes()
         {
             var assembliesResolver = _configuration.Services.GetAssembliesResolver();
             var controllersResolver = _configuration.Services.GetHttpControllerTypeResolver();
@@ -74,47 +79,19 @@ namespace Umbraco.Web.WebApi
                 g => g.ToLookup(t => t.Namespace ?? String.Empty, StringComparer.OrdinalIgnoreCase),
                 StringComparer.OrdinalIgnoreCase);
 
-            var result = new ConcurrentStack<NamespaceHttpControllerMetadata>();
+            var result = new ConcurrentDictionary<string, HttpControllerDescriptor>();
 
             foreach (var controllerTypeGroup in duplicateControllers)
             {
                 foreach (var controllerType in controllerTypeGroup.Value.SelectMany(controllerTypesGrouping => controllerTypesGrouping))
                 {
-                    result.Push(new NamespaceHttpControllerMetadata(controllerTypeGroup.Key, controllerType.Namespace,
-                        new HttpControllerDescriptor(_configuration, controllerTypeGroup.Key, controllerType)));
+                    result.TryAdd(string.Format("{0}-{1}", controllerTypeGroup.Key, controllerType.Namespace),
+                        new HttpControllerDescriptor(_configuration, controllerTypeGroup.Key, controllerType));
                 }
             }
 
             return result;
         }
 
-        private class NamespaceHttpControllerMetadata
-        {
-            private readonly string _controllerName;
-            private readonly string _controllerNamespace;
-            private readonly HttpControllerDescriptor _descriptor;
-
-            public NamespaceHttpControllerMetadata(string controllerName, string controllerNamespace, HttpControllerDescriptor descriptor)
-            {
-                _controllerName = controllerName;
-                _controllerNamespace = controllerNamespace;
-                _descriptor = descriptor;
-            }
-
-            public string ControllerName
-            {
-                get { return _controllerName; }
-            }
-
-            public string ControllerNamespace
-            {
-                get { return _controllerNamespace; }
-            }
-
-            public HttpControllerDescriptor Descriptor
-            {
-                get { return _descriptor; }
-            }
-        }
     }
 }
