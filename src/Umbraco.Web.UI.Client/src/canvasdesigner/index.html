@@ -116,8 +116,8 @@
                     <div class="editor-category" ng-repeat="category in getCategories(configItem)" ng-show="hasEditor(configItem.editors, category)">
                         <h4 class="panel-title" ng-click="setSelectedCategory(category)">
                             {{category}}
-                            <i class="icon icon-add small right" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
-                            <i class="icon icon-remove small right" ng-hide="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
+                            <i class="icon icon-remove small right" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
+                            <i class="icon icon-add small right" ng-hide="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
                         </h4>
                         <div class="canvasdesigner-panel-container" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)">
                             <div class="canvasdesigner-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category">
