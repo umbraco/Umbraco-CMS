@@ -235,6 +235,11 @@ namespace umbraco.DataLayer
             }
         }
 
+        internal int ExecuteNonQuery(string commandText)
+        {
+            return ExecuteNonQuery(commandText, new P[0]);
+        }
+
         /// <summary>
         /// Executes a command and returns a records reader containing the results.
         /// </summary>
@@ -257,6 +262,11 @@ namespace umbraco.DataLayer
                 LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteReader", commandText, parameters, e);
             }
+        }
+
+        internal IRecordsReader ExecuteReader(string commandText)
+        {
+            return ExecuteReader(commandText, new P[0]);
         }
 
         /// <summary>
