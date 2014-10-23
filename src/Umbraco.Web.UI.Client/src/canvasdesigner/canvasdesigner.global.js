@@ -4,7 +4,7 @@
 /*********************************************************************************************************/
 
 /* Called for every canvasdesigner-over rollover */
-var refrechIntelCanvasdesigner = function (schema) {
+var refreshIntelCanvasdesigner = function (schema) {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 

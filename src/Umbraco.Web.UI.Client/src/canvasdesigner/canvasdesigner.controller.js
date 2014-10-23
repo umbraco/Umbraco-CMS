@@ -138,14 +138,14 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
 
             });
 
-            // Refrech page style
+            // Refresh page style
             refreshFrontStyles(parameters);
 
-            // Refrech layout of selected element
+            // Refresh layout of selected element
             //$timeout(function () {
             $scope.positionSelectedHide();
                 if ($scope.currentSelected) {
-                    refrechOutlineSelected($scope.currentSelected);
+                    refreshOutlineSelected($scope.currentSelected);
                 }
             //}, 200);
 
@@ -310,7 +310,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     $scope.setCurrentSelected = function(item) {
         $scope.currentSelected = item;
         $scope.clearSelectedCategory();
-        refrechOutlineSelected($scope.currentSelected);
+        refreshOutlineSelected($scope.currentSelected);
     }
 
     /* Editor categories */
@@ -349,8 +349,8 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     };
 
     var refreshFrontStyles = function (parameters) {
-        if (document.getElementById("resultFrame").contentWindow.refrechLayout)
-            document.getElementById("resultFrame").contentWindow.refrechLayout(parameters);
+        if (document.getElementById("resultFrame").contentWindow.refreshLayout)
+            document.getElementById("resultFrame").contentWindow.refreshLayout(parameters);
     };
 
     var hideUmbracoPreviewBadge = function () {
@@ -370,10 +370,10 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
         $scope.outlineSelectedHide();
     };
 
-    var refrechOutlineSelected = function (config) {
+    var refreshOutlineSelected = function (config) {
         var schema = config.selector ? config.selector : config.schema;
-        if (document.getElementById("resultFrame").contentWindow.refrechOutlineSelected)
-            document.getElementById("resultFrame").contentWindow.refrechOutlineSelected(schema);
+        if (document.getElementById("resultFrame").contentWindow.refreshOutlineSelected)
+            document.getElementById("resultFrame").contentWindow.refreshOutlineSelected(schema);
     }
 
     $scope.outlineSelectedHide = function () {
@@ -382,10 +382,10 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
             document.getElementById("resultFrame").contentWindow.outlineSelectedHide();
     };
 
-    $scope.refrechOutlinePosition = function (config) {
+    $scope.refreshOutlinePosition = function (config) {
         var schema = config.selector ? config.selector : config.schema;
-        if (document.getElementById("resultFrame").contentWindow.refrechOutlinePosition)
-            document.getElementById("resultFrame").contentWindow.refrechOutlinePosition(schema);
+        if (document.getElementById("resultFrame").contentWindow.refreshOutlinePosition)
+            document.getElementById("resultFrame").contentWindow.refreshOutlinePosition(schema);
     }
 
     $scope.positionSelectedHide = function () {
@@ -479,7 +479,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
                 var iframe = (element.context.contentWindow || element.context.contentDocument);
                 if(iframe && iframe.document.getElementById("umbracoPreviewBadge"))
 					iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
-                if (!document.getElementById("resultFrame").contentWindow.refrechLayout) {
+                if (!document.getElementById("resultFrame").contentWindow.refreshLayout) {
                     scope.frameLoaded = true;
                     scope.$apply();
                 }
