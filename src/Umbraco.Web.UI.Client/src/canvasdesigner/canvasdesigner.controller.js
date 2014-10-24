@@ -343,11 +343,12 @@ var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.s
     }
 
     $scope.setSelectedCategory = function (item) {
-        $scope.selectedCategory = item;
+        $scope.categoriesVisibility = $scope.categoriesVisibility || {};
+        $scope.categoriesVisibility[item] = !$scope.categoriesVisibility[item];
     }
 
     $scope.clearSelectedCategory = function () {
-        $scope.selectedCategory = "";
+        $scope.categoriesVisibility = null;
     }
 
     /*****************************************************************************/
