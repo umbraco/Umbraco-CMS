@@ -228,6 +228,7 @@
     <key alias="entername">Indtast navn...</key>
     <key alias="search">Søg...</key>
     <key alias="filter">Filtrer...</key>
+    <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
   </area>
   <area alias="editcontenttype">
 	<key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
