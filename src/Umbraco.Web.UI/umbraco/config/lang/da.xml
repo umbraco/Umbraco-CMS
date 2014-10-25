@@ -596,16 +596,13 @@ Mange hilsner fra Umbraco robotten
     <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Tilføj eksternt link</key>
-    <key alias="addInternal">Tilføj internt link</key>
-    <key alias="addlink">Tilføj</key>
-    <key alias="caption">Billedtekst</key>
-    <key alias="internalPage">Intern side</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Flyt ned</key>
-    <key alias="modeUp">Flyt op</key>
-    <key alias="newWindow">Åben i nyt vindue</key>
-    <key alias="removeLink">Fjern link</key>
+    <key alias="enterExternal">indtast eksternt link</key>
+    <key alias="chooseInternal">vælg en intern side</key>
+    <key alias="caption">Tekst</key>
+    <key alias="link">Link</key>
+    <key alias="newWindow">Nyt vindue</key>
+    <key alias="captionPlaceholder">Indtast en tekst</key>
+    <key alias="externalLinkPlaceholder">Indtast et link</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
