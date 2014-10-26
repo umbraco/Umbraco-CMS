@@ -605,6 +605,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="captionPlaceholder">Indtast en tekst</key>
     <key alias="externalLinkPlaceholder">Indtast et link</key>
   </area>
+  <area alias="imagecropper">
+    <key alias="reset">Nulstil</key>
+  </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
