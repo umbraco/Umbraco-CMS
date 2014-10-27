@@ -12,7 +12,7 @@
                             <div class="td uSky-templates-column"
                                 ng-class="{last:$last}"
                                 ng-repeat="section in template.sections"
-                                style="width:{{ section.$percentage }}%">
+                                style="width:{{ percentage(section.grid) }}%">
                             </div>
                         </div>
                     </div>
