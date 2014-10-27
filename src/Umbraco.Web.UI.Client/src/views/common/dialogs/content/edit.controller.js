@@ -1,4 +1,4 @@
-function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, umbModelMapper, $http) {
+function ContentEditDialogController($scope, editorState, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, umbModelMapper, $http) {
     
     $scope.defaultButton = null;
     $scope.subButtons = [];
@@ -48,6 +48,12 @@ function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window
         });
         $scope.defaultButton = buttons.defaultButton;
         $scope.subButtons = buttons.subButtons;
+
+        //This is a total hack but we have really no other way of sharing data to the property editors of this
+        // content item, so we'll just set the property on the content item directly
+        $scope.content.isDialogEditor = true;
+
+        editorState.set($scope.content);
     }
 
     //check if the entity is being passed in, otherwise load it from the server
