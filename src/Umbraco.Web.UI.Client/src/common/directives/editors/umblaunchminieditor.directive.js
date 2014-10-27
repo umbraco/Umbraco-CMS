@@ -51,7 +51,7 @@ angular.module("umbraco.directives")
 
                             //Now we need to check if the content item that was edited was actually the same content item
                             // as the main content editor and if so, update all property data	                
-                            if (data.id === scope.node.id) {
+                            if (data.id === currEditorState.id) {
                                 var changed = contentEditingHelper.reBindChangedProperties(currEditorState, data);
                             }
                         },
