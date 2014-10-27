@@ -15,7 +15,7 @@
                     <i class="{{node.icon}} hover-hide"></i> 
                     {{node.name}}
                 </a>
-                <div ng-if="!dialogEditor">
+                <div ng-if="!dialogEditor && cfg.showEditButton">
                     <small><a href umb-launch-mini-editor="node">Edit</a></small>
                 </div>
             </li>

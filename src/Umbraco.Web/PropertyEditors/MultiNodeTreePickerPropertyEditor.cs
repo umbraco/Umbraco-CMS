@@ -16,7 +16,8 @@ namespace Umbraco.Web.PropertyEditors
         {
             _internalPreValues = new Dictionary<string, object>
                 {
-                    {"multiPicker", "1"}
+                    {"multiPicker", "1"},
+                    {"showEditButton", "0"}
                 };
         }
         
@@ -45,6 +46,9 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("maxNumber", "Maximum number of items", "number")]
             public string MaxNumber { get; set; }
+
+            [PreValueField("showEditButton", "Show edit button", "boolean")]
+            public string ShowEditButton { get; set; }
 
             /// <summary>
             /// This ensures the multiPicker pre-val is set based on the maxNumber of nodes set

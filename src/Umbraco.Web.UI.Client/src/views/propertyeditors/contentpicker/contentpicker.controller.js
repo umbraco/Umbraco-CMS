@@ -13,6 +13,7 @@ angular.module('umbraco')
 	    //configuration
 	    $scope.cfg = {
 	        multiPicker: "0",
+	        showEditButton: "0",
 	        entityType: "Document",
 	        filterCssClass: "not-allowed not-published",
 
@@ -29,6 +30,7 @@ angular.module('umbraco')
 
 	    //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
 	    $scope.cfg.multiPicker = ($scope.cfg.multiPicker === "0" ? false : true);
+	    $scope.cfg.showEditButton = ($scope.cfg.showEditButton === "0" ? false : true);
 
 	    if ($scope.cfg.startNode.type === "member") {
 	        $scope.cfg.entityType = "Member";
