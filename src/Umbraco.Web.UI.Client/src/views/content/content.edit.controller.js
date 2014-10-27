@@ -68,7 +68,6 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
         contentEditingHelper.contentEditorPerformSave({
-            fileManager: fileManager,
             statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
             scope: $scope,

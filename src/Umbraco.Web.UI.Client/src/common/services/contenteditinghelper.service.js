@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by 
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper($q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState, keyboardService) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState, keyboardService) {
 
     return {
         
@@ -13,9 +13,6 @@ function contentEditingHelper($q, $location, $routeParams, notificationsService,
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
                 throw "args must be an object";
-            }
-            if (!args.fileManager) {
-                throw "args.fileManager is not defined";
             }
             if (!args.scope) {
                 throw "args.scope is not defined";
@@ -35,7 +32,7 @@ function contentEditingHelper($q, $location, $routeParams, notificationsService,
             var deferred = $q.defer();
             
             if (formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
-                args.saveMethod(args.content, $routeParams.create, args.fileManager.getFiles())
+                args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope, notifications: data.notifications });

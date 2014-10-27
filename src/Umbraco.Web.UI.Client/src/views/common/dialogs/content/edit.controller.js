@@ -3,12 +3,10 @@ function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window
     $scope.defaultButton = null;
     $scope.subButtons = [];
     var dialogOptions = $scope.$parent.dialogOptions;
-    var fileManagerInstance = fileManager.createStandaloneInstance();
 
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
         contentEditingHelper.contentEditorPerformSave({
-            fileManager: fileManagerInstance,
             statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
             scope: $scope,
@@ -45,7 +43,7 @@ function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window
                 saveAndPublish: $scope.saveAndPublish,
                 sendToPublish: $scope.sendToPublish,
                 save: $scope.save,
-                unPublish: $scope.unPublish
+                unPublish: angular.noop
             }
         });
         $scope.defaultButton = buttons.defaultButton;
@@ -72,27 +70,6 @@ function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window
             });
     }  
 
-    $scope.unPublish = function () {
-
-        if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
-
-            contentResource.unPublish($scope.content.id)
-                .then(function (data) {
-
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-
-                    contentEditingHelper.handleSuccessfulSave({
-                        scope: $scope,
-                        savedContent: data,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-                    });
-
-                    init($scope.content);
-                });
-        }
-
-    };
-
     $scope.sendToPublish = function () {
         performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending..." });
     };
@@ -117,10 +94,6 @@ function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window
         }
     };
 
-    //dispose the file manager instance
-    $scope.$on('$destroy', function () {
-        fileManagerInstance.clearFiles();
-    });
 }
 
 

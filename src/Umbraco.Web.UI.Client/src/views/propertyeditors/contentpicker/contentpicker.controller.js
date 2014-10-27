@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.ContentPickerController",
 
-	function($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams){
+	function ($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager) {
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
 
@@ -68,14 +68,35 @@ angular.module('umbraco')
 		};
 
 		$scope.edit = function (node) {
+
+		    //We need to store the current files selected in the file manager locally because the fileManager
+		    //is a singleton and is shared globally. The mini dialog will also be referencing the fileManager 
+		    //and we don't want it to be sharing the same files as the main editor. So we'll store the current files locally here,
+            //clear them out and then launch the dialog. When the dialog closes, we'll reset the fileManager to it's previous state.
+
+		    var currFiles = _.groupBy(fileManager.getFiles(), "alias");            
+		    fileManager.clearFiles();
+
 			dialogService.open({
 				template: "views/common/dialogs/content/edit.html",
 				id: node.id,
 				closeOnSave:true,
 				tabFilter: ["Generic properties"],
-				callback: function(data){
-					node.name = data.name;
-				}
+				callback: function(data) {
+				    node.name = data.name;
+				    //reset the fileManager to what it was
+				    fileManager.clearFiles();
+				    _.each(currFiles, function (val, key) {				        
+				        fileManager.setFiles(key, _.map(currFiles['upload'], function (i) { return i.file; }));
+				    });
+				},
+			    closeCallback: function() {
+			        //reset the fileManager to what it was
+			        fileManager.clearFiles();
+			        _.each(currFiles, function(val, key) {
+			            fileManager.setFiles(key, _.map(currFiles['upload'], function (i) { return i.file; }));
+			        });
+			    }
 			});
 		};
 
