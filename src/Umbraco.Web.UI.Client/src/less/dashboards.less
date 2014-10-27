@@ -19,15 +19,85 @@
         height: 4px;
     }
 
-    .video_player video {
-        width: 100%;
-        max-width: 640px;
-        border: 1px solid #ededed;
-        border-left: none;
-        border-bottom: none;
-        box-sizing:border-box;
-        -moz-box-sizing:border-box;
-    }
+
+    .video_player{
+		video {
+	        width: 100%;
+	        max-width: 640px;
+	        border: 1px solid #ededed;
+	        border-left: none;
+	        border-bottom: none;
+	        box-sizing:border-box;
+	        -moz-box-sizing:border-box;
+		}
+
+		input[type="range"] {
+		    position: relative;
+		    z-index: 999;
+		    max-width: 640px;
+		    width: 100%;
+		    margin: 0 auto;
+		    opacity: 0;
+		    cursor: pointer;
+		}
+
+		input[type="range"]::-ms-fill-lower, input[type="range"]::-ms-fill-upper {
+		    background: transparent;
+		}
+
+		input[type="range"]::-ms-tooltip {
+		    display: none;
+		}
+
+		.video-controls {
+		    position: relative;
+		    max-width: 640px;
+		    height: 20px;
+		    margin: -13px auto 40px;
+		    opacity: .8;
+		}
+
+		.loader {
+		    display: block;
+		    width: 100%;
+		    height: 3px;
+		    margin-top: -13px;
+		    background-color: whitesmoke;
+		}
+
+		.progress-bar {
+		    display: block;
+		    box-sizing: border-box;
+		    -moz-box-sizing:border-box;
+		    max-width: 100%;
+		    width: 200px;
+		    height: 100%;
+		    background: #7c7e80;
+		}
+
+		.video-controls, .loader, .progress-bar {
+			-webkit-transition: all 150ms ease-in-out;
+			        transition: all 150ms ease-in-out;
+		}
+
+		.progress-bar {
+			transition-property: background;
+		}
+
+		.video_player video:hover + .video-controls, .video-controls:hover {
+		    margin-top: -19px;
+		    margin-bottom: 46px;
+		    opacity: 1;
+		}
+
+		.video_player video:hover + .video-controls .loader, .video-controls:hover .loader  {
+		    height: 8px;
+		}
+
+		.video_player video:hover + .video-controls .progress-bar, .video-controls:hover .progress-bar {
+			background: #2e99f4;
+		}
+	}
 
     .installer-top {
 		overflow: hidden;
