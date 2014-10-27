@@ -1,18 +1,14 @@
 function dateTimePickerController($scope, notificationsService, assetsService, angularHelper, userService, $element) {
 
+    //lists the custom language files that we currently support
+    var customLangs = ["pt-BR"];
+
     //setup the default config
     var config = {
         pickDate: true,
         pickTime: true,
-		useSeconds: true,
-        format: "YYYY-MM-DD HH:mm:ss",
-		icons: {
-                    time: "icon-time",
-                    date: "icon-calendar",
-                    up: "icon-chevron-up",
-                    down: "icon-chevron-down"
-                }
-
+        pick12HourFormat: false,
+        format: "yyyy-MM-dd hh:mm:ss"
     };
 
     //map the user config
@@ -29,7 +25,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         angularHelper.safeApply($scope, function() {
             // when a date is changed, update the model
             if (e.localDate) {
-                if ($scope.model.config.format == "YYYY-MM-DD HH:mm:ss") {
+                if ($scope.model.config.format == "yyyy-MM-dd hh:mm:ss") {
                     $scope.model.value = e.localDate.toIsoDateTimeString();
                 }
                 else {
@@ -47,34 +43,34 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     userService.getCurrentUser().then(function (user) {
 
         assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css').then(function() {
+            var filesToLoad = ["lib/datetimepicker/bootstrap-datetimepicker.js"];
 
-        var filesToLoad = ["lib/datetimepicker/moment-with-locales.js",
-						   "lib/datetimepicker/bootstrap-datetimepicker.js"];
+            //if we support this custom culture, set it, then we'll need to load in that lang file
+            if (_.contains(customLangs, user.locale)) {
+                $scope.model.config.language = user.locale;
+                filesToLoad.push("lib/datetimepicker/langs/datetimepicker." + user.locale + ".js");
+            }
 
-            
-		$scope.model.config.language = user.locale;
-		
+            assetsService.load(filesToLoad).then(
+                function () {
+                    //The Datepicker js and css files are available and all components are ready to use.
 
-		assetsService.load(filesToLoad).then(
-			function () {
-				//The Datepicker js and css files are available and all components are ready to use.
+                    // Get the id of the datepicker button that was clicked
+                    var pickerId = $scope.model.alias;
 
-				// Get the id of the datepicker button that was clicked
-				var pickerId = $scope.model.alias;
+                    // Open the datepicker and add a changeDate eventlistener
+                    $element.find("div:first")
+                        .datetimepicker($scope.model.config)
+                        .on("changeDate", applyDate);
 
-				// Open the datepicker and add a changeDate eventlistener
-				$element.find("div:first")
-					.datetimepicker($scope.model.config)
-					.on("changeDate", applyDate);
+                    //manually assign the date to the plugin
+                    $element.find("div:first").datetimepicker("setValue", $scope.model.value ? $scope.model.value : null);
 
-				//manually assign the date to the plugin
-				$element.find("div:first").datetimepicker("setValue", $scope.model.value ? $scope.model.value : null);
-
-				//Ensure to remove the event handler when this instance is destroyted
-				$scope.$on('$destroy', function () {
-					$element.find("div:first").datetimepicker("destroy");
-				});
-			});
+                    //Ensure to remove the event handler when this instance is destroyted
+                    $scope.$on('$destroy', function () {
+                        $element.find("div:first").datetimepicker("destroy");
+                    });
+                });
         });
 
         

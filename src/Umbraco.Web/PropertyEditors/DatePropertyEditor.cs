@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             _defaultPreVals = new Dictionary<string, object>
                 {
-                    {"format", "YYYY-MM-DD"},
+                    {"format", "yyyy-MM-dd"},
                     {"pickTime", false}
                 };
         }
