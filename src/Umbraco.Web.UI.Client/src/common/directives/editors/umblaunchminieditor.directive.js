@@ -16,7 +16,15 @@ angular.module("umbraco.directives")
             },
             link: function(scope, element, attrs) {
 
+                var launched = false;
+
                 element.click(function() {
+
+                    if (launched === true) {
+                        return;
+                    }
+
+                    launched = true;
 
                     //We need to store the current files selected in the file manager locally because the fileManager
                     // is a singleton and is shared globally. The mini dialog will also be referencing the fileManager 
@@ -54,6 +62,8 @@ angular.module("umbraco.directives")
                             if (data.id === currEditorState.id) {
                                 var changed = contentEditingHelper.reBindChangedProperties(currEditorState, data);
                             }
+
+                            launched = false;
                         },
                         closeCallback: function () {
                             //reset the fileManager to what it was
@@ -65,6 +75,7 @@ angular.module("umbraco.directives")
                             //reset the editor state
                             editorState.set(currEditorState);
 
+                            launched = false;
                         }
                     });
 
