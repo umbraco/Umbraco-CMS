@@ -1,50 +1,82 @@
 function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, umbModelMapper, $http) {
-    //setup scope vars
-    $scope.model = {};
-    $scope.model.defaultButton = null;
-    $scope.model.subButtons = [];
-    $scope.model.nodeId = 0;
-
+    
+    $scope.defaultButton = null;
+    $scope.subButtons = [];
     var dialogOptions = $scope.$parent.dialogOptions;
+    var fileManagerInstance = fileManager.createStandaloneInstance();
 
-    if(angular.isObject(dialogOptions.entity)){
-        $scope.model.entity = $scope.filterTabs(dialogOptions.entity, dialogOptions.tabFilter);
-        $scope.loaded = true;
-    }else{
+    // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
+    function performSave(args) {
+        contentEditingHelper.contentEditorPerformSave({
+            fileManager: fileManagerInstance,
+            statusMessage: args.statusMessage,
+            saveMethod: args.saveMethod,
+            scope: $scope,
+            content: $scope.content
+        }).then(function (content) {
+            //success
+            $scope.busy = false;
+            
+            if (dialogOptions.closeOnSave) {
+                $scope.submit(content);
+            }
 
-        if (dialogOptions.create) {
-            //we are creating so get an empty content item
-            contentResource.getScaffold(dialogOptions.id, dialogOptions.contentType)
-                .then(function(data) {
-                    $scope.loaded = true;
-                    $scope.model.entity = $scope.filterTabs(data, dialogOptions.tabFilter);
-                });
-        }
-        else {
-            //we are editing so get the content item from the server
-            contentResource.getById(dialogOptions.id)
-                .then(function(data) {
-                    $scope.loaded = true;
-                    $scope.model.entity = $scope.filterTabs(data, dialogOptions.tabFilter);
-                    
-                    
-                    //in one particular special case, after we've created a new item we redirect back to the edit
-                    // route but there might be server validation errors in the collection which we need to display
-                    // after the redirect, so we will bind all subscriptions which will show the server validation errors
-                    // if there are any and then clear them so the collection no longer persists them.
-                    serverValidationManager.executeAndClearAllSubscriptions();
-                });
-        }
+        }, function(err) {
+            //error
+            $scope.busy = false;
+        });
     }
 
-    function performSave(args) {
-        var deferred = $q.defer();
+    function filterTabs(entity, blackList) {
+        if (blackList) {
+            _.each(entity.tabs, function (tab) {
+                tab.hide = _.contains(blackList, tab.alias);
+            });
+        }
 
-        $scope.busy = true;
+        return entity;
+    };
+    
+    function init(content) {
+        var buttons = contentEditingHelper.configureContentEditorButtons({
+            create: $routeParams.create,
+            content: content,
+            methods: {
+                saveAndPublish: $scope.saveAndPublish,
+                sendToPublish: $scope.sendToPublish,
+                save: $scope.save,
+                unPublish: $scope.unPublish
+            }
+        });
+        $scope.defaultButton = buttons.defaultButton;
+        $scope.subButtons = buttons.subButtons;
+    }
 
-        if (formHelper.submitForm({ scope: $scope, statusMessage: args.statusMessage })) {
+    //check if the entity is being passed in, otherwise load it from the server
+    if (angular.isObject(dialogOptions.entity)) {
+        $scope.loaded = true;
+        $scope.content = filterTabs(dialogOptions.entity, dialogOptions.tabFilter);
+        init($scope.content);
+    }
+    else {
+        contentResource.getById(dialogOptions.id)
+            .then(function(data) {
+                $scope.loaded = true;
+                $scope.content = filterTabs(data, dialogOptions.tabFilter);
+                init($scope.content);
+                //in one particular special case, after we've created a new item we redirect back to the edit
+                // route but there might be server validation errors in the collection which we need to display
+                // after the redirect, so we will bind all subscriptions which will show the server validation errors
+                // if there are any and then clear them so the collection no longer persists them.
+                serverValidationManager.executeAndClearAllSubscriptions();
+            });
+    }  
 
-            args.saveMethod($scope.model.entity, $routeParams.create, fileManager.getFiles())
+    $scope.unPublish = function () {
+
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
+
+            contentResource.unPublish($scope.content.id)
                 .then(function (data) {
 
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
@@ -52,63 +84,43 @@ function ContentEditDialogController($scope, $routeParams, $q, $timeout, $window
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
                         savedContent: data,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.model.entity, data)
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    $scope.busy = false;
-                    deferred.resolve(data);
-                    
-                }, function (err) {
-                    
-                    contentEditingHelper.handleSaveError({
-                        redirectOnFailure: true,
-                        err: err,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.model.entity, err.data)
-                    });
-
-                    $scope.busy = false;
-                    deferred.reject(err);
+                    init($scope.content);
                 });
         }
-        else {
-            $scope.busy = false;
-            deferred.reject();
-        }
 
-        return deferred.promise;
-    }
-
-    $scope.filterTabs = function(entity, blackList){
-        if(blackList){
-            _.each(entity.tabs, function(tab){
-                tab.hide = _.contains(blackList, tab.alias);
-            });
-        }
-
-        return entity;
     };
 
-    $scope.saveAndPublish = function() {
-        $scope.submit($scope.model.entity);
+    $scope.sendToPublish = function () {
+        performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending..." });
     };
 
-    $scope.saveAndPublish = function() {
-        performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing..." })
-            .then(function(content){
-                if(dialogOptions.closeOnSave){
-                    $scope.submit(content);
-                }
-            });
+    $scope.saveAndPublish = function () {
+        performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing..." });
     };
 
     $scope.save = function () {
-        performSave({ saveMethod: contentResource.save, statusMessage: "Saving..." })
-            .then(function(content){
-                if(dialogOptions.closeOnSave){
-                    $scope.submit(content);
-                }
-            });
+        performSave({ saveMethod: contentResource.save, statusMessage: "Saving..." });
     };
+
+    // this method is called for all action buttons and then we proxy based on the btn definition
+    $scope.performAction = function (btn) {
+
+        if (!btn || !angular.isFunction(btn.handler)) {
+            throw "btn.handler must be a function reference";
+        }
+
+        if (!$scope.busy) {
+            btn.handler.apply(this);
+        }
+    };
+
+    //dispose the file manager instance
+    $scope.$on('$destroy', function () {
+        fileManagerInstance.clearFiles();
+    });
 }
 
 

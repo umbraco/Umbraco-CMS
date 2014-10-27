@@ -68,8 +68,7 @@ angular.module('umbraco')
 		};
 
 		$scope.edit = function (node) {
-			dialogService.open(
-			{
+			dialogService.open({
 				template: "views/common/dialogs/content/edit.html",
 				id: node.id,
 				closeOnSave:true,

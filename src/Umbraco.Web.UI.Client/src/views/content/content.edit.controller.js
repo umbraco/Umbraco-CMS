@@ -14,53 +14,23 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
     $scope.isNew = $routeParams.create;
+    
+    function init(content) {
 
-    //This sets up the action buttons based on what permissions the user has.
-    //The allowedActions parameter contains a list of chars, each represents a button by permission so 
-    //here we'll build the buttons according to the chars of the user.
-    function configureButtons(content) {
-        //reset
-        $scope.subButtons = [];
-
-        //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
-        // Publish, SendToPublish, Save
-        var buttonOrder = ["U", "H", "A"];
-
-        //Create the first button (primary button)
-        //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
-        if (!$routeParams.create || _.contains(content.allowedActions, "C")) {
-            for (var b in buttonOrder) {
-                if (_.contains(content.allowedActions, buttonOrder[b])) {
-                    $scope.defaultButton = createButtonDefinition(buttonOrder[b]);
-                    break;
-                }
+        var buttons = contentEditingHelper.configureContentEditorButtons({
+            create: $routeParams.create,
+            content: content,
+            methods: {
+                saveAndPublish: $scope.saveAndPublish,
+                sendToPublish: $scope.sendToPublish,
+                save: $scope.save,
+                unPublish: $scope.unPublish
             }
-        }
+        });
+        $scope.defaultButton = buttons.defaultButton;
+        $scope.subButtons = buttons.subButtons;
 
-        //Now we need to make the drop down button list, this is also slightly tricky because:
-        //We cannot have any buttons if there's no default button above.
-        //We cannot have the unpublish button (Z) when there's no publish permission.    
-        //We cannot have the unpublish button (Z) when the item is not published.           
-        if ($scope.defaultButton) {
-
-            //get the last index of the button order
-            var lastIndex = _.indexOf(buttonOrder, $scope.defaultButton.letter);
-            //add the remaining
-            for (var i = lastIndex + 1; i < buttonOrder.length; i++) {
-                if (_.contains(content.allowedActions, buttonOrder[i])) {
-                    $scope.subButtons.push(createButtonDefinition(buttonOrder[i]));
-                }
-            }
-
-
-            //if we are not creating, then we should add unpublish too, 
-            // so long as it's already published and if the user has access to publish
-            if (!$routeParams.create) {
-                if (content.publishDate && _.contains(content.allowedActions, "U")) {
-                    $scope.subButtons.push(createButtonDefinition("Z"));
-                }
-            }
-        }
+        editorState.set($scope.content);
 
         //We fetch all ancestors of the node to generate the footer breadcrump navigation
         if (!$routeParams.create) {
@@ -69,51 +39,6 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                     anc.pop();
                     $scope.ancestors = anc;
                 });
-        }
-    }
-
-    function createButtonDefinition(ch) {
-        switch (ch) {
-            case "U":
-                //publish action
-                keyboardService.bind("ctrl+p", $scope.saveAndPublish);
-
-                return {
-                    letter: ch,
-                    labelKey: "buttons_saveAndPublish",
-                    handler: $scope.saveAndPublish,
-                    hotKey: "ctrl+p"
-                };
-            case "H":
-                //send to publish
-                keyboardService.bind("ctrl+p", $scope.sendToPublish);
-
-                return {
-                    letter: ch,
-                    labelKey: "buttons_saveToPublish",
-                    handler: $scope.sendToPublish,
-                    hotKey: "ctrl+p"
-                };
-            case "A":
-                //save
-                keyboardService.bind("ctrl+s", $scope.save);
-                return {
-                    letter: ch,
-                    labelKey: "buttons_save",
-                    handler: $scope.save,
-                    hotKey: "ctrl+s"
-                };
-            case "Z":
-                //unpublish
-                keyboardService.bind("ctrl+u", $scope.unPublish);
-
-                return {
-                    letter: ch,
-                    labelKey: "content_unPublish",
-                    handler: $scope.unPublish
-                };
-            default:
-                return null;
         }
     }
 
@@ -140,54 +65,26 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
         }
     }
 
-    /** This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish */
+    // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
-        var deferred = $q.defer();
-
-        $scope.busy = true;
-
-        if (formHelper.submitForm({ scope: $scope, statusMessage: args.statusMessage })) {
-
-            args.saveMethod($scope.content, $routeParams.create, fileManager.getFiles())
-                .then(function (data) {
-
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-
-                    contentEditingHelper.handleSuccessfulSave({
-                        scope: $scope,
-                        savedContent: data,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-                    });
-
-                    editorState.set($scope.content);
-                    $scope.busy = false;
-
-                    configureButtons(data);
-
-                    syncTreeNode($scope.content, data.path);
-
-                    deferred.resolve(data);
-
-                }, function (err) {
-
-                    contentEditingHelper.handleSaveError({
-                        redirectOnFailure: true,
-                        err: err,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
-                    });
-
-                    editorState.set($scope.content);
-                    $scope.busy = false;
-
-                    deferred.reject(err);
-                });
-        }
-        else {
+        contentEditingHelper.contentEditorPerformSave({
+            fileManager: fileManager,
+            statusMessage: args.statusMessage,
+            saveMethod: args.saveMethod,
+            scope: $scope,
+            content: $scope.content
+        }).then(function (data) {
+            //success
             $scope.busy = false;
-            deferred.reject();
-        }
-
-        return deferred.promise;
+            init($scope.content);
+            syncTreeNode($scope.content, data.path);
+        }, function (err) {
+            //error
+            $scope.busy = false;
+            if (err) {
+                editorState.set($scope.content);
+            }
+        });
     }
 
     function resetLastListPageNumber(content) {
@@ -206,9 +103,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                 $scope.loaded = true;
                 $scope.content = data;
 
-                editorState.set($scope.content);
-
-                configureButtons($scope.content);
+                init($scope.content);                
 
                 resetLastListPageNumber($scope.content);
             });
@@ -226,9 +121,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                         : "/content/content/edit/" + data.parentId;
                 }
 
-                editorState.set($scope.content);
-
-                configureButtons($scope.content);
+                init($scope.content);
 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
@@ -258,9 +151,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    editorState.set($scope.content);
-
-                    configureButtons(data);
+                    init($scope.content);
 
                     syncTreeNode($scope.content, data.path);
 
@@ -301,7 +192,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
  
     };
 
-    /** this method is called for all action buttons and then we proxy based on the btn definition */
+    // this method is called for all action buttons and then we proxy based on the btn definition
     $scope.performAction = function (btn) {
 
         if (!btn || !angular.isFunction(btn.handler)) {

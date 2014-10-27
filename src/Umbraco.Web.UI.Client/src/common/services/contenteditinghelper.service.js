@@ -5,10 +5,177 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by 
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState) {
+function contentEditingHelper($q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState, keyboardService) {
 
     return {
         
+        /** Used by the content editor and mini content editor to perform saving operations */
+        contentEditorPerformSave: function (args) {
+            if (!angular.isObject(args)) {
+                throw "args must be an object";
+            }
+            if (!args.fileManager) {
+                throw "args.fileManager is not defined";
+            }
+            if (!args.scope) {
+                throw "args.scope is not defined";
+            }
+            if (!args.content) {
+                throw "args.content is not defined";
+            }
+            if (!args.statusMessage) {
+                throw "args.statusMessage is not defined";
+            }
+            if (!args.saveMethod) {
+                throw "args.saveMethod is not defined";
+            }
+
+            var self = this;
+
+            var deferred = $q.defer();
+            
+            if (formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
+                args.saveMethod(args.content, $routeParams.create, args.fileManager.getFiles())
+                    .then(function (data) {
+
+                        formHelper.resetForm({ scope: args.scope, notifications: data.notifications });
+
+                        self.handleSuccessfulSave({
+                            scope: args.scope,
+                            savedContent: data,
+                            rebindCallback: self.reBindChangedProperties(args.content, data)
+                        });
+                        deferred.resolve(data);
+
+                    }, function (err) {
+                        self.handleSaveError({
+                            redirectOnFailure: true,
+                            err: err,
+                            rebindCallback: self.reBindChangedProperties(args.content, err.data)
+                        });
+                        deferred.reject(err);
+                    });
+            }
+            else {
+                deferred.reject();
+            }
+
+            return deferred.promise;
+        },
+        
+        /** Returns the action button definitions based on what permissions the user has.
+        The content.allowedActions parameter contains a list of chars, each represents a button by permission so 
+        here we'll build the buttons according to the chars of the user. */
+        configureContentEditorButtons: function (args) {
+
+            if (!angular.isObject(args)) {
+                throw "args must be an object";
+            }
+            if (!args.content) {
+                throw "args.content is not defined";
+            }
+            if (!args.methods) {
+                throw "args.methods is not defined";
+            }
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.save || !args.methods.unPublish) {
+                throw "args.methods does not contain all required defined methods";
+            }
+
+            var buttons = {
+                defaultButton: null,
+                subButtons: []
+            };
+
+            function createButtonDefinition(ch) {
+                switch (ch) {
+                    case "U":
+                        //publish action
+                        keyboardService.bind("ctrl+p", args.methods.saveAndPublish);
+
+                        return {
+                            letter: ch,
+                            labelKey: "buttons_saveAndPublish",
+                            handler: args.methods.saveAndPublish,
+                            hotKey: "ctrl+p"
+                        };
+                    case "H":
+                        //send to publish
+                        keyboardService.bind("ctrl+p", args.methods.sendToPublish);
+
+                        return {
+                            letter: ch,
+                            labelKey: "buttons_saveToPublish",
+                            handler: args.methods.sendToPublish,
+                            hotKey: "ctrl+p"
+                        };
+                    case "A":
+                        //save
+                        keyboardService.bind("ctrl+s", args.methods.save);
+                        return {
+                            letter: ch,
+                            labelKey: "buttons_save",
+                            handler: args.methods.save,
+                            hotKey: "ctrl+s"
+                        };
+                    case "Z":
+                        //unpublish
+                        keyboardService.bind("ctrl+u", args.methods.unPublish);
+
+                        return {
+                            letter: ch,
+                            labelKey: "content_unPublish",
+                            handler: args.methods.unPublish
+                        };
+                    default:
+                        return null; 
+                }
+            }
+
+            //reset
+            buttons.subButtons = [];
+
+            //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
+            // Publish, SendToPublish, Save
+            var buttonOrder = ["U", "H", "A"];
+
+            //Create the first button (primary button)
+            //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
+            if (!args.create || _.contains(args.content.allowedActions, "C")) {
+                for (var b in buttonOrder) {
+                    if (_.contains(args.content.allowedActions, buttonOrder[b])) {
+                        buttons.defaultButton = createButtonDefinition(buttonOrder[b]);
+                        break;
+                    }
+                }
+            }
+
+            //Now we need to make the drop down button list, this is also slightly tricky because:
+            //We cannot have any buttons if there's no default button above.
+            //We cannot have the unpublish button (Z) when there's no publish permission.    
+            //We cannot have the unpublish button (Z) when the item is not published.           
+            if (buttons.defaultButton) {
+
+                //get the last index of the button order
+                var lastIndex = _.indexOf(buttonOrder, buttons.defaultButton.letter);
+                //add the remaining
+                for (var i = lastIndex + 1; i < buttonOrder.length; i++) {
+                    if (_.contains(args.content.allowedActions, buttonOrder[i])) {
+                        buttons.subButtons.push(createButtonDefinition(buttonOrder[i]));
+                    }
+                }
+
+
+                //if we are not creating, then we should add unpublish too, 
+                // so long as it's already published and if the user has access to publish
+                if (!args.create) {
+                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U")) {
+                        buttons.subButtons.push(createButtonDefinition("Z"));
+                    }
+                }
+            }
+
+            return buttons;
+        },
 
         /**
          * @ngdoc method

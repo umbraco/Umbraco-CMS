@@ -8,20 +8,19 @@
 		<div class="umb-panel-header">
 			<umb-content-name
 			    placeholder="@placeholders_entername"
-			    ng-model="model.entity.name"/>
+			    ng-model="content.name"/>
 		</div>
 
 		<div class="umb-panel-body with-footer">
-			<div id="tab{{tab.id}}" ng-repeat="tab in model.entity.tabs">
-			    <div class="umb-pane" ng-if="!tab.hide">
-			    	<h5>{{tab.label}} - {{tab.alias}}</h5>
-			        <umb-property 
-			            property="property"
-			            ng-repeat="property in tab.properties">
-			            <umb-editor model="property"></umb-editor>
-			        </umb-property>				
-			    </div>
-			 </div>    
+            <div id="tab{{tab.id}}" ng-repeat="tab in content.tabs">
+                <div class="umb-pane" ng-if="!tab.hide">
+                    <h5>{{tab.label}} - {{tab.alias}}</h5>
+                    <umb-property property="property"
+                                  ng-repeat="property in tab.properties">
+                        <umb-editor model="property"></umb-editor>
+                    </umb-property>
+                </div>
+            </div>    
 		</div>
 
 
