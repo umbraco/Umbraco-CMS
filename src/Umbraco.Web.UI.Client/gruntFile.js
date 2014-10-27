@@ -108,7 +108,7 @@ module.exports = function (grunt) {
     vsdir: '../Umbraco.Web.UI/umbraco',
     pkg: grunt.file.readJSON('package.json'),
     banner:
-    '/*! <%= pkg.title || pkg.name %> - v<%= buildVersion %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+    '/*! <%= pkg.title || pkg.name %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
     '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
     ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
     ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
