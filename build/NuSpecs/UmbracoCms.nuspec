@@ -45,6 +45,7 @@
     <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
     <file src="tools\Dashboard.config.install.xdt" target="Content\config\Dashboard.config.install.xdt" />
     <file src="tools\trees.config.install.xdt" target="Content\config\trees.config.install.xdt" />
+    <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
     <file src="build\**" target="build" />
   </files>
 </package>
