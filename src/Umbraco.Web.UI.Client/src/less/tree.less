@@ -38,7 +38,7 @@
 	background: #fff;
 	border-color: @blue;
 }
-.umb-tree li.current > div a, 
+.umb-tree li.current > div a,
 .umb-tree li.current > div i.icon{
 	color: white !important;
 	background: @blue;
@@ -145,7 +145,7 @@
 	padding-left: 35px;
 }
 
-.umb-tree .umb-tree-node-search {    
+.umb-tree .umb-tree-node-search {
     cursor:pointer;
     /*color:@turquoise;*/
 }
@@ -163,7 +163,7 @@
 }
 
 a.umb-options {
-	visibility: hidden;	
+	visibility: hidden;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
@@ -274,6 +274,16 @@ div.is-container:before{
 	font-size: 8px;
 	padding-left: 13px;
 	padding-top: 8px;
+}
+
+div.locked:before{
+	content:"\e0a7";
+	font-family: 'icomoon';
+	color: @red;
+	position: absolute;
+	font-size: 20px;
+	padding-left: 7px;
+	padding-top: 7px;
 }
 
 // Tree context menu
@@ -401,7 +411,7 @@ div.is-container:before{
 
 
 
-// Loading Animation 
+// Loading Animation
 // ------------------------
 
 .umb-tree li div.l{
@@ -434,4 +444,3 @@ body.touch .umb-actions a{
 }
 
 body.touch a.umb-options i {margin-top: 20px;}
-
