@@ -43,8 +43,9 @@ function FormsController($scope, $route, packageResource) {
     };
 
     $scope.complete = function(result){
-        var urL = window.location.href + "?init=true";
+        var url = window.location.href + "?init=true";
         window.location.href = url;
+        
         //window.location.reload();
     };
 
