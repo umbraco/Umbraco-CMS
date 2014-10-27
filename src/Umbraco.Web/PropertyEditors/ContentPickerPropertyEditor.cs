@@ -30,8 +30,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ContentPickerPreValueEditor : PreValueEditor
         {
-            [PreValueField("showEditButton", "Show edit button", "boolean")]
-            public string ShowEditButton { get; set; }
+            //[PreValueField("showEditButton", "Show edit button", "boolean")]
+            //public string ShowEditButton { get; set; }
 
         }
     }
