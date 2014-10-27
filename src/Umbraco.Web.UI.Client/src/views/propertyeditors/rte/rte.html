@@ -1,5 +1,6 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.RTEController" class="umb-editor umb-rte">
     <div ng-if="isLoading">Loading...</div>
-    <textarea ng-style="{ visibility :  isLoading ? 'hidden' : 'visible'}" 
-              ng-model="model.value" rows="10" id="{{model.alias}}_rte"></textarea>
+    <textarea ng-style="{ visibility :  isLoading ? 'hidden' : 'visible'}"
+              ng-model="model.value" rows="10"
+              id="{{textAreaHtmlId}}"></textarea>
 </div>
