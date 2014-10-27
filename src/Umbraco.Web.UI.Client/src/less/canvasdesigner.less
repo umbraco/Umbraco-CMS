@@ -426,6 +426,11 @@ ul.sections li.current, ul.sections li:hover {
 
 .main-panel.selected {
     margin-left: 80px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: auto;
 }
 
 .main-panel .content {
@@ -480,7 +485,7 @@ ul.sections li.current, ul.sections li:hover {
     cursor: pointer;
 }
 
-.samples > li:hover {
+.samples > li:hover, .samples > li.hover {
     background: #f8f8f8;
 }
 

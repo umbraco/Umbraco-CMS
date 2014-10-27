@@ -3,8 +3,8 @@
 /* Global function and variable for panel/page com  */
 /*********************************************************************************************************/
 
-/* Called for every canvasdesigner-over rollover */
-var refrechIntelCanvasdesigner = function (schema) {
+/* Called for every canvasdesigner-over click */
+var onClickCanvasdesignerItem = function (schema) {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 
@@ -20,6 +20,22 @@ var refrechIntelCanvasdesigner = function (schema) {
     scope.clearSelectedCategory();
 
     scope.closeFloatPanels();
+
+    scope.$apply();
+
+}
+
+/* Called for every canvasdesigner-over rollover */
+var onMouseoverCanvasdesignerItem = function (name) {
+
+    var scope = angular.element($("#canvasdesignerPanel")).scope();
+
+    $.each(scope.canvasdesignerModel.configs, function (indexConfig, config) {
+        config.highlighted = false;
+        if (config.name && name.toLowerCase() == config.name.toLowerCase()) {
+            config.highlighted = true;
+        }
+    });
 
     scope.$apply();
 

@@ -95,7 +95,12 @@
                 </div>
                 <div class="content">
                     <ul class="samples">
-                        <li ng-repeat="configItem in canvasdesignerModel.configs" ng-mousemove="refrechOutlinePosition(configItem)" ng-click="setCurrentSelected(configItem)">
+                        <li ng-repeat="configItem in canvasdesignerModel.configs"
+                            ng-mousemove="refreshOutlinePosition(configItem)"
+                            ng-class="{hover: configItem.highlighted == true}"
+                            ng-mouseenter="setCurrentHighlighted(configItem)"
+                            ng-mouseleave="configItem.highlighted = false"
+                            ng-click="setCurrentSelected(configItem)">
                             {{configItem.name}}
                         </li>
                     </ul>
@@ -111,10 +116,10 @@
                     <div class="editor-category" ng-repeat="category in getCategories(configItem)" ng-show="hasEditor(configItem.editors, category)">
                         <h4 class="panel-title" ng-click="setSelectedCategory(category)">
                             {{category}}
-                            <i class="icon icon-add small right" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
-                            <i class="icon icon-remove small right" ng-hide="selectedCategory == category || (selectedCategory == '' && $index == 0)"></i>
+                            <i class="icon icon-remove small right" ng-show="categoriesVisibility[category] === true"></i>
+                            <i class="icon icon-add small right" ng-hide="categoriesVisibility[category] === true"></i>
                         </h4>
-                        <div class="canvasdesigner-panel-container" ng-show="selectedCategory == category || (selectedCategory == '' && $index == 0)">
+                        <div class="canvasdesigner-panel-container" ng-show="categoriesVisibility[category] === true">
                             <div class="canvasdesigner-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category">
                                 <h5>{{item.name}} <i class="icon icon-help-alt"></i></h5>
                                 <div ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>

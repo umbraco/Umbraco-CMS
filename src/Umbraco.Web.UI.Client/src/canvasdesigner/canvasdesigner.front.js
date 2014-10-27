@@ -4,7 +4,7 @@
 
 var currentTarget = undefined;
 
-var refrechLayout = function (parameters) {
+var refreshLayout = function (parameters) {
 
     // hide preview badget
     $("#umbracoPreviewBadge").hide();
@@ -99,6 +99,9 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
             if (target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
                 target.unbind();
                 outlinePosition(target);
+
+                parent.onMouseoverCanvasdesignerItem(target.attr('canvasdesigner-over-name'), target);
+
                 target.click(function (e) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -107,7 +110,7 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
                     currentTarget = target;
                     outlineSelected();
 
-                    parent.refrechIntelCanvasdesigner(target.attr('canvasdesigner-over'), target);
+                    parent.onClickCanvasdesignerItem(target.attr('canvasdesigner-over'), target);
                     return false;
                 });
             }
@@ -120,7 +123,7 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
 
 }
 
-var refrechOutlinePosition = function(schema) {
+var refreshOutlinePosition = function(schema) {
     outlinePosition($(schema));
 }
 
@@ -155,7 +158,7 @@ var outlinePosition = function (oTarget) {
     }
 }
 
-var refrechOutlineSelected = function (schema) {
+var refreshOutlineSelected = function (schema) {
     outlineSelected($(schema));
 }
 
