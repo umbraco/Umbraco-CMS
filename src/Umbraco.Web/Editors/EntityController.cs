@@ -459,7 +459,12 @@ namespace Umbraco.Web.Editors
             //add additional data
             foreach (var m in mapped)
             {
-                m.Icon = "icon-user";
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == "icon-document")
+                {
+                    m.Icon = "icon-user";
+                }
+
                 var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
@@ -488,7 +493,11 @@ namespace Umbraco.Web.Editors
             //add additional data
             foreach (var m in mapped)
             {
-                m.Icon = "icon-picture";                 
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == "icon-document")
+                {
+                    m.Icon = "icon-picture";                     
+                }
             }
             return mapped;
         } 

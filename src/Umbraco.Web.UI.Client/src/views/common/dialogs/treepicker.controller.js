@@ -132,9 +132,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            });
 
 	            //check filter
-	            if (dialogOptions.filter) {	             
-	                performFiltering(args.children);	             
-	            }
+	            performFiltering(args.children);	            
 	        }
 	    }
 
@@ -233,6 +231,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	    function performFiltering(nodes) {
 
+	        if (!dialogOptions.filter) {
+	            return;
+	        }
+
 	        //remove any list view search nodes from being filtered since these are special nodes that always must
 	        // be allowed to be clicked on
 	        nodes = _.filter(nodes, function(n) {
@@ -249,19 +251,25 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            angular.forEach(filtered, function (value, key) {
 	                value.filtered = true;
 	                if (dialogOptions.filterCssClass) {
+                        if (!value.cssClasses) {
+                            value.cssClasses = [];
+                        }
 	                    value.cssClasses.push(dialogOptions.filterCssClass);
 	                }
 	            });
 	        } else {
-	            var a = dialogOptions.filter.split(',');
+	            var a = dialogOptions.filter.toLowerCase().split(',');
 	            angular.forEach(nodes, function (value, key) {
 
-	                var found = a.indexOf(value.metaData.contentType) >= 0;
+	                var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
 
 	                if (!dialogOptions.filterExclude && !found || dialogOptions.filterExclude && found) {
 	                    value.filtered = true;
 
 	                    if (dialogOptions.filterCssClass) {
+	                        if (!value.cssClasses) {
+	                            value.cssClasses = [];
+	                        }
 	                        value.cssClasses.push(dialogOptions.filterCssClass);
 	                    }
 	                }
@@ -277,6 +285,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
         
 	    /** method to select a search result */
 	    $scope.selectResult = function (evt, result) {
+
+            if (result.filtered) {
+                return;
+            }
+
 	        result.selected = result.selected === true ? false : true;
 
 	        //since result = an entity, we'll pass it in so we don't have to go back to the server
@@ -381,15 +394,25 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
         }
 
 	    $scope.onSearchResults = function(results) {
+	        
+            //filter all items - this will mark an item as filtered
+	        performFiltering(results);
+
+	        //now actually remove all filtered items so they are not even displayed
+	        results = _.filter(results, function(item) {
+	            return !item.filtered;
+	        });
+
 	        $scope.searchInfo.results = results;
 
+            //sync with the curr selected results
 	        _.each($scope.searchInfo.results, function (result) {
 	            var exists = _.find($scope.dialogData.selection, function (selectedId) {
 	                return result.id == selectedId;
 	            });
 	            if (exists) {
 	                result.selected = true;
-	            }
+	            }	            
 	        });
 
 	        $scope.searchInfo.showSearch = true;

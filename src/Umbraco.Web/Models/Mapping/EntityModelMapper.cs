@@ -85,6 +85,11 @@ namespace Umbraco.Web.Models.Mapping
                               }
                           }
                           basic.Path = result.Fields.ContainsKey("__Path") ? result.Fields["__Path"] : "";
+                          
+                          if (result.Fields.ContainsKey(UmbracoContentIndexer.NodeTypeAliasFieldName))
+                          {
+                              basic.AdditionalData.Add("contentType", result.Fields[UmbracoContentIndexer.NodeTypeAliasFieldName]);
+                          }
                       });
 
             config.CreateMap<ISearchResults, IEnumerable<EntityBasic>>()
