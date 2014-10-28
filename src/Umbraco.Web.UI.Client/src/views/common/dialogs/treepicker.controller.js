@@ -50,15 +50,26 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        dialogOptions.filterExclude = false;
 	        dialogOptions.filterAdvanced = false;
 
-	        if (dialogOptions.filter[0] === "!") {
-	            dialogOptions.filterExclude = true;
-	            dialogOptions.filter = dialogOptions.filter.substring(1);
-	        }
-
 	        //used advanced filtering
-	        if (dialogOptions.filter[0] === "{") {
+	        if (angular.isFunction(dialogOptions.filter)) {
 	            dialogOptions.filterAdvanced = true;
 	        }
+            else if (angular.isObject(dialogOptions.filter)) {
+                dialogOptions.filterAdvanced = true;
+            }
+            else {
+                if (dialogOptions.filter.startsWith("!")) {
+                    dialogOptions.filterExclude = true;
+                    dialogOptions.filter = dialogOptions.filter.substring(1);
+                }
+
+                //used advanced filtering
+                if (dialogOptions.filter.startsWith("{")) {
+                    dialogOptions.filterAdvanced = true;
+                    //convert to object
+                    dialogOptions.filter = angular.fromJson(dialogOptions.filter);
+                }
+            }
 	    } 
 
 	    function nodeExpandedHandler(ev, args) {            
@@ -221,8 +232,21 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    }
 
 	    function performFiltering(nodes) {
+
+	        //remove any list view search nodes from being filtered since these are special nodes that always must
+	        // be allowed to be clicked on
+	        nodes = _.filter(nodes, function(n) {
+	            return !angular.isObject(n.metaData.listViewNode);
+	        });
+
 	        if (dialogOptions.filterAdvanced) {
-	            angular.forEach(_.where(nodes, angular.fromJson(dialogOptions.filter)), function (value, key) {
+
+                //filter either based on a method or an object
+	            var filtered = angular.isFunction(dialogOptions.filter)
+	                ? _.filter(nodes, dialogOptions.filter)
+	                : _.where(nodes, dialogOptions.filter);
+
+	            angular.forEach(filtered, function (value, key) {
 	                value.filtered = true;
 	                if (dialogOptions.filterCssClass) {
 	                    value.cssClasses.push(dialogOptions.filterCssClass);
