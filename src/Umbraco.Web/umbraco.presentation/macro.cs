@@ -1848,6 +1848,7 @@ namespace umbraco
         {
             var id = Node.getCurrentNodeId();
             var content = UmbracoContext.Current.ContentCache.GetById(id);
+            //TODO: This should check for null!
             return CompatibilityHelper.ConvertToNode(content);
         }
 

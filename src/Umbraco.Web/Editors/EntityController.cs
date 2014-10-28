@@ -296,7 +296,7 @@ namespace Umbraco.Web.Editors
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName"};
-                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId)
+                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
                         sb.Append(searchFrom);
