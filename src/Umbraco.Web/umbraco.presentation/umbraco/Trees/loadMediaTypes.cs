@@ -57,13 +57,7 @@ function openMediaType(id) {
                 xNode.OpenIcon = "icon-item-arrangement";
                 xNode.Source = GetTreeServiceUrl(mediaType.Id);
                 xNode.HasChildren = hasChildren;
-                
-                if (hasChildren)
-                {
-                    xNode.Icon = "settingMasterDataType.gif";
-                    xNode.OpenIcon = "settingMasterDataType.gif";
-                }
-
+          
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)
                 {

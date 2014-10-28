@@ -693,7 +693,14 @@ namespace umbraco.cms.businesslogic
                     else
                     {
                         ContentTypeItem.ParentId = value;
-                        var newMaster = ApplicationContext.Current.Services.ContentTypeService.GetContentType(value);
+
+                        //Try to load the ContentType/MediaType through the new public api
+                        if (nodeObjectType == new Guid(Constants.ObjectTypes.DocumentType))
+                        {
+                            
+                        }
+
+                        var newMaster = CallGetContentTypeMethod(value);
                         var added = ContentTypeItem.AddContentType(newMaster);
                     }
                 }
@@ -719,7 +726,7 @@ namespace umbraco.cms.businesslogic
                 }
                 else
                 {
-                    var newMaster = ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentContentTypeId);
+                    var newMaster = CallGetContentTypeMethod(parentContentTypeId);
                     var added = ContentTypeItem.AddContentType(newMaster);
                 }
             }
@@ -1149,7 +1156,7 @@ namespace umbraco.cms.businesslogic
             //Try to load the ContentType/MediaType through the new public api
             if (nodeObjectType == new Guid(Constants.ObjectTypes.DocumentType))
             {
-                var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+                var contentType = CallGetContentTypeMethod(Id);
                 if (contentType != null)
                 {
                     PopulateContentTypeFromContentTypeBase(contentType);
@@ -1158,7 +1165,7 @@ namespace umbraco.cms.businesslogic
             }
             else if (nodeObjectType == new Guid(Constants.ObjectTypes.MediaType))
             {
-                var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Id);
+                var mediaType = CallGetContentTypeMethod(Id);
                 if (mediaType != null)
                 {
                     PopulateContentTypeFromContentTypeBase(mediaType);
@@ -1167,7 +1174,7 @@ namespace umbraco.cms.businesslogic
             }
             else if (nodeObjectType == new Guid(Constants.ObjectTypes.MemberType))
             {
-                var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Id);
+                var memberType = CallGetContentTypeMethod(Id);
                 if (memberType != null)
                 {
                     PopulateContentTypeFromContentTypeBase(memberType);
@@ -1234,6 +1241,29 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Private Methods
+
+        private Func<int, IContentTypeComposition> CallGetContentTypeMethod
+        {
+            get
+            {
+                if (nodeObjectType == new Guid(Constants.ObjectTypes.DocumentType))
+                {
+                    return ApplicationContext.Current.Services.ContentTypeService.GetContentType;
+                }
+                if (nodeObjectType == new Guid(Constants.ObjectTypes.MediaType))
+                {
+                    return ApplicationContext.Current.Services.ContentTypeService.GetMediaType;
+                }
+                if (nodeObjectType == new Guid(Constants.ObjectTypes.MemberType))
+                {
+                    return ApplicationContext.Current.Services.MemberTypeService.Get;
+                }
+
+                //default to content
+                return ApplicationContext.Current.Services.ContentTypeService.GetContentType;
+            }
+        }
+
         /// <summary>
         /// The cache key used to cache the properties for the content type
         /// </summary>
