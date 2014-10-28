@@ -5,12 +5,14 @@
 
 angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($rootScope, $q, $http, $timeout, $compile, $templateCache) {
 
-
-    function closeDialog(dialog) {
+    function closeDialog(dialog, destroyScope) {
         if (dialog.element) {
             dialog.element.removeClass("selected");
             dialog.element.html("");
-            dialog.scope.$destroy();
+
+            if (destroyScope) {
+                dialog.scope.$destroy();
+            }
         }
     }
 
@@ -32,7 +34,11 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
             };
 
             var dialog = angular.extend(defaults, options);
+            var destroyScope = true;
 
+            if (options && options.scope) {
+                destroyScope = false;
+            }
             var scope = (options && options.scope) || $rootScope.$new();
 
             // Save original value for cancel action
@@ -42,10 +48,11 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
 
 
             /************************************/
+            // Close dialog if the user clicks outside the dialog. (Not working well with colorpickers and datepickers)
             $(document).mousedown(function (e) {
                 var container = dialog.element;
                 if (!container.is(e.target) && container.has(e.target).length === 0) {
-                    closeDialog(dialog);
+                    closeDialog(dialog, destroyScope);
                 }
             });
             /************************************/
@@ -66,7 +73,7 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
                     if (dialog.cancel) {
                         dialog.cancel(originalDialogItem);
                     }
-                    closeDialog(dialog);
+                    closeDialog(dialog, destroyScope);
                 }
 
                 scope.change = function (data) {
@@ -79,11 +86,11 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
                     if (dialog.callback) {
                         dialog.callback(data);
                     }
-                    closeDialog(dialog);
+                    closeDialog(dialog, destroyScope);
                 };
 
                 scope.close = function () {
-                    closeDialog(dialog);
+                    closeDialog(dialog, destroyScope);
                 }
 
                 scope.dialogData = dialog.dialogData;

@@ -9,7 +9,10 @@ angular.module('spectrumcolorpicker', [])
           restrict: 'E',
           transclude: true,
           scope: {
-              colorselected: '='
+              colorselected: '=',
+              setColor: '=',
+              flat: '=',
+              showPalette: '='
           },
           link: function (scope, $element) {
 
@@ -18,9 +21,13 @@ angular.module('spectrumcolorpicker', [])
               $element.find("input").spectrum({
                   color: scope.colorselected,
                   allowEmpty: true,
-                  preferredFormat: "rgb",
+                  preferredFormat: "hex",
                   showAlpha: true,
                   showInput: true,
+                  flat: scope.flat,
+                  localStorageKey: "spectrum.panel",
+                  showPalette: scope.showPalette,
+                  palette: [],
                   change: function (color) {
 
                       if (color) {
@@ -45,8 +52,10 @@ angular.module('spectrumcolorpicker', [])
 
               });
 
-              scope.$watch('colorselected', function () {
-                  $element.find("input").spectrum("set", scope.colorselected);
+              scope.$watch('setcolor', function (setColor) {
+                  if (scope.$eval(setColor) === true) {
+                      $element.find("input").spectrum("set", scope.colorselected);
+                  }
               }, true);
 
           },
