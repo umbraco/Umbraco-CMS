@@ -2,6 +2,11 @@ A note about running Umbraco from Visual Studio.
 
 Don't forget to build!
 
+BETA Notice: We've done our best to transform your config files, we are testing this in 7.2 beta and would love to 
+hear back if it didn't work so we can improve this feature. We'd love to see your before and after config files 
+(make sure to delete sensitive data like passwords and API keys) in the issue tracker at http://issues.umbraco.org/
+Remember, we backed up your files in App_Data\NuGetBackup so you can find the original file before it was transformed.
+
 When upgrading your website using NuGet you should answer "No" to the questions to overwrite the Web.config 
 file (and config files in the config folder). 
 

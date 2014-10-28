@@ -14,6 +14,15 @@ if ($project) {
 	$webConfigSource = Join-Path $projectDestinationPath "Web.config"
 	Copy-Item $webConfigSource $backupPath -Force
 	
+	# Backup config files folder
+	$configFolder = Join-Path $projectDestinationPath "Config"
+	if(Test-Path $configFolder) {
+		$umbracoBackupPath = Join-Path $backupPath "Config"
+		New-Item -ItemType Directory -Force -Path $umbracoBackupPath
+		
+		robocopy $configFolder $umbracoBackupPath /e /LOG:$copyLogsPath\ConfigBackup.log
+	}
+	
 	# Copy umbraco and umbraco_files from package to project folder
 	# This is only done when these folders already exist because we 
 	# only want to do this for upgrades
@@ -140,7 +149,10 @@ if ($project) {
 	}
 
 	$installFolder = Join-Path $projectDestinationPath "Install"
-	if(Test-Path $umbracoFolder) {
+	if(Test-Path $installFolder) {
 		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
+	
+	# Open readme.txt file
+	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
 }
