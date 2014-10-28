@@ -52,8 +52,6 @@
     <compilation>
       <assemblies xdt:Transform="InsertIfMissing" />
       <assemblies>
-        <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
-        <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
         <add assembly="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" xdt:Locator="Match(assembly)"
     xdt:Transform="InsertIfMissing" />
         <add assembly="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
@@ -68,6 +66,13 @@
         <add assembly="System.Web.Routing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <add assembly="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <add assembly="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
+      </assemblies>
+    </compilation>
+
+    <compilation>
+      <assemblies>
+        <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
+        <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
       </assemblies>
     </compilation>
 
@@ -126,36 +131,31 @@
 
   <runtime xdt:Transform="InsertIfMissing" />
   <runtime>
-    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="SetAttributes()">
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="InsertIfMissing">
-        <assemblyIdentity name="System.Net.Http" publicKeyToken="b03f5f7f11d50a3a" culture="neutral"/>
-        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0"/>
-      </dependentAssembly>
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="InsertIfMissing">
-        <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="6.0.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="InsertIfMissing">
-        <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.1" />
-      </dependentAssembly>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="InsertIfMissing" />
+  </runtime>
+  
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
     </assemblyBinding>
   </runtime>
 
   <runtime>
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Replace">
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Net.Http" publicKeyToken="b03f5f7f11d50a3a" culture="neutral"/>
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0"/>
       </dependentAssembly>
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Replace">
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="6.0.0.0" />
       </dependentAssembly>
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Replace">
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.1" />
-      </dependentAssembly>	  
+      </dependentAssembly>
     </assemblyBinding>
   </runtime>
 
