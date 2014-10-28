@@ -1373,11 +1373,38 @@ THE SOFTWARE.
     };
 
     $.fn.datetimepicker = function (options) {
+
+        ////////MODIFICATION FOR COMPATIBILITY WITH OLD DATEPICKER
+        //store the orig method args
+        var methodArgs = arguments;
+        ///////END MODIFICATION FOR COMPATIBILTIY
+
         return this.each(function () {
             var $this = $(this),
                 data = $this.data('DateTimePicker');
             if (!data) {
                 $this.data('DateTimePicker', new DateTimePicker(this, options));
+            }
+            else {
+                ////////MODIFICATION FOR COMPATIBILITY WITH OLD DATEPICKER
+                //this is how the old api was accessed, now it is accessed directly by the 
+                // .data("DateTimePicker") of the element that is assigned. 
+                if (methodArgs.length == 0) {
+                    return;
+                }
+                var method = data[methodArgs[0]];
+                if (!(typeof method == "function")) {
+                    return;
+                }
+                var args = [];
+                //remove first argument, note that arguments is not a true array! so we need to do this manually
+                for (var i = 1; i < methodArgs.length; i++) {
+                    args.push(methodArgs[i]);
+                }                
+                //call the method
+                method.apply(this, args);
+
+                ///////END MODIFICATION FOR COMPATIBILTIY
             }
         });
     };

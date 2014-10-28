@@ -48,7 +48,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
         assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css').then(function() {
 
-        var filesToLoad = ["lib/datetimepicker/moment-with-locales.js",
+        var filesToLoad = ["lib/moment/moment-with-locales.js",
 						   "lib/datetimepicker/bootstrap-datetimepicker.js"];
 
             
