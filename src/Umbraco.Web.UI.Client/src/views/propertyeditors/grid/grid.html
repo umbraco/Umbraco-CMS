@@ -12,7 +12,7 @@
                             <div class="td uSky-templates-column"
                                 ng-class="{last:$last}"
                                 ng-repeat="section in template.sections"
-                                style="width:{{ percentage(section.grid) }}%">
+                                ng-style="{width: percentage(section.grid) + '%'}">
                             </div>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                  ng-class="{last:$last}"
                  ng-repeat="section in model.value.sections"
                  ng-init="initSection(section)"
-                 style="width:{{section.$percentage}}%">
+                 ng-style="{width: section.$percentage + '%'}">
 
                 <div ui-sortable="sortableOptions" ng-model="section.rows">
 
@@ -81,7 +81,7 @@
                                     <div class="tr">
 
                                         <!-- cells in row -->
-                                        <div style="width:{{ area.$percentage }}%"
+                                        <div ng-style="{width: area.$percentage + '%'}"
                                              ng-class="{last:$last,first:$first}"
                                              class="td mainTd usky-cell"
                                              ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
@@ -221,7 +221,7 @@
                                 <li ng-repeat="layout in  section.$allowedLayouts" ng-show="layout.areas.length > 0">
                                     <div class="tb mainTbpt" ng-click="addRow(section, layout)">
                                         <div class="tr">
-                                            <div style="width:{{ percentage(area.grid); }}%"
+                                            <div ng-style="{width: percentage(area.grid) + '%'}"
                                                  class="middle mainTdpt td"
                                                  ng-repeat="area in layout.areas">
                                                 <i class="icon {{cellPreview(area)}}"></i>
