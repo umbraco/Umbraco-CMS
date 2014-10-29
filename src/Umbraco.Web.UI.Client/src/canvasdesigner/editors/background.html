@@ -2,8 +2,8 @@
 <div ng-controller="Umbraco.canvasdesigner.background">
 
     <div class="box-slider">
-        <spectrum colorselected="item.values.color"></spectrum>
-    </div>    
+        <div colorpicker ng-model="item.values.color"></div>
+    </div>
 
     <div class="box-slider">
         <div class="imagePickerPreview" ng-click="open(item.values)" style="background-image:{{ item.values.imageorpattern }}">
