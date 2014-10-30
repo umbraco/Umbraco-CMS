@@ -58,11 +58,7 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     //load media data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-    var entityType = "Media";
-    if (!$scope.cfg === undefined) {
-        entityType = $scope.cfg.entityType;
-    }
-    entityResource.getByIds(modelIds, entityType).then(function (data) {
+    entityResource.getByIds(modelIds, "Media").then(function (data) {
         _.each(data, function (item, i) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
             $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
