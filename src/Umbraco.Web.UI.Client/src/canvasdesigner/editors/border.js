@@ -92,35 +92,30 @@ angular.module("Umbraco.canvasdesigner")
         $scope.setselectedBorder($scope.borderList[0]);
     }, false);
 
-    $scope.$watch( "selectedBorder", function () {
+    $scope.$watch("selectedBorder", function () {
 
         if ($scope.selectedBorder.name == "all") {
             $scope.item.values.bordersize = $scope.selectedBorder.size;
-            $scope.item.values.bordercolor = $scope.selectedBorder.color;
-            $scope.item.values.bordertype =$scope.selectedBorder.type;
+            $scope.item.values.bordertype = $scope.selectedBorder.type;
         }
 
         if ($scope.selectedBorder.name == "left") {
             $scope.item.values.leftbordersize = $scope.selectedBorder.size;
-            $scope.item.values.leftbordercolor = $scope.selectedBorder.color;
             $scope.item.values.leftbordertype = $scope.selectedBorder.type;
         }
 
         if ($scope.selectedBorder.name == "right") {
             $scope.item.values.rightbordersize = $scope.selectedBorder.size;
-            $scope.item.values.rightbordercolor = $scope.selectedBorder.color;
             $scope.item.values.rightbordertype = $scope.selectedBorder.type;
         }
 
         if ($scope.selectedBorder.name == "top") {
             $scope.item.values.topbordersize = $scope.selectedBorder.size;
-            $scope.item.values.topbordercolor = $scope.selectedBorder.color;
             $scope.item.values.topbordertype = $scope.selectedBorder.type;
         }
 
         if ($scope.selectedBorder.name == "bottom") {
             $scope.item.values.bottombordersize = $scope.selectedBorder.size;
-            $scope.item.values.bottombordercolor = $scope.selectedBorder.color;
             $scope.item.values.bottombordertype = $scope.selectedBorder.type;
         }
 

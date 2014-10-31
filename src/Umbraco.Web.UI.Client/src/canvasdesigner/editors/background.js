@@ -10,7 +10,7 @@ angular.module("Umbraco.canvasdesigner")
     if (!$scope.item.values) {
         $scope.item.values = {
             imageorpattern: '',
-            color:''
+            color: ''
         };
     }
 

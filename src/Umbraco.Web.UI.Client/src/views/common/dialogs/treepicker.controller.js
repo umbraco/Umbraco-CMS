@@ -50,15 +50,26 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        dialogOptions.filterExclude = false;
 	        dialogOptions.filterAdvanced = false;
 
-	        if (dialogOptions.filter[0] === "!") {
-	            dialogOptions.filterExclude = true;
-	            dialogOptions.filter = dialogOptions.filter.substring(1);
-	        }
-
 	        //used advanced filtering
-	        if (dialogOptions.filter[0] === "{") {
+	        if (angular.isFunction(dialogOptions.filter)) {
 	            dialogOptions.filterAdvanced = true;
 	        }
+            else if (angular.isObject(dialogOptions.filter)) {
+                dialogOptions.filterAdvanced = true;
+            }
+            else {
+                if (dialogOptions.filter.startsWith("!")) {
+                    dialogOptions.filterExclude = true;
+                    dialogOptions.filter = dialogOptions.filter.substring(1);
+                }
+
+                //used advanced filtering
+                if (dialogOptions.filter.startsWith("{")) {
+                    dialogOptions.filterAdvanced = true;
+                    //convert to object
+                    dialogOptions.filter = angular.fromJson(dialogOptions.filter);
+                }
+            }
 	    } 
 
 	    function nodeExpandedHandler(ev, args) {            
@@ -121,9 +132,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            });
 
 	            //check filter
-	            if (dialogOptions.filter) {	             
-	                performFiltering(args.children);	             
-	            }
+	            performFiltering(args.children);	            
 	        }
 	    }
 
@@ -221,23 +230,46 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    }
 
 	    function performFiltering(nodes) {
+
+	        if (!dialogOptions.filter) {
+	            return;
+	        }
+
+	        //remove any list view search nodes from being filtered since these are special nodes that always must
+	        // be allowed to be clicked on
+	        nodes = _.filter(nodes, function(n) {
+	            return !angular.isObject(n.metaData.listViewNode);
+	        });
+
 	        if (dialogOptions.filterAdvanced) {
-	            angular.forEach(_.where(nodes, angular.fromJson(dialogOptions.filter)), function (value, key) {
+
+                //filter either based on a method or an object
+	            var filtered = angular.isFunction(dialogOptions.filter)
+	                ? _.filter(nodes, dialogOptions.filter)
+	                : _.where(nodes, dialogOptions.filter);
+
+	            angular.forEach(filtered, function (value, key) {
 	                value.filtered = true;
 	                if (dialogOptions.filterCssClass) {
+                        if (!value.cssClasses) {
+                            value.cssClasses = [];
+                        }
 	                    value.cssClasses.push(dialogOptions.filterCssClass);
 	                }
 	            });
 	        } else {
-	            var a = dialogOptions.filter.split(',');
+	            var a = dialogOptions.filter.toLowerCase().split(',');
 	            angular.forEach(nodes, function (value, key) {
 
-	                var found = a.indexOf(value.metaData.contentType) >= 0;
+	                var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
 
 	                if (!dialogOptions.filterExclude && !found || dialogOptions.filterExclude && found) {
 	                    value.filtered = true;
 
 	                    if (dialogOptions.filterCssClass) {
+	                        if (!value.cssClasses) {
+	                            value.cssClasses = [];
+	                        }
 	                        value.cssClasses.push(dialogOptions.filterCssClass);
 	                    }
 	                }
@@ -253,6 +285,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
         
 	    /** method to select a search result */
 	    $scope.selectResult = function (evt, result) {
+
+            if (result.filtered) {
+                return;
+            }
+
 	        result.selected = result.selected === true ? false : true;
 
 	        //since result = an entity, we'll pass it in so we don't have to go back to the server
@@ -357,15 +394,25 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
         }
 
 	    $scope.onSearchResults = function(results) {
+	        
+            //filter all items - this will mark an item as filtered
+	        performFiltering(results);
+
+	        //now actually remove all filtered items so they are not even displayed
+	        results = _.filter(results, function(item) {
+	            return !item.filtered;
+	        });
+
 	        $scope.searchInfo.results = results;
 
+            //sync with the curr selected results
 	        _.each($scope.searchInfo.results, function (result) {
 	            var exists = _.find($scope.dialogData.selection, function (selectedId) {
 	                return result.id == selectedId;
 	            });
 	            if (exists) {
 	                result.selected = true;
-	            }
+	            }	            
 	        });
 
 	        $scope.searchInfo.showSearch = true;

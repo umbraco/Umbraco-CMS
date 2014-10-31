@@ -3,7 +3,7 @@
 /* Canvasdesigner panel app and controller */
 /*********************************************************************************************************/
 
-var app = angular.module("Umbraco.canvasdesigner", ['spectrumcolorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services'])
+var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 'umbraco.resources', 'umbraco.services'])
 
 .controller("Umbraco.canvasdesignerController", function ($scope, $http, $window, $timeout, $location, dialogService) {
 

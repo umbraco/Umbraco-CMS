@@ -74,11 +74,7 @@ function openNodeType(id) {
                 xNode.OpenIcon = "icon-item-arrangement";
                 xNode.Source = GetTreeServiceUrl(docType.Id);
                 xNode.HasChildren = hasChildren;
-                if (hasChildren)
-                {
-                    xNode.Icon = "icon-item-arrangement";
-                    xNode.OpenIcon = "icon-item-arrangement";
-                }
+                
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)

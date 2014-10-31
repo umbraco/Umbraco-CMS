@@ -18,7 +18,7 @@
                                         <div class="td uSky-templates-column"
                                              ng-class="{last:$last}"
                                              ng-repeat="section in template.sections"
-                                             style="width:{{ percentage(section.grid) }}%">
+                                             ng-style="{width: percentage(section.grid) + '%'}">
                                         </div>
                                     </div>
                                 </a>
@@ -61,12 +61,12 @@
                                    ng-class="{last:$last, selected:section==currentSection}"
                                    ng-repeat="section in currentTemplate.sections"
                                    ng-click="configureSection(section, currentTemplate)"
-                                   style="width:{{ percentage(section.grid) }}%">
+                                   ng-style="{width: percentage(section.grid) + '%'}">
                                 </a>
 
                                 <a class="td uSky-templates-column add" ng-if="availableTemplateSpace > 0"
                                    ng-click="configureSection(undefined, currentTemplate)"
-                                   style="width:{{ percentage(availableTemplateSpace) }}%">
+                                   ng-style="{width: percentage(availableTemplateSpace) + '%'}">
                                     <i class="icon icon-add"></i>
                                 </a>
                             </div>
@@ -119,7 +119,7 @@
                                             <div class="uSky-templates-row" style="float: left">
                                                 <a href class="tb mainTbpt">
                                                     <div class="tr">
-                                                        <div style="width:{{ percentage(area.grid); }}%" class="middle mainTdpt td" ng-repeat="area in layout.areas">
+                                                        <div ng-style="{width: percentage(area.grid) +'%'}" class="middle mainTdpt td" ng-repeat="area in layout.areas">
                                                             <i class="icon {{areaPreview(area)}}"></i>
                                                         </div>
                                                     </div>
@@ -179,7 +179,7 @@
                             <div class="uSky-templates-row" style="float: left">
                                 <a href class="tb mainTbpt" ng-click="configureLayout(layout)">
                                     <div class="tr">
-                                        <div style="width:{{ percentage(area.grid); }}%" class="middle mainTdpt td" ng-repeat="area in layout.areas">
+                                        <div ng-style="{width: percentage(area.grid) +'%'}" class="middle mainTdpt td" ng-repeat="area in layout.areas">
                                             <i class="icon {{areaPreview(area)}}"></i>
                                         </div>
                                     </div>
@@ -223,12 +223,12 @@
                                  ng-class="{last:$last, selected:area==currentArea}"
                                  ng-repeat="area in currentLayout.areas"
                                  ng-click="configureArea(area, currentLayout)"
-                                 style="width:{{ percentage(area.grid) }}%">
+                                 ng-style="{width: percentage(area.grid) + '%'}">
                              </a>
 
                              <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
                                  ng-click="configureArea(undefined, currentLayout)"
-                                 style="width:{{ percentage(availableLayoutSpace) }}%">
+                                 ng-style="{width: percentage(availableLayoutSpace) '%'}">
                                  <i class="icon icon-add"></i>
                              </a>
                          </div>

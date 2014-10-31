@@ -1,78 +1,70 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco')
-.controller("Umbraco.PrevalueEditors.MediaPickerController",
+function mediaPickerController($scope, dialogService, entityResource, $log, iconHelper) {
 
-	function($scope, dialogService, entityResource, $log, iconHelper){
-		$scope.renderModel = [];
-		$scope.ids = [];
+    function trim(str, chr) {
+        var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
+        return str.replace(rgxtrim, '');
+    }
 
-		$scope.cfg = {
-			multiPicker: false,
-			entityType: "Media",
-			type: "media",
-			treeAlias: "media"
-		};
+    $scope.renderModel = [];   
 
-		if($scope.model.value){
-			$scope.ids = $scope.model.value.split(',');
-			entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
-				_.each(data, function (item, i) {
-					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-					$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
-				});
-			});
-		}
+    var dialogOptions = {
+        multiPicker: false,
+        entityType: "Media",
+        section: "media",
+        treeAlias: "media",
+        callback: function(data) {
+            if (angular.isArray(data)) {
+                _.each(data, function (item, i) {
+                    $scope.add(item);
+                });
+            }
+            else {
+                $scope.clear();
+                $scope.add(data);
+            }
+        }
+    };
 
+    $scope.openContentPicker = function(){
+        var d = dialogService.treePicker(dialogOptions);
+    };
 
-		$scope.openContentPicker =function(){
-			var d = dialogService.treePicker({
-				section: $scope.cfg.type,
-				treeAlias: $scope.cfg.type,
-				multiPicker: $scope.cfg.multiPicker,
-				callback: populate});
-		};
+    $scope.remove =function(index){
+        $scope.renderModel.splice(index, 1);
+    };
 
-		$scope.remove =function(index){
-			$scope.renderModel.splice(index, 1);
-			$scope.ids.splice(index, 1);
-			$scope.model.value = trim($scope.ids.join(), ",");
-		};
+    $scope.clear = function() {
+        $scope.renderModel = [];
+    };
 
-		$scope.clear = function() {
-			$scope.model.value = "";
-			$scope.renderModel = [];
-			$scope.ids = [];
-		};
+    $scope.add = function (item) {
+        var currIds = _.map($scope.renderModel, function (i) {
+            return i.id;
+        });
+        if (currIds.indexOf(item.id) < 0) {
+            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+            $scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+        }	
+    };
 
-		$scope.add =function(item){
-			if($scope.ids.indexOf(item.id) < 0){
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+    $scope.$on("formSubmitting", function (ev, args) {
+        var currIds = _.map($scope.renderModel, function (i) {
+            return i.id;
+        });
+        $scope.model.value = trim(currIds.join(), ",");
+    });
 
-				$scope.ids.push(item.id);
-				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
-				$scope.model.value = trim($scope.ids.join(), ",");
-			}	
-		};
+    //load media data
+    var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
+    entityResource.getByIds(modelIds, $scope.cfg.entityType).then(function (data) {
+        _.each(data, function (item, i) {
+            item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+        });
+    });
+    
+}
 
-
-		$scope.$on("formSubmitting", function (ev, args) {
-			$scope.model.value = trim($scope.ids.join(), ",");
-		});
-
-		function trim(str, chr) {
-			var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+chr+'+|'+chr+'+$', 'g');
-			return str.replace(rgxtrim, '');
-		}
-
-		function populate(data){
-			if(angular.isArray(data)){
-				_.each(data, function (item, i) {
-					$scope.add(item);
-				});
-			}else{
-				$scope.clear();
-				$scope.add(data);
-			}
-		}
-	});
+angular.module('umbraco').controller("Umbraco.PrevalueEditors.MediaPickerController",mediaPickerController);

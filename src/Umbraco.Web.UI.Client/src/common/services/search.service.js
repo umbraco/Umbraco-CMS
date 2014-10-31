@@ -26,7 +26,7 @@ angular.module('umbraco.services')
     function configureMemberResult(member) {
         member.menuUrl = umbRequestHelper.getApiUrl("memberTreeBaseUrl", "GetMenu", [{ id: member.id }, { application: 'member' }]);
         member.editorPath = "member/member/edit/" + (member.key ? member.key : member.id);
-        member.metaData = { treeAlias: "member" };
+        angular.extend(member.metaData, { treeAlias: "member" });
         member.subTitle = member.metaData.Email;
     }
     
@@ -34,13 +34,13 @@ angular.module('umbraco.services')
     {
         media.menuUrl = umbRequestHelper.getApiUrl("mediaTreeBaseUrl", "GetMenu", [{ id: media.id }, { application: 'media' }]);
         media.editorPath = "media/media/edit/" + media.id;
-        media.metaData = { treeAlias: "media" };
+        angular.extend(media.metaData, { treeAlias: "media" });
     }
     
     function configureContentResult(content) {
         content.menuUrl = umbRequestHelper.getApiUrl("contentTreeBaseUrl", "GetMenu", [{ id: content.id }, { application: 'content' }]);
         content.editorPath = "content/content/edit/" + content.id;
-        content.metaData = { treeAlias: "content" };
+        angular.extend(content.metaData, { treeAlias: "content" });
         content.subTitle = content.metaData.Url;        
     }
 
@@ -165,8 +165,10 @@ angular.module('umbraco.services')
             
         },
 
+        //TODO: This doesn't do anything!
         setCurrent: function(sectionAlias) {
-            currentSection = sectionAlias;
+
+            var currentSection = sectionAlias;
         }
     };
 });

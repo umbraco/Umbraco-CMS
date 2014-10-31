@@ -68,7 +68,6 @@ describe('Content picker controller tests', function () {
             scope.remove(1);
             scope.$apply();
             expect(scope.renderModel.length).toBe(2);
-            expect(scope.ids.length).toBe(2);
             expect(scope.model.value).toBe("1233,23121");
         });
 
@@ -77,7 +76,6 @@ describe('Content picker controller tests', function () {
             scope.add({name: "meh", id: 666, icon: "woop"});
             scope.$apply();
             expect(scope.renderModel.length).toBe(4);
-            expect(scope.ids.length).toBe(4);
             expect(scope.model.value).toBe("1233,1231,23121,666");
         });
 
@@ -86,13 +84,11 @@ describe('Content picker controller tests', function () {
             scope.add({ name: "meh", id: 666, icon: "woop" });
             scope.$apply();
             expect(scope.renderModel.length).toBe(4);
-            expect(scope.ids.length).toBe(4);
             expect(scope.model.value).toBe("1233,1231,23121,666");
 
             scope.add({ name: "meh 2", id: 666, icon: "woop 2" });
             scope.$apply();
             expect(scope.renderModel.length).toBe(4);
-            expect(scope.ids.length).toBe(4);
             expect(scope.model.value).toBe("1233,1231,23121,666");
         });  
     });

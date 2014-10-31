@@ -170,6 +170,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             ((MemberType)entity).AddingEntity();
             
+            //set a default icon if one is not specified
+            if (entity.Icon.IsNullOrWhiteSpace())
+            {
+                entity.Icon = "icon-user";
+            }
+
             //By Convention we add 9 stnd PropertyTypes to an Umbraco MemberType
             entity.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();

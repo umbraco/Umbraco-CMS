@@ -296,7 +296,7 @@ namespace Umbraco.Web.Editors
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName"};
-                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId)
+                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
                         sb.Append(searchFrom);
@@ -305,20 +305,33 @@ namespace Umbraco.Web.Editors
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    if (Security.CurrentUser.StartMediaId > 0 || searchFrom != null)
+
+                    var mediaSearchFrom = int.MinValue;
+
+                    if (Security.CurrentUser.StartMediaId > 0 ||
+                        //if searchFrom is specified and it is greater than 0
+                        (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
                     {
                         sb.Append("+__Path: \\-1*\\,");
-                        sb.Append((searchFrom ?? Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture)));
+                        sb.Append(mediaSearchFrom > 0
+                            ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
+                            : Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
                         sb.Append("\\,* ");
                     }
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
 
-                    if (Security.CurrentUser.StartMediaId > 0 || searchFrom != null)
+                    var contentSearchFrom = int.MinValue;
+
+                    if (Security.CurrentUser.StartContentId > 0 || 
+                        //if searchFrom is specified and it is greater than 0
+                        (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
                     {
                         sb.Append("+__Path: \\-1*\\,");
-                        sb.Append((searchFrom ?? Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture)));
+                        sb.Append(contentSearchFrom > 0
+                            ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
+                            : Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
                         sb.Append("\\,* ");
                     }
                     break;
@@ -446,7 +459,12 @@ namespace Umbraco.Web.Editors
             //add additional data
             foreach (var m in mapped)
             {
-                m.Icon = "icon-user";
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == "icon-document")
+                {
+                    m.Icon = "icon-user";
+                }
+
                 var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
@@ -475,7 +493,11 @@ namespace Umbraco.Web.Editors
             //add additional data
             foreach (var m in mapped)
             {
-                m.Icon = "icon-picture";                 
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == "icon-document")
+                {
+                    m.Icon = "icon-picture";                     
+                }
             }
             return mapped;
         } 
