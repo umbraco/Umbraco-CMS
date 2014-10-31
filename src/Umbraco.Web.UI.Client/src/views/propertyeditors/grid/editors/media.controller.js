@@ -3,7 +3,8 @@ angular.module("umbraco")
     function ($scope, $rootScope, $timeout, dialogService) {
 
     	$scope.setImage = function(){
-    		dialogService.mediaPicker({
+    	    dialogService.mediaPicker({
+    	        startNodeId: $scope.control.editor.config && $scope.control.editor.config.startNodeId ? $scope.control.editor.config.startNodeId : undefined,
     		    multiPicker: false,
     		    callback: function (data) {
     		    	$scope.control.value = {
