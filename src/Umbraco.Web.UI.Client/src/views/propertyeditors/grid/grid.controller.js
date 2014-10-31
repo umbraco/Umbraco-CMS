@@ -507,4 +507,10 @@ angular.module("umbraco")
             $scope.initContent();
 
         });
+
+        // Optional stylesheet link that can be used for improve the macros' display
+        if ($scope.model.config.items.optionalStylesheet && $scope.model.config.items.optionalStylesheet != '') {
+            assetsService.loadCss($scope.model.config.items.optionalStylesheet);
+        }
+
     });
