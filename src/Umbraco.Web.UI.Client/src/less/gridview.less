@@ -184,7 +184,7 @@
 
 
 .usky-grid  .cell-tools-remove {
-    display:inline-block;
+    display: inline-block;
     position: absolute;
     top: 0px;
     right: 5px;
@@ -198,7 +198,7 @@
 }
 
 .usky-grid  .cell-tools-move {
-    display:inline-block;
+    display: inline-block;
     position: absolute;
     top: 40px;
     right: 5px;
@@ -206,6 +206,13 @@
     cursor: move
 }
 
+.usky-grid  .cell-tools-setting { 
+    display: inline-block;
+    position: absolute;
+    top: 80px;
+    right: 5px;
+    z-index: 500;
+}
 
 
 // CONTROL
@@ -255,8 +262,9 @@
 // CONTROL PLACEHOLDER
 // -------------------------
 .usky-grid  .usky-control-placeholder {
-    min-height: 50px;
+    padding-top: 20px !important;
     position: relative;
+    min-height: 78px;
     text-align: center;
     text-align: -moz-center;
     cursor: text;
@@ -285,7 +293,7 @@
     padding: 20px;
     padding-bottom: 30px;
     position: relative;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.2);
     border: 4px dashed @grayLight;
     text-align: center;
     text-align: -moz-center;

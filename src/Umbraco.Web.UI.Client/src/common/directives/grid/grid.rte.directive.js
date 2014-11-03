@@ -127,6 +127,9 @@ angular.module("umbraco.directives")
                                     //force overflow to hidden to prevent no needed scroll
                                     editor.getBody().style.overflow = "hidden";
 
+                                    //force transparent background
+                                    editor.getBody().style.background = "transparent";
+
                                     $timeout(function(){
                                         if(scope.value === null){
                                             editor.focus();
