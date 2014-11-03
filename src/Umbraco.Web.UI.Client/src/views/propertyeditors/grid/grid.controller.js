@@ -184,9 +184,15 @@ angular.module("umbraco")
             $scope.currentRow = null;
         };
 
+        $scope.setCurrentRemoveRow = function (Row) {
+            $scope.currentRemoveRow = Row;
+        };
+
+        $scope.disableCurrentRemoveRow = function (Row) {
+            $scope.currentRemoveRow = null;
+        };
+
         $scope.setCurrentMovedRow = function (Row) {
-            $scope.currentRow = null;
-            $scope.currentRemoveControl = null;
             $scope.currentMovedRow = Row;
         };
 

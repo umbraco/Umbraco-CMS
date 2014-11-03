@@ -63,8 +63,7 @@ if ($project) {
 			
 		$consoleWindow = $(Get-VSComponentModel).GetService([NuGetConsole.IPowerConsoleWindow])		
 			
-		$props = $consoleWindow.GetType().GetProperties([System.Reflection.BindingFlags]::Instance -bor `		
-		  [System.Reflection.BindingFlags]::NonPublic)		
+		$props = $consoleWindow.GetType().GetProperties([System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
 			
 		$prop = $props | ? { $_.Name -eq "ActiveHostInfo" } | select -first 1		
 		if ($prop -eq $null) { return }		
@@ -91,10 +90,8 @@ if ($project) {
 		# get reference to the window, then smart output console provider		
 		# copy web.config if messages in buffered console contains "installing...UmbracoCms" in last operation		
 		
-		$instanceField = [NuGet.Dialog.PackageManagerWindow].GetField("CurrentInstance", [System.Reflection.BindingFlags]::Static -bor `		
-		  [System.Reflection.BindingFlags]::NonPublic)		
-		$consoleField = [NuGet.Dialog.PackageManagerWindow].GetField("_smartOutputConsoleProvider", [System.Reflection.BindingFlags]::Instance -bor `		
-		  [System.Reflection.BindingFlags]::NonPublic)		
+		$instanceField = [NuGet.Dialog.PackageManagerWindow].GetField("CurrentInstance", [System.Reflection.BindingFlags]::Static -bor [System.Reflection.BindingFlags]::NonPublic)		
+		$consoleField = [NuGet.Dialog.PackageManagerWindow].GetField("_smartOutputConsoleProvider", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
 		if ($instanceField -eq $null -or $consoleField -eq $null) { return }		
 			
 		$instance = $instanceField.GetValue($null)		
@@ -105,8 +102,7 @@ if ($project) {
 			
 		$console = $consoleProvider.CreateOutputConsole($false)		
 			
-		$messagesField = $console.GetType().GetField("_messages", [System.Reflection.BindingFlags]::Instance -bor `		
-		  [System.Reflection.BindingFlags]::NonPublic)		
+		$messagesField = $console.GetType().GetField("_messages", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
 		if ($messagesField -eq $null) { return }		
 			
 		$messages = $messagesField.GetValue($console)		
