@@ -200,6 +200,14 @@ angular.module("umbraco")
             $scope.currentMovedRow = null;
         };
 
+        $scope.setCurrentSettingRow = function (Row) {
+            $scope.currentSettingRow = Row;
+        };
+
+        $scope.disableCurrentSettingRow = function (Row) {
+            $scope.currentSettingRow = null;
+        };
+
         $scope.getAllowedLayouts = function(column){
             var layouts = $scope.model.config.items.layouts;
 
@@ -236,7 +244,6 @@ angular.module("umbraco")
             }
         };
 
-
         // *********************************************
         // Cell management functions
         // *********************************************
@@ -257,9 +264,6 @@ angular.module("umbraco")
                 return "icon-layout";
             }
         };
-
-
-
 
         // *********************************************
         // Control management functions
@@ -296,6 +300,14 @@ angular.module("umbraco")
 
         $scope.disableCurrentMovedControl = function (Control) {
             $scope.currentMovedControl = null;
+        };
+
+        $scope.setCurrentSettingControl = function (Control) {
+            $scope.currentSettingControl = Control;
+        };
+
+        $scope.disableCurrentSettingControl = function (Control) {
+            $scope.currentSettingControl = null;
         };
 
         $scope.setUniqueId = function (cell, index) {
@@ -348,13 +360,6 @@ angular.module("umbraco")
         $scope.percentage = function(spans){
             return ((spans/12)*100).toFixed(1);
         };
-
-
-
-
-
-
-
 
         // *********************************************
         // INITIALISATION
@@ -475,12 +480,88 @@ angular.module("umbraco")
                 //set a no disposable unique ID (util for row styling)
                 original.id = !row.id ? $scope.setUniqueId() : row.id;
 
+                //set optional setting if it exists
+                if (row.setting) original.setting = row.setting;
+
                 return original;
             }
 
         };
 
+        // *********************************************
+        // -- optional row/cell settings --
+        // Feature that allows to extend the grid with 
+        // additional custom row/cell settings
+        // *********************************************
 
+        /* init setting */
+        $scope.initSetting = function () {
+
+            if ($scope.model.config.items.optionalSetting) {
+
+                gridService.getGridSettings().then(function (response) {
+
+                    if (response.data && response.data.length > 0) {
+
+                        $scope.setting = response.data[0];
+
+                        // Load dependencies and register row setting controller
+                        if ($scope.setting.dependencies) {
+                            assetsService.load($scope.setting.dependencies).then(function () {
+                                if ($scope.setting.rowSetting && $scope.setting.rowSetting.controller) {
+                                    var rowSettingController = eval($scope.setting.rowSetting.controller)
+                                    if (rowSettingController) {
+                                        app.controllerProvider.register($scope.setting.rowSetting.controller, rowSettingController);
+                                    }
+                                }
+                                if ($scope.setting.controlSetting && $scope.setting.controlSetting.controller) {
+                                    var controlSettingController = eval($scope.setting.controlSetting.controller)
+                                    if (controlSettingController) {
+                                        app.controllerProvider.register($scope.setting.controlSetting.controller, controlSettingController);
+                                    }
+                                }
+                            });
+                        }
+
+                        // Load assets
+                        if ($scope.setting.assets) {
+                            assetsService.loadCss($scope.setting.assets);
+                        }
+
+                    }
+                })
+
+            }
+
+        }
+
+        /* Open optional row setting panel */
+        $scope.openSetting = function (item) {
+            if ($scope.setting && $scope.setting.rowSetting) {
+                var dialog = dialogService.open({
+                    template: $scope.setting.rowSetting.view,
+                    show: true,
+                    dialogData: item.setting ? item.setting : undefined,
+                    callback: function (data) {
+                        item.setting = data ? data : undefined;
+                    }
+                });
+            }
+        }
+
+        /* Optional style that can be added to the item by setting.styles */
+        $scope.setSettingStyles = function (item) {
+            if (item.setting && item.setting.styles) {
+                return item.setting.styles;
+            }
+        }
+
+        /* Optional classes that can be added to the item by setting.classes */
+        $scope.setSettingClasses = function (item) {
+            if (item.setting && item.setting.classes) {
+                return item.setting.classes;
+            }
+        }
 
         // *********************************************
         // Init control
@@ -501,9 +582,11 @@ angular.module("umbraco")
             }
         };
 
-
         gridService.getGridEditors().then(function(response){
             $scope.availableEditors = response.data;
+
+            // Init optional row setting
+            $scope.initSetting();
 
             $scope.contentReady = true;
 
@@ -513,4 +596,5 @@ angular.module("umbraco")
             $scope.initContent();
 
         });
+
     });

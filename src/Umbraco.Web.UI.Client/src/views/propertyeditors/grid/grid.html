@@ -40,10 +40,11 @@
 
                     <!-- for each row in template section -->
                     <div ng-repeat="row in section.rows"
-                         class="usky-row"
+                         class="usky-row {{setSettingClasses(row)}}"
                          ng-mouseover="setCurrentRow(row)"
                          ng-mouseleave="disableCurrentRow()"
-                         ng-class="{'selectedControl':currentRow == row && currentControl === null}">
+                         ng-class="{'selectedControl':currentRow == row && currentControl === null}"
+                         ng-style="setSettingStyles(row)">
 
                         <!-- Row tool -->
                         <div class="row-tools" ng-animate="'fade'" ng-if="currentRow == row && currentControl === null">
@@ -71,11 +72,21 @@
                                     <i class="icon icon-navigation"></i>
                                 </div>
                             </div>
+
+                            <div ng-if="setting && setting.rowSetting" class="cell-tools-setting">
+                                <div class="iconBox"
+                                     ng-click="openSetting(row)"
+                                     ng-mouseover="setCurrentSettingRow(row)"
+                                     ng-mouseleave="disableCurrentSettingRow(row)">
+                                    <i class="icon icon-settings"></i>
+                                </div>
+                            </div>
+
                         </div>
 
                         <!-- row container -->
                         <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                             ng-class="{last:$last,first:$first,warnhighlight:currentRemoveRow == row, infohighlight:currentMovedRow == row}">
+                             ng-class="{last:$last,first:$first,warnhighlight:currentRemoveRow == row, infohighlight:currentMovedRow == row || currentSettingRow == row}">
                             <div class="mainTb">
                                 <div class="tb">
                                     <div class="tr">
@@ -137,7 +148,8 @@
                                                  ng-mouseover="setCurrentControl(control)"
                                                  ng-mouseleave="disableCurrentControl(control)"
                                                  ng-animate="'fade'"
-                                                 class="usky-control">
+                                                 class="usky-control {{setSettingClasses(control)}}"
+                                                 ng-style="setSettingStyles(control)">
 
                                                 <!-- Filled cell tools -->
                                                 <div class="cell-tools"
@@ -169,10 +181,20 @@
                                                         </div>
                                                     </div>
 
+                                                    <!-- setting cell -->
+                                                    <div ng-if="setting && setting.controlSetting" class="cell-tools-setting">
+                                                        <div class="iconBox"
+                                                             ng-click="openSetting(control)"
+                                                             ng-mouseover="setCurrentSettingControl(control)"
+                                                             ng-mouseleave="disableCurrentSettingControl(control)">
+                                                            <i class="icon icon-settings"></i>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
 
                                                 <div class="usky-control-inner" ng-class="{last:$last,
-                                                               infohighlight:currentMovedControl == control,
+                                                               infohighlight:currentMovedControl == control || currentSettingControl == control,
                                                                warnhighlight:currentRemoveControl == control,
                                                                selectedControl:currentControl == control}">
                                                     <!-- Redering the editor for specific control -->
