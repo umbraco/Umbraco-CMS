@@ -170,4 +170,6 @@ app.config(function ($routeProvider) {
 
         //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
         // $locationProvider.html5Mode(true);         //turn html5 mode on
-});
+    }).config(function($controllerProvider) {
+        app.controllerProvider = $controllerProvider;
+    });
