@@ -14,18 +14,25 @@ namespace Umbraco.Web.Scheduling
             {                
                 var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
 
-                var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
-
-                try
+                if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                 {
-                    using (var wc = new WebClient())
-                    {
-                        wc.DownloadString(url);
-                    }
+                    LogHelper.Warn<KeepAlive>("No url for service (yet), skip.");
                 }
-                catch (Exception ee)
+                else
                 {
-                    LogHelper.Error<KeepAlive>("Error in ping", ee);
+                    var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
+
+                    try
+                    {
+                        using (var wc = new WebClient())
+                        {
+                            wc.DownloadString(url);
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        LogHelper.Error<KeepAlive>("Error in ping", ee);
+                    }
                 }
             }
             

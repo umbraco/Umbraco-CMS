@@ -27,13 +27,21 @@ namespace Umbraco.Web.Scheduling
                 try
                 {
                     var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
-                    var url = string.Format("{0}/RestServices/ScheduledPublish/Index", umbracoBaseUrl);
-                    using (var wc = new WebClient())
-                    {
-                        //pass custom the authorization header
-                        wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(appContext));
 
-                        var result = wc.UploadString(url, "");
+                    if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
+                    {
+                        LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
+                    }
+                    else
+                    {
+                        var url = string.Format("{0}/RestServices/ScheduledPublish/Index", umbracoBaseUrl);
+                        using (var wc = new WebClient())
+                        {
+                            //pass custom the authorization header
+                            wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(appContext));
+
+                            var result = wc.UploadString(url, "");
+                        }
                     }
                 }
                 catch (Exception ee)
