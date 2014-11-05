@@ -1,6 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid">
 
 <div ng-if="contentReady">
+    
     <!-- Template picker -->
     <div class="uSky-templates tb" ng-show="!model.value || model.value == ''">
         <div class="tr">
@@ -41,9 +42,8 @@
                     <!-- for each row in template section -->
                     <div ng-repeat="row in section.rows"
                          class="usky-row"
-                         ng-mouseover="setCurrentRow(row)"
-                         ng-mouseleave="disableCurrentRow()"
-                         ng-class="{'selectedControl':currentRow == row && currentControl === null}">
+                         ng-mouseenter="setCurrentRow(row)"
+                         ng-mouseleave="disableCurrentRow()">
 
                         <!-- Row tool -->
                         <div class="row-tools" ng-animate="'fade'" ng-if="currentRow == row && currentControl === null">
@@ -52,8 +52,8 @@
                             <div class="cell-tools-remove">
                                 <div class="iconBox"
                                      ng-click="deletePrompt = true"
-                                     ng-mouseover="setCurrentRemoveControl(row)"
-                                     ng-mouseover="disableCurrentRemoveControl(row)">
+                                     ng-mouseenter="setCurrentRemoveControl(row)"
+                                     ng-mouseleave="disableCurrentRemoveControl(row)">
 
                                     <span ng-if="deletePrompt">
                                         Are you sure?
@@ -65,17 +65,24 @@
                             </div>
 
                             <div class="cell-tools-move">
-                                <div class="iconBox"
-                                     ng-mouseover="setCurrentMovedRow(row)"
-                                     ng-mouseleave="disableCurrentMovedRow(row)">
+                                <a class="iconBox"
+                                    href>
                                     <i class="icon icon-navigation"></i>
-                                </div>
+                                </a>
                             </div>
+
+                            <div class="cell-tools-edit">
+                                <a href class="iconBox" ng-click="editGridItemSettings(row)">
+                                    <i class="icon icon-settings-alt"></i>
+                                </a>
+                            </div>
+
                         </div>
 
                         <!-- row container -->
                         <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                             ng-class="{last:$last,first:$first,warnhighlight:currentRemoveControl == row, infohighlight:currentMovedRow == row}">
+                            ng-class="{last:$last,first:$first, warnhighlight:currentRemoveControl == row, infohighlight:currentMovedRow == row}">
+
                             <div class="mainTb">
                                 <div class="tb">
                                     <div class="tr">
@@ -89,7 +96,6 @@
                                             <!-- if area is empty tools -->
                                             <div class="usky-control usky-control-placeholder"
                                                  ng-if="area.controls.length == 0">
-
                                                 <div ng-if="area.allowed && area.allowed.length === 1"
                                                      ng-init="singleEditor = area.$allowedEditors[0]"
                                                      class="cell-tools-add-single single-editor-{{singleEditor.alias}}">
@@ -168,7 +174,6 @@
                                                             <i class="icon icon-navigation"></i>
                                                         </div>
                                                     </div>
-
                                                 </div>
 
                                                 <div class="usky-control-inner" ng-class="{last:$last,
@@ -250,6 +255,3 @@
 </div>
 
 </div>
-
-
-

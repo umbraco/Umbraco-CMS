@@ -1,7 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController" class="usky-grid usky-grid-configuration">
 
     <div style="width: 600px">
-
             <div class="control-group uSky-templates" ng-if="!currentTemplate">
 
                 <umb-control-group label="Grid layouts" description="Layouts are the overall work area for the grid editor, usually you only need one or two differnt layouts" hide-label="false">
@@ -27,7 +26,7 @@
 
                             <div>
                                 <a ng-click="configureTemplate(template)" href>{{template.name}}</a><br />
-                                <small>{{template.sections.length}} layout areas</small><br />
+                                <small>{{template.sections.length}} sections</small><br />
 
                                 <a class="btn btn-small btn-link" href ng-click="deleteTemplate($index)"><i class="icon-delete red"></i> Delete layout </a>
                             </div>
@@ -39,20 +38,21 @@
                     <button class="btn btn-small"
                             prevent-default
                             ng-click="configureTemplate()">
-                        <i class="icon-add"></i>Add layout
+                        <i class="icon-add"></i>Add new layout
                     </button>
 
                 </umb-control-group>
 
             </div>
 
+            
             <div ng-if="currentTemplate">
                 <h5>Layout</h5>
                 <umb-control-group label="Name" hide-label="false">
                     <input type="text" class="" ng-model="currentTemplate.name" />
                 </umb-control-group>
 
-                <umb-control-group label="Sections" description="Choose an area in the layout to edit" hide-label="false">
+                <umb-control-group label="Sections" description="Choose a section in the layout to edit" hide-label="false">
                     <div class="uSky-templates-template"
                          style="margin: 0; width: 350px; position: relative;">
                         <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
@@ -74,8 +74,7 @@
                     </div>
 
                     <div ng-if="currentSection" style="padding-bottom: 50px;">
-                        <h5>Modify layout area</h5>
-                        <umb-control-group label="Size" hide-label="false">
+                        <umb-control-group label="Width" hide-label="false">
                             <div class="grid-size-scaler">
                                 <a href ng-click="scaleDown(currentSection)">
                                     <i class="icon icon-remove"></i>
@@ -128,7 +127,7 @@
 
                                             <div>
                                                 {{layout.name}}<br />
-                                                <small>{{layout.areas.length}} configurable columns</small><br />
+                                                <small>{{layout.areas.length}} configurable sections</small><br />
                                             </div>
 
                                             <br style="clear: both" />
@@ -138,11 +137,11 @@
                             </div>
                         </umb-control-group>
 
-                        <button prevent-default ng-click="closeSection()" class="btn btn-small">Finish editing area</button>
+                        <button prevent-default ng-click="closeSection()" class="btn btn-small">Finish editing section</button>
 
                         <a class="btn btn-small btn-link"
                            href
-                           ng-click="deleteSection($index)"><i class="icon-delete red"></i>Delete area</a>
+                           ng-click="deleteSection($index)"><i class="icon-delete red"></i>Delete section</a>
                     </div>
 
                 </umb-control-group>
@@ -163,10 +162,10 @@
 
     <div style="max-width: 600px">
 
-        <div class="control-group uSky-templates" ng-if="!currentLayout">
+        <div class="control-group uSky-templates" ng-if="!currentTemplate">
             <umb-control-group
                 label="Row configurations"
-                description="Rows are predefined columns of editors arranged horizontally"
+                description="Rows are predefined cells arranged horizontally"
                 hide-label="false">
                 <div class="control-group uSky-templates-rows">
 
@@ -188,7 +187,7 @@
 
                             <div>
                                 <a ng-click="configureLayout(layout)" href>{{layout.name}}</a><br />
-                                <small>{{layout.areas.length}} columns</small><br />
+                                <small>{{layout.areas.length}} cells</small><br />
                                 <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)"><i class="icon-delete red"></i> Delete row </a>
                             </div>
 
@@ -214,7 +213,7 @@
                 <input type="text" class="" ng-model="currentLayout.name" />
             </umb-control-group>
 
-            <umb-control-group label="Layout areas" hide-label="false" description="Choose column from the row to edit">
+            <umb-control-group label="Layout areas" hide-label="false" description="Choose a cell from the row to edit">
                  <div class="uSky-templates-template"
                      style="margin: 0; width: 350px; position: relative;">
                      <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
@@ -236,15 +235,12 @@
                 </div>
 
                 <div ng-if="currentArea" style="padding-bottom: 50px;">
-                    <h5>Modify column</h5>
-                    <umb-control-group label="Size" hide-label="false">
+                     <umb-control-group label="Width" hide-label="false">
                         <div class="grid-size-scaler">
                             <a href ng-click="scaleDown(currentArea)">
                                 <i class="icon icon-remove"></i>
                             </a>
-
                             {{currentArea.grid}}
-
                             <a href ng-click="scaleUp(currentArea, availableLayoutSpace)">
                                 <i class="icon icon-add"></i>
                             </a>
@@ -252,7 +248,6 @@
                     </umb-control-group>
 
                     <umb-control-group hide-label="true">
-
                         <ul class="unstyled">
                             <li>
                                 <label>
@@ -280,15 +275,13 @@
                         </div>
                     </umb-control-group>
 
-                    <button prevent-default ng-click="closeArea()" class="btn btn-small">Finish editing column</button>
+                    <button prevent-default ng-click="closeArea()" class="btn btn-small">Finish editing cell</button>
 
                     <a class="btn btn-small btn-link"
                         href
-                        ng-click="deleteArea($index)"><i class="icon-delete red"></i> Delete column </a>
+                        ng-click="deleteArea($index)"><i class="icon-delete red"></i> Delete cell </a>
                 </div>
             </umb-control-group>
-
-
 
             <umb-control-group hide-label="false" ng-if="!currentArea">
                 <button  prevent-default ng-click="closeLayout()" class="btn btn-small">Finish editing row</button>
@@ -296,9 +289,66 @@
         </div>
 
     </div>
-    <div style="max-width: 600px">
+    <div style="max-width: 600px" ng-if="!currentTemplate && !currentLayout">
+
         <umb-control-group label="Columns" hide-label="false" description="Total combined number of columns in the grid layout">
                 <input type="text" class="" ng-model="model.value.columns" />
+        </umb-control-group>
+
+        <umb-control-group label="Settings" hide-label="false" description="Configure what settings editors can change">
+            <ul class="unstyled list-icons umb-contentpicker"
+                ui-sortable
+                ng-model="model.config">
+
+                <li ng-repeat="configValue in model.value.config">
+                    <i class="icon icon-navigation handle"></i>
+
+                    <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
+                        <i class="icon icon-delete red hover-show"></i>
+                        <i class="icon-settings-alt-2 hover-hide"></i>
+                        {{configValue.label}}
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="unstyled list-icons">
+                <li>
+                    <i class="icon icon-add blue"></i>
+                    <a href="#" ng-click="editConfig()" prevent-default>
+                        Edit settings
+                    </a>
+                </li>
+            </ul>
+
+        </umb-control-group>
+
+
+
+        <umb-control-group label="Styles"  hide-label="false" description="Configure what styling editors can change">
+            <ul class="unstyled list-icons  umb-contentpicker"
+                ui-sortable
+                ng-model="model.value.styles">
+
+                <li ng-repeat="style in model.value.styles">
+                    <i class="icon icon-navigation handle"></i>
+
+                    <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
+                        <i class="icon icon-delete red hover-show"></i>
+                        <i class="icon-brush hover-hide"></i>
+                        {{style.label}}
+                    </a>
+
+                </li>
+            </ul>
+
+            <ul class="unstyled list-icons">
+                <li>
+                    <i class="icon icon-add blue"></i>
+                    <a href="#" ng-click="editStyles()" prevent-default>
+                        Edit style configuration
+                    </a>
+                </li>
+            </ul>
         </umb-control-group>
     </div>
 </div>

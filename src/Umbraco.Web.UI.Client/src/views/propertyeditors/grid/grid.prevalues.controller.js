@@ -3,6 +3,39 @@ angular.module("umbraco")
     function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, gridService, imageHelper, $timeout) {
 
         var emptyModel = {
+            styles:[
+                {
+                    label: "Set a background image",
+                    description: "Set a row background",
+                    key: "background-image",
+                    view: "imagepicker",
+                    modifier: "url({0})"
+                },
+
+                {
+                    label: "Set a font color",
+                    description: "Pick a color",
+                    key: "color",
+                    view: "colorpicker"
+                }
+            ],
+
+            config:[
+                {
+                    label: "Preview",
+                    description: "Display a live preview",
+                    key: "preview",
+                    view: "boolean"
+                },
+
+                {
+                    label: "Class",
+                    description: "Set a css class",
+                    key: "class",
+                    view: "textstring"
+                }
+            ],
+
             columns: 12,
             templates:[
                 {
@@ -195,10 +228,41 @@ angular.module("umbraco")
                 delete collection;
             }
         };
-        
+
         $scope.percentage = function(spans){
             return ((spans / $scope.model.value.columns) * 100).toFixed(1);
         };
+
+
+        $scope.removeConfigValue = function(collection, index){
+            collection.splice(index, 1);
+        };
+
+
+        var editConfigCollection = function(configValues, title, callbackOnSave){
+            dialogService.open(
+                {
+                    template: "views/propertyeditors/grid/dialogs/editconfig.html",
+                    config: configValues,
+                    name: title,
+                    callback: function(data){
+                        callbackOnSave(data);
+                    }
+                });
+        };
+
+        $scope.editConfig = function(){
+            editConfigCollection($scope.model.value.config, "Settings", function(data){
+                $scope.model.value.config = data;
+            });
+	    };
+
+        $scope.editStyles = function(){
+            editConfigCollection($scope.model.value.styles, "Styling", function(data){
+                $scope.model.value.styles = data;
+            });
+        };
+
 
         /****************
             watchers
@@ -236,8 +300,18 @@ angular.module("umbraco")
         if (!$scope.model.value || $scope.model.value === "" || !$scope.model.value.templates) {
             $scope.model.value = emptyModel;
         } else {
+
             if (!$scope.model.value.columns) {
                 $scope.model.value.columns = emptyModel.columns;
+            }
+
+
+            if (!$scope.model.value.config) {
+                $scope.model.value.config = [];
+            }
+
+            if (!$scope.model.value.styles) {
+                $scope.model.value.styles = [];
             }
         }
 

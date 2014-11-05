@@ -99,8 +99,8 @@ angular.module("umbraco")
 
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
-                    notIncludedRte = []
-                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'))
+                    notIncludedRte = [];
+                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                 });
             },
 
@@ -119,7 +119,7 @@ angular.module("umbraco")
                 }, 500, false);
             }
 
-        }
+        };
 
         // *********************************************
         // Add items overlay menu
@@ -218,18 +218,32 @@ angular.module("umbraco")
             if(row){
                section.rows.push(row);
             }
-
         };
 
         $scope.removeRow = function (section, $index) {
             if (section.rows.length > 0) {
                 section.rows.splice($index, 1);
                 $scope.openRTEToolbarId = null;
-
                 $scope.initContent();
             }
         };
 
+        $scope.editGridItemSettings = function (gridItem) {
+
+            dialogService.open(
+                {
+                    template: "views/propertyeditors/grid/dialogs/config.html",
+                    gridItem: gridItem,
+                    config: $scope.model.config,
+                    callback: function(data){
+
+                        gridItem.styles = data.styles;
+                        gridItem.config = data.config;
+
+                    }
+                });
+                
+        };
 
         // *********************************************
         // Cell management functions
@@ -401,6 +415,7 @@ angular.module("umbraco")
                 _.forEach(section.rows, function(row, index){
                     if(!row.$initialized){
                         var initd = $scope.initRow(row);
+
                         //if init fails, remove
                         if(!initd){
                             section.rows.splic(index, 1);
@@ -420,12 +435,15 @@ angular.module("umbraco")
 
             //merge the layout data with the original config data
             //if there are no config info on this, splice it out
-            var original = _.find($scope.model.config.items.layouts, function(o){ return o.name === row.name; });
+            var original = _.find($scope.model.config.items.layouts, function (o) { return o.name === row.name; });
+
             if(!original){
                 return null;
             }else{
                 //make a copy to not touch the original config
                 original = angular.copy(original);
+                original.styles = row.styles;
+                original.config = row.config;
 
                 //sync area configuration
                 _.each(original.areas, function(area, areaIndex){

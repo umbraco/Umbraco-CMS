@@ -5,7 +5,7 @@
          overflow-y:hidden!important;
       }
 
- IFRAME {overflow:hidden;}  
+ IFRAME {overflow:hidden;}
 
 
  // Sortabel
@@ -29,7 +29,7 @@
      background: none !important;
      color: #999 !important;
      padding: 0 !important;
-     margin: 0 !important;    
+     margin: 0 !important;
  }
 
  .usky-grid .ui-sortable-helper .cell-tools{
@@ -66,7 +66,7 @@
  .usky-grid  .right {
      float:right;
  }
- 
+
 
  // general layout components
  // -------------------------
@@ -108,10 +108,10 @@
      text-align: center;
  }
 
- .usky-grid  .mainTb {    
+ .usky-grid  .mainTb {
      border-collapse: separate;
  }
- .usky-grid  .mainTd {    
+ .usky-grid  .mainTd {
      position:relative;
  }
 
@@ -120,10 +120,10 @@
  // COLUMN
  // -------------------------
  .usky-grid  .usky-column {
-     
+
  }
  .usky-grid  .usky-column.last {
-     
+
  }
 
 
@@ -206,6 +206,11 @@
     cursor: move
 }
 
+.usky-grid .cell-tools-edit{
+    position: absolute;
+    top: 80px;
+    right: 5px;
+}
 
 
 // CONTROL
@@ -216,9 +221,9 @@
     -webkit-transition: all .20s ease-in-out;*/
     position:relative;
     display:block;
-    
+
     /*
-    border: 1px dashed rgba(255, 0, 0, .0);     
+    border: 1px dashed rgba(255, 0, 0, .0);
     border-bottom-width: 1px;
     */
 
@@ -247,7 +252,7 @@
 }
 
 .usky-grid .usky-control-inner{
-    min-height: 60px;    
+    min-height: 60px;
 }
 
 
@@ -255,7 +260,7 @@
 // CONTROL PLACEHOLDER
 // -------------------------
 .usky-grid  .usky-control-placeholder {
-    min-height: 50px;
+    min-height: 20px;
     position: relative;
     text-align: center;
     text-align: -moz-center;
@@ -266,7 +271,7 @@
     font-size: 14px; opacity: 0.7; text-align: left;
     padding: 5px;
     border:1px solid rgba(182, 182, 182, 0.3);
-    height: 50px;
+    height: 20px;
 }
 
 .usky-grid  .usky-control-placeholder:hover .placeholder{
@@ -293,7 +298,7 @@
 .usky-grid .usky-editor-placeholder i{
     color: @grayLight;
     font-size: 85px;
-    line-height: 85px;  
+    line-height: 85px;
     display: block;
     margin-bottom: 10px;
 }
@@ -326,7 +331,7 @@
      resize: none;
      font-style: italic;
 }
- 
+
  .usky-grid  .cellPanelRte {
      min-height:60px;
  }
@@ -382,7 +387,7 @@
  }
 
 
- 
+
 
 
  .usky-grid  ul {
@@ -450,7 +455,7 @@
      background-color: #F7F7F7 !important;
  }
 
- 
+
  // MEDIA EDITOR
  // -------------------------
  .usky-grid  .fullSizeImage {
@@ -488,18 +493,18 @@
  /**************************************************************************************************/
 
  .usky-grid .usky-cell{
-     
+
  }
 
  .usky-grid .usky-row{
-     
+
  }
 
  .usky-grid .usky-control{
      margin: 10px 0 0 0;
      padding: 5px;
  }
- 
+
  .usky-grid .usky-templates-columns{
      margin-top: 30px;
  }
@@ -526,7 +531,7 @@
      overflow:hidden;
      width:100%;
  }
- 
+
  .usky-grid .uSky-templates-template {
      display:inline-block;
      width:100px;
@@ -538,9 +543,9 @@
      border:5px solid @blue;
  }
 
- .usky-grid .uSky-templates-template .tb { 
-     width:100%; 
-     height:150px; 
+ .usky-grid .uSky-templates-template .tb {
+     width:100%;
+     height:150px;
      padding:10px;
      background-color: @grayLighter;
      border: 5px solid @grayLight;
@@ -548,11 +553,11 @@
      position: relative;
  }
 
- .usky-grid .uSky-templates-template .tr { 
+ .usky-grid .uSky-templates-template .tr {
      height: 100%;
      position: relative;
  }
- 
+
  .usky-grid .uSky-templates-template .tb .uSky-templates-column {
      height:100%;
      border: 1px dashed @grayLight;
@@ -583,7 +588,7 @@
  }
 
 
- .usky-grid  .mainTbpt:hover {    
+ .usky-grid  .mainTbpt:hover {
      border-color:@blue;
  }
 
@@ -592,13 +597,13 @@
      border-spacing: 3px;
      border-collapse: separate;
      height: 35px;
-     border: 2px solid @grayLight;  
+     border: 2px solid @grayLight;
      margin:0px;
      background-color: @grayLighter;
- } 
- .usky-grid  .mainTdpt {    
+ }
+ .usky-grid  .mainTdpt {
      height: 35px;
-     border: 1px dashed @grayLight;  
+     border: 1px dashed @grayLight;
      margin:0px;
      background-color: rgba(228, 228, 228, 0.41);
      overflow: hidden;
@@ -674,7 +679,7 @@
  /**************************************************************************************************/
 .usky-grid-configuration .uSky-templates{
     text-align: left;
-}   
+}
 
 .usky-grid-configuration ul{
     display: block;
@@ -737,4 +742,3 @@
 }
 
 .usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
-
