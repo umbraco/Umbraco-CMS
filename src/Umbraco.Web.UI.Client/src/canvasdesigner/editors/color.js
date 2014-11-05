@@ -9,7 +9,7 @@ angular.module("Umbraco.canvasdesigner")
 
     if (!$scope.item.values) {
         $scope.item.values = {
-            color: '',
+            color: ''
         };
     }
 

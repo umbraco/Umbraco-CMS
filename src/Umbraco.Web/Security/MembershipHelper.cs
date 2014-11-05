@@ -172,11 +172,14 @@ namespace Umbraco.Web.Security
                 if (status != MembershipCreateStatus.Success) return null;
             }
 
-            //Set member online
-            provider.GetUser(model.Username, true);
-
-            //Log them in
-            FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+            if (logMemberIn)
+            {
+                //Set member online
+                provider.GetUser(model.Username, true);
+    
+                //Log them in
+                FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+            }
 
             return membershipUser;
         }

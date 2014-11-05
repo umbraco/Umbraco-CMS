@@ -1,5 +1,31 @@
 ﻿@inherits UmbracoViewPage<dynamic>
 @using Umbraco.Web.Templates
+@using Newtonsoft.Json.Linq
+
+@functions {
+    public static MvcHtmlString RenderElementAttributes(dynamic contentItem)
+    {
+        var attrs = new List<string>();
+        JObject cfg = contentItem.config;
+
+        if(cfg != null)
+            foreach (JProperty property in cfg.Properties())
+                attrs.Add(property.Name + "='" + property.Value.ToString() + "'");
+
+        JObject style = contentItem.styles;
+
+        if (style != null) { 
+        var cssVals = new List<string>();
+        foreach (JProperty property in style.Properties())
+            cssVals.Add(property.Name + ":" + property.Value.ToString() + ";");
+
+        if (cssVals.Any())
+            attrs.Add("style='" + string.Join(" ", cssVals) + "'");
+        }
+            
+        return new MvcHtmlString(string.Join(" ", attrs));
+    }
+}
 
 
 @if (Model != null && !string.IsNullOrEmpty(Model.ToString()))
@@ -13,7 +39,7 @@
                 <div class="col-md-@s.grid column">
                     @foreach (var row in s.rows)
                     {
-                        <div class="gridrow_@row.uniqueId" >
+                        <div class="gridrow_@row.uniqueId"  @RenderElementAttributes(row)>
                             <div class="container">
                                 <div class="row clearfix">
 

@@ -13,7 +13,7 @@
                             <div class="td uSky-templates-column"
                                 ng-class="{last:$last}"
                                 ng-repeat="section in template.sections"
-                                style="width:{{ percentage(section.grid) }}%">
+                                ng-style="{width: percentage(section.grid) + '%'}">
                             </div>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                  ng-class="{last:$last}"
                  ng-repeat="section in model.value.sections"
                  ng-init="initSection(section)"
-                 style="width:{{section.$percentage}}%">
+                 ng-style="{width: section.$percentage + '%'}">
 
                 <div ui-sortable="sortableOptions" ng-model="section.rows">
 
@@ -81,14 +81,14 @@
 
                         <!-- row container -->
                         <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                            ng-class="{last:$last,first:$first, warnhighlight:currentRemoveControl == row, infohighlight:currentMovedRow == row}">
+                             ng-class="{last:$last,first:$first,warnhighlight:currentRemoveRow == row, infohighlight:currentMovedRow == row}">
 
                             <div class="mainTb">
                                 <div class="tb">
                                     <div class="tr">
 
                                         <!-- cells in row -->
-                                        <div style="width:{{ area.$percentage }}%"
+                                        <div ng-style="{width: area.$percentage + '%'}"
                                              ng-class="{last:$last,first:$first}"
                                              class="td mainTd usky-cell"
                                              ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
@@ -100,12 +100,12 @@
                                                      ng-init="singleEditor = area.$allowedEditors[0]"
                                                      class="cell-tools-add-single single-editor-{{singleEditor.alias}}">
 
-                                                     <div class="help-text" style="margin-bottom: 15px">
-                                                            To start, click the <i class=" icon {{singleEditor.icon}} blue">
+                                                    <div class="help-text" style="margin-bottom: 15px">
+                                                        To start, click the <i class=" icon {{singleEditor.icon}} blue">
                                                         </i> below and add your first {{singleEditor.name}}
-                                                     </div><br/>
+                                                    </div><br />
 
-                                                     <div class="iconBox">
+                                                    <div class="iconBox">
                                                         <a href ng-click="addControl(singleEditor, area)">
                                                             <i class="icon {{singleEditor.icon}}"></i>
                                                         </a>
@@ -116,14 +116,14 @@
                                                 <div ng-if="!area.allowed || area.allowed.length > 1">
 
                                                     <div class="help-text" style="margin-bottom: 15px">
-                                                           To start, click the <i class=" icon icon-add blue">
-                                                       </i> below and add your first element
-                                                    </div><br/>
+                                                        To start, click the <i class=" icon icon-add blue">
+                                                        </i> below and add your first element
+                                                    </div><br />
 
 
                                                     <div class="cell-tools-add"
-                                                        ng-if="!currentToolsControl"
-                                                        ng-animate="'fade'">
+                                                         ng-if="!currentToolsControl"
+                                                         ng-animate="'fade'">
 
                                                         <div class="iconBox">
                                                             <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
@@ -157,12 +157,12 @@
                                                              ng-mouseover="setCurrentRemoveControl(control)"
                                                              ng-mouseleave="disableCurrentRemoveControl(control)">
 
-                                                                <span ng-show="deletePrompt">
-                                                                    Are you sure?
-                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)">Yes</a>
-                                                                </span>
+                                                            <span ng-show="deletePrompt">
+                                                                Are you sure?
+                                                                <a href style="text-decoration: underline" ng-click="removeControl(area, $index)">Yes</a>
+                                                            </span>
 
-                                                                <i ng-show="!deletePrompt" class="icon icon-trash"></i>
+                                                            <i ng-show="!deletePrompt" class="icon icon-trash"></i>
                                                         </div>
                                                     </div>
 
@@ -189,8 +189,8 @@
 
                                                 <!-- add stuff -->
                                                 <div class="cell-tools-add"
-                                                    ng-show="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)"
-                                                    ng-animate="'fade'">
+                                                     ng-show="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)"
+                                                     ng-animate="'fade'">
 
                                                     <div class="iconBox">
                                                         <a href ng-click="addItemOverlay($event, area, control.$index, control.$uniqueId)">
@@ -226,7 +226,7 @@
                                 <li ng-repeat="layout in  section.$allowedLayouts" ng-show="layout.areas.length > 0">
                                     <div class="tb mainTbpt" ng-click="addRow(section, layout)">
                                         <div class="tr">
-                                            <div style="width:{{ percentage(area.grid); }}%"
+                                            <div ng-style="{width: percentage(area.grid) + '%'}"
                                                  class="middle mainTdpt td"
                                                  ng-repeat="area in layout.areas">
                                                 <i class="icon {{cellPreview(area)}}"></i>

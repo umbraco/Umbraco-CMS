@@ -17,37 +17,30 @@ namespace Umbraco.Core.Sync
         /// status. This will attempt to determine the internal umbraco base url that can be used by the current
         /// server to send a request to itself if it is in a load balanced environment.
         /// </summary>
-        /// <returns>The full base url including schema (i.e. http://myserver:80/umbraco )</returns>
+        /// <returns>The full base url including schema (i.e. http://myserver:80/umbraco ) - or <c>null</c> if the url
+        /// cannot be determined at the moment (usually because the first request has not properly completed yet).</returns>
         public static string GetCurrentServerUmbracoBaseUrl()
         {
             var status = GetStatus();
 
             if (status == CurrentServerEnvironmentStatus.Single)
             {
-                //if it's a single install, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
-                if (GlobalSettings.UseSSL)
-                {
-                    return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
-                }
-                else
-                {
-                    return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
-                }
+                // single install, return null if no original url, else use original url as base
+                // use http or https as appropriate
+                return string.IsNullOrWhiteSpace(ApplicationContext.Current.OriginalRequestUrl)
+                    ? null // not initialized yet
+                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", ApplicationContext.Current.OriginalRequestUrl);
             }
 
             var servers = UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers.ToArray();
 
             if (servers.Any() == false)
             {
-                //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
-                if (GlobalSettings.UseSSL)
-                {
-                    return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
-                }
-                else
-                {
-                    return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
-                }
+                // cannot be determined, return null if no original url, else use original url as base
+                // use http or https as appropriate
+                return string.IsNullOrWhiteSpace(ApplicationContext.Current.OriginalRequestUrl)
+                    ? null // not initialized yet
+                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", ApplicationContext.Current.OriginalRequestUrl);
             }
 
             foreach (var server in servers)
@@ -72,15 +65,11 @@ namespace Umbraco.Core.Sync
                 }                
             }
 
-            //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
-            if (GlobalSettings.UseSSL)
-            {
-                return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
-            }
-            else
-            {
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
-            }
+            // cannot be determined, return null if no original url, else use original url as base
+            // use http or https as appropriate
+            return string.IsNullOrWhiteSpace(ApplicationContext.Current.OriginalRequestUrl)
+                ? null // not initialized yet
+                : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", ApplicationContext.Current.OriginalRequestUrl);
         }
 
         /// <summary>

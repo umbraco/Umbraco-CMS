@@ -3,8 +3,12 @@ angular.module("umbraco")
     function ($scope, $rootScope, $timeout, dialogService, macroResource, macroService,  $routeParams) {
 
         $scope.title = "Click to insert macro";
+
         $scope.setMacro = function(){
-    		dialogService.macroPicker({
+            dialogService.macroPicker({
+                dialogData: {
+                    macroData: $scope.control.value
+                },
                 callback: function (data) {
 
                     $scope.control.value = {
