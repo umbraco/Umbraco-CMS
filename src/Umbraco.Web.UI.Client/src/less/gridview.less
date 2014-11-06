@@ -71,15 +71,17 @@
  // general layout components
  // -------------------------
  .usky-grid  .tb {
-     display:table;
      width: 100%;
-     table-layout: fixed;
  }
+
  .usky-grid  .td {
-     display:table-cell;
+     width: 100%;
+     display: inline-block;
      vertical-align:top;
      border-right:1px dashed rgba(182, 182, 182, 0.0);
+     box-sizing: border-box;
  }
+
  .usky-grid .tb:hover .td{
      border-right:1px dashed rgba(182, 182, 182, 0.3);
  }
@@ -87,23 +89,8 @@
      border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
  }
  .usky-grid  .tr {
-     display:table-row;
  }
- .usky-grid  .td2{
-     width: 50%;
- }
- .usky-grid  .td3{
-     width: 33.33%;
- }
- .usky-grid  .td4{
-     width: 25%;
- }
- .usky-grid  .td5{
-     width: 20%;
- }
- .usky-grid  .td6{
-     width: 16.6%;
- }
+
  .usky-grid  .middle {
      text-align: center;
  }
@@ -594,19 +581,16 @@
 
  .usky-grid  .mainTbpt {
      cursor:pointer;
-     border-spacing: 3px;
      border-collapse: separate;
-     height: 35px;
+     min-height: 35px;
      border: 2px solid @grayLight;
      margin:0px;
+     padding: 1px;
      background-color: @grayLighter;
  }
+
  .usky-grid  .mainTdpt {
-     height: 35px;
-     border: 1px dashed @grayLight;
-     margin:0px;
-     background-color: rgba(228, 228, 228, 0.41);
-     overflow: hidden;
+     padding: 1px;
  }
 
 

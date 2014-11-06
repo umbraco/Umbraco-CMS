@@ -10,24 +10,10 @@ angular.module("umbraco")
                     key: "background-image",
                     view: "imagepicker",
                     modifier: "url({0})"
-                },
-
-                {
-                    label: "Set a font color",
-                    description: "Pick a color",
-                    key: "color",
-                    view: "colorpicker"
                 }
             ],
 
             config:[
-                {
-                    label: "Preview",
-                    description: "Display a live preview",
-                    key: "preview",
-                    view: "boolean"
-                },
-
                 {
                     label: "Class",
                     description: "Set a css class",
@@ -214,8 +200,8 @@ angular.module("umbraco")
             utillities
         *****************/
         $scope.scaleUp = function(section, max){
-           var add = (max > 1) ? 1 : max;
-           section.grid = section.grid+add;
+           //var add = (max > 1) ? 1 : max;
+           section.grid = section.grid+1;
         };
         $scope.scaleDown = function(section){
            var remove = (section.grid > 1) ? 1 : section.grid;
