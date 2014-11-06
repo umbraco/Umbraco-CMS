@@ -11,18 +11,18 @@
 
                         <li ng-repeat="template in model.value.templates">
 
-                            <div class="uSky-templates-template" style="float: left">
-                                <a href class="tb" ng-click="configureTemplate(template)">
-                                    <div class="tr">
-                                        <div class="td uSky-templates-column"
-                                             ng-class="{last:$last}"
-                                             ng-repeat="section in template.sections"
-                                             style="width:{{ percentage(section.grid) }}%">
-                                        </div>
+                            <a class="uSky-templates-template tb mainTbpt" style="float: left" 
+                                ng-click="configureTemplate(template)">
+                                <div class="tr">
+                                    <div 
+                                        ng-style="{width: percentage(section.grid) + '%'}"
+                                        class="mainTdpt td"
+                                        ng-class="{last:$last}"
+                                        ng-repeat="section in template.sections">
+                                        <span style="height: 50px"></span>
                                     </div>
-                                </a>
-                            </div>
-
+                                </div>
+                            </a>   
 
                             <div>
                                 <a ng-click="configureTemplate(template)" href>{{template.name}}</a><br />
@@ -175,15 +175,20 @@
 
                         <li ng-repeat="layout in model.value.layouts">
 
-                            <div class="uSky-templates-row" style="float: left">
-                                <a href class="tb mainTbpt" ng-click="configureLayout(layout)">
-                                    <div class="tr">
-                                        <div style="width:{{ percentage(area.grid); }}%" class="middle mainTdpt td" ng-repeat="area in layout.areas">
-                                            <i class="icon {{areaPreview(area)}}"></i>
-                                        </div>
+                            <a class="uSky-templates-template tb mainTbpt" style="float: left" 
+                               ng-click="configureLayout(layout)">
+                                <div class="tr">
+                                    <div 
+                                        ng-style="{width: percentage(area.grid) + '%'}"
+                                        class="mainTdpt td"
+                                        ng-class="{last:$last}"
+                                        ng-repeat="area in layout.areas">
+                                        <span style="height: 20px"></span>
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                            </a> 
+
+                            
 
                             <div>
                                 <a ng-click="configureLayout(layout)" href>{{layout.name}}</a><br />
@@ -214,10 +219,13 @@
             </umb-control-group>
 
             <umb-control-group label="Layout areas" hide-label="false" description="Choose a cell from the row to edit">
+
                  <div class="uSky-templates-template"
                      style="margin: 0; width: 350px; position: relative;">
-                     <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
+                     
+                     <div class="tb" style="height: auto; border: none !important; background: none">
                          <div class="tr">
+
                              <a class="td uSky-templates-column"
                                  ng-class="{last:$last, selected:area==currentArea}"
                                  ng-repeat="area in currentLayout.areas"
@@ -225,7 +233,7 @@
                                  style="width:{{ percentage(area.grid) }}%">
                              </a>
 
-                             <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
+                             <a class="td uSky-templates-column add" 
                                  ng-click="configureArea(undefined, currentLayout)"
                                  style="width:{{ percentage(availableLayoutSpace) }}%">
                                  <i class="icon icon-add"></i>
@@ -241,7 +249,7 @@
                                 <i class="icon icon-remove"></i>
                             </a>
                             {{currentArea.grid}}
-                            <a href ng-click="scaleUp(currentArea, availableLayoutSpace)">
+                            <a href ng-click="scaleUp(currentArea, availableLayoutSpace, true)">
                                 <i class="icon icon-add"></i>
                             </a>
                         </div>

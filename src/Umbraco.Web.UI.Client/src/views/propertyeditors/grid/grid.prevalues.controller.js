@@ -179,10 +179,17 @@ angular.module("umbraco")
                 delete $scope.currentArea;
             }else{
                if(area === undefined){
-                    var space = ($scope.availableLayoutSpace > 4) ? 4 : $scope.availableLayoutSpace;
+                    var available = $scope.availableLayoutSpace;
+                    var space = 4;
+
+                    if(available < 4 && available > 0){
+                        space = available;
+                    }
+
                     area = {
                         grid: space
                     };
+
                     layout.areas.push(area);
                }
                $scope.currentArea = area;
@@ -199,9 +206,13 @@ angular.module("umbraco")
         /****************
             utillities
         *****************/
-        $scope.scaleUp = function(section, max){
+        $scope.scaleUp = function(section, max, overflow){
+           var add = 1;
+           if(overflow !== true){
+                add = (max > 1) ? 1 : max;
+           }
            //var add = (max > 1) ? 1 : max;
-           section.grid = section.grid+1;
+           section.grid = section.grid+add;
         };
         $scope.scaleDown = function(section){
            var remove = (section.grid > 1) ? 1 : section.grid;

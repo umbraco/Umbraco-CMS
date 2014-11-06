@@ -8,7 +8,7 @@ angular.module("umbraco")
         $scope.currentToolsControl = null;
         $scope.currentControl = null;
         $scope.openRTEToolbarId = null;
-
+        $scope.hasSettings = false;
 
         // *********************************************
         // Sortable options
@@ -385,6 +385,11 @@ angular.module("umbraco")
         $scope.initContent = function() {
             var clear = true;
 
+            //settings indicator shortcut
+            if($scope.model.config.items.config || $scope.model.config.items.styles){
+                $scope.hasSettings = true;
+            }
+
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
                 _.forEach($scope.model.value.sections, function(section){
 
@@ -453,9 +458,14 @@ angular.module("umbraco")
 
                 //sync area configuration
                 _.each(original.areas, function(area, areaIndex){
+                    
+                    var currentArea = row.areas[areaIndex];
+                    area.config = currentArea.config;
+                    area.styles = currentArea.styles;
+
                     //copy over existing controls into the new areas
                     if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
-                        area.controls = row.areas[areaIndex].controls;
+                        area.controls = currentArea.controls;
 
                         _.forEach(area.controls, function(control, controlIndex){
                             $scope.initControl(control, controlIndex);

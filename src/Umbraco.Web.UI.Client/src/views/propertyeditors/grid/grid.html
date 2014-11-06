@@ -71,9 +71,9 @@
                                 </a>
                             </div>
 
-                            <div class="cell-tools-edit">
+                            <div class="cell-tools-edit" ng-if="hasSettings">
                                 <a href class="iconBox" ng-click="editGridItemSettings(row)">
-                                    <i class="icon icon-settings-alt"></i>
+                                    <i class="icon icon-settings"></i>
                                 </a>
                             </div>
 
@@ -92,51 +92,6 @@
                                              ng-class="{last:$last,first:$first}"
                                              class="td mainTd usky-cell"
                                              ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
-
-                                            <!-- if area is empty tools -->
-                                            <div class="usky-control usky-control-placeholder"
-                                                 ng-if="area.controls.length == 0">
-                                                <div ng-if="area.allowed && area.allowed.length === 1"
-                                                     ng-init="singleEditor = area.$allowedEditors[0]"
-                                                     class="cell-tools-add-single single-editor-{{singleEditor.alias}}">
-
-                                                    <div class="help-text" style="margin-bottom: 15px">
-                                                        To start, click the <i class=" icon {{singleEditor.icon}} blue">
-                                                        </i> below and add your first {{singleEditor.name}}
-                                                    </div><br />
-
-                                                    <div class="iconBox">
-                                                        <a href ng-click="addControl(singleEditor, area)">
-                                                            <i class="icon {{singleEditor.icon}}"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-
-
-                                                <div ng-if="!area.allowed || area.allowed.length > 1">
-
-                                                    <div class="help-text" style="margin-bottom: 15px">
-                                                        To start, click the <i class=" icon icon-add blue">
-                                                        </i> below and add your first element
-                                                    </div><br />
-
-
-                                                    <div class="cell-tools-add"
-                                                         ng-if="!currentToolsControl"
-                                                         ng-animate="'fade'">
-
-                                                        <div class="iconBox">
-                                                            <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
-                                                                <i class=" icon icon-add"></i>
-                                                            </a>
-                                                        </div>
-
-                                                        <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
-
-                                                    </div>
-                                                </div>
-
-                                            </div>
 
                                             <!-- Controls in cell -->
                                             <div ng-repeat="control in area.controls"
@@ -174,6 +129,12 @@
                                                             <i class="icon icon-navigation"></i>
                                                         </div>
                                                     </div>
+
+                                                    <div class="cell-tools-edit" ng-if="hasSettings && $first">
+                                                        <a href class="iconBox" ng-click="editGridItemSettings(area)">
+                                                            <i class="icon icon-settings"></i>
+                                                        </a>
+                                                    </div>
                                                 </div>
 
                                                 <div class="usky-control-inner" ng-class="{last:$last,
@@ -186,24 +147,31 @@
                                                          class="usky-cell usky-cell-{{control.editor.view}}">
                                                     </div>
                                                 </div>
-
-                                                <!-- add stuff -->
-                                                <div class="cell-tools-add"
-                                                     ng-show="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)"
-                                                     ng-animate="'fade'">
-
-                                                    <div class="iconBox">
-                                                        <a href ng-click="addItemOverlay($event, area, control.$index, control.$uniqueId)">
-                                                            <i class=" icon icon-add"></i>
-                                                        </a>
-                                                    </div>
-
-                                                    <div ng-show="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
-                                                </div>
-
                                             </div>
                                             <!-- Controls repeat end -->
+                                                
+                                            <!-- if area is empty tools -->
+                                            <div class="usky-control usky-control-placeholder"
+                                                 ng-if="area.controls.length == 0">
+                                                    <div class="help-text" style="margin-bottom: 15px">
+                                                        To start, click the <i class=" icon icon-add blue">
+                                                        </i> below and add your first element
+                                                    </div><br />
+                                            </div> 
 
+                                            <div class="cell-tools-add"
+                                                 ng-if="!currentToolsControl"
+                                                 ng-animate="'fade'">
+
+                                                <div class="iconBox">
+                                                    <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
+                                                        <i class=" icon icon-add"></i>
+                                                    </a>
+                                                </div>
+
+                                                <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
+                                            </div>
+                                                
                                         </div>
                                         <!-- cells repeat end -->
                                     </div>
@@ -231,10 +199,11 @@
                                             <div ng-style="{width: percentage(area.grid) + '%'}"
                                                  class="mainTdpt td"
                                                  ng-repeat="area in layout.areas">
-                                                <span></span>
+                                                 <span></span>
                                             </div>
                                         </div>
                                     </div>
+
                                     <small>{{layout.name}}</small>
                                 </li>
                             </ul>

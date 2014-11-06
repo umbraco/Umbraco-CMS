@@ -18,7 +18,7 @@
      width: 160px !important;
      overflow: hidden;
      padding: 5px;
-     border-radius:50px;
+     border-radius:5px;
      -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
@@ -149,6 +149,7 @@
     right: 0;
     width: 150px;
     opacity: 0.3;
+    z-index: 50;
 }
 
 .usky-grid .cell-tools:hover{
@@ -158,11 +159,9 @@
 .usky-grid  .cell-tools-add {
     position: absolute;
     text-align: center;
-    bottom: -20px;
+    bottom: 0px;
     left: 0;
     right: 0;
-    z-index: 500;
-    opacity: 0.3;
 }
 
 .usky-grid  .usky-control:hover .cell-tools-add{
@@ -480,7 +479,7 @@
  /**************************************************************************************************/
 
  .usky-grid .usky-cell{
-
+    padding-bottom: 20px;
  }
 
  .usky-grid .usky-row{
@@ -569,29 +568,52 @@
      vertical-align: middle;
  }
 
- .usky-grid .usky-templates-columns .td i{
+.usky-grid .usky-templates-columns .td i{
      color: @gray;
      opacity: 0.8
- }
+}
 
-
- .usky-grid  .mainTbpt:hover {
+.usky-grid  .mainTbpt:hover {
      border-color:@blue;
- }
+}
 
- .usky-grid  .mainTbpt {
+.usky-grid  .mainTbpt {
      cursor:pointer;
      border-collapse: separate;
      min-height: 35px;
      border: 2px solid @grayLight;
      margin:0px;
      padding: 1px;
-     background-color: @grayLighter;
- }
+}
 
- .usky-grid  .mainTdpt {
+.usky-grid  .mainTdpt {
      padding: 1px;
- }
+}
+
+.usky-grid .mainTbpt {
+    height: auto;
+}
+
+.usky-grid .mainTdpt {
+    height: 11px;
+    margin: 0;
+    overflow: hidden;
+    border: 1px dashed #d9d9d9;
+    display: block;
+    float: left;
+}
+
+.mainTdpt span{
+    width: 100%;
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0 1px;
+    height: 10px;
+    background: @grayLight
+}
+
 
 
  /**************************************************************************************************/
@@ -603,14 +625,13 @@
      height: 380px;
      overflow: auto;
      border: 1px solid #ccc;
-     margin-top: -190px;
+     margin-top: -270px;
      margin-left: -150px;
      background: white;
      padding: 7px;
      top: 0;
      left: 50%;
-
-     z-index: 666;
+     z-index: 6660;
      -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
@@ -677,14 +698,21 @@
 
 .usky-grid-configuration .uSky-templates .uSky-templates-template{
     margin: 0px 20px 20px 0px;
-    width: 60px;
+    width: 80px;
 }
 
+
 .usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
-    height: 50px;
+    max-height: 50px;
     border-width: 2px !important;
     padding: 0px;
     border-spacing:2px;
+    overflow: hidden;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template span{
+    background: @grayLight;
+    display: inline-block;
 }
 
 .usky-grid-configuration .uSky-templates .uSky-templates-template .tb:hover{
@@ -695,6 +723,8 @@
     display: block;
     float: left;
     margin-left: -1px;
+    border: 1px white solid !important;
+    background: @grayLighter;
 }
 
 .usky-grid-configuration .uSky-templates-column.last{
@@ -706,9 +736,14 @@
     font-size: 20px;
     line-height: 70px;
     color: #ccc;
-    text-decoration: none
+    text-decoration: none;
+    background: white;
 }
 
+.usky-grid-configuration .mainTdpt{
+    height: initial;
+    border: none;
+}
 
 .usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
     margin: 0px 50px 20px 0px;

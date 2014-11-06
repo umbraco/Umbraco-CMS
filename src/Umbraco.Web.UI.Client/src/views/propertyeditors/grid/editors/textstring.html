@@ -1,5 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.Grid.TextStringController">
 	<textarea
+		rows="1"
 		class="textstring input-block-level" id="{{control.uniqueId}}_text"
 		ng-keyup="adjustSize($event)" ng-model="control.value"
 		ng-attr-style="{{control.editor.config.style}}" placeholder="Write here..."></textarea>
