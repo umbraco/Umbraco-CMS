@@ -716,6 +716,16 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="imagecropper">
     <key alias="reset">Reset</key>
   </area>
+  <area alias="grid">
+    <key alias="helpSelectLayout">To start, select a layout for your grid</key>
+    <key alias="helpAddRows">Add rows to your layout</key>
+    <key alias="helpAddElement"><![CDATA[To start, click the <i class=" icon icon-add blue"></i> below and add your first element]]></key>
+    <key alias="insertControl">Insert control</key>
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+  </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>

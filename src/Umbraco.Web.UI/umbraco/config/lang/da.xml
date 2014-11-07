@@ -608,6 +608,16 @@ Mange hilsner fra Umbraco robotten
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
   </area>
+  <area alias="grid">
+    <key alias="helpSelectLayout">Vælg et layout for at starte</key>
+    <key alias="helpAddRows">Tilføj rækker til dit layout</key>
+    <key alias="helpAddElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
+    <key alias="insertControl">Indsæt element</key>
+    <key alias="clickToEmbed">Klik for at indlejre</key>
+    <key alias="clickToInsertImage">Klik for at indsætte et billede</key>
+    <key alias="placeholderImageCaption">Billedtekst...</key>
+    <key alias="placeholderWriteHere">Skriv her...</key>
+  </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
