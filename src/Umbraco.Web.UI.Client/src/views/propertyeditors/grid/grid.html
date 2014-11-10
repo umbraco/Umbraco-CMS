@@ -3,27 +3,40 @@
 <div ng-if="contentReady">
     
     <!-- Template picker -->
-    <div class="uSky-templates tb" ng-show="!model.value || model.value == ''">
-        <div class="tr">
-            <div class="td middle">
-                <div class="uSky-templates-template"
-                    ng-repeat="template in model.config.items.templates" style="">
-                    <div class="tb" ng-click="addTemplate(template)">
-                        <div class="tr">
-                            <div class="td uSky-templates-column"
+
+    <div class="templates-preview"
+                    ng-show="!model.value || model.value == ''">
+                
+        <div class="preview-rows layout"
+                        ng-repeat="template in model.config.items.templates"
+                        ng-click="addTemplate(template)">
+            
+            <div class="preview-row">
+                
+                <div class="preview-col"
                                 ng-class="{last:$last}"
                                 ng-repeat="section in template.sections"
                                 ng-style="{width: percentage(section.grid) + '%'}">
-                            </div>
-                        </div>
+                    
+                    <div class="preview-cell">
                     </div>
+    
                 </div>
-
-                <br/>
-                <div class="help-text">To start, select a layout for your grid</div>
+                                        
             </div>
-        </div>
-    </div>
+
+            <div class="preview-overlay">
+            </div>
+
+            <small>{{layout.name}}</small>
+
+        </div> <!-- .templates-preview-rows -->
+
+        <p><span class="help-text">Add rows to your layout</span></p>
+
+
+    </div> <!-- .templates-preview -->
+
     <!-- template picker end -->
 
     <!-- Grids -->
@@ -188,35 +201,40 @@
 
 
                 <!-- column tools -->
-                <div class="usky-templates-columns tb">
-
-                    <div class="tr">
-                        <div class="td middle">
-                            <ul>
-                                <li ng-repeat="layout in  section.$allowedLayouts" ng-show="layout.areas.length > 0">
-                                    <div class="tb mainTbpt" ng-click="addRow(section, layout)">
-                                        <div class="tr">
-                                            <div ng-style="{width: percentage(area.grid) + '%'}"
-                                                 class="mainTdpt td"
-                                                 ng-repeat="area in layout.areas">
-                                                 <span></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <small>{{layout.name}}</small>
-                                </li>
-                            </ul>
-
+                
+                <div class="templates-preview">
+                
+                    <div class="preview-rows columns"
+                                    ng-repeat="layout in  section.$allowedLayouts"
+                                    ng-show="layout.areas.length > 0"
+                                    ng-click="addRow(section, layout)">
+                        
+                        <div class="preview-row">
+                            
+                            <div class="preview-col" ng-style="{width: percentage(area.grid) + '%'}" ng-repeat="area in layout.areas">
+                                
+                                <div class="preview-cell">
+                                </div>
+                
+                            </div>
+                                                    
                         </div>
-                    </div>
-                    <div class="tr">
-                        <div class="td middle">
-                            <br />
-                            <span class="help-text">Add rows to your layout</span>
+
+                        <div class="preview-overlay">
                         </div>
-                    </div>
-                </div>
+
+                        <small>{{layout.name}}</small>
+
+                    </div> <!-- .templates-preview-rows -->
+
+
+                    <p>
+                        <span class="help-text">Add rows to your layout</span>
+                    </p>
+            
+
+                </div> <!-- .templates-preview -->
+                
                 <!-- column tools end -->
 
             </div>

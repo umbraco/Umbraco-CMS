@@ -614,7 +614,108 @@
     background: @grayLight
 }
 
+/* New template preview */
+.usky-grid {
 
+	.templates-preview {
+		display: inline-block;
+		width: 100%;
+		text-align: center;
+
+		small {
+			position: absolute;
+			width: 100%;
+			left: 0;
+			bottom: -25px;
+			padding-top: 15px;
+		}
+
+		.help-text {
+			margin: 35px 35px 0 0;
+		}
+	}
+
+	.preview-rows {
+		display: inline-block;
+		position: relative;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		width: 125px;
+		margin: 35px 40px 15px 0;	
+		border: 2px solid @grayLight; /* @grayLight */
+		transition: border 200ms linear;
+
+		&:hover {
+			border-color: @blue;
+			cursor: pointer;
+		}
+	
+		.preview-row {
+			display: inline-block;
+			width: 100%;
+			vertical-align: bottom;
+		}
+	}
+
+	.preview-rows.layout {
+		height: 180px;
+		padding: 2px;
+
+		.preview-row {
+			height: 100%;
+		}
+
+		.preview-col {
+			height: 100%;
+			border: dashed 1px @grayLight;
+		}
+
+		.preview-cell {
+			background-color: @grayLighter;
+		}
+		.preview-overlay {
+			display: none;
+		}
+	}
+
+	.preview-rows.columns {
+		min-height: 18px;
+		line-height: 11px;
+		padding: 1px;
+	}
+
+	.preview-col {
+		display: block;
+		float: left;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		width: 33.3%; /* temp value */
+		height: 10px;
+		margin: 0;
+		border: 1px solid @white; /* @white */
+
+		.preview-cell {
+			display: block;
+			width: 100%;
+			height: 100%;
+			background-color: @grayLight; /* @grayLight */
+			margin: 0 1px 1px 0;
+		}
+	}
+	
+	.preview-overlay {
+		display: block;
+        width: 100%;
+        position: absolute;
+        height: 100%;
+        top: 0;
+        box-sizing: border-box;
+        left: 0;
+        border: 3px solid white;
+	}
+}
 
  /**************************************************************************************************/
  /* overlay */
