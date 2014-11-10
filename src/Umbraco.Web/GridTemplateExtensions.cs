@@ -17,7 +17,7 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
         {
             var view = "Grid/" + framework;
-            return new MvcHtmlString(renderPartialViewToString(view, property.Value));
+            return new MvcHtmlString(RenderPartialViewToString(view, property.Value));
         }
 
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem)
@@ -33,20 +33,22 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
         {
             var view = "Grid/" + framework;
-            var model =  contentItem.GetProperty(propertyAlias).Value;
+            var model = contentItem.GetProperty(propertyAlias).Value;
 
-            return  new MvcHtmlString(renderPartialViewToString(view, model));
+            return new MvcHtmlString(RenderPartialViewToString(view, model));
         }
 
-        private static string renderPartialViewToString(string viewName, object model)
+        private static string RenderPartialViewToString(string viewName, object model)
         {
             using (var sw = new StringWriter())
             {
-                var cc = new ControllerContext();
-                cc.RequestContext = new RequestContext(UmbracoContext.Current.HttpContext, new RouteData()
-                {
-                    Route = RouteTable.Routes["Umbraco_default"]
-                });
+                var cc = new ControllerContext
+                             {
+                                 RequestContext =
+                                     new RequestContext(
+                                     UmbracoContext.Current.HttpContext,
+                                     new RouteData() { Route = RouteTable.Routes["Umbraco_default"] })
+                             };
 
                 var routeHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory(), UmbracoContext.Current);
                 var routeDef = routeHandler.GetUmbracoRouteDefinition(cc.RequestContext, UmbracoContext.Current.PublishedContentRequest);
@@ -66,6 +68,5 @@ namespace Umbraco.Web
                 return sw.GetStringBuilder().ToString();
             }
         }
-
     }
 }
