@@ -23,12 +23,11 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new gridPreValueEditor();
+            return new GridPreValueEditor();
         }
-
     }
 
-    internal class gridPreValueEditor : PreValueEditor
+    internal class GridPreValueEditor : PreValueEditor
     {
         [PreValueField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
         public string Items { get; set; }
