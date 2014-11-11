@@ -189,12 +189,10 @@
                                                  ng-if="!currentToolsControl"
                                                  ng-animate="'fade'">
 
-                                                <div class="iconBox">
-                                                    <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
-                                                        <i class=" icon icon-add"></i>
-                                                    </a>
-                                                </div>
-
+                                                <a class="iconBox" href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
+                                                    <i class=" icon icon-add"></i>
+                                                </a>
+                                                
                                                 <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
                                             </div>
 
