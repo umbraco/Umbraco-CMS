@@ -184,20 +184,20 @@ angular.module("umbraco")
             $scope.currentRow = null;
         };
 
-        $scope.setCurrentRemoveRow = function (Row) {
-            $scope.currentRemoveRow = Row;
+        $scope.setWarnighlightRow = function (row) {
+            $scope.currentWarnhighlightRow = row;
         };
 
-        $scope.disableCurrentRemoveRow = function (Row) {
-            $scope.currentRemoveRow = null;
+        $scope.disableWarnhighlightRow = function () {
+            $scope.currentWarnhighlightRow = null;
         };
 
-        $scope.setCurrentMovedRow = function (Row) {
-            $scope.currentMovedRow = Row;
+        $scope.setInfohighlightRow = function (row) {
+            $scope.currentInfohighlightRow = row;
         };
 
-        $scope.disableCurrentMovedRow = function (Row) {
-            $scope.currentMovedRow = null;
+        $scope.disableInfohighlightRow = function () {
+            $scope.currentInfohighlightRow = null;
         };
 
         $scope.getAllowedLayouts = function(column){
@@ -252,14 +252,14 @@ angular.module("umbraco")
         };
 
         // *********************************************
-        // Cell management functions
+        // Area management functions
         // *********************************************
 
         $scope.setCurrentCell = function (cell) {
             $scope.currentCell = cell;
         };
 
-        $scope.disableCurrentCell = function (cell) {
+        $scope.disableCurrentCell = function () {
             $scope.currentCell = null;
         };
 
@@ -272,7 +272,13 @@ angular.module("umbraco")
             }
         };
 
+        $scope.setInfohighlightArea = function (cell) {
+            $scope.currentInfohighlightArea = cell;
+        };
 
+        $scope.disableInfohighlightArea = function () {
+            $scope.currentInfohighlightArea = null;
+        };
 
 
         // *********************************************
@@ -294,22 +300,20 @@ angular.module("umbraco")
             $scope.currentToolsControl = null;
         };
 
-        $scope.setCurrentRemoveControl = function (Control) {
-            $scope.currentRemoveControl = Control;
+        $scope.setWarnhighlightControl = function (Control) {
+            $scope.currentWarnhighlightControl = Control;
         };
 
-        $scope.disableCurrentRemoveControl = function (Control) {
-            $scope.currentRemoveControl = null;
+        $scope.disableWarnhighlightControl = function (Control) {
+            $scope.currentWarnhighlightControl = null;
         };
 
-        $scope.setCurrentMovedControl = function (Control) {
-            $scope.currentRow = null;
-            $scope.currentRemoveControl = null;
-            $scope.currentMovedControl = Control;
+        $scope.setInfohighlightControl = function (Control) {
+            $scope.currentInfohighlightControl = Control;
         };
 
-        $scope.disableCurrentMovedControl = function (Control) {
-            $scope.currentMovedControl = null;
+        $scope.disableInfohighlightControl = function (Control) {
+            $scope.currentInfohighlightControl = null;
         };
 
         $scope.setUniqueId = function (cell, index) {
