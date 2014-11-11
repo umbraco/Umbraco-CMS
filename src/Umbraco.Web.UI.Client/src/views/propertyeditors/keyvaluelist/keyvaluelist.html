@@ -4,7 +4,7 @@
     <div class="control-group" ng-repeat="item in value">
         <ng-form name="keyvalueForm">
     			<i class="icon icon-navigation handle"></i>
-        <input type="text" name="key" ng-model="item.key" placeholder="key" ng-required="true" ensure-unique="value" /><span> =&gt; </span><input type="text" name="label" ng-model="item.value" placeholder="label" />
+        <input type="text" name="key" ng-model="item.key" placeholder="key" ng-required="true" ensure-unique="value" /><span class="icon icon-right-double-arrow"></span><input type="text" name="label" ng-model="item.value" placeholder="label" />
         <a prevent-default href="" title="Remove this text box"
             ng-show="value.length > model.config.min"
             ng-click="remove($index)">
