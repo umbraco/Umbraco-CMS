@@ -108,8 +108,9 @@
 
                                         <!-- Areas in row -->
                                         <div ng-style="{width: area.$percentage + '%'}"
-                                             ng-class="{last:$last,first:$first}"
                                              class="td mainTd usky-cell"
+                                             ng-class="{last:$last,first:$first, infohighlight:currentInfohighlightArea == area,
+                                                            warnhighlight:currentWarnhighlightArea == area}"
                                              ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
 
                                             <!-- Controls in areas -->
@@ -117,8 +118,6 @@
                                                  ng-mouseover="setCurrentControl(control)"
                                                  ng-mouseleave="disableCurrentControl(control)"
                                                  ng-animate="'fade'"
-                                                 ng-class="{infohighlight:currentInfohighlightArea == area,
-                                                            warnhighlight:currentWarnhighlightArea == area}"
                                                  class="usky-control">
 
                                                 <!-- Filled cell tools -->
