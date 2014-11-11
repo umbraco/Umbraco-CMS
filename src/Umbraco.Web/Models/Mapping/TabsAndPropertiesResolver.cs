@@ -211,7 +211,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 
                 //then we'll just use the root group's data to make the composite tab
-                var rootGroup = propertyGroups.Single(x => x.ParentId == null);
+                var rootGroup = propertyGroups.First(x => x.ParentId == null);
                 aggregateTabs.Add(new Tab<ContentPropertyDisplay>
                     {
                         Id = rootGroup.Id,
