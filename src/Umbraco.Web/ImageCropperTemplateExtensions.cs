@@ -152,14 +152,15 @@ namespace Umbraco.Web
             //Use the media item's umbracoExtension property to determine the file format
             //ImageProcessor is hard-coded to use PNG if no format is specified, but that results in huge sizes for JPEG images
             string mediaItemFormat = null;
-            if(mediaItem.HasValue(Constants.Conventions.Media.Extension))
-            {
-                mediaItemFormat = mediaItem.GetPropertyValue<string>(Constants.Conventions.Media.Extension);
-            }
-            else
+            if(format != null)
             {
                 mediaItemFormat = format;
             }
+            else if(mediaItem.HasValue(Constants.Conventions.Media.Extension))
+            {
+                mediaItemFormat = mediaItem.GetPropertyValue<string>(Constants.Conventions.Media.Extension);
+            }
+            
 
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
