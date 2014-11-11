@@ -1,4 +1,4 @@
-﻿function NestedPropertiesListController($scope, $q, dataTypeResource) {
+﻿function NestedPropertiesListController($scope, $q, dataTypeResource, angularHelper) {
 
     if (!$scope.model.value) {
         $scope.model.value = [];
@@ -18,6 +18,9 @@
             writeValue();
             $scope.model.value.push({});
             syncValue();
+
+            var currForm = angularHelper.getCurrentForm($scope);
+            currForm.$setDirty();
         }
     };
 
@@ -31,6 +34,9 @@
         }
         $scope.model.value = remainder;
         syncValue();
+
+        var currForm = angularHelper.getCurrentForm($scope);
+        currForm.$setDirty();
     };
 
 
@@ -66,8 +72,6 @@
     }
 
     function writeValue() {
-        console.log($scope.value);
-        console.log($scope.model.value);
         $scope.model.value = _.map($scope.value, function (value) {
             return _.reduce(value, function (o, v, i) {
                 o[v.alias] = v.value;

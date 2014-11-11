@@ -1,12 +1,14 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.NestedPropertyController",
-function ($scope, entityResource) {
+function ($scope, entityResource, angularHelper) {
 
     if (!$scope.model.value) {
         $scope.model.value = [];
     }
 
     $scope.add = function () {
-        $scope.model.value.push({ alias: '', title: '', descriptoin: '', datatype: 'textstring', required: false });
+        $scope.model.value.push({ alias: '', title: '', descriptoin: '', datatype: 'textstring', required: false, showsummary: false });
+        var currForm = angularHelper.getCurrentForm($scope);
+        currForm.$setDirty();
     };
 
     $scope.remove = function (index) {
@@ -17,11 +19,14 @@ function ($scope, entityResource) {
             }
         }
         $scope.model.value = remainder;
+        var currForm = angularHelper.getCurrentForm($scope);
+        currForm.$setDirty();
     };
 
     var setAliasDebounce = _.debounce(function (index) {
-        $scope.model.value[index].alias = $scope.model.value[index].label.substring(0, 1).toLowerCase() + $scope.model.value[index].label.replace(/\s+/, '').slice(1);
-    }, 500);
+        if ($scope.model.value[index].label)
+            $scope.model.value[index].alias = $scope.model.value[index].label.substring(0, 1).toLowerCase() + $scope.model.value[index].label.replace(/\s+/, '').slice(1);
+    }, 50);
 
     $scope.setAlias = function (index) {
         setAliasDebounce(index);
@@ -50,10 +55,13 @@ function ($scope, entityResource) {
                 $scope.model.value.splice(originalIndex, 1);
                 $scope.model.value.splice(newIndex, 0, movedElement);
             }
+
+            var currForm = angularHelper.getCurrentForm($scope);
+            currForm.$setDirty();
         }
     };
 
-    
+
     function getElementIndexByPrevalueText(value) {
         for (var i = 0; i < $scope.model.value.length; i++) {
             if ($scope.model.value[i].alias === value) {
