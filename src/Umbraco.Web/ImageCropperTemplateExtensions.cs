@@ -226,7 +226,7 @@ namespace Umbraco.Web
             int? height = null,
             string imageCropperValue = null,
             string cropAlias = null,
-            string format = "jpg",
+            string format = null,
             int? quality = null,
             ImageCropMode? imageCropMode = null,
             ImageCropAnchor? imageCropAnchor = null,
