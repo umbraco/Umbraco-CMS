@@ -1,4 +1,4 @@
-﻿function KeyValueListController($scope) {
+﻿function KeyValueListController($scope, angularHelper) {
 
     if (!$scope.model.value) {
         $scope.model.value = {  };
@@ -19,6 +19,9 @@
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.value.length < $scope.model.config.max) {
             $scope.value.push({ key: '', value: '' });
+
+            var currForm = angularHelper.getCurrentForm($scope);
+            currForm.$setDirty();
         }
     };
 
@@ -30,6 +33,9 @@
             }
         }
         $scope.value = remainder;
+
+        var currForm = angularHelper.getCurrentForm($scope);
+        currForm.$setDirty();
     };
 
     $scope.$on("formSubmitting", function (ev, args) {
