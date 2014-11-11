@@ -186,7 +186,7 @@
 .usky-grid  .cell-tools-move {
     display:inline-block;
     position: absolute;
-    top: 40px;
+    top: 33px;
     right: 5px;
     z-index: 500;
     cursor: move
@@ -194,7 +194,7 @@
 
 .usky-grid .cell-tools-edit{
     position: absolute;
-    top: 80px;
+    top: 66px;
     right: 5px;
 }
 
@@ -229,11 +229,11 @@
     /*border-bottom:1px solid rgba(182, 182, 182, 0.0) !important;*/
 }
 
-.usky-grid .warnhighlight{
+.usky-grid .warnhighlight, .usky-grid  .td.last.warnhighlight{
      border: 1px dashed @red !important;
 }
 
-.usky-grid .infohighlight{
+.usky-grid .infohighlight, .usky-grid  .td.last.infohighlight{
      border: 1px dashed @blue !important;
 }
 
@@ -327,7 +327,7 @@
 // ICONS
 // -------------------------
  .usky-grid  .iconBox {
-     padding: 4px 7px 4px 7px;
+     padding: 4px 6px 4px 6px;
      display: inline-block;
      cursor: pointer;
      border-radius: 200px;
@@ -339,6 +339,7 @@
           background: @blue !important;
           color: white !important;
           border-color: @blue !important;
+          text-decoration:none;
  }
 
  .usky-grid  .iconBox a:hover {
@@ -370,10 +371,8 @@
  .usky-grid  .iconBox i {
      font-size:16px !important;
      color: #5F5F5F;
+     display:block;
  }
-
-
-
 
 
  .usky-grid  ul {
