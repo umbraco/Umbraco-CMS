@@ -156,6 +156,10 @@ namespace Umbraco.Web
             {
                 mediaItemFormat = mediaItem.GetPropertyValue<string>(Constants.Conventions.Media.Extension);
             }
+            else
+            {
+                mediaItemFormat = format;
+            }
 
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
