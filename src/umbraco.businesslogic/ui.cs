@@ -300,46 +300,108 @@ namespace umbraco
             return stringWithVars;
         }
 
+
+
         /// <summary>
         /// Gets the language file as a xml document.
+        /// Merges with language files found in AppPlugins. If key already exists in language xml it will not get overwritten. 
+        /// Use tags which have a 'namespace' eg ajmButtonName
         /// </summary>
         /// <param name="language">The language.</param>
         /// <returns></returns>
         public static XmlDocument getLanguageFile(string language)
         {
-            var cacheKey = "uitext_" + language;
-
-            var file = IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml");
-            if (File.Exists(file))
+            lock (ApplicationContext.Current.ApplicationCache.RuntimeCache)
             {
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    cacheKey,
-                    CacheItemPriority.Default,
-                    new CacheDependency(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")),
-                    () =>
-                        {
-                            using (var langReader = new XmlTextReader(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")))
-                            {
-                                try
-                                {
-                                    var langFile = new XmlDocument();
-                                    langFile.Load(langReader);
-                                    return langFile;
-                                }
-                                catch (Exception e)
-                                {
-                                    LogHelper.Error<ui>("Error reading umbraco language xml source (" + language + ")", e);
-                                    return null;
-                                }
-                            }
-                        });
-            }
-            else
-            {
-                return null;
-            }
+                var cacheKey = "uitext_" + language;
+                XmlDocument languageDoc = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem(
+                    cacheKey
+                    ) as XmlDocument;
 
+                if (languageDoc != null)
+                {
+                    return languageDoc;
+                }
+
+                // get core lang files
+                List<string> files = new List<string>() { IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml") };
+
+                // scan for plugin lang files
+                files.AddRange(
+                    Directory.GetFiles(IOHelper.MapPath(SystemDirectories.AppPlugins), language + ".xml", SearchOption.AllDirectories).
+                    Where(f => Directory.GetParent(f).Name.Equals("lang", StringComparison.InvariantCultureIgnoreCase))
+                    .ToList<string>()
+                );
+
+                foreach (string plugin in files)
+                {
+                    MergeXmlLanguageFile(ref languageDoc, plugin);
+                }
+
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
+                    cacheKey, ()=>{return languageDoc;}, dependentFiles: files.ToArray());
+
+                return languageDoc;
+            }
         }
 
+        private static void MergeXmlLanguageFile(ref XmlDocument languageDoc, string file)
+        {
+            LogHelper.Debug<ui>("Loading language file " + file);
+            try
+            {
+                if (languageDoc == null)
+                {
+                    languageDoc = new XmlDocument();
+                    languageDoc.Load(file);
+                    return;
+                }
+                else
+                {
+                    XmlDocument pluginXml = new XmlDocument();
+                    pluginXml.Load(file);
+
+                    foreach (XmlNode key in pluginXml.SelectNodes("language/area/key"))
+                    {
+
+                        string pluginAreaAlias = key.ParentNode.Attributes["alias"].Value;
+                        string pluginKeyAlias = key.Attributes["alias"].Value;
+
+                        XmlNode existingNode = languageDoc.SelectSingleNode(string.Format("language/area[@alias='{0}']/key[@alias='{1}']", pluginAreaAlias, pluginKeyAlias));
+
+                        if (existingNode != null)
+                        {
+                            // do we update or override?
+                            LogHelper.Warn<ui>("Key already exists for {0}_{1}. Won't override, use key names with namespaces.", () => new object[] { pluginAreaAlias, pluginKeyAlias });
+                        }
+                        else
+                        {
+                            string areaAliasValue = key.ParentNode.Attributes["alias"].Value;
+                            XmlNode areaElement = languageDoc.SelectSingleNode(string.Format("language/area[@alias='{0}']", areaAliasValue)) as XmlElement;
+                            if (areaElement == null)
+                            {
+                                areaElement = languageDoc.CreateElement("area");
+                                XmlAttribute areaAlias = languageDoc.CreateAttribute("alias");
+                                areaAlias.Value = areaAliasValue;
+                                languageDoc.SelectSingleNode("/").AppendChild(areaElement);
+                            }
+
+                            XmlElement keyElemement = languageDoc.CreateElement("key");
+                            XmlAttribute alias = languageDoc.CreateAttribute("alias");
+                            alias.Value = key.Attributes["alias"].Value;
+
+                            keyElemement.Attributes.Append(alias);
+                            keyElemement.InnerXml = key.InnerXml;
+
+                            areaElement.AppendChild(keyElemement);
+                        }
+                    }
+                }
+            }
+            catch (Exception x)
+            {
+                LogHelper.Error<ui>( "Error loading langauage file: " + file + x.Message ,x);
+            }
+        }
     }
 }
