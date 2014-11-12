@@ -5,7 +5,17 @@ namespace Umbraco.Core.Services
 {
     public interface IApplicationTreeService
     {
-        void Intitialize(IEnumerable<ApplicationTree> existingTrees);
+        /// <summary>
+        /// Initializes the service with any trees found in plugins
+        /// </summary>
+        /// <param name="allAvailableTrees">
+        /// A collection of all available tree found in assemblies in the application
+        /// </param>
+        /// <remarks>
+        /// This will update the trees.config with the found tree plugins that are not currently listed in the file when the first
+        /// access is made to resolve the tree collection
+        /// </remarks>
+        void Intitialize(IEnumerable<ApplicationTree> allAvailableTrees);
 
         /// <summary>
         /// Creates a new application tree.
