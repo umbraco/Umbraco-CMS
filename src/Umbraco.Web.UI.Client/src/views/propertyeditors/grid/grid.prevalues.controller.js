@@ -75,132 +75,69 @@ angular.module("umbraco")
         *****************/
 
         $scope.configureTemplate = function(template){
-           if($scope.currentTemplate && $scope.currentTemplate === template){
-                delete $scope.currentTemplate;
-           }else{
-               //if no template is passed in, we can assume we are adding a new one
-               if(template === undefined){
-                    template = {
-                        name: "",
-                        sections:[
+           if(template === undefined){
+                template = {
+                    name: "",
+                    sections:[
 
-                        ]
-                    };
-                    $scope.model.value.templates.push(template);
+                    ]
+                };
+                $scope.model.value.templates.push(template);
+           }    
+           
+           dialogService.open(
+               {
+                   template: "views/propertyEditors/grid/dialogs/layoutconfig.html",
+                   currentLayout: template,
+                   rows: $scope.model.value.layouts,
+                   columns: $scope.model.value.columns
                }
-               $scope.currentTemplate = template;
-            }
+           );
+
         };
         $scope.deleteTemplate = function(index){
             $scope.model.value.templates.splice(index, 1);
         };
-        $scope.closeTemplate = function(){
+        
 
-           //clean-up
-           _.forEach($scope.currentTemplate.sections, function(section, index){
-                if(section.grid <= 0){
-                    $scope.currentTemplate.sections.splice(index, 1);
-                }
-           });
-
-           $scope.currentTemplate = undefined;
-
-        };
-
-        /****************
-            Section
-        *****************/
-        $scope.configureSection = function(section, template){
-            if($scope.currentSection && $scope.currentSection === section){
-                delete $scope.currentSection;
-            }else{
-               if(section === undefined){
-                    var space = ($scope.availableTemplateSpace > 4) ? 4 : $scope.availableTemplateSpace;
-                    section = {
-                        grid: space
-                    };
-                    template.sections.push(section);
-               }
-               $scope.currentSection = section;
-            }
-        };
-        $scope.deleteSection = function(index){
-            $scope.currentTemplate.sections.splice(index, 1);
-        };
-        $scope.closeSection = function(){
-            $scope.currentSection = undefined;
-        };
+        
 
 
 
 
         /****************
-            layout
+            Row
         *****************/
 
         $scope.configureLayout = function(layout){
-           if($scope.currentLayout && $scope.currentLayout === layout){
-                delete $scope.currentLayout;
-           }else{
-               //if no template is passed in, we can assume we are adding a new one
-               if(layout === undefined){
-                    layout = {
-                        name: "",
-                        areas:[
 
-                        ]
-                    };
-                    $scope.model.value.layouts.push(layout);
-               }
-               $scope.currentLayout = layout;
+            if(layout === undefined){
+                 layout = {
+                     name: "",
+                     areas:[
+
+                     ]
+                 };
+                 $scope.model.value.layouts.push(layout);
             }
+
+            dialogService.open(
+                {
+                    template: "views/propertyEditors/grid/dialogs/rowconfig.html",
+                    currentRow: layout,
+                    editors: $scope.editors,
+                    columns: $scope.model.value.columns
+                }
+            );
         };
+
+
         $scope.deleteLayout = function(index){
             $scope.model.value.layouts.splice(index, 1);
         };
-        $scope.closeLayout = function(){
-
-           //clean-up
-           _.forEach($scope.currentLayout.areas, function(area, index){
-                if(area.grid <= 0){
-                    $scope.currentLayout.areas.splice(index, 1);
-                }
-           });
-
-           $scope.currentLayout = undefined;
-        };
 
 
-        /****************
-            area
-        *****************/
-        $scope.configureArea = function(area, layout){
-            if($scope.currentArea && $scope.currentArea === area){
-                delete $scope.currentArea;
-            }else{
-               if(area === undefined){
-                    var available = $scope.availableLayoutSpace;
-                    var space = 4;
-
-                    if(available < 4 && available > 0){
-                        space = available;
-                    }
-
-                    area = {
-                        grid: space
-                    };
-
-                    layout.areas.push(area);
-               }
-               $scope.currentArea = area;
-            }
-        };
-        $scope.deleteArea = function(index){
-            $scope.currentLayout.areas.splice(index, 1);
-        };
-        $scope.closeArea = function(){
-            $scope.currentArea = undefined;
-        };
+        
 
 
         /****************
