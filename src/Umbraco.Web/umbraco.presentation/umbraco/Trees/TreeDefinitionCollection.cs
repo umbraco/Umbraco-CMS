@@ -139,20 +139,17 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         private void EnsureTreesRegistered(bool clearFirst = false)
         {
-			using (var l = new UpgradeableReadLock(Lock))
+            //if we already have trees, exit
+            if (this.Count > 0)
+                return;
+
+			using (var l = new WriteLock(Lock))
 			{
 				if (clearFirst)
 				{
 					this.Clear();
 				}
-
-				//if we already have tree, exit
-				if (this.Count > 0)
-					return;
-
-				l.UpgradeToWriteLock();
-
-
+                
 				var foundITrees = PluginManager.Current.ResolveTrees();
 
 				var objTrees = ApplicationTree.getAll();
