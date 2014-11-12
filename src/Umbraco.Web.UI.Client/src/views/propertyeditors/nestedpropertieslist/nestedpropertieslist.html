@@ -1,5 +1,5 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.NestedPropertiesListController" class="umb-editor umb-nestedpropertieslist">
-   <div ui-sortable ng-model="value">
+   <div ui-sortable="sortableOptions" ng-model="value">
     <div class="control-group" ng-repeat="item in value" ng-init="expand=false">
         <ng-form name="keyvalueForm">
             <p>
