@@ -11,6 +11,7 @@
  // Sortabel
  // -------------------------
  .usky-grid .ui-sortable-helper  {
+     position:absolute;
      border: dashed 1px #000 !important;
      background: #ccc;
      opacity: 0.4;
@@ -162,13 +163,16 @@
     bottom: 0px;
     left: 0;
     right: 0;
-    margin: 0 20px 1px 0;
+    margin: 0 45px 1px 0;
+
+    &.emptyArea{
+        margin: 0 0 1px 0;
+    }
 }
 
 .usky-grid  .usky-control:hover .cell-tools-add{
     opacity: 1;
 }
-
 
 .usky-grid  .cell-tools-remove {
     display:inline-block;
