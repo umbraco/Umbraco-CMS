@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence
                 connection.Open();
                 connection.Close();
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 return false;
             }
