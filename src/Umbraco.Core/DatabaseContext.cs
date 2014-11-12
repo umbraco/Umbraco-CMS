@@ -75,9 +75,8 @@ namespace Umbraco.Core
                     {
                         if (_canConnect == false)
                         {
-                            _connectCheck = true;
-
                             _canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                            _connectCheck = true;
                         }
                     }
                 }

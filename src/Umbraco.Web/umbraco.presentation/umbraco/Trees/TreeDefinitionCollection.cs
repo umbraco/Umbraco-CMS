@@ -28,8 +28,9 @@ namespace umbraco.cms.presentation.Trees
         //create singleton
         private static readonly TreeDefinitionCollection instance = new TreeDefinitionCollection();
 
-    	private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
-	
+        private static readonly object Locker = new object();
+        private static volatile bool _ensureTrees = false;
+
         public static TreeDefinitionCollection Instance
         {
             get 
@@ -128,7 +129,12 @@ namespace umbraco.cms.presentation.Trees
 
         public void ReRegisterTrees()
         {
-            EnsureTreesRegistered(true);
+            //clears the trees/flag so that they are lazily refreshed on next access
+            lock (Locker)
+            {
+                this.Clear();
+                _ensureTrees = false;
+            }
         }
 
         /// <summary>
@@ -137,67 +143,68 @@ namespace umbraco.cms.presentation.Trees
         /// This will also store an instance of each tree object in the TreeDefinition class which should be 
         /// used when referencing all tree classes.
         /// </summary>
-        private void EnsureTreesRegistered(bool clearFirst = false)
+        private void EnsureTreesRegistered()
         {
-            //if we already have trees, exit
-            if (this.Count > 0)
-                return;
+            if (_ensureTrees == false)
+            {
+                lock (Locker)
+                {
+                    if (_ensureTrees == false)
+                    {
 
-			using (var l = new WriteLock(Lock))
-			{
-				if (clearFirst)
-				{
-					this.Clear();
-				}
-                
-				var foundITrees = PluginManager.Current.ResolveTrees();
+                        var foundITrees = PluginManager.Current.ResolveTrees();
 
-				var objTrees = ApplicationTree.getAll();
-				var appTrees = new List<ApplicationTree>();
-				appTrees.AddRange(objTrees);
+                        var objTrees = ApplicationTree.getAll();
+                        var appTrees = new List<ApplicationTree>();
+                        appTrees.AddRange(objTrees);
 
-				var apps = Application.getAll();
+                        var apps = Application.getAll();
 
-				foreach (var type in foundITrees)
-				{
+                        foreach (var type in foundITrees)
+                        {
 
-					//find the Application tree's who's combination of assembly name and tree type is equal to 
-					//the Type that was found's full name.
-					//Since a tree can exist in multiple applications we'll need to register them all.
-					
-					//The logic of this has changed in 6.0: http://issues.umbraco.org/issue/U4-1360
-					// we will support the old legacy way but the normal way is to match on assembly qualified names
+                            //find the Application tree's who's combination of assembly name and tree type is equal to 
+                            //the Type that was found's full name.
+                            //Since a tree can exist in multiple applications we'll need to register them all.
 
-				    var appTreesForType = appTrees.FindAll(
-				        tree =>
-				            {
-				                //match the type on assembly qualified name if the assembly attribute is empty or if the
-				                // tree type contains a comma (meaning it is assembly qualified)
-				                if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
-				                {
-									return tree.GetRuntimeType() == type;
-								}
+                            //The logic of this has changed in 6.0: http://issues.umbraco.org/issue/U4-1360
+                            // we will support the old legacy way but the normal way is to match on assembly qualified names
 
-				                //otherwise match using legacy match rules
-				                return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type).InvariantEquals(type.FullName));
-				            }
-				        );
+                            var appTreesForType = appTrees.FindAll(
+                                tree =>
+                                {
+                                    //match the type on assembly qualified name if the assembly attribute is empty or if the
+                                    // tree type contains a comma (meaning it is assembly qualified)
+                                    if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
+                                    {
+                                        return tree.GetRuntimeType() == type;
+                                    }
 
-					foreach (var appTree in appTreesForType)
-					{
-						//find the Application object whos name is the same as our appTree ApplicationAlias
-						var app = apps.Find(
-							a => (a.alias == appTree.ApplicationAlias)
-							);
+                                    //otherwise match using legacy match rules
+                                    return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type).InvariantEquals(type.FullName));
+                                }
+                                );
 
-						var def = new TreeDefinition(type, appTree, app);
-						this.Add(def);
-					}
-				}
-				//sort our trees with the sort order definition
-				this.Sort((t1, t2) => t1.Tree.SortOrder.CompareTo(t2.Tree.SortOrder));
-			
-			}
+                            foreach (var appTree in appTreesForType)
+                            {
+                                //find the Application object whos name is the same as our appTree ApplicationAlias
+                                var app = apps.Find(
+                                    a => (a.alias == appTree.ApplicationAlias)
+                                    );
+
+                                var def = new TreeDefinition(type, appTree, app);
+                                this.Add(def);
+                            }
+                        }
+                        //sort our trees with the sort order definition
+                        this.Sort((t1, t2) => t1.Tree.SortOrder.CompareTo(t2.Tree.SortOrder));
+
+                        _ensureTrees = true;
+                    }
+                }
+            }
+
+
         }
        
     }
