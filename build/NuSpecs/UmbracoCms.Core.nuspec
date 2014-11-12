@@ -33,8 +33,9 @@
             <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
 			<dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
             <dependency id="Examine" version="[0.1.57, 1.0.0)" />
-            <dependency id="ImageProcessor" version="[1.9.5, 2.0.0)" />
-            <dependency id="ImageProcessor.Web" version="[3.3.1, 4.0.0)" />
+            <dependency id="ImageProcessor" version="[1.9.5, 3.0.0)" />
+            <dependency id="ImageProcessor.Web" version="[3.3.1, 5.0.0)" />
+            <dependency id="dotless" version="[1.4.1, 2.0.0)" />
         </dependencies>
     </metadata>
     <files>

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Mvc.Async;
@@ -9,6 +11,8 @@ namespace Umbraco.Web.Mvc
 	/// </summary>
     public class RenderActionInvoker : AsyncControllerActionInvoker
 	{
+
+	    private static readonly ConcurrentDictionary<Type, ReflectedActionDescriptor> IndexDescriptors = new ConcurrentDictionary<Type, ReflectedActionDescriptor>(); 
 
 		/// <summary>
 		/// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
@@ -27,12 +31,15 @@ namespace Umbraco.Web.Mvc
                 //check if the controller is an instance of IRenderMvcController
 				if (controllerContext.Controller is IRenderMvcController)
 				{
-				    return new ReflectedActionDescriptor(
-				        controllerContext.Controller.GetType().GetMethods()
-				            .First(x => x.Name == "Index" &&
-				                        x.GetCustomAttributes(typeof (NonActionAttribute), false).Any() == false),
-				        "Index",
-				        controllerDescriptor);
+				    return IndexDescriptors.GetOrAdd(controllerContext.Controller.GetType(),
+				        type => new ReflectedActionDescriptor(
+				            controllerContext.Controller.GetType().GetMethods()
+				                .First(x => x.Name == "Index" &&
+				                            x.GetCustomAttributes(typeof (NonActionAttribute), false).Any() == false),
+				            "Index",
+				            controllerDescriptor));
+
+
 
 				}
 			}
