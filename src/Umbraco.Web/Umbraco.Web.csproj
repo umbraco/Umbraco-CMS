@@ -262,6 +262,7 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
@@ -464,6 +465,8 @@
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
+    <Compile Include="Scheduling\IBackgroundTask.cs" />
+    <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\NotificationsHandler.cs" />

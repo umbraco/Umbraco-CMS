@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Sync
@@ -17,23 +18,30 @@ namespace Umbraco.Core.Sync
         /// status. This will attempt to determine the internal umbraco base url that can be used by the current
         /// server to send a request to itself if it is in a load balanced environment.
         /// </summary>
-        /// <returns>The full base url including schema (i.e. http://myserver:80/umbraco )</returns>
-        public static string GetCurrentServerUmbracoBaseUrl()
+        /// <returns>The full base url including schema (i.e. http://myserver:80/umbraco ) - or <c>null</c> if the url
+        /// cannot be determined at the moment (usually because the first request has not properly completed yet).</returns>
+        public static string GetCurrentServerUmbracoBaseUrl(ApplicationContext appContext, IUmbracoSettingsSection settings)
         {
-            var status = GetStatus();
+            var status = GetStatus(settings);
 
             if (status == CurrentServerEnvironmentStatus.Single)
             {
-                //if it's a single install, then the base url has to be the first url registered
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                // single install, return null if no original url, else use original url as base
+                // use http or https as appropriate
+                return string.IsNullOrWhiteSpace(appContext.OriginalRequestUrl)
+                    ? null // not initialized yet
+                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl);
             }
 
-            var servers = UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers.ToArray();
+            var servers = settings.DistributedCall.Servers.ToArray();
 
             if (servers.Any() == false)
             {
-                //cannot be determined, then the base url has to be the first url registered
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                // cannot be determined, return null if no original url, else use original url as base
+                // use http or https as appropriate
+                return string.IsNullOrWhiteSpace(appContext.OriginalRequestUrl)
+                    ? null // not initialized yet
+                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl);
             }
 
             foreach (var server in servers)
@@ -58,22 +66,25 @@ namespace Umbraco.Core.Sync
                 }                
             }
 
-            //cannot be determined, then the base url has to be the first url registered
-            return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            // cannot be determined, return null if no original url, else use original url as base
+            // use http or https as appropriate
+            return string.IsNullOrWhiteSpace(appContext.OriginalRequestUrl)
+                ? null // not initialized yet
+                : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl);
         }
 
         /// <summary>
         /// Returns the current environment status for the current server
         /// </summary>
         /// <returns></returns>
-        public static CurrentServerEnvironmentStatus GetStatus()
+        public static CurrentServerEnvironmentStatus GetStatus(IUmbracoSettingsSection settings)
         {
-            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+            if (settings.DistributedCall.Enabled == false)
             {
                 return CurrentServerEnvironmentStatus.Single;
             }
 
-            var servers = UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers.ToArray();
+            var servers = settings.DistributedCall.Servers.ToArray();
 
             if (servers.Any() == false)
             {
