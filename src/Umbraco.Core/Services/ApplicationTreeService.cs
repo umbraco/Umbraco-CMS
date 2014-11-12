@@ -18,16 +18,16 @@ namespace Umbraco.Core.Services
         private readonly CacheHelper _cache;
         private IEnumerable<ApplicationTree> _allAvailableTrees;
         private volatile bool _isInitialized = false;
-        private readonly object _locker = new object();
+        internal const string TreeConfigFileName = "trees.config";
+        private static string _treeConfig;
+        private static readonly object Locker = new object();
 
         public ApplicationTreeService(CacheHelper cache)
         {
             _cache = cache;
         }
 
-        internal const string TreeConfigFileName = "trees.config";
-        private static string _treeConfig;
-        private static readonly object Locker = new object();
+        
 
         /// <summary>
         /// gets/sets the trees.config file path

@@ -6,10 +6,15 @@ namespace Umbraco.Core.Services
     public interface ISectionService
     {
         /// <summary>
-        /// Ensures all available sections exist in the storage medium
+        /// Initializes the service with all available application plugins
         /// </summary>
-        /// <param name="existingSections"></param>
-        void Initialize(IEnumerable<Section> existingSections);
+        /// <param name="allAvailableSections">
+        /// All application plugins found in assemblies
+        /// </param>
+        /// <remarks>
+        /// This is used to populate the app.config file with any applications declared in plugins that don't exist in the file
+        /// </remarks>
+        void Initialize(IEnumerable<Section> allAvailableSections);
 
         /// <summary>
         /// The cache storage for all applications
