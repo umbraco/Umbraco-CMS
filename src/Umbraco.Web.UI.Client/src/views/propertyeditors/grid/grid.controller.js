@@ -152,8 +152,8 @@ angular.module("umbraco")
             $scope.overlayMenu.show = true;
         };
 
-        $scope.closeItemOverlay = function(){
-            $scope.currentControl = undefined;
+        $scope.closeItemOverlay = function () {
+            $scope.currentControl = null;
             $scope.overlayMenu.show = false;
             $scope.overlayMenu.key = undefined;
         };
@@ -229,6 +229,7 @@ angular.module("umbraco")
         $scope.removeRow = function (section, $index) {
             if (section.rows.length > 0) {
                 section.rows.splice($index, 1);
+                $scope.currentRow = null;
                 $scope.openRTEToolbarId = null;
                 $scope.initContent();
             }
@@ -360,6 +361,7 @@ angular.module("umbraco")
         };
 
         $scope.removeControl = function (cell, $index) {
+            $scope.currentControl = null;
             cell.controls.splice($index, 1);
         };
 
