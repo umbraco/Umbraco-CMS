@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,9 +25,15 @@ namespace Umbraco.Core.Persistence
         public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate)
         {
             var expresionist = new PocoToSqlExpressionHelper<T>();
-            string whereExpression = expresionist.Visit(predicate);
-
+            var whereExpression = expresionist.Visit(predicate);
             return sql.Where(whereExpression, expresionist.GetSqlParameters());
+        }
+
+        public static Sql WhereIn<T>(this Sql sql, Expression<Func<T, object>> fieldSelector, IEnumerable values)
+        {
+            var expresionist = new PocoToSqlExpressionHelper<T>();
+            var fieldExpression = expresionist.Visit(fieldSelector);
+            return sql.Where(fieldExpression + " IN (@values)", new {@values = values});
         }
 
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
