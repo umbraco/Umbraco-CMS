@@ -63,8 +63,8 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
-    $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "0" ? false : true);
-    $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "0" ? false : true);
+    $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
+    $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
 
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
