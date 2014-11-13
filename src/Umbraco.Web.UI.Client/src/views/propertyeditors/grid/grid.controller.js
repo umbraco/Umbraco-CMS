@@ -28,6 +28,17 @@ angular.module("umbraco")
                 left: 90
             },
 
+            sort: function (event, ui) {
+                /* prevent vertical scroll out of the screen */
+                var max = $(".usky-grid").width() - 150;
+                if (parseInt(ui.helper.css('left')) > max) {
+                    ui.helper.css({ 'left': max + "px" })
+                }
+                if (parseInt(ui.helper.css('left')) < 20) {
+                    ui.helper.css({ 'left': 20 })
+                }
+            },
+
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
@@ -46,7 +57,6 @@ angular.module("umbraco")
         var cancelMove = false;
 
         $scope.sortableOptionsCell = {
-
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
@@ -59,6 +69,18 @@ angular.module("umbraco")
             cursorAt: {
                 top: 45,
                 left: 90
+            },
+
+            sort: function (event, ui) {
+                /* prevent vertical scroll out of the screen */
+                var position = parseInt(ui.item.parent().offset().left) + parseInt(ui.helper.css('left')) - parseInt($(".usky-grid").offset().left);
+                var max = $(".usky-grid").width() - 220;
+                if (position > max) {
+                    ui.helper.css({ 'left': max - parseInt(ui.item.parent().offset().left) + parseInt($(".usky-grid").offset().left) + "px" })
+                }
+                if (position < 0) {
+                    ui.helper.css({ 'left': 0 - parseInt(ui.item.parent().offset().left) + parseInt($(".usky-grid").offset().left) + "px" })
+                }
             },
 
             over: function (event, ui) {
@@ -525,7 +547,6 @@ angular.module("umbraco")
             }
 
         };
-
 
 
         // *********************************************
