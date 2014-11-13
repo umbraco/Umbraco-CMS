@@ -282,7 +282,7 @@
     <Compile Include="Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
     <Compile Include="Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
-    <Compile Include="Dynamics\QueryableExtensionTests.cs" />
+    <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
     <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
@@ -318,6 +318,8 @@
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
+    <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
+    <Compile Include="ServerEnvironmentHelperTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
@@ -382,7 +384,7 @@
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
-    <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
+    <Compile Include="Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
     <Compile Include="LibraryTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
@@ -470,15 +472,15 @@
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
-    <Compile Include="Surface\PluginControllerAreaTests.cs" />
-    <Compile Include="Sync\DistributedCacheTests.cs" />
+    <Compile Include="Controllers\PluginControllerAreaTests.cs" />
+    <Compile Include="DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="TestHelpers\BaseUmbracoApplicationTest.cs" />
     <Compile Include="TestHelpers\DatabaseBehavior.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
-    <Compile Include="GlobalSettingsTests.cs" />
+    <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlAndTemplateTests.cs" />
@@ -496,11 +498,11 @@
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="TestHelpers\DisposableUmbracoTest.cs" />
-    <Compile Include="Trees\BaseContentTreeTests.cs" />
-    <Compile Include="Trees\BaseMediaTreeTests.cs" />
+    <Compile Include="TreesAndSections\BaseContentTreeTests.cs" />
+    <Compile Include="TreesAndSections\BaseMediaTreeTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
-    <Compile Include="TypeHelperTests.cs" />
+    <Compile Include="Plugins\TypeHelperTests.cs" />
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
@@ -520,11 +522,11 @@
     <Compile Include="UriExtensionsTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
-    <Compile Include="MacroEngineFactoryTests.cs" />
+    <Compile Include="Macros\MacroEngineFactoryTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
-    <Compile Include="PluginManagerExtensions.cs" />
-    <Compile Include="PluginManagerTests.cs" />
+    <Compile Include="Plugins\PluginManagerExtensions.cs" />
+    <Compile Include="Plugins\PluginManagerTests.cs" />
     <Compile Include="TestHelpers\Stubs\FakeLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
@@ -534,7 +536,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CoreStrings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
-    <Compile Include="TypeFinderTests.cs" />
+    <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="XmlExtensionsTests.cs" />
     <Compile Include="XmlHelperTests.cs" />
@@ -704,9 +706,7 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Install\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

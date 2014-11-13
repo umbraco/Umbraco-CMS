@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Specialized;
 using System.Linq;
-using System.Security;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Examine.LuceneEngine.Config;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using UmbracoExamine.Config;
-using Examine.LuceneEngine;
 using System.Collections.Generic;
 using Examine;
 using System.IO;
@@ -73,7 +70,9 @@ namespace UmbracoExamine
             _memberService = memberService;
 	    }
 
-        /// <summary>
+	    
+
+	    /// <summary>
         /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
         /// </summary>
         /// <param name="indexSet"></param>

@@ -1,30 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web.Compilation;
 using NUnit.Framework;
 using SqlCE4Umbraco;
+using umbraco;
+using umbraco.businesslogic;
+using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
+using umbraco.DataLayer;
+using umbraco.editorControls;
+using umbraco.MacroEngines;
 using Umbraco.Tests.TestHelpers;
+using umbraco.uicontrols;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
-using umbraco;
-using umbraco.DataLayer;
-using umbraco.MacroEngines;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.editorControls;
-using umbraco.interfaces;
-using umbraco.uicontrols;
-using umbraco.cms;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.Plugins
 {
 
     [TestFixture]

@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services
                 _treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(cache));
 
             if (_sectionService == null)
-                _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
+                _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, provider, cache));
 
             if (_macroService == null)
                 _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory.Value));

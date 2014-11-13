@@ -2,15 +2,19 @@
 using System.IO;
 using System.Linq;
 using System.Security;
+using System.Web;
 using Examine;
+using Examine.LuceneEngine.Config;
 using Examine.Providers;
 using Examine.SearchCriteria;
+using Lucene.Net.Store;
 using Umbraco.Core;
 using UmbracoExamine.Config;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Lucene.Net.Analysis;
+using UmbracoExamine.LocalStorage;
 
 
 namespace UmbracoExamine
@@ -20,6 +24,10 @@ namespace UmbracoExamine
     /// </summary>
 	public class UmbracoExamineSearcher : LuceneSearcher
     {
+
+        private volatile Lucene.Net.Store.Directory _localTempDirectory;
+        private static readonly object Locker = new object();
+        private string _localTempPath = null;
 
         #region Constructors
 
@@ -54,12 +62,26 @@ namespace UmbracoExamine
             _name = name;
 
             //We need to check if we actually can initialize, if not then don't continue
-            if (!CanInitialize())
+            if (CanInitialize() == false)
             {
                 return;
             }
 
             base.Initialize(name, config);
+
+            if (config != null && config["useTempStorage"] != null)
+            {
+                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
+                // for websites that are running from a remove file server and file IO latency becomes an issue
+                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<bool>();
+                if (attemptUseTempStorage)
+                {   
+                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
+                    var configuredPath = indexSet.IndexPath;
+                    var codegenPath = HttpRuntime.CodegenDir;
+                    _localTempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
+                }
+            }
         }
 
         /// <summary>
@@ -136,6 +158,28 @@ namespace UmbracoExamine
                 .Where(x => x != UmbracoContentIndexer.IndexPathFieldName)
                 .Where(x => x != UmbracoContentIndexer.NodeTypeAliasFieldName)
                 .ToArray();
-        }		
+        }
+
+        protected override Lucene.Net.Store.Directory GetLuceneDirectory()
+        {
+            //local temp storage is not enabled, just return the default
+            if (_localTempPath == null) return base.GetLuceneDirectory();
+
+            //local temp storage is enabled, configure the local directory instance
+            if (_localTempDirectory == null)
+            {
+                lock (Locker)
+                {
+                    if (_localTempDirectory == null)
+                    {
+                        _localTempDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
+                            new DirectoryInfo(_localTempPath),
+                            base.GetLuceneDirectory());
+                    }
+                }
+            }
+
+            return _localTempDirectory;
+        }
     }
 }
