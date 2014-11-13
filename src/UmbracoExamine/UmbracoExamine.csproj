@@ -122,6 +122,7 @@
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectory.cs" />
+    <Compile Include="LocalStorage\LocalTempStorageDirectoryTracker.cs" />
     <Compile Include="LocalStorage\LocalTempStorageIndexer.cs" />
     <Compile Include="LocalStorage\MultiIndexOutput.cs" />
     <Compile Include="LoggingLevel.cs" />

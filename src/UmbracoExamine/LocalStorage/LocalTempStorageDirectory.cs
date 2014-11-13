@@ -9,14 +9,20 @@ namespace UmbracoExamine.LocalStorage
     public class LocalTempStorageDirectory : SimpleFSDirectory
     {
         private readonly Lucene.Net.Store.Directory _realDirectory;
-
+        
         public LocalTempStorageDirectory(
             DirectoryInfo tempStorageDir,
             Lucene.Net.Store.Directory realDirectory)
             : base(tempStorageDir)
         {
             _realDirectory = realDirectory;
+            Enabled = true;
         }
+
+        /// <summary>
+        /// If initialization fails, it will be disabled and then this will just wrap the 'real directory'
+        /// </summary>
+        internal bool Enabled { get; set; }
 
         public override string[] ListAll()
         {
@@ -49,7 +55,11 @@ namespace UmbracoExamine.LocalStorage
         public override void DeleteFile(string name)
         {
             //perform on both dirs
-            base.DeleteFile(name);
+            if (Enabled)
+            {
+                base.DeleteFile(name);    
+            }
+            
             _realDirectory.DeleteFile(name);
         }
 
@@ -67,10 +77,14 @@ namespace UmbracoExamine.LocalStorage
         public override IndexOutput CreateOutput(string name)
         {
             //write to both indexes
+            if (Enabled)
+            {
+                return new MultiIndexOutput(
+                    base.CreateOutput(name),
+                    _realDirectory.CreateOutput(name));    
+            }
 
-            return new MultiIndexOutput(
-                base.CreateOutput(name),
-                _realDirectory.CreateOutput(name));
+            return _realDirectory.CreateOutput(name);
         }
 
         /// <summary>
@@ -78,13 +92,21 @@ namespace UmbracoExamine.LocalStorage
         /// </summary>
         public override IndexInput OpenInput(string name)
         {
-            //return the reader from the cache, not the real dir
-            return base.OpenInput(name);
+            if (Enabled)
+            {
+                //return the reader from the cache, not the real dir
+                return base.OpenInput(name);    
+            }
+
+            return _realDirectory.OpenInput(name);
         }
 
         public override void Dispose()
         {
-            base.Dispose();
+            if (Enabled)
+            {
+                base.Dispose();    
+            }
             _realDirectory.Dispose();
         }
 

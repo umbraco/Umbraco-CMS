@@ -16,10 +16,9 @@ namespace UmbracoExamine.LocalStorage
     {
         private string _tempPath;
         public Lucene.Net.Store.Directory LuceneDirectory { get; private set; }
-        private static readonly object Locker = new object();
+        private readonly object _locker = new object();
         public SnapshotDeletionPolicy Snapshotter { get; private set; }
-        private bool _syncStorage = false;
-
+        
         public LocalTempStorageIndexer()
         {
             IndexDeletionPolicy policy = new KeepOnlyLastCommitDeletionPolicy();
@@ -32,121 +31,101 @@ namespace UmbracoExamine.LocalStorage
 
             _tempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
 
-            if (config != null)
-            {
-                if (config["syncTempStorage"] != null)
-                {
-                    var attempt = config["syncTempStorage"].TryConvertTo<bool>();
-                    if (attempt)
-                    {
-                        _syncStorage = attempt.Result;
-                    }
-                }
-            }
+            var success = InitializeLocalIndexAndDirectory(baseLuceneDirectory, analyzer, configuredPath);
 
-            InitializeLocalIndexAndDirectory(baseLuceneDirectory, analyzer, configuredPath);
+            //create the custom lucene directory which will keep the main and temp FS's in sync
+            LuceneDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
+                new DirectoryInfo(_tempPath),
+                baseLuceneDirectory,
+                //flag to disable the mirrored folder if not successful
+                success == false);
         }
 
-        private void InitializeLocalIndexAndDirectory(Lucene.Net.Store.Directory baseLuceneDirectory, Analyzer analyzer, string configuredPath)
+        private bool InitializeLocalIndexAndDirectory(Lucene.Net.Store.Directory baseLuceneDirectory, Analyzer analyzer, string configuredPath)
         {
-            lock (Locker)
+            lock (_locker)
             {
                 if (Directory.Exists(_tempPath) == false)
                 {
                     Directory.CreateDirectory(_tempPath);
                 }
 
-                //if we are syncing storage to the main file system to temp files, then sync from the main FS to our temp FS
-                if (_syncStorage)
+                //copy index
+
+                using (new IndexWriter(
+                    //read from the underlying/default directory, not the temp codegen dir
+                    baseLuceneDirectory,
+                    analyzer,
+                    Snapshotter,
+                    IndexWriter.MaxFieldLength.UNLIMITED))
                 {
-                    //copy index
-
-                    using (new IndexWriter(
-                        //read from the underlying/default directory, not the temp codegen dir
-                        baseLuceneDirectory,
-                        analyzer,
-                        Snapshotter,
-                        IndexWriter.MaxFieldLength.UNLIMITED))
+                    try
                     {
-                        try
+                        var basePath = IOHelper.MapPath(configuredPath);
+
+                        var commit = Snapshotter.Snapshot();
+                        var allSnapshotFiles = commit.GetFileNames().Concat(new[] { commit.GetSegmentsFileName() })
+                            .Distinct()
+                            .ToArray();
+
+                        var tempDir = new DirectoryInfo(_tempPath);
+
+                        //Get all files in the temp storage that don't exist in the snapshot collection, we want to remove these
+                        var toRemove = tempDir.GetFiles()
+                            .Select(x => x.Name)
+                            .Except(allSnapshotFiles);
+
+                        using (var tempDirectory = new SimpleFSDirectory(tempDir))
                         {
-                            var basePath = IOHelper.MapPath(configuredPath);
-
-                            var commit = Snapshotter.Snapshot();
-                            var allSnapshotFiles = commit.GetFileNames().Concat(new[] {commit.GetSegmentsFileName()}).ToArray();
-
-                            var tempDir = new DirectoryInfo(_tempPath);
-
-                            //Get all files in the temp storage that don't exist in the snapshot collection, we want to remove these
-                            var toRemove = tempDir.GetFiles()
-                                .Select(x => x.Name)
-                                .Except(allSnapshotFiles);
-                            
-                            using (var tempDirectory = new SimpleFSDirectory(tempDir))
+                            if (IndexWriter.IsLocked(tempDirectory) == false)
                             {
-                                if (IndexWriter.IsLocked(tempDirectory) == false)
+                                foreach (var file in toRemove)
                                 {
-                                    foreach (var file in toRemove)
+                                    try
                                     {
-                                        try
-                                        {
-                                            File.Delete(Path.Combine(_tempPath, file));
-                                        }
-                                        catch (IOException ex)
-                                        {
-                                            LogHelper.Error<LocalTempStorageIndexer>("Could not delete index file, could not sync from main storage", ex);
-
-                                            //quit here and do not assign the lucene directory, this means that the app will now just be working from normal storage
-                                            return;
-                                        }
+                                        File.Delete(Path.Combine(_tempPath, file));
+                                    }
+                                    catch (IOException ex)
+                                    {
+                                        LogHelper.Error<LocalTempStorageIndexer>("Could not delete index file, could not sync from main storage", ex);
+                                        //quit here
+                                        return false;
                                     }
                                 }
-                                else
-                                {
-                                    LogHelper.Warn<LocalTempStorageIndexer>("Cannot sync index files from main storage, the index is currently locked");
-                                    
-                                    //quit here and do not assign the lucene directory, this means that the app will now just be working from normal storage
-                                    return;
-                                }
                             }
-
-                            foreach (var fileName in allSnapshotFiles.Where(f => f.IsNullOrWhiteSpace() == false))
+                            else
                             {
-                                try
-                                {
-                                    File.Copy(
-                                        Path.Combine(basePath, "Index", fileName),
-                                        Path.Combine(_tempPath, Path.GetFileName(fileName)), true);
-                                }
-                                catch (IOException ex)
-                                {
-                                    LogHelper.Error<LocalTempStorageIndexer>("Could not copy index file, could not sync from main storage", ex);
-
-                                    //quit here and do not assign the lucene directory, this means that the app will now just be working from normal storage
-                                    return;
-                                }
+                                LogHelper.Warn<LocalTempStorageIndexer>("Cannot sync index files from main storage, the index is currently locked");
+                                //quit here
+                                return false;
                             }
-
                         }
-                        finally
+
+                        foreach (var fileName in allSnapshotFiles.Where(f => f.IsNullOrWhiteSpace() == false))
                         {
-                            Snapshotter.Release();
+                            try
+                            {
+                                File.Copy(
+                                    Path.Combine(basePath, "Index", fileName),
+                                    Path.Combine(_tempPath, Path.GetFileName(fileName)), true);
+                            }
+                            catch (IOException ex)
+                            {
+                                LogHelper.Error<LocalTempStorageIndexer>("Could not copy index file, could not sync from main storage", ex);
+
+                                //quit here
+                                return false;
+                            }
                         }
+
                     }
-
-                    //create the custom lucene directory which will keep the main and temp FS's in sync
-
-                    LuceneDirectory = new LocalTempStorageDirectory(
-                        new DirectoryInfo(_tempPath),
-                        baseLuceneDirectory);
-                }
-                else
-                {
-                    //just return a normal lucene directory that uses the codegen folder
-
-                    LuceneDirectory = FSDirectory.Open(new DirectoryInfo(_tempPath));
+                    finally
+                    {
+                        Snapshotter.Release();
+                    }
                 }
 
+                return true;
             }
         }
     }

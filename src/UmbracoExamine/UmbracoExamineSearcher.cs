@@ -28,7 +28,6 @@ namespace UmbracoExamine
         private volatile Lucene.Net.Store.Directory _localTempDirectory;
         private static readonly object Locker = new object();
         private string _localTempPath = null;
-        private bool _syncTempStorage = false;
 
         #region Constructors
 
@@ -81,15 +80,6 @@ namespace UmbracoExamine
                     var configuredPath = indexSet.IndexPath;
                     var codegenPath = HttpRuntime.CodegenDir;
                     _localTempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
-                }
-
-                if (config["syncTempStorage"] != null)
-                {
-                    var attemptSync = config["syncTempStorage"].TryConvertTo<bool>();
-                    if (attemptSync)
-                    {
-                        _syncTempStorage = attemptSync.Result;
-                    }
                 }
             }
         }
@@ -182,17 +172,9 @@ namespace UmbracoExamine
                 {
                     if (_localTempDirectory == null)
                     {
-                        if (_syncTempStorage)
-                        {
-                            _localTempDirectory = new LocalTempStorageDirectory(
-                                new DirectoryInfo(_localTempPath),
-                                base.GetLuceneDirectory());
-                        }
-                        else
-                        {
-                            //not syncing just use a normal lucene directory
-                            _localTempDirectory = FSDirectory.Open(new DirectoryInfo(_localTempPath));
-                        }
+                        _localTempDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
+                            new DirectoryInfo(_localTempPath),
+                            base.GetLuceneDirectory());
                     }
                 }
             }
