@@ -40,7 +40,6 @@ angular.module("umbraco")
                     tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
             }
-
         };
 
         var notIncludedRte = [];
@@ -235,13 +234,14 @@ angular.module("umbraco")
             }
         };
 
-        $scope.editGridItemSettings = function (gridItem) {
+        $scope.editGridItemSettings = function (gridItem, itemType) {
 
             dialogService.open(
                 {
                     template: "views/propertyeditors/grid/dialogs/config.html",
                     gridItem: gridItem,
                     config: $scope.model.config,
+                    itemType: itemType,
                     callback: function(data){
 
                         gridItem.styles = data.styles;
@@ -338,7 +338,8 @@ angular.module("umbraco")
 
             var newControl = {
                 value: null,
-                editor: editor
+                editor: editor,
+                $initializing: true
             };
 
             if (index === undefined) {
@@ -410,6 +411,8 @@ angular.module("umbraco")
                         $scope.model.value.sections.splice(index, 1);
                     }
                 });
+            }else if($scope.model.config.items.templates && $scope.model.config.items.templates.length === 1){
+                $scope.addTemplate($scope.model.config.items.templates[0]);
             }
 
             if(clear){

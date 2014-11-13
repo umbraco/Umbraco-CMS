@@ -29,8 +29,9 @@ angular.module("umbraco")
         }
 
 
-        $scope.styles = angular.copy($scope.dialogOptions.config.items.styles);
-        $scope.config = angular.copy($scope.dialogOptions.config.items.config);
+        $scope.styles = _.filter( angular.copy($scope.dialogOptions.config.items.styles), function(item){return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
+        $scope.config = _.filter( angular.copy($scope.dialogOptions.config.items.config), function(item){return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
+
 
         var element = $scope.dialogOptions.gridItem;
         if(angular.isObject(element.config)){
