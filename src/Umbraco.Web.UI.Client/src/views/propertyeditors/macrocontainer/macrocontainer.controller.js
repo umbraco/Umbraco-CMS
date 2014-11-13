@@ -66,20 +66,23 @@ angular.module('umbraco')
 				openDialog(index);
 		};
 
-		$scope.add =function(){
-				openDialog();
+		$scope.add = function () {
+
+		    if ($scope.model.config.max && $scope.model.config.max > 0 && $scope.renderModel.length >= $scope.model.config.max) {
+                //cannot add more than the max
+		        return;
+		    }
+		    
+			openDialog();
 		};
 
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
-			$scope.macros.splice(index, 1);
-			$scope.model.value = trim($scope.macros.join(), ",");
 		};
 
 	    $scope.clear = function() {
 	        $scope.model.value = "";
 	        $scope.renderModel = [];
-	        $scope.macros = [];
 	    };
 
 	    $scope.$on("formSubmitting", function (ev, args) {	
