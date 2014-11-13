@@ -24,7 +24,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 else
                 {
-                    var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
+                    var url = string.Format("{0}ping.aspx", umbracoBaseUrl.EnsureEndsWith('/'));
 
                     try
                     {

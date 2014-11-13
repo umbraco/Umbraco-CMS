@@ -26,22 +26,18 @@ namespace Umbraco.Core.Sync
 
             if (status == CurrentServerEnvironmentStatus.Single)
             {
-                // single install, return null if no original url, else use original url as base
+                // single install, return null if no config/original url, else use config/original url as base
                 // use http or https as appropriate
-                return string.IsNullOrWhiteSpace(appContext.OriginalRequestUrl)
-                    ? null // not initialized yet
-                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl);
+                return GetBaseUrl(appContext, settings);
             }
 
             var servers = settings.DistributedCall.Servers.ToArray();
 
             if (servers.Any() == false)
             {
-                // cannot be determined, return null if no original url, else use original url as base
+                // cannot be determined, return null if no config/original url, else use config/original url as base
                 // use http or https as appropriate
-                return string.IsNullOrWhiteSpace(appContext.OriginalRequestUrl)
-                    ? null // not initialized yet
-                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl);
+                return GetBaseUrl(appContext, settings);
             }
 
             foreach (var server in servers)
@@ -66,11 +62,9 @@ namespace Umbraco.Core.Sync
                 }                
             }
 
-            // cannot be determined, return null if no original url, else use original url as base
+            // cannot be determined, return null if no config/original url, else use config/original url as base
             // use http or https as appropriate
-            return string.IsNullOrWhiteSpace(appContext.OriginalRequestUrl)
-                ? null // not initialized yet
-                : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl);
+            return GetBaseUrl(appContext, settings);
         }
 
         /// <summary>
@@ -118,6 +112,22 @@ namespace Umbraco.Core.Sync
             }
             
             return CurrentServerEnvironmentStatus.Slave;
+        }
+
+        private static string GetBaseUrl(ApplicationContext appContext, IUmbracoSettingsSection settings)
+        {
+            return (
+                // is config empty?
+                settings.ScheduledTasks.BaseUrl.IsNullOrWhiteSpace()
+                    // is the orig req empty?
+                    ? appContext.OriginalRequestUrl.IsNullOrWhiteSpace()
+                        // we've got nothing
+                        ? null
+                        //the orig req url is not null, use that
+                        : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl)
+                    // the config has been specified, use that
+                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", settings.ScheduledTasks.BaseUrl))
+                .EnsureEndsWith('/');
         }
     }
 }

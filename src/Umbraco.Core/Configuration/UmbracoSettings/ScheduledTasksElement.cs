@@ -16,5 +16,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return Tasks; }
         }
+
+        [ConfigurationProperty("baseUrl", IsRequired = false, DefaultValue = null)]
+        public string BaseUrl
+        {
+            get { return (string)base["baseUrl"]; }
+        }
     }
 }
