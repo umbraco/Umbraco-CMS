@@ -53,8 +53,7 @@
 
                                                 @foreach (var control in area.controls){
                                                     if (control != null && control.editor != null && control.editor.view != null){
-                                                        string editor = "grid/editors/" + control.editor.view.ToString();
-                                                        <text>@Html.Partial(editor, (object)control)</text>
+                                                        <text>@Html.Partial("grid/editors/base", (object)control)</text>
                                                     }
                                                 }
 
