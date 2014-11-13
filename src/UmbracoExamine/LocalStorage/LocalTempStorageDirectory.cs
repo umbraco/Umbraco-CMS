@@ -49,8 +49,8 @@ namespace UmbracoExamine.LocalStorage
         public override void DeleteFile(string name)
         {
             //perform on both dirs
-            _realDirectory.DeleteFile(name);
             base.DeleteFile(name);
+            _realDirectory.DeleteFile(name);
         }
 
         /// <summary>Returns the length of a file in the directory. </summary>

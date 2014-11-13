@@ -19,14 +19,14 @@ namespace UmbracoExamine.DataServices
 	{
 		private readonly ServiceContext _services;
 
-        [SecuritySafeCritical]
+        
 		public UmbracoMediaService()
 			: this(ApplicationContext.Current.Services)
 		{
 
 		}
 
-        [SecuritySafeCritical]
+        
 		public UmbracoMediaService(ServiceContext services)
 		{
 			_services = services;
@@ -39,7 +39,7 @@ namespace UmbracoExamine.DataServices
 		/// </summary>
 		/// <param name="xpath"></param>
 		/// <returns></returns>
-		[SecuritySafeCritical]
+		
 		public XDocument GetLatestMediaByXpath(string xpath)
 		{
 			var xmlMedia = XDocument.Parse("<media></media>");

@@ -47,7 +47,7 @@ namespace UmbracoExamine
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
         /// <param name="analyzer"></param>
-		[SecuritySafeCritical]
+		
 		public UmbracoContentIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
             : base(indexerData, indexPath, dataService, analyzer, async) { }
 
@@ -59,7 +59,7 @@ namespace UmbracoExamine
 		/// <param name="dataService"></param>
 		/// <param name="analyzer"></param>
 		/// <param name="async"></param>
-		[SecuritySafeCritical]
+		
 		public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
 			: base(indexerData, luceneDirectory, dataService, analyzer, async) { }
 
@@ -128,8 +128,8 @@ namespace UmbracoExamine
         /// <exception cref="T:System.InvalidOperationException">
         /// An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
         /// </exception>
-        [SecuritySafeCritical]
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        
+        public override void Initialize(string name, NameValueCollection config)
         {
            
             //check if there's a flag specifying to support unpublished content,
@@ -201,7 +201,7 @@ namespace UmbracoExamine
         /// This ensures that the special __Raw_ fields are indexed
         /// </summary>
         /// <param name="docArgs"></param>
-        [SecuritySafeCritical]
+        
         protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
         {
             var d = docArgs.Document;
@@ -363,7 +363,7 @@ namespace UmbracoExamine
         /// ensure our special Path field is added to the collection
         /// </summary>
         /// <param name="e"></param>
-        [SecuritySafeCritical]
+        
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
             //strip html of all users fields if we detect it has HTML in it. 
