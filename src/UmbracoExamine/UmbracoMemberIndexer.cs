@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
 using Examine.LuceneEngine.Config;
@@ -13,7 +12,6 @@ using Examine;
 using System.IO;
 using UmbracoExamine.DataServices;
 using Lucene.Net.Analysis;
-using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace UmbracoExamine
 {

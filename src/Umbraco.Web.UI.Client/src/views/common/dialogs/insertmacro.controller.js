@@ -136,7 +136,16 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     entityResource.getAll("Macro", ($scope.dialogData && $scope.dialogData.richTextEditor && $scope.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
 
-            $scope.macros = data;
+            //if 'allowedMacros' is specified, we need to filter
+            if (angular.isArray($scope.dialogData.allowedMacros) && $scope.dialogData.allowedMacros.length > 0) {
+                $scope.macros = _.filter(data, function(d) {
+                    return _.contains($scope.dialogData.allowedMacros, d.alias);
+                });
+            }
+            else {
+                $scope.macros = data;
+            }
+            
 
             //check if there's a pre-selected macro and if it exists
             if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.macroAlias) {

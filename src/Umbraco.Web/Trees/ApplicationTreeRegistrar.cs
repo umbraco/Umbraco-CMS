@@ -53,16 +53,14 @@ namespace Umbraco.Web.Trees
                     //convert them to ApplicationTree instances
                     var legacyItems = legacyTreeTypes
                         .Select(x =>
-                        new Tuple<Type, global::umbraco.businesslogic.TreeAttribute, ObsoleteAttribute>(
-                                new Tuple<Type, global::umbraco.businesslogic.TreeAttribute>(
-                                    x,
-                            x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).SingleOrDefault(),
-                                    x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).SingleOrDefault()))
-                            x.GetCustomAttributes<ObsoleteAttribute>(false).SingleOrDefault()))
-                //ensure that the legacy tree attribute exists
+                            new Tuple<Type, global::umbraco.businesslogic.TreeAttribute, ObsoleteAttribute>(
+                                x,
+                                x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).SingleOrDefault(),
+                                x.GetCustomAttributes<ObsoleteAttribute>(false).SingleOrDefault()))
+                        //ensure that the legacy tree attribute exists
                         .Where(x => x.Item2 != null)
-                //ensure that it's not obsoleted, any obsoleted tree will not be auto added to the config
-                .Where(x => x.Item3 == null)
+                        //ensure that it's not obsoleted, any obsoleted tree will not be auto added to the config
+                        .Where(x => x.Item3 == null)
                         //make sure the legacy tree isn't added on top of the controller tree!        
                         .Where(x => added.InvariantContains(x.Item2.Alias) == false)
                         .Select(x => new ApplicationTree(x.Item2.Initialize, x.Item2.SortOrder, x.Item2.ApplicationAlias, x.Item2.Alias, x.Item2.Title, x.Item2.IconClosed, x.Item2.IconOpen, x.Item1.GetFullNameWithAssembly()));

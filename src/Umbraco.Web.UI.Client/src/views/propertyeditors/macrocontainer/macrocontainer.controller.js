@@ -2,7 +2,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.MacroContainerController",
 	
-	function($scope, dialogService, entityResource, macroService, macroResource){
+	function($scope, dialogService, entityResource, macroService){
 		$scope.renderModel = [];
 		
 		if($scope.model.value){
@@ -35,11 +35,13 @@ angular.module('umbraco')
 		}
 
 		function openDialog(index){
-			var dialogData = {};
+			var dialogData = {
+			    allowedMacros: $scope.model.config.allowed
+			};
 
 			if(index !== null && $scope.renderModel[index]) {
 				var macro = $scope.renderModel[index];
-				dialogData = {macroData: macro};
+				dialogData[macroData] = macro;
 			}
 			
 			dialogService.macroPicker({

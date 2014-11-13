@@ -59,8 +59,7 @@ namespace Umbraco.Web.Scheduling
                             wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(_appContext));
 
                             var result = wc.UploadString(url, "");
-                        }
-                        }
+                        }                        
                     }
                 }
                 catch (Exception ee)
