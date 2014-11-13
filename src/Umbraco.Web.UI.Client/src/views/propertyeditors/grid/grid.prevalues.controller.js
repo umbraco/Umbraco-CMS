@@ -95,15 +95,11 @@ angular.module("umbraco")
            );
 
         };
+
         $scope.deleteTemplate = function(index){
             $scope.model.value.templates.splice(index, 1);
         };
         
-
-        
-
-
-
 
         /****************
             Row
@@ -135,26 +131,12 @@ angular.module("umbraco")
         $scope.deleteLayout = function(index){
             $scope.model.value.layouts.splice(index, 1);
         };
-
-
         
 
 
         /****************
             utillities
         *****************/
-        $scope.scaleUp = function(section, max, overflow){
-           var add = 1;
-           if(overflow !== true){
-                add = (max > 1) ? 1 : max;
-           }
-           //var add = (max > 1) ? 1 : max;
-           section.grid = section.grid+add;
-        };
-        $scope.scaleDown = function(section){
-           var remove = (section.grid > 1) ? 1 : section.grid;
-           section.grid = section.grid-remove;
-        };
         $scope.toggleCollection = function(collection, toggle){
             if(toggle){
                 collection = [];
@@ -168,10 +150,13 @@ angular.module("umbraco")
         };
 
 
+        /****************
+            Config
+        *****************/
+
         $scope.removeConfigValue = function(collection, index){
             collection.splice(index, 1);
         };
-
 
         var editConfigCollection = function(configValues, title, callbackOnSave){
             dialogService.open(
@@ -196,30 +181,6 @@ angular.module("umbraco")
                 $scope.model.value.styles = data;
             });
         };
-
-
-        /****************
-            watchers
-        *****************/
-        $scope.$watch("currentTemplate", function(template){
-            if(template){
-                var total = 0;
-                _.forEach(template.sections, function(section){
-                    total = (total + section.grid);
-                });
-                $scope.availableTemplateSpace = $scope.model.value.columns - total;
-            }
-        }, true);
-
-        $scope.$watch("currentLayout", function(layout){
-            if(layout){
-                var total = 0;
-                _.forEach(layout.areas, function(area){
-                    total = (total + area.grid);
-                });
-                $scope.availableLayoutSpace = $scope.model.value.columns - total;
-            }
-        }, true);
 
 
         /****************
@@ -248,5 +209,29 @@ angular.module("umbraco")
                 $scope.model.value.styles = [];
             }
         }
+
+        /****************
+            Clean up
+        *****************/
+        $scope.$on("formSubmitting", function (ev, args) {
+            var ts = $scope.model.value.templates;
+            var ls = $scope.model.value.layouts;
+
+            _.each(ts, function(t){
+                _.each(t.sections, function(section, index){
+                   if(section.grid === 0){
+                    t.sections.splice(index, 1);
+                   }
+               });
+            });
+
+            _.each(ls, function(l){
+                _.each(l.areas, function(area, index){
+                   if(area.grid === 0){
+                    l.areas.splice(index, 1);
+                   }
+               });
+            });
+        });
 
     });

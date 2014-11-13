@@ -397,13 +397,17 @@ angular.module("umbraco")
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
-                _.forEach($scope.model.value.sections, function(section){
+                _.forEach($scope.model.value.sections, function(section, index){
 
-                    $scope.initSection(section);
+                    if(section.grid > 0){
+                        $scope.initSection(section);
 
-                    //we do this to ensure that the grid can be reset by deleting the last row
-                    if(section.rows.length > 0){
-                        clear = false;
+                        //we do this to ensure that the grid can be reset by deleting the last row
+                        if(section.rows.length > 0){
+                            clear = false;
+                        }
+                    }else{
+                        $scope.model.value.sections.splice(index, 1);
                     }
                 });
             }
@@ -435,7 +439,7 @@ angular.module("umbraco")
 
                         //if init fails, remove
                         if(!initd){
-                            section.rows.splic(index, 1);
+                            section.rows.splice(index, 1);
                         }else{
                             section.rows[index] = initd;
                         }
@@ -465,38 +469,43 @@ angular.module("umbraco")
                 //sync area configuration
                 _.each(original.areas, function(area, areaIndex){
                     
-                    var currentArea = row.areas[areaIndex];
-                    area.config = currentArea.config;
-                    area.styles = currentArea.styles;
 
-                    //copy over existing controls into the new areas
-                    if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
-                        area.controls = currentArea.controls;
+                    if(area.grid > 0){
+                        var currentArea = row.areas[areaIndex];
+                        area.config = currentArea.config;
+                        area.styles = currentArea.styles;
 
-                        _.forEach(area.controls, function(control, controlIndex){
-                            $scope.initControl(control, controlIndex);
-                        });
+                        //copy over existing controls into the new areas
+                        if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
+                            area.controls = currentArea.controls;
 
-                    }else{
-                        area.controls = [];
-                    }
+                            _.forEach(area.controls, function(control, controlIndex){
+                                $scope.initControl(control, controlIndex);
+                            });
 
-                    //set width
-                    area.$percentage = $scope.percentage(area.grid);
-                    area.$uniqueId = $scope.setUniqueId();
-
-                    //set editor permissions
-                    if(!area.allowed || area.allowAll === true){
-                        area.$allowedEditors = $scope.availableEditors;
-                        area.$allowsRTE = true;
-                    }else{
-                        area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
-                            return _.indexOf(area.allowed, editor.alias) >= 0;
-                        });
-
-                        if(_.indexOf(area.allowed,"rte")>=0){
-                            area.$allowsRTE = true;
+                        }else{
+                            area.controls = [];
                         }
+
+                        //set width
+                        area.$percentage = $scope.percentage(area.grid);
+                        area.$uniqueId = $scope.setUniqueId();
+
+                        //set editor permissions
+                        if(!area.allowed || area.allowAll === true){
+                            area.$allowedEditors = $scope.availableEditors;
+                            area.$allowsRTE = true;
+                        }else{
+                            area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
+                                return _.indexOf(area.allowed, editor.alias) >= 0;
+                            });
+
+                            if(_.indexOf(area.allowed,"rte")>=0){
+                                area.$allowsRTE = true;
+                            }
+                        }
+                    }else{
+                        original.areas.splice(areaIndex, 1);
                     }
                 });
 
