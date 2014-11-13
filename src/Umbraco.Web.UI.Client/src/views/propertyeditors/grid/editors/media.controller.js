@@ -17,7 +17,7 @@ angular.module("umbraco")
     	};
 
     	$timeout(function(){
-    		if($scope.control.value === null){
+    		if($scope.control.$initializing){
     			$scope.setImage();
     		}
     	}, 200);

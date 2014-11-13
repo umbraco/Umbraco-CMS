@@ -2,7 +2,7 @@
 
 	<div class="usky-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
 		<i class="icon icon-picture"></i>
-		<div class="help-text">Click to insert image</div>
+		<div ng-id="!control.$inserted" class="help-text">Click to insert image</div>
 	</div>
 
 	<div ng-if="control.value">

@@ -36,9 +36,9 @@ angular.module("umbraco")
         };
 
     	$timeout(function(){
-    		if($scope.control.value === null){
+    		if($scope.control.$initializing){
     			$scope.setMacro();
-    		}else{
+    		}else if($scope.control.value){
                 var parsed = macroService.parseMacroSyntax($scope.control.value.syntax);
                 $scope.setPreview(parsed);
             }
