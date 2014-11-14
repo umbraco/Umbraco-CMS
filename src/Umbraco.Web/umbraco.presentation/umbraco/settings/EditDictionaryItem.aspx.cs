@@ -118,26 +118,5 @@ namespace umbraco.settings
 		{    
 		}
 		#endregion
-
-
-
-		private class languageTextbox : TextBox 
-		{
-			
-			private int _languageid;
-			public int languageid 
-			{				
-				set {_languageid = value;}
-				get {return _languageid;}
-			}
-			public languageTextbox(int languageId) : base() {
-				this.TextMode = TextBoxMode.MultiLine;
-				this.Rows = 10;
-				this.Columns = 40;
-				this.Attributes.Add("style", "margin: 3px; width: 98%;");
-		
-				this.languageid = languageId;
-			}
-		}
 	}
 }

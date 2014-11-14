@@ -82,18 +82,5 @@ namespace umbraco.IO
         {
 			return Umbraco.Core.IO.IOHelper.ValidateFileExtension(filePath, validFileExtensions); 
         }
-
-
-        /// <summary>
-        /// Returns the path to the root of the application, by getting the path to where the assembly where this
-        /// method is included is present, then traversing until it's past the /bin directory. Ie. this makes it work
-        /// even if the assembly is in a /bin/debug or /bin/release folder
-        /// </summary>
-        /// <returns></returns>
-        private static string getRootDirectorySafe()
-        {
-			return Umbraco.Core.IO.IOHelper.GetRootDirectorySafe(); 
-        }
-
     }
 }

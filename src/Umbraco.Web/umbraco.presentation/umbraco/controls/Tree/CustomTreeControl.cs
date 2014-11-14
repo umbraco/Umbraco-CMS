@@ -33,8 +33,6 @@ namespace umbraco.controls.Tree
     [ClientDependency(13, ClientDependencyType.Javascript, "Tree/UmbracoTree.js", "UmbracoClient")]
     public class CustomTreeControl : TreeControl
     {
-        private static readonly object m_Locker = new object();
-
         /// <summary>
         /// Ensure child controls are created on  init
         /// </summary>

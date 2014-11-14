@@ -76,19 +76,5 @@ namespace Umbraco.Core.Persistence.Factories
                               };
             return nodeDto;
         }
-
-        private int DeterminePropertyTypeId(int initialId, string alias, IEnumerable<PropertyType> propertyTypes)
-        {
-            if (initialId == 0 || initialId == default(int))
-            {
-                var propertyType = propertyTypes.SingleOrDefault(x => x.Alias.Equals(alias));
-                if (propertyType == null)
-                    return default(int);
-
-                return propertyType.Id;
-            }
-
-            return initialId;
-        }
     }
 }

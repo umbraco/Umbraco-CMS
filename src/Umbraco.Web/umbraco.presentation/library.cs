@@ -67,7 +67,6 @@ namespace umbraco
         /// </summary>
         public static DateTime PublishStart;
         private page _page;
-        private static readonly object libraryCacheLock = new object();
 
         #endregion
 

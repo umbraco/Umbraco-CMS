@@ -26,7 +26,6 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
-using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.BasePages;
 using Constants = Umbraco.Core.Constants;
@@ -45,7 +44,6 @@ namespace umbraco.controls
     {
         // General Private members
         private ContentType _contentType;
-        private static string UmbracoPath = SystemDirectories.Umbraco;
         public bool HideStructure { get; set; }
         public Func<DocumentType, DocumentType> DocumentTypeCallback { get; set; }
 
