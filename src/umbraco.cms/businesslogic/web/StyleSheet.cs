@@ -361,12 +361,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [before save].
         /// </summary>
-        public static event SaveEventHandler BeforeSave;
+        public new static event SaveEventHandler BeforeSave;
         /// <summary>
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeSave(SaveEventArgs e)
+        protected override void FireBeforeSave(SaveEventArgs e)
         {
             if (BeforeSave != null)
                 BeforeSave(this, e);
@@ -375,12 +375,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [after save].
         /// </summary>
-        public static event SaveEventHandler AfterSave;
+        public new static event SaveEventHandler AfterSave;
         /// <summary>
         /// Raises the <see cref="E:AfterSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e)
+        protected override void FireAfterSave(SaveEventArgs e)
         {
             if (AfterSave != null)
                 AfterSave(this, e);
@@ -403,12 +403,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [before delete].
         /// </summary>
-        public static event DeleteEventHandler BeforeDelete;
+        public new static event DeleteEventHandler BeforeDelete;
         /// <summary>
         /// Raises the <see cref="E:BeforeDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
+        protected override void FireBeforeDelete(DeleteEventArgs e)
         {
             if (BeforeDelete != null)
                 BeforeDelete(this, e);
@@ -417,12 +417,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [after delete].
         /// </summary>
-        public static event DeleteEventHandler AfterDelete;
+        public new static event DeleteEventHandler AfterDelete;
         /// <summary>
         /// Raises the <see cref="E:AfterDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
+        protected override void FireAfterDelete(DeleteEventArgs e)
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);

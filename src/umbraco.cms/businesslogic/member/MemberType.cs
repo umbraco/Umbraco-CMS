@@ -290,15 +290,15 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// Occurs when a language is saved.
         /// </summary>
-        public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(SaveEventArgs e)
+        public new static event SaveEventHandler BeforeSave;
+        protected override void FireBeforeSave(SaveEventArgs e)
         {
             if (BeforeSave != null)
                 BeforeSave(this, e);
         }
 
-        public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(SaveEventArgs e)
+        public new static event SaveEventHandler AfterSave;
+        protected override void FireAfterSave(SaveEventArgs e)
         {
             if (AfterSave != null)
                 AfterSave(this, e);
@@ -311,15 +311,15 @@ namespace umbraco.cms.businesslogic.member
                 New(this, e);
         }
 
-        public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
+        public new static event DeleteEventHandler BeforeDelete;
+        protected override void FireBeforeDelete(DeleteEventArgs e)
         {
             if (BeforeDelete != null)
                 BeforeDelete(this, e);
         }
 
-        public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
+        public new static event DeleteEventHandler AfterDelete;
+        protected override void FireAfterDelete(DeleteEventArgs e)
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);

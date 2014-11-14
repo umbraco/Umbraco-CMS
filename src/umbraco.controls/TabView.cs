@@ -125,12 +125,7 @@ namespace umbraco.uicontrols {
 	        set { _status = value; }
 	    }
 
-	    private bool _autoResize = true;
-        public bool AutoResize
-	    {
-	        get { return _autoResize; }
-	        set { _autoResize = value; }
-	    }
+	   
 
         public string ActiveTabId
         {

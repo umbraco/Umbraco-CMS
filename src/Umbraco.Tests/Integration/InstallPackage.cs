@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Integration
         }
         
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
             base.TearDown();
         }

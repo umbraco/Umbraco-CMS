@@ -33,7 +33,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         public DateTime Date { get { return Resolve<DateTime>(Property()); } }
 
-        public Textpage Parent
+        public new Textpage Parent
         {
             get
             {

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         public string BodyText { get { return Resolve<string>(Property()); } }
 
-        public Textpage Parent
+        public new Textpage Parent
         {
             get
             {

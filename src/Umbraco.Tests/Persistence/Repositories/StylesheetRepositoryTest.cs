@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
             //Delete all files
             var files = _fileSystem.GetFiles("", "*.css");

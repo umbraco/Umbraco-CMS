@@ -31,9 +31,7 @@
         table.relations td.parentToChild { background-image: url('/umbraco/developer/RelationTypes/Images/ParentToChild.png'); }
         table.relations td.bidirectional { background-image: url('/umbraco/developer/RelationTypes/Images/Bidirectional.png'); }
     </style>  
-  
-    <script type="text/javascript">
-    </script>
+
 </asp:Content>
 
 <asp:Content ID="bodyContent" ContentPlaceHolderID="body" runat="server">

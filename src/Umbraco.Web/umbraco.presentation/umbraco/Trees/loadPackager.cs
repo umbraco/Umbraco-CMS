@@ -47,7 +47,7 @@ namespace umbraco
         /// Sets the id.
         /// </summary>
         /// <value>The id.</value>
-        public int id
+        public override int id
         {
             set { _id = value; }
         }
@@ -56,7 +56,7 @@ namespace umbraco
         /// Sets the app.
         /// </summary>
         /// <value>The app.</value>
-        public string app
+        public override string app
         {
             set { _app = value; }
         }

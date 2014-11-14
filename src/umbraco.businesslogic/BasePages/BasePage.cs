@@ -296,7 +296,7 @@ namespace umbraco.BasePages
         /// Gets the user.
         /// </summary>
         /// <value></value>
-        public User UmbracoUser
+        public virtual User UmbracoUser
         {
             get
             {
