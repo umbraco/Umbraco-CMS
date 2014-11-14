@@ -465,13 +465,6 @@
     <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Search\QuickSearch.ascx.cs">
-      <DependentUpon>QuickSearch.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
-      <DependentUpon>QuickSearch.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.cs">
       <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1739,7 +1732,6 @@
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="Umbraco\Images\throbber.gif" />
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleInit.js" />
-    <Content Include="Umbraco\Search\QuickSearch.ascx" />
     <Content Include="Umbraco\Images\Umbraco\bin.png" />
     <Content Include="Umbraco\Images\Umbraco\bin_closed.png" />
     <Content Include="Umbraco\Images\Umbraco\bin_empty.png" />
@@ -1836,13 +1828,10 @@
     <Content Include="Umbraco_Client\Tree\NodeDefinition.js" />
     <Content Include="Umbraco_Client\Tree\UmbracoTree.js" />
     <Content Include="Umbraco_Client\Application\UmbracoClientManager.js" />
-    <Content Include="Umbraco\Plugins\Tinymce3\InsertAnchor.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertChar.aspx" />
     <Content Include="Umbraco\Webservices\TreeClientService.asmx" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
     <Content Include="Umbraco_Client\PasswordStrength\passwordstrength.js" />
     <Content Include="Umbraco_Client\Ui\jQueryWresize.js" />
-    <Content Include="Umbraco\Search\quickSearch.js" />
     <Content Include="Umbraco\Members\search.aspx" />
     <Content Include="Umbraco\Translation\details.aspx" />
     <Content Include="Umbraco_Client\Modal\modalBackground.gif" />
@@ -1967,10 +1956,6 @@
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleBackEnd.js" />
     <Content Include="Umbraco\Js\umbracoUpgradeChecker.js" />
     <Content Include="Umbraco\Members\ViewMembers.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertImage.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertLink.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\insertMacro.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\tinymce3tinymceCompress.aspx" />
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1989,22 +1974,6 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\Scripting\templates\cshtml\EmptyTemplate.cshtml">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="Umbraco\Scripting\templates\cshtml\Gallery.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
@@ -2061,16 +2030,6 @@
     </None>
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
-    <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Navigation.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\SiteMap.cshtml" />
-    <None Include="Umbraco\Scripting\Templates\Py\SubpagesAsThumnbnails.py" />
-    <None Include="Umbraco\Scripting\Templates\Py\SubpagesFromAChangeableSource.py" />
-    <None Include="Umbraco\Scripting\Templates\Py\SubpagesFromCurrentPage.py" />
-    <None Include="Umbraco\Scripting\Templates\Rb\SubpagesAsThumnbnails.rb" />
-    <None Include="Umbraco\Scripting\Templates\Rb\SubpagesFromAChangeableSource.rb" />
-    <None Include="Umbraco\Scripting\Templates\Rb\SubpagesFromCurrentPage.rb" />
     <Content Include="Umbraco\Users\NodePermissions.ascx" />
     <Content Include="Umbraco\Users\PermissionEditor.aspx" />
     <Content Include="Umbraco\Users\PermissionsEditor.js" />
@@ -2478,7 +2437,6 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
-    <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
