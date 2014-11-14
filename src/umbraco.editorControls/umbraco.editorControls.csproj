@@ -192,18 +192,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BaseTreePickerEditor.cs" />
-    <Compile Include="checkboxlist\CheckBoxDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="checkboxlist\checkboxList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="colorpicker\colorPicker.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="colorpicker\ColorPickerDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="CsvToXmlData.cs" />
     <Compile Include="DataTypeGuids.cs" />
     <Compile Include="datefieldmultiple\DataTypeDatefieldMultiple.cs">
@@ -227,15 +215,6 @@
     <Compile Include="DefaultPrevalueEditor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="dictionaryPicker\dictionaryPicker.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="dictionaryPicker\dictionaryPickerDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="dropdownlist\dropdown.cs" />
-    <Compile Include="dropdownlist\DropDownDataType.cs" />
-    <Compile Include="dropdownlist\dropDownKeysDataType.cs" />
     <Compile Include="folderbrowser\DataTypeFolderbrowser.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -252,22 +231,10 @@
     <Compile Include="imagecropper\Resources.Designer.cs" />
     <Compile Include="imagecropper\SaveData.cs" />
     <Compile Include="imagecropper\SmartListBox.cs" />
-    <Compile Include="KeyValuePrevalueEditor.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="label\DataTypeNoEdit.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="label\noEdit.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="listbox\dropdownMultiple.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="listbox\ListBoxDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="listbox\ListBoxKeysDataType.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="macrocontainer\DataType.cs" />
@@ -327,12 +294,6 @@
     </Compile>
     <Compile Include="PrevalueEditorExtensions.cs" />
     <Compile Include="PropertyTypePicker.cs" />
-    <Compile Include="radiobuttonlist\radiobox.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="radiobuttonlist\RadioButtonListDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="relatedlinks\PagePickerDataExtractor.cs" />
     <Compile Include="relatedlinks\RelatedLinksData.cs" />
     <Compile Include="relatedlinks\RelatedLinksDataEditor.cs" />
