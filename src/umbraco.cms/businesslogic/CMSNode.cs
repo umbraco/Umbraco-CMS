@@ -978,15 +978,6 @@ order by level,sortOrder";
         }
 
         /// <summary>
-        /// The menu items used in the tree view
-        /// </summary>
-        [Obsolete("this is not used anywhere")]
-        public virtual BusinessLogic.console.MenuItemI[] MenuItems
-        {
-            get { return new BusinessLogic.console.MenuItemI[0]; }
-        }
-
-        /// <summary>
         /// Not implemented, always returns "about:blank"
         /// </summary>
         public virtual string DefaultEditorURL

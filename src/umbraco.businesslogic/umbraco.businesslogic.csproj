@@ -215,9 +215,6 @@
     <Compile Include="Log.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MenuItemI.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="StateHelper.cs" />
     <Compile Include="ui.cs">
       <SubType>Code</SubType>
