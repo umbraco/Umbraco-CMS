@@ -17,6 +17,8 @@ SET nuGetFolder=%CD%\..\src\packages\
 ..\src\.nuget\NuGet.exe sources Remove -Name MyGetUmbracoCore
 ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/
 ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
+..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder%
+..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder%
 
 ECHO Removing the belle build folder to make sure everything is clean as a whistle
 RD ..\src\Umbraco.Web.UI.Client\build /Q /S
