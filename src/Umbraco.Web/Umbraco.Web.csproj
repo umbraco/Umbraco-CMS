@@ -113,7 +113,7 @@
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
     <Reference Include="dotless.Core">
-      <HintPath>..\packages\dotless.1.4.0.0\lib\dotless.Core.dll</HintPath>
+      <HintPath>..\packages\dotless.1.4.1.0\lib\dotless.Core.dll</HintPath>
     </Reference>
     <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
