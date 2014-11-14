@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IMacro BuildEntity(MacroDto dto)
         {
-            var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
+            var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroFilePath);
             foreach (var p in dto.MacroPropertyDtos)
             {
                 model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
                     CachePersonalized = entity.CacheByMember,
                     DontRender = entity.DontRender,
                     Name = entity.Name,
-                    Python = entity.ScriptPath,
+                    MacroFilePath = entity.ScriptPath,
                     RefreshRate = entity.CacheDuration,
                     ScriptAssembly = entity.ControlAssembly,
                     ScriptType = entity.ControlType,

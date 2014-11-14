@@ -27,7 +27,6 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
-using umbraco.scripting;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Core.IO;
@@ -104,56 +103,7 @@ namespace umbraco
             _page = page;
         }
 
-        #endregion
-
-        #region Python Helper functions
-
-        /// <summary>
-        /// Executes the given python script and returns the standardoutput.
-        /// The Globals known from python macros are not accessible in this context.
-        /// Neither macro or page nor the globals known from python macros are 
-        /// accessible in this context. Only stuff we initialized in site.py
-        /// can be used.
-        /// </summary>
-        /// <param name="file">The filename of the python script including the extension .py</param>
-        /// <returns>Returns the StandardOutput</returns>
-        public static string PythonExecuteFile(string file)
-        {
-            try
-            {
-                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + file);
-                object res = python.executeFile(path);
-                return res.ToString();
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
-
-        /// <summary>
-        /// Executes the given python expression and returns the standardoutput.
-        /// The Globals known from python macros are not accessible in this context.
-        /// Neighter macro or page nor the globals known from python macros are 
-        /// accessible in this context. Only stuff we initialized in site.py
-        /// can be used.
-        /// </summary>
-        /// <param name="expression">Python expression to execute</param>
-        /// <returns>Returns the StandardOutput</returns>
-        public static string PythonExecute(string expression)
-        {
-            try
-            {
-                object res = python.execute(expression);
-                return res.ToString();
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
-
-        #endregion
+        #endregion       
 
         #region Publish Helper Methods
 

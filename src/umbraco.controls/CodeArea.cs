@@ -65,7 +65,7 @@ namespace umbraco.uicontrols
         public EditorType CodeBase { get; set; }
         public string ClientSaveMethod { get; set; }
 
-        public enum EditorType { JavaScript, Css, Python, XML, HTML, Razor, HtmlMixed }
+        public enum EditorType { JavaScript, Css, XML, HTML, Razor, HtmlMixed }
 
         protected override void OnInit(EventArgs e)
         {

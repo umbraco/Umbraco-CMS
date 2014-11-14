@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using System.Collections;
 using umbraco.cms.businesslogic.macro;
 using System.Web;
+using Umbraco.Core.Models;
 
 namespace umbraco.presentation.templateControls
 {
@@ -154,7 +155,9 @@ namespace umbraco.presentation.templateControls
                 } else {
                     tempMacro.Model.ScriptName = FileLocation;
                 }
-                tempMacro.Model.MacroType = MacroTypes.Script;
+                
+                tempMacro.Model.MacroType = MacroTypes.PartialView;
+
                 if (!String.IsNullOrEmpty(Attributes["Cache"])) {
                     var cacheDuration = 0;
                     if (int.TryParse(Attributes["Cache"], out cacheDuration))

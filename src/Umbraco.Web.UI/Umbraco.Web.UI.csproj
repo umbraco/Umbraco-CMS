@@ -355,13 +355,6 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Create\DlrScripting.ascx.cs">
-      <DependentUpon>DlrScripting.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\DlrScripting.ascx.designer.cs">
-      <DependentUpon>DlrScripting.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Create\PartialView.ascx.cs">
       <DependentUpon>PartialView.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -424,13 +417,6 @@
     </Compile>
     <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
@@ -851,7 +837,6 @@
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
-    <Content Include="Umbraco_Client\Editors\EditMacroScripts.js" />
     <Content Include="Umbraco_Client\Editors\EditXslt.css" />
     <Content Include="Umbraco_Client\Editors\EditXslt.js" />
     <Content Include="Umbraco_Client\Editors\EditScript.js" />
@@ -1751,8 +1736,6 @@
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
     <Content Include="Umbraco\Controls\ContentTypeControlNew.ascx" />
     <Content Include="Umbraco\Controls\GenericProperties\GenericProperty.ascx" />
-    <Content Include="Umbraco\Create\DlrScripting.ascx" />
-    <Content Include="Umbraco\Images\Umbraco\developerRuby.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerScript.gif" />
     <Content Include="Umbraco_Client\Tree\sprites.png" />
     <Content Include="Umbraco_Client\Tree\sprites_ie6.gif" />
@@ -1983,9 +1966,7 @@
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Umbraco\Developer\Python\editPython.aspx" />
     <Content Include="Umbraco\Images\Developer\customControlIcon.png" />
-    <Content Include="Umbraco\Images\Developer\pythonIcon.png" />
     <Content Include="Umbraco\Images\Developer\usercontrolIcon.png" />
     <Content Include="Umbraco\Images\Developer\xsltIcon.png" />
     <Content Include="Umbraco\Images\exportDocumenttype.png" />
@@ -2109,7 +2090,6 @@
     <Content Include="Umbraco_Client\Images\progressbar.gif" />
     <Content Include="Umbraco\Images\sendToTranslate.png" />
     <Content Include="Umbraco\Images\Tray\traySprites.png" />
-    <Content Include="Umbraco\Images\Umbraco\developerPython.gif" />
     <Content Include="Umbraco\Images\Umbraco\package.png" />
     <Content Include="Umbraco\Images\Umbraco\settingsScript.gif" />
     <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />

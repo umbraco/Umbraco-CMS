@@ -528,9 +528,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\Language.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasksBase.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -913,7 +910,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
-    <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -957,9 +953,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewMacrosTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
@@ -1083,11 +1076,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\PublishQueue.cs" />
-    <Compile Include="umbraco.presentation\python.cs" />
     <Compile Include="umbraco.presentation\NotFoundHandlers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\requestModule.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\showField.cs">
@@ -1192,7 +1181,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\DataTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScriptingTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MediaTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MemberGroupTasks.cs" />
@@ -1200,7 +1188,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\MemberTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\NewMemberUIEventArgs.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\nodetypeTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\PythonTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\ScriptTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\stylesheetPropertyTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\StylesheetTasks.cs" />
@@ -1611,7 +1598,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseMediaTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadDLRScripts.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1701,7 +1687,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberTypes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadNodeTypes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadPython.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadScripts.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />

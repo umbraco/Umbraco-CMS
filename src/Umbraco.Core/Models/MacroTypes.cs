@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal enum MacroTypes
+    public enum MacroTypes
     {
         [EnumMember]
         Xslt = 1,

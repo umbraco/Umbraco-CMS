@@ -6,9 +6,12 @@ using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
+using File = System.IO.File;
+using Macro = umbraco.cms.businesslogic.macro.Macro;
 
 namespace Umbraco.Tests.Macros
 {

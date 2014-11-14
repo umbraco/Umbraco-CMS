@@ -51,19 +51,8 @@ namespace umbraco.IO
         public static string Media
         {
 			get { return global::Umbraco.Core.IO.SystemDirectories.Media; }
-        }
-
-        [Obsolete("Please use MacroScripts instead!", true)]
-        public static string Python
-        {
-			get { return global::Umbraco.Core.IO.SystemDirectories.MacroScripts; }
-        }
-
-        public static string MacroScripts
-        {
-			get { return global::Umbraco.Core.IO.SystemDirectories.MacroScripts; }
-        }
-
+        }       
+        
         public static string Scripts
         {
 			get { return global::Umbraco.Core.IO.SystemDirectories.Scripts; }

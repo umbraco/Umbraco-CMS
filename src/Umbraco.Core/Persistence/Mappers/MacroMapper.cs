@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Macro, MacroDto>(src => src.DontRender, dto => dto.DontRender);
             CacheMap<Macro, MacroDto>(src => src.Name, dto => dto.Name);
             CacheMap<Macro, MacroDto>(src => src.CacheDuration, dto => dto.RefreshRate);
-            CacheMap<Macro, MacroDto>(src => src.ScriptPath, dto => dto.Python);
+            CacheMap<Macro, MacroDto>(src => src.ScriptPath, dto => dto.MacroFilePath);
             CacheMap<Macro, MacroDto>(src => src.UseInEditor, dto => dto.UseInEditor);
             CacheMap<Macro, MacroDto>(src => src.XsltPath, dto => dto.Xslt);
         }

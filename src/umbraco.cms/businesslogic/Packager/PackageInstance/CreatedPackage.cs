@@ -124,7 +124,7 @@ namespace umbraco.cms.businesslogic.packager
                 //Init package file...
                 CreatePackageManifest();
                 //Info section..
-                AppendElement(utill.PackageInfo(pack, _packageManifest));
+                AppendElement(PackagerUtility.PackageInfo(pack, _packageManifest));
 
                 //Documents and tags...
                 var contentNodeId = 0;
@@ -258,7 +258,7 @@ namespace umbraco.cms.businesslogic.packager
                 {
                     if (int.TryParse(macroId, out outInt))
                     {
-                        macros.AppendChild(utill.Macro(int.Parse(macroId), true, localPath, _packageManifest));
+                        macros.AppendChild(PackagerUtility.Macro(int.Parse(macroId), true, localPath, _packageManifest));
                     }
                 }
                 AppendElement(macros);
@@ -303,7 +303,7 @@ namespace umbraco.cms.businesslogic.packager
                 //Files
                 foreach (var fileName in pack.Files)
                 {
-                    utill.AppendFileToManifest(fileName, localPath, _packageManifest);
+                    PackagerUtility.AppendFileToManifest(fileName, localPath, _packageManifest);
                 }
 
                 //Load control on install...
@@ -311,7 +311,7 @@ namespace umbraco.cms.businesslogic.packager
                 {
                     XmlNode control = _packageManifest.CreateElement("control");
                     control.InnerText = pack.LoadControl;
-                    utill.AppendFileToManifest(pack.LoadControl, localPath, _packageManifest);
+                    PackagerUtility.AppendFileToManifest(pack.LoadControl, localPath, _packageManifest);
                     AppendElement(control);
                 }
 
@@ -354,7 +354,7 @@ namespace umbraco.cms.businesslogic.packager
 
 
                 var packPath = packagesDirectory + "/" + (pack.Name + "_" + pack.Version).Replace(' ', '_') + "." + Settings.PackageFileExtension;
-                utill.ZipPackage(localPath, IOHelper.MapPath(packPath));
+                PackagerUtility.ZipPackage(localPath, IOHelper.MapPath(packPath));
 
                 pack.PackagePath = packPath;
 

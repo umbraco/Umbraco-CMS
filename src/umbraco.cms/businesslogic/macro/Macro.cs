@@ -457,17 +457,14 @@ namespace umbraco.cms.businesslogic.macro
         public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
         {
             if (string.IsNullOrEmpty(xslt) == false)
-                return MacroTypes.XSLT;
+                return MacroTypes.Xslt;
 	        
 			if (string.IsNullOrEmpty(scriptFile) == false)
 			{
 				//we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
 				//a partial view macro, not a script macro
 				//we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
-				return (scriptFile.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-				        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
-					       ? MacroTypes.PartialView
-					       : MacroTypes.Script;
+			    return MacroTypes.PartialView;
 			}
 
 	        if (string.IsNullOrEmpty(scriptType) == false && scriptType.InvariantContains(".ascx"))

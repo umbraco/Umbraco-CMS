@@ -37,7 +37,6 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Media, true), IOHelper.MapPath(SystemDirectories.Media, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Packages, true), IOHelper.MapPath(SystemDirectories.Packages, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Preview, true), IOHelper.MapPath(SystemDirectories.Preview, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.MacroScripts, true), IOHelper.MapPath(SystemDirectories.MacroScripts, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Root, true), IOHelper.MapPath(SystemDirectories.Root, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Scripts, true), IOHelper.MapPath(SystemDirectories.Scripts, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Umbraco, true), IOHelper.MapPath(SystemDirectories.Umbraco, false));

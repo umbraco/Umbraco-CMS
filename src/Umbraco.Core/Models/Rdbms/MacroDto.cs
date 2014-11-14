@@ -53,9 +53,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool DontRender { get; set; }
 
+        //TODO: Rename this column! - actually please revamp all of the macros! :)
         [Column("macroPython")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Python { get; set; }
+        public string MacroFilePath { get; set; }
 
         [ResultColumn]
         public List<MacroPropertyDto> MacroPropertyDtos { get; set; }

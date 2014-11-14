@@ -10,6 +10,10 @@ using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation.urlRewriter
 {
+
+    //TODO: Do we need these?????????
+
+
     public class FormRewriterControlAdapter : System.Web.UI.Adapters.ControlAdapter
     {
         protected override void Render(HtmlTextWriter writer)
@@ -49,7 +53,7 @@ namespace umbraco.presentation.urlRewriter
                     }
                     else
                     {
-                        formAction = Context.Items[requestModule.ORIGINAL_URL_CXT_KEY].ToString();
+                        formAction = Context.Items["umbOriginalUrl"].ToString();
                         if (!String.IsNullOrEmpty(Context.Request.Url.Query))
                         {
                             formAction += Context.Request.Url.Query;

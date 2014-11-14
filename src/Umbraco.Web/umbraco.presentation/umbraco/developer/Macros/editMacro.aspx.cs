@@ -68,9 +68,6 @@ namespace umbraco.cms.presentation.developer
 				// Load xslt files from default dir
 				PopulateXsltFiles();
 
-				// Load razor script files from default dir
-                PopulateMacroScriptFiles();
-
 				// Load usercontrols
 				PopulateUserControls(IOHelper.MapPath(SystemDirectories.UserControls));
 				userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
@@ -149,28 +146,7 @@ namespace umbraco.cms.presentation.developer
 			xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
 		}
 
-		private static void GetMacroScriptFilesFromDir(string orgPath, string path, ArrayList files)
-		{
-			var dirInfo = new DirectoryInfo(path);
-			if (dirInfo.Exists == false)
-				return;
-
-			var fileInfo = dirInfo.GetFiles("*.*").Where(f => f.Name.ToLowerInvariant() != "web.config".ToLowerInvariant());
-			foreach (var file in fileInfo)
-				files.Add(path.Replace(orgPath, string.Empty) + file.Name);
-
-			// Populate subdirectories
-			var dirInfos = dirInfo.GetDirectories();
-			foreach (var dir in dirInfos)
-				GetMacroScriptFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
-		}
-
-        private void PopulateMacroScriptFiles()
-		{
-			var razors = new ArrayList();
-			var razorDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
-			GetMacroScriptFilesFromDir(razorDir, razorDir, razors);
-		}
+		
 
 		public void deleteMacroProperty(object sender, EventArgs e)
 		{
