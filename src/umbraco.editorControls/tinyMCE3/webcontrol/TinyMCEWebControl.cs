@@ -343,7 +343,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                 {
                     // Create div
                     Hashtable attributes = helper.ReturnAttributes(tag.Groups[1].Value);
-                    string div = macro.renderMacroStartTag(attributes, nodeId, versionId); //.Replace("&quot;", "&amp;quot;");
+                    string div = macro.RenderMacroStartTag(attributes, nodeId, versionId); //.Replace("&quot;", "&amp;quot;");
 
                     // Insert macro contents here...
                     macro m;
@@ -380,7 +380,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     }
 
 
-                    div += macro.renderMacroEndTag();
+                    div += macro.RenderMacroEndTag();
                     content = content.Replace(tag.Groups[1].Value, div);
                 }
                 catch (Exception ee)

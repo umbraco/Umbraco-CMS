@@ -289,7 +289,7 @@ namespace umbraco
 
                                 try
                                 {
-                                    Control c = tempMacro.renderMacro(attributes, umbPage.Elements, umbPage.PageID);
+                                    Control c = tempMacro.RenderMacro(attributes, umbPage.Elements, umbPage.PageID);
                                     if (c != null)
                                         pageContent.Controls.Add(c);
                                     else

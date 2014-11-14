@@ -13,8 +13,6 @@ namespace Umbraco.Core.Models
         [EnumMember]
         Xslt = 1,
         [EnumMember]
-        CustomControl = 2,
-        [EnumMember]
         UserControl = 3,
         [EnumMember]
         Unknown = 4,

@@ -54,9 +54,6 @@ namespace Umbraco.Core.Services
             if (string.IsNullOrEmpty(macro.ControlType) == false && macro.ControlType.InvariantContains(".ascx"))
                 return MacroTypes.UserControl;
 
-            if (string.IsNullOrEmpty(macro.ControlType) == false && string.IsNullOrEmpty(macro.ControlAssembly) == false)
-                return MacroTypes.CustomControl;
-
             return MacroTypes.Unknown;
         }
 

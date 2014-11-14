@@ -165,7 +165,7 @@ namespace umbraco.presentation.templateControls
                     else
                         System.Web.HttpContext.Current.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
                 }
-                var c = tempMacro.renderMacro((Hashtable)Context.Items["pageElements"], pageId);
+                var c = tempMacro.RenderMacro((Hashtable)Context.Items["pageElements"], pageId);
                 if (c != null)
                 {
                     Exceptions = tempMacro.Exceptions;
@@ -179,7 +179,7 @@ namespace umbraco.presentation.templateControls
                 var tempMacro = macro.GetMacro(Alias);
                 if (tempMacro != null) {
                     try {
-                        var c = tempMacro.renderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
+                        var c = tempMacro.RenderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
                         if (c != null)
                             Controls.Add(c);
                         else

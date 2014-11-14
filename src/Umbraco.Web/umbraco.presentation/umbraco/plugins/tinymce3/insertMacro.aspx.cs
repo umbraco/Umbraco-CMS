@@ -204,7 +204,7 @@ namespace umbraco.presentation.tinymce3
             HttpContext.Current.Items["macrosAdded"] = 0;
             HttpContext.Current.Items["pageID"] = pageId.ToString();
 
-            var div = macro.renderMacroStartTag(attributes, pageId, pageVersion).Replace("\\", "\\\\").Replace("'", "\\'");
+            var div = macro.RenderMacroStartTag(attributes, pageId, pageVersion).Replace("\\", "\\\\").Replace("'", "\\'");
 
             var macroContent = macro.MacroContentByHttp(pageId, pageVersion, attributes).Replace("\\", "\\\\").Replace("'", "\\'").Replace("/", "\\/").Replace("\n", "\\n");
 
@@ -212,7 +212,7 @@ namespace umbraco.presentation.tinymce3
                 macroContent = "<b>Macro rendering contains script code</b><br/>This macro won\\'t be rendered in the editor because it contains script code. It will render correct during runtime.";
 
             div += macroContent;
-            div += macro.renderMacroEndTag();
+            div += macro.RenderMacroEndTag();
 
             _scriptOnLoad += string.Format("\t\tumbracoEditMacroDo('{0}', '{1}', '{2}');\n", macroAttributes.Replace("'", "\\'"), m.Name.Replace("'", "\\'"), div);
         }

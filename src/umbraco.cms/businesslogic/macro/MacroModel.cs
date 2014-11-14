@@ -17,7 +17,9 @@ namespace umbraco.cms.businesslogic.macro
         public string MacroControlIdentifier { get; set; }
         public MacroTypes MacroType { get; set; }
 
+        [Obsolete("This is no longer used, we should remove it in v8, CustomControl macros are gone")]
         public string TypeAssembly { get; set; }
+
         public string TypeName { get; set; }
         public string Xslt { get; set; }
         public string ScriptName { get; set; }
@@ -60,15 +62,14 @@ namespace umbraco.cms.businesslogic.macro
                     Properties.Add(
                         new MacroPropertyModel(mp.Alias, string.Empty, mp.Type.Alias, mp.Type.BaseType));
                 }
-                MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName, TypeAssembly);
+                MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName);
             }
         }
 
-        public MacroModel(string name, string alias, string typeAssembly, string typeName, string xslt, string scriptName, int cacheDuration, bool cacheByPage, bool cacheByMember)
+        public MacroModel(string name, string alias, string typeName, string xslt, string scriptName, int cacheDuration, bool cacheByPage, bool cacheByMember)
         {
             Name = name;
             Alias = alias;
-            TypeAssembly = typeAssembly;
             TypeName = typeName;
             Xslt = xslt;
             ScriptName = scriptName;
@@ -78,7 +79,7 @@ namespace umbraco.cms.businesslogic.macro
 
             Properties = new List<MacroPropertyModel>();
 
-            MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName, TypeAssembly);
+            MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName);
         }
     }
 }

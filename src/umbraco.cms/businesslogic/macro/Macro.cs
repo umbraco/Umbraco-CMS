@@ -454,7 +454,7 @@ namespace umbraco.cms.businesslogic.macro
                     });
         }
 
-        public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
+        public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType)
         {
             if (string.IsNullOrEmpty(xslt) == false)
                 return MacroTypes.Xslt;
@@ -469,9 +469,6 @@ namespace umbraco.cms.businesslogic.macro
 
 	        if (string.IsNullOrEmpty(scriptType) == false && scriptType.InvariantContains(".ascx"))
 		        return MacroTypes.UserControl;
-	        
-			if (string.IsNullOrEmpty(scriptType) == false && !string.IsNullOrEmpty(scriptAssembly))
-		        return MacroTypes.CustomControl;
 
 	        return MacroTypes.Unknown;
         }
