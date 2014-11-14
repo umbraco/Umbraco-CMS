@@ -170,7 +170,6 @@
     <Compile Include="RazorCore\IParameterDictionary.cs" />
     <Compile Include="RazorCore\UmbracoParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RazorCore\RazorBuildProvider.cs" />
     <Compile Include="RazorCore\RazorMacroEngine.cs" />
     <Compile Include="RazorDynamicNode\Res.cs" />
     <Compile Include="RazorDynamicNode\Signature.cs" />
