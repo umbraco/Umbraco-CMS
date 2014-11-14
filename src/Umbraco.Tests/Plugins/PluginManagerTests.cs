@@ -13,7 +13,6 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
-using umbraco.editorControls;
 using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
 using Umbraco.Web;
@@ -52,8 +51,7 @@ namespace Umbraco.Tests.Plugins
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-					typeof(UmbracoContext).Assembly,
-					typeof(BaseDataType).Assembly
+					typeof(UmbracoContext).Assembly
 			    };
         }
 

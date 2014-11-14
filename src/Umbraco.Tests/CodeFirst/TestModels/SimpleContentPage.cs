@@ -1,11 +1,11 @@
 ﻿using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.editorControls.textfield;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
     public class SimpleContentPage : ContentTypeBase
     {
-        [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(TextboxPropertyEditor), PropertyGroup = "Content")]
         public string Title { get; set; }
 
         [Richtext(PropertyGroup = "Content")]

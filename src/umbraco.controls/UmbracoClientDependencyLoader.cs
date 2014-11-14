@@ -28,7 +28,7 @@ namespace umbraco.uicontrols
             
         }
 
-        public static new ClientDependencyLoader TryCreate(Control parent, out bool isNew)
+        public static ClientDependencyLoader TryCreate(Control parent, out bool isNew)
         {
             if (ClientDependencyLoader.Instance == null)
             {

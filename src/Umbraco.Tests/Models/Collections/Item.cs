@@ -180,8 +180,6 @@ namespace Umbraco.Tests.Models.Collections
                 return false;*/
 
             return ReferenceEquals(left, right);
-
-            return left.Equals(right);
         }
 
         public static bool operator !=(Item left, Item right)

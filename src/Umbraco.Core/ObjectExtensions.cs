@@ -206,7 +206,7 @@ namespace Umbraco.Core
 			return Attempt<object>.Fail();
 		}
 
-		private static Nullable<Attempt<object>> TryConvertToFromString(this string input, Type destinationType)
+		private static Attempt<object>? TryConvertToFromString(this string input, Type destinationType)
 		{
 			if (destinationType == typeof(string))
 				return Attempt<object>.Succeed(input);

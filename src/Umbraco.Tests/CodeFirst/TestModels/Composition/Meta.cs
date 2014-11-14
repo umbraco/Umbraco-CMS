@@ -1,15 +1,14 @@
 ﻿using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.editorControls.textfield;
-using umbraco.editorControls.textfieldmultiple;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.TestModels.Composition
 {
     public class Meta : ContentTypeBase, IMeta
     {
-        [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(TextboxPropertyEditor), PropertyGroup = "Content")]
         public string MetaKeywords { get; set; }
 
-        [PropertyType(typeof(textfieldMultipleDataType))]
+        [PropertyType(typeof(MultipleTextStringPropertyEditor))]
         public string MetaDescription { get; set; }
     }
 

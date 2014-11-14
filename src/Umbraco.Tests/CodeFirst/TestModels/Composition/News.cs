@@ -1,5 +1,5 @@
 ﻿using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.editorControls.textfield;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.TestModels.Composition
 {
@@ -8,7 +8,7 @@ namespace Umbraco.Tests.CodeFirst.TestModels.Composition
     /// </summary>
     public class News : Base, IMetaSeo, IMeta
     {
-        [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(TextboxPropertyEditor), PropertyGroup = "Content")]
         public string Author { get; set; }
     }
 }

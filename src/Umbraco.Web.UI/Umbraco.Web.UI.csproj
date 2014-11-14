@@ -263,10 +263,6 @@
       <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
-      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
-      <Name>umbraco.editorControls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>

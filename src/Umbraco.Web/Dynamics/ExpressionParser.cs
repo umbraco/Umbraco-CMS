@@ -516,7 +516,7 @@ namespace Umbraco.Web.Dynamics
 						ParameterExpression[] parameters = new ParameterExpression[(expr as LambdaExpression).Parameters.Count];
 						(expr as LambdaExpression).Parameters.CopyTo(parameters, 0);
 						var invokedExpr = Expression.Invoke(expr, parameters);
-						var not = Expression.Not(Expression.TypeAs(invokedExpr, typeof(Nullable<bool>)));
+						var not = Expression.Not(Expression.TypeAs(invokedExpr, typeof(bool?)));
 						expr = Expression.Lambda<Func<T, bool>>(
 							Expression.Condition(
 								Expression.Property(not, "HasValue"),

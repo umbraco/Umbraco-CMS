@@ -194,13 +194,9 @@ namespace Umbraco.Web.Dynamics
                 }
             }
 
-            bool isDynamicNodeList = false;
-            if (typedSource != null)
-            {
-                isDynamicNodeList = true;
-            }
+            bool isDynamicNodeList = false || typedSource != null;
 
-            ParameterExpression[] parameters = new ParameterExpression[] {
+		    ParameterExpression[] parameters = new ParameterExpression[] {
                 Expression.Parameter(source.ElementType, "") };
             var parser = new ExpressionParser<T>(parameters, ordering, values, false);
             IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();

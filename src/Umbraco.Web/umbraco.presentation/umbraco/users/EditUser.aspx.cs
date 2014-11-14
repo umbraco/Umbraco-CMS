@@ -240,10 +240,7 @@ namespace umbraco.cms.presentation.user
 
         void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            args.IsValid = false;
-
-            if (lapps.SelectedIndex >= 0)
-                args.IsValid = true;
+            args.IsValid = false || lapps.SelectedIndex >= 0;
         }
 
         private void SetupChannel()

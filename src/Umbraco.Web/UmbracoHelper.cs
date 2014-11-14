@@ -1175,11 +1175,7 @@ namespace Umbraco.Web
 										insideTagSpaceEncountered = false;
 										currentTag = string.Empty;
 										tagContents = string.Empty;
-										isTagClose = false;
-										if (tr.Peek() == (int)'/')
-										{
-											isTagClose = true;
-										}
+										isTagClose = false || tr.Peek() == (int)'/';
 									}
 									else if (ic == (int)'>')
 									{

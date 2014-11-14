@@ -18,7 +18,6 @@ using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
-using umbraco.editorControls.tags;
 using umbraco.interfaces;
 using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
@@ -59,7 +58,6 @@ namespace Umbraco.Tests.Plugins
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-                    typeof(Tag).Assembly,
                     typeof(global::UmbracoExamine.BaseUmbracoIndexer).Assembly
 			    };
 

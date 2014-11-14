@@ -146,15 +146,15 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// The save event handler
         /// </summary>
-        new public delegate void SaveEventHandler(StylesheetProperty sender, SaveEventArgs e);
+        public delegate void SaveEventHandler(StylesheetProperty sender, SaveEventArgs e);
         /// <summary>
         /// The new event handler
         /// </summary>
-        new public delegate void NewEventHandler(StylesheetProperty sender, NewEventArgs e);
+        public delegate void NewEventHandler(StylesheetProperty sender, NewEventArgs e);
         /// <summary>
         /// The delete event handler
         /// </summary>
-        new public delegate void DeleteEventHandler(StylesheetProperty sender, DeleteEventArgs e);
+        public delegate void DeleteEventHandler(StylesheetProperty sender, DeleteEventArgs e);
 
 
         /// <summary>

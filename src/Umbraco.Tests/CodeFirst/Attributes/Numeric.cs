@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.CodeFirst.Definitions;
-using umbraco.editorControls.numberfield;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.Attributes
 {
@@ -9,7 +9,7 @@ namespace Umbraco.Tests.CodeFirst.Attributes
     public class Numeric : PropertyTypeAttribute
     {
         public Numeric(string dataTypeName)
-            : base(typeof(IDataTypenteger))
+            : base(typeof(IntegerPropertyEditor))
         {
             DataTypeName = dataTypeName;
             DatabaseType = DataTypeDatabaseType.Integer;

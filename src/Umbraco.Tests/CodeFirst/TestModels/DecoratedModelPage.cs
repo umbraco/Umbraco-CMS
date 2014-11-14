@@ -1,6 +1,6 @@
 ﻿using System;
 using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.editorControls.textfield;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
@@ -9,10 +9,10 @@ namespace Umbraco.Tests.CodeFirst.TestModels
         AllowedTemplates = new[]{"umbMaster"})]
     public class DecoratedModelPage : ContentTypeBase
     {
-        [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(TextboxPropertyEditor), PropertyGroup = "Content")]
         public string Author { get; set; }
 
-        [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(TextboxPropertyEditor), PropertyGroup = "Content")]
         public string Title { get; set; }
 
         [Richtext(PropertyGroup = "Content")]

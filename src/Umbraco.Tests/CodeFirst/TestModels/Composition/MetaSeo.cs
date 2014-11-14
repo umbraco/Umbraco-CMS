@@ -1,11 +1,11 @@
 ﻿using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.editorControls.textfieldmultiple;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.TestModels.Composition
 {
     public class MetaSeo : ContentTypeBase, IMetaSeo
     {
-        [PropertyType(typeof(textfieldMultipleDataType))]
+        [PropertyType(typeof(MultipleTextStringPropertyEditor))]
         public string FriendlySeoStuff { get; set; }
     }
 
