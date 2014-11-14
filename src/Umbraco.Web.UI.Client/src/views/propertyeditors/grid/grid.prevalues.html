@@ -28,7 +28,7 @@
 
                         <div>
                             {{template.name}} <br/>
-                            <small>{{template.sections.length}} sections</small> <br/>
+                            <small>{{template.sections.length}} section{{template.sections.length == 1 ? '' : 's'}}</small> <br/>
                             <a class="btn btn-small btn-link"
                                href
                                ng-click="deleteTemplate($index)"><i class="icon-delete red">
