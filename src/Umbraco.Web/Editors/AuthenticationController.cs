@@ -1,26 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Web;
-using System.Web.Helpers;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Security;
 using AutoMapper;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.providers;
 
 namespace Umbraco.Web.Editors
 {

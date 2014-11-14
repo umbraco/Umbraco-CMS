@@ -1,24 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
 using umbraco;
-using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
-using umbraco.providers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
-using Member = umbraco.cms.businesslogic.member.Member;
 using User = umbraco.BusinessLogic.User;
 
 namespace Umbraco.Web.Security

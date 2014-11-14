@@ -219,7 +219,7 @@ namespace Umbraco.Web.Models.Mapping
                     });
 
             //check if there's an approval field
-            var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
+            var provider = membersProvider as IUmbracoMemberTypeMembershipProvider;
             if (member.HasIdentity == false && provider != null)
             {
                 var approvedField = provider.ApprovedPropertyTypeAlias;

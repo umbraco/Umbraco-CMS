@@ -289,10 +289,6 @@
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.providers\umbraco.providers.csproj">
-      <Project>{D7636876-0756-43CB-A192-138C6F0D5E42}</Project>
-      <Name>umbraco.providers</Name>
-    </ProjectReference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UrlRewritingNet.UrlRewriter">
       <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.60829.1\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
