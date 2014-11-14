@@ -122,12 +122,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (WebRoutingElement)this["web.routing"]; }
         }
 
-        [ConfigurationProperty("scripting")]
-        internal ScriptingElement Scripting
-        {
-            get { return (ScriptingElement)this["scripting"]; }
-        }
-        
         IContentSection IUmbracoSettingsSection.Content
         {
             get { return Content; }
@@ -193,9 +187,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return WebRouting; }
         }
 
-        IScriptingSection IUmbracoSettingsSection.Scripting
-        {
-            get { return Scripting; }
-        }
     }
 }

@@ -178,13 +178,7 @@ namespace umbraco
             get { return UmbracoConfig.For.UmbracoSettings().Templates.EnableTemplateFolders; }
         }
 
-        /// <summary>
-        /// razor DynamicNode typecasting detects XML and returns DynamicXml - Root elements that won't convert to DynamicXml
-        /// </summary>
-        public static List<string> NotDynamicXmlDocumentElements
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.Select(x => x.Element).ToList(); }
-        }
+      
 
         /// <summary>
         /// Gets a value indicating whether umbraco will clone XML cache on publish.

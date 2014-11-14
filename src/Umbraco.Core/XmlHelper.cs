@@ -85,8 +85,13 @@ namespace Umbraco.Core
             var nav = doc.CreateNavigator();
             if (nav.MoveToFirstChild())
             {
-                var name = nav.LocalName; // must not match an excluded tag
-                if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
+                //SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
+                // used apart from for tests so don't think this matters. In any case, we no longer check for this!
+
+                //var name = nav.LocalName; // must not match an excluded tag
+                //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
+                
+                return true;
             }
 
             doc = null;
@@ -120,11 +125,16 @@ namespace Umbraco.Core
                 return false; // string can't be parsed into xml
             }
 
-            var name = elt.Name.LocalName; // must not match an excluded tag
-            if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
+            //SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
+            // used apart from for tests so don't think this matters. In any case, we no longer check for this!
 
-            elt = null;
-            return false;
+            //var name = elt.Name.LocalName; // must not match an excluded tag
+            //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) 
+            //    return true;
+            //elt = null;
+            //return false;
+
+            return true;
         }
         
         /// <summary>

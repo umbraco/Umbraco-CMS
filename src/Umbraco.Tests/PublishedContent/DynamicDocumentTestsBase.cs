@@ -30,9 +30,6 @@ namespace Umbraco.Tests.PublishedContent
             _umbracoSettings = SettingsForTests.GenerateMockSettings();
             SettingsForTests.ConfigureSettings(_umbracoSettings);
 
-            var scriptingMock = Mock.Get(_umbracoSettings.Scripting);
-            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
-
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             // when they are requested, but we must declare those that we

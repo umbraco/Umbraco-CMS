@@ -42,7 +42,6 @@ namespace Umbraco.Tests.TestHelpers
             var providers = new Mock<IProvidersSection>();
             var help = new Mock<IHelpSection>();
             var routing = new Mock<IWebRoutingSection>();
-            var scripting = new Mock<IScriptingSection>();
 
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
@@ -57,7 +56,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Providers).Returns(providers.Object);
             settings.Setup(x => x.Help).Returns(help.Object);
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
-            settings.Setup(x => x.Scripting).Returns(scripting.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
             settings.Setup(x => x.Content.UseLegacyXmlSchema).Returns(false);

@@ -28,6 +28,5 @@
 
         IWebRoutingSection WebRouting { get; }
 
-        IScriptingSection Scripting { get; }
     }
 }
