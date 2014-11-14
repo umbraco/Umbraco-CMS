@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -24,9 +23,7 @@ namespace umbraco.NodeFactory
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
 	public class Node : INode
 	{
-		private Hashtable _aliasToNames = new Hashtable();
-
-		private bool _initialized = false;
+	    private bool _initialized = false;
 		private Nodes _children = new Nodes();
 		private Node _parent = null;
 		private int _id;

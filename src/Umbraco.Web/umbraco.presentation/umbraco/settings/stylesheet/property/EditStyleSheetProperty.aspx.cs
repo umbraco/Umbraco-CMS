@@ -25,7 +25,6 @@ namespace umbraco.cms.presentation.settings.stylesheet
         }
 
         private businesslogic.web.StylesheetProperty _stylesheetproperty;
-        private DropDownList _ddl = new DropDownList();
 
         protected void Page_Load(object sender, EventArgs e)
         {

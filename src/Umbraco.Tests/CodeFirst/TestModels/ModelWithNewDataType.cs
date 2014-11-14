@@ -1,15 +1,14 @@
 ﻿using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.editorControls.textfield;
-using umbraco.editorControls.tinyMCE3;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
     public class ModelWithNewDataType : ContentTypeBase
     {
-        [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(TextboxPropertyEditor), PropertyGroup = "Content")]
         public string Title { get; set; }
 
-        [PropertyType(typeof(tinyMCE3dataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(RichTextPropertyEditor), PropertyGroup = "Content")]
         public string BodyContent { get; set; } 
     }
 }

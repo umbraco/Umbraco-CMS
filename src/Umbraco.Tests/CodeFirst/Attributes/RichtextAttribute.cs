@@ -1,5 +1,5 @@
 ﻿using System;
-using umbraco.editorControls.tinyMCE3;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.CodeFirst.Attributes
 {
@@ -7,7 +7,7 @@ namespace Umbraco.Tests.CodeFirst.Attributes
     public class RichtextAttribute : PropertyTypeAttribute
     {
         public RichtextAttribute()
-            : base(typeof(tinyMCE3dataType))
+            : base(typeof(RichTextPropertyEditor))
         {
         }
     }

@@ -28,18 +28,7 @@ namespace Umbraco.Web.BaseRest
                 : s.ToLower().Split(Split, StringSplitOptions.RemoveEmptyEntries);
 		}
 
-	    static string GetAttribute(XmlNode node, string name)
-		{
-            if (node == null)
-                throw new ArgumentNullException("node");
-	        var attributes = node.Attributes;
-            if (attributes == null)
-                throw new ArgumentException(@"Node has no Attributes collection.", "node"); 
-			var attribute = attributes[name];
-			return attribute == null ? null : attribute.Value;
-		}
-
-		#endregion
+        #endregion
 
 		private RestExtensionMethodInfo()
 		{
