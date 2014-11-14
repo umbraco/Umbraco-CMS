@@ -14,6 +14,7 @@ ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %rel
 
 ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise you'd have to run build.cmd twice
 SET nuGetFolder=%CD%\..\src\packages\
+..\src\.nuget\NuGet.exe sources Remove -Name MyGetUmbracoCore
 ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/
 ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
 
