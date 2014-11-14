@@ -14,7 +14,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.editorControls;
-using umbraco.MacroEngines;
 using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
 using Umbraco.Web;
@@ -53,7 +52,6 @@ namespace Umbraco.Tests.Plugins
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-			        typeof(ICultureDictionary).Assembly,
 					typeof(UmbracoContext).Assembly,
 					typeof(BaseDataType).Assembly
 			    };
@@ -310,13 +308,6 @@ namespace Umbraco.Tests.Plugins
         {
             var types = PluginManager.Current.ResolveDataTypes();
             Assert.AreEqual(35, types.Count());
-        }
-
-        [Test]
-        public void Resolves_RazorDataTypeModels()
-        {
-            var types = PluginManager.Current.ResolveRazorDataTypeModels();
-            Assert.AreEqual(2, types.Count());
         }
 
         [Test]

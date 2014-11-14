@@ -377,7 +377,6 @@
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlConverterTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
-    <Compile Include="PublishedContent\LegacyExamineBackedMediaTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
@@ -445,7 +444,6 @@
     <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
     <Compile Include="PublishedContent\DynamicDocumentTestsBase.cs" />
-    <Compile Include="PublishedContent\DynamicNodeTests.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
@@ -609,10 +607,6 @@
     <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
-      <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
-      <Name>umbraco.MacroEngines</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.providers\umbraco.providers.csproj">
       <Project>{d7636876-0756-43cb-a192-138c6f0d5e42}</Project>

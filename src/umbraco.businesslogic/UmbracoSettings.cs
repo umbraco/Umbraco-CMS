@@ -8,7 +8,6 @@ using Umbraco.Core;
 using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using RazorDataTypeModelStaticMappingItem = umbraco.MacroEngines.RazorDataTypeModelStaticMappingItem;
 
 namespace umbraco
 {
@@ -185,24 +184,6 @@ namespace umbraco
         public static List<string> NotDynamicXmlDocumentElements
         {
             get { return UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.Select(x => x.Element).ToList(); }
-        }
-
-        public static List<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
-        {
-			get
-			{
-			    var mapping = UmbracoConfig.For.UmbracoSettings().Scripting.DataTypeModelStaticMappings;
-				
-				//now we need to map to the old object until we can clean all this nonsense up
-				return mapping.Select(x => new RazorDataTypeModelStaticMappingItem()
-					{
-						DataTypeGuid = x.DataTypeGuid,
-						NodeTypeAlias = x.NodeTypeAlias,
-						PropertyTypeAlias = x.PropertyTypeAlias,
-						Raw = string.Empty,
-						TypeName = x.MappingName
-					}).ToList();
-			}
         }
 
         /// <summary>

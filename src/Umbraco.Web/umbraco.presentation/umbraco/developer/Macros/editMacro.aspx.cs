@@ -89,7 +89,6 @@ namespace umbraco.cms.presentation.developer
 			macroName.Text = macro.Name;
 			macroAlias.Text = macro.Alias;
 			macroXslt.Text = macro.XsltPath;
-			macroPython.Text = macro.ScriptPath;
 		    cachePeriod.Text = macro.CacheDuration.ToInvariantString();
 			macroRenderContent.Checked = macro.DontRender == false;
 			macroEditor.Checked = macro.UseInEditor;
@@ -123,7 +122,6 @@ namespace umbraco.cms.presentation.developer
 			macro.ControlAssembly = macroAssemblyValue;
 			macro.ControlType = macroTypeValue;
 			macro.XsltPath = macroXslt.Text;
-			macro.ScriptPath = macroPython.Text;
 		}
 
 		private static void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
@@ -172,9 +170,6 @@ namespace umbraco.cms.presentation.developer
 			var razors = new ArrayList();
 			var razorDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
 			GetMacroScriptFilesFromDir(razorDir, razorDir, razors);
-			pythonFiles.DataSource = razors;
-			pythonFiles.DataBind();
-			pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
 		}
 
 		public void deleteMacroProperty(object sender, EventArgs e)
@@ -492,24 +487,6 @@ namespace umbraco.cms.presentation.developer
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
 		protected global::System.Web.UI.WebControls.PlaceHolder assemblyBrowser;
-
-		/// <summary>
-		/// macroPython control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.TextBox macroPython;
-
-		/// <summary>
-		/// pythonFiles control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.DropDownList pythonFiles;
 
 		/// <summary>
 		/// Pane1_3 control.

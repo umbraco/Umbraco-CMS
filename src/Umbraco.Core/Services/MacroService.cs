@@ -47,14 +47,8 @@ namespace Umbraco.Core.Services
                 return MacroTypes.Xslt;
 
             if (string.IsNullOrEmpty(macro.ScriptPath) == false)
-            {
-                //we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
-                //a partial view macro, not a script macro
-                //we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
-                return (macro.ScriptPath.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-                        || (Regex.IsMatch(macro.ScriptPath, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
-                           ? MacroTypes.PartialView
-                           : MacroTypes.Script;
+            {                
+                return MacroTypes.PartialView;
             }
 
             if (string.IsNullOrEmpty(macro.ControlType) == false && macro.ControlType.InvariantContains(".ascx"))

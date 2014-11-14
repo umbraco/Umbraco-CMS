@@ -2,11 +2,7 @@
 using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Linq.Dynamic;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Web.Management;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;

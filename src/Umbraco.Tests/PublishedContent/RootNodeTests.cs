@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using NUnit.Framework;
-using umbraco;
-using umbraco.MacroEngines;
 using Umbraco.Web;
-using Umbraco.Web.Models;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -38,39 +31,5 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNull(content);
         }
 
-        [Test]
-        public void LegacyDynamicNodeSortOfHasRootNode()
-        {
-            // there is a node with ID -1
-            var node = new DynamicNode(-1);
-            Assert.IsNotNull(node);
-            Assert.AreEqual(-1, node.Id);
-
-            // content at root
-            node = new DynamicNode(1046);
-            Assert.IsNotNull(node);
-            Assert.AreEqual(1, node.Level);
-
-            // has no parent
-            // (confirmed in 4.7 and 6.1)
-            Assert.IsNull(node.Parent);
-
-            // has siblings etc - no idea how we're supposed to get them?
-            //var siblings = node.Parent.Children; 
-            //Assert.AreEqual(2, siblings.Count());
-
-            // non-existing content is "zero node"
-            node = new DynamicNode(666, DynamicBackingItemType.Content); // set type to avoid Examine in tests
-            Assert.IsNotNull(node);
-            Assert.AreEqual(0, node.Id);
-        }
-
-        [Test]
-        public void Fix_U4_4374()
-        {
-            var node = new DynamicNode(-1);
-            var id = node.DescendantsOrSelf().First().Id;
-            Assert.AreEqual(-1, id);
-        }
     }
 }

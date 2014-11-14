@@ -82,12 +82,6 @@
                     <asp:PlaceHolder ID="assemblyBrowserUserControl" runat="server"></asp:PlaceHolder>
         </cc1:PropertyPanel>
 
-        <cc1:PropertyPanel runat="server" Text="Razor script">
-             <asp:TextBox ID="macroPython" runat="server" CssClass="guiInputText"></asp:TextBox>
-                    <asp:DropDownList ID="pythonFiles" runat="server">
-                    </asp:DropDownList>
-        </cc1:PropertyPanel>
-
         <asp:PlaceHolder runat="server" Visible="false">
               <asp:TextBox ID="macroAssembly" runat="server" CssClass="guiInputText"></asp:TextBox>
                     (Assembly)<br />

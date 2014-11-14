@@ -235,7 +235,7 @@ namespace Umbraco.Tests.PublishedContent
 				.FirstOrDefault();
 
 			Assert.IsNotNull(result);
-			Assert.IsTrue(result.GetType() == typeof(DynamicNull) || result.GetType() == typeof(umbraco.MacroEngines.DynamicNull));
+			Assert.IsTrue(result.GetType() == typeof(DynamicNull));
 			//Assert.AreEqual(typeof(DynamicNull), result.GetType());
 		}
 
@@ -259,7 +259,7 @@ namespace Umbraco.Tests.PublishedContent
 				.FirstOrDefault();
 
 			Assert.IsNotNull(result);
-			Assert.IsTrue(result.GetType() == typeof (DynamicNull) || result.GetType() == typeof (umbraco.MacroEngines.DynamicNull));
+			Assert.IsTrue(result.GetType() == typeof (DynamicNull));
 			//Assert.AreEqual(typeof (DynamicNull), result.GetType());
 		}
 

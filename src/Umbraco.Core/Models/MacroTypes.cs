@@ -19,10 +19,6 @@ namespace Umbraco.Core.Models
         [EnumMember]
         Unknown = 4,
         [EnumMember]
-        Python = 5,
-        [EnumMember]
-        Script = 6,
-        [EnumMember]
         PartialView = 7
     }
 }
