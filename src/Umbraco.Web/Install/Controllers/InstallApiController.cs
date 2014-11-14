@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -281,14 +278,5 @@ namespace Umbraco.Web.Install.Controllers
                 }
             }
         }
-
-        private HttpResponseMessage Json(object jsonObject, HttpStatusCode status)
-        {
-            var response = Request.CreateResponse(status);
-            var json = JObject.FromObject(jsonObject);
-            response.Content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            return response;
-        }
-
     }
 }

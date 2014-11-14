@@ -192,12 +192,5 @@ namespace UmbracoExamine
                     e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
             }
         }
-
-        private static XElement GetMemberItem(int nodeId)
-        {
-			//TODO: Change this so that it is not using the LegacyLibrary, just serialize manually!
-            var nodes = LegacyLibrary.GetMember(nodeId);
-            return XElement.Parse(nodes.Current.OuterXml);
-        }
     }
 }

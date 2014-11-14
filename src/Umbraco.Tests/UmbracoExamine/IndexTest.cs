@@ -192,8 +192,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		#region Private methods and properties
 
-		private readonly TestContentService _contentService = new TestContentService();
-		private readonly TestMediaService _mediaService = new TestMediaService();
+	    private readonly TestMediaService _mediaService = new TestMediaService();
 
 		private static UmbracoExamineSearcher _searcher;
 		private static UmbracoContentIndexer _indexer;

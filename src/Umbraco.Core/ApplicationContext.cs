@@ -208,13 +208,7 @@ namespace Umbraco.Core
 			}			
 		}
 
-        private void AssertIsReady()
-        {
-            if (!this.IsReady)
-                throw new Exception("ApplicationContext is not ready yet.");
-        }
-
-        private void AssertIsNotReady()
+	    private void AssertIsNotReady()
         {
             if (this.IsReady)
                 throw new Exception("ApplicationContext has already been initialized.");

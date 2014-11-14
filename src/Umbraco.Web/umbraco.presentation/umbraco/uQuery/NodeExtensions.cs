@@ -507,17 +507,6 @@ namespace umbraco
         /// <summary>
         /// Get a string value for the supplied property alias
         /// </summary>
-        /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
-        /// <param name="propertyAlias">alias of propety to get</param>
-        /// <returns>empty string, or property value as string</returns>
-        private static string GetPropertyAsString(this Node node, string propertyAlias)
-        {
-            return GetPropertyAsString((INode)node, propertyAlias);
-        }
-
-        /// <summary>
-        /// Get a string value for the supplied property alias
-        /// </summary>
         /// <param name="node">an umbraco.interfaces.INode object</param>
         /// <param name="propertyAlias">alias of propety to get</param>
         /// <returns>empty string, or property value as string</returns>
@@ -532,17 +521,6 @@ namespace umbraco
             }
 
             return propertyValue;
-        }
-
-        /// <summary>
-        /// Get a boolean value for the supplied property alias (works with built in Yes/No dataype)
-        /// </summary>
-        /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
-        /// <param name="propertyAlias">alias of propety to get</param>
-        /// <returns>true if can cast value, else false for all other circumstances</returns>
-        private static bool GetPropertyAsBoolean(this Node node, string propertyAlias)
-        {
-            return GetPropertyAsBoolean((INode)node, propertyAlias);
         }
 
         /// <summary>

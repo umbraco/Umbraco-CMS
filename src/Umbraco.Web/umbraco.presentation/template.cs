@@ -280,7 +280,7 @@ namespace umbraco
                             macro tempMacro;
                             String macroID = helper.FindAttribute(attributes, "macroid");
                             if (macroID != String.Empty)
-                                tempMacro = getMacro(macroID);
+                                tempMacro = GetMacro(macroID);
                             else
                                 tempMacro = macro.GetMacro(helper.FindAttribute(attributes, "macroalias"));
 
@@ -409,7 +409,7 @@ namespace umbraco
                     String macroID = helper.FindAttribute(attributes, "macroid");
                     if (macroID != "")
                     {
-                        macro tempMacro = getMacro(macroID);
+                        macro tempMacro = GetMacro(macroID);
                         _templateOutput.Replace(tag.Value.ToString(), tempMacro.MacroContent.ToString());
                     }
                 }
@@ -427,7 +427,7 @@ namespace umbraco
                                 String macroID = helper.FindAttribute(tempAttributes, "macroid");
                                 if (Convert.ToInt32(macroID) > 0)
                                 {
-                                    macro tempContentMacro = getMacro(macroID);
+                                    macro tempContentMacro = GetMacro(macroID);
                                     _templateOutput.Replace(tag.Value.ToString(), tempContentMacro.MacroContent.ToString());
                                 }
 
@@ -452,20 +452,11 @@ namespace umbraco
 
         #region private methods
 
-        private macro getMacro(String macroID)
+        private static macro GetMacro(String macroID)
         {
             System.Web.HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroID.ToString() + ")");
             return macro.GetMacro(Convert.ToInt16(macroID));
         }
-
-        private String FindAttribute(Hashtable attributes, String key)
-        {
-            if (attributes[key] != null)
-                return attributes[key].ToString();
-            else
-                return "";
-        }
-
 
         #endregion
 

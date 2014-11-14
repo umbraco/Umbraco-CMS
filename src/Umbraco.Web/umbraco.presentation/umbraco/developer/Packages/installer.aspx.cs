@@ -337,14 +337,6 @@ namespace umbraco.presentation.developer.packages
         }
 
         /// <summary>
-        /// Runs Post refresh actions such reloading the correct tree nodes, etc...
-        /// </summary>
-        private void PerformPostRefreshAction()
-        {
-            BasePage.Current.ClientTools.ReloadActionNode(true, true);
-        }
-
-        /// <summary>
         /// Runs Post install actions such as clearning any necessary cache, reloading the correct tree nodes, etc...
         /// </summary>
         /// <param name="packageId"></param>

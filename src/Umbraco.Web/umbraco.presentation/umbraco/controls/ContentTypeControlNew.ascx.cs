@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -24,7 +23,6 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
 using umbraco.presentation;
 using umbraco.BasePages;
@@ -476,113 +474,7 @@ namespace umbraco.controls
             else
                 lt_icon.Text = _contentType.IconUrl.TrimStart('.');
 
-            /*
-            var dirInfo = new DirectoryInfo(Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
-            var fileInfo = dirInfo.GetFiles();
-
-            var spriteFileNames = CMSNode.DefaultIconClasses.Select(IconClassToIconFileName).ToList();
-            var diskFileNames = fileInfo.Select(FileNameToIconFileName).ToList();
-            var listOfIcons = new List<ListItem>();
-            // .sprNew was never intended to be in the document type editor
-            foreach (var iconClass in CMSNode.DefaultIconClasses.Where(iconClass => iconClass.Equals(".sprNew", StringComparison.InvariantCultureIgnoreCase) == false))
-            {
-                // Still shows the selected even if we tell it to hide sprite duplicates so as not to break an existing selection
-                if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false
-                    && UmbracoConfiguration.Current.UmbracoSettings.Content.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
-                    && diskFileNames.Contains(IconClassToIconFileName(iconClass)))
-                    continue;
-                
-                AddSpriteListItem(iconClass, listOfIcons);
-            }
-
-            foreach (var file in fileInfo)
-            {
-                // NH: don't show the sprite file
-                if (file.Name.ToLowerInvariant() == "sprites.png".ToLowerInvariant() || file.Name.ToLowerInvariant() == "sprites_ie6.gif".ToLowerInvariant())
-                    continue;
-
-                // Still shows the selected even if we tell it to hide file duplicates so as not to break an existing selection
-                if (_contentType.IconUrl.Equals(file.Name, StringComparison.InvariantCultureIgnoreCase) == false
-                    && UmbracoConfiguration.Current.UmbracoSettings.Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
-                    && spriteFileNames.Contains(FileNameToIconFileName(file)))
-                    continue;
-
-                var listItemValue = ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + file.Name);
-
-                AddFileListItem(file.Name, listItemValue, listOfIcons);
-            }
-
-            ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
-
-            
-            // Get thumbnails
-            dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
-            fileInfo = dirInfo.GetFiles();
-
-            foreach (var file in fileInfo)
-            {
-                var li = new ListItem(file.Name);
-                li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + file.Name));
-                
-                if (this.Page.IsPostBack == false && li.Value == _contentType.Thumbnail) 
-                    li.Selected = true;
-
-               // ddlThumbnails.Items.Add(li);
-            }
-
-            
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", string.Format(@"
-function refreshDropDowns() {{
-    jQuery('#{1}').msDropDown({{ showIcon: true, style: 'width:250px;' }});
-    jQuery('#{3}').msDropDown({{ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' }});
-}}
-jQuery(document).ready(function() {{ refreshDropDowns(); }});
-", ddlIcons.ClientID, ddlIcons.ClientID, ddlIcons.ClientID, ddlThumbnails.ClientID, 500), true);
-            txtName.Text = _contentType.GetRawText();
-            txtAlias.Text = _contentType.Alias;
-            description.Text = _contentType.GetRawDescription();
-            */
         }
-
-        private void AddSpriteListItem(string iconClass, ICollection<ListItem> listOfIcons)
-        {
-            var li = new ListItem(
-                      helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1)))
-                      .Replace("Spr Tree", "")
-                      .Trim(), iconClass);
-
-            li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
-            li.Attributes.Add("style", "padding-left:24px !important; background-repeat:no-repeat; width:auto; height:auto;");
-
-            AddListItem(listOfIcons, li);
-        }
-
-        private void AddFileListItem(string fileName, string listItemValue, ICollection<ListItem> listOfIcons)
-        {
-            var li = new ListItem(fileName, fileName);
-
-            li.Attributes.Add("title", listItemValue);
-
-            AddListItem(listOfIcons, li);
-        }
-
-        private void AddListItem(ICollection<ListItem> listOfIcons, ListItem li)
-        {
-            if (this.Page.IsPostBack == false && li.Value == _contentType.IconUrl)
-                li.Selected = true;
-
-            listOfIcons.Add(li);
-        }
-
-        private static string IconClassToIconFileName(string iconClass)
-        {
-            return iconClass.Substring(1, iconClass.Length - 1).ToLowerInvariant().Replace("sprTree".ToLowerInvariant(), "");
-        }
-
-        private static string FileNameToIconFileName(FileInfo file)
-        {
-            return file.Name.Substring(0, file.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLowerInvariant();
-        }        
 
         #endregion
 
@@ -1068,18 +960,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     }
                 }
             }
-        }
-
-        private bool DoesPropertyTypeAliasExist(GenericProperty gpData)
-        {
-            bool hasAlias = _contentType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
-            ContentType ct = _contentType;
-            while (ct.MasterContentType > 0)
-            {
-                ct = new ContentType(ct.MasterContentType);
-                hasAlias = ct.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
-            }
-            return !hasAlias;
         }
 
         /// <summary>

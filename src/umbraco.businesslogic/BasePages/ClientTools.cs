@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Web;
 using umbraco.BasePages;
 using System.Web.UI;
 using Umbraco.Core.IO;
@@ -326,12 +325,7 @@ namespace umbraco.BasePages
 			return this;
 		}
 
-		private Page GetCurrentPage()
-		{
-			return HttpContext.Current.CurrentHandler as Page;
-		}
-
-        /// <summary>
+	    /// <summary>
         /// This will use the ScriptManager to register the script if one is available, otherwise will default to the ClientScript
         /// class of the page.
         /// </summary>
