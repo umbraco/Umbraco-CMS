@@ -2,9 +2,18 @@
 IF NOT EXIST UmbracoVersion.txt (
 	ECHO UmbracoVersion.txt missing!
 	GOTO :showerror
-) 
-SET /p release=<UmbracoVersion.txt
-SET comment=
+)
+
+REM Get the version and comment from UmbracoVersion.txt lines 2 and 3
+SET "release="
+SET "comment="
+FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
+FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED comment SET "comment=%%i"
+
+REM If there's arguments on the command line overrule UmbracoVersion.txt and use that as the version
+IF [%1] NEQ [] (SET release=%1)
+IF [%2] NEQ [] (SET comment=%2) ELSE (SET "comment=")
+
 SET version=%release%
 
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
@@ -33,21 +42,22 @@ ECHO Performing MSBuild and producing Umbraco binaries zip files
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
 
 ECHO Adding dummy files to include in the NuGet package so that empty folders actually get created
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\App_Code\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\App_Data\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\App_Plugins\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\css\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\masterpages\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\media\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\scripts\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\usercontrols\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\Views\Partials\dummy.txt
-echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\Views\MacroPartials\dummy.txt
+SET dummytext=This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete.
+ECHO %dummytext% > .\_BuildOutput\WebApp\App_Code\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\App_Data\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\App_Plugins\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\css\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\masterpages\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\media\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\scripts\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\usercontrols\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\Views\Partials\dummy.txt
+ECHO %dummytext% > .\_BuildOutput\WebApp\Views\MacroPartials\dummy.txt
 
 ECHO Adding Web.config transform files to the NuGet package
-ren .\_BuildOutput\WebApp\MacroScripts\Web.config Web.config.transform
-ren .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
-ren .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
+REN .\_BuildOutput\WebApp\MacroScripts\Web.config Web.config.transform
+REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
+REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO Packing the NuGet release files
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
