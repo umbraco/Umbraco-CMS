@@ -12,7 +12,7 @@ FOR /F "skip=2 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED comment SE
 
 REM If there's arguments on the command line overrule UmbracoVersion.txt and use that as the version
 IF [%1] NEQ [] (SET release=%1)
-IF [%2] NEQ [] (SET comment=%2) ELSE (SET "comment=")
+IF [%2] NEQ [] (SET comment=%2) ELSE (IF [%1] NEQ [] (SET "comment="))
 
 SET version=%release%
 
