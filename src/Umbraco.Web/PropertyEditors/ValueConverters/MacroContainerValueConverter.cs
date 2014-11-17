@@ -14,6 +14,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// </summary>
     [PropertyValueType(typeof (IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
+    [DefaultPropertyValueConverter]
     public class MacroContainerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
