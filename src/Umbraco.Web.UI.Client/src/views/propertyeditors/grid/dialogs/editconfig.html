@@ -21,6 +21,10 @@
         <div class="umb-panel-footer">
             <div class="umb-el-wrap umb-panel-buttons">
                 <div class="btn-toolbar umb-btn-toolbar pull-right">
+                    <a href ng-click="close()" class="btn btn-link">
+                         <localize key="general_cancel">Cancel</localize>
+                    </a>
+
                     <a href ng-click="saveAndClose(gridConfigEditor.$valid)" class="btn btn-primary">
                         <localize key="buttons_save">Save</localize>
                     </a>
