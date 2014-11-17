@@ -7,9 +7,9 @@
 
 	<div ng-if="control.value">
 		<img
-			ng-if="control.value"
+			ng-if="url"
 			ng-click="setImage()"
-			ng-src="{{control.value.image}}"
+			ng-src="{{url}}"
 			class="fullSizeImage" />
 		<input type="text" class="caption" ng-model="control.value.caption" placeholder="Image caption..."/>
  	</div>
