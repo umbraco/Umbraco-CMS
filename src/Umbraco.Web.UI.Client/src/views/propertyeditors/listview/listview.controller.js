@@ -86,8 +86,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 $scope.pagination[i] = { index: i, name: i + 1 };
             }
 
+            //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
+            // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
+            // available page and then re-load again
             if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
+
+                //reload!
+                $scope.reloadView(id);
             }
 
         });

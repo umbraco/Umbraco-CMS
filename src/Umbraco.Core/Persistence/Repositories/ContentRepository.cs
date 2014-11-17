@@ -694,7 +694,10 @@ namespace Umbraco.Core.Persistence.Repositories
             IEnumerable<IContent> result;
             var pagedResult = Database.Page<DocumentDto>(pageNumber, pageSize, modifiedSQL, sql.Arguments);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            if (totalRecords > 0)
+            //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
+            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in 
+            // the pageResult, then the GetAll will actually return ALL records in the db.
+            if (pagedResult.Items.Any())
             {
                 // Parse out node Ids and load content (we need the cast here in order to be able to call the IQueryable extension
                 // methods OrderBy or OrderByDescending)
