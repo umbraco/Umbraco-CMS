@@ -2078,14 +2078,14 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Views\Partials\Grid\bootstrap3.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\embed.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\macro.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\media.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\rte.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\textstring.cshtml" />
-    <Content Include="Views\Partials\Grid\bootstrap2.cshtml" />
-    <Content Include="Views\Partials\Grid\Editors\base.cshtml" />
+    <Content Include="Views\Partials\Grid\Bootstrap3.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\Embed.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\Macro.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\Media.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\Rte.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\Textstring.cshtml" />
+    <Content Include="Views\Partials\Grid\Bootstrap2.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
