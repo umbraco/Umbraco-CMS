@@ -44,7 +44,7 @@ angular.module("umbraco.directives")
 										scope.height,
 										scope.maxSize, 
 										scope.maxSize, 
-										true);
+										false);
 
 								//so if we have a max size, override the thumb sizes
 								scope.width = ratioCalculation.width;
