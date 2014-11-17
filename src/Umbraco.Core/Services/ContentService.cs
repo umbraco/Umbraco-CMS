@@ -507,7 +507,7 @@ namespace Umbraco.Core.Services
                 
                 var query = Query<IContent>.Builder;
                 //if the id is -1, then just get all
-                if (id > 0)
+                if (id != -1)
                 {
                     query.Where(x => x.ParentId == id);
                 }
@@ -537,7 +537,7 @@ namespace Umbraco.Core.Services
 
                 var query = Query<IContent>.Builder;
                 //if the id is -1, then just get all
-                if (id > 0)
+                if (id != -1)
                 {
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
