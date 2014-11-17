@@ -728,6 +728,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
 
+            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in 
+            // the pageResult, then the GetAll will actually return ALL records in the db.
+            if (pagedResult.Items.Any())
 
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
