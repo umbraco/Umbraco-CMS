@@ -2085,6 +2085,7 @@
     <Content Include="Views\Partials\Grid\Editors\rte.cshtml" />
     <Content Include="Views\Partials\Grid\Editors\textstring.cshtml" />
     <Content Include="Views\Partials\Grid\bootstrap2.cshtml" />
+    <Content Include="Views\Partials\Grid\Editors\base.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
