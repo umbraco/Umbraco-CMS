@@ -38,24 +38,29 @@ angular.module("umbraco")
                 }
             }
 
-            $scope.addTag = function (e) {
+            $scope.addTagOnEnter = function (e) {
                 var code = e.keyCode || e.which;
                 if (code == 13) { //Enter keycode   
-
-                    //ensure that we're not pressing the enter key whilst selecting a typeahead value from the drop down
                     if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
                         //this is required, otherwise the html form will attempt to submit.
                         e.preventDefault();
-                        //we need to use jquery because typeahead duplicates the text box
-                        addTag($scope.tagToAdd);
-                        $scope.tagToAdd = "";
-                        //this clears the value stored in typeahead so it doesn't try to add the text again
-                        // http://issues.umbraco.org/issue/U4-4947
-                        $typeahead.typeahead('val', '');
+                        
+                        $scope.addTag();
                     }
-
                 }
             };
+
+            $scope.addTag = function () {
+                //ensure that we're not pressing the enter key whilst selecting a typeahead value from the drop down
+                //we need to use jquery because typeahead duplicates the text box
+                addTag($scope.tagToAdd);
+                $scope.tagToAdd = "";
+                //this clears the value stored in typeahead so it doesn't try to add the text again
+                // http://issues.umbraco.org/issue/U4-4947
+                $typeahead.typeahead('val', '');
+            };
+
+
 
             $scope.removeTag = function (tag) {
                 var i = $scope.currentTags.indexOf(tag);
