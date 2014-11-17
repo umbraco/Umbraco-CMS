@@ -32,7 +32,7 @@
 
             </div> <!-- .templates-preview-rows -->
 
-            <p><span class="help-text">Add rows to your layout</span></p>
+            <p><span class="help-text"><localize key="grid_addRows"/></span></p>
 
 
         </div> <!-- .templates-preview -->
@@ -67,8 +67,8 @@
                                          ng-mouseleave="disableWarnhighlightRow(row)">
 
                                         <span ng-if="deletePrompt">
-                                            Are you sure?
-                                            <a href style="text-decoration: underline" ng-click="removeRow(section, $index)">Yes</a>
+                                            <localize key="general_areyousure"/>
+                                            <a href style="text-decoration: underline" ng-click="removeRow(section, $index)"><localize key="general_yes"/></a>
                                         </span>
 
                                         <i ng-if="!deletePrompt" class="icon icon-trash"></i>
@@ -131,8 +131,8 @@
                                                                  ng-mouseleave="disableWarnhighlightControl(control)">
 
                                                                 <span ng-show="deletePrompt">
-                                                                    Are you sure?
-                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)">Yes</a>
+                                                                    <localize key="general_areyousure"/>
+                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)"><localize key="general_yes"/></a>
                                                                 </span>
 
                                                                 <i ng-show="!deletePrompt" class="icon icon-trash"></i>
@@ -178,8 +178,7 @@
                                                 <div class="usky-control usky-control-placeholder"
                                                      ng-if="area.controls.length == 0">
                                                     <div class="help-text" style="margin-bottom: 15px">
-                                                        To start, click the <i class=" icon icon-add blue">
-                                                        </i> below and add your first element
+                                                        <localize key="grid_addElement"/>
                                                     </div><br />
                                                 </div>
 
@@ -237,7 +236,7 @@
 
 
                         <p>
-                            <span class="help-text">Add rows to your layout</span>
+                            <span class="help-text"><localize key="grid_addRows" /></span>
                         </p>
 
 

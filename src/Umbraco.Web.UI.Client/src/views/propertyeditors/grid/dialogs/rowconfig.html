@@ -3,10 +3,10 @@ ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
     <div class="umb-panel-body no-header with-footer">
         <div class="umb-forms-settings">
 
-            <h5>Row configuration</h5>
-            <p>Adjust the row by setting cell widths and adding additional cells</p>
+            <h5><localize key="grid_addRowConfiguration" /></h5>
+            <p><localize key="grid_addRowConfigurationDetail" /></p>
             
-            <umb-control-group label="Name">
+            <umb-control-group label="@general_name">
                 <input type="text" ng-model="currentRow.name" />
             </umb-control-group>
 
@@ -34,7 +34,7 @@ ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
 
             <div ng-if="currentCell" style="padding-bottom: 50px;">
 
-                <umb-control-group label="Width">
+                <umb-control-group label="@general_width">
                     <div  class="grid-size-scaler" >
                         <div class="grid-size-scaler">
                             <a href ng-click="scaleDown(currentCell)">
@@ -57,7 +57,7 @@ ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
                                     ng-model="currentCell.allowAll"
                                     ng-checked="currentCell.allowed === undefined"
                                     ng-change="toggleCollection(currentCell.allowed, currentCell.allowAll)" />
-                                    Allow all editors
+                                    <localize key="grid_allowAllEditors"/>
                             </label>
                         </li>
                     </ul>
