@@ -369,37 +369,53 @@ AND umbracoNode.id <> @id",
             }
 
             var sortOrder = 1;
+			var newAlias = 0;
 
-            foreach (var pre in values)
-            {
-                var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
-                if (existing != null)
-                {
-                    existing.Value = pre.Value.Value;
-                    existing.SortOrder = sortOrder;
-                    _preValRepository.AddOrUpdate(new PreValueEntity
-                    {
-                        //setting an id will update it
-                        Id = existing.Id,
-                        Alias = existing.Alias,                        
-                        SortOrder = existing.SortOrder,
-                        Value = existing.Value,
-                        DataType = dataType,
-                    });
-                }
-                else
-                {
-                    _preValRepository.AddOrUpdate(new PreValueEntity
-                    {
-                        Alias = pre.Key,
-                        SortOrder = sortOrder,
-                        Value = pre.Value.Value,
-                        DataType = dataType,
-                    });
-                }
+			foreach (var pre in values)
+			{
+				var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
+				if (existing != null)
+				{
+					existing.Value = pre.Value.Value;
+					existing.SortOrder = sortOrder;
+					_preValRepository.AddOrUpdate(new PreValueEntity
+					{
+						//setting an id will update it
+						Id = existing.Id,
+						Alias = existing.Alias,                        
+						SortOrder = existing.SortOrder,
+						Value = existing.Value,
+						DataType = dataType,
+					});
+				}
+				else
+				{
+					// adding new prevalue so make sure our alias is unique by adding 1 to the largest existing (or newly added already within this batch)
+					if (newAlias > 0)
+					{
+						newAlias++;
+					}
+					else
+					{
+						newAlias =
+							Database.ExecuteScalar<int>(
+								"SELECT (coalesce(max(alias), 0) + 1) " +
+								"FROM cmsDataTypePreValues " +
+								"WHERE datatypeNodeId = @datatypeNodeId",
+								new { datatypeNodeId = dataType.Id });
+					}
 
-                sortOrder++;
-            }
+					_preValRepository.AddOrUpdate(new PreValueEntity
+					{
+						Alias = Convert.ToString(newAlias),
+						SortOrder = sortOrder,
+						Value = pre.Value.Value,
+						DataType = dataType,
+					});
+				}
+
+				sortOrder++;
+			}
 
         }
 
