@@ -7,6 +7,7 @@ angular.module("umbraco")
         $scope.setMacro = function(){
             dialogService.macroPicker({
                 dialogData: {
+                    richTextEditor: true,  
                     macroData: $scope.control.value
                 },
                 callback: function (data) {
