@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             }
             else
             {
-                //If we are on SQLServer, we need to delete constraints by name, older versions of umbraco did not name these default constraints
+                //If we are on SQLServer, we need to delete default constraints by name, older versions of umbraco did not name these default constraints
                 // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
                 // http://issues.umbraco.org/issue/U4-4133
                 var sqlServerSyntaxProvider = new SqlServerSyntaxProvider();
@@ -51,16 +51,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
             Delete.Column("macroPropertyHidden").FromTable("cmsMacroProperty");
 
-            if (Context.CurrentDatabaseProvider != DatabaseProviders.SqlServer)
+            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
                 Delete.ForeignKey().FromTable("cmsMacroProperty").ForeignColumn("macroPropertyType").ToTable("cmsMacroPropertyType").PrimaryColumn("id");
             }
             else
             {
-                //If we are on SQLServer, we need to delete constraints by name, older versions of umbraco did not name these key constraints
-                // consistently so we need to look up the constraint name to delete, this only pertains to SQL Server and this issue:
-                // http://issues.umbraco.org/issue/U4-4133
-
+                //Before we try to delete this constraint, we'll see if it exists first, some older schemas never had it and some older schema's had this named
+                // differently than the default.
+                
                 var keyConstraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct();
                 var constraint = keyConstraints
                     .SingleOrDefault(x => x.Item1 == "cmsMacroProperty" && x.Item2 == "macroPropertyType" && x.Item3.InvariantStartsWith("PK_") == false);
