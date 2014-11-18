@@ -2,10 +2,20 @@
 @using Umbraco.Web.Templates
 
 @if (Model.value != null)
-{ 
-    <div class="thumbnail">
-        <img src="@Model.value.image" alt="@Model.value.caption">
-    </div>
+{   
+    var url = Model.value.image;
+    if(Model.editor.config != null && Model.editor.config.size != null){
+        url += "?width=" + Model.editor.config.size.width;
+        url += "&height=" + Model.editor.config.size.height;
+
+        if(Model.value.focalPoint != null){
+            url += "&center=" + Model.value.focalPoint.top +"," + Model.value.focalPoint.left;
+            url += "&mode=crop";
+        }
+    }
+    
+    <img src="@url" alt="@Model.value.caption">
+    
     if (Model.value.caption != null)
     {
         <p class="caption">@Model.value.caption</p>
