@@ -308,7 +308,11 @@ namespace Umbraco.Core.Persistence.Repositories
             IEnumerable<TEntity> result;
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
-            if (totalRecords > 0)
+
+            //NOTE: We need to check the actual items returned, not the 'totalRecords', that is because if you request a page number
+            // that doesn't actually have any data on it, the totalRecords will still indicate there are records but there are none in 
+            // the pageResult, then the GetAll will actually return ALL records in the db.
+            if (pagedResult.Items.Any())
             {
                 //Crete the inner paged query that was used above to get the paged result, we'll use that as the inner sub query
                 var args = sqlNodeIdsWithSort.Arguments;

@@ -562,7 +562,14 @@ namespace Umbraco.Core.Persistence
 					{
 						object val = cmd.ExecuteScalarWithRetry();
 						OnExecutedCommand(cmd);
-						return (T)Convert.ChangeType(val, typeof(T));
+
+                        if (val == null || val == DBNull.Value)
+                            return default(T);
+
+                        Type t = typeof(T);
+                        Type u = Nullable.GetUnderlyingType(t);
+
+                        return (T)Convert.ChangeType(val, u ?? t);
 					}
 				}
 				finally

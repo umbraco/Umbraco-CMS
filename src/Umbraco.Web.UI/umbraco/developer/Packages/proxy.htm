@@ -7,15 +7,16 @@
 
     <script type="text/javascript">
         
-        //This is a genius way of parsing a uri
+        //This is a stupid way of parsing a uri
         //https://gist.github.com/jlong/2428561
 
         try {
+		
             var parser = document.createElement('a');
             parser.href = window.location.search.substring(1);
 
             // => "http:"
-            if (!parser.protocol || (parser.protocol.toLowerCase() != "http:" && parser.protocol.toLowerCase() != "https:")) {
+            if (parser.protocol && (parser.protocol.toLowerCase() != "http:" && parser.protocol.toLowerCase() != "https:")) {
                 throw "invalid protocol";
             };
 
@@ -27,13 +28,13 @@
             //parser.port;     // => "3000"
 
             // => "/pathname/"
-            if (!parser.pathname || ((parser.pathname.length - parser.pathname.indexOf("/developer/packages/installer.aspx")) != "/developer/packages/installer.aspx".length))
+            if (!parser.pathname || ((parser.pathname.length - parser.pathname.toLowerCase().indexOf("/developer/packages/installer.aspx")) != "/developer/packages/installer.aspx".length))
             {
                 throw "invalid pathname";
             }
             
             // => "?search=test"
-            if (!parser.search || parser.search.indexOf("?repoGuid") != 0) {
+            if (!parser.search || parser.search.toLowerCase().indexOf("?repoguid") != 0) {
                 throw "invalid search";
             }
             

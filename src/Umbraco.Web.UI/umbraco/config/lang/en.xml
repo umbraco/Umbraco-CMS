@@ -245,6 +245,7 @@
     <key alias="entername">Enter a name...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
+    <key alias="enterTags">Type to enter tags...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -841,6 +842,39 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="quickGuide">Quick Guide to Umbraco template tags</key>
     <key alias="template">Template</key>
   </area>
+
+
+  <area alias="grid">
+    <key alias="insertControl">Insert control</key>
+    <key alias="addRows">Add rows to your layout</key>
+    <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
+
+    <key alias="gridLayouts">Grid layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two differnt layouts</key>
+    <key alias="addGridLayout">Add grid layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+    
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+  </area>
+
   <area alias="templateEditor">
     <key alias="alternativeField">Alternative field</key>
     <key alias="alternativeText">Alternative Text</key>
