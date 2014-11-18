@@ -187,7 +187,7 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("general", "email"),
                         Value = display.Email,
                         View = "email",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
+                        Validation = { Mandatory = true }        
                     },
                 new ContentPropertyDisplay
                     {
@@ -259,7 +259,7 @@ namespace Umbraco.Web.Models.Mapping
             if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
             {
                 prop.View = "textbox";
-                prop.Config = new Dictionary<string, object> {{"IsRequired", true}};
+                prop.Validation.Mandatory = true;
             }
             else
             {
