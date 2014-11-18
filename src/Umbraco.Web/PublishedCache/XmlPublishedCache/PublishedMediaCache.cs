@@ -197,32 +197,25 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 () => id);
 
 			var media = global::umbraco.library.GetMedia(id, true);
-			if (media != null && media.Current != null)
-			{
-				media.MoveNext();
-				var moved = media.Current.MoveToFirstChild();
-				//first check if we have an error
-				if (moved)
-				{
-					if (media.Current.Name.InvariantEquals("error"))
-					{
-						return null;
-					}	
-				}
-				if (moved)
-				{
-					//move back to the parent and return
-					media.Current.MoveToParent();	
-				}
-				return ConvertFromXPathNavigator(media.Current);
-			}
+
+		    return ConvertFromXPathNodeIterator(media, id);
+		}
+
+        internal IPublishedContent ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
+	    {
+            if (media != null && media.Current != null)
+            {
+                return media.Current.Name.InvariantEquals("error") 
+                    ? null 
+                    : ConvertFromXPathNavigator(media.Current);
+            }
 
             LogHelper.Debug<PublishedMediaCache>(
                 "Could not retrieve media {0} from Examine index or from legacy library.GetMedia method",
                 () => id);
 
-			return null;
-		}
+            return null;
+	    }
 
 		internal IPublishedContent ConvertFromSearchResult(SearchResult searchResult)
 		{
