@@ -6,6 +6,7 @@ using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
@@ -418,7 +419,7 @@ namespace Umbraco.Tests.Models
             Assert.That(content.Properties["title"], Is.Not.Null);
             Assert.That(content.Properties["title"].Alias, Is.EqualTo("title"));
             Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
-            Assert.That(content.Properties["metaDescription"].Value, Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(content.Properties["description"].Value, Is.EqualTo("This is the meta description for a textpage"));
         }
 
         [Test]
@@ -612,9 +613,9 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Contains("author"), Is.True);
             Assert.That(content.Properties.Contains("keywords"), Is.True);
-            Assert.That(content.Properties.Contains("metaDescription"), Is.True);
+            Assert.That(content.Properties.Contains("description"), Is.True);
             Assert.That(content.Properties["keywords"].Value, Is.EqualTo("text,page,meta"));
-            Assert.That(content.Properties["metaDescription"].Value, Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(content.Properties["description"].Value, Is.EqualTo("This is the meta description for a textpage"));
         }
 
         [Test]
@@ -631,7 +632,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Contains("author"), Is.True);
             Assert.That(content.Properties.Contains("keywords"), Is.False);
-            Assert.That(content.Properties.Contains("metaDescription"), Is.False);
+            Assert.That(content.Properties.Contains("description"), Is.False);
         }
 
         [Test]
@@ -828,7 +829,7 @@ namespace Umbraco.Tests.Models
         public void Can_Avoid_Circular_Dependencies_In_Composition()
         {
             var textPage = MockedContentTypes.CreateTextpageContentType();
-            var parent = MockedContentTypes.CreateSimpleContentType("parent", "Parent");
+            var parent = MockedContentTypes.CreateSimpleContentType("parent", "Parent", null, true);
             var meta = MockedContentTypes.CreateMetaContentType();
             var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(
                                                                                     new List<PropertyType>
@@ -863,7 +864,9 @@ namespace Umbraco.Tests.Models
             var addedMetaMixin2 = mixin2.AddContentType(meta);
             var addedMixin2 = mixin1.AddContentType(mixin2);
             var addedMeta = parent.AddContentType(meta);
+
             var addedMixin1 = parent.AddContentType(mixin1);
+
             var addedMixin1Textpage = textPage.AddContentType(mixin1);
             var addedTextpageParent = parent.AddContentType(textPage);
 

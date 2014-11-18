@@ -69,7 +69,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     title = name + " textpage",
                     bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
                     keywords = "text,page,meta",
-                    metaDescription = "This is the meta description for a textpage"
+                    description = "This is the meta description for a textpage"
                 };
 
             content.PropertyValues(obj);
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                         title = name + " title",
                         bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
                         keywords = "text,page,meta",
-                        metaDescription = "This is the meta description for a textpage"
+                        description = "This is the meta description for a textpage"
                     };
 
                 content.PropertyValues(obj);
