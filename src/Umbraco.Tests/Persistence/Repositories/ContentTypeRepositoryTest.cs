@@ -193,8 +193,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {                
                 var ctMain = MockedContentTypes.CreateSimpleContentType();
-                var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain);
-                var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1);
+                var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
+                var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true);
                 
                 repository.AddOrUpdate(ctMain);
                 repository.AddOrUpdate(ctChild1);
@@ -282,14 +282,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Act                
-                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("metaDescription");
+                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("description");
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
                 var result = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Assert
-                Assert.That(result.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
+                Assert.That(result.PropertyTypes.Any(x => x.Alias == "description"), Is.False);
                 Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(result.PropertyGroups.Count));
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(result.PropertyTypes.Count()));
             }
@@ -434,7 +434,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
-                Assert.That(subpage.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+                Assert.That(subpage.Properties.First(x => x.Alias == "description").Value, Is.EqualTo("This is the meta description for a textpage"));
             }
         }
 
@@ -534,7 +534,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Assert
                 var updated = contentRepository.Get(subpage.Id);
                 Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
-                Assert.That(updated.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+                Assert.That(updated.Properties.First(x => x.Alias == "description").Value, Is.EqualTo("This is the meta description for a textpage"));
 
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
