@@ -24,20 +24,20 @@ angular.module("umbraco")
         };
 
         $scope.setUrl = function(){
-            
+
             if($scope.control.value.image){
                 var url = $scope.control.value.image;
 
-                if($scope.control.editor.config.size){    
+                if($scope.control.editor.config && $scope.control.editor.config.size){
                     url += "?width=" + $scope.control.editor.config.size.width;
                     url += "&height=" + $scope.control.editor.config.size.height;
 
                     if($scope.control.value.focalPoint){
-                        url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left; 
+                        url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left;
                         url += "&mode=crop";
                     }
-                }   
-                
+                }
+
                 $scope.url = url;
             }
         };
