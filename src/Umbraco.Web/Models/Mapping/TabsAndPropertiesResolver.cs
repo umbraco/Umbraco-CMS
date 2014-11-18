@@ -203,6 +203,9 @@ namespace Umbraco.Web.Models.Mapping
                             propsForGroup));
                 }
 
+                if (aggregateProperties.Count == 0)
+                    continue;
+
                 // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
                 foreach (var prop in aggregateProperties)
                 {

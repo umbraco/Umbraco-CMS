@@ -647,31 +647,79 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             DualContentTypeCompositions.ID = "compositionContentTypes";
             DualContentTypeCompositions.Width = 175;
 
-            int[] compositionIds = _contentType.ContentTypeItem.CompositionIds().ToArray();
-            if (!Page.IsPostBack)
-            {
-                string chosenContentTypeIDs = "";
-                ContentType[] contentTypes = _contentType.GetAll();
-                foreach (ContentType ct in contentTypes.OrderBy(x => x.Text))
-                {
-                    ListItem li = new ListItem(ct.Text, ct.Id.ToString());
-                    if (ct.Id == _contentType.Id)
-                        li.Enabled = false;
+            // fix for 7.2 - only top-level content types can be used as mixins
 
-                    DualContentTypeCompositions.Items.Add(li);
-                    lstContentTypeCompositions.Items.Add(li);
-                    
-                    foreach (int i in compositionIds)
-                    {
-                        if (i == ct.Id)
-                        {
-                            li.Selected = true;
-                            chosenContentTypeIDs += ct.Id + ",";
-                        }
-                    }
+            if (Page.IsPostBack == false)
+            {
+                var allContentTypes = ApplicationContext.Services.ContentTypeService.GetAllContentTypes().ToArray();
+
+                // find out if any content type uses this content type
+                var isUsed = allContentTypes.Any(x => x.ContentTypeComposition.Any(y => y.Id == _contentType.Id));
+                if (isUsed)
+                {
+                    // if it is used then it has to remain top-level
+                    // so no composition is possible at all
+                    DualContentTypeCompositions.Items.Clear();
+                    lstContentTypeCompositions.Items.Clear();
+                    DualContentTypeCompositions.Value = "";
+
+                    PlaceHolderContentTypeCompositions.Controls.Add(new Literal { Text = "<em>This content type is used as a parent and/or in "
+                        + "a composition, and therefore cannot be composed itself.</em>"});
                 }
-                DualContentTypeCompositions.Value = chosenContentTypeIDs;
+                else
+                {
+                    // if it is not used then composition is possible
+                    // usable types are those that are top-level
+                    var usableContentTypes = allContentTypes
+                        .Where(x => x.ContentTypeComposition.Any() == false)
+                        .OrderBy(x => x.Name);
+                    var usedContentTypes = _contentType.ContentTypeItem.ContentTypeComposition.ToArray();
+
+                    var wtf = new List<int>();
+                    foreach (var contentType in usableContentTypes)
+                    {
+                        var li = new ListItem(contentType.Name, contentType.Id.ToInvariantString())
+                        {
+                            // disable this and/or its parent
+                            Enabled = contentType.Id != _contentType.Id && contentType.Id != _contentType.ParentId,
+                            // select
+                            Selected = usedContentTypes.Any(x => x.Id == contentType.Id)
+                        };
+                        DualContentTypeCompositions.Items.Add(li);
+                        lstContentTypeCompositions.Items.Add(li);
+
+                        if (li.Selected)
+                            wtf.Add(contentType.Id);
+                    }
+                    DualContentTypeCompositions.Value = string.Join(",", wtf);
+                }
             }
+
+            //int[] compositionIds = _contentType.ContentTypeItem.CompositionIds().ToArray();
+            //if (!Page.IsPostBack)
+            //{
+            //    string chosenContentTypeIDs = "";
+            //    ContentType[] contentTypes = _contentType.GetAll();
+            //    foreach (ContentType ct in contentTypes.OrderBy(x => x.Text))
+            //    {
+            //        ListItem li = new ListItem(ct.Text, ct.Id.ToString());
+            //        if (ct.Id == _contentType.Id)
+            //            li.Enabled = false;
+
+            //        DualContentTypeCompositions.Items.Add(li);
+            //        lstContentTypeCompositions.Items.Add(li);
+                    
+            //        foreach (int i in compositionIds)
+            //        {
+            //            if (i == ct.Id)
+            //            {
+            //                li.Selected = true;
+            //                chosenContentTypeIDs += ct.Id + ",";
+            //            }
+            //        }
+            //    }
+            //    DualContentTypeCompositions.Value = chosenContentTypeIDs;
+            //}
         }
 
         private int[] SaveCompositionContentTypes()
