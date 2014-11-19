@@ -529,7 +529,8 @@ namespace umbraco
             var serializer = new EntityXmlSerializer();
             var serialized = serializer.Serialize(
                 ApplicationContext.Current.Services.MediaService, 
-                ApplicationContext.Current.Services.DataTypeService,                
+                ApplicationContext.Current.Services.DataTypeService,
+                ApplicationContext.Current.Services.UserService,                
                 media, 
                 deep);
             return serialized;
