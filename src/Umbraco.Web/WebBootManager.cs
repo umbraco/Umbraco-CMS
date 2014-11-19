@@ -338,7 +338,7 @@ namespace Umbraco.Web
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
-                new PublishedCache.XmlPublishedCache.PublishedMediaCache()));
+                new PublishedCache.XmlPublishedCache.PublishedMediaCache(ApplicationContext)));
 
             GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector), 
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));

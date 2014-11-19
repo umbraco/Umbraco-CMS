@@ -518,9 +518,8 @@ namespace umbraco
 
             LogHelper.Debug<library>("No media result for id {0}", () => MediaId);
 
-            var xd = new XmlDocument();
-            xd.LoadXml(string.Format("<error>No media is maching '{0}'</error>", MediaId));
-            return xd.CreateNavigator().Select("/");
+            var errorXml = new XElement("error", string.Format("No media is maching '{0}'", MediaId));
+            return errorXml.CreateNavigator().Select("/");
         }
 
         private static XElement GetMediaDo(int mediaId, bool deep)
@@ -529,8 +528,11 @@ namespace umbraco
             if (media == null) return null;
             var serializer = new EntityXmlSerializer();
             var serialized = serializer.Serialize(
-                ApplicationContext.Current.Services.MediaService, ApplicationContext.Current.Services.DataTypeService,
-                ApplicationContext.Current.Services.UserService, media, deep);
+                ApplicationContext.Current.Services.MediaService, 
+                ApplicationContext.Current.Services.DataTypeService,
+                ApplicationContext.Current.Services.UserService,                
+                media, 
+                deep);
             return serialized;
         }
 

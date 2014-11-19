@@ -229,30 +229,27 @@ namespace Umbraco.Core.Services
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
-            using (new WriteLock(Locker))
+            using (var uow = _uowProvider.GetUnitOfWork())
             {
-                using (var uow = _uowProvider.GetUnitOfWork())
+                using (var transaction = uow.Database.GetTransaction())
                 {
-                    using (var transaction = uow.Database.GetTransaction())
+                    var sortOrderObj =
+                    uow.Database.ExecuteScalar<object>(
+                        "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
+                    int sortOrder;
+                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
                     {
-                        var sortOrderObj =
-                        uow.Database.ExecuteScalar<object>(
-                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
-                        int sortOrder;
-                        if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
-                        {
-                            sortOrder = 1;
-                        }
-
-                        foreach (var value in values)
-                        {
-                            var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
-                            uow.Database.Insert(dto);
-                            sortOrder++;
-                        }
-
-                        transaction.Complete();
+                        sortOrder = 1;
                     }
+
+                    foreach (var value in values)
+                    {
+                        var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
+                        uow.Database.Insert(dto);
+                        sortOrder++;
+                    }
+
+                    transaction.Complete();
                 }
             }
         }
