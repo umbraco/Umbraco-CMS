@@ -418,7 +418,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
-				    media.MoveNext();
 					xpath = media.Current;
 				}
 				else
