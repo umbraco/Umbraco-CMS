@@ -271,7 +271,7 @@ angular.module("umbraco")
 
                     }
                 });
-                
+
         };
 
         // *********************************************
@@ -380,7 +380,7 @@ angular.module("umbraco")
         };
 
         $scope.getEditor = function(alias){
-            return  _.find($scope.availableEditors, function(editor){return editor.alias === alias});
+            return  _.find($scope.availableEditors, function(editor){return editor.alias === alias;});
         };
 
         $scope.removeControl = function (cell, $index) {
@@ -493,7 +493,7 @@ angular.module("umbraco")
 
                 //sync area configuration
                 _.each(original.areas, function(area, areaIndex){
-                    
+
 
                     if(area.grid > 0){
                         var currentArea = row.areas[areaIndex];
@@ -558,6 +558,9 @@ angular.module("umbraco")
             control.$uniqueId = $scope.setUniqueId();
 
             if(!control.$editorPath){
+                var editorConfig = $scope.getEditor(control.editor.alias);
+                control.editor = editorConfig;
+
                 //if its a path
                 if(_.indexOf(control.editor.view, "/") >= 0){
                     control.$editorPath = control.editor.view;
