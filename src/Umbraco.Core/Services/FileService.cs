@@ -391,10 +391,17 @@ namespace Umbraco.Core.Services
         internal IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {
             var snippetPath = IOHelper.MapPath(string.Format("{0}/PartialViewMacros/Templates/", SystemDirectories.Umbraco));
-            return Directory.GetFiles(snippetPath, "*.cshtml")
+            var files = Directory.GetFiles(snippetPath, "*.cshtml")
                 .Select(Path.GetFileNameWithoutExtension)
                 .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
                 .ToArray();
+
+            //Ensure the ones that are called 'Empty' are at the top
+            var empty = files.Where(x => Path.GetFileName(x).InvariantStartsWith("Empty"))
+                .OrderBy(x => x.Length)
+                .ToArray();
+
+            return empty.Union(files.Except(empty));
         } 
 
         internal void DeletePartialViewFolder(string folderPath)
@@ -515,7 +522,10 @@ namespace Umbraco.Core.Services
                         .ToFirstUpperInvariant()
                         .ToSafeAlias(false);
 
-                    repository.AddOrUpdate(new Macro(name, name) { ScriptPath = partialView.Path });
+                    //The partial view path to be saved with the macro must be a fully qualified virtual path
+                    var virtualPath = string.Format("{0}/{1}/{2}", SystemDirectories.MvcViews, "MacroPartials", partialView.Path);
+
+                    repository.AddOrUpdate(new Macro(name, name) { ScriptPath = virtualPath });
                 }
 
                 //commit both - ensure that the macro is created if one was added
