@@ -408,7 +408,7 @@ namespace Umbraco.Tests.Mvc
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 appCtx,
-                new PublishedCaches(cache, new PublishedMediaCache()),
+                new PublishedCaches(cache, new PublishedMediaCache(appCtx)),
                 new WebSecurity(http, appCtx));
 
             //if (setSingleton)
