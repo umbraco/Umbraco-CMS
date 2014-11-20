@@ -6,7 +6,10 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface ITemplateRepository : IRepositoryQueryable<int, ITemplate>
     {
         ITemplate Get(string alias);
+
         IEnumerable<ITemplate> GetAll(params string[] aliases);
+
+        IEnumerable<ITemplate> GetChildren(int masterTemplateId);
 
         /// <summary>
         /// Returns a template as a template node which can be traversed (parent, children)

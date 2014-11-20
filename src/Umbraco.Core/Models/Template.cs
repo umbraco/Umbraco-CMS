@@ -18,88 +18,36 @@ namespace Umbraco.Core.Models
     {
         private string _alias;
         private string _name;
-        private int _creatorId;
-        private int _level;
-        private int _sortOrder;
-        private int _parentId;
         private string _masterTemplateAlias;
+        private Lazy<int> _masterTemplateId;
 
-        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.CreatorId);
-        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.Level);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.SortOrder);
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.ParentId);
+
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
+        private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
         
         public Template(string path, string name, string alias)
             : base(path)
         {
             base.Path = path;
-            ParentId = -1;
-            _name = name; //.Replace("/", ".").Replace("\\", ""); // why? that's just the name!
+            _name = name;
             _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
         }
 
         [DataMember]
-        internal int CreatorId
+        public Lazy<int> MasterTemplateId
         {
-            get { return _creatorId; }
+            get { return _masterTemplateId; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _creatorId = value;
-                    return _creatorId;
-                }, _creatorId, CreatorIdSelector);    
+                    _masterTemplateId = value;
+                    return _masterTemplateId;
+                }, _masterTemplateId, MasterTemplateIdSelector);
             }
         }
 
-        [DataMember]
-        internal int Level
-        {
-            get { return _level; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _level = value;
-                    return _level;
-                }, _level, LevelSelector);    
-            }
-        }
-
-        [DataMember]
-        internal int SortOrder
-        {
-            get { return _sortOrder; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _sortOrder = value;
-                    return _sortOrder;
-                }, _sortOrder, SortOrderSelector);    
-            }
-        }
-
-        [DataMember]
-        internal int ParentId
-        {
-            get { return _parentId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _parentId = value;
-                    return _parentId;
-                }, _parentId, ParentIdSelector);    
-            }
-        }
-        
-        [DataMember]
-        internal Lazy<int> MasterTemplateId { get; set; }
-
-        [DataMember]
-        internal string MasterTemplateAlias
+        public string MasterTemplateAlias
         {
             get { return _masterTemplateAlias; }
             set
@@ -108,7 +56,7 @@ namespace Umbraco.Core.Models
                 {
                     _masterTemplateAlias = value;
                     return _masterTemplateAlias;
-                }, _masterTemplateAlias, MasterTemplateAliasSelector);    
+                }, _masterTemplateAlias, MasterTemplateAliasSelector);
             }
         }
 
@@ -129,6 +77,12 @@ namespace Umbraco.Core.Models
                 return _name;
             }
         }
+
+
+        /// <summary>
+        /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
+        /// </summary>
+        public bool IsMasterTemplate { get; internal set; }
 
         /// <summary>
         /// Returns the <see cref="RenderingEngine"/> that corresponds to the template file

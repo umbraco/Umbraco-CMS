@@ -18,10 +18,7 @@ namespace Umbraco.Tests.Models
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
-                CreatorId = 66,
-                Level = 55,
-                ParentId = 2,
-                SortOrder = 99,
+              
                 MasterTemplateAlias = "master",
                 MasterTemplateId = new Lazy<int>(() => 88)                
             };
@@ -32,15 +29,11 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone, item);
             Assert.AreEqual(clone.CreateDate, item.CreateDate);
             Assert.AreEqual(clone.Alias, item.Alias);
-            Assert.AreEqual(clone.CreatorId, item.CreatorId);
             Assert.AreEqual(clone.Id, item.Id);
             Assert.AreEqual(clone.Key, item.Key);
-            Assert.AreEqual(clone.Level, item.Level);
             Assert.AreEqual(clone.MasterTemplateAlias, item.MasterTemplateAlias);
             Assert.AreEqual(clone.MasterTemplateId.Value, item.MasterTemplateId.Value);
             Assert.AreEqual(clone.Name, item.Name);
-            Assert.AreEqual(clone.ParentId, item.ParentId);
-            Assert.AreEqual(clone.SortOrder, item.SortOrder);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
 
             //This double verifies by reflection
@@ -63,10 +56,6 @@ namespace Umbraco.Tests.Models
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
-                CreatorId = 66,
-                Level = 55,
-                ParentId = 2,
-                SortOrder = 99,
                 MasterTemplateAlias = "master",
                 MasterTemplateId = new Lazy<int>(() => 88)
             };

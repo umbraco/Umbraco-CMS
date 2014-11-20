@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberTypeReadOnlyFactory : IEntityFactory<IMemberType, MemberTypeReadOnlyDto>
+    internal class MemberTypeReadOnlyFactory 
     {
         public IMemberType BuildEntity(MemberTypeReadOnlyDto dto)
         {

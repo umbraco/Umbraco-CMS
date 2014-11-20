@@ -96,6 +96,12 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
         /// <summary>
+        /// Gets a list of all <see cref="ITemplate"/> objects
+        /// </summary>
+        /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
+        IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
+
+        /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its alias
         /// </summary>
         /// <param name="alias">Alias of the template</param>

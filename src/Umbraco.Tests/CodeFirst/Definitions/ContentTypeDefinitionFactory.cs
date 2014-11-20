@@ -325,7 +325,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                ? string.Concat(@alias, ".cshtml")
                                : string.Concat(@alias, ".masterpage");
 
-                    template = new Template(string.Empty, name, @alias) { CreatorId = 0, Content = string.Empty};
+                    template = new Template(string.Empty, name, @alias) { Content = string.Empty};
 					ApplicationContext.Current.Services.FileService.SaveTemplate(template);
                 }
                 templates.Add(template);

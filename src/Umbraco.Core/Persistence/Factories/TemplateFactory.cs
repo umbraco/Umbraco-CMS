@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class TemplateFactory : IEntityFactory<Template, TemplateDto>
+    internal class TemplateFactory
     {
         private readonly int _primaryKey;
         private readonly Guid _nodeObjectTypeId;
@@ -25,21 +28,23 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
-        
-        public Template BuildEntity(TemplateDto dto)
+
+        public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions)
         {
             var template = new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
                                {
                                    CreateDate = dto.NodeDto.CreateDate,
                                    Id = dto.NodeId,
-                                   Key = dto.NodeDto.UniqueId.Value,
-                                   CreatorId = dto.NodeDto.UserId.Value,
-                                   Level = dto.NodeDto.Level,
-                                   ParentId = dto.NodeDto.ParentId,
-                                   SortOrder = dto.NodeDto.SortOrder,
+                                   Key = dto.NodeDto.UniqueId.Value,                                   
                                    Path = dto.NodeDto.Path
                                };
-            
+
+            if (childDefinitions.Any(x => x.ParentId == dto.NodeId))
+            {
+                template.IsMasterTemplate = true;
+            }
+
+            //TODO: Change this to ParentId: http://issues.umbraco.org/issue/U4-5846
             if(dto.Master.HasValue)
                 template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
 
@@ -80,15 +85,13 @@ namespace Umbraco.Core.Persistence.Factories
                               {
                                   CreateDate = entity.CreateDate,
                                   NodeId = entity.Id,
-                                  Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
+                                  Level = 1,
                                   NodeObjectType = _nodeObjectTypeId,
-                                  ParentId = entity.ParentId,
+                                  ParentId = entity.MasterTemplateId.Value,
                                   Path = entity.Path,
-                                  SortOrder = entity.SortOrder,
                                   Text = entity.Name,
                                   Trashed = false,
-                                  UniqueId = entity.Key,
-                                  UserId = entity.CreatorId
+                                  UniqueId = entity.Key
                               };
 
             return nodeDto;

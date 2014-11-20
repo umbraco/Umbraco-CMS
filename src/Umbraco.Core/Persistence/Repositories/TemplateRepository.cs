@@ -11,6 +11,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Sync;
 
@@ -71,7 +72,21 @@ namespace Umbraco.Core.Persistence.Repositories
             
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
 
-            return dtos.Select(MapFromDto);
+            //look up the simple template definitions that have a master template assigned, this is used 
+            // later to populate the template item's properties
+            var childIdsSql = new Sql()
+                .Select("nodeId,alias," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("master"))
+                .From<TemplateDto>()
+                .Where<TemplateDto>(t => t.Master > 0);
+            var childIds = Database.Fetch<dynamic>(childIdsSql)
+                .Select(x => new UmbracoEntity
+                {
+                    Id = x.nodeId,
+                    ParentId = x.master,
+                    Name = x.alias
+                });
+
+            return dtos.Select(d => MapFromDto(d, childIds));
         }
 
         protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)
@@ -82,7 +97,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
 
-            return dtos.Select(MapFromDto);
+            //look up the simple template definitions that have a master template assigned, this is used 
+            // later to populate the template item's properties
+            var childIdsSql = new Sql()
+                .Select("nodeId,alias," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("master"))
+                .From<TemplateDto>()
+                .Where<TemplateDto>(t => t.Master > 0);
+            var childIds = Database.Fetch<dynamic>(childIdsSql)
+                .Select(x => new UmbracoEntity
+                {
+                    Id = x.nodeId,
+                    ParentId = x.master,
+                    Name = x.alias
+                });
+
+            return dtos.Select(d => MapFromDto(d, childIds));
         }
 
         #endregion
@@ -150,23 +179,26 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new TemplateFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(template);
 
-            //NOTE Should the logic below have some kind of fallback for empty parent ids ?
-            //Logic for setting Path, Level and SortOrder
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = template.ParentId });
-            int level = parent.Level + 1;
-            int sortOrder =
-                Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-                                                      new { ParentId = template.ParentId, NodeObjectType = NodeObjectTypeId });
+            //NOTE: There is no reason for sort order, path or level with templates, also the ParentId column is NOT used, need to fix:
+            // http://issues.umbraco.org/issue/U4-5846
+            //var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = template.ParentId });
+            //int level = parent.Level + 1;
+            //int sortOrder =
+            //    Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
+            //                                          new { ParentId = template.ParentId, NodeObjectType = NodeObjectTypeId });
 
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;
-            nodeDto.Path = parent.Path;
-            nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
-            nodeDto.SortOrder = sortOrder;
+            nodeDto.Path = "-1," + dto.NodeDto.NodeId;
+            nodeDto.Level = 1;
+            nodeDto.SortOrder = 0;
             var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
+            //NOTE: Templates don't have paths, but they could i suppose if we wanted, once the ParentId thing is fixed we could
+            // do it, but we haven't had that since the beginning of time so don't think it's necessary at all.
             //Update with new correct path
-            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            //nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+
             Database.Update(nodeDto);
 
             //Insert template dto
@@ -176,9 +208,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Update entity with correct values
             template.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
             template.Path = nodeDto.Path;
-            template.SortOrder = sortOrder;
-            template.Level = level;
-
+            
             template.ResetDirtyProperties();
         }
 
@@ -198,18 +228,20 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //Look up parent to get and set the correct Path if ParentId has changed
-            if (entity.IsPropertyDirty("ParentId"))
-            {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((Template)entity).ParentId });
-                entity.Path = string.Concat(parent.Path, ",", entity.Id);
-                ((Template)entity).Level = parent.Level + 1;
-                var maxSortOrder =
-                    Database.ExecuteScalar<int>(
-                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                        new { ParentId = ((Template)entity).ParentId, NodeObjectType = NodeObjectTypeId });
-                ((Template)entity).SortOrder = maxSortOrder + 1;
-            }
+            //NOTE: There is no reason for sort order, path or level with templates, also the ParentId column is NOT used, need to fix:
+            // http://issues.umbraco.org/issue/U4-5846
+            ////Look up parent to get and set the correct Path if ParentId has changed
+            //if (entity.IsPropertyDirty("ParentId"))
+            //{
+            //    var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((Template)entity).ParentId });
+            //    entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            //    ((Template)entity).Level = parent.Level + 1;
+            //    var maxSortOrder =
+            //        Database.ExecuteScalar<int>(
+            //            "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+            //            new { ParentId = ((Template)entity).ParentId, NodeObjectType = NodeObjectTypeId });
+            //    ((Template)entity).SortOrder = maxSortOrder + 1;
+            //}
 
             //Get TemplateDto from db to get the Primary key of the entity
             var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
@@ -278,14 +310,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        private ITemplate MapFromDto(TemplateDto dto)
+        private ITemplate MapFromDto(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions)
         {
             string csViewName = string.Concat(dto.Alias, ".cshtml");
             string vbViewName = string.Concat(dto.Alias, ".vbhtml");
             string masterpageName = string.Concat(dto.Alias, ".master");
 
             var factory = new TemplateFactory();
-            var template = factory.BuildEntity(dto);
+            var template = factory.BuildEntity(dto, childDefinitions);
 
             if (dto.Master.HasValue)
             {
@@ -430,6 +462,28 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
+        public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
+        {
+            //TODO: Fix this N+1!
+
+            List<TemplateDto> found;
+            if (masterTemplateId == -1)
+            {
+                var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Master == null);
+                found = Database.Fetch<TemplateDto, NodeDto>(sql);
+            }
+            else
+            {
+                var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Master == masterTemplateId);
+                found = Database.Fetch<TemplateDto, NodeDto>(sql);
+            }
+
+            foreach (var templateDto in found)
+            {
+                yield return Get(templateDto.NodeId);
+            }
+        }
+
         /// <summary>
         /// Returns a template as a template node which can be traversed (parent, children)
         /// </summary>
@@ -437,8 +491,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TemplateNode GetTemplateNode(string alias)
         {
-            //in order to do this we need to get all of the templates and then organize, unfortunately 
-            // our db structure does not use the path correctly for templates so we cannot just look
+            //in order to do this we need to get all of the templates and then organize, 
+            // TODO: unfortunately our db structure does not use the path correctly for templates so we cannot just look
             // up a template tree easily.
 
             //first get all template objects

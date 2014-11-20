@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Net.Http.Formatting;
 using System.Web.Services.Description;
@@ -16,7 +17,7 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Languages)]
     [LegacyBaseTree(typeof(loadLanguages))]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, "Languages")]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, "Languages", sortOrder: 4)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class LanguageTreeController : TreeController
@@ -78,6 +79,7 @@ namespace Umbraco.Web.Trees
             }
 
             var lang = Services.LocalizationService.GetLanguageById(int.Parse(id));
+            if (lang == null) return new MenuItemCollection();
 
             //add delete option for all languages
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias))

@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class ServerRegistrationFactory : IEntityFactory<ServerRegistration, ServerRegistrationDto>
+    internal class ServerRegistrationFactory 
     {
         #region Implementation of IEntityFactory<Language,LanguageDto>
 

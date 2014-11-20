@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MediaTypeFactory : IEntityFactory<IMediaType, ContentTypeDto>
+    internal class MediaTypeFactory 
     {
         private readonly Guid _nodeObjectType;
 
