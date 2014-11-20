@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web.UI;
 using Umbraco.Web;
@@ -38,6 +39,11 @@ namespace umbraco.cms.presentation.create.controls
                         //                    if (dt.MasterContentType == 0)
                         masterType.Items.Add(new ListItem(dt.Text, dt.Id.ToString(CultureInfo.InvariantCulture)));
                     }
+
+                    if (masterType.Items.Count == 1)
+                    {
+                        pp_mastertypes.Visible = false;
+                    }
                 }
                 else
                 {
@@ -70,6 +76,9 @@ namespace umbraco.cms.presentation.create.controls
 
                 // check master type
                 string masterTypeVal = String.IsNullOrEmpty(Request.GetItemAsString("nodeId")) || Request.GetItemAsString("nodeId") == "init" ? masterType.SelectedValue : Request.GetItemAsString("nodeId");
+
+                // set master type to none if no master type was selected, or the drop down was hidden because there were no doctypes available
+			    masterTypeVal = string.IsNullOrEmpty(masterTypeVal) ? "0" : masterTypeVal;
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
