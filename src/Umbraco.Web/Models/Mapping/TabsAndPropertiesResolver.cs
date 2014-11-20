@@ -202,17 +202,12 @@ namespace Umbraco.Web.Models.Mapping
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
                             propsForGroup));
                 }
-
+                
                 if (aggregateProperties.Count == 0)
                     continue;
 
-                // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
-                foreach (var prop in aggregateProperties)
-                {
-                    prop.Label = TranslateItem(prop.Label);
-                    prop.Description = TranslateItem(prop.Description);
-                }
-                
+                    TranslateProperties(aggregateProperties);
+
                 //then we'll just use the root group's data to make the composite tab
                 var rootGroup = propertyGroups.First(x => x.ParentId == null);
                 aggregateTabs.Add(new Tab<ContentPropertyDisplay>
@@ -230,19 +225,31 @@ namespace Umbraco.Web.Models.Mapping
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
 
             //now add the generic properties tab
+            var genericproperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties).ToList();
+            TranslateProperties(genericproperties);
+
             aggregateTabs.Add(new Tab<ContentPropertyDisplay>
                 {
                     Id = 0,
                     Label = ui.Text("general", "properties"),
                     Alias = "Generic properties",
-                    Properties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties)
+                    Properties = genericproperties
                 });
-
 
             //set the first tab to active
             aggregateTabs.First().IsActive = true;
 
             return aggregateTabs;
+        }
+
+        private void TranslateProperties(IEnumerable<ContentPropertyDisplay> properties)
+        {
+            // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
+            foreach (var prop in properties)
+            {
+                prop.Label = TranslateItem(prop.Label);
+                prop.Description = TranslateItem(prop.Description);
+            }
         }
 
         // TODO: This should really be centralized and used anywhere globalization applies.
