@@ -2,7 +2,7 @@
 <language alias="he" intName="Hebrew (Israel)" localName="Hebrew" lcid="" culture="he-IL">
   <creator>
     <name>Umbraco Hebrew 2011</name>
-    <link>http://umbraco.org</link>
+    <link>http://our.umbraco.org</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">נהל שמות מתחם</key>
@@ -354,7 +354,7 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              done.<br /><a href="http://our.umbraco.org/wiki/reference/webconfig" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -469,7 +469,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="renewSession">יש לבצע חידוש פעילות על מנת לשמור על התוכן</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">ברוכים הבאים לאומברקו, יש להזין שם משתמש וסיסמה בשדות למטה:</key>
   </area>
   <area alias="main">

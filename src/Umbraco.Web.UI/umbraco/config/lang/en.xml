@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
-    <name>umbraco</name>
-    <link>http://umbraco.org</link>
+    <name>Umbraco</name>
+    <link>http://umbraco.com</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Culture and Hostnames</key>
@@ -418,11 +418,11 @@
       Press the <strong>install</strong> button to install the Umbraco %0% database
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
+    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              done.<br /><a href="http://our.umbraco.org/wiki/reference/webconfig" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -437,7 +437,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
       proceed. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
-    <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
@@ -478,11 +478,11 @@
     ]]></key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
+        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates. 
         (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
-    <key alias="runwayHeader">You’ve just set up a clean Umbraco platform. What do you want to do next?</key>
+    <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
     <key alias="runwayInstalled">Runway is installed</key>
     <key alias="runwayInstalledText"><![CDATA[
       You have the foundation in place. Select what modules you wish to install on top of it.<br />
@@ -493,7 +493,7 @@
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
       "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
-        but you can easily edit, extend or remove it. It’s not necessary and you can perfectly use Umbraco without it. However, 
+        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However, 
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
         </p>
