@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
+using umbraco.businesslogic.Exceptions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -160,7 +161,22 @@ namespace umbraco.cms.businesslogic.packager
                         try
                         {
                             tempDir = UnPack(fi.FullName);
-                            LoadConfig(tempDir);
+
+                            if (IsValidPackage(tempDir))
+                            {
+                                LoadConfig(tempDir);
+                            }
+                            else
+                            {
+                                //lets clean up
+                                var dir = new DirectoryInfo(tempDir);
+                                dir.Delete(true);
+                                throw new InvalidUmbracoPackageException();
+                            }
+                        }
+                        catch (InvalidUmbracoPackageException inv)
+                        {
+                            throw inv;
                         }
                         catch (Exception unpackE)
                         {
@@ -645,6 +661,13 @@ namespace umbraco.cms.businesslogic.packager
                 return path + fileName;
             return path + Path.DirectorySeparatorChar + fileName;
         }
+
+        private static bool IsValidPackage(string tmpPackageDir)
+        {
+            var dir = new DirectoryInfo(tmpPackageDir);
+            return dir.GetFiles("package.xml",SearchOption.AllDirectories).Any();
+        }
+
         private static string UnPack(string zipName)
         {
             // Unzip

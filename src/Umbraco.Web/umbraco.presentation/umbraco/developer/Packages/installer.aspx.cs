@@ -12,6 +12,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
+using umbraco.businesslogic.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.BasePages;
@@ -119,6 +120,10 @@ namespace umbraco.presentation.developer.packages
                 file1.PostedFile.SaveAs(IOHelper.MapPath(fileName));
                 tempFile.Value = _installer.Import(_tempFileName);
                 UpdateSettings();
+            }
+            catch (InvalidUmbracoPackageException invalid)
+            {
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.error,ui.GetText("general","error"), ui.GetText("packager", "packageInvalid"));
             }
             catch (Exception ex)
             {

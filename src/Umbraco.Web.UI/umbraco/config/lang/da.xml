@@ -535,6 +535,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Pakke meta data</key>
     <key alias="packageName">Pakkenavn</key>
+    <key alias="packageInvalid">Pakken ser ikke ud til at indeholde de korrekte umbraco filer (package.xml)</key>
     <key alias="packageNoItemsHeader">Pakken indeholder ingen elementer</key>
     <key alias="packageNoItemsText"><![CDATA[Denne pakkefil indeholder ingen elementer som kan af-installeres.<br/><br/>Du kan roligt fjerne denne fra systemet ved at klikke på "Fjern pakke" nedenfor.]]></key>
     <key alias="packageNoUpgrades">Ingen opdateringer tilgængelige</key>

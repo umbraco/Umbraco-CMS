@@ -189,6 +189,7 @@
     <Compile Include="ApplicationTree.cs" />
     <Compile Include="ApplicationTreeRegistrar.cs" />
     <Compile Include="DefaultApps.cs" />
+    <Compile Include="Exceptions\InvalidUmbracoPackageException.cs" />
     <Compile Include="LogTypes.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="TreeAttribute.cs" />

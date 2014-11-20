@@ -632,6 +632,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageDocumentation">Documentation</key>
     <key alias="packageMetaData">Package meta data</key>
     <key alias="packageName">Package name</key>
+    <key alias="packageInvalid">Package does not contain valid umbraco files (package.xml)</key>
     <key alias="packageNoItemsHeader">Package doesn't contain any items</key>
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
