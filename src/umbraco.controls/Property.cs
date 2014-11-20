@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Web.UI;
 
@@ -13,6 +14,8 @@ namespace umbraco.uicontrols
         }
 
         private string m_Text = string.Empty;
+        private Control _control;
+
         public string Text
         {
             get { return m_Text; }
@@ -45,7 +48,19 @@ namespace umbraco.uicontrols
 
             if (m_Text != string.Empty)
             {
-                writer.WriteLine("<label class=\"control-label\" for=\"inputPassword\">" + m_Text + "</label>");
+                if (_control == null)
+                {
+                    _control = Controls.OfType<Control>().FirstOrDefault(c => c.Visible && (c.GetType().Name.Contains("Literal") == false));
+                }
+
+                if (_control == null)
+                {
+                    writer.WriteLine("<span class=\"control-label\">{0}</span>", m_Text);
+                }
+                else
+                {
+                    writer.WriteLine("<label class=\"control-label\" for=\"{0}\">{1}</label>", _control != null ? _control.ClientID : "", m_Text);
+                }
             }
 
             writer.WriteLine("<div class=\"controls controls-row\">");
@@ -64,6 +79,10 @@ namespace umbraco.uicontrols
 
         }
 
+        public void SetLabelFor(Control control)
+        {
+            _control = control;
+        }
     }
 
 }
