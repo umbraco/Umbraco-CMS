@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -12,6 +13,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<ILoggingService> _loggingService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
         private Lazy<IUserService> _userService;
@@ -52,6 +54,7 @@ namespace Umbraco.Core.Services
         /// <param name="treeService"></param>
         /// <param name="tagService"></param>
         /// <param name="notificationService"></param>
+        /// <param name="loggingService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -69,7 +72,7 @@ namespace Umbraco.Core.Services
             ISectionService sectionService,
             IApplicationTreeService treeService,
             ITagService tagService,
-            INotificationService notificationService)
+            INotificationService notificationService, ILoggingService loggingService)
         {
             _tagService = new Lazy<ITagService>(() => tagService);     
             _contentService = new Lazy<IContentService>(() => contentService);        
@@ -88,7 +91,7 @@ namespace Umbraco.Core.Services
             _memberService = new Lazy<IMemberService>(() => memberService);
             _userService = new Lazy<IUserService>(() => userService);
             _notificationService = new Lazy<INotificationService>(() => notificationService);
-
+            _loggingService = new Lazy<ILoggingService>(() => loggingService);
         }
 
         /// <summary>
@@ -174,6 +177,10 @@ namespace Umbraco.Core.Services
                 _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory.Value));
+
+
+            if (_loggingService== null)
+                _loggingService = new Lazy<ILoggingService>(() => new LoggingService());
             
         }
 
@@ -328,6 +335,13 @@ namespace Umbraco.Core.Services
         {
             get { return _memberGroupService.Value; }
         }
-        
+
+        /// <summary>
+        /// Gets the LoggingService
+        /// </summary>
+        public ILoggingService LoggingService
+        {
+            get { return _loggingService.Value; }
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
@@ -56,7 +57,7 @@ namespace Umbraco.Tests
             new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object,
-                new Mock<INotificationService>().Object);
+                new Mock<INotificationService>().Object, new Mock<ILoggingService>().Object);
             Assert.Pass();
         }
 
@@ -101,7 +102,7 @@ namespace Umbraco.Tests
                     new Mock<ISectionService>().Object,
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object,
-                    new Mock<INotificationService>().Object),
+                    new Mock<INotificationService>().Object, new Mock<ILoggingService>().Object),
                 CacheHelper.CreateDisabledCacheHelper());
             
             Assert.Pass();
