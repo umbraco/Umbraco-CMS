@@ -175,6 +175,7 @@ namespace umbraco.cms.businesslogic.language
         /// Primary used when deleting a language from Umbraco.
         /// </summary>
         /// <param name="languageId"></param>
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public static void RemoveByLanguage(int languageId)
         {
             // remove from database

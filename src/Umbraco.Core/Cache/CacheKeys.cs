@@ -45,6 +45,7 @@ namespace Umbraco.Core.Cache
         
         public const string PropertyTypeCacheKey = "UmbracoPropertyTypeCache";
 
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string LanguageCacheKey = "UmbracoLanguageCache";
 
         public const string DomainCacheKey = "UmbracoDomainList";

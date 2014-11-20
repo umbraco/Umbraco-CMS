@@ -47,6 +47,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
+        //TODO: Fix this up so there is no N+1
+
         protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
@@ -65,6 +67,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
         }
+
+        //TODO: Fix this up so there is no N+1
 
         protected override IEnumerable<ILanguage> PerformGetByQuery(IQuery<ILanguage> query)
         {
@@ -99,9 +103,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
+            
             var list = new List<string>
                            {
+                               //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
+                               // but we still need to remove them
+                               "DELETE FROM cmsLanguageText WHERE languageId = @Id",
                                "DELETE FROM umbracoLanguage WHERE id = @Id"
                            };
             return list;
