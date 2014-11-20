@@ -29,7 +29,8 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "languages", "Languages", sortOrder: 4)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
+    //[Tree(Constants.Applications.Settings, "languages", "Languages", sortOrder: 4)]
     public class loadLanguages : BaseTree
 	{
         public loadLanguages(string application) : base(application) { }
