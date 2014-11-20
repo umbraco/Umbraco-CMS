@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -97,20 +98,44 @@ namespace umbraco.presentation.umbraco.dialogs
 
 		private void submit_Click(object sender, EventArgs e)
 		{
-			tempFileName = "justDelete_" + Guid.NewGuid().ToString() + ".udt";
-			var fileName = IOHelper.MapPath(SystemDirectories.Data + "/" + tempFileName);
-			tempFile.Value = fileName;
+            //ensure user has selected a udt file to import
+		    try
+		    {
+		        if (documentTypeFile.PostedFile.FileName != string.Empty && documentTypeFile.PostedFile.FileName.EndsWith(".udt"))
+		        {
+		            tempFileName = "justDelete_" + Guid.NewGuid().ToString() + ".udt";
+		            var fileName = IOHelper.MapPath(SystemDirectories.Data + "/" + tempFileName);
+		            tempFile.Value = fileName;
 
-			documentTypeFile.PostedFile.SaveAs(fileName);
+		            documentTypeFile.PostedFile.SaveAs(fileName);
 
-			var xd = new XmlDocument();
-			xd.Load(fileName);
-			dtName.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Name").FirstChild.Value;
-			dtAlias.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Alias").FirstChild.Value;
+		            var xd = new XmlDocument();
+		            xd.Load(fileName);
+		            dtName.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Name").FirstChild.Value;
+		            dtAlias.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Alias").FirstChild.Value;
 
-			Wizard.Visible = false;
-			done.Visible = false;
-			Confirm.Visible = true;
+		            Wizard.Visible = false;
+		            done.Visible = false;
+		            Confirm.Visible = true;
+		        }
+		        else
+		        {
+                    InvalidUdtFileError(new Exception("No file picked for udt import"), documentTypeFile.PostedFile.FileName);
+		        }
+		    }
+		    catch (Exception ex)
+		    {
+                InvalidUdtFileError(ex, documentTypeFile.PostedFile.FileName);
+		    }
+
+
 		}
+
+	    private void InvalidUdtFileError(Exception ex,string udtFile)
+	    {
+
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.GetText("errorHandling", "errorHeader"), ui.GetText("settings", "importDocumentTypeHelp"));
+            LogHelper.Error<Exception>(string.Format("Error importing udt file {0}",udtFile),ex);
+	    }
 	}
 }
