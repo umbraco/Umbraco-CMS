@@ -8,7 +8,7 @@
 
 							<h1>Create User</h1>
 							<div class="create-hold">
-								<p>You can now setup a new admin user to log into Umbraco, we recommend using a stong password for this (a password which is more than 4 characters and contains a mix of letters, numbers and symbols).
+								<p>You can now setup a new admin user to log into Umbraco, we recommend using a strong password for this (a password which is more than 4 characters and contains a mix of letters, numbers and symbols).
                                 Please make a note of the chosen password.</p>
 								<p>The password can be changed once you have completed the installation and logged into the admin interface.</p>
 							</div>
