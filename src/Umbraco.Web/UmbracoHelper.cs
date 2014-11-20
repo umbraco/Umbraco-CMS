@@ -26,10 +26,155 @@ using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
 {
+    public interface IUmbracoHelper
+    {
+        TagQuery TagQuery { get; }
+
+        PublishedContentQuery ContentQuery { get; }
+
+        IPublishedContent AssignedContentItem { get; }
+
+        IHtmlString RenderTemplate(int pageId, int? altTemplateId = null);
+
+        IHtmlString RenderMacro(string alias);
+
+        IHtmlString RenderMacro(string alias, object parameters);
+
+        IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters);
+
+        IHtmlString Field(string fieldAlias, 
+            string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
+            bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
+            RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
+            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
+            bool formatAsDate = false, 
+            bool formatAsDateWithTime = false,
+            string formatAsDateWithTimeSeparator = "");
+
+        IHtmlString Field(IPublishedContent currentPage, string fieldAlias, 
+            string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
+            bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
+            RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
+            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
+            bool formatAsDate =  false,
+            bool formatAsDateWithTime = false,
+            string formatAsDateWithTimeSeparator = "");
+
+        string GetDictionaryValue(string key);
+
+        bool IsProtected(int documentId, string path);
+
+        bool MemberHasAccess(int nodeId, string path);
+
+        bool MemberIsLoggedOn();
+
+        string NiceUrl(int nodeId);
+
+        string Url(int contentId);
+
+        string Url(int contentId, UrlProviderMode mode);
+
+        string NiceUrlWithDomain(int nodeId);
+
+        string UrlAbsolute(int contentId);
+
+        IPublishedContent TypedMember(object id);
+        IPublishedContent TypedMember(int id);
+        IPublishedContent TypedMember(string id);
+        dynamic Member(object id);
+        dynamic Member(int id);
+        dynamic Member(string id);
+        IPublishedContent TypedContent(object id);
+        IPublishedContent TypedContent(int id);
+        IPublishedContent TypedContent(string id);
+        IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars);
+        IEnumerable<IPublishedContent> TypedContent(params object[] ids);
+        IEnumerable<IPublishedContent> TypedContent(params int[] ids);
+        IEnumerable<IPublishedContent> TypedContent(params string[] ids);
+        IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids);
+        IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids);
+        IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids);
+        IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars);
+        IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
+        IEnumerable<IPublishedContent> TypedContentAtRoot();
+        dynamic Content(object id);
+        dynamic Content(int id);
+        dynamic Content(string id);
+        dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars);
+        dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars);
+        dynamic Content(params object[] ids);
+        dynamic Content(params int[] ids);
+        dynamic Content(params string[] ids);
+        dynamic Content(IEnumerable<object> ids);
+        dynamic Content(IEnumerable<int> ids);
+        dynamic Content(IEnumerable<string> ids);
+        dynamic ContentAtXPath(string xpath, params XPathVariable[] vars);
+        dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
+        dynamic ContentAtRoot();
+
+        IPublishedContent TypedMedia(object id);
+
+        IPublishedContent TypedMedia(int id);
+        IPublishedContent TypedMedia(string id);
+        IEnumerable<IPublishedContent> TypedMedia(params object[] ids);
+        IEnumerable<IPublishedContent> TypedMedia(params int[] ids);
+        IEnumerable<IPublishedContent> TypedMedia(params string[] ids);
+        IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids);
+        IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids);
+        IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids);
+        IEnumerable<IPublishedContent> TypedMediaAtRoot();
+        dynamic Media(object id);
+        dynamic Media(int id);
+        dynamic Media(string id);
+        dynamic Media(params object[] ids);
+        dynamic Media(params int[] ids);
+        dynamic Media(params string[] ids);
+        dynamic Media(IEnumerable<object> ids);
+        dynamic Media(IEnumerable<int> ids);
+        dynamic Media(IEnumerable<string> ids);
+        dynamic MediaAtRoot();
+
+        dynamic Search(string term, bool useWildCards = true, string searchProvider = null);
+
+        dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
+
+        IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null);
+
+        IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
+
+        dynamic ToDynamicXml(string xml);
+        dynamic ToDynamicXml(XElement xElement);
+        dynamic ToDynamicXml(XPathNodeIterator xpni);
+
+        string ReplaceLineBreaksForHtml(string text);
+
+        string CreateMd5Hash(string text);
+
+        HtmlString StripHtml(IHtmlString html, params string[] tags);
+        HtmlString StripHtml(DynamicNull html, params string[] tags);
+        HtmlString StripHtml(string html, params string[] tags);
+        string Coalesce(params object[] args);
+        string Concatenate(params object[] args);
+        string Join(string seperator, params object[] args);
+        IHtmlString Truncate(IHtmlString html, int length);
+        IHtmlString Truncate(IHtmlString html, int length, bool addElipsis);
+        IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent);
+        IHtmlString Truncate(DynamicNull html, int length);
+        IHtmlString Truncate(DynamicNull html, int length, bool addElipsis);
+        IHtmlString Truncate(DynamicNull html, int length, bool addElipsis, bool treatTagsAsContent);
+        IHtmlString Truncate(string html, int length);
+        IHtmlString Truncate(string html, int length, bool addElipsis);
+        IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent);
+        HtmlString If(bool test, string valueIfTrue, string valueIfFalse);
+        HtmlString If(bool test, string valueIfTrue);
+        string GetPreValueAsString(int id);
+    }
+
+
     /// <summary>
 	/// A helper class that provides many useful methods and functionality for using Umbraco in templates
 	/// </summary>
-	public class UmbracoHelper
+    public class UmbracoHelper : IUmbracoHelper
 	{
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
