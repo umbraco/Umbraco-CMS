@@ -1550,21 +1550,43 @@ namespace Umbraco.Web
 
         // utilities
 
+
+        /// <summary>
+        /// This method will return all siblings of the supplied content or media item (including the item supplied)
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns>a collection of siblings together with the current content (content / media or member) item</returns>
         public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content)
         {
             // content.Parent, content.Children and cache.GetAtRoot() should be fast enough,
             // or cached by the content cache, so that we don't have to implement cache here.
 
-            // returns the true tree siblings, even if the content is in a set
-            // get the root docs if parent is null
-
             // note: I don't like having to refer to the "current" content cache here, but
             // what else? would need root content to have a special, non-null but hidden,
             // parent...
 
-            var siblings = content.Parent == null
-                       ? UmbracoContext.Current.ContentCache.GetAtRoot()
-                       : content.Parent.Children;
+            IEnumerable<IPublishedContent> siblings = null;
+
+            if (content.Parent == null) // can't get the parent of the current content, so calculate which root children to get
+            {
+                switch (content.ItemType)
+                {
+                    case PublishedItemType.Content:
+                        siblings = UmbracoContext.Current.ContentCache.GetAtRoot();
+                        break;
+
+                    case PublishedItemType.Media:
+                        siblings = UmbracoContext.Current.MediaCache.GetAtRoot();
+                        break;
+
+                    case PublishedItemType.Member:
+                        throw new Exception("Siblings of Members not currently supported");
+                }
+            }
+            else
+            {
+                siblings = content.Parent.Children;
+            }
 
             // make sure we run it once
             return siblings.ToArray();
