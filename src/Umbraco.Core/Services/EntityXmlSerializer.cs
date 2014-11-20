@@ -248,7 +248,9 @@ namespace Umbraco.Core.Services
             {
                 var tab = new XElement("Tab",
                                        new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name));
+                                       new XElement("Caption", propertyGroup.Name),
+                                       new XElement("SortOrder", propertyGroup.SortOrder));
+
                 tabs.Add(tab);
             }
 
@@ -354,7 +356,8 @@ namespace Umbraco.Core.Services
             {
                 var tab = new XElement("Tab",
                                        new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name));
+                                       new XElement("Caption", propertyGroup.Name),
+                                       new XElement("SortOrder", propertyGroup.SortOrder));
                 tabs.Add(tab);
             }
 
