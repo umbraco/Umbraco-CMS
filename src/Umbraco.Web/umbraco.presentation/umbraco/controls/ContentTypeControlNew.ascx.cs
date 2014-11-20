@@ -1090,7 +1090,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             foreach (DataGridItem dgi in dgTabs.Items)
             {
                 int tabid = int.Parse(dgi.Cells[0].Text);
-                string tabName = ((TextBox)dgi.FindControl("txtTab")).Text.Replace("'", "''");
+                string tabName = ((TextBox) dgi.FindControl("txtTab")).Text;
                 int tabSortOrder;
                 if (Int32.TryParse(((TextBox)dgi.FindControl("txtSortOrder")).Text, out tabSortOrder))
                 {
