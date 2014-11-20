@@ -249,8 +249,6 @@
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\HelpElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\HelpElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
