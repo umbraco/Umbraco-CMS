@@ -1,9 +1,12 @@
 using System;
 using System.Globalization;
 using System.Net.Http.Formatting;
+using System.Web.Services.Description;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using umbraco.presentation.actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -46,6 +49,7 @@ namespace Umbraco.Web.Trees
                             Uri.EscapeDataString("/umbraco/settings/editLanguage.aspx?id=" + language.Id)));
                 }
             }
+
             return nodes;
         }
 
@@ -58,21 +62,34 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
-
+            
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                var createMenuItem = menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-                createMenuItem.LaunchDialogUrl("/umbraco/create.aspx?nodeId=init&nodeType=initlanguages&nodeName=Languages", ui.GetText("general", "create"));
-
+                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
+                    //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                    //use the legacy format
+                    .ConvertLegacyMenuItem(null, "initlanguages", queryStrings.GetValue<string>("application"));
+               
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
                 return menu;
             }
 
+            var lang = Services.LocalizationService.GetLanguageById(int.Parse(id));
+
             //add delete option for all languages
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias))
+                //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                //use the legacy format
+                .ConvertLegacyMenuItem(new UmbracoEntity
+                {
+                    Id = lang.Id,
+                    Level = 1,
+                    ParentId = -1,
+                    Name = lang.CultureInfo.DisplayName                    
+                }, "language", queryStrings.GetValue<string>("application"));
 
             return menu;
         }
