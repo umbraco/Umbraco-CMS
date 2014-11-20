@@ -266,7 +266,7 @@
     <key alias="findDocument">Trova</key>
     <key alias="folder">Cartella</key>
     <key alias="height">Altezza</key>
-    <key alias="help">Aiuto</key>
+    <key alias="help">Guida</key>
     <key alias="icon">Icona</key>
     <key alias="import">Importa</key>
     <key alias="innerMargin"><![CDATA[Margine interno (inner margin)]]></key>
@@ -630,7 +630,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="contentTypeTabCreated">Tab creata</key>
     <key alias="contentTypeTabDeleted">Tab eliminata</key>
     <key alias="contentTypeTabDeletedText">Tab con id: %0% eliminata</key>
-    <key alias="contentUnpublished">Contenuto non pubblicato</key>
+    <key alias="contentUnpublished">Contenuto non pubblicare</key>
     <key alias="cssErrorHeader"><![CDATA[Foglio di stile non salvato]]></key>
     <key alias="cssSavedHeader"><![CDATA[Foglio di stile salvato]]></key>
     <key alias="cssSavedText"><![CDATA[Foglio di stile salvato correttamente]]></key>
