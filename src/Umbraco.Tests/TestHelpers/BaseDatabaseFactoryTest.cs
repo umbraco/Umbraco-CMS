@@ -192,8 +192,6 @@ namespace Umbraco.Tests.TestHelpers
             PropertyEditorResolver.Current = new PropertyEditorResolver(
                 () => PluginManager.Current.ResolvePropertyEditors());
 
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
 
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory(true)); //disable all repo caches for tests!

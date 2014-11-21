@@ -28,12 +28,10 @@ namespace Umbraco.Web.WebServices
         public JsonResult PublishDocument(int documentId, bool publishDescendants, bool includeUnpublished)
         {
             var content = Services.ContentService.GetById(documentId);
-            var doc = new Document(content);
-            //var contentService = (ContentService) Services.ContentService;
+
             if (publishDescendants == false)
             {
-                //var result = contentService.SaveAndPublishInternal(content);
-                var result = doc.SaveAndPublish(UmbracoUser.Id);
+                var result = Services.ContentService.SaveAndPublishWithStatus(content, Security.CurrentUser.Id);
                 return Json(new
                     {
                         success = result.Success,
@@ -42,10 +40,10 @@ namespace Umbraco.Web.WebServices
             }
             else
             {
-                /*var result = ((ContentService) Services.ContentService)
-                    .PublishWithChildrenInternal(content, UmbracoUser.Id, includeUnpublished)
-                    .ToArray();*/
-                var result = doc.PublishWithSubs(UmbracoUser.Id, includeUnpublished);
+                var result = Services.ContentService
+                    .PublishWithChildrenWithStatus(content, Security.CurrentUser.Id, includeUnpublished)
+                    .ToArray();
+
                 return Json(new
                     {
                         success = result.All(x => x.Success),

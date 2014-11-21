@@ -242,51 +242,7 @@ namespace umbraco.cms.businesslogic.media
             return null;
         }
 
-        /// <summary>
-        /// Overrides the moving of a <see cref="Media"/> object to a new location by changing its parent id.
-        /// </summary>
-        public override void Move(int newParentId)
-        {
-            MoveEventArgs e = new MoveEventArgs();
-            base.FireBeforeMove(e);
-
-            if (!e.Cancel)
-            {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.MediaService.Move(MediaItem, newParentId, userId);
-            }
-
-            base.FireAfterMove(e);
-        }
-
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Save()", false)]
-        public override void Save()
-        {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            foreach (var property in GenericProperties)
-            {
-                MediaItem.SetValue(property.PropertyType.Alias, property.Value);
-            }
-            
-            if (!e.Cancel)
-            {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.MediaService.Save(MediaItem, userId);
-
-                base.VersionDate = MediaItem.UpdateDate;
-
-                base.Save();
-                
-                FireAfterSave(e);
-            }
-        }
+      
 
         /// <summary>
         /// Moves the media to the trash

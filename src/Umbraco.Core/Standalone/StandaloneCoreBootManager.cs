@@ -21,9 +21,6 @@ namespace Umbraco.Core.Standalone
 
             base.InitializeApplicationRootPath(_baseDirectory);
 
-            // this is only here to ensure references to the assemblies needed for
-            // the DataTypesResolver otherwise they won't be loaded into the AppDomain.
-            var interfacesAssemblyName = typeof(IDataType).Assembly.FullName;
         }
 
         protected override void InitializeApplicationEventsResolver()

@@ -160,10 +160,6 @@ namespace umbraco.presentation.developer.packages
                 }
             }
 
-            if (_installer.ContainsLegacyPropertyEditors)
-            {
-                LegacyPropertyEditorPanel.Visible = true;
-            }
 
             if (_installer.ContainsBinaryFileErrors)
             {

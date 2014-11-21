@@ -33,10 +33,6 @@ namespace Umbraco.Web.Standalone
 
             base.InitializeApplicationRootPath(_baseDirectory);
 
-            // this is only here to ensure references to the assemblies needed for
-            // the DataTypesResolver otherwise they won't be loaded into the AppDomain.
-            var interfacesAssemblyName = typeof(IDataType).Assembly.FullName;
-
             // TODO there's also that one... but we don't use it in standalone?
             //using umbraco.editorControls;
             //var editorControlsAssemblyName = typeof(uploadField).Assembly.FullName;

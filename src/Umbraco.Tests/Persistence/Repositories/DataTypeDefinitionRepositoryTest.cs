@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             int id;
             using (var repository = CreateRepository(unitOfWork))
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) {Name = "test"};
+                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
 
                 repository.AddOrUpdate(dataTypeDefinition);
 
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             int id;
             using (var repository = CreateRepository(unitOfWork))
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
                 unitOfWork.Commit();
                 id = dataTypeDefinition.Id;
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
             using (var repository = CreateRepository(unitOfWork))
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
 
                 Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
@@ -318,7 +318,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             int dtid;
             using (var repository = CreateRepository(unitOfWork))
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
                 unitOfWork.Commit();
                 dtid = dataTypeDefinition.Id;
@@ -343,7 +343,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             int dtid;
             using (var repository = CreateRepository(unitOfWork))
             {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
                 unitOfWork.Commit();
                 dtid = dataTypeDefinition.Id;
@@ -375,7 +375,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             DataTypeDefinition dtd;
             using (var repository = creator())
             {
-                dtd = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Commit();                
             }
@@ -412,7 +412,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             DataTypeDefinition dtd;
             using (var repository = creator())
             {
-                dtd = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
                 unitOfWork.Commit();
             }

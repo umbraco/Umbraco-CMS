@@ -26,11 +26,11 @@ namespace Umbraco.Web.Routing
 			var url = NotFoundHandlerHelper.GetLegacyUrlForNotFoundHandlers();
             LogHelper.Debug<ContentFinderByNotFoundHandler<THandler>>("Running for legacy url='{0}'.", () => url);
 
-			if (handler.Execute(url) && handler.redirectID > 0)
+			if (handler.Execute(url) && handler.RedirectId > 0)
 			{
-				LogHelper.Debug<ContentFinderByNotFoundHandler<THandler>>("Handler '{0}' returned id={1}.", () => type.FullName, () => handler.redirectID);
+				LogHelper.Debug<ContentFinderByNotFoundHandler<THandler>>("Handler '{0}' returned id={1}.", () => type.FullName, () => handler.RedirectId);
 
-                var content = pcr.RoutingContext.UmbracoContext.ContentCache.GetById(handler.redirectID);
+                var content = pcr.RoutingContext.UmbracoContext.ContentCache.GetById(handler.RedirectId);
 
 			    LogHelper.Debug<ContentFinderByNotFoundHandler<THandler>>(content == null
 			        ? "Could not find content with that id."

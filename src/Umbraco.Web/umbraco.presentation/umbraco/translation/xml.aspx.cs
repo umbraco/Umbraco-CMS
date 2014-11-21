@@ -97,7 +97,8 @@ namespace umbraco.presentation.translation
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "Id", t.Id.ToString()));
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "Date", t.Date.ToString("s")));
             xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "NodeId", t.Node.Id.ToString()));
-            xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
+            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+            //xTask.SetAttributeNode(XmlHelper.AddAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
             xTask.AppendChild(XmlHelper.AddCDataNode(xd, "Comment", t.Comment));
             string protocol = GlobalSettings.UseSSL ? "https" : "http";
             xTask.AppendChild(XmlHelper.AddTextNode(xd, "PreviewUrl", protocol + "://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));

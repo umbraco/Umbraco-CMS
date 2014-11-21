@@ -170,8 +170,7 @@ namespace Umbraco.Core.Models.PublishedContent
             _converter = null;
             
             //get all converters for this property type
-            // todo: remove Union() once we drop IPropertyEditorValueConverter support.
-            var foundConverters = converters.Union(GetCompatConverters()).Where(x => x.IsConverter(this)).ToArray();
+            var foundConverters = converters.Where(x => x.IsConverter(this)).ToArray();
             if (foundConverters.Length == 1)
             {
                 _converter = foundConverters[0];
@@ -357,43 +356,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #endregion
 
-        #region Compat
-
-        // backward-compatibility: support IPropertyEditorValueConverter while we have to
-        // todo: remove once we drop IPropertyEditorValueConverter support.
-
-        IEnumerable<IPropertyValueConverter> GetCompatConverters()
-        {
-            var propertyEditorGuid = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
-            return PropertyEditorValueConvertersResolver.HasCurrent && propertyEditorGuid.HasValue
-                ? PropertyEditorValueConvertersResolver.Current.Converters
-                    .Where(x => x.IsConverterFor(propertyEditorGuid.Value, ContentType.Alias, PropertyTypeAlias))
-                    .Select(x => new CompatConverter(x))
-                : Enumerable.Empty<IPropertyValueConverter>();
-        }
-
-        private class CompatConverter : PropertyValueConverterBase
-        {
-            private readonly IPropertyEditorValueConverter _converter;
-
-            public CompatConverter(IPropertyEditorValueConverter converter)
-            {
-                _converter = converter;
-            }
-
-            public override bool IsConverter(PublishedPropertyType propertyType)
-            {
-                return true;
-            }
-
-            public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
-            {
-                // NOTE: ignore preview, because IPropertyEditorValueConverter does not support it
-                return _converter.ConvertPropertyValue(source).Result;
-            }
-        }
-
-        #endregion
+       
 
         #region Detached
 

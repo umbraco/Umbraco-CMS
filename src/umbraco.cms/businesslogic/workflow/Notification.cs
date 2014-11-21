@@ -1,20 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net.Mail;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using umbraco.interfaces;
-using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.workflow
 {

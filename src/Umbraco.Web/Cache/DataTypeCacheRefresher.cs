@@ -34,19 +34,6 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="dataTypes"></param>
         /// <returns></returns>
-        internal static string SerializeToJsonPayload(params global::umbraco.cms.businesslogic.datatype.DataTypeDefinition[] dataTypes)
-        {
-            var serializer = new JavaScriptSerializer();
-            var items = dataTypes.Select(FromDataTypeDefinition).ToArray();
-            var json = serializer.Serialize(items);
-            return json;
-        }
-
-        /// <summary>
-        /// Creates the custom Json payload used to refresh cache amongst the servers
-        /// </summary>
-        /// <param name="dataTypes"></param>
-        /// <returns></returns>
         internal static string SerializeToJsonPayload(params IDataTypeDefinition[] dataTypes)
         {
             var serializer = new JavaScriptSerializer();
@@ -55,20 +42,6 @@ namespace Umbraco.Web.Cache
             return json;
         }
 
-        /// <summary>
-        /// Converts a macro to a jsonPayload object
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
-        private static JsonPayload FromDataTypeDefinition(global::umbraco.cms.businesslogic.datatype.DataTypeDefinition dataType)
-        {
-            var payload = new JsonPayload
-            {
-                UniqueId = dataType.UniqueId,
-                Id = dataType.Id
-            };
-            return payload;
-        }
 
         /// <summary>
         /// Converts a macro to a jsonPayload object

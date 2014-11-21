@@ -213,15 +213,6 @@
     </Compile>
     <Compile Include="Actions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
-    <Compile Include="businesslogic\datatype\AbstractDataEditorControl.cs" />
-    <Compile Include="businesslogic\datatype\DataEditorSetting.cs" />
-    <Compile Include="businesslogic\datatype\DataEditorSettingsStorage.cs" />
-    <Compile Include="businesslogic\datatype\DataEditorSettingType.cs" />
-    <Compile Include="businesslogic\datatype\DataEditorSettingValidationResult.cs" />
-    <Compile Include="businesslogic\datatype\DBTypes.cs" />
-    <Compile Include="businesslogic\datatype\FileHandlerData.cs" />
-    <Compile Include="businesslogic\datatype\IDataEditorSettingType.cs" />
-    <Compile Include="businesslogic\datatype\PreValue.cs" />
     <Compile Include="businesslogic\Files\IFile.cs" />
     <Compile Include="businesslogic\Files\NotAnImageException.cs" />
     <Compile Include="businesslogic\Files\UmbracoFile.cs" />
@@ -237,9 +228,6 @@
     <Compile Include="businesslogic\macro\MacroPropertyModel.cs" />
     <Compile Include="businesslogic\media\IMediaFactory.cs" />
     <Compile Include="businesslogic\media\MediaFactory.cs" />
-    <Compile Include="businesslogic\media\UmbracoFileMediaFactory.cs" />
-    <Compile Include="businesslogic\media\UmbracoImageMediaFactory.cs" />
-    <Compile Include="businesslogic\media\UmbracoMediaFactory.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -256,7 +244,6 @@
     <Compile Include="businesslogic\Packager\PackageActions\publishRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
-    <Compile Include="businesslogic\Property\Properties.cs" />
     <Compile Include="businesslogic\ProviderBase.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
@@ -292,17 +279,6 @@
     <Compile Include="businesslogic\ContentType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\datatype\AbstractDataEditor.cs" />
-    <Compile Include="businesslogic\datatype\BaseDataType.cs" />
-    <Compile Include="businesslogic\datatype\DataTypeDefinition.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\datatype\DefaultData.cs" />
-    <Compile Include="businesslogic\datatype\DefaultPreValueEditor.cs" />
-    <Compile Include="businesslogic\datatype\factory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\datatype\PreValues.cs" />
     <Compile Include="businesslogic\Dictionary.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -355,9 +331,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\propertytype\propertytype.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\Property\Property.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\RecycleBin.cs" />

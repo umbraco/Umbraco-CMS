@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,20 +7,13 @@ using System.Web;
 using System.Web.Caching;
 using System.Web.UI;
 using System.Xml;
-using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Profiling;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
-using Umbraco.Core.IO;
 
 namespace umbraco.presentation.templateControls
 {
@@ -265,59 +257,5 @@ namespace umbraco.presentation.templateControls
             return item.TextIfEmpty;
         }
 
-        /// <summary>
-        /// Gets the field content from database instead of the published XML via the APIs.
-        /// </summary>
-        /// <param name="itemAttributes"></param>
-        /// <param name="nodeIdInt">The node id.</param>
-        /// <param name="currentField">The field that should be fetched.</param>
-        /// <returns>The contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
-        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
-        protected virtual string GetContentFromDatabase(AttributeCollectionAdapter itemAttributes, int nodeIdInt, string currentField)
-        {
-            var c = new Content(nodeIdInt);
-
-            var property = c.getProperty(currentField);
-            if (property == null)
-                throw new ArgumentException(String.Format("Could not find property {0} of node {1}.", currentField, nodeIdInt));
-
-            var umbItem = new item(property.Value.ToString(), itemAttributes);
-            var tempElementContent = umbItem.FieldContent;
-
-            // If the current content object is a document object, we'll only output it if it's published
-            if (c.nodeObjectType == Document._objectType)
-            {
-                try
-                {
-                    var d = (Document)c;
-                    if (!d.Published)
-                        tempElementContent = "";
-                }
-                catch { }
-            }
-
-            // Add the content to the cache
-            if (!string.IsNullOrEmpty(tempElementContent))
-            {
-                ApplicationContext.Current.ApplicationCache.InsertCacheItem(
-                    string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, currentField),
-                    CacheItemPriority.Default, () => tempElementContent);
-            }
-            return tempElementContent;
-        }
-
-        /// <summary>
-        /// Gets the content from cache.
-        /// </summary>
-        /// <param name="nodeIdInt">The node id.</param>
-        /// <param name="field">The field.</param>
-        /// <returns>The cached contents of the <paramref name="field"/> from the <paramref name="nodeIdInt"/> content object</returns>
-        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
-        protected virtual object GetContentFromCache(int nodeIdInt, string field)
-        {
-            var content = ApplicationContext.Current.ApplicationCache.GetCacheItem<object>(
-                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, field));
-            return content;
-        }
     }
 }

@@ -413,6 +413,7 @@
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
+    <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
@@ -561,12 +562,9 @@
     <Compile Include="Persistence\Repositories\Interfaces\ITagRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\TagRepository.cs" />
-    <Compile Include="PropertyEditors\BackwardsCompatibleData.cs" />
-    <Compile Include="PropertyEditors\BackwardsCompatibleDataType.cs" />
     <Compile Include="PropertyEditors\EmailValidator.cs" />
     <Compile Include="PropertyEditors\IParameterEditor.cs" />
     <Compile Include="PropertyEditors\LegacyParameterEditorAliasConverter.cs" />
-    <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
     <Compile Include="Persistence\Mappers\MemberMapper.cs" />
     <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
@@ -967,7 +965,6 @@
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="Persistence\PetaPoco.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
-    <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="Dynamics\ParseException.cs" />
     <Compile Include="Dynamics\PropertyResult.cs" />
     <Compile Include="Dynamics\Res.cs" />
@@ -978,7 +975,6 @@
     <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
-    <Compile Include="DataTypesResolver.cs" />
     <Compile Include="DisposableObject.cs" />
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="ExpressionHelper.cs" />
@@ -993,7 +989,6 @@
     <Compile Include="Macros\MacroFieldEditorsResolver.cs" />
     <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorValueConvertersResolver.cs" />
     <Compile Include="ObjectResolution\ManyObjectsResolverBase.cs" />
     <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />
     <Compile Include="ObjectResolution\Resolution.cs" />

@@ -578,56 +578,6 @@ namespace umbraco.cms.businesslogic.member
                 Version = MemberItem.Version;
         }
 
-        /// <summary>
-        /// Used to persist object changes to the database
-        /// </summary>
-        /// <param name="raiseEvents"></param>
-        public void Save(bool raiseEvents)
-        {
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            //Due to backwards compatibility with this API we need to check for duplicate emails here if required.
-            // This check should not be done here, as this logic is based on the MembershipProvider            
-            var requireUniqueEmail = provider.RequiresUniqueEmail;
-            //check if there's anyone with this email in the db that isn't us
-            var membersFromEmail = GetMembersFromEmail(Email);
-            if (requireUniqueEmail && membersFromEmail != null && membersFromEmail.Any(x => x.Id != Id))
-            {
-                throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
-            }
-
-            var e = new SaveEventArgs();
-            if (raiseEvents)
-            {
-                FireBeforeSave(e);    
-            }
-
-            foreach (var property in GenericProperties)
-            {
-                MemberItem.SetValue(property.PropertyType.Alias, property.Value);
-            }
-
-            if (e.Cancel == false)
-            {
-                ApplicationContext.Current.Services.MemberService.Save(MemberItem, raiseEvents);
-
-                //base.VersionDate = MemberItem.UpdateDate;
-
-                base.Save();
-
-                if (raiseEvents)
-                {
-                    FireAfterSave(e);    
-                }
-            }
-        }
-
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-        public override void Save()
-        {
-            Save(true);
-        }
 
         /// <summary>
         /// Xmlrepresentation of a member
@@ -747,17 +697,7 @@ namespace umbraco.cms.businesslogic.member
         }
         #endregion
 
-        #region Protected methods
-        protected override XmlNode generateXmlWithoutSaving(XmlDocument xd)
-        {
-            XmlNode node = xd.CreateNode(XmlNodeType.Element, "node", "");
-            XmlPopulate(xd, ref node, false);
-            node.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
-            node.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
-            return node;
-        }
-
-        #endregion
+     
 
         #region Private methods
 

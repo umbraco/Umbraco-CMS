@@ -452,49 +452,7 @@ namespace Umbraco.Web.Search
 	                .Where(x => x.EnableDefaultEventHandler));
 	    }
 
-		/// <summary>
-		/// Converts a content node to XDocument
-		/// </summary>
-		/// <param name="node"></param>
-		/// <param name="cacheOnly">true if data is going to be returned from cache</param>
-		/// <returns></returns>		
-        [Obsolete("This method is no longer used and will be removed from the core in future versions, the cacheOnly parameter has no effect. Use the other ToXDocument overload instead")]
-		public static XDocument ToXDocument(Content node, bool cacheOnly)
-		{			
-			return ToXDocument(node);
-		}
-
-		/// <summary>
-		/// Converts a content node to Xml
-		/// </summary>
-		/// <param name="node"></param>
-		/// <returns></returns>		
-		private static XDocument ToXDocument(Content node)
-		{
-            if (TypeHelper.IsTypeAssignableFrom<Document>(node))
-            {
-                return new XDocument(((Document) node).Content.ToXml());
-            }
-
-            if (TypeHelper.IsTypeAssignableFrom<global::umbraco.cms.businesslogic.media.Media>(node))
-            {
-                return new XDocument(((global::umbraco.cms.businesslogic.media.Media) node).MediaItem.ToXml());
-            }
-
-			var xDoc = new XmlDocument();
-			var xNode = xDoc.CreateNode(XmlNodeType.Element, "node", "");
-			node.XmlPopulate(xDoc, ref xNode, false);
-
-			if (xNode.Attributes["nodeTypeAlias"] == null)
-			{
-				//we'll add the nodeTypeAlias ourselves                                
-				XmlAttribute d = xDoc.CreateAttribute("nodeTypeAlias");
-				d.Value = node.ContentType.Alias;
-				xNode.Attributes.Append(d);
-			}
-
-			return new XDocument(ExamineXmlExtensions.ToXElement(xNode));
-		}
+		
 
 	}
 }

@@ -8,18 +8,14 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Media.ThumbnailProviders;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.Tags;
-using Umbraco.Web.BaseRest;
 using Tag = umbraco.cms.businesslogic.Tags.Tag;
 
 namespace Umbraco.Web.WebServices
 {
-    //TODO: Can we convert this to MVC please instead of /base?
+    //TODO: Convert this to MVC and see if we still need it
 
-    [RestExtension("FolderBrowserService")]
     public class FolderBrowserService
     {
-        [RestExtensionMethod(ReturnXml = false)]
         public static string GetChildren(int parentId)
         {
             var currentUser = GetCurrentUser();
@@ -64,7 +60,6 @@ namespace Umbraco.Web.WebServices
             return new JavaScriptSerializer().Serialize(data);
         }
 
-        [RestExtensionMethod(ReturnXml = false)]
         public static string Delete(string nodeIds)
         {
             var currentUser = GetCurrentUser();

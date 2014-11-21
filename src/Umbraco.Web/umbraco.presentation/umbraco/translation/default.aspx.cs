@@ -198,12 +198,13 @@ namespace umbraco.presentation.translation
                         if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) && (t.User.Id == UmbracoUser.Id || t.ParentUser.Id == UmbracoUser.Id))
                         {
 
-                            // update node contents
-                            var d = new Document(t.Node.Id);
-                            Document.Import(d.ParentId, UmbracoUser, (XmlElement)taskNode);
+                            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+                            //// update node contents
+                            //var d = new Document(t.Node.Id);
+                            //Document.Import(d.ParentId, UmbracoUser, (XmlElement)taskNode);
 
-                            //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
-                            ApplicationContext.Services.NotificationService.SendNotification(d.Content, ActionTranslate.Instance, ApplicationContext);
+                            ////send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
+                            //ApplicationContext.Services.NotificationService.SendNotification(d.Content, ActionTranslate.Instance, ApplicationContext);
 
                             t.Closed = true;
                             t.Save();

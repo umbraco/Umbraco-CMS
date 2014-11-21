@@ -124,7 +124,6 @@
     </Compile>
     <Compile Include="IApplication.cs" />
     <Compile Include="IApplicationStartupHandler.cs" />
-    <Compile Include="IDataFieldWithButtons.cs" />
     <Compile Include="IProperty.cs" />
     <Compile Include="ITag.cs" />
     <Compile Include="ITaskReturnUrl.cs" />
@@ -137,27 +136,11 @@
     <Compile Include="ICacheRefresher.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IData.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IDataEditor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IDataPrevalue.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IDataWithPreview.cs" />
     <Compile Include="IMacroGuiRendering.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IMenuElement.cs" />
     <Compile Include="INode.cs" />
-    <Compile Include="INotFoundHandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="IPackageAction.cs" />
     <Compile Include="ITask.cs">
       <SubType>Code</SubType>

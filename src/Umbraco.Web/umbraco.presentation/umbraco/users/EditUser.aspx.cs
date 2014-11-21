@@ -17,7 +17,6 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
-using umbraco.presentation.channels.businesslogic;
 using umbraco.uicontrols;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
@@ -224,7 +223,6 @@ namespace umbraco.cms.presentation.user
             sectionValidator.Style.Add("color", "red"); 
 
             SetupForm();
-            SetupChannel();
 
             ClientTools
                 .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
@@ -237,100 +235,6 @@ namespace umbraco.cms.presentation.user
             args.IsValid = false || lapps.SelectedIndex >= 0;
         }
 
-        private void SetupChannel()
-        {
-            Channel userChannel;
-            try
-            {
-                userChannel =
-                    new Channel(u.Id);
-            }
-            catch
-            {
-                userChannel = new Channel();
-            }
-
-            // Populate dropdowns
-            foreach (DocumentType dt in DocumentType.GetAllAsList())
-                cDocumentType.Items.Add(
-                    new ListItem(dt.Text, dt.Alias)
-                    );
-
-            // populate fields
-            ArrayList fields = new ArrayList();
-            cDescription.ID = "cDescription";
-            cCategories.ID = "cCategories";
-            cExcerpt.ID = "cExcerpt";
-            cDescription.Items.Add(new ListItem(ui.Text("choose"), ""));
-            cCategories.Items.Add(new ListItem(ui.Text("choose"), ""));
-            cExcerpt.Items.Add(new ListItem(ui.Text("choose"), ""));
-
-            foreach (PropertyType pt in PropertyType.GetAll())
-            {
-                if (!fields.Contains(pt.Alias))
-                {
-                    cDescription.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
-                    cCategories.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
-                    cExcerpt.Items.Add(new ListItem(string.Format("{0} ({1})", pt.Name, pt.Alias), pt.Alias));
-                    fields.Add(pt.Alias);
-                }
-            }
-
-            // Handle content and media pickers
-
-            PlaceHolder medias = new PlaceHolder();
-            cMediaPicker.AppAlias = Constants.Applications.Media;
-            cMediaPicker.TreeAlias = "media";
-
-            if (userChannel.MediaFolder > 0)
-                cMediaPicker.Value = userChannel.MediaFolder.ToString();
-            else
-                cMediaPicker.Value = "-1";
-
-            medias.Controls.Add(cMediaPicker);
-
-            PlaceHolder content = new PlaceHolder();
-            cContentPicker.AppAlias = Constants.Applications.Content;
-            cContentPicker.TreeAlias = "content";
-
-            if (userChannel.StartNode > 0)
-                cContentPicker.Value = userChannel.StartNode.ToString();
-            else
-                cContentPicker.Value = "-1";
-
-            content.Controls.Add(cContentPicker);
-
-
-            // Setup the panes
-            Pane ppInfo = new Pane();
-            ppInfo.addProperty(ui.Text("name", UmbracoUser), cName);
-            ppInfo.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
-            ppInfo.addProperty(ui.Text("user", "searchAllChildren", UmbracoUser), cFulltree);
-            ppInfo.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
-
-            Pane ppFields = new Pane();
-            ppFields.addProperty(ui.Text("user", "documentType", UmbracoUser), cDocumentType);
-            ppFields.addProperty(ui.Text("user", "descriptionField", UmbracoUser), cDescription);
-            ppFields.addProperty(ui.Text("user", "categoryField", UmbracoUser), cCategories);
-            ppFields.addProperty(ui.Text("user", "excerptField", UmbracoUser), cExcerpt);
-
-
-            TabPage channelInfo = UserTabs.NewTabPage(ui.Text("user", "contentChannel", UmbracoUser));
-
-            channelInfo.Controls.Add(ppInfo);
-            channelInfo.Controls.Add(ppFields);
-
-
-            if (!IsPostBack)
-            {
-                cName.Text = userChannel.Name;
-                cDescription.SelectedValue = userChannel.FieldDescriptionAlias;
-                cCategories.SelectedValue = userChannel.FieldCategoriesAlias;
-                cExcerpt.SelectedValue = userChannel.FieldExcerptAlias;
-                cDocumentType.SelectedValue = userChannel.DocumentTypeAlias;
-                cFulltree.Checked = userChannel.FullTree;
-            }
-        }
 
         /// <summary>
         /// Setups the form.
@@ -490,37 +394,6 @@ namespace umbraco.cms.presentation.user
 
                     u.Save();
 
-                    // save data
-                    if (cName.Text != "")
-                    {
-                        Channel c;
-                        try
-                        {
-                            c = new Channel(u.Id);
-                        }
-                        catch
-                        {
-                            c = new Channel();
-                            c.User = u;
-                        }
-
-                        c.Name = cName.Text;
-                        c.FullTree = cFulltree.Checked;
-                        c.StartNode = int.Parse(cContentPicker.Value);
-                        c.MediaFolder = int.Parse(cMediaPicker.Value);
-                        c.FieldCategoriesAlias = cCategories.SelectedValue;
-                        c.FieldDescriptionAlias = cDescription.SelectedValue;
-                        c.FieldExcerptAlias = cExcerpt.SelectedValue;
-                        c.DocumentTypeAlias = cDocumentType.SelectedValue;
-
-                        //
-                        c.MediaTypeAlias = Constants.Conventions.MediaTypes.Image; // [LK:2013-03-22] This was previously lowercase; unsure if using const will cause an issue.
-                        c.MediaTypeFileProperty = Constants.Conventions.Media.File;
-                        c.ImageSupport = true;
-
-                        c.Save();
-
-                    }
 
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", UmbracoUser), "");
                 }

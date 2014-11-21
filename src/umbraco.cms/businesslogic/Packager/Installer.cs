@@ -72,11 +72,6 @@ namespace umbraco.cms.businesslogic.packager
         /// </summary>
         public List<string> BinaryFileErrors { get { return _binaryFileErrors; } }
 
-        /// <summary>
-        /// Indicates that the package contains legacy property editors
-        /// </summary>
-        public bool ContainsLegacyPropertyEditors { get; private set; }
-        
         public bool ContainsStyleSheeConflicts { get; private set; }
         public IDictionary<string, string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
 
@@ -485,21 +480,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-            if (ContainsUnsecureFiles)
-            {
-                //Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
-                string[] assemblyErrors;
-                var assembliesWithReferences = PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(tempDir, out assemblyErrors).ToArray();
-                if (assemblyErrors.Any())
-                {
-                    ContainsBinaryFileErrors = true;
-                    BinaryFileErrors.AddRange(assemblyErrors);
-                }
-                if (assembliesWithReferences.Any())
-                {
-                    ContainsLegacyPropertyEditors = true;
-                }
-            }
+          
 
             //this will check for existing macros with the same alias
             //since we will not overwrite on import it's a good idea to inform the user what will be overwritten

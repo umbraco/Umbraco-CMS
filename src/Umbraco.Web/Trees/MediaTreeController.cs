@@ -25,7 +25,6 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Settings,
         Constants.Applications.Developer,
         Constants.Applications.Members)]
-    [LegacyBaseTree(typeof(loadMedia))]
     [Tree(Constants.Applications.Media, Constants.Trees.Media, "Media")]
     [PluginController("UmbracoTrees")]
     [CoreTree]

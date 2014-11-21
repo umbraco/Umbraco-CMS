@@ -17,7 +17,6 @@ using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
-using Property = umbraco.cms.businesslogic.property.Property;
 using Umbraco.Core.Strings;
 
 namespace umbraco.cms.businesslogic.web
@@ -171,115 +170,6 @@ namespace umbraco.cms.businesslogic.web
 
         #region Static Methods
 
-        /// <summary>
-        /// Imports (create) a document from a xmlrepresentation of a document, used by the packager
-        /// </summary>
-        /// <param name="ParentId">The id to import to</param>
-        /// <param name="Creator">Creator of the new document</param>
-        /// <param name="Source">Xmlsource</param>
-        public static int Import(int ParentId, User Creator, XmlElement Source)
-        {
-            // check what schema is used for the xml
-            bool sourceIsLegacySchema = Source.Name.ToLower() == "node" ? true : false;
-
-            // check whether or not to create a new document
-            int id = int.Parse(Source.GetAttribute("id"));
-            Document d = null;
-            if (Document.IsDocument(id))
-            {
-                try
-                {
-                    // if the parent is the same, we'll update the existing document. Else we'll create a new document below
-                    d = new Document(id);
-                    if (d.ParentId != ParentId)
-                        d = null;
-                }
-                catch { }
-            }
-
-            // document either didn't exist or had another parent so we'll create a new one
-            if (d == null)
-            {
-                string nodeTypeAlias = sourceIsLegacySchema ? Source.GetAttribute("nodeTypeAlias") : Source.Name;
-                d = MakeNew(
-                    Source.GetAttribute("nodeName"),
-                    DocumentType.GetByAlias(nodeTypeAlias),
-                    Creator,
-                    ParentId);
-            }
-            else
-            {
-                // update name of the document
-                d.Text = Source.GetAttribute("nodeName");
-            }
-
-            d.CreateDateTime = DateTime.Parse(Source.GetAttribute("createDate"));
-
-            // Properties
-            string propertyXPath = sourceIsLegacySchema ? "data" : "* [not(@isDoc)]";
-            foreach (XmlElement n in Source.SelectNodes(propertyXPath))
-            {
-                string propertyAlias = sourceIsLegacySchema ? n.GetAttribute("alias") : n.Name;
-                Property prop = d.getProperty(propertyAlias);
-                string propValue = xmlHelper.GetNodeValue(n);
-
-                if (prop != null)
-                {
-                    // only update real values
-                    if (!String.IsNullOrEmpty(propValue))
-                    {
-                        //test if the property has prevalues, of so, try to convert the imported values so they match the new ones
-                        SortedList prevals = cms.businesslogic.datatype.PreValues.GetPreValues(prop.PropertyType.DataTypeDefinition.Id);
-
-                        //Okey we found some prevalue, let's replace the vals with some ids
-                        if (prevals.Count > 0)
-                        {
-                            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>(propValue.Split(','));
-
-                            foreach (DictionaryEntry item in prevals)
-                            {
-                                string pval = ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Value;
-                                string pid = ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Id.ToString();
-
-                                if (list.Contains(pval))
-                                    list[list.IndexOf(pval)] = pid;
-
-                            }
-
-                            //join the list of new values and return it as the new property value
-                            System.Text.StringBuilder builder = new System.Text.StringBuilder();
-                            bool isFirst = true;
-
-                            foreach (string str in list)
-                            {
-                                if (!isFirst)
-                                    builder.Append(",");
-
-                                builder.Append(str);
-                                isFirst = false;
-                            }
-                            prop.Value = builder.ToString();
-
-                        }
-                        else
-                            prop.Value = propValue;
-                    }
-                }
-                else
-                {
-					LogHelper.Warn<Document>(String.Format("Couldn't import property '{0}' as the property type doesn't exist on this document type", propertyAlias));
-                }
-            }
-
-            d.Save();
-
-            // Subpages
-            string subXPath = sourceIsLegacySchema ? "node" : "* [@isDoc]";
-            foreach (XmlElement n in Source.SelectNodes(subXPath))
-                Import(d.Id, Creator, n);
-
-            return d.Id;
-        }
 
         /// <summary>
         /// Creates a new document
@@ -429,24 +319,6 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.Services.ContentService.RePublishAll();
         }
 
-        public static void RegeneratePreviews()
-        {
-            XmlDocument xd = new XmlDocument();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument");
-
-            while (dr.Read())
-            {
-                try
-                {
-                    new Document(dr.GetInt("nodeId")).SaveXmlPreview(xd);
-                }
-                catch (Exception ee)
-                {
-					LogHelper.Error<Document>("Error generating preview xml", ee);
-                }
-            }
-            dr.Close();
-        }
 
         /// <summary>
         /// Retrieve a list of documents with an expirationdate greater than today
@@ -769,19 +641,6 @@ namespace umbraco.cms.businesslogic.web
 
         }
 
-        /// <summary>
-        /// Saves and Publishes a document.
-        /// A xmlrepresentation of the document and its data are exposed to the runtime data
-        /// (an xmlrepresentation is added -or updated if the document previously are published) ,
-        /// this will lead to a new version of the document being created, for continuing editing of
-        /// the data.
-        /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
-        public void Publish(User u)
-        {
-            this.Published = SaveAndPublish(u);
-        }
 
         /// <summary>
         /// Publishing a document
@@ -894,46 +753,7 @@ namespace umbraco.cms.businesslogic.web
             return publishedResults;
         }
 
-        [Obsolete("Don't use! Only used internally to support the legacy events", false)]
-        internal Attempt<PublishStatus> SaveAndPublish(int userId)
-        {
-            var result = Attempt.Fail(new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
-            foreach (var property in GenericProperties)
-            {
-                Content.SetValue(property.PropertyType.Alias, property.Value);
-            }
-
-            var saveArgs = new SaveEventArgs();
-            FireBeforeSave(saveArgs);
-
-            if (!saveArgs.Cancel)
-            {
-                var publishArgs = new PublishEventArgs();
-                FireBeforePublish(publishArgs);
-
-                if (!publishArgs.Cancel)
-                {
-                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
-                    result = ApplicationContext.Current.Services.ContentService
-                        .SaveAndPublishWithStatus(Content, userId);
-                    base.VersionDate = Content.UpdateDate;
-                    this.UpdateDate = Content.UpdateDate;
-
-                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
-                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
-                    // has bound to those events, I suppose we'll need to keep this here.
-                    base.Save();
-
-                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
-                    FireAfterSave(saveArgs);
-
-                    //Now we need to fire the After publish event
-                    FireAfterPublish(publishArgs);
-                }
-            }
-
-            return result;
-        }
+    
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
         public void UnPublish()
@@ -950,94 +770,8 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        /// <summary>
-        /// Used to persist object changes to the database. 
-        /// </summary>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Save()", false)]
-        public override void Save()
-        {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
+      
 
-            foreach (var property in GenericProperties)
-            {
-                Content.SetValue(property.PropertyType.Alias, property.Value);
-            }
-
-            if (!e.Cancel)
-            {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentService.Save(Content, userId);
-
-                base.VersionDate = Content.UpdateDate;
-                this.UpdateDate = Content.UpdateDate;
-
-                base.Save();
-
-                FireAfterSave(e);
-            }
-        }
-
-        /// <summary>
-        /// Do not use! only used internally in order to get the published status until we upgrade everything to use the new API
-        /// </summary>
-        /// <param name="u"></param>
-        /// <returns></returns>
-        [Obsolete("Do not use! only used internally in order to get the published status until we upgrade everything to use the new API")]
-        internal Attempt<PublishStatus> SaveAndPublishWithResult(User u)
-        {
-            foreach (var property in GenericProperties)
-            {
-                Content.SetValue(property.PropertyType.Alias, property.Value);
-            }
-
-            var saveArgs = new SaveEventArgs();
-            FireBeforeSave(saveArgs);
-
-            if (!saveArgs.Cancel)
-            {
-                var publishArgs = new PublishEventArgs();
-                FireBeforePublish(publishArgs);
-
-                if (!publishArgs.Cancel)
-                {
-                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
-                    var result = ApplicationContext.Current.Services.ContentService
-                        .SaveAndPublishWithStatus(Content, u.Id);
-                    base.VersionDate = Content.UpdateDate;
-                    this.UpdateDate = Content.UpdateDate;
-
-                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
-                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
-                    // has bound to those events, I suppose we'll need to keep this here.
-                    base.Save();
-
-                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
-                    FireAfterSave(saveArgs);
-
-                    //Now we need to fire the After publish event
-                    FireAfterPublish(publishArgs);
-
-                    return result;
-                }
-
-                return new Attempt<PublishStatus>(false, new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
-            }
-
-            return new Attempt<PublishStatus>(false, new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
-        }
-
-        /// <summary>
-        /// Saves and publishes a document
-        /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        /// <returns></returns>
-        public bool SaveAndPublish(User u)
-        {
-            var result = SaveAndPublishWithResult(u);
-            return result.Success;
-        }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
@@ -1102,27 +836,6 @@ namespace umbraco.cms.businesslogic.web
             return tempPath;
         }
 
-        /// <summary>
-        /// Overrides the moving of a <see cref="Document"/> object to a new location by changing its parent id.
-        /// </summary>
-        public override void Move(int newParentId)
-        {
-            MoveEventArgs e = new MoveEventArgs();
-            base.FireBeforeMove(e);
-
-            if (!e.Cancel)
-            {
-                var current = User.GetCurrent();
-                int userId = current == null ? 0 : current.Id;
-                ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
-
-                //We need to manually update this property as the above change is not directly reflected in 
-                //the current object unless its reloaded.
-                base.ParentId = newParentId;
-            }
-
-            base.FireAfterMove(e);
-        }
 
         /// <summary>
         /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
@@ -1207,164 +920,6 @@ namespace umbraco.cms.businesslogic.web
             return descendants.Select(x => new Document(x.Id, true));
         }
 
-        /// <summary>
-        /// Refreshes the xml, used when publishing data on a document which already is published
-        /// </summary>
-        /// <param name="xd">The source xmldocument</param>
-        /// <param name="x">The previous xmlrepresentation of the document</param>
-        [Obsolete("Obsolete, Doesn't appear to be used anywhere", false)]
-        public void XmlNodeRefresh(XmlDocument xd, ref XmlNode x)
-        {
-            x.Attributes.RemoveAll();
-            foreach (XmlNode xDel in x.SelectNodes("./data"))
-                x.RemoveChild(xDel);
-
-            XmlPopulate(xd, ref x, false);
-        }
-
-        /// <summary>
-        /// Creates an xmlrepresentation of the document and saves it to the database
-        /// </summary>
-        /// <param name="xd"></param>
-        public override void XmlGenerate(XmlDocument xd)
-        {
-            XmlNode x = generateXmlWithoutSaving(xd);
-            // Save to db
-            saveXml(x);
-        }
-
-        /// <summary>
-        /// A xmlrepresentaion of the document, used when publishing/exporting the document, 
-        /// 
-        /// Optional: Recursive get childdocuments xmlrepresentation
-        /// </summary>
-        /// <param name="xd">The xmldocument</param>
-        /// <param name="Deep">Recursive add of childdocuments</param>
-        /// <returns></returns>
-        public override XmlNode ToXml(XmlDocument xd, bool Deep)
-        {
-            if (Published)
-            {
-                if (_xml == null)
-                {
-                    // Load xml from db if _xml hasn't been loaded yet
-                    _xml = importXml();
-
-                    // Generate xml if xml still null (then it hasn't been initialized before)
-                    if (_xml == null)
-                    {
-                        XmlGenerate(new XmlDocument());
-                        _xml = importXml();
-                    }
-                }
-
-                XmlNode x = xd.ImportNode(_xml, true);
-
-                if (Deep)
-                {
-                    var c = Children;
-                    foreach (Document d in c)
-                    {
-                        if (d.Published)
-                            x.AppendChild(d.ToXml(xd, true));
-                    }
-                }
-
-                return x;
-            }
-            else
-                return null;
-        }
-
-        /// <summary>
-        /// Populate a documents xmlnode
-        /// </summary>
-        /// <param name="xd">Xmldocument context</param>
-        /// <param name="x">The node to fill with data</param>
-        /// <param name="Deep">If true the documents childrens xmlrepresentation will be appended to the Xmlnode recursive</param>
-        public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
-        {
-            string urlName = this.Content.GetUrlSegment().ToLower();
-            foreach (Property p in GenericProperties.Where(p => p != null && p.Value != null && string.IsNullOrEmpty(p.Value.ToString()) == false))
-                x.AppendChild(p.ToXml(xd));
-
-            // attributes
-            x.Attributes.Append(addAttribute(xd, "id", Id.ToString()));
-            //            x.Attributes.Append(addAttribute(xd, "version", Version.ToString()));
-            if (Level > 1)
-                x.Attributes.Append(addAttribute(xd, "parentID", Parent.Id.ToString()));
-            else
-                x.Attributes.Append(addAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));
-            x.Attributes.Append(addAttribute(xd, "writerID", Writer.Id.ToString()));
-            x.Attributes.Append(addAttribute(xd, "creatorID", Creator.Id.ToString()));
-            if (ContentType != null)
-                x.Attributes.Append(addAttribute(xd, "nodeType", ContentType.Id.ToString()));
-            x.Attributes.Append(addAttribute(xd, "template", _template.ToString()));
-            x.Attributes.Append(addAttribute(xd, "sortOrder", sortOrder.ToString()));
-            x.Attributes.Append(addAttribute(xd, "createDate", CreateDateTime.ToString("s")));
-            x.Attributes.Append(addAttribute(xd, "updateDate", VersionDate.ToString("s")));
-            x.Attributes.Append(addAttribute(xd, "nodeName", Text));
-            x.Attributes.Append(addAttribute(xd, "urlName", urlName));
-            x.Attributes.Append(addAttribute(xd, "writerName", Writer.Name));
-            x.Attributes.Append(addAttribute(xd, "creatorName", Creator.Name.ToString()));
-            if (ContentType != null && UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-                x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
-            x.Attributes.Append(addAttribute(xd, "path", Path));
-
-            if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-            {
-                x.Attributes.Append(addAttribute(xd, "isDoc", ""));
-            }
-
-            if (Deep)
-            {
-                //store children array here because iterating over an Array object is very inneficient.
-                var c = Children;
-                foreach (Document d in c)
-                {
-                    XmlNode xml = d.ToXml(xd, true);
-                    if (xml != null)
-                    {
-                        x.AppendChild(xml);
-                    }
-                    else
-                    {
-                        LogHelper.Debug<Document>(string.Format("Document {0} not published so XML cannot be generated", d.Id));
-                    }
-                }
-
-            }
-        }
-
-        /// <summary>
-        /// This is a specialized method which literally just makes sure that the sortOrder attribute of the xml
-        /// that is stored in the database is up to date.
-        /// </summary>
-        public void refreshXmlSortOrder()
-        {
-            if (Published)
-            {
-                if (_xml == null)
-                    // Load xml from db if _xml hasn't been loaded yet
-                    _xml = importXml();
-
-                // Generate xml if xml still null (then it hasn't been initialized before)
-                if (_xml == null)
-                {
-                    XmlGenerate(new XmlDocument());
-                    _xml = importXml();
-                }
-                else
-                {
-                    // Update the sort order attr
-                    _xml.Attributes.GetNamedItem("sortOrder").Value = sortOrder.ToString();
-                    saveXml(_xml);
-                }
-
-            }
-
-        }
 
         public override List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
         {
@@ -1380,14 +935,6 @@ namespace umbraco.cms.businesslogic.web
             return nodes;
         }
 
-        public override XmlNode ToPreviewXml(XmlDocument xd)
-        {
-            if (!PreviewExists(Version))
-            {
-                SaveXmlPreview(xd);
-            }
-            return GetPreviewXml(xd, Version);
-        }
 
         /// <summary>
         /// Method to remove an assigned template from a document
@@ -1504,10 +1051,6 @@ namespace umbraco.cms.businesslogic.web
                 _expire = dr.GetDateTime("expireDate");
         }
 
-        protected void SaveXmlPreview(XmlDocument xd)
-        {
-            SavePreviewXml(generateXmlWithoutSaving(xd), Version);
-        }
 
         #endregion
 

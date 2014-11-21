@@ -49,25 +49,6 @@ namespace umbraco.cms.businesslogic.member
 
         #region Regenerate Xml Structures
 
-        /// <summary>
-        /// Rebuilds the xml structure for the member item by id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <remarks>
-        /// This is not thread safe
-        /// </remarks>
-        internal override void RebuildXmlStructureForContentItem(int contentId)
-        {
-            var xd = new XmlDocument();
-            try
-            {
-                new Member(contentId).XmlGenerate(xd);
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<MemberType>("Error generating xml", ee);
-            }
-        }
 
         #endregion
 
@@ -152,50 +133,7 @@ namespace umbraco.cms.businesslogic.member
                 FireAfterSave(e);
             }
         }
-        
-        public XmlElement ToXml(XmlDocument xd)
-        {
-            XmlElement root = xd.CreateElement("MemberType");
-
-            var info = xd.CreateElement("Info");
-            root.AppendChild(info);
-            info.AppendChild(xmlHelper.addTextNode(xd, "Name", this.Text));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Alias", this.Alias));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Icon", this.IconUrl));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Thumbnail", this.Thumbnail));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Description", this.Description));
-
-            XmlElement pts = xd.CreateElement("GenericProperties");
-            foreach (PropertyType pt in this.PropertyTypes)
-            {
-                XmlElement ptx = xd.CreateElement("GenericProperty");
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Name", pt.Name));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Alias", pt.Alias));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
-
-                //Datatype definition guid was added in v4 to enable datatype imports
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
-
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Validation", pt.ValidationRegExp));
-                ptx.AppendChild(xmlHelper.addCDataNode(xd, "Description", pt.Description));
-                pts.AppendChild(ptx);
-            }
-            root.AppendChild(pts);
-
-            // tabs
-            XmlElement tabs = xd.CreateElement("Tabs");
-            foreach (TabI t in getVirtualTabs.ToList())
-            {
-                XmlElement tabx = xd.CreateElement("Tab");
-                tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));
-                tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Caption));
-                tabs.AppendChild(tabx);
-            }
-            root.AppendChild(tabs);
-            return root;
-        }
+       
 
         #endregion
 

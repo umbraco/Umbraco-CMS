@@ -56,10 +56,11 @@ namespace umbraco.presentation.umbraco.translation {
             pp_owner.Controls.Add(lt);
             pp_owner.Text = ui.Text("translation", "taskAssignedBy");
 
-            lt = new Literal();
-            lt.Text = Translation.CountWords(t.Node.Id).ToString();
-            pp_totalWords.Controls.Add(lt);
-            pp_totalWords.Text = ui.Text("translation", "totalWords");
+            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+            //lt = new Literal();
+            //lt.Text = Translation.CountWords(t.Node.Id).ToString();
+            //pp_totalWords.Controls.Add(lt);
+            //pp_totalWords.Text = ui.Text("translation", "totalWords");
 
             lt = new Literal();
             lt.Text = library.ReplaceLineBreaks(t.Comment);
@@ -98,13 +99,14 @@ namespace umbraco.presentation.umbraco.translation {
             pageRow[ui.Text("name")] = ui.Text("nodeName");
             pageRow[ui.Text("value")] = page.Text;
             pageTable.Rows.Add(pageRow);
-            
-            foreach (PropertyType pt in page.ContentType.PropertyTypes) {
-                pageRow = pageTable.NewRow();
-                pageRow[ui.Text("name")] = pt.Name;
-                pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
-                pageTable.Rows.Add(pageRow);
-            }
+
+            //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
+            //foreach (PropertyType pt in page.ContentType.PropertyTypes) {
+            //    pageRow = pageTable.NewRow();
+            //    pageRow[ui.Text("name")] = pt.Name;
+            //    pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
+            //    pageTable.Rows.Add(pageRow);
+            //}
             
             dg_fields.DataSource = pageTable;
             dg_fields.DataBind();

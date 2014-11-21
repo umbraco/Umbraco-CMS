@@ -1,166 +1,168 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Web.UI.WebControls;
-using umbraco.cms.presentation.Trees;
-using umbraco.cms.businesslogic.web;
-using System.Linq;
-using umbraco.controls;
+﻿//TODO: This needs a full rewrite in angular! kept here for reference for now
 
-namespace umbraco.settings
-{
-    public partial class EditContentTypeNew : BasePages.UmbracoEnsuredPage
-    {
-        public EditContentTypeNew()
-        {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
-        }
+//using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using System.Globalization;
+//using System.Web.UI.WebControls;
+//using umbraco.cms.presentation.Trees;
+//using umbraco.cms.businesslogic.web;
+//using System.Linq;
+//using umbraco.controls;
 
-        protected controls.ContentTypeControlNew ContentTypeControlNew1;
-        private DocumentType _dt;
+//namespace umbraco.settings
+//{
+//    public partial class EditContentTypeNew : BasePages.UmbracoEnsuredPage
+//    {
+//        public EditContentTypeNew()
+//        {
+//            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+//        }
 
-        override protected void OnInit(EventArgs e)
-        {
-            ContentTypeControlNew1.DocumentTypeCallback = new Func<DocumentType, DocumentType>(UpdateAllowedTemplates);
-            ContentTypeControlNew1.InfoTabPage.Controls.Add(tmpPane);
-            base.OnInit(e);
-        }
+//        protected controls.ContentTypeControlNew ContentTypeControlNew1;
+//        private DocumentType _dt;
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            _dt = new DocumentType(int.Parse(Request.QueryString["id"]));
-            if (!Page.IsPostBack)
-            {
-                BindTemplates();
+//        override protected void OnInit(EventArgs e)
+//        {
+//            ContentTypeControlNew1.DocumentTypeCallback = new Func<DocumentType, DocumentType>(UpdateAllowedTemplates);
+//            ContentTypeControlNew1.InfoTabPage.Controls.Add(tmpPane);
+//            base.OnInit(e);
+//        }
 
-                ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadNodeTypes>().Tree.Alias)
-                     .SyncTree("-1,init," + _dt.Path.Replace("-1,", ""), false);
-            }
-        }
+//        protected void Page_Load(object sender, EventArgs e)
+//        {
+//            _dt = new DocumentType(int.Parse(Request.QueryString["id"]));
+//            if (!Page.IsPostBack)
+//            {
+//                BindTemplates();
 
-        protected override bool OnBubbleEvent(object source, EventArgs args)
-        {
-            bool handled = false;
-            var eventArgs = args as SaveClickEventArgs;
-            if (eventArgs != null)
-            {
-                var e = eventArgs;
-                if (e.Message == "Saved")
-                {
-                    ClientTools.ShowSpeechBubble(e.IconType, ui.Text("contentTypeSavedHeader"), "");
+//                ClientTools
+//                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadNodeTypes>().Tree.Alias)
+//                     .SyncTree("-1,init," + _dt.Path.Replace("-1,", ""), false);
+//            }
+//        }
 
-                    BindTemplates();
-                }
-                else
-                {
-                    ClientTools.ShowSpeechBubble(e.IconType, e.Message, "");
-                }
-                handled = true;
-            }
-            return handled;
-        }
+//        protected override bool OnBubbleEvent(object source, EventArgs args)
+//        {
+//            bool handled = false;
+//            var eventArgs = args as SaveClickEventArgs;
+//            if (eventArgs != null)
+//            {
+//                var e = eventArgs;
+//                if (e.Message == "Saved")
+//                {
+//                    ClientTools.ShowSpeechBubble(e.IconType, ui.Text("contentTypeSavedHeader"), "");
 
-        protected void dgTemplate_itemdatabound(object sender, DataGridItemEventArgs e)
-        {
-            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
-            {
-                ((CheckBox)e.Item.FindControl("ckbAllowTemplate")).Checked = true;
-            }
-        }
+//                    BindTemplates();
+//                }
+//                else
+//                {
+//                    ClientTools.ShowSpeechBubble(e.IconType, e.Message, "");
+//                }
+//                handled = true;
+//            }
+//            return handled;
+//        }
 
-        private DocumentType UpdateAllowedTemplates(DocumentType documentType)
-        {
-            var tmp = new ArrayList();
+//        protected void dgTemplate_itemdatabound(object sender, DataGridItemEventArgs e)
+//        {
+//            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+//            {
+//                ((CheckBox)e.Item.FindControl("ckbAllowTemplate")).Checked = true;
+//            }
+//        }
 
-            foreach (ListItem li in templateList.Items)
-            {
-                if (li.Selected)
-                    tmp.Add(new cms.businesslogic.template.Template(int.Parse(li.Value)));
-            }
+//        private DocumentType UpdateAllowedTemplates(DocumentType documentType)
+//        {
+//            var tmp = new ArrayList();
 
-            var tt = new cms.businesslogic.template.Template[tmp.Count];
-            for (int i = 0; i < tt.Length; i++)
-            {
-                tt[i] = (cms.businesslogic.template.Template)tmp[i];
-            }
+//            foreach (ListItem li in templateList.Items)
+//            {
+//                if (li.Selected)
+//                    tmp.Add(new cms.businesslogic.template.Template(int.Parse(li.Value)));
+//            }
 
-            documentType.allowedTemplates = tt;
+//            var tt = new cms.businesslogic.template.Template[tmp.Count];
+//            for (int i = 0; i < tt.Length; i++)
+//            {
+//                tt[i] = (cms.businesslogic.template.Template)tmp[i];
+//            }
 
-            if (documentType.allowedTemplates.Length > 0 && ddlTemplates.SelectedIndex >= 0)
-            {
-                documentType.DefaultTemplate = int.Parse(ddlTemplates.SelectedValue);
-            }
-            else
-            {
-                documentType.RemoveDefaultTemplate();
-            }
+//            documentType.allowedTemplates = tt;
 
-            _dt = documentType;
+//            if (documentType.allowedTemplates.Length > 0 && ddlTemplates.SelectedIndex >= 0)
+//            {
+//                documentType.DefaultTemplate = int.Parse(ddlTemplates.SelectedValue);
+//            }
+//            else
+//            {
+//                documentType.RemoveDefaultTemplate();
+//            }
 
-            return documentType;
-        }
+//            _dt = documentType;
 
-        private void BindTemplates()
-        {
-            var templates = (from t in cms.businesslogic.template.Template.GetAllAsList()
-                             join at in _dt.allowedTemplates on t.Id equals at.Id into at_l
-                             from at in at_l.DefaultIfEmpty()
-                             select new
-                             {
-                                 Id = t.Id,
-                                 Name = t.Text,
-                                 Selected = at != null
-                             }).ToList();
+//            return documentType;
+//        }
 
-            templateList.Items.Clear();
-            templateList.Items.AddRange(templates.ConvertAll(item =>
-            {
-                var li = new ListItem { Text = item.Name, Value = item.Id.ToString(CultureInfo.InvariantCulture), Selected = item.Selected };
-                return li;
-            }).ToArray());
+//        private void BindTemplates()
+//        {
+//            var templates = (from t in cms.businesslogic.template.Template.GetAllAsList()
+//                             join at in _dt.allowedTemplates on t.Id equals at.Id into at_l
+//                             from at in at_l.DefaultIfEmpty()
+//                             select new
+//                             {
+//                                 Id = t.Id,
+//                                 Name = t.Text,
+//                                 Selected = at != null
+//                             }).ToList();
+
+//            templateList.Items.Clear();
+//            templateList.Items.AddRange(templates.ConvertAll(item =>
+//            {
+//                var li = new ListItem { Text = item.Name, Value = item.Id.ToString(CultureInfo.InvariantCulture), Selected = item.Selected };
+//                return li;
+//            }).ToArray());
 
 
-            ddlTemplates.Enabled = templates.Any();
-            ddlTemplates.Items.Clear();
-            ddlTemplates.Items.Insert(0, new ListItem(ui.Text("choose") + "...", "0"));
-            ddlTemplates.Items.AddRange(templates.ConvertAll(item =>
-            {
-                var li = new ListItem { Text = item.Name, Value = item.Id.ToString(CultureInfo.InvariantCulture) };
-                return li;
-            }).ToArray());
+//            ddlTemplates.Enabled = templates.Any();
+//            ddlTemplates.Items.Clear();
+//            ddlTemplates.Items.Insert(0, new ListItem(ui.Text("choose") + "...", "0"));
+//            ddlTemplates.Items.AddRange(templates.ConvertAll(item =>
+//            {
+//                var li = new ListItem { Text = item.Name, Value = item.Id.ToString(CultureInfo.InvariantCulture) };
+//                return li;
+//            }).ToArray());
 
-            var ddlTemplatesSelect = ddlTemplates.Items.FindByValue(_dt.DefaultTemplate.ToString(CultureInfo.InvariantCulture));
-            if (ddlTemplatesSelect != null)
-                ddlTemplatesSelect.Selected = true;
-        }
+//            var ddlTemplatesSelect = ddlTemplates.Items.FindByValue(_dt.DefaultTemplate.ToString(CultureInfo.InvariantCulture));
+//            if (ddlTemplatesSelect != null)
+//                ddlTemplatesSelect.Selected = true;
+//        }
 
-        /// <summary>
-        /// tmpPane control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.Pane tmpPane;
+//        /// <summary>
+//        /// tmpPane control.
+//        /// </summary>
+//        /// <remarks>
+//        /// Auto-generated field.
+//        /// To modify move field declaration from designer file to code-behind file.
+//        /// </remarks>
+//        protected global::umbraco.uicontrols.Pane tmpPane;
 
-        /// <summary>
-        /// templateList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList templateList;
+//        /// <summary>
+//        /// templateList control.
+//        /// </summary>
+//        /// <remarks>
+//        /// Auto-generated field.
+//        /// To modify move field declaration from designer file to code-behind file.
+//        /// </remarks>
+//        protected global::System.Web.UI.WebControls.CheckBoxList templateList;
 
-        /// <summary>
-        /// ddlTemplates control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlTemplates;
-    }
-}
+//        /// <summary>
+//        /// ddlTemplates control.
+//        /// </summary>
+//        /// <remarks>
+//        /// Auto-generated field.
+//        /// To modify move field declaration from designer file to code-behind file.
+//        /// </remarks>
+//        protected global::System.Web.UI.WebControls.DropDownList ddlTemplates;
+//    }
+//}

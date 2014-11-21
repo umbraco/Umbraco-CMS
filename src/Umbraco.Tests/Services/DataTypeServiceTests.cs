@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Tests.TestHelpers;
@@ -73,10 +74,10 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
+            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.Save(dataTypeDefinition);
             dataTypeService.SavePreValues(dataTypeDefinition, new Dictionary<string, PreValue>
                 {
@@ -103,10 +104,10 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
+            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
@@ -132,10 +133,10 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
+            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
@@ -169,10 +170,10 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
+            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
@@ -203,10 +204,10 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
+            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.Save(dataTypeDefinition);
             dataTypeService.SavePreValues(dataTypeDefinition.Id, new[] {"preVal1", "preVal2"});
             

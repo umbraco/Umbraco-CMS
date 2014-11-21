@@ -288,17 +288,19 @@ namespace umbraco.cms.businesslogic.packager
                 }
                 AppendElement(languages);
 
-                //Datatypes
-                var dataTypes = _packageManifest.CreateElement("DataTypes");
-                foreach (var dtId in pack.DataTypes)
-                {
-                    if (int.TryParse(dtId, out outInt))
-                    {
-                        datatype.DataTypeDefinition dtd = new datatype.DataTypeDefinition(outInt);
-                        dataTypes.AppendChild(dtd.ToXml(_packageManifest));
-                    }
-                }
-                AppendElement(dataTypes);
+                //TODO: Fix this! ... actually once we use the new packager we don't need to
+
+                ////Datatypes
+                //var dataTypes = _packageManifest.CreateElement("DataTypes");
+                //foreach (var dtId in pack.DataTypes)
+                //{
+                //    if (int.TryParse(dtId, out outInt))
+                //    {
+                //        datatype.DataTypeDefinition dtd = new datatype.DataTypeDefinition(outInt);
+                //        dataTypes.AppendChild(dtd.ToXml(_packageManifest));
+                //    }
+                //}
+                //AppendElement(dataTypes);
 
                 //Files
                 foreach (var fileName in pack.Files)

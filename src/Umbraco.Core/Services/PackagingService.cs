@@ -515,9 +515,6 @@ namespace Umbraco.Core.Services
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
 
-                //we'll check if it is a GUID (legacy id for a property editor)
-                var legacyPropertyEditorId = Guid.Empty;
-                Guid.TryParse(property.Element("Type").Value, out legacyPropertyEditorId);
                 //get the alias as a string for use below
                 var propertyEditorAlias = property.Element("Type").Value.Trim();
 
@@ -526,22 +523,13 @@ namespace Umbraco.Core.Services
 
                 if (dataTypeDefinition == null)
                 {
-                    var dataTypeDefinitions = legacyPropertyEditorId != Guid.Empty
-                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId)
-                                                  : _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
                         dataTypeDefinition = dataTypeDefinitions.First();
                     }
                 }
-                else if (legacyPropertyEditorId != Guid.Empty && dataTypeDefinition.ControlId != legacyPropertyEditorId)
-                {
-                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
-                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
-                    {
-                        dataTypeDefinition = dataTypeDefinitions.First();
-                    }
-                }
+               
                 else if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
                 {
                     var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
@@ -736,29 +724,14 @@ namespace Umbraco.Core.Services
                                            ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
                                            : DataTypeDatabaseType.Ntext;
 
-                    //check if the Id was a GUID, that means it is referenced using the legacy property editor GUID id
-                    if (legacyPropertyEditorId != Guid.Empty)
+                    //the Id field is actually the string property editor Alias
+                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeElement.Attribute("Id").Value.Trim())
                     {
-                        var dataTypeDefinition = new DataTypeDefinition(-1, legacyPropertyEditorId)
-                            {
-                                Key = dataTypeDefinitionId,
-                                Name = dataTypeDefinitionName,
-                                DatabaseType = databaseType
-                            };
-                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
-                    }
-                    else
-                    {
-                        //the Id field is actually the string property editor Alias
-                        var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeElement.Attribute("Id").Value.Trim())
-                        {
-                            Key = dataTypeDefinitionId,
-                            Name = dataTypeDefinitionName,
-                            DatabaseType = databaseType
-                        };
-                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
-                    }
-
+                        Key = dataTypeDefinitionId,
+                        Name = dataTypeDefinitionName,
+                        DatabaseType = databaseType
+                    };
+                    dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
                 }
             }
 

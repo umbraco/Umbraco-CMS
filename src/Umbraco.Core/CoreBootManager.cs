@@ -296,10 +296,7 @@ namespace Umbraco.Core
 
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
 				() => PluginManager.Current.ResolveCacheRefreshers());
-
-			DataTypesResolver.Current = new DataTypesResolver(
-				() => PluginManager.Current.ResolveDataTypes());
-
+            
 			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
 				() => PluginManager.Current.ResolveMacroRenderings());
 
@@ -313,9 +310,6 @@ namespace Umbraco.Core
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveTypes<IMigration>());
 
-            // todo: remove once we drop IPropertyEditorValueConverter support.
-            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-				PluginManager.Current.ResolvePropertyEditorValueConverters());
 
 			// need to filter out the ones we dont want!!
 		    PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(

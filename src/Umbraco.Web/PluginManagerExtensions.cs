@@ -48,15 +48,6 @@ namespace Umbraco.Web
 			return resolver.ResolveTypes<ITree>();
 		}
 
-		/// <summary>
-		/// Returns all classes attributed with RestExtensionAttribute attribute
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveRestExtensions(this PluginManager resolver)
-		{
-			return resolver.ResolveAttributedTypes<Umbraco.Web.BaseRest.RestExtensionAttribute>();
-		}
 
 		/// <summary>
 		/// Returns all classes attributed with XsltExtensionAttribute attribute

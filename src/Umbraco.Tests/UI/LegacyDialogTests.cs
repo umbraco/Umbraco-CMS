@@ -29,7 +29,6 @@ namespace Umbraco.Tests.UI
 
         [TestCase(typeof(UserTypeTasks), DefaultApps.users)]
         [TestCase(typeof(contentItemTypeTasks), DefaultApps.member)]
-        [TestCase(typeof(contentItemTasks), DefaultApps.member)]
         [TestCase(typeof(XsltTasks), DefaultApps.developer)]
         [TestCase(typeof(userTasks), DefaultApps.users)]
         [TestCase(typeof(templateTasks), DefaultApps.settings)]
@@ -44,7 +43,6 @@ namespace Umbraco.Tests.UI
         [TestCase(typeof(dictionaryTasks), DefaultApps.settings)]
         [TestCase(typeof(macroTasks), DefaultApps.developer)]
         [TestCase(typeof(languageTasks), DefaultApps.settings)]
-        [TestCase(typeof(DataTypeTasks), DefaultApps.developer)]
         [TestCase(typeof(CreatedPackageTasks), DefaultApps.developer)]
         [TestCase(typeof(PartialViewTasks), DefaultApps.settings)]
         public void Check_Assigned_Apps_For_Tasks(Type taskType, DefaultApps app)

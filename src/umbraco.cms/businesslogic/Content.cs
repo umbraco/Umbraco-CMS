@@ -5,16 +5,13 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using umbraco.cms.businesslogic.property;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.cms.helpers;
-using umbraco.cms.businesslogic.datatype.controls;
 using File = System.IO.File;
-using Property = umbraco.cms.businesslogic.property.Property;
+
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic
@@ -40,7 +37,6 @@ namespace umbraco.cms.businesslogic
         private bool _versionDateInitialized;
         private string _contentTypeIcon;
         private ContentType _contentType;
-        private Properties _loadedProperties = null;
         protected internal IContentBase ContentBase;
 
         #endregion
@@ -221,30 +217,6 @@ namespace umbraco.cms.businesslogic
             }
         }
 
-        /// <summary>
-        /// Retrieve a list of generic properties of the content
-        /// </summary>
-        public Properties GenericProperties
-        {
-            get
-            {
-                EnsureProperties();
-                return _loadedProperties;
-            }
-        }
-
-        /// <summary>
-        /// Retrieve a list of generic properties of the content
-        /// </summary>
-        [Obsolete("Use the GenericProperties property instead")]
-        public Property[] getProperties
-        {
-            get
-            {
-                EnsureProperties();
-                return _loadedProperties.ToArray();
-            }
-        }
 
         /// <summary>
         /// Content is under version control, you are able to programatically create new versions
@@ -282,105 +254,9 @@ namespace umbraco.cms.businesslogic
         {            
             base.Save();
 
-            ClearLoadedProperties();
         }
 
-        /// <summary>
-        /// Retrieve a Property given the alias
-        /// </summary>
-        /// <param name="alias">Propertyalias (defined in the documenttype)</param>
-        /// <returns>The property with the given alias</returns>
-        public virtual Property getProperty(string alias)
-        {
-            EnsureProperties();
 
-            return _loadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
-        }
-
-        /// <summary>
-        /// Retrieve a property given the propertytype
-        /// </summary>
-        /// <param name="pt">PropertyType</param>
-        /// <returns>The property with the given propertytype</returns>
-        public virtual Property getProperty(PropertyType pt)
-        {
-            EnsureProperties();
-
-            return _loadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
-        }
-
-        /// <summary>
-        /// Add a property to the Content
-        /// </summary>
-        /// <param name="pt">The PropertyType of the Property</param>
-        /// <param name="versionId">The version of the document on which the property should be add'ed</param>
-        /// <returns>The new Property</returns>
-        public virtual Property addProperty(PropertyType pt, Guid versionId)
-        {
-            ClearLoadedProperties();
-            
-            return property.Property.MakeNew(pt, this, versionId);
-
-        }
-
-        /// <summary>
-        /// An Xmlrepresentation of a Content object.
-        /// </summary>
-        /// <param name="xd">Xmldocument context</param>
-        /// <param name="Deep">If true, the Contents children are appended to the Xmlnode recursive</param>
-        /// <returns>The Xmlrepresentation of the data on the Content object</returns>
-        public override XmlNode ToXml(XmlDocument xd, bool Deep)
-        {
-            if (_xml == null)
-            {
-                XmlDocument xmlDoc = new XmlDocument();
-                // we add a try/catch clause here, as the xmlreader will throw an exception if there's no xml in the table
-                // after the empty catch we'll generate the xml which is why we don't do anything in the catch part
-                try
-                {
-                    XmlReader xr = SqlHelper.ExecuteXmlReader("select xml from cmsContentXml where nodeID = " + this.Id.ToString());
-                    if (xr.MoveToContent() != System.Xml.XmlNodeType.None)
-                    {
-                        xmlDoc.Load(xr);
-                        _xml = xmlDoc.FirstChild;
-                    }
-                    xr.Close();
-                }
-                catch
-                {
-                }
-
-
-                // Generate xml if xml still null (then it hasn't been initialized before)
-                if (_xml == null)
-                {
-                    this.XmlGenerate(new XmlDocument());
-                    _xml = importXml();
-                }
-
-            }
-
-            XmlNode x = xd.ImportNode(_xml, true);
-
-            if (Deep)
-            {
-                var childs = this.Children;
-                foreach (BusinessLogic.console.IconI c in childs)
-                {
-                    try
-                    {
-                        x.AppendChild(new Content(c.Id).ToXml(xd, true));
-                    }
-                    catch (Exception mExp)
-                    {
-                        System.Web.HttpContext.Current.Trace.Warn("Content", "Error adding node to xml: " + mExp.ToString());
-                    }
-                }
-            }
-
-            return x;
-
-        }
 
         /// <summary>
         /// Removes the Xml cached in the database - unpublish and cleaning
@@ -390,60 +266,14 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
         }
 
-        /// <summary>
-        /// Generates the Content XmlNode
-        /// </summary>
-        /// <param name="xd"></param>
-        public virtual void XmlGenerate(XmlDocument xd)
-        {
-            SaveXmlDocument(generateXmlWithoutSaving(xd));
-        }
 
-        public virtual void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
-        {
-            var props = this.GenericProperties;
-            foreach (property.Property p in props)
-                if (p != null && p.Value != null && string.IsNullOrEmpty(p.Value.ToString()) == false)
-                    x.AppendChild(p.ToXml(xd));
-
-            // attributes
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "id", this.Id.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "version", this.Version.ToString()));
-            if (this.Level > 1)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.Parent.Id.ToString()));
-            else
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "level", this.Level.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "writerID", this.User.Id.ToString()));
-            if (this.ContentType != null)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "nodeType", this.ContentType.Id.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "template", "0"));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "sortOrder", this.sortOrder.ToString()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", this.CreateDateTime.ToString("s")));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "updateDate", this.VersionDate.ToString("s")));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "nodeName", this.Text));
-            if (this.Text != null)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "urlName", this.Text.Replace(" ", "").ToLower()));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "writerName", this.User.Name));
-            if (this.ContentType != null)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "nodeTypeAlias", this.ContentType.Alias));
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "path", this.Path));
-
-            if (Deep)
-            {
-                //store children array here because iterating over an Array property object is very inneficient.
-                var children = this.Children;
-                foreach (Content c in children)
-                    x.AppendChild(c.ToXml(xd, true));
-            }
-        }
+       
 
         /// <summary>
         /// Deletes the current Content object, must be overridden in the child class.
         /// </summary>
         public override void delete()
         {
-            ClearLoadedProperties();
 
             // Delete all data associated with this content
             this.deleteAllProperties();
@@ -493,7 +323,6 @@ namespace umbraco.cms.businesslogic
         /// <param name="InitContentTypeIcon"></param>
         protected void InitializeContent(int InitContentType, Guid InitVersion, DateTime InitVersionDate, string InitContentTypeIcon)
         {
-            ClearLoadedProperties();
 
             if (_contentType == null)
                 _contentType = ContentType.GetContentType(InitContentType);
@@ -503,63 +332,8 @@ namespace umbraco.cms.businesslogic
             _contentTypeIcon = InitContentTypeIcon;
         }
 
-        /// <summary>
-        /// Creates a new Content object from the ContentType.
-        /// </summary>
-        /// <param name="ct"></param>
-        protected virtual void CreateContent(ContentType ct)
-        {
-            SqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
-            createNewVersion(DateTime.Now);
-        }
-        
-        /// <summary>
-        /// Method for creating a new version of the data associated to the Content. 
-        /// </summary>
-        /// <returns>The new version Id</returns>
-		protected Guid createNewVersion(DateTime versionDate = default(DateTime))
-        {
-			if (versionDate == default (DateTime))
-			{
-				versionDate = DateTime.Now;
-			}
-
-            ClearLoadedProperties();
-
-            Guid newVersion = Guid.NewGuid();
-            bool tempHasVersion = hasVersion();
-
-            // we need to ensure that a version in the db exist before we add related data
-            SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId,versionDate) values (" + this.Id + ",'" + newVersion + "', @updateDate)",
-                SqlHelper.CreateParameter("@updateDate", versionDate));
-
-            List<PropertyType> pts = ContentType.PropertyTypes;
-            foreach (propertytype.PropertyType pt in pts)
-            {
-                object oldValue = "";
-                if (tempHasVersion)
-                {
-                    try
-                    {
-                        oldValue = this.getProperty(pt.Alias).Value;
-                    }
-                    catch { }
-                }
-                property.Property p = this.addProperty(pt, newVersion);
-                if (oldValue != null && oldValue.ToString() != "") p.Value = oldValue;
-            }
-            this.Version = newVersion;
-            return newVersion;
-        }
-
-        protected virtual XmlNode generateXmlWithoutSaving(XmlDocument xd)
-        {
-            string nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : Casing.SafeAliasWithForcingCheck(ContentType.Alias);
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
-            XmlPopulate(xd, ref x, false);
-            return x;
-        }
-
+   
+      
         /// <summary>
         /// Saves the XML document to the data source.
         /// </summary>
@@ -580,147 +354,12 @@ namespace umbraco.cms.businesslogic
                                       SqlHelper.CreateParameter("@xml", node.OuterXml));
         }
 
-        /// <summary>
-        /// Deletes all files and the folder that have been saved with this content item which are based on the Upload data
-        /// type. This is called when a media or content tree node is deleted. 
-        /// </summary>
-        protected void DeleteAssociatedMediaFiles()
-        {
-            // Remove all files
-
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadField = DataTypesResolver.Current.GetById(new Guid(Constants.PropertyEditors.UploadField));
-             
-            foreach (Property p in GenericProperties)
-            {               
-                var isUploadField = false;
-                try
-                {
-                    if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
-                         && p.Value.ToString() != ""
-                         && File.Exists(global::Umbraco.Core.IO.IOHelper.MapPath(p.Value.ToString())))
-                    {
-                        isUploadField = true;
-                    }
-                }
-                catch (ArgumentException)
-                {
-                    //the data type definition may not exist anymore at this point because another thread may
-                    //have deleted it.
-                    isUploadField = false;
-                }
-                if (isUploadField)
-                {
-                    var relativeFilePath = fs.GetRelativePath(p.Value.ToString());
-                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        fs.DeleteFile(relativeFilePath, true);
-                    }
-                }
-            }
-        }
-
+       
         #endregion
 
         #region Private Methods
 
-        /// <summary>
-        /// Clears the locally loaded properties which forces them to be reloaded next time they requested
-        /// </summary>
-        private void ClearLoadedProperties()
-        {
-            _loadedProperties = null;
-        }
 
-        /// <summary>
-        /// Makes sure that the properties are initialized. If they are already initialized, this does nothing.
-        /// </summary>
-        private void EnsureProperties()
-        {
-            if (_loadedProperties == null)
-            {
-                InitializeProperties();
-            }
-        }
-
-        /// <summary>
-        /// Loads all properties from database into objects. If this method is re-called, it will re-query the database.
-        /// </summary>
-        /// <remarks>
-        /// This optimizes sql calls. This will first check if all of the properties have been loaded. If not, 
-        /// then it will query for all property types for the current version from the db. It will then iterate over each
-        /// cmdPropertyData row and store the id and propertyTypeId in a list for lookup later. Once the records have been 
-        /// read, we iterate over the cached property types for this ContentType and create a new property based on
-        /// our stored list of proeprtyTypeIds. We then have a cached list of Property objects which will get returned
-        /// on all subsequent calls and is also used to return a property with calls to getProperty.
-        /// </remarks>
-        private void InitializeProperties()
-        {
-            _loadedProperties = new Properties();
-
-            if (ContentBase != null)
-            {
-                //NOTE: we will not load any properties where HasIdentity = false - this is because if properties are 
-                // added to the property collection that aren't persisted we'll get ysods
-                _loadedProperties.AddRange(ContentBase.Properties.Where(x => x.HasIdentity).Select(x => new Property(x)));
-                return;
-            }
-
-            if (this.ContentType == null)
-                return;
-
-            //Create anonymous typed list with 2 props, Id and PropertyTypeId of type Int.
-            //This will still be an empty list since the props list is empty.
-            var propData = _loadedProperties.Select(x => new { Id = 0, PropertyTypeId = 0 }).ToList();
-
-            string sql = @"select id, propertyTypeId from cmsPropertyData where versionId=@versionId";
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql,
-                SqlHelper.CreateParameter("@versionId", Version)))
-            {
-                while (dr.Read())
-                {
-                    //add the item to our list
-                    propData.Add(new { Id = dr.Get<int>("id"), PropertyTypeId = dr.Get<int>("propertyTypeId") });
-                }
-            }
-
-            foreach (PropertyType pt in this.ContentType.PropertyTypes)
-            {
-                if (pt == null)
-                    continue;
-
-                //get the propertyId
-                var property = propData.LastOrDefault(x => x.PropertyTypeId == pt.Id);
-                if (property == null)
-                {
-                    continue;
-                    //var prop = Property.MakeNew(pt, this, Version);
-                    //property = new {Id = prop.Id, PropertyTypeId = pt.Id};
-                }
-                var propertyId = property.Id;
-
-                Property p = null;
-                try
-                {
-                    p = new Property(propertyId, pt);
-                }
-                catch
-                {
-                    continue; //this remains from old code... not sure why we would do this?
-                }
-
-                _loadedProperties.Add(p);
-            }
-        }
 
         /// <summary>
         /// Optimized method for bulk deletion of properties´on a Content object.
@@ -730,42 +369,8 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where contentNodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
         }
 
-        private XmlNode importXml()
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(SqlHelper.ExecuteXmlReader("select xml from cmsContentXml where nodeID = " + this.Id.ToString()));
-
-            return xmlDoc.FirstChild;
-        }
-
-        /// <summary>
-        /// Indication if the Content exists in at least one version.
-        /// </summary>
-        /// <returns>Returns true if the Content has a version</returns>
-        private bool hasVersion()
-        {
-            int versionCount = SqlHelper.ExecuteScalar<int>("select Count(Id) as tmp from cmsContentVersion where contentId = " + this.Id.ToString());
-            return (versionCount > 0);
-        }
-
         #endregion
 
-        #region XmlPreivew
-
-        public override XmlNode ToPreviewXml(XmlDocument xd)
-        {
-            if (!PreviewExists(Version))
-            {
-                saveXmlPreview(xd);
-            }
-            return GetPreviewXml(xd, Version);
-        }
-
-        private void saveXmlPreview(XmlDocument xd)
-        {
-            SavePreviewXml(generateXmlWithoutSaving(xd), Version);
-        }
-
-        #endregion
+     
     }
 }

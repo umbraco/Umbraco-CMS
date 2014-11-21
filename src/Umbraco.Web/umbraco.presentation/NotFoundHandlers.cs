@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using Umbraco.Core.IO;
 using umbraco.NodeFactory;
+using Umbraco.Web.Routing;
 
 namespace umbraco {
 
@@ -168,7 +169,7 @@ namespace umbraco {
             get { return _cacheUrl; }
         }
 
-        public int redirectID {
+        public int RedirectId {
             get {
                 // TODO:  Add SearchForAlias.redirectID getter implementation
                 return _redirectID;
@@ -222,7 +223,7 @@ namespace umbraco {
             return _succes;
         }
 
-        public int redirectID {
+        public int RedirectId {
             get {
                 // TODO:  Add SearchForProfile.redirectID getter implementation
                 return _redirectID;
@@ -287,7 +288,7 @@ namespace umbraco {
             return _succes;
         }
 
-        public int redirectID {
+        public int RedirectId {
             get {
                 // TODO:  Add SearchForProfile.redirectID getter implementation
                 return _redirectID;
@@ -328,7 +329,7 @@ namespace umbraco {
 			}
         }
 
-        public int redirectID {
+        public int RedirectId {
             get {
                 return _redirectID;
             }

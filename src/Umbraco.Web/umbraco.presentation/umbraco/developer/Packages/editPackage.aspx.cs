@@ -160,18 +160,20 @@ namespace umbraco.presentation.developer.packages
                         dictionary.Items.Add(li);
                     }
 
-                    /*Data types */
-                    cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
-                    foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
-                    {
+                    //TODO: Fix this with the new services and apis! and then remove since this should all be in angular
 
-                        ListItem li = new ListItem(umbDtd.Text, umbDtd.Id.ToString());
+                    ///*Data types */
+                    //cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+                    //foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
+                    //{
 
-                        if (pack.DataTypes.Contains(umbDtd.Id.ToString()))
-                            li.Selected = true;
+                    //    ListItem li = new ListItem(umbDtd.Text, umbDtd.Id.ToString());
 
-                        cbl_datatypes.Items.Add(li);
-                    }
+                    //    if (pack.DataTypes.Contains(umbDtd.Id.ToString()))
+                    //        li.Selected = true;
+
+                    //    cbl_datatypes.Items.Add(li);
+                    //}
 
                     /* FILES */
                     packageFilesRepeater.DataSource = pack.Files;

@@ -447,7 +447,6 @@ namespace Umbraco.Core.Packaging
             
             installWarnings.UnsecureFiles = FindUnsecureFiles(sourceDestination);
             installWarnings.FilesReplaced = FindFilesToBeReplaced(sourceDestination);
-            installWarnings.AssembliesWithLegacyPropertyEditors = FindLegacyPropertyEditors(packagePath, sourceDestination);
             
             return installWarnings;
         }
@@ -456,20 +455,7 @@ namespace Umbraco.Core.Packaging
         {
             return sourceDestination.Where(sd => File.Exists(Path.Combine(FullPathToRoot, sd.Value))).ToArray();
         }
-
-        private IEnumerable<string> FindLegacyPropertyEditors(string packagePath, IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
-        {
-            var dlls = sourceDestinationPair.Where(
-                sd => (Path.GetExtension(sd.Value) ?? string.Empty).Equals(".dll", StringComparison.InvariantCultureIgnoreCase)).Select(sd => sd.Key).ToArray();
-
-            if (dlls.Any() == false) { return new List<string>(); }
-            
-            // Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
-            string[] assemblyErrors;
-            IEnumerable<byte[]> assemblyesToScan =_packageExtraction.ReadFilesFromArchive(packagePath, dlls);
-            return PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(assemblyesToScan, out assemblyErrors).ToArray();
-        }
-
+        
         private KeyValuePair<string, string>[] FindUnsecureFiles(IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
         {
             return sourceDestinationPair.Where(sd => IsFileDestinationUnsecure(sd.Value)).ToArray();

@@ -32,21 +32,6 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _databaseType;
 
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the alternative contructor that specifies an alias")]
-        public DataTypeDefinition(int parentId, Guid controlId)
-        {
-            _parentId = parentId;
-
-            _propertyEditorAlias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(controlId, false);
-            if (_propertyEditorAlias == null)
-            {
-                //convert to Label!
-                LogHelper.Warn<DataTypeDefinition>("Could not find a GUID -> Alias mapping for the legacy property editor with id " + controlId + ". The DataType has been converted to a Label.");
-                _propertyEditorAlias = Constants.PropertyEditors.NoEditAlias;
-            }
-
-            _additionalData = new Dictionary<string, object>();
-        }
         public DataTypeDefinition(int parentId, string propertyEditorAlias)
         {
             _parentId = parentId;
@@ -202,27 +187,6 @@ namespace Umbraco.Core.Models
                 }, _propertyEditorAlias, PropertyEditorAliasSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
                 _additionalData["DatabaseType"] = value;
-            }
-        }
-
-        /// <summary>
-        /// Id of the DataType control
-        /// </summary>
-        [DataMember]
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead. This method will return a generated GUID for any property editor alias not explicitly mapped to a legacy ID")]
-        public Guid ControlId
-        {
-            get
-            {
-                return LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(
-                    _propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId).Value;
-            }
-            set
-            {
-                var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);
-                PropertyEditorAlias = alias;
-                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
-                _additionalData["ControlId"] = value;
             }
         }
 

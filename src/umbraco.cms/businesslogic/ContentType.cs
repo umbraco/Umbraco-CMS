@@ -15,7 +15,6 @@ using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
 using Language = umbraco.cms.businesslogic.language.Language;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
@@ -146,27 +145,7 @@ namespace umbraco.cms.businesslogic
             PropertyTypeCache.Clear();
         }
 
-        public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
-        {
-            //propertyTypeAlias needs to be invariant, so we will store uppercase
-            var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias.ToUpper());
-
-
-            return PropertyTypeCache.GetOrAdd(
-                key,
-                tuple =>
-                {
-                    // With 4.10 we can't do this via direct SQL as we have content type mixins
-                    var controlId = Guid.Empty;
-                    var ct = GetByAlias(contentTypeAlias);
-                    var pt = ct.getPropertyType(propertyTypeAlias);
-                    if (pt != null)
-                    {
-                        controlId = pt.DataTypeDefinition.DataType.Id;
-                    }
-                    return controlId;
-                });
-        }
+       
 
         /// <summary>
         /// Gets the type of the content.
@@ -265,19 +244,7 @@ namespace umbraco.cms.businesslogic
 
         #region Regenerate Xml Structures
 
-        /// <summary>
-        /// Used to rebuild all of the xml structures for content of the current content type in the cmsContentXml table
-        /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        internal void RebuildXmlStructuresForContent()
-        {
-            //Clears all xml structures in the cmsContentXml table for the current content type
-            ClearXmlStructuresForContent();
-            foreach (var i in GetContentIdsForContentType())
-            {
-                RebuildXmlStructureForContentItem(i);
-            }
-        }
+       
 
         /// <summary>
         /// Returns all content ids associated with this content type
@@ -306,25 +273,7 @@ namespace umbraco.cms.businesslogic
             return ids;
         }
 
-        /// <summary>
-        /// Rebuilds the xml structure for the content item by id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <remarks>
-        /// This is not thread safe
-        /// </remarks>
-        internal virtual void RebuildXmlStructureForContentItem(int contentId)
-        {
-            var xd = new XmlDocument();
-            try
-            {
-                new Content(contentId).XmlGenerate(xd);
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<ContentType>("Error generating xml", ee);
-            }
-        }
+      
 
         /// <summary>
         /// Clears all xml structures in the cmsContentXml table for the current content type
@@ -940,30 +889,6 @@ namespace umbraco.cms.businesslogic
 
         }
 
-        /// <summary>
-        /// Adding a PropertyType to the ContentType, will add a new datafield/Property on all Documents of this Type.
-        /// </summary>
-        /// <param name="dt">The DataTypeDefinition of the PropertyType</param>
-        /// <param name="Alias">The Alias of the PropertyType</param>
-        /// <param name="Name">The userfriendly name</param>
-        public PropertyType AddPropertyType(DataTypeDefinition dt, string Alias, string Name)
-        {
-            PropertyType pt = PropertyType.MakeNew(dt, this, Name, Alias);
-
-            // Optimized call
-            PopulatePropertyData(pt, Id);
-
-            // Inherited content types (document types only)
-            PopulateMasterContentTypes(pt, Id);
-
-            //			foreach (Content c in Content.getContentOfContentType(this)) 
-            //				c.addProperty(pt,c.Version);
-
-            // Remove from cache
-            FlushFromCache(Id);
-
-            return pt;
-        }
 
         /// <summary>
         /// Adding a PropertyType to a Tab, the Tabs are primarily used for making the 

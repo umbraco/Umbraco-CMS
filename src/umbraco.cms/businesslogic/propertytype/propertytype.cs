@@ -7,14 +7,10 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
-using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.propertytype
 {
@@ -77,17 +73,6 @@ namespace umbraco.cms.businesslogic.propertytype
 
         #region Properties
 
-        public DataTypeDefinition DataTypeDefinition
-        {
-            get { return DataTypeDefinition.GetDataTypeDefinition(_DataTypeId); }
-            set
-            {
-                _DataTypeId = value.Id;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "Update cmsPropertyType set DataTypeId = " + value.Id + " where id=" + Id);
-            }
-        }
 
         public int Id
         {
@@ -273,40 +258,7 @@ namespace umbraco.cms.businesslogic.propertytype
             return _description;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public static PropertyType MakeNew(DataTypeDefinition dt, ContentType ct, string name, string alias)
-        {
-            //make sure that the alias starts with a letter
-            if (string.IsNullOrEmpty(alias))
-                throw new ArgumentNullException("alias");
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
-            if (!Char.IsLetter(alias[0]))
-                throw new ArgumentException("alias must start with a letter", "alias");
-
-            PropertyType pt;
-            try
-            {
-                // The method is synchronized, but we'll still look it up with an additional parameter (alias)
-                SqlHelper.ExecuteNonQuery(
-                    "INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@DataTypeId, @ContentTypeId, @alias, @name)",
-                    SqlHelper.CreateParameter("@DataTypeId", dt.Id),
-                    SqlHelper.CreateParameter("@ContentTypeId", ct.Id),
-                    SqlHelper.CreateParameter("@alias", alias),
-                    SqlHelper.CreateParameter("@name", name));
-                pt =
-                    new PropertyType(
-                        SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@alias",
-                                                     SqlHelper.CreateParameter("@alias", alias)));
-            }
-            finally
-            {
-                // Clear cached items
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
-            }
-
-            return pt;
-        }
+       
 
         public static PropertyType[] GetAll()
         {
@@ -428,23 +380,6 @@ namespace umbraco.cms.businesslogic.propertytype
             ContentType.FlushFromCache(contentTypeId);
         }
 
-        public IDataType GetEditControl(object value, bool isPostBack)
-        {
-            IDataType dt = DataTypeDefinition.DataType;
-            dt.DataEditor.Editor.ID = Alias;
-            IData df = DataTypeDefinition.DataType.Data;
-            (dt.DataEditor.Editor).ID = Alias;
-
-            if (!isPostBack)
-            {
-                if (value != null)
-                    dt.Data.Value = value;
-                else
-                    dt.Data.Value = "";
-            }
-
-            return dt;
-        }
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility

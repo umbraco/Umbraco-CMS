@@ -14,6 +14,5 @@ namespace Umbraco.Core.Packaging.Models
         public IEnumerable<IMacro> ConflictingMacroAliases { get; set; }
         public IEnumerable<ITemplate> ConflictingTemplateAliases { get; set; }
         public IEnumerable<IFile> ConflictingStylesheetNames { get; set; }
-        public IEnumerable<string> AssembliesWithLegacyPropertyEditors { get; set; }
     }
 }

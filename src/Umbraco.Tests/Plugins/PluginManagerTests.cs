@@ -301,20 +301,7 @@ namespace Umbraco.Tests.Plugins
             Assert.AreEqual(7, apps.Count());
         }
 
-        [Test]
-        public void Resolves_DataTypes()
-        {
-            var types = PluginManager.Current.ResolveDataTypes();
-            Assert.AreEqual(35, types.Count());
-        }
-
-        [Test]
-        public void Resolves_RestExtensions()
-        {
-            var types = PluginManager.Current.ResolveRestExtensions();
-            Assert.AreEqual(3, types.Count());
-        }
-
+   
         [Test]
         public void Resolves_XsltExtensions()
         {
@@ -347,13 +334,6 @@ namespace Umbraco.Tests.Plugins
      
         [XsltExtension("Blah.Blah")]
         public class MyXsltExtension
-        {
-
-        }
-
-
-        [Umbraco.Web.BaseRest.RestExtension("Blah")]
-        public class MyRestExtesion
         {
 
         }

@@ -21,7 +21,6 @@ using umbraco.DataLayer;
 using umbraco.interfaces;
 using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
-using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Tests.Plugins
 {
@@ -85,7 +84,8 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Find_Classes_With_Attribute()
         {
-            var typesFound = TypeFinder.FindClassesWithAttribute<RestExtensionAttribute>(_assemblies);
+            var typesFound = TypeFinder.FindClassesWithAttribute<Umbraco.Web.Trees.TreeAttribute>(_assemblies);
+            //TODO: Fix this with the correct count
             Assert.AreEqual(1, typesFound.Count());
         }
 

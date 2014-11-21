@@ -49,18 +49,7 @@ namespace umbraco.cms.businesslogic.contentitem
 			}
 		}
 
-		public static ContentItem MakeNew(string Name, ContentItemType cit, BusinessLogic.User u, int ParentId) 
-		{			
-			Guid newId = Guid.NewGuid();
-			// Updated to match level from base node
-			CMSNode n = new CMSNode(ParentId);
-			int newLevel = n.Level;
-			newLevel++;
-			CMSNode.MakeNew(ParentId,_objectType, u.Id, newLevel,  Name, newId);
-			ContentItem tmp = new ContentItem(newId);
-			tmp.CreateContent(cit);
-			return tmp;
-		}
+		
 
 		
 		new public void delete() 

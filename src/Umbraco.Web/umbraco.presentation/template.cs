@@ -325,32 +325,34 @@ namespace umbraco
                             {
                                 try
                                 {
-                                    if (helper.FindAttribute(attributes, "nodeId") != "" && int.Parse(helper.FindAttribute(attributes, "nodeId")) != 0)
-                                    {
-                                        cms.businesslogic.Content c = new umbraco.cms.businesslogic.Content(int.Parse(helper.FindAttribute(attributes, "nodeId")));
-                                        item umbItem = new item(c.getProperty(helper.FindAttribute(attributes, "field")).Value.ToString(), attributes);
-                                        tempElementContent = umbItem.FieldContent;
+                                    //TODO: Make this work again - but let's make sure this whole class is overhauled and useful
 
-                                        // Check if the content is published
-                                        if (c.nodeObjectType == cms.businesslogic.web.Document._objectType)
-                                        {
-                                            try
-                                            {
-                                                cms.businesslogic.web.Document d = (cms.businesslogic.web.Document)c;
-                                                if (!d.Published)
-                                                    tempElementContent = "";
-                                            }
-                                            catch { }
-                                        }
+                                    //if (helper.FindAttribute(attributes, "nodeId") != "" && int.Parse(helper.FindAttribute(attributes, "nodeId")) != 0)
+                                    //{
+                                    //    cms.businesslogic.Content c = new umbraco.cms.businesslogic.Content(int.Parse(helper.FindAttribute(attributes, "nodeId")));
+                                    //    item umbItem = new item(c.getProperty(helper.FindAttribute(attributes, "field")).Value.ToString(), attributes);
+                                    //    tempElementContent = umbItem.FieldContent;
 
-                                    }
-                                    else
-                                    {
-                                        // NH adds Live Editing test stuff
-                                        item umbItem = new item(umbPage.Elements, attributes);
-                                        //								item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
-                                        tempElementContent = umbItem.FieldContent;
-                                    }
+                                    //    // Check if the content is published
+                                    //    if (c.nodeObjectType == cms.businesslogic.web.Document._objectType)
+                                    //    {
+                                    //        try
+                                    //        {
+                                    //            cms.businesslogic.web.Document d = (cms.businesslogic.web.Document)c;
+                                    //            if (!d.Published)
+                                    //                tempElementContent = "";
+                                    //        }
+                                    //        catch { }
+                                    //    }
+
+                                    //}
+                                    //else
+                                    //{
+                                    //    // NH adds Live Editing test stuff
+                                    //    item umbItem = new item(umbPage.Elements, attributes);
+                                    //    //								item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
+                                    //    tempElementContent = umbItem.FieldContent;
+                                    //}
 
                                     if (debugMode)
                                         tempElementContent =
@@ -378,11 +380,6 @@ namespace umbraco
 
         }
 
-		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ParseInternalLinks instead")]
-        public static string ParseInternalLinks(string pageContents)
-		{
-			return Umbraco.Web.Templates.TemplateUtilities.ParseInternalLinks(pageContents);
-		}
 
         /// <summary>
         /// Parses the content of the templateOutput stringbuilder, and matches any tags given in the

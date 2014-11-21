@@ -128,7 +128,6 @@
     <Compile Include="LoggingLevel.cs" />
     <Compile Include="StaticField.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
-    <Compile Include="ContentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmbracoContentIndexer.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />

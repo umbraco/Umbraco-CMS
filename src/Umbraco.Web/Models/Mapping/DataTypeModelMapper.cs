@@ -68,7 +68,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
                 .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
                 .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
-                .ForMember(x => x.ControlId, expression => expression.Ignore())
                 .ForMember(x => x.CreatorId, expression => expression.Ignore())
                 .ForMember(x => x.Level, expression => expression.Ignore())
                 .ForMember(x => x.SortOrder, expression => expression.Ignore())

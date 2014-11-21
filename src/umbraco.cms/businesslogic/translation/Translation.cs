@@ -5,7 +5,6 @@ using System.Web;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.IO;
@@ -87,35 +86,6 @@ namespace umbraco.cms.businesslogic.translation
             }
         }
 
-        public static int CountWords(int DocumentId)
-        {
-            Document d = new Document(DocumentId);
-
-            int words = CountWordsInString(d.Text);
-            var props = d.GenericProperties;
-            foreach (Property p in props)
-            {
-                if (p.Value.GetType() == "".GetType())
-                {
-                    if (p.Value.ToString().Trim() != "")
-                        words += CountWordsInString(p.Value.ToString());
-                }
-            }
-
-            return words;
-        }
-
-        private static int CountWordsInString(string Text)
-        {
-            string pattern = @"<(.|\n)*?>";
-            string tmpStr = Regex.Replace(Text, pattern, string.Empty);
-
-            tmpStr = tmpStr.Replace("\t", " ").Trim();
-            tmpStr = tmpStr.Replace("\n", " ");
-            tmpStr = tmpStr.Replace("\r", " ");
-
-            MatchCollection collection = Regex.Matches(tmpStr, @"[\S]+");
-            return collection.Count; 
-        }
+        
     }
 }

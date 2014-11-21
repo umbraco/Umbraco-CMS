@@ -199,35 +199,35 @@ namespace umbraco.presentation.developer.packages
                     //removing failing files from the uninstall manifest
                     SyncLists(_pack.Data.DictionaryItems, tempList);
 
+                    //TODO: Fix this with the new services and apis! and then remove since this should all be in angular
+                    //foreach (var str in _pack.Data.DataTypes)
+                    //{
+                    //    var tId = 0;
 
-                    foreach (var str in _pack.Data.DataTypes)
-                    {
-                        var tId = 0;
+                    //    if (int.TryParse(str, out tId))
+                    //    {
+                    //        try
+                    //        {
+                    //            var dtd = new cms.businesslogic.datatype.DataTypeDefinition(tId);
 
-                        if (int.TryParse(str, out tId))
-                        {
-                            try
-                            {
-                                var dtd = new cms.businesslogic.datatype.DataTypeDefinition(tId);
+                    //            if (dtd != null)
+                    //            {
+                    //                var li = new ListItem(dtd.Text, dtd.Id.ToString());
+                    //                li.Selected = true;
 
-                                if (dtd != null)
-                                {
-                                    var li = new ListItem(dtd.Text, dtd.Id.ToString());
-                                    li.Selected = true;
-
-                                    dataTypes.Items.Add(li);
-                                }
-                                else
-                                {
-                                    tempList.Add(str);
-                                }
-                            }
-                            catch
-                            {
-                                tempList.Add(str);
-                            }
-                        }
-                    }
+                    //                dataTypes.Items.Add(li);
+                    //            }
+                    //            else
+                    //            {
+                    //                tempList.Add(str);
+                    //            }
+                    //        }
+                    //        catch
+                    //        {
+                    //            tempList.Add(str);
+                    //        }
+                    //    }
+                    //}
 
                     //removing failing files from the uninstall manifest
                     SyncLists(_pack.Data.DataTypes, tempList);
@@ -476,21 +476,23 @@ namespace umbraco.presentation.developer.packages
                 }
             }
 
-            //Remove Data types
-            foreach (ListItem li in dataTypes.Items)
-            {
-                if (li.Selected)
-                {
-                    int nId;
+            //TODO: Fix this with the new services and apis! and then remove since this should all be in angular
 
-                    if (int.TryParse(li.Value, out nId))
-                    {
-                        var dtd = new cms.businesslogic.datatype.DataTypeDefinition(nId);
-                        dtd.delete();
-                        _pack.Data.DataTypes.Remove(nId.ToString());
-                    }
-                }
-            }
+            ////Remove Data types
+            //foreach (ListItem li in dataTypes.Items)
+            //{
+            //    if (li.Selected)
+            //    {
+            //        int nId;
+
+            //        if (int.TryParse(li.Value, out nId))
+            //        {
+            //            var dtd = new cms.businesslogic.datatype.DataTypeDefinition(nId);
+            //            dtd.delete();
+            //            _pack.Data.DataTypes.Remove(nId.ToString());
+            //        }
+            //    }
+            //}
 
             _pack.Save();
 

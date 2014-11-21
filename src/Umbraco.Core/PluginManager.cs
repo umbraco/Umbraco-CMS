@@ -510,24 +510,8 @@ namespace Umbraco.Core
             return ResolveTypes<ICacheRefresher>();
         }
 
-        /// <summary>
-        /// Returns all available IPropertyEditorValueConverter
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolvePropertyEditorValueConverters()
-        {
-            return ResolveTypes<IPropertyEditorValueConverter>();
-        }
-
-        /// <summary>
-        /// Returns all available IDataType in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveDataTypes()
-        {
-            return ResolveTypes<IDataType>();
-        }
-
+      
+        
         /// <summary>
         /// Returns all available IMacroGuiRendering in application
         /// </summary>

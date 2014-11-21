@@ -321,17 +321,9 @@
     </Compile>
     <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.designer.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Controls\PasswordChanger.ascx.cs">
       <DependentUpon>passwordChanger.ascx</DependentUpon>
@@ -467,7 +459,6 @@
     </Compile>
     <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.cs">
       <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.designer.cs">
       <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
@@ -1060,15 +1051,9 @@
     <Content Include="Umbraco_Client\DateTimePicker\datetimepicker.css" />
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
     <Content Include="Umbraco\Controls\ContentTypeControlNew.ascx" />
-    <Content Include="Umbraco\Controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="Umbraco\Images\Umbraco\developerScript.gif" />
     <Content Include="Umbraco_Client\Tree\sprites.png" />
     <Content Include="Umbraco_Client\Tree\sprites_ie6.gif" />
-    <Content Include="Umbraco\Controls\Images\ImageViewer.ascx" />
-    <Content Include="Umbraco\Controls\Images\ImageViewer.js" />
-    <Content Include="Umbraco\Controls\Images\ImageViewerUpdater.asmx" />
-    <Content Include="Umbraco\Controls\Images\UploadMediaImage.ascx" />
-    <Content Include="Umbraco\Controls\Images\UploadMediaImage.js" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="Umbraco\Images\throbber.gif" />
     <Content Include="Umbraco\Images\Umbraco\bin.png" />
@@ -1217,7 +1202,6 @@
     <Content Include="Umbraco\Dialogs\cruds.aspx" />
     <Content Include="Umbraco\Dialogs\emptyTrashcan.aspx" />
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\imageViewer.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\insertMacro.aspx" />
     <Content Include="Umbraco\Dialogs\insertTable.aspx" />

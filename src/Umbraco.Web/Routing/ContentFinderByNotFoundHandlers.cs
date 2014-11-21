@@ -68,11 +68,11 @@ namespace Umbraco.Web.Routing
                 // else it's a legacy handler: run
 
                 // can't find a document => continue with other handlers
-                if (handler.Execute(url) == false || handler.redirectID <= 0)
+                if (handler.Execute(url) == false || handler.RedirectId <= 0)
                     continue;
 
                 // found a document ID => ensure it's a valid document
-                var redirectId = handler.redirectID;
+                var redirectId = handler.RedirectId;
                 docRequest.PublishedContent = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectId);
 
                 if (docRequest.HasPublishedContent == false)

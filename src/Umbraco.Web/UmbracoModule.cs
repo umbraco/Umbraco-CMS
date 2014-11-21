@@ -120,13 +120,7 @@ namespace Umbraco.Web
                 return;
             }
 
-			// do not process but remap to handler if it is a base rest request
-			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.OriginalRequestUrl))
-			{
-				httpContext.RemapHandler(new BaseRest.BaseRestHandler());
-				return;
-			}
-
+		
 			// do not process if this request is not a front-end routable page
 		    var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
             //raise event here
@@ -218,9 +212,7 @@ namespace Umbraco.Web
                 //check installer
                 || request.Url.IsInstallerRequest()
                 //detect in preview
-                || (request.HasPreviewCookie() && request.Url != null && request.Url.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
-                //check for base
-                || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
+                || (request.HasPreviewCookie() && request.Url != null && request.Url.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false))
             {
                 return true;
             }
