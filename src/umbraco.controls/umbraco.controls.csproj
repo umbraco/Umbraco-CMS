@@ -90,7 +90,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="DataAttributes.cs" />
-    <Compile Include="DatePicker\DateTimePicker.cs" />
     <Compile Include="FieldDropDownList.cs" />
     <Compile Include="MenuButton.cs" />
     <Compile Include="MenuSplitButton.cs" />
