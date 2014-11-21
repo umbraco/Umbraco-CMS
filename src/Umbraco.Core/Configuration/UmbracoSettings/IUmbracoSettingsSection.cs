@@ -12,7 +12,6 @@
 
         IDeveloperSection Developer { get; }
 
-        IViewStateMoverModuleSection ViewStateMoverModule { get; }
 
         ILoggingSection Logging { get; }
 

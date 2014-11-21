@@ -233,7 +233,6 @@
     <Compile Include="Configuration\UmbracoSettings\IServer.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IViewStateMoverModuleSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LinkElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\LinksCollection.cs" />
@@ -258,7 +257,6 @@
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ViewstateMoverModuleElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Attempt.cs" />

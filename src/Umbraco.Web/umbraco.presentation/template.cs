@@ -224,7 +224,7 @@ namespace umbraco
             Control pageContent = new Control();
 
             bool stop = false;
-            bool debugMode = umbraco.presentation.UmbracoContext.Current.Request.IsDebug;
+            bool debugMode = UmbracoContext.Current.HttpContext.IsDebuggingEnabled;
 
             while (!stop)
             {

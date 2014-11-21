@@ -132,7 +132,7 @@ namespace umbraco
             {
                 var content = "";
 
-                var umbracoXml = presentation.UmbracoContext.Current.GetXml();
+                var umbracoXml = global::umbraco.content.Instance.XmlContent;
 
                 var splitpath = (String[])elements["splitpath"];
                 for (int i = 0; i < splitpath.Length - 1; i++)

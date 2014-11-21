@@ -26,7 +26,7 @@ namespace umbraco.presentation.umbraco.dialogs
 		{
 			// Put user code to initialize the page here
 			//nodeName.Text = new cms.businesslogic.CMSNode(int.Parse(helper.Request("nodeID"))).Text;
-			auditLog.DataSource = BusinessLogic.Log.Instance.GetAuditLogItems(int.Parse(UmbracoContext.Current.Request["nodeID"]));
+			auditLog.DataSource = BusinessLogic.Log.Instance.GetAuditLogItems(int.Parse(Request["nodeID"]));
 			auditLog.DataBind();
 			auditLog.BorderWidth = 0;
 			auditLog.BorderStyle = BorderStyle.None;

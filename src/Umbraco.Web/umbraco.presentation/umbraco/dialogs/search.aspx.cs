@@ -58,8 +58,8 @@ namespace umbraco.presentation.dialogs
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = (CurrentApp == Constants.Applications.Members)
-                ? UmbracoContext.Current.InternalMemberSearchProvider
-                : UmbracoContext.Current.InternalSearchProvider;
+                ? ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"]
+                : ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
 
             //create some search criteria, make everything combined to be 'And' and only search the current app
             var criteria = internalSearcher.CreateSearchCriteria(CurrentApp, Examine.SearchCriteria.BooleanOperation.And);
@@ -79,11 +79,11 @@ namespace umbraco.presentation.dialogs
                     operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
 
                 // ensure the user can only find nodes they are allowed to see
-                if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
+                if (UmbracoUser.StartNodeId > 0)
                 {
                     //TODO: This is not correct! This will not filter out seearches 'from' this node, this
                     // query is meant to search 'for' a specific node.
-                    operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                    operation = operation.And().Id(UmbracoUser.StartNodeId);
                 }
 
                 results = internalSearcher.Search(operation.Compile());

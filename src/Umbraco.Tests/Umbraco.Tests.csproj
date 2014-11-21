@@ -236,8 +236,6 @@
     <Compile Include="Configurations\UmbracoSettings\TemplateElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\TemplateElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
     <Compile Include="Controllers\WebApiEditors\ContentControllerUnitTests.cs" />

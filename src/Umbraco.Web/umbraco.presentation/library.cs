@@ -30,7 +30,6 @@ using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Core.IO;
-using UmbracoContext = umbraco.presentation.UmbracoContext;
 
 namespace umbraco
 {
@@ -1351,9 +1350,7 @@ namespace umbraco
         // only difference is that the UmbracoContext way will check if its in preview mode.
         private static XmlDocument GetThreadsafeXmlDocument()
         {
-            return UmbracoContext.Current != null
-                       ? UmbracoContext.Current.GetXml()
-                       : content.Instance.XmlContent;
+            return content.Instance.XmlContent;
         }
 
         /// <summary>
@@ -1467,10 +1464,10 @@ namespace umbraco
         public static string QueryForNode(string id)
         {
             string XPathQuery = string.Empty;
-            if (UmbracoContext.Current.GetXml().GetElementById(id) != null)
+            if (content.Instance.XmlContent.GetElementById(id) != null)
             {
                 string[] path =
-                    UmbracoContext.Current.GetXml().GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
+                    content.Instance.XmlContent.GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
                 for (int i = 1; i < path.Length; i++)
                 {
                     if (i > 1)

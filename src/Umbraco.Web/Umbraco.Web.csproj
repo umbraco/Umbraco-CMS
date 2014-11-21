@@ -1023,9 +1023,6 @@
     <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\keepAliveService.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\library.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1038,30 +1035,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\publishingService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\PublishQueue.cs" />
-    <Compile Include="umbraco.presentation\showField.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\template.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\UmbracoContext.cs" />
-    <Compile Include="umbraco.presentation\UmbracoPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\UmbracoRequest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\UmbracoResponse.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\UmbracoServerUtility.cs" />
     <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.cs">
       <DependentUpon>delete.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1633,7 +1612,6 @@
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\viewstateMoverModule.cs" />
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />

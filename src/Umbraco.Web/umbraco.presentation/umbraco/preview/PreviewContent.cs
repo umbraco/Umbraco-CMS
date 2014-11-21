@@ -20,11 +20,13 @@ using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 
 namespace umbraco.presentation.preview
 {
     //TODO : Migrate this to a new API!
 
+    [Obsolete("Get rid of this!!!")]
     public class PreviewContent
     {
         // zb-00004 #29956 : refactor cookies names & handling

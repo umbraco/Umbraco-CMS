@@ -446,19 +446,7 @@ namespace umbraco
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether umbraco will use the viewstate mover module.
-        /// The viewstate mover will move all asp.net viewstate information to the bottom of the aspx page
-        /// to ensure that search engines will index text instead of javascript viewstate information.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if umbraco will use the viewstate mover module; otherwise, <c>false</c>.
-        /// </value>
-        public static bool UseViewstateMoverModule
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().ViewStateMoverModule.Enable; }
-        }
-
+     
 
         /// <summary>
         /// Tells us whether the Xml Content cache is disabled or not

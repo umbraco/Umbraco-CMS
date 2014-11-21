@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
+using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using umbraco.cms.businesslogic.member;
@@ -28,7 +29,7 @@ namespace umbraco.presentation.umbraco.members
             if (provider.IsUmbracoMembershipProvider())
             {
                 var query = searchQuery.Text.ToLower();
-                var internalSearcher = UmbracoContext.Current.InternalMemberSearchProvider;
+                var internalSearcher = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"];
 
                 if (String.IsNullOrEmpty(query) == false)
                 {

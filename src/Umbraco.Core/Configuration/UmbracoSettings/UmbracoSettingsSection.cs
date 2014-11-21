@@ -37,11 +37,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (DeveloperElement)this["developer"]; }
         }
 
-        [ConfigurationProperty("viewstateMoverModule")]
-        internal ViewstateMoverModuleElement ViewstateMoverModule
-        {
-            get { return (ViewstateMoverModuleElement)this["viewstateMoverModule"]; }
-        }
 
         [ConfigurationProperty("logging")]
         internal LoggingElement Logging
@@ -145,11 +140,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IDeveloperSection IUmbracoSettingsSection.Developer
         {
             get { return Developer; }
-        }
-
-        IViewStateMoverModuleSection IUmbracoSettingsSection.ViewStateMoverModule
-        {
-            get { return ViewstateMoverModule; }
         }
 
         ILoggingSection IUmbracoSettingsSection.Logging

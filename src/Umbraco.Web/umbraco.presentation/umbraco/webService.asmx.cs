@@ -143,7 +143,7 @@ namespace umbraco
             try
             {
                 //if the query starts with "*" then query all fields
-                var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
+                var internalSearcher = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
                 var criteria = internalSearcher.CreateSearchCriteria(IndexTypes.Content);
                 IEnumerable<SearchResult> results;
                 if (Query.StartsWith("*"))
