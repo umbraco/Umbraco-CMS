@@ -43,7 +43,7 @@ namespace Umbraco.Core.Services
 			return "[Thread " + Thread.CurrentThread.ManagedThreadId + "] " + generateMessageFormat;
 		}
 
-		#region Error
+
 		/// <summary>
 		/// Adds an error log
 		/// </summary>
@@ -62,9 +62,7 @@ namespace Umbraco.Core.Services
 				logger.Error(PrefixThreadId(message), exception);
 		}
 
-		#endregion
 
-		#region Warn		
 
 		public void Warn(Type callingType, string message, params Func<object>[] formatItems)
 		{
@@ -139,9 +137,9 @@ namespace Umbraco.Core.Services
 			WarnWithException(typeof(T), message, showHttpTrace, e, formatItems);
 		} 
 
-		#endregion
+		
 
-		#region Info
+
 		/// <summary>
 		/// Traces a message, only generating the message if tracing is actually enabled. Use this method to avoid calling any long-running methods such as "ToDebugString" if logging is disabled.
 		/// </summary>
@@ -190,9 +188,10 @@ namespace Umbraco.Core.Services
 		{
 			Info(typeof(T), generateMessageFormat, formatItems);
 		} 
-		#endregion
+	
 
-		#region Debug
+
+
 		/// <summary>
 		/// Debugs a message, only generating the message if tracing is actually enabled. Use this method to avoid calling any long-running methods such as "ToDebugString" if logging is disabled.
 		/// </summary>
@@ -261,7 +260,5 @@ namespace Umbraco.Core.Services
 			Debug(typeof(T), generateMessageFormat, formatItems);
 		}
 
-		#endregion
-		
 	}
 }
