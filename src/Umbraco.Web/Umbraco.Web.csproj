@@ -264,7 +264,6 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
-    <Compile Include="Routing\INotFoundHandler.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
@@ -513,6 +512,7 @@
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
+    <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -566,7 +566,6 @@
     <Compile Include="Models\UmbracoProperty.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
-    <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
@@ -726,7 +725,6 @@
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -847,10 +845,8 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
-    <Compile Include="Routing\ContentFinderByNotFoundHandler.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
-    <Compile Include="Routing\ContentFinderByNotFoundHandlers.cs" />
     <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
     <Compile Include="Routing\DefaultUrlProvider.cs" />
@@ -859,7 +855,6 @@
     <Compile Include="Routing\SiteDomainHelper.cs" />
     <Compile Include="Routing\SiteDomainHelperResolver.cs" />
     <Compile Include="Routing\UrlProviderResolver.cs" />
-    <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Security\LegacyDefaultAppMapping.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
@@ -952,7 +947,6 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -985,9 +979,6 @@
     <Compile Include="Mvc\UmbracoTemplatePage.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />
     <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
     <Compile Include="UmbracoUserControl.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1051,9 +1042,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\PublishQueue.cs" />
-    <Compile Include="umbraco.presentation\NotFoundHandlers.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\showField.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1186,7 +1174,6 @@
     <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.designer.cs">
       <DependentUpon>MemberSearch.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Page_Legacy.cs" />
     <Compile Include="umbraco.presentation\umbraco\preview\PreviewContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
@@ -1430,10 +1417,6 @@
     <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.designer.cs">
       <DependentUpon>ViewMembers.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Properties.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProvider.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1466,7 +1449,6 @@
       <DependentUpon>editScript.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>

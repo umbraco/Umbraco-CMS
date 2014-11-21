@@ -6,6 +6,7 @@ namespace umbraco.interfaces
 	/// <summary>
 	/// Interface for created application trees in the umbraco backoffice
 	/// </summary>
+    [Obsolete("Get rid of this!!")]
 	public interface ITree
 	{
         /// <summary>

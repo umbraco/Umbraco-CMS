@@ -64,8 +64,7 @@ namespace Umbraco.Web.Standalone
 			ContentFinderResolver.Current = new ContentFinderResolver(
 				typeof (ContentFinderByPageIdQuery),
 				typeof (ContentFinderByNiceUrl),
-				typeof (ContentFinderByIdPath),
-                typeof (ContentFinderByNotFoundHandlers)
+				typeof (ContentFinderByIdPath)
             );
 
             // TODO what else?

@@ -124,6 +124,7 @@
     </Compile>
     <Compile Include="IApplication.cs" />
     <Compile Include="IApplicationStartupHandler.cs" />
+    <Compile Include="INode.cs" />
     <Compile Include="IProperty.cs" />
     <Compile Include="ITag.cs" />
     <Compile Include="ITaskReturnUrl.cs" />
@@ -140,7 +141,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IMenuElement.cs" />
-    <Compile Include="INode.cs" />
     <Compile Include="IPackageAction.cs" />
     <Compile Include="ITask.cs">
       <SubType>Code</SubType>

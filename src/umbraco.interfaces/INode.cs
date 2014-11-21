@@ -6,6 +6,7 @@ using System.Text;
 
 namespace umbraco.interfaces
 {
+    [Obsolete("Get rid of this!!")]
     public interface INode
     {
         INode Parent { get; }

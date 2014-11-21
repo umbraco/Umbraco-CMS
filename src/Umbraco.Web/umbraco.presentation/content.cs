@@ -1,33 +1,22 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Xml;
-using System.Xml.XPath;
-using umbraco.cms.presentation;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models;
 using umbraco.DataLayer;
-using umbraco.presentation.nodeFactory;
 using Umbraco.Web;
-using Action = umbraco.BusinessLogic.Actions.Action;
-using Node = umbraco.NodeFactory.Node;
-using Umbraco.Core;
 using File = System.IO.File;
 
 namespace umbraco
@@ -364,27 +353,6 @@ namespace umbraco
                 attr.Value = d.sortOrder.ToString();
                 xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, node, xmlContentCopy);
 
-                // update sitemapprovider
-                if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
-                {
-                    try
-                    {
-                        var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                        var n = new Node(d.Id, true);
-                        if (string.IsNullOrEmpty(n.Url) == false && n.Url != "/#")
-                        {
-                            prov.UpdateNode(n);
-                        }
-                        else
-                        {
-                            LogHelper.Debug<content>(string.Format("Can't update Sitemap Provider due to empty Url in node id: {0}", d.Id));
-                        }
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<content>(string.Format("Error adding node to Sitemap Provider in PublishNodeDo(): {0}", d.Id), ee);
-                    }
-                }
             }
 
 			return xmlContentCopy;
@@ -726,12 +694,7 @@ namespace umbraco
                 //SD: changed to fire event BEFORE running the sitemap!! argh.
                 FireAfterClearDocumentCache(doc, e);
 
-                // update sitemapprovider
-                if (SiteMap.Provider is UmbracoSiteMapProvider)
-                {
-                    var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                    prov.RemoveNode(doc.Id);
-                }                
+                      
             }
         }
 

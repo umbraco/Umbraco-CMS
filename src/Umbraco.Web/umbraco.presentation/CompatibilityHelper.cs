@@ -9,6 +9,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.umbraco.presentation
 {
+    [Obsolete("Get rid of this!!")]
     static class CompatibilityHelper
     {
         // NOTE - moved from umbraco.MacroEngines to avoid circ. references
@@ -95,7 +96,7 @@ namespace Umbraco.Web.umbraco.presentation
             }
             public IProperty GetProperty(string alias)
             {
-                return PropertiesAsList.Cast<global::umbraco.NodeFactory.Property>().FirstOrDefault(p => p.Alias == alias);
+                return PropertiesAsList.FirstOrDefault(p => p.Alias == alias);
             }
 
             public IProperty GetProperty(string alias, out bool propertyExists)

@@ -357,13 +357,7 @@ namespace Umbraco.Web
                     typeof(CustomRouteUrlProvider)
                 );
 
-            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(
-                // handled by ContentLastChanceFinderByNotFoundHandlers for the time being
-                // soon as we get rid of INotFoundHandler support, we must enable this
-                //new ContentFinderByLegacy404()
-
-                // implement INotFoundHandler support... remove once we get rid of it
-                new ContentLastChanceFinderByNotFoundHandlers());
+            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(new ContentFinderByLegacy404());
 
             ContentFinderResolver.Current = new ContentFinderResolver(
                 // all built-in finders in the correct order, devs can then modify this list
@@ -371,16 +365,10 @@ namespace Umbraco.Web
                 typeof(ContentFinderByPageIdQuery),
                 typeof(ContentFinderByNiceUrl),
                 typeof(ContentFinderByIdPath),
+                typeof (ContentFinderByNiceUrlAndTemplate),
+                typeof (ContentFinderByProfile),
+                typeof (ContentFinderByUrlAlias)
 
-                // these will be handled by ContentFinderByNotFoundHandlers so they can be enabled/disabled
-                // via the config file... soon as we get rid of INotFoundHandler support, we must enable
-                // them here.
-                //typeof (ContentFinderByNiceUrlAndTemplate),
-                //typeof (ContentFinderByProfile),
-                //typeof (ContentFinderByUrlAlias),
-
-                // implement INotFoundHandler support... remove once we get rid of it
-                typeof(ContentFinderByNotFoundHandlers)
             );
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());

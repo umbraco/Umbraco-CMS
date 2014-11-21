@@ -20,7 +20,6 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using System.Net;
 using System.Collections;
-using umbraco.NodeFactory;
 
 namespace umbraco.presentation.webservices
 {

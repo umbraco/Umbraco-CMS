@@ -34,7 +34,6 @@ using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.DataLayer;
-using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
 using Umbraco.Web.umbraco.presentation;
 using Content = umbraco.cms.businesslogic.Content;
@@ -1231,7 +1230,7 @@ namespace umbraco
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-			var ret = engine.Execute(macro, GetCurrentNode());
+            var ret = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
             
 			retVal.Result = ret;
 			return retVal;
@@ -1286,7 +1285,6 @@ namespace umbraco
                 return new LiteralControl(string.Format("Unable to create control {0} from assembly {1}",
                                                         controlName, asm.FullName));
 
-            AddCurrentNodeToControl(control);
 
             // Properties
             UpdateControlProperties(control, model);
@@ -1374,7 +1372,6 @@ namespace umbraco
 
                 TraceInfo(LoadUserControlKey, string.Format("Usercontrol added with id '{0}'", oControl.ID));
 
-	            AddCurrentNodeToControl(oControl);
                 UpdateControlProperties(oControl, model);
                 return oControl;
             }
@@ -1385,23 +1382,6 @@ namespace umbraco
             }
         }
 
-        private static void AddCurrentNodeToControl(Control control)
-        {
-            var type = control.GetType();
-
-            PropertyInfo currentNodeProperty = type.GetProperty("CurrentNode");
-            if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
-            {
-                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
-            }
-            currentNodeProperty = type.GetProperty("currentNode");
-            if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
-            {
-                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
-            }
-        }
 
         private static void TraceInfo(string category, string message, bool excludeProfiling = false)
         {
@@ -1642,14 +1622,6 @@ namespace umbraco
             return xslt;
         }
 
-
-        private static INode GetCurrentNode()
-        {
-            var id = Node.getCurrentNodeId();
-            var content = UmbracoContext.Current.ContentCache.GetById(id);
-            //TODO: This should check for null!
-            return CompatibilityHelper.ConvertToNode(content);
-        }
 
         #region Events
 
