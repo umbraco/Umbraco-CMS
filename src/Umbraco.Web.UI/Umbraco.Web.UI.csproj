@@ -545,12 +545,6 @@
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\BaseRestExtensions.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Config\BaseRestExtensions.Release.config">
-      <DependentUpon>BaseRestExtensions.config</DependentUpon>
-    </None>
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>

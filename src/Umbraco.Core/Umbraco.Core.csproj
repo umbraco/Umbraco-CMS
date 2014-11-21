@@ -164,15 +164,8 @@
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
-    <Compile Include="Configuration\BaseRest\IBaseRestSection.cs" />
-    <Compile Include="Configuration\BaseRest\IExtension.cs" />
-    <Compile Include="Configuration\BaseRest\IMethodSection.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
-    <Compile Include="Configuration\BaseRest\BaseRestSection.cs" />
-    <Compile Include="Configuration\BaseRest\ExtensionElement.cs" />
-    <Compile Include="Configuration\BaseRest\ExtensionElementCollection.cs" />
-    <Compile Include="Configuration\BaseRest\MethodElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessItem.cs" />
     <Compile Include="Configuration\Dashboard\AccessType.cs" />
