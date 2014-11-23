@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
-    <name>The Umbraco Community</name>
-    <link>http://our.umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Языки и домены</key>
@@ -369,7 +369,7 @@
 		<p>Для настройки откройте файл "web.config" с помошью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "umbracoDbDSN"),
 		затем сохраните файл.</p>
 		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
-		<a href="http://our.umbraco.org/wiki/reference/webconfig"
+		<a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7"
 		target="_blank">Более подробно о внесении изменений в файл "web.config" расскзано здесь.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно распологать некоторой информацией о Вашем сервере базы данных
 		(строка подключения "connection string")<br />

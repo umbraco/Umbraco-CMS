@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
-    <name>Umbraco</name>
-    <link>http://umbraco.com</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Culture and Hostnames</key>
@@ -44,16 +44,16 @@
     <key alias="invalidNode">Invalid node.</key>
     <key alias="invalidDomain">Invalid domain format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
-    <key alias="domain">Domain</key>
     <key alias="language">Language</key>
+    <key alias="domain">Domain</key>
     <key alias="domainCreated">New domain '%0%' has been created</key>
     <key alias="domainDeleted">Domain '%0%' is deleted</key>
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
+    <key alias="domainUpdated">Domain '%0%' has been updated</key>
+    <key alias="orEdit">Edit Current Domains</key>
     <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
         "https://www.example.com/".<br /><br />One-level paths in domains are supported, eg. "example.com/en". However, they
         should be avoided. Better use the culture setting above.]]></key>
-    <key alias="domainUpdated">Domain '%0%' has been updated</key>
-    <key alias="orEdit">Edit Current Domains</key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
@@ -422,7 +422,7 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://our.umbraco.org/wiki/reference/webconfig" target="_blank">
+              done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -751,6 +751,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentTypeUses">This Content Type uses</key>
     <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
+    <key alias="masterDocumentType">Master Document Type</key>
+    <key alias="createMatchingTemplate">Create matching template</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>

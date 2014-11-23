@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en_us" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
   <creator>
-    <name>Umbraco</name>
-    <link>http://umbraco.com</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Culture and Hostnames</key>
@@ -430,7 +430,7 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://our.umbraco.org/wiki/reference/webconfig" target="_blank">
+              done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -764,6 +764,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentTypeUses">This Content Type uses</key>
     <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
+    <key alias="masterDocumentType">Master Document Type</key>
+    <key alias="createMatchingTemplate">Create matching template</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
