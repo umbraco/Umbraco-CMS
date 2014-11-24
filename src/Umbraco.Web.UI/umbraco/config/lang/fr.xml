@@ -2,7 +2,7 @@
 <language alias="fr" intName="French" localName="français" lcid="12" culture="fr-FR">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://Umbraco.org/documentation/language-files</link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gérer les noms d'hôtes</key>
@@ -420,7 +420,7 @@
               <p>Pour poursuivre, éditez le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scrollez jusqu'en bas, ajoutez une "connection string" dans la ligne "umbracoDbDSN" et sauvegardez votre fichier.</p>
               <p>
               Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
-              <br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              <br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Pour effectuer cette étape, vous devez d'abord connaître des informations de votre serveur de base de données ("connection string").<br />
         Contactez votre administrateur système si nécessaire.
@@ -545,6 +545,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="greeting6">Joyeux samedi</key>
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="timeout">La session a expiré</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Tableau de bord</key>
@@ -750,6 +751,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentTypeUses">Ce type de contenu utilise</key>
     <key alias="asAContentMasterType">en tant que type de contenu master, les onglets du type de contenu master ne sont pas affichés et peuvent seulement être modifiés dans le type de contenu master lui-même.</key>
     <key alias="noPropertiesDefinedOnTab">Aucune propriétés définies dans cet onglet. Cliquez sur le lien "Ajouter une nouvelle propriété" en haut pour créer une nouvelle propriété.</key>
+    <key alias="masterDocumentType">Type de contenu parent</key>
+    <key alias="createMatchingTemplate">Créer le template correspondant</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Tri achevé.</key>
