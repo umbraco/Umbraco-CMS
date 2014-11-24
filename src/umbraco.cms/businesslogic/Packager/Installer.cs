@@ -161,26 +161,28 @@ namespace umbraco.cms.businesslogic.packager
                         try
                         {
                             tempDir = UnPack(fi.FullName);
-
-                            if (IsValidPackage(tempDir))
-                            {
-                                LoadConfig(tempDir);
-                            }
-                            else
-                            {
-                                //lets clean up
-                                var dir = new DirectoryInfo(tempDir);
-                                dir.Delete(true);
-                                throw new InvalidUmbracoPackageException();
-                            }
-                        }
-                        catch (InvalidUmbracoPackageException inv)
-                        {
-                            throw inv;
                         }
                         catch (Exception unpackE)
                         {
                             throw new Exception("Error unpacking extension...", unpackE);
+                        }
+                        if (IsValidPackage(tempDir))
+                        {
+                            try
+                            {
+                                LoadConfig(tempDir);
+                            }
+                            catch (Exception loadEx)
+                            {
+                                throw new Exception("Error loading configuration...", loadEx);
+                            }
+                        }
+                        else
+                        {
+                            //lets clean up
+                            var dir = new DirectoryInfo(tempDir);
+                            dir.Delete(true);
+                            throw new FileNotFoundException();
                         }
                     }
                     else
@@ -278,7 +280,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 insPack.Save();
 
-                
+
             }
         }
 
@@ -665,7 +667,7 @@ namespace umbraco.cms.businesslogic.packager
         private static bool IsValidPackage(string tmpPackageDir)
         {
             var dir = new DirectoryInfo(tmpPackageDir);
-            return dir.GetFiles("package.xml",SearchOption.AllDirectories).Any();
+            return dir.GetFiles("package.xml", SearchOption.AllDirectories).Any();
         }
 
         private static string UnPack(string zipName)

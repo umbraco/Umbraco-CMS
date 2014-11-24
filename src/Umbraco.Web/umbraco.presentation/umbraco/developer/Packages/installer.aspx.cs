@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Web;
 using System.Web.SessionState;
@@ -121,7 +122,7 @@ namespace umbraco.presentation.developer.packages
                 tempFile.Value = _installer.Import(_tempFileName);
                 UpdateSettings();
             }
-            catch (InvalidUmbracoPackageException invalid)
+            catch (FileNotFoundException)
             {
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.error,ui.GetText("general","error"), ui.GetText("packager", "packageInvalid"));
             }
