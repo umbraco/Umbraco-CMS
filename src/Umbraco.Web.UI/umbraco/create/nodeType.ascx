@@ -9,7 +9,7 @@
         <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
     </cc1:PropertyPanel>
     
-    <cc1:PropertyPanel runat="server" text="Master Document Type" ID="pp_mastertypes">
+    <cc1:PropertyPanel runat="server" text="Master Document Type" ID="pp_MasterDocumentType">
         <asp:ListBox id="masterType" Runat="server" cssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single"></asp:ListBox>
         <asp:Literal ID="masterTypePreDefined" runat="server" Visible="false"></asp:Literal>
     </cc1:PropertyPanel>
