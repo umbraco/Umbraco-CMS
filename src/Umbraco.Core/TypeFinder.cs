@@ -609,7 +609,7 @@ namespace Umbraco.Core
                 }
                 catch (TypeLoadException ex)
                 {
-                    LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", Path.GetFileName(a.Location)), ex);
+                    LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
                     continue; 
                 }
 
