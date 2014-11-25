@@ -1,7 +1,7 @@
-using System.Linq;
 namespace umbraco.cms.presentation.create.controls
 {
     using System;
+    using System.Linq;
     using System.Globalization;
     using System.Web;
     using System.Web.UI.WebControls;
@@ -10,6 +10,7 @@ namespace umbraco.cms.presentation.create.controls
     using umbraco.cms.businesslogic.web;
 
     using Umbraco.Core;
+    using Umbraco.Core.Strings;
     using Umbraco.Web;
     using Umbraco.Web.UI;
 
@@ -72,10 +73,34 @@ namespace umbraco.cms.presentation.create.controls
                 e.IsValid = false;
         }
 
+	    private bool ValidateAlias(string text)
+	    {
+            // get the alias - same way we do it in nodetypeTasks.PerformSave()
+            // ensure it's not empty
+            var alias = text.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase, ' ');
+            if (string.IsNullOrWhiteSpace(alias))
+                return false;
+
+            // ensure no content with that alias exists
+            var existing = ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias);
+            if (existing != null)
+                return false;
+
+            // all is ok
+	        return true;
+	    }
+
 		protected void sbmt_Click(object sender, EventArgs e)
 		{
 			if (Page.IsValid) 
 			{
+			    if (ValidateAlias(rename.Text) == false)
+			    {
+                    BasePage.Current.ClientTools.ShowSpeechBubble(BasePage.speechBubbleIcon.error, "Error",
+                        "Name is empty, invalid, or causing an invalid or duplicate alias.");
+			        return;
+			    }
+
 				var createTemplateVal = 0;
 			    if (createTemplate.Checked)
 					createTemplateVal = 1;
@@ -86,15 +111,27 @@ namespace umbraco.cms.presentation.create.controls
                 // set master type to none if no master type was selected, or the drop down was hidden because there were no doctypes available
 			    masterTypeVal = string.IsNullOrEmpty(masterTypeVal) ? "0" : masterTypeVal;
 
-                var returnUrl = LegacyDialogHandler.Create(
-                    new HttpContextWrapper(Context),
-                    BasePage.Current.getUser(),
-                    Request.GetItemAsString("nodeType"),
-                    createTemplateVal,
-					rename.Text,
-                    int.Parse(masterTypeVal));
+			    string returnUrl;
+			    try
+			    {
+                    // this *may* throw even if Page.IsValid because of race conditions
+                    returnUrl = LegacyDialogHandler.Create(
+                        new HttpContextWrapper(Context),
+                        BasePage.Current.getUser(),
+                        Request.GetItemAsString("nodeType"),
+                        createTemplateVal,
+                        rename.Text,
+                        int.Parse(masterTypeVal));
+                }
+			    catch (Exception ex)
+			    {
+                    // because it's always nicer to show a message to user vs YSOD
+                    BasePage.Current.ClientTools.ShowSpeechBubble(BasePage.speechBubbleIcon.error, "Error",
+                        ex.GetType().FullName + ": " + ex.Message);
+			        return;
+			    }
 
-				BasePage.Current.ClientTools
+                BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)
 					.ChildNodeCreated()
 					.CloseModalWindow();
