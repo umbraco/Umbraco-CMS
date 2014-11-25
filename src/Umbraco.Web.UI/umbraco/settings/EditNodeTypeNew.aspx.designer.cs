@@ -11,5 +11,23 @@ namespace Umbraco.Web.UI.Umbraco.Settings {
     
     
     public partial class EditNodeTypeNew {
+        
+        /// <summary>
+        /// allowedTemplates control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel allowedTemplates;
+        
+        /// <summary>
+        /// defaultTemplate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel defaultTemplate;
     }
 }

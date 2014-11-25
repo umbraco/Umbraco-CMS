@@ -2,7 +2,7 @@
 <language alias="no" intName="Norwegian" localName="norsk" lcid="20" culture="nb-NO">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://Umbraco.org/documentation/language-files</link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Angi domene</key>
@@ -352,7 +352,7 @@
     <key alias="databaseHeader">Databasekonfigurasjon</key>
     <key alias="databaseInstall">Klikk &lt;strong&gt;installer&lt;/strong&gt;-knappen for å installere Umbraco %0% databasen</key>
     <key alias="databaseInstallDone">Umbraco %0% har nå blitt kopiert til din database. Trykk &lt;strong&gt;Neste&lt;/strong&gt; for å fortsette.</key>
-    <key alias="databaseNotFound">&lt;p&gt;Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.&lt;/p&gt;&lt;p&gt;For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "UmbracoDbDSN" og lagre filen.&lt;/p&gt;&lt;p&gt;Klikk &lt;strong&gt;prøv på nytt&lt;/strong&gt; når du er ferdig.&lt;br /&gt; &lt;a href="http://Umbraco.org/redir/installWebConfig" target="_blank"&gt;Mer informasjon om redigering av web.config her.&lt;/a&gt;&lt;/p&gt;</key>
+    <key alias="databaseNotFound">&lt;p&gt;Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.&lt;/p&gt;&lt;p&gt;For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.&lt;/p&gt;&lt;p&gt;Klikk &lt;strong&gt;prøv på nytt&lt;/strong&gt; når du er ferdig.&lt;br /&gt; &lt;a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"&gt;Mer informasjon om redigering av web.config her.&lt;/a&gt;&lt;/p&gt;</key>
     <key alias="databaseText">For å fullføre dette steget, må du vite en del informasjon om din database server ("tilkoblingsstreng").&lt;br/&gt; Vennligst kontakt din ISP om nødvendig. Hvis du installerer på en lokal maskin eller server, må du kanskje skaffe informasjonen fra din systemadministrator.</key>
     <key alias="databaseUpgrade">&lt;p&gt; Trykk på knappen &lt;strong&gt;oppgrader&lt;/strong&gt; for å oppgradere databasen din til Umbraco %0%&lt;/p&gt; &lt;p&gt; Ikke vær urolig - intet innhold vil bli slettet og alt vil fortsette å virke etterpå! &lt;/p&gt;</key>
     <key alias="databaseUpgradeDone">Databasen din har blitt oppgradert til den siste utgaven, %0%.&lt;br/&gt;Trykk &lt;strong&gt;Neste&lt;/strong&gt; for å fortsette.</key>
@@ -415,7 +415,7 @@
     <key alias="renewSession">Forny innlogging for å lagre</key>
   </area>
   <area alias="login">
-    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://Umbraco.org" style="text-decoration: none" target="_blank"&gt;Umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
     <key alias="topText">Velkommen til Umbraco, skriv inn ditt brukernavn og passord i feltene under:</key>
   </area>
   <area alias="main">

@@ -2,7 +2,7 @@
 <language alias="pl" intName="Polish" localName="polski" lcid="21" culture="pl-PL">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://Umbraco.org/documentation/language-files</link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Zarządzanie hostami</key>
@@ -339,7 +339,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="databaseHeader">Konfiguracja bazy danych</key>
     <key alias="databaseInstall"><![CDATA[Naciśnij przycisk <strong>instaluj</strong> aby zainstalować bazę danych Umbraco %0%]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% zostało skopiowane do Twojej bazy danych. Naciśnij <strong>Dalej</strong> aby kontynuować.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p> <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "UmbracoDbDSN" i zapisz plik.</p> <p>Kliknij <strong>ponów próbę</strong> kiedy skończysz.<br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">Tu znajdziesz więcej informacji na temat edycji pliku "web.config".</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p> <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p> <p>Kliknij <strong>ponów próbę</strong> kiedy skończysz.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Tu znajdziesz więcej informacji na temat edycji pliku "web.config".</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Aby zakończyć ten etap instalacji, będziesz musiał podać parametry połączenia do Twojego serwera baz danych ("connection string").<br />Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba. W przypadku instalacji na lokalnej maszynie lub serwerze możesz potrzebować pomocy administratora.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Naciśnij przycisk <strong>aktualizuj</strong> by zaktualizować swoją bazę danych do Umbraco %0%</p> <p>Bez obaw - żadne dane nie zostaną usunięte i wszystko będzie działać jak należy!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Twoja baza danych została zaktualizowana do wersji %0%.<br />Naciśnij przycisk <strong>Dalej</strong> aby kontynuować.]]></key>
@@ -402,7 +402,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Witamy w Umbraco. Wprowadź swój login oraz hasło w polach poniżej:</key>
   </area>
   <area alias="main">

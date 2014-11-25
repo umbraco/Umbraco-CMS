@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="pt" intName="Portuguese Brazil" localName="Portuguese Brazil" lcid="" culture="pt-BR">
   <creator>
-    <name>Carlos Casalicchio</name>
-    <link>http://www.zueuz.net</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gerenciar hostnames</key>
@@ -340,7 +340,7 @@
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% agora foi copiado para seu banco de dados. Pressione <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Banco de dados não encontrado! Favor checar se a informação no "connection string" do "web.config" esteja correta. </p>
 <p>Para prosseguir, favor editar o arquivo "web.config" (usando Visual Studio ou seu editor de texto favorito), role até embaixo, adicione a connection string para seu banco de dados com a chave de nome "UmbracoDbDSN" e salve o arquivo </p>
-<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">
+<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Mais informações em como editar o web.config aqui.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este passo, você deve saber algumas informações relativas ao seu servidor de banco de dados ("connection string"). <br /> Favor contatar seu provedor de internet ou hospedagem web se necessário. Se você estiver instalando em uma máquina ou servidor local é possível que você precise dessas informações por um administrador de sistema.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>
@@ -440,7 +440,7 @@ Pressione <strong>"próximo"</strong> para iniciar o assistente.]]></key>
     <key alias="renewSession">Renovar agora para salvar seu trabalho</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Bem vindo(a) à Umbraco, digite seu nome de usuário e senha nas caixas abaixo:</key>
   </area>
   <area alias="main">

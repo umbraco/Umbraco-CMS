@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -12,7 +12,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     //Now we need to check if this is for media, members or content because that will depend on the resources we use
     var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback, createEditUrlCallback;
     
-    if ($scope.model.config.entityType && $scope.model.config.entityType === "member") {
+    //check the config for the entity type, or the current section name (since the config is only set in c#, not in pre-vals)
+    if (($scope.model.config.entityType && $scope.model.config.entityType === "member") || (appState.getSectionState("currentSection") === "member")) {
         $scope.entityType = "member";
         contentResource = $injector.get('memberResource');
         getContentTypesCallback = $injector.get('memberTypeResource').getTypes;
@@ -26,7 +27,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         };
     }
     else {
-        if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
+        //check the config for the entity type, or the current section name (since the config is only set in c#, not in pre-vals)
+        if (($scope.model.config.entityType && $scope.model.config.entityType === "media") || (appState.getSectionState("currentSection") === "media")) {
             $scope.entityType = "media";
             contentResource = $injector.get('mediaResource');
             getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;                        
