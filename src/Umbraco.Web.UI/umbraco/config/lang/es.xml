@@ -480,14 +480,14 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="renewSession">Renovar su sessión para guardar sus cambios</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday </key>
-    <key alias="greeting2">Happy tubular Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy funky Friday</key>
-    <key alias="greeting6">Happy Caturday</key>
-    <key alias="instruction">Log in below</key>
+    <key alias="greeting0">Feliz Domingo</key>
+    <key alias="greeting1">Feliz Lunes</key>
+    <key alias="greeting2">Feliz Martes</key>
+    <key alias="greeting3">Feliz Miércoles</key>
+    <key alias="greeting4">Feliz Jueves</key>
+    <key alias="greeting5">Feliz Viernes</key>
+    <key alias="greeting6">Feliz Sábado</key>
+    <key alias="instruction">Introduce abajo</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Bienvenido a umbraco, escribe tu nombre de usuario y clave en los campos de debajo:</key>
