@@ -234,7 +234,7 @@ namespace umbraco.DataLayer
                 throw new SqlHelperException("ExecuteNonQuery", commandText, parameters, e);
             }
         }
-
+        
         /// <summary>
         /// Executes a command and returns a records reader containing the results.
         /// </summary>
@@ -258,7 +258,7 @@ namespace umbraco.DataLayer
                 throw new SqlHelperException("ExecuteReader", commandText, parameters, e);
             }
         }
-
+        
         /// <summary>
         /// Executes a command that returns an XML value.
         /// </summary>
