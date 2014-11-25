@@ -55,6 +55,8 @@ namespace Umbraco.Web.Trees
                 template.IsMasterTemplate,
                 GetEditorPath(template, queryStrings))));
 
+            nodes.ForEach(x => x.NodeType = "tempaltes");
+
             return nodes;
         }
 
@@ -72,9 +74,9 @@ namespace Umbraco.Web.Trees
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                    //Since we haven't implemented anything for templates in angular, this needs to be converted to 
                     //use the legacy format
-                    .ConvertLegacyMenuItem(null, "initlanguages", queryStrings.GetValue<string>("application"));
+                    .ConvertLegacyMenuItem(null, "inittemplates", queryStrings.GetValue<string>("application"));
 
                 //refresh action
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
@@ -84,25 +86,49 @@ namespace Umbraco.Web.Trees
 
             var template = Services.FileService.GetTemplate(int.Parse(id));
             if (template == null) return new MenuItemCollection();
+            var entity = FromTemplate(template);
 
+            //Create the create action for creating sub layouts
+            menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
+                //Since we haven't implemented anything for templates in angular, this needs to be converted to 
+                //use the legacy format
+                .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
+
+            //don't allow delete if it has child layouts
             if (template.IsMasterTemplate == false)
             {
                 //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias))
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias), true)
                     //Since we haven't implemented anything for languages in angular, this needs to be converted to 
                     //use the legacy format
-                    .ConvertLegacyMenuItem(null, "templates", queryStrings.GetValue<string>("application"));
+                    .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
             }
 
+            //add refresh
+            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
             
 
             return menu;
         }
 
+        private UmbracoEntity FromTemplate(ITemplate template)
+        {
+            return new UmbracoEntity
+            {
+                CreateDate = template.CreateDate,
+                Id = template.Id,
+                Key = template.Key,
+                Name = template.Name,
+                NodeObjectTypeId = new Guid(Constants.ObjectTypes.Template),
+                //TODO: Fix parent/paths on templates
+                ParentId = -1,
+                Path = template.Path,
+                UpdateDate = template.UpdateDate
+            };
+        }
+
         private string GetEditorPath(ITemplate template, FormDataCollection queryStrings)
         {
-            //UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(template) 
-
             //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
 
             return Path.GetExtension(template.Path).InvariantEquals(".master")
