@@ -247,7 +247,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(aliases);
+                return repository.GetAll(aliases).OrderBy(x => x.Name);
             }
         }
 
@@ -259,7 +259,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
             {
-                return repository.GetChildren(masterTemplateId);
+                return repository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
             }
         }
 
