@@ -55,8 +55,6 @@ namespace Umbraco.Web.Trees
                 template.IsMasterTemplate,
                 GetEditorPath(template, queryStrings))));
 
-            nodes.ForEach(x => x.NodeType = "tempaltes");
-
             return nodes;
         }
 
