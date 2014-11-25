@@ -12,9 +12,18 @@ namespace umbraco.js
 		{
             Response.ContentType = "application/json";
             string lang = "en";
-            if(ValidateCurrentUser()){
+            var language = GlobalSettings.DefaultUILanguage;
+
+            if (language != string.Empty)
+            {
+                lang = language;
+            }
+
+            if (ValidateCurrentUser())
+            {
                 lang = UmbracoUser.Language;
             }
+
 
     	    XmlDocument all = ui.getLanguageFile(lang);
 
