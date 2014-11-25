@@ -1,32 +1,38 @@
-using System.Globalization;
-using Umbraco.Core;
-using Umbraco.Core.Strings;
-using Umbraco.Web.UI;
-using Umbraco.Web;
-
 namespace umbraco.cms.presentation.create.controls
 {
-	using System;
-	using System.Data;
-	using System.Drawing;
-	using System.Web;
-	using System.Web.UI.WebControls;
-	using System.Web.UI.HtmlControls;
-	using umbraco.cms.helpers;
-	using umbraco.BasePages;
+    using System;
+    using System.Globalization;
+    using System.Web;
+    using System.Web.UI.WebControls;
+
+    using umbraco.BasePages;
     using umbraco.cms.businesslogic.web;
 
-	/// <summary>
+    using Umbraco.Core;
+    using Umbraco.Core.Strings;
+    using Umbraco.Web;
+    using Umbraco.Web.UI;
+
+    /// <summary>
 	///		Summary description for nodeType.
 	/// </summary>
 	public partial class nodeType : System.Web.UI.UserControl
 	{
-
-
-		protected void Page_Load(object sender, EventArgs e)
-		{
-			sbmt.Text = ui.Text("create");
-            pp_name.Text = ui.Text("name");
+        /// <summary>
+        /// The page_load.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            this.sbmt.Text = ui.Text("create");
+            this.pp_name.Text = ui.Text("name");
+            this.pp_MasterDocumentType.Text = ui.Text("masterDocumentType");
+            this.createTemplate.Text = ui.Text("createMatchingTemplate");
 
             if (!IsPostBack)
             {

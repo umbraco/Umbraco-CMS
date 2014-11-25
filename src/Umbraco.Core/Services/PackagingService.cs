@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
         public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-            
+
             if (raiseEvents)
             {
                 if (ExportingContent.IsRaisedEventCancelled(new ExportEventArgs<IContent>(content, nodeName), this))
@@ -84,13 +84,13 @@ namespace Umbraco.Core.Services
             var exporter = new EntityXmlSerializer();
             var xml = exporter.Serialize(_contentService, _dataTypeService, content, deep);
 
-            if(raiseEvents)
+            if (raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
 
             return xml;
         }
 
-        
+
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
                 if (ImportingContent.IsRaisedEventCancelled(new ImportEventArgs<IContent>(element), this))
                     return Enumerable.Empty<IContent>();
             }
-            
+
             var name = element.Name.LocalName;
             if (name.Equals("DocumentSet"))
             {
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Services
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
-                if(raiseEvents)
+                if (raiseEvents)
                     ImportedContent.RaiseEvent(new ImportEventArgs<IContent>(contents, element, false), this);
                 return contents;
             }
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Services
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
-                if(raiseEvents)
+                if (raiseEvents)
                     ImportedContent.RaiseEvent(new ImportEventArgs<IContent>(contents, element, false), this);
                 return contents;
             }
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services
 
                             //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
                             var database = ApplicationContext.Current.DatabaseContext.Database;
-                            var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = propertyType.DataTypeDefinitionId});
+                            var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
 
                             var propertyValueList = new List<string>();
                             foreach (var preValue in propertyValue.Split(','))
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Services
                         }
 
                         //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue);        
+                        content.SetValue(propertyTypeAlias, propertyValue);
                     }
                 }
             }
@@ -491,13 +491,13 @@ namespace Umbraco.Core.Services
                 {
                     contentType.AddPropertyGroup(caption);
 
-                    int sortOrder;
-                    if(tab.Element("SortOrder") != null && 
-                        int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
-                    {
-                        // Override the sort order with the imported value
-                        contentType.PropertyGroups[caption].SortOrder = sortOrder;
-                    }
+                }
+
+                int sortOrder;
+                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                {
+                    // Override the sort order with the imported value
+                    contentType.PropertyGroups[caption].SortOrder = sortOrder;
                 }
             }
         }
@@ -549,7 +549,7 @@ namespace Umbraco.Core.Services
                         dataTypeDefinition = dataTypeDefinitions.First();
                     }
                 }
-                
+
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
@@ -786,15 +786,15 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinition = dataTypes.First(x => x.Name == dataTypeDefinitionName);
 
                 var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
-                                                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                                                        .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace())
                                                         .Select(x => x.Attribute("Value").Value);
 
                 var valuesWithKeys = prevaluesElement.Elements("PreValue")
-                    .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                    .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
                     .ToDictionary(
-                        key => (string) key.Attribute("Alias"),
-                        val => new PreValue((string) val.Attribute("Value")));
-                
+                        key => (string)key.Attribute("Alias"),
+                        val => new PreValue((string)val.Attribute("Value")));
+
                 //save the values with keys
                 _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
 
@@ -841,7 +841,7 @@ namespace Umbraco.Core.Services
 
             var exporter = new EntityXmlSerializer();
             var xml = exporter.Serialize(dictionaryItem);
-            
+
             if (includeChildren)
             {
                 var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
@@ -1115,7 +1115,7 @@ namespace Umbraco.Core.Services
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
-            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro; 
+            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
             var macro = existingMacro ?? new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
@@ -1210,7 +1210,7 @@ namespace Umbraco.Core.Services
         public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-            
+
             if (raiseEvents)
             {
                 if (ExportingMedia.IsRaisedEventCancelled(new ExportEventArgs<IMedia>(media, nodeName), this))
@@ -1220,7 +1220,7 @@ namespace Umbraco.Core.Services
             var exporter = new EntityXmlSerializer();
             var xml = exporter.Serialize(_mediaService, _dataTypeService, media, deep);
 
-            if(raiseEvents)
+            if (raiseEvents)
                 ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);
 
             return xml;
@@ -1334,7 +1334,7 @@ namespace Umbraco.Core.Services
             if (templates.Any())
                 _fileService.SaveTemplate(templates, userId);
 
-            if(raiseEvents)
+            if (raiseEvents)
                 ImportedTemplate.RaiseEvent(new ImportEventArgs<ITemplate>(templates, element, false), this);
 
             return templates;
@@ -1352,10 +1352,10 @@ namespace Umbraco.Core.Services
 
             IEnumerable<IFile> styleSheets = Enumerable.Empty<IFile>();
 
-            if(element.Elements().Any())
+            if (element.Elements().Any())
                 throw new NotImplementedException("This needs to be implimentet");
 
-            
+
             if (raiseEvents)
                 ImportingStylesheets.RaiseEvent(new ImportEventArgs<IFile>(styleSheets, element, false), this);
 
@@ -1480,7 +1480,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContent>> ImportedContent;
 
-        
+
         public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContent>> ExportingContent;
 
         /// <summary>
@@ -1607,7 +1607,7 @@ namespace Umbraco.Core.Services
         /// Occurs before Importing Stylesheets
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IFile>> ImportingStylesheets;
-        
+
         /// <summary>
         /// Occurs after Template is Imported and Saved
         /// </summary>
@@ -1622,7 +1622,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Template is Exported to Xml
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportedTemplate;
-        
+
         /// <summary>
         /// Occurs before Importing umbraco package
         /// </summary>
