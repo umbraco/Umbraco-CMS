@@ -21,10 +21,16 @@ namespace Umbraco.Core.Models
         private string _masterTemplateAlias;
         private Lazy<int> _masterTemplateId;
 
-
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
         private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
-        
+
+        public Template(string name, string alias)
+            : base(string.Empty)
+        {
+            _name = name;
+            _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
+        }
+
         public Template(string path, string name, string alias)
             : base(path)
         {
@@ -61,21 +67,19 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        public override string Alias
-        {
-            get
-            {
-                return _alias;
-            }
-        }
+        string ITemplate.Name { get; set; }
 
         [DataMember]
+        string ITemplate.Alias { get; set; }
+
+        public override string Alias
+        {
+            get { return ((ITemplate)this).Alias; }
+        }
+        
         public override string Name
         {
-            get
-            {
-                return _name;
-            }
+            get { return ((ITemplate)this).Name; }
         }
 
 
@@ -156,5 +160,7 @@ namespace Umbraco.Core.Models
 
             return clone;
         }
+
+        
     }
 }

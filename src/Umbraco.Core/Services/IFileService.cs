@@ -137,6 +137,8 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the template</param>
         void SaveTemplate(ITemplate template, int userId = 0);
 
+        ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
+
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>

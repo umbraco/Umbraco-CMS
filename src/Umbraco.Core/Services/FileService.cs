@@ -239,6 +239,21 @@ namespace Umbraco.Core.Services
 
 
         #region Templates
+
+        public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
+        {
+            var template = new Template(name, name)
+            {
+                Content = content
+            };
+            if (masterTemplate != null)
+            {
+                template.SetMasterTemplate(masterTemplate);
+            }
+            SaveTemplate(template, userId);
+            return template;
+        }
+
         /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
@@ -807,5 +822,8 @@ namespace Umbraco.Core.Services
 
         #endregion
 
+
+
+        
     }
 }

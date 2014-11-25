@@ -170,7 +170,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //TODO Possibly ensure unique alias here (as is done in the legacy Template class)?
+            //TODO ensure unique alias here (as is done in the legacy Template class)!
+            //TODO: The legacy one also checked for length, so do that too!
+            //TODO: Integrate the ViewHelper, MasterPageHelper stuff for when saving the template content
 
             //Save to db
             var template = entity as Template;
