@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
-    <name>Alexander Bryukhov, Roman Voropaev (Unico Design Ltd., Novosibirsk, RU)</name>
-    <link>http://unicodsgn.com</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Языки и домены</key>
@@ -410,7 +410,7 @@
 		<p>Для настройки откройте файл "web.config" с помошью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "UmbracoDbDSN"),
 		затем сохраните файл.</p>
 		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
-		<a href="http://Umbraco.org/redir/installWebConfig"
+		<a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7"
 		target="_blank">Более подробно о внесении изменений в файл "web.config" расскзано здесь.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно распологать некоторой информацией о Вашем сервере базы данных
 		(строка подключения "connection string")<br />
@@ -525,7 +525,7 @@
     <key alias="renewSession">Обновите сейчас, чтобы сохранить сделанные изменения</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p>]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
     <key alias="greeting0">Сегодня ж выходной</key>
     <key alias="greeting1">Понедельник — день тяжелый</key>
     <key alias="greeting2">Уже вторник</key>

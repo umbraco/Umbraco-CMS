@@ -2,7 +2,7 @@
 <language alias="it" intName="Italian" localName="italiano" lcid="16" culture="it-IT">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://Umbraco.org/documentation/language-files</link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gestisci hostnames</key>
@@ -266,7 +266,7 @@
     <key alias="findDocument">Trova</key>
     <key alias="folder">Cartella</key>
     <key alias="height">Altezza</key>
-    <key alias="help">Aiuto</key>
+    <key alias="help">Guida</key>
     <key alias="icon">Icona</key>
     <key alias="import">Importa</key>
     <key alias="innerMargin"><![CDATA[Margine interno (inner margin)]]></key>
@@ -343,7 +343,7 @@
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% è stato copiato nel tuo database. Premi <strong>Avanti</strong> per proseguire.]]></key>
     <key alias="databaseNotFound">
       <![CDATA[<p>Database non trovato! Perfavore, controlla che le informazioni della stringa di connessione nel file "web.config" siano corrette.</p>
-<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "UmbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]>
+<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]>
     </key>
     <key alias="databaseText"><![CDATA[Per completare questo passaggio, devi conoscere alcune informazioni riguardanti il tuo database server ("connection string"). Se è necessario contatta il tuo ISP per reperire le informazioni necessarie. Se stai effettuando l'installazione in locale o su un server, puoi richiederle al tuo amministratore di sistema]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Premi il tasto <strong>aggiorna</strong> per aggiornare il database ad Umbraco %0%</p><p>Non preoccuparti, il contenuto non verrà perso e tutto continuerà a funzionare dopo l'aggiornamento!</p>]]></key>
@@ -428,7 +428,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Benvenuti in Umbraco, digita il tuo username e la tua password nelle caselle seguenti:</key>
   </area>
   <area alias="main">
@@ -630,7 +630,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="contentTypeTabCreated">Tab creata</key>
     <key alias="contentTypeTabDeleted">Tab eliminata</key>
     <key alias="contentTypeTabDeletedText">Tab con id: %0% eliminata</key>
-    <key alias="contentUnpublished">Contenuto non pubblicato</key>
+    <key alias="contentUnpublished">Contenuto non pubblicare</key>
     <key alias="cssErrorHeader"><![CDATA[Foglio di stile non salvato]]></key>
     <key alias="cssSavedHeader"><![CDATA[Foglio di stile salvato]]></key>
     <key alias="cssSavedText"><![CDATA[Foglio di stile salvato correttamente]]></key>

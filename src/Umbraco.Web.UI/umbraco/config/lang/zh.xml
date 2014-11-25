@@ -2,7 +2,7 @@
 <language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
   <creator>
     <name>孙柱梁</name>
-    <link></link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">管理主机名</key>
@@ -384,7 +384,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
               <p>您可以自行编辑“web.config”文件，键名为 “UmbracoDbDSN”</p>
               <p>
-             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">。
+             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">。
                                     如何编辑web.config</a></p>
     ]]></key>
     <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />

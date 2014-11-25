@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <language alias="de" intName="German" localName="Deutsch" lcid="7" culture="de-DE">
   <creator>
-    <name>The German Umbraco Community</name>
-    <link>http://Umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Hostnamen verwalten</key>
@@ -465,7 +465,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
-    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://Umbraco.org" style="text-decoration: none" target="_blank"&gt;Umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
     <key alias="greeting1">Einen wunderbaren Sonntag</key>
     <key alias="greeting6">Frohen freundlichen Freitag</key>
     <key alias="greeting5">Donnerwetter Donnerstag</key>

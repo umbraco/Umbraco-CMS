@@ -1,31 +1,38 @@
-using System.Globalization;
-using Umbraco.Core;
-using Umbraco.Web.UI;
-using Umbraco.Web;
-
+using System.Linq;
 namespace umbraco.cms.presentation.create.controls
 {
-	using System;
-	using System.Data;
-	using System.Drawing;
-	using System.Web;
-	using System.Web.UI.WebControls;
-	using System.Web.UI.HtmlControls;
-	using umbraco.cms.helpers;
-	using umbraco.BasePages;
+    using System;
+    using System.Globalization;
+    using System.Web;
+    using System.Web.UI.WebControls;
+
+    using umbraco.BasePages;
     using umbraco.cms.businesslogic.web;
 
-	/// <summary>
+    using Umbraco.Core;
+    using Umbraco.Web;
+    using Umbraco.Web.UI;
+
+    /// <summary>
 	///		Summary description for nodeType.
 	/// </summary>
 	public partial class nodeType : System.Web.UI.UserControl
 	{
-
-
-		protected void Page_Load(object sender, EventArgs e)
-		{
-			sbmt.Text = ui.Text("create");
-            pp_name.Text = ui.Text("name");
+        /// <summary>
+        /// The page_load.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            this.sbmt.Text = ui.Text("create");
+            this.pp_name.Text = ui.Text("name");
+            this.pp_MasterDocumentType.Text = ui.Text("masterDocumentType");
+            this.createTemplate.Text = ui.Text("createMatchingTemplate");
 
             if (!IsPostBack)
             {
@@ -37,6 +44,11 @@ namespace umbraco.cms.presentation.create.controls
                     {
                         //                    if (dt.MasterContentType == 0)
                         masterType.Items.Add(new ListItem(dt.Text, dt.Id.ToString(CultureInfo.InvariantCulture)));
+                    }
+
+                    if (masterType.Items.Count == 1)
+                    {
+                        pp_mastertypes.Visible = false;
                     }
                 }
                 else
@@ -70,6 +82,9 @@ namespace umbraco.cms.presentation.create.controls
 
                 // check master type
                 string masterTypeVal = String.IsNullOrEmpty(Request.GetItemAsString("nodeId")) || Request.GetItemAsString("nodeId") == "init" ? masterType.SelectedValue : Request.GetItemAsString("nodeId");
+
+                // set master type to none if no master type was selected, or the drop down was hidden because there were no doctypes available
+			    masterTypeVal = string.IsNullOrEmpty(masterTypeVal) ? "0" : masterTypeVal;
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
