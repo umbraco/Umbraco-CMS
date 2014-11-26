@@ -405,6 +405,23 @@ namespace Umbraco.Core.Services
             if (parent != null)
                 contentType.AddContentType(parent);
 
+            var compositionsElement = infoElement.Element("Compositions");
+            if (compositionsElement != null && compositionsElement.HasElements)
+            {
+                var compositions = compositionsElement.Elements("Composition");
+                if (compositions.Any())
+                {
+                    foreach (var composition in compositions)
+                    {
+                        var compositionAlias = composition.Value;
+                        var compositionContentType = _importedContentTypes.ContainsKey(compositionAlias)
+                            ? _importedContentTypes[compositionAlias]
+                            : _contentTypeService.GetContentType(compositionAlias);
+                        var added = contentType.AddContentType(compositionContentType);
+                    }
+                }
+            }
+
             return UpdateContentTypeFromXml(documentType, contentType);
         }
 
@@ -417,14 +434,46 @@ namespace Umbraco.Core.Services
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
+
             //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.
             var allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
+
             //NOTE IsListView is a new property in the package xml so we need to verify it exists before using it.
             var isListView = infoElement.Element("IsListView");
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
+
+            //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
+            var masterElement = infoElement.Element("Master");
+            if (masterElement != null)
+            {
+                var masterAlias = masterElement.Value;
+                IContentType parent = _importedContentTypes.ContainsKey(masterAlias)
+                    ? _importedContentTypes[masterAlias]
+                    : _contentTypeService.GetContentType(masterAlias);
+
+                contentType.SetLazyParentId(new Lazy<int>(() => parent.Id));
+            }
+
+            //Update Compositions on the ContentType to ensure that they are as is defined in the package xml
+            var compositionsElement = infoElement.Element("Compositions");
+            if (compositionsElement != null && compositionsElement.HasElements)
+            {
+                var compositions = compositionsElement.Elements("Composition");
+                if (compositions.Any())
+                {
+                    foreach (var composition in compositions)
+                    {
+                        var compositionAlias = composition.Value;
+                        var compositionContentType = _importedContentTypes.ContainsKey(compositionAlias)
+                            ? _importedContentTypes[compositionAlias]
+                            : _contentTypeService.GetContentType(compositionAlias);
+                        var added = contentType.AddContentType(compositionContentType);
+                    }
+                }
+            }
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
