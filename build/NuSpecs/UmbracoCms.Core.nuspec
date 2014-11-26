@@ -15,7 +15,7 @@
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
-            <dependency id="Microsoft.AspNet.Mvc" version="[4.0.40804.0,5.0.0)" />
+            <dependency id="Microsoft.AspNet.Mvc" version="[4.0.30506.0,5.0.0)" />
             <dependency id="Microsoft.AspNet.WebApi" version="[4.0.30506,5.0.0)" />
             <dependency id="Microsoft.AspNet.WebApi.WebHost" version="[4.0.30506, 5.0.0)" />
             <dependency id="Microsoft.AspNet.WebApi.Core" version="[4.0.30506, 5.0.0)" />
