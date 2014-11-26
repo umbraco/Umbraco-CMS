@@ -1648,9 +1648,11 @@ namespace Umbraco.Web
             // what else? would need root content to have a special, non-null but hidden,
             // parent...
 
+
+
             var siblings = content.Parent == null
-                       ? UmbracoContext.Current.ContentCache.GetAtRoot()
-                       : content.Parent.Children;
+                ? content.ItemType == PublishedItemType.Media ? UmbracoContext.Current.MediaCache.GetAtRoot() : UmbracoContext.Current.ContentCache.GetAtRoot()
+                : content.Parent.Children;
 
             // make sure we run it once
             return siblings.ToArray();

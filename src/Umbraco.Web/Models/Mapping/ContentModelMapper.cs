@@ -128,7 +128,8 @@ namespace Umbraco.Web.Models.Mapping
 
             //fill in the template config to be passed to the template drop down.
             var templateItemConfig = new Dictionary<string, string> { { "", "Choose..." } };
-            foreach (var t in content.ContentType.AllowedTemplates)
+            foreach (var t in content.ContentType.AllowedTemplates
+                .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false))
             {
                 templateItemConfig.Add(t.Alias, t.Name);
             }
