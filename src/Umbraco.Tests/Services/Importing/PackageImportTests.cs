@@ -584,6 +584,31 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(textpage.ContentTypeCompositionExists("Seo"), Is.True);
         }
 
+        [Test]
+        public void PackagingService_Can_Import_Package_With_Compositions_Ordered()
+        {
+            // Arrange
+            string strXml = ImportResources.CompositionsTestPackage_Random;
+            var xml = XElement.Parse(strXml);
+            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+
+            // Assert
+            Assert.That(contentTypes, Is.Not.Null);
+            Assert.That(contentTypes.Any(), Is.True);
+            Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
+
+            var testContentType = contentTypes.First(x => x.Alias.Equals("CompositeTest"));
+            Assert.That(testContentType.ContentTypeComposition.Count(), Is.EqualTo(3));
+            Assert.That(testContentType.ContentTypeCompositionExists("Content"), Is.True);
+            Assert.That(testContentType.ContentTypeCompositionExists("Meta"), Is.True);
+            Assert.That(testContentType.ContentTypeCompositionExists("Seo"), Is.True);
+        }
+
         private void AddLanguages()
         {
             var norwegian = new Core.Models.Language("nb-NO");

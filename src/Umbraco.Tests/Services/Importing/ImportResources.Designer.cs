@@ -143,6 +143,34 @@ namespace Umbraco.Tests.Services.Importing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;Composite Test&lt;/name&gt;
+        ///      &lt;version&gt;dfsfd&lt;/version&gt;
+        ///      &lt;license url=&quot;http://opensource.org/licenses/MIT&quot;&gt;MIT License&lt;/license&gt;
+        ///      &lt;url&gt;ddsff&lt;/url&gt;
+        ///      &lt;requirements&gt;
+        ///        &lt;major&gt;3&lt;/major&gt;
+        ///        &lt;minor&gt;0&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name&gt;fsdfds&lt;/name&gt;
+        ///      &lt;website&gt;sfdf&lt;/website&gt;
+        ///    &lt;/author&gt;
+        ///    &lt;rea [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CompositionsTestPackage_Random {
+            get {
+                return ResourceManager.GetString("CompositionsTestPackage_Random", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         ///&lt;umbPackage&gt;
         ///  &lt;files /&gt;

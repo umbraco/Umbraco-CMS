@@ -694,6 +694,7 @@
     <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Services\Importing\CompositionsTestPackage-Random.xml" />
     <Content Include="Services\Importing\CompositionsTestPackage.xml" />
     <Content Include="Services\Importing\Dictionary-Package.xml" />
     <Content Include="UmbracoExamine\TestFiles\media.xml" />
