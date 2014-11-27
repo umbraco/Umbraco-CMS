@@ -24,8 +24,6 @@
 
         IProvidersSection Providers { get; }
 
-        IHelpSection Help { get; }
-
         IWebRoutingSection WebRouting { get; }
 
         IScriptingSection Scripting { get; }

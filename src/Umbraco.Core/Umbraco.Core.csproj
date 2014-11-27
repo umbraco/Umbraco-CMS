@@ -217,7 +217,6 @@
     <Compile Include="Configuration\UmbracoSettings\DistributedCallElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\HelpElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
@@ -225,7 +224,6 @@
     <Compile Include="Configuration\UmbracoSettings\IDeveloperSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IDistributedCallSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IHelpSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILink.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />

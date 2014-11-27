@@ -40,7 +40,6 @@ namespace Umbraco.Tests.TestHelpers
             var distCall = new Mock<IDistributedCallSection>();
             var repos = new Mock<IRepositoriesSection>();
             var providers = new Mock<IProvidersSection>();
-            var help = new Mock<IHelpSection>();
             var routing = new Mock<IWebRoutingSection>();
             var scripting = new Mock<IScriptingSection>();
 
@@ -55,7 +54,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.DistributedCall).Returns(distCall.Object);
             settings.Setup(x => x.PackageRepositories).Returns(repos.Object);
             settings.Setup(x => x.Providers).Returns(providers.Object);
-            settings.Setup(x => x.Help).Returns(help.Object);
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
             settings.Setup(x => x.Scripting).Returns(scripting.Object);
 
