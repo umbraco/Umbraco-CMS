@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodeUniqueID")) == false)
             {
-                Create.Index("IX_umbracoNodeUniqueID").OnTable("umbracoNode").OnColumn("uniqueID").Unique();
+				Create.Index("IX_umbracoNodeUniqueID").OnTable("umbracoNode").OnColumn("uniqueID").Ascending().WithOptions().NonClustered();
             }
         }
 
