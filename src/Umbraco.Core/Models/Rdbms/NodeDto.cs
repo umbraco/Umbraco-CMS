@@ -41,6 +41,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("uniqueID")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeUniqueID")]
         public Guid? UniqueId { get; set; }
 
         [Column("text")]
