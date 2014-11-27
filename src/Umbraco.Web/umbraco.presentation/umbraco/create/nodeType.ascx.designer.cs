@@ -47,8 +47,6 @@ namespace umbraco.cms.presentation.create.controls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.PropertyPanel pp_name;
-
-        protected global::umbraco.uicontrols.PropertyPanel pp_mastertypes;
         
         /// <summary>
         /// rename control.

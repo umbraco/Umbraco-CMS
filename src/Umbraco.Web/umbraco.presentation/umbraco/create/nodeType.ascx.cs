@@ -49,7 +49,7 @@ namespace umbraco.cms.presentation.create.controls
 
                     if (masterType.Items.Count == 1)
                     {
-                        pp_mastertypes.Visible = false;
+                        pp_MasterDocumentType.Visible = false;
                     }
                 }
                 else
