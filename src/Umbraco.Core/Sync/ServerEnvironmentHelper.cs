@@ -24,8 +24,15 @@ namespace Umbraco.Core.Sync
 
             if (status == CurrentServerEnvironmentStatus.Single)
             {
-                //if it's a single install, then the base url has to be the first url registered
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                //if it's a single install, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
+                if (GlobalSettings.UseSSL)
+                {
+                    return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
+                else
+                {
+                    return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
             }
 
             var servers = UmbracoSettings.DistributionServers;
@@ -33,8 +40,15 @@ namespace Umbraco.Core.Sync
             var nodes = servers.SelectNodes("./server");
             if (nodes == null)
             {
-                //cannot be determined, then the base url has to be the first url registered
-                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
+                if (GlobalSettings.UseSSL)
+                {
+                    return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
+                else
+                {
+                    return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+                }
             }
 
             var xmlNodes = nodes.Cast<XmlNode>().ToList();
@@ -58,11 +72,18 @@ namespace Umbraco.Core.Sync
                         xmlNode.InnerText,
                         xmlNode.AttributeValue<string>("forcePortnumber").IsNullOrWhiteSpace() ? "80" : xmlNode.AttributeValue<string>("forcePortnumber"),
                         IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimStart('/'));
-                }                
+                }
             }
 
-            //cannot be determined, then the base url has to be the first url registered
-            return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
+            if (GlobalSettings.UseSSL)
+            {
+                return string.Format("https://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            }
+            else
+            {
+                return string.Format("http://{0}", ApplicationContext.Current.OriginalRequestUrl);
+            }
         }
 
         /// <summary>
@@ -85,7 +106,7 @@ namespace Umbraco.Core.Sync
             }
 
             var master = nodes.Cast<XmlNode>().FirstOrDefault();
-            
+
             if (master == null)
             {
                 return CurrentServerEnvironmentStatus.Unknown;
@@ -104,12 +125,12 @@ namespace Umbraco.Core.Sync
             }
 
             if ((appId.IsNullOrWhiteSpace() == false && appId.Trim().InvariantEquals(HttpRuntime.AppDomainAppId))
-                    || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))                
+                    || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))
             {
                 //match by appdid or server name!
-                return CurrentServerEnvironmentStatus.Master;             
+                return CurrentServerEnvironmentStatus.Master;
             }
-            
+
             return CurrentServerEnvironmentStatus.Slave;
         }
     }
