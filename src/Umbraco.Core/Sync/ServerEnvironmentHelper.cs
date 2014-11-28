@@ -72,7 +72,7 @@ namespace Umbraco.Core.Sync
                         xmlNode.InnerText,
                         xmlNode.AttributeValue<string>("forcePortnumber").IsNullOrWhiteSpace() ? "80" : xmlNode.AttributeValue<string>("forcePortnumber"),
                         IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimStart('/'));
-                }
+                }                
             }
 
             //cannot be determined, then the base url has to be the first url registered. Use HTTP or HTTPS as appropriate.
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Sync
             }
 
             var master = nodes.Cast<XmlNode>().FirstOrDefault();
-
+            
             if (master == null)
             {
                 return CurrentServerEnvironmentStatus.Unknown;
@@ -125,12 +125,12 @@ namespace Umbraco.Core.Sync
             }
 
             if ((appId.IsNullOrWhiteSpace() == false && appId.Trim().InvariantEquals(HttpRuntime.AppDomainAppId))
-                    || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))
+                    || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))                
             {
                 //match by appdid or server name!
-                return CurrentServerEnvironmentStatus.Master;
+                return CurrentServerEnvironmentStatus.Master;             
             }
-
+            
             return CurrentServerEnvironmentStatus.Slave;
         }
     }
