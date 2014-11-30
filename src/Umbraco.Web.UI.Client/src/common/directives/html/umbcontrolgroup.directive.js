@@ -8,7 +8,7 @@ angular.module("umbraco.directives.html")
         return {
             scope: {
                 label: "@label",
-                description: "@description",
+                description: "@",
                 hideLabel: "@",
                 alias: "@"
             },
