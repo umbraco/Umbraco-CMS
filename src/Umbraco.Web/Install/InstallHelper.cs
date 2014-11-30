@@ -191,7 +191,7 @@ namespace Umbraco.Web.Install
 
             try
             {
-                var requestUri = string.Format("http://localhost:24217/webapi/StarterKit/Get/?umbracoVersion={0}",
+                var requestUri = string.Format("http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={0}",
                     UmbracoVersion.Current);
                 var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
                 var httpClient = new HttpClient();
