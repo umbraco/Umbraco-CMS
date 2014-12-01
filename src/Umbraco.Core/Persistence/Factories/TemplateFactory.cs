@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -10,15 +11,19 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class TemplateFactory
     {
+        private readonly IFileSystem _viewFileSystem;
         private readonly int _primaryKey;
         private readonly Guid _nodeObjectTypeId;
 
-        public TemplateFactory()
-        {}
+        public TemplateFactory(IFileSystem viewFileSystem)
+        {
+            _viewFileSystem = viewFileSystem;
+        }
 
-        public TemplateFactory(Guid nodeObjectTypeId)
+        public TemplateFactory(Guid nodeObjectTypeId, IFileSystem viewFileSystem)
         {
             _nodeObjectTypeId = nodeObjectTypeId;
+            _viewFileSystem = viewFileSystem;
         }
 
         public TemplateFactory(int primaryKey, Guid nodeObjectTypeId)
@@ -31,7 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions)
         {
-            var template = new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
+            var template = new Template(dto.NodeDto.Text, dto.Alias, _viewFileSystem)
                                {
                                    CreateDate = dto.NodeDto.CreateDate,
                                    Id = dto.NodeId,

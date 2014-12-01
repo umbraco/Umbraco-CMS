@@ -32,14 +32,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Name
         {
-            get
-            {
-                if (_name == null)
-                {
-                    _name = System.IO.Path.GetFileName(Path);
-                }
-                return _name;
-            }
+            get { return _name ?? (_name = System.IO.Path.GetFileName(Path)); }
         }
 
         /// <summary>

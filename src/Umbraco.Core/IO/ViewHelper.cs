@@ -1,10 +1,9 @@
 using System;
 using System.IO;
 using System.Text;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Core.IO
 {
     internal class ViewHelper
     {

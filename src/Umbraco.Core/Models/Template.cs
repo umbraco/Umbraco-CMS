@@ -25,6 +25,8 @@ namespace Umbraco.Core.Models
 
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
         private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
+        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Alias);
+        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Name);
 
         public Template(string name, string alias)
             : base(string.Empty)
@@ -79,28 +81,44 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        string ITemplate.Name
+        public new string Name
         {
             get { return _name; }
-            set { _name = value; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
+                
+            }
         }
 
         [DataMember]
-        string ITemplate.Alias
+        public new string Alias
         {
             get { return _alias; }
-            set { _alias = value; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _alias = value.ToCleanString(CleanStringType.UnderscoreAlias);
+                    return _alias;
+                }, _alias, AliasSelector);
+                
+            }
         }
 
-        public override string Alias
-        {
-            get { return ((ITemplate)this).Alias; }
-        }
+        //public override string Alias
+        //{
+        //    get { return ((ITemplate)this).Alias; }
+        //}
         
-        public override string Name
-        {
-            get { return ((ITemplate)this).Name; }
-        }
+        //public override string Name
+        //{
+        //    get { return ((ITemplate)this).Name; }
+        //}
 
 
         /// <summary>

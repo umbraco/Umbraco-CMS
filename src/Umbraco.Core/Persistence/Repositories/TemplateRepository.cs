@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -13,6 +15,8 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -24,6 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private IFileSystem _masterpagesFileSystem;
         private IFileSystem _viewsFileSystem;
+        private ITemplatesSection _templateConfig;
 
         public TemplateRepository(IDatabaseUnitOfWork work)
             : base(work)
@@ -37,17 +42,19 @@ namespace Umbraco.Core.Persistence.Repositories
             EnsureDependencies();
         }
 
-        internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem)
+        internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
+            _templateConfig = templateConfig;
         }
 
         private void EnsureDependencies()
         {
             _masterpagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            _templateConfig = UmbracoConfig.For.UmbracoSettings().Templates;
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
@@ -169,15 +176,29 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //TODO ensure unique alias here (as is done in the legacy Template class)!
-            //TODO: The legacy one also checked for length, so do that too!
-            //TODO: Integrate the ViewHelper, MasterPageHelper stuff for when saving the template content
+            EnsureValidAlias(entity);
+
+
+            if (entity.Content.IsNullOrWhiteSpace())
+            {
+                //set default content
+                switch (_templateConfig.DefaultRenderingEngine)
+                {
+                    case RenderingEngine.Unknown:
+                    case RenderingEngine.Mvc:
+                        entity.Content = ViewHelper.GetDefaultFileContent();
+                        break;
+                    case RenderingEngine.WebForms:
+                        //TODO: Fill this in
+                        break;
+                }
+            }
 
             //Save to db
             var template = (Template)entity;
             template.AddingEntity();
 
-            var factory = new TemplateFactory(NodeObjectTypeId);
+            var factory = new TemplateFactory(NodeObjectTypeId, _viewsFileSystem);
             var dto = factory.BuildDto(template);
 
             //NOTE: There is no reason for sort order, path or level with templates, also the ParentId column is NOT used, need to fix:
@@ -215,6 +236,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(ITemplate entity)
         {
+            EnsureValidAlias(entity);
+
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
             {
                 if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
@@ -226,6 +249,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     string masterpageName = string.Concat(entity.Alias, ".master");
                     _masterpagesFileSystem.AddFile(masterpageName, stream, true);
+                }
+            }
+
+            if (entity.IsPropertyDirty("Alias"))
+            {
+                //we need to check what it currently is before saving and remove that file
+                var current = Get(entity.Id);
+                if (current.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+                {
+                    string viewName = string.Concat(current.Alias, ".cshtml");
+                    _viewsFileSystem.DeleteFile(viewName);
+                }
+                else
+                {
+                    string masterpageName = string.Concat(current.Alias, ".master");
+                    _masterpagesFileSystem.DeleteFile(masterpageName);
                 }
             }
 
@@ -247,7 +286,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Get TemplateDto from db to get the Primary key of the entity
             var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             //Save updated entity to db
-            var template = entity as Template;
+            var template = (Template)entity;
             template.UpdateDate = DateTime.Now;
             var factory = new TemplateFactory(templateDto.PrimaryKey, NodeObjectTypeId);
             var dto = factory.BuildDto(template);
@@ -309,7 +348,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string vbViewName = string.Concat(dto.Alias, ".vbhtml");
             string masterpageName = string.Concat(dto.Alias, ".master");
 
-            var factory = new TemplateFactory();
+            var factory = new TemplateFactory(_viewsFileSystem);
             var template = factory.BuildEntity(dto, childDefinitions);
 
             if (dto.Master.HasValue)
@@ -575,5 +614,39 @@ namespace Umbraco.Core.Persistence.Repositories
         } 
 
         #endregion
+
+        /// <summary>
+        /// Ensures that there are not duplicate aliases and if so, changes it to be a numbered version and also verifies the length
+        /// </summary>
+        /// <param name="template"></param>
+        private void EnsureValidAlias(ITemplate template)
+        {
+            //ensure unique alias 
+            template.Alias = template.Alias.ToCleanString(CleanStringType.UnderscoreAlias);
+
+            if (template.Alias.Length > 100)
+                template.Alias = template.Alias.Substring(0, 95);
+
+            if (AliasAlreadExists(template))
+            {
+                template.Alias = EnsureUniqueAlias(template, 1);
+            }
+        }
+
+        private bool AliasAlreadExists(ITemplate template)
+        {
+            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias == template.Alias && x.NodeId != template.Id);
+            var count = Database.ExecuteScalar<int>(sql);
+            return count > 0;
+        }
+
+        private string EnsureUniqueAlias(ITemplate template, int attempts)
+        {
+            //TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
+            if (AliasAlreadExists(template))
+                return template.Alias + attempts;
+            attempts++;
+            return EnsureUniqueAlias(template, attempts);
+        }
     }
 }

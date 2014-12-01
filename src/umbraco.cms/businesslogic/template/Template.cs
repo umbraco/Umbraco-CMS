@@ -561,7 +561,7 @@ namespace umbraco.cms.businesslogic.template
 
         public List<string> contentPlaceholderIds()
         {
-            return Umbraco.Core.Services.MasterPageHelper.GetContentPlaceholderIds(TemplateEntity).ToList();
+            return MasterPageHelper.GetContentPlaceholderIds(TemplateEntity).ToList();
         }
 
 
