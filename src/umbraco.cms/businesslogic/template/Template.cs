@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using umbraco.DataLayer;
 using System.Text.RegularExpressions;
@@ -28,7 +29,7 @@ namespace umbraco.cms.businesslogic.template
         
         #region Private members
 
-        private ITemplate _template;
+        internal ITemplate TemplateEntity;
         //private string _OutputContentType;
         //private string _design;
         //private string _alias;
@@ -63,14 +64,14 @@ namespace umbraco.cms.businesslogic.template
 	    {
 		    get
 		    {
-		        return _template.Path;
+		        return TemplateEntity.Path;
 
-				switch (DetermineRenderingEngine(this))
+				switch (DetermineRenderingEngine(TemplateEntity))
 				{
 					case RenderingEngine.Mvc:
-						return ViewHelper.GetFilePath(this);
+                        return ViewHelper.GetFilePath(TemplateEntity);
 					case RenderingEngine.WebForms:
-						return MasterPageHelper.GetFilePath(this);
+						return MasterPageHelper.GetFilePath(TemplateEntity);
 					default:
 						throw new ArgumentOutOfRangeException();
 				}	  
@@ -88,7 +89,7 @@ namespace umbraco.cms.businesslogic.template
 
         internal Template(ITemplate template)
         {
-            _template = template;
+            TemplateEntity = template;
         }
 
         public Template(int id) : base(id) { }
@@ -107,7 +108,7 @@ namespace umbraco.cms.businesslogic.template
 
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.FileService.SaveTemplate(_template);
+                ApplicationContext.Current.Services.FileService.SaveTemplate(TemplateEntity);
                 //base.Save();
                 FireAfterSave(e);
             }
@@ -115,7 +116,7 @@ namespace umbraco.cms.businesslogic.template
 
         public string GetRawText()
         {
-            return _template.Content;
+            return TemplateEntity.Content;
             //return base.Text;
         }
 
@@ -124,7 +125,7 @@ namespace umbraco.cms.businesslogic.template
         {
             get
             {
-                var tempText = _template.Name;
+                var tempText = TemplateEntity.Name;
                 //string tempText = base.Text;
                 if (!tempText.StartsWith("#"))
                     return tempText;
@@ -156,8 +157,8 @@ namespace umbraco.cms.businesslogic.template
 
         protected override void setupNode()
         {
-            _template = ApplicationContext.Current.Services.FileService.GetTemplate(Id);
-            if (_template == null)
+            TemplateEntity = ApplicationContext.Current.Services.FileService.GetTemplate(Id);
+            if (TemplateEntity == null)
             {
                 throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
             }
@@ -186,7 +187,7 @@ namespace umbraco.cms.businesslogic.template
         {
             get
             {
-                return _template.Path;
+                return TemplateEntity.Path;
 
                 //TODO: Fix the path on templates!
 
@@ -218,14 +219,14 @@ namespace umbraco.cms.businesslogic.template
             }
             set
             {
-                _template.Path = value;
+                TemplateEntity.Path = value;
             }
         }
 
         public string Alias
         {
-            get { return _template.Alias; }
-            set { _template.Alias = value; }
+            get { return TemplateEntity.Alias; }
+            set { TemplateEntity.Alias = value; }
 
         }
 
@@ -237,7 +238,7 @@ namespace umbraco.cms.businesslogic.template
 
         public override bool HasChildren
         {
-            get { return _template.IsMasterTemplate; }
+            get { return TemplateEntity.IsMasterTemplate; }
             set
             {
                 //Do nothing!
@@ -250,7 +251,7 @@ namespace umbraco.cms.businesslogic.template
             {
                 if (_mastertemplate.HasValue == false)
                 {
-                    var master = ApplicationContext.Current.Services.FileService.GetTemplate(_template.MasterTemplateAlias);
+                    var master = ApplicationContext.Current.Services.FileService.GetTemplate(TemplateEntity.MasterTemplateAlias);
                     if (master != null)
                     {
                         _mastertemplate = master.Id;
@@ -267,14 +268,14 @@ namespace umbraco.cms.businesslogic.template
                 //set to null if it's zero                
                 if (value == 0)
                 {
-                    _template.SetMasterTemplate(null);
+                    TemplateEntity.SetMasterTemplate(null);
                 }
                 else
                 {
                     var found = ApplicationContext.Current.Services.FileService.GetTemplate(value);
                     if (found != null)
                     {
-                        _template.SetMasterTemplate(found);
+                        TemplateEntity.SetMasterTemplate(found);
                         _mastertemplate = found.Id;
                     }
                 }
@@ -285,11 +286,11 @@ namespace umbraco.cms.businesslogic.template
         {
             get
             {
-                return _template.Content;
+                return TemplateEntity.Content;
             }
             set
             {
-                _template.Content = value;
+                TemplateEntity.Content = value;
 
                 //FlushCache();
 
@@ -318,18 +319,22 @@ namespace umbraco.cms.businesslogic.template
 
         public XmlNode ToXml(XmlDocument doc)
         {
-            XmlNode template = doc.CreateElement("Template");
-            template.AppendChild(xmlHelper.addTextNode(doc, "Name", base.Text));
-            template.AppendChild(xmlHelper.addTextNode(doc, "Alias", this.Alias));
+            var serializer = new EntityXmlSerializer();
+            var serialized = serializer.Serialize(TemplateEntity);
+            return serialized.GetXmlNode(doc);
 
-            if (this.MasterTemplate != 0)
-            {
-                template.AppendChild(xmlHelper.addTextNode(doc, "Master", new Template(this.MasterTemplate).Alias));
-            }
+            //XmlNode template = doc.CreateElement("Template");
+            //template.AppendChild(xmlHelper.addTextNode(doc, "Name", base.Text));
+            //template.AppendChild(xmlHelper.addTextNode(doc, "Alias", this.Alias));
 
-            template.AppendChild(xmlHelper.addCDataNode(doc, "Design", this.Design));
+            //if (this.MasterTemplate != 0)
+            //{
+            //    template.AppendChild(xmlHelper.addTextNode(doc, "Master", new Template(this.MasterTemplate).Alias));
+            //}
 
-            return template;
+            //template.AppendChild(xmlHelper.addCDataNode(doc, "Design", this.Design));
+
+            //return template;
         }
 
         /// <summary>
@@ -381,7 +386,7 @@ namespace umbraco.cms.businesslogic.template
 	    /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
 	    /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
 	    /// </remarks>
-	    private static RenderingEngine DetermineRenderingEngine(Template t, string design = null)
+	    private static RenderingEngine DetermineRenderingEngine(ITemplate t, string design = null)
 		{
             var engine = UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine;
 
@@ -575,7 +580,7 @@ namespace umbraco.cms.businesslogic.template
                 //if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias))))
                 //    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias)));
 
-                ApplicationContext.Current.Services.FileService.DeleteTemplate(_template.Alias);
+                ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);
 
                 FireAfterDelete(e);
             }
@@ -604,27 +609,7 @@ namespace umbraco.cms.businesslogic.template
 
         public List<string> contentPlaceholderIds()
         {
-            List<string> retVal = new List<string>();
-
-            string masterPageFile = this.MasterPageFile;
-            string mp = System.IO.File.ReadAllText(masterPageFile);
-            string pat = "<asp:ContentPlaceHolder+(\\s+[a-zA-Z]+\\s*=\\s*(\"([^\"]*)\"|'([^']*)'))*\\s*/?>";
-            Regex r = new Regex(pat, RegexOptions.IgnoreCase);
-            Match m = r.Match(mp);
-
-            while (m.Success)
-            {
-                CaptureCollection cc = m.Groups[3].Captures;
-                foreach (Capture c in cc)
-                {
-                    if (c.Value != "server")
-                        retVal.Add(c.Value);
-                }
-
-                m = m.NextMatch();
-            }
-
-            return retVal;
+            return Umbraco.Core.Services.MasterPageHelper.GetContentPlaceholderIds(TemplateEntity).ToList();
         }
 
 

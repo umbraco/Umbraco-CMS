@@ -262,8 +262,6 @@
     <Compile Include="businesslogic\ProviderBase.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
-    <Compile Include="businesslogic\template\MasterpageHelper.cs" />
-    <Compile Include="businesslogic\template\ViewHelper.cs" />
     <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="helpers\Casing.cs" />

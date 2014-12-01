@@ -67,10 +67,18 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        string ITemplate.Name { get; set; }
+        string ITemplate.Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
 
         [DataMember]
-        string ITemplate.Alias { get; set; }
+        string ITemplate.Alias
+        {
+            get { return _alias; }
+            set { _alias = value; }
+        }
 
         public override string Alias
         {
