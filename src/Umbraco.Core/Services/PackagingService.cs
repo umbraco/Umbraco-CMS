@@ -438,15 +438,10 @@ namespace Umbraco.Core.Services
                              : _contentTypeService.GetContentType(masterAlias);
             }
 
+            var alias = infoElement.Element("Alias").Value;
             var contentType = parent == null
-                                  ? new ContentType(-1)
-                                        {
-                                            Alias = infoElement.Element("Alias").Value
-                                        }
-                                  : new ContentType(parent)
-                                        {
-                                            Alias = infoElement.Element("Alias").Value
-                                        };
+                                  ? new ContentType(-1) { Alias = alias }
+                                  : new ContentType(parent, alias);
 
             if (parent != null)
                 contentType.AddContentType(parent);
