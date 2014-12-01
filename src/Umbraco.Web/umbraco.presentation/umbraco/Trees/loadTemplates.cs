@@ -40,6 +40,8 @@ namespace umbraco
     {
         public loadTemplates(string application) : base(application) {}
 
+        private ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
+
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
             rootNode.NodeType = "init" + TreeAlias; 
@@ -199,7 +201,7 @@ namespace umbraco
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
 
-                if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t.TemplateEntity))
+                if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && _viewHelper.ViewExists(t.TemplateEntity))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "icon-newspaper-alt";

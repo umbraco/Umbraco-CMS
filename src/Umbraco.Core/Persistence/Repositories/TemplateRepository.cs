@@ -136,7 +136,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            //TODO check for references in DocumentDto and remove value (nullable)
             var list = new List<string>
                            {
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
@@ -175,7 +174,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO: Integrate the ViewHelper, MasterPageHelper stuff for when saving the template content
 
             //Save to db
-            var template = entity as Template;
+            var template = (Template)entity;
             template.AddingEntity();
 
             var factory = new TemplateFactory(NodeObjectTypeId);
@@ -289,25 +288,17 @@ namespace Umbraco.Core.Persistence.Repositories
             //now we can delete this one
             base.PersistDeletedItem(entity);
 
-            //Check for file under the Masterpages filesystem
-            if (_masterpagesFileSystem.FileExists(entity.Name))
+            if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
             {
-                _masterpagesFileSystem.DeleteFile(entity.Name);
+                var viewName = string.Concat(entity.Alias, ".cshtml");
+                _viewsFileSystem.DeleteFile(viewName);
             }
-            else if (_masterpagesFileSystem.FileExists(entity.Path))
+            else
             {
-                _masterpagesFileSystem.DeleteFile(entity.Path);
+                var masterpageName = string.Concat(entity.Alias, ".master");
+                _masterpagesFileSystem.DeleteFile(masterpageName);
             }
 
-            //Check for file under the Views/Mvc filesystem
-            if (_viewsFileSystem.FileExists(entity.Name))
-            {
-                _viewsFileSystem.DeleteFile(entity.Name);
-            }
-            else if (_viewsFileSystem.FileExists(entity.Path))
-            {
-                _viewsFileSystem.DeleteFile(entity.Path);
-            }
         }
 
         #endregion
@@ -514,7 +505,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             //need to get the top-most node of the current tree
             var top = selfDto;
-            while (top.Master.HasValue)
+            while (top.Master.HasValue && top.Master.Value != -1)
             {
                 top = allDtos.Single(x => x.NodeId == top.Master.Value);
             }

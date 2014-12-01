@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
             {
                 // Act
-                var template = new Template("test-add-masterpage.master", "test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -86,6 +87,46 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Add_View()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
+            {
+                // Act
+                var template = new Template("test", "test") { Content = ViewHelper.GetDefaultFileContent() };
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
+
+                //Assert
+                Assert.That(repository.Get("test"), Is.Not.Null);
+                Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
+            }
+
+        }
+
+        //[Test]
+        //public void Can_Perform_Add_Unique_Alias()
+        //{
+        //    // Arrange
+        //    var provider = new PetaPocoUnitOfWorkProvider();
+        //    var unitOfWork = provider.GetUnitOfWork();
+        //    using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
+        //    {
+        //        // Act
+        //        var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+        //        repository.AddOrUpdate(template);
+        //        unitOfWork.Commit();
+
+        //        //Assert
+        //        Assert.That(repository.Get("test"), Is.Not.Null);
+        //        Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.True);
+        //    }
+
+        //}
+
+        [Test]
         public void Can_Perform_Update_MasterPage()
         {
             // Arrange
@@ -94,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
             {
                 // Act
-                var template = new Template("test-updated-masterpage.master", "test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -120,17 +161,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
             {
-                var template = new Template("test-add-masterpage.master", "test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
                 // Act
                 var templates = repository.Get("test");
+                Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.True);
                 repository.Delete(templates);
                 unitOfWork.Commit();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
+                Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.False);
             }
 
            
@@ -158,7 +201,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
                 {
-                    var template = new Template("test-add-masterpage.master", "test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                    var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
                     repository.AddOrUpdate(template);
                     unitOfWork.Commit();
 
@@ -186,9 +229,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
             {
-                var parent = new Template("test-parent-masterpage.master", "parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
-                var child = new Template("test-child-masterpage.master", "child", "child") { Content = @"<%@ Master Language=""C#"" %>" };
-                var baby = new Template("test-baby-masterpage.master", "baby", "baby") { Content = @"<%@ Master Language=""C#"" %>" };
+                var parent = new Template("parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
+                var child = new Template("child", "child") { Content = @"<%@ Master Language=""C#"" %>" };
+                var baby = new Template("baby", "baby") { Content = @"<%@ Master Language=""C#"" %>" };
                 child.MasterTemplateAlias = parent.Alias;
                 child.MasterTemplateId = new Lazy<int>(() => parent.Id);
                 baby.MasterTemplateAlias = child.Alias;
@@ -218,17 +261,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem))
             {
-                var parent = new Template("test-parent-masterpage.master", "parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
+                var parent = new Template("parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
 
-                var child1 = new Template("test-child1-masterpage.master", "child1", "child1") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler1 = new Template("test-toddler1-masterpage.master", "toddler1", "toddler1") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler2 = new Template("test-toddler2-masterpage.master", "toddler2", "toddler2") { Content = @"<%@ Master Language=""C#"" %>" };
-                var baby1 = new Template("test-baby1-masterpage.master", "baby1", "baby1") { Content = @"<%@ Master Language=""C#"" %>" };
+                var child1 = new Template("child1", "child1") { Content = @"<%@ Master Language=""C#"" %>" };
+                var toddler1 = new Template("toddler1", "toddler1") { Content = @"<%@ Master Language=""C#"" %>" };
+                var toddler2 = new Template("toddler2", "toddler2") { Content = @"<%@ Master Language=""C#"" %>" };
+                var baby1 = new Template("baby1", "baby1") { Content = @"<%@ Master Language=""C#"" %>" };
 
-                var child2 = new Template("test-child2-masterpage.master", "child2", "child2") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler3 = new Template("test-toddler3-masterpage.master", "toddler3", "toddler3") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler4 = new Template("test-toddler4-masterpage.master", "toddler4", "toddler4") { Content = @"<%@ Master Language=""C#"" %>" };
-                var baby2 = new Template("test-baby2-masterpage.master", "baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
+                var child2 = new Template("child2", "child2") { Content = @"<%@ Master Language=""C#"" %>" };
+                var toddler3 = new Template("toddler3", "toddler3") { Content = @"<%@ Master Language=""C#"" %>" };
+                var toddler4 = new Template("toddler4", "toddler4") { Content = @"<%@ Master Language=""C#"" %>" };
+                var baby2 = new Template("baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
 
 
                 child1.MasterTemplateAlias = parent.Alias;

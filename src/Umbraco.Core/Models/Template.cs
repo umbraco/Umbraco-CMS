@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -16,6 +17,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Template : File, ITemplate
     {
+        private readonly IFileSystem _viewFileSystem;
         private string _alias;
         private string _name;
         private string _masterTemplateAlias;
@@ -29,14 +31,24 @@ namespace Umbraco.Core.Models
         {
             _name = name;
             _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
+            _masterTemplateId = new Lazy<int>(() => -1);
+            _viewFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
         }
 
+        public Template(string name, string alias, IFileSystem viewFileSystem)
+            : this(name, alias)
+        {
+            if (viewFileSystem == null) throw new ArgumentNullException("viewFileSystem");
+            _viewFileSystem = viewFileSystem;
+        }
+
+        [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
         public Template(string path, string name, string alias)
             : base(path)
         {
-            base.Path = path;
             _name = name;
             _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
+            _masterTemplateId = new Lazy<int>(() => -1);
         }
 
         [DataMember]
@@ -102,10 +114,7 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="RenderingEngine"/></returns>
         public RenderingEngine GetTypeOfRenderingEngine()
         {
-            if(Path.EndsWith("cshtml") || Path.EndsWith("vbhtml"))
-                return RenderingEngine.Mvc;
-
-            return RenderingEngine.WebForms;
+            return DetermineRenderingEngine();
         }
 
         /// <summary>
@@ -169,6 +178,52 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
+        /// <summary>
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// rendering engine to use.
+        /// </summary> 
+        /// <returns></returns>
+        /// <remarks>
+        /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
+        /// </remarks>
+        private RenderingEngine DetermineRenderingEngine()
+        {
+            var engine = UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine;
+
+            if (Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(Content))
+            {
+                //there is a design but its definitely a webforms design
+                return RenderingEngine.WebForms;
+            }
+
+            var viewHelper = new ViewHelper(_viewFileSystem);
+
+            switch (engine)
+            {
+                case RenderingEngine.Mvc:
+                    //check if there's a view in ~/masterpages
+                    if (MasterPageHelper.MasterPageExists(this) && viewHelper.ViewExists(this) == false)
+                    {
+                        //change this to webforms since there's already a file there for this template alias
+                        engine = RenderingEngine.WebForms;
+                    }
+                    break;
+                case RenderingEngine.WebForms:
+                    //check if there's a view in ~/views
+                    if (viewHelper.ViewExists(this) && MasterPageHelper.MasterPageExists(this) == false)
+                    {
+                        //change this to mvc since there's already a file there for this template alias
+                        engine = RenderingEngine.Mvc;
+                    }
+                    break;
+            }
+            return engine;
+        }
         
     }
 }

@@ -29,6 +29,7 @@ namespace umbraco.cms.businesslogic.template
         
         #region Private members
 
+        private ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
         internal ITemplate TemplateEntity;
         //private string _OutputContentType;
         //private string _design;
@@ -64,12 +65,10 @@ namespace umbraco.cms.businesslogic.template
 	    {
 		    get
 		    {
-		        return TemplateEntity.Path;
-
-				switch (DetermineRenderingEngine(TemplateEntity))
+				switch (TemplateEntity.GetTypeOfRenderingEngine())
 				{
 					case RenderingEngine.Mvc:
-                        return ViewHelper.GetFilePath(TemplateEntity);
+                        return _viewHelper.GetPhysicalFilePath(TemplateEntity);
 					case RenderingEngine.WebForms:
 						return MasterPageHelper.GetFilePath(TemplateEntity);
 					default:
@@ -370,53 +369,6 @@ namespace umbraco.cms.businesslogic.template
         {
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
-
-	    /// <summary>
-	    /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
-	    /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
-	    /// rendering engine to use.
-	    /// </summary>
-	    /// <param name="t"></param>
-	    /// <param name="design">If a template body is specified we'll check if it contains master page markup, if it does we'll auto assume its webforms </param>
-	    /// <returns></returns>
-	    /// <remarks>
-	    /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
-	    /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
-	    /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
-	    /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
-	    /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
-	    /// </remarks>
-	    private static RenderingEngine DetermineRenderingEngine(ITemplate t, string design = null)
-		{
-            var engine = UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine;
-
-			if (!design.IsNullOrWhiteSpace() && MasterPageHelper.IsMasterPageSyntax(design))
-			{
-				//there is a design but its definitely a webforms design
-				return RenderingEngine.WebForms;
-			}
-
-			switch (engine)
-			{
-				case RenderingEngine.Mvc:
-					//check if there's a view in ~/masterpages
-					if (MasterPageHelper.MasterPageExists(t) && !ViewHelper.ViewExists(t))
-					{
-						//change this to webforms since there's already a file there for this template alias
-						engine = RenderingEngine.WebForms;
-					}
-					break;
-				case RenderingEngine.WebForms:
-					//check if there's a view in ~/views
-					if (ViewHelper.ViewExists(t) && !MasterPageHelper.MasterPageExists(t))
-					{
-						//change this to mvc since there's already a file there for this template alias
-						engine = RenderingEngine.Mvc;
-					}
-					break;
-			}
-			return engine;
-		}
 
         public static Template MakeNew(string Name, User u, Template master)
         {

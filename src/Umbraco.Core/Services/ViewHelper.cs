@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using Umbraco.Core.IO;
@@ -7,60 +8,94 @@ namespace Umbraco.Core.Services
 {
     internal class ViewHelper
     {
-        internal static bool ViewExists(ITemplate t)
+        private readonly IFileSystem _viewFileSystem;
+
+        public ViewHelper(IFileSystem viewFileSystem)
         {
-            string path = GetFilePath(t);
-            return System.IO.File.Exists(path);
+            if (viewFileSystem == null) throw new ArgumentNullException("viewFileSystem");
+            _viewFileSystem = viewFileSystem;
         }
 
-        internal static string GetFilePath(ITemplate t)
+        internal bool ViewExists(ITemplate t)
         {
-            return IOHelper.MapPath(ViewPath(t.Alias));
+            return _viewFileSystem.FileExists(ViewPath(t.Alias));
         }
 
-        internal static string GetFileContents(ITemplate t)
+        [Obsolete("This is only used for legacy purposes and will be removed in future versions")]
+        internal string GetPhysicalFilePath(ITemplate t)
+        {
+            return _viewFileSystem.GetFullPath(ViewPath(t.Alias));
+        }
+
+        internal string GetFileContents(ITemplate t)
         {
             string viewContent = "";
-            string path = IOHelper.MapPath(ViewPath(t.Alias));
+            string path = ViewPath(t.Alias);
 
-            if (System.IO.File.Exists(path))
+            if (_viewFileSystem.FileExists(path))
             {
-                TextReader tr = new StreamReader(path);
-                viewContent = tr.ReadToEnd();
-                tr.Close();
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                {
+                    viewContent = tr.ReadToEnd();
+                    tr.Close();
+                }
             }
 
             return viewContent;
         }
 
-        internal static string CreateViewFile(ITemplate t, bool overWrite = false)
+        internal string CreateViewFile(ITemplate t, bool overWrite = false)
         {
             string viewContent;
-            string path = IOHelper.MapPath(ViewPath(t.Alias));
+            string path = ViewPath(t.Alias);
 
-            if (System.IO.File.Exists(path) == false || overWrite)
-                viewContent = SaveTemplateToFile(t, t.Alias);
+            if (_viewFileSystem.FileExists(path) == false || overWrite)
+            {
+                viewContent = SaveTemplateToFile(t, t.Alias);   
+            }                
             else
             {
-                TextReader tr = new StreamReader(path);
-                viewContent = tr.ReadToEnd();
-                tr.Close();
+                using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
+                {
+                    viewContent = tr.ReadToEnd();
+                    tr.Close();
+                }
             }
 
             return viewContent;
         }
 
-        internal static string SaveTemplateToFile(ITemplate template, string currentAlias)
+        internal static string GetDefaultFileContent(string layoutPageAlias = null)
+        {
+            var design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = null;
+}";
+
+            if (layoutPageAlias.IsNullOrWhiteSpace() == false)
+                design = design.Replace("null", string.Format("\"{0}.cshtml\"", layoutPageAlias));
+
+            return design;
+        }
+
+        internal string SaveTemplateToFile(ITemplate template, string currentAlias)
         {
             var design = EnsureInheritedLayout(template);
-            System.IO.File.WriteAllText(IOHelper.MapPath(ViewPath(template.Alias)), design, Encoding.UTF8);
+            var path = ViewPath(template.Alias);
+
+            using (var ms = new MemoryStream())
+            using (var writer = new StreamWriter(ms, Encoding.UTF8))
+            {
+                writer.Write(design);
+                _viewFileSystem.AddFile(path, ms, true);
+            }
 
             return template.Content;
         }
 
-        internal static string UpdateViewFile(ITemplate t, string currentAlias = null)
+        internal string UpdateViewFile(ITemplate t, string currentAlias = null)
         {
-            var path = IOHelper.MapPath(ViewPath(t.Alias));
+            var path = ViewPath(t.Alias);
 
             if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != t.Alias)
             {
@@ -75,43 +110,44 @@ namespace Umbraco.Core.Services
                 //}
 
                 //then kill the old file.. 
-                var oldFile = IOHelper.MapPath(ViewPath(currentAlias));
-                if (System.IO.File.Exists(oldFile))
-                    System.IO.File.Delete(oldFile);
+                var oldFile = ViewPath(currentAlias);
+                if (_viewFileSystem.FileExists(oldFile))
+                    _viewFileSystem.DeleteFile(oldFile);
             }
 
-            System.IO.File.WriteAllText(path, t.Content, Encoding.UTF8);
+            using (var ms = new MemoryStream())
+            using (var writer = new StreamWriter(ms, Encoding.UTF8))
+            {
+                writer.Write(t.Content);
+                _viewFileSystem.AddFile(path, ms, true);
+            }
             return t.Content;
         }
 
-        internal static void RemoveViewFile(string alias)
+        internal void RemoveViewFile(string alias)
         {
             if (string.IsNullOrWhiteSpace(alias) == false)
             {
-                var file = IOHelper.MapPath(ViewPath(alias));
-                if (System.IO.File.Exists(file))
-                    System.IO.File.Delete(file);
+                var file = ViewPath(alias);
+                if (_viewFileSystem.FileExists(file))
+                    _viewFileSystem.DeleteFile(file);
             }
         }
 
-        public static string ViewPath(string alias)
+        public string ViewPath(string alias)
         {
-            return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+            return _viewFileSystem.GetRelativePath(alias.Replace(" ", "") + ".cshtml");
+
+            //return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
-        private static string EnsureInheritedLayout(ITemplate template)
+        private string EnsureInheritedLayout(ITemplate template)
         {
             string design = template.Content;
 
             if (string.IsNullOrEmpty(design))
             {
-                design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-@{
-    Layout = null;
-}";
-
-                if (template.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
-                    design = design.Replace("null", string.Format("\"{0}.cshtml\"", template.MasterTemplateAlias));
+                design = GetDefaultFileContent(template.MasterTemplateAlias);
             }
 
             return design;
