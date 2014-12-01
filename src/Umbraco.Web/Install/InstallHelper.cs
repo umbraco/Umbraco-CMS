@@ -41,7 +41,7 @@ namespace Umbraco.Web.Install
         public IEnumerable<InstallSetupStep> GetAllSteps()
         {
             return new List<InstallSetupStep>
-            {                
+            {
                 new NewInstallStep(_umbContext.Application),
                 new UpgradeStep(),
                 new FilePermissionsStep(),
@@ -87,12 +87,12 @@ namespace Umbraco.Web.Install
                 {
                     Directory.Move(IOHelper.MapPath(SystemDirectories.Install), IOHelper.MapPath("~/app_data/temp/install_backup"));
                 }
-            }                
+            }
 
             if (Directory.Exists(IOHelper.MapPath("~/Areas/UmbracoInstall")))
-            {                
+            {
                 Directory.Delete(IOHelper.MapPath("~/Areas/UmbracoInstall"), true);
-            }   
+            }
         }
 
         internal void InstallStatus(bool isCompleted, string errorMsg)
@@ -193,14 +193,17 @@ namespace Umbraco.Web.Install
             {
                 var requestUri = string.Format("http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={0}",
                     UmbracoVersion.Current);
-                var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-                var httpClient = new HttpClient();
-                var response = httpClient.SendAsync(request).Result;
-                packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
+
+                using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
+                using (var httpClient = new HttpClient())
+                using (var response = httpClient.SendAsync(request).Result)
+                {
+                    packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
+                }
             }
             catch (AggregateException ex)
             {
-               LogHelper.Error<InstallHelper>("Could not download list of available starter kits", ex);
+                LogHelper.Error<InstallHelper>("Could not download list of available starter kits", ex);
             }
 
             return packages;
