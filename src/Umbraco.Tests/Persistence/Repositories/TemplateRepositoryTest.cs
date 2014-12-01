@@ -423,89 +423,113 @@ namespace Umbraco.Tests.Persistence.Repositories
             
         }
 
-        //[Test]
-        //public void Can_Perform_Get_On_ScriptRepository()
-        //{
-        //    // Arrange
-        //    var provider = new FileUnitOfWorkProvider();
-        //    var unitOfWork = provider.GetUnitOfWork();
-        //    var repository = new ScriptRepository(unitOfWork, _masterPageFileSystem);
+        [Test]
+        public void Path_Is_Set_Correctly_On_Creation()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
+                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
+            {
+                var parent = new Template("parent", "parent");
+                var child1 = new Template("child1", "child1");
+                var toddler1 = new Template("toddler1", "toddler1");
+                var toddler2 = new Template("toddler2", "toddler2");
+                var baby1 = new Template("baby1", "baby1");
+                var child2 = new Template("child2", "child2");
+                var toddler3 = new Template("toddler3", "toddler3");
+                var toddler4 = new Template("toddler4", "toddler4");
+                var baby2 = new Template("baby2", "baby2");
 
-        //    // Act
-        //    var exists = repository.Get("test-script.js");
+                child1.MasterTemplateAlias = parent.Alias;
+                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
+                child2.MasterTemplateAlias = parent.Alias;
+                child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
+                toddler1.MasterTemplateAlias = child1.Alias;
+                toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
+                toddler2.MasterTemplateAlias = child1.Alias;
+                toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
+                toddler3.MasterTemplateAlias = child2.Alias;
+                toddler3.MasterTemplateId = new Lazy<int>(() => child2.Id);
+                toddler4.MasterTemplateAlias = child2.Alias;
+                toddler4.MasterTemplateId = new Lazy<int>(() => child2.Id);
+                baby1.MasterTemplateAlias = toddler2.Alias;
+                baby1.MasterTemplateId = new Lazy<int>(() => toddler2.Id);
+                baby2.MasterTemplateAlias = toddler4.Alias;
+                baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
+                
 
-        //    // Assert
-        //    Assert.That(exists, Is.Not.Null);
-        //    Assert.That(exists.Alias, Is.EqualTo("test-script"));
-        //    Assert.That(exists.Name, Is.EqualTo("test-script.js"));
-        //}
+                // Act
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                repository.AddOrUpdate(child2);
+                repository.AddOrUpdate(toddler1);
+                repository.AddOrUpdate(toddler2);
+                repository.AddOrUpdate(toddler3);
+                repository.AddOrUpdate(toddler4);
+                repository.AddOrUpdate(baby1);
+                repository.AddOrUpdate(baby2);
+                unitOfWork.Commit();
 
-        //[Test]
-        //public void Can_Perform_GetAll_On_ScriptRepository()
-        //{
-        //    // Arrange
-        //    var provider = new FileUnitOfWorkProvider();
-        //    var unitOfWork = provider.GetUnitOfWork();
-        //    var repository = new ScriptRepository(unitOfWork, _masterPageFileSystem);
+                // Assert
+                Assert.AreEqual(string.Format("-1,{0}", parent.Id), parent.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child1.Id), child1.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child2.Id), child2.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child2.Id), child2.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler1.Id), toddler1.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler2.Id), toddler2.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler3.Id), toddler3.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler4.Id), toddler4.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id), baby1.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id), baby2.Path);
+            }
 
-        //    var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-        //    repository.AddOrUpdate(script);
-        //    var script2 = new Script("test-script2.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-        //    repository.AddOrUpdate(script2);
-        //    var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-        //    repository.AddOrUpdate(script3);
-        //    unitOfWork.Commit();
 
-        //    // Act
-        //    var scripts = repository.GetAll();
+        }
 
-        //    // Assert
-        //    Assert.That(scripts, Is.Not.Null);
-        //    Assert.That(scripts.Any(), Is.True);
-        //    Assert.That(scripts.Any(x => x == null), Is.False);
-        //    Assert.That(scripts.Count(), Is.EqualTo(4));
-        //}
+        [Test]
+        public void Path_Is_Set_Correctly_On_Update()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
+                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
+            {
+                var parent = new Template("parent", "parent");
+                var child1 = new Template("child1", "child1");
+                var child2 = new Template("child2", "child2");
+                var toddler1 = new Template("toddler1", "toddler1");
+                var toddler2 = new Template("toddler2", "toddler2");
 
-        //[Test]
-        //public void Can_Perform_GetAll_With_Params_On_ScriptRepository()
-        //{
-        //    // Arrange
-        //    var provider = new FileUnitOfWorkProvider();
-        //    var unitOfWork = provider.GetUnitOfWork();
-        //    var repository = new ScriptRepository(unitOfWork, _masterPageFileSystem);
+                child1.MasterTemplateAlias = parent.Alias;
+                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
+                child2.MasterTemplateAlias = parent.Alias;
+                child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
+                toddler1.MasterTemplateAlias = child1.Alias;
+                toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
+                toddler2.MasterTemplateAlias = child1.Alias;
+                toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
 
-        //    var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-        //    repository.AddOrUpdate(script);
-        //    var script2 = new Script("test-script2.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-        //    repository.AddOrUpdate(script2);
-        //    var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-        //    repository.AddOrUpdate(script3);
-        //    unitOfWork.Commit();
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                repository.AddOrUpdate(child2);
+                repository.AddOrUpdate(toddler1);
+                repository.AddOrUpdate(toddler2);
+                unitOfWork.Commit();
 
-        //    // Act
-        //    var scripts = repository.GetAll("test-script1.js", "test-script2.js");
+                //Act
+                toddler2.SetMasterTemplate(child2);
+                repository.AddOrUpdate(toddler2);
+                unitOfWork.Commit();
 
-        //    // Assert
-        //    Assert.That(scripts, Is.Not.Null);
-        //    Assert.That(scripts.Any(), Is.True);
-        //    Assert.That(scripts.Any(x => x == null), Is.False);
-        //    Assert.That(scripts.Count(), Is.EqualTo(2));
-        //}
+                //Assert
+                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler2.Id), toddler2.Path);
 
-        //[Test]
-        //public void Can_Perform_Exists_On_ScriptRepository()
-        //{
-        //    // Arrange
-        //    var provider = new FileUnitOfWorkProvider();
-        //    var unitOfWork = provider.GetUnitOfWork();
-        //    var repository = new ScriptRepository(unitOfWork, _masterPageFileSystem);
+            }
+        }
 
-        //    // Act
-        //    var exists = repository.Exists("test-script.js");
-
-        //    // Assert
-        //    Assert.That(exists, Is.True);
-        //}
 
         [TearDown]
         public override void TearDown()

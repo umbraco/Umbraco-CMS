@@ -119,7 +119,8 @@ namespace umbraco.cms.businesslogic.template
             //return base.Text;
         }
 
-        //TODO: This is the name of the template, which can apparenlty be localized using the umbraco dictionary, so we need to cater for this!
+        //TODO: This is the name of the template, which can apparenlty be localized using the umbraco dictionary, so we need to cater for this but that
+        // shoud really be done as part of mapping logic for models that are being consumed in the UI, not at the business logic layer.
         public override string Text
         {
             get

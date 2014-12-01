@@ -24,26 +24,26 @@ namespace Umbraco.Core.IO
             return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + t.Alias.Replace(" ", "") + ".master");
         }
 
-        internal static string CreateMasterPage(ITemplate t, IFileService fileService, bool overWrite = false)
-        {
-            string masterpageContent = "";
+        //internal static string CreateMasterPage(ITemplate t, IFileService fileService, bool overWrite = false)
+        //{
+        //    string masterpageContent = "";
 
-            if (System.IO.File.Exists(GetFilePath(t)) == false || overWrite)
-            {
-                masterpageContent = CreateDefaultMasterPageContent(t, t.Alias, fileService);
-                SaveDesignToFile(t, null, masterpageContent);
-            }
-            else
-            {
-                using (var tr = new StreamReader(GetFilePath(t)))
-                {
-                    masterpageContent = tr.ReadToEnd();
-                    tr.Close();    
-                }
-            }
+        //    if (System.IO.File.Exists(GetFilePath(t)) == false || overWrite)
+        //    {
+        //        masterpageContent = CreateDefaultMasterPageContent(t, t.Alias, fileService);
+        //        SaveDesignToFile(t, null, masterpageContent);
+        //    }
+        //    else
+        //    {
+        //        using (var tr = new StreamReader(GetFilePath(t)))
+        //        {
+        //            masterpageContent = tr.ReadToEnd();
+        //            tr.Close();    
+        //        }
+        //    }
 
-            return masterpageContent;
-        }
+        //    return masterpageContent;
+        //}
 
         internal static string GetFileContents(ITemplate t)
         {

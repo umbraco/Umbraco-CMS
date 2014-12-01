@@ -201,26 +201,23 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new TemplateFactory(NodeObjectTypeId, _viewsFileSystem);
             var dto = factory.BuildDto(template);
 
-            //NOTE: There is no reason for sort order, path or level with templates, also the ParentId column is NOT used, need to fix:
-            // http://issues.umbraco.org/issue/U4-5846
-            //var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = template.ParentId });
-            //int level = parent.Level + 1;
-            //int sortOrder =
-            //    Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-            //                                          new { ParentId = template.ParentId, NodeObjectType = NodeObjectTypeId });
-
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;
             nodeDto.Path = "-1," + dto.NodeDto.NodeId;
-            nodeDto.Level = 1;
-            nodeDto.SortOrder = 0;
             var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
-            //NOTE: Templates don't have paths, but they could i suppose if we wanted, once the ParentId thing is fixed we could
-            // do it, but we haven't had that since the beginning of time so don't think it's necessary at all.
             //Update with new correct path
-            //nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-
+            //TODO: need to fix:
+            // http://issues.umbraco.org/issue/U4-5846            
+            var parent = Get(template.MasterTemplateId.Value);
+            if (parent != null)
+            {
+                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            }
+            else
+            {
+                nodeDto.Path = "-1," + dto.NodeDto.NodeId;
+            }
             Database.Update(nodeDto);
 
             //Insert template dto
@@ -268,25 +265,25 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //NOTE: There is no reason for sort order, path or level with templates, also the ParentId column is NOT used, need to fix:
+            var template = (Template)entity;
+
+            //TODO: need to fix:
             // http://issues.umbraco.org/issue/U4-5846
-            ////Look up parent to get and set the correct Path if ParentId has changed
-            //if (entity.IsPropertyDirty("ParentId"))
-            //{
-            //    var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((Template)entity).ParentId });
-            //    entity.Path = string.Concat(parent.Path, ",", entity.Id);
-            //    ((Template)entity).Level = parent.Level + 1;
-            //    var maxSortOrder =
-            //        Database.ExecuteScalar<int>(
-            //            "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-            //            new { ParentId = ((Template)entity).ParentId, NodeObjectType = NodeObjectTypeId });
-            //    ((Template)entity).SortOrder = maxSortOrder + 1;
-            //}
+            // And use the ParentId column instead of the extra template parent id column
+            if (entity.IsPropertyDirty("MasterTemplateId"))
+            {
+                var parent = Get(template.MasterTemplateId.Value);
+                if (parent != null)
+                {
+                    entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                }
+                
+            }
 
             //Get TemplateDto from db to get the Primary key of the entity
             var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             //Save updated entity to db
-            var template = (Template)entity;
+            
             template.UpdateDate = DateTime.Now;
             var factory = new TemplateFactory(templateDto.PrimaryKey, NodeObjectTypeId);
             var dto = factory.BuildDto(template);
@@ -420,14 +417,11 @@ namespace Umbraco.Core.Persistence.Repositories
             string path = string.Empty;
 
             using (var stream = _viewsFileSystem.OpenFile(fileName))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                content = reader.ReadToEnd();
             }
 
-            template.Path = _viewsFileSystem.GetRelativePath(fileName);
             template.UpdateDate = _viewsFileSystem.GetLastModified(path).UtcDateTime;
             //Currently set with db values, but will eventually be changed
             //template.CreateDate = _viewsFileSystem.GetCreated(path).UtcDateTime;
@@ -442,14 +436,11 @@ namespace Umbraco.Core.Persistence.Repositories
             string path = string.Empty;
 
             using (var stream = _masterpagesFileSystem.OpenFile(fileName))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                content = reader.ReadToEnd();
             }
 
-            template.Path = _masterpagesFileSystem.GetRelativePath(fileName);
             template.UpdateDate = _masterpagesFileSystem.GetLastModified(path).UtcDateTime;
             //Currently set with db values, but will eventually be changed
             //template.CreateDate = _masterpagesFileSystem.GetCreated(path).UtcDateTime;
