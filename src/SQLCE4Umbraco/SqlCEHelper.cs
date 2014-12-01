@@ -229,5 +229,17 @@ namespace SqlCE4Umbraco
             return new SqlCeDataReaderHelper(SqlCeApplicationBlock.ExecuteReader(ConnectionString, CommandType.Text,
                                                             commandText, parameters));
         }
+
+
+        internal IRecordsReader ExecuteReader(string commandText)
+        {
+            return ExecuteReader(commandText, new SqlCEParameter(string.Empty, string.Empty));
+        }
+
+
+        internal int ExecuteNonQuery(string commandText)
+        {
+            return ExecuteNonQuery(commandText, new SqlCEParameter(string.Empty, string.Empty));
+        }
     }
 }

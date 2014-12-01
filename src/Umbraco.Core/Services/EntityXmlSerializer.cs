@@ -311,9 +311,17 @@ namespace Umbraco.Core.Services
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
                                     new XElement("IsListView", contentType.IsContainer.ToString()));
 
-            var masterContentType = contentType.CompositionAliases().FirstOrDefault();
-            if (masterContentType != null)
-                info.Add(new XElement("Master", masterContentType));
+            var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
+            if(masterContentType != null)
+                info.Add(new XElement("Master", masterContentType.Alias));
+
+            var compositionsElement = new XElement("Compositions");
+            var compositions = contentType.ContentTypeComposition;
+            foreach (var composition in compositions)
+            {
+                compositionsElement.Add(new XElement("Composition", composition.Alias));
+            }
+            info.Add(compositionsElement);
 
             var allowedTemplates = new XElement("AllowedTemplates");
             foreach (var template in contentType.AllowedTemplates)
@@ -321,6 +329,7 @@ namespace Umbraco.Core.Services
                 allowedTemplates.Add(new XElement("Template", template.Alias));
             }
             info.Add(allowedTemplates);
+
             if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
                 info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
             else

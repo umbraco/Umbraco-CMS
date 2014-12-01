@@ -332,11 +332,54 @@ namespace Umbraco.Core.Services
             }
 
             _importedContentTypes = new Dictionary<string, IContentType>();
-            var documentTypes = name.Equals("DocumentTypes")
+            var unsortedDocumentTypes = name.Equals("DocumentTypes")
                                     ? (from doc in element.Elements("DocumentType") select doc).ToList()
                                     : new List<XElement> { element };
-            //NOTE it might be an idea to sort the doctype XElements based on dependencies
-            //before creating the doc types - should also allow for a better structure/inheritance support.
+
+            //NOTE Here we sort the doctype XElements based on dependencies
+            //before creating the doc types - this should also allow for a better structure/inheritance support.
+            var fields = new List<TopologicalSorter.DependencyField<XElement>>();
+            foreach (var documentType in unsortedDocumentTypes)
+            {
+                var elementCopy = documentType;
+                var infoElement = elementCopy.Element("Info");
+                var dependencies = new List<string>();
+
+                //Add the Master as a dependency
+                if (elementCopy.Element("Master") != null &&
+                    string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false)
+                {
+                    dependencies.Add(elementCopy.Element("Master").Value);
+                }
+
+                //Add compositions as dependencies
+                var compositionsElement = infoElement.Element("Compositions");
+                if (compositionsElement != null && compositionsElement.HasElements)
+                {
+                    var compositions = compositionsElement.Elements("Composition");
+                    if (compositions.Any())
+                    {
+                        foreach (var composition in compositions)
+                        {
+                            dependencies.Add(composition.Value);
+                        }
+                    }
+                }
+                
+                var field = new TopologicalSorter.DependencyField<XElement>
+                {
+                    Alias = infoElement.Element("Alias").Value,
+                    Item = new Lazy<XElement>(() => elementCopy),
+                    DependsOn = dependencies.ToArray()
+                };
+
+                fields.Add(field);
+            }
+
+            //Sorting the Document Types based on dependencies
+            var documentTypes = TopologicalSorter.GetSortedItems(fields).ToList();
+
+            //Iterate the sorted document types and create them as IContentType objects
             foreach (var documentType in documentTypes)
             {
                 var alias = documentType.Element("Info").Element("Alias").Value;
@@ -349,9 +392,12 @@ namespace Umbraco.Core.Services
                 }
             }
 
+            //Save the newly created/updated IContentType objects
             var list = _importedContentTypes.Select(x => x.Value).ToList();
             _contentTypeService.Save(list, userId);
 
+            //Now we can finish the import by updating the 'structure', 
+            //which requires the doc types to be saved/available in the db
             if (importStructure)
             {
                 var updatedContentTypes = new List<IContentType>();
@@ -417,14 +463,46 @@ namespace Umbraco.Core.Services
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
+
             //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.
             var allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
+
             //NOTE IsListView is a new property in the package xml so we need to verify it exists before using it.
             var isListView = infoElement.Element("IsListView");
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
+
+            //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
+            var masterElement = infoElement.Element("Master");
+            if (masterElement != null)
+            {
+                var masterAlias = masterElement.Value;
+                IContentType parent = _importedContentTypes.ContainsKey(masterAlias)
+                    ? _importedContentTypes[masterAlias]
+                    : _contentTypeService.GetContentType(masterAlias);
+
+                contentType.SetLazyParentId(new Lazy<int>(() => parent.Id));
+            }
+
+            //Update Compositions on the ContentType to ensure that they are as is defined in the package xml
+            var compositionsElement = infoElement.Element("Compositions");
+            if (compositionsElement != null && compositionsElement.HasElements)
+            {
+                var compositions = compositionsElement.Elements("Composition");
+                if (compositions.Any())
+                {
+                    foreach (var composition in compositions)
+                    {
+                        var compositionAlias = composition.Value;
+                        var compositionContentType = _importedContentTypes.ContainsKey(compositionAlias)
+                            ? _importedContentTypes[compositionAlias]
+                            : _contentTypeService.GetContentType(compositionAlias);
+                        var added = contentType.AddContentType(compositionContentType);
+                    }
+                }
+            }
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
