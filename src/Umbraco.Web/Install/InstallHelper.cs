@@ -165,7 +165,9 @@ namespace Umbraco.Web.Install
                 if (result == 1)
                 {
                     //the user has not been configured
-                    return true;
+                    //this is always true on UaaS, need to check if there's multiple users too
+                    var usersResult = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    return usersResult == 1;
                 }
 
                 //                //check if there are any content types configured, if there isn't then we will consider this a new install
