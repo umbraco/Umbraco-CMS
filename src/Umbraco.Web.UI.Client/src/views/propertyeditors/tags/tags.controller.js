@@ -29,9 +29,15 @@ angular.module("umbraco")
                 }
             }
 
+            // Method required by the ValidateMandatoryProperty directive 
+            // Returns true if the property editor's has at least one tag selected
+            $scope.validateMandatoryProperty = function () {
+                return ($scope.currentTags != null && $scope.currentTags.length > 0);
+            }
+
             //Helper method to add a tag on enter or on typeahead select
             function addTag(tagToAdd) {
-                if (tagToAdd.length > 0) {
+                if (tagToAdd != null && tagToAdd.length > 0) {
                     if ($scope.currentTags.indexOf(tagToAdd) < 0) {                       
                         $scope.currentTags.push(tagToAdd);
                     }
