@@ -33,6 +33,14 @@ angular.module("umbraco.directives.html")
                 else {
                     scope.labelstring = scope.label;
                 }
+
+                if (scope.description && scope.description[0] === "@") {
+                    scope.descriptionstring = localizationService.localize(scope.description.substring(1));
+                }
+                else {
+                    scope.descriptionstring = scope.description;
+                }
+
             }
         };
     });
