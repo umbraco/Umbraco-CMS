@@ -846,9 +846,15 @@ namespace Umbraco.Core.Services
             var list = dataTypes.Select(x => x.Value).ToList();
             if (list.Any())
             {
-                _dataTypeService.Save(list, userId);
+                //NOTE: As long as we have to deal with the two types of PreValue lists (with/without Keys)
+                //this is a bit of a pain to handle while ensuring that the imported DataTypes has PreValues
+                //place when triggering the save event.
 
-                SavePrevaluesFromXml(list, dataTypeElements);
+                _dataTypeService.Save(list, userId, false);//Save without raising events
+
+                SavePrevaluesFromXml(list, dataTypeElements);//Save the PreValues for the current list of DataTypes
+
+                _dataTypeService.Save(list, userId, true);//Re-save and raise events
             }
 
             if (raiseEvents)
