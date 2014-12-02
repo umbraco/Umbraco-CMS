@@ -30,6 +30,7 @@ namespace umbraco.cms.businesslogic.template
         #region Private members
 
         private ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
+        private MasterPageHelper _masterPageHelper = new MasterPageHelper(new PhysicalFileSystem(SystemDirectories.Masterpages));
         internal ITemplate TemplateEntity;
         //private string _OutputContentType;
         //private string _design;
@@ -70,7 +71,7 @@ namespace umbraco.cms.businesslogic.template
 					case RenderingEngine.Mvc:
                         return _viewHelper.GetPhysicalFilePath(TemplateEntity);
 					case RenderingEngine.WebForms:
-						return MasterPageHelper.GetFilePath(TemplateEntity);
+                        return _masterPageHelper.GetPhysicalFilePath(TemplateEntity);
 					default:
 						throw new ArgumentOutOfRangeException();
 				}	  

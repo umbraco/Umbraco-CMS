@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
@@ -18,6 +19,8 @@ namespace Umbraco.Core.Models
     public class Template : File, ITemplate
     {
         private readonly IFileSystem _viewFileSystem;
+        private readonly IFileSystem _masterPageFileSystem;
+        private readonly ITemplatesSection _templateConfig;
         private string _alias;
         private string _name;
         private string _masterTemplateAlias;
@@ -35,13 +38,17 @@ namespace Umbraco.Core.Models
             _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
             _masterTemplateId = new Lazy<int>(() => -1);
             _viewFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            _templateConfig = UmbracoConfig.For.UmbracoSettings().Templates;
         }
 
-        public Template(string name, string alias, IFileSystem viewFileSystem)
+        public Template(string name, string alias, IFileSystem viewFileSystem, IFileSystem masterPageFileSystem, ITemplatesSection templateConfig)
             : this(name, alias)
         {
             if (viewFileSystem == null) throw new ArgumentNullException("viewFileSystem");
+            if (masterPageFileSystem == null) throw new ArgumentNullException("masterPageFileSystem");
             _viewFileSystem = viewFileSystem;
+            _masterPageFileSystem = masterPageFileSystem;
+            _templateConfig = templateConfig;
         }
 
         [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
@@ -142,18 +149,18 @@ namespace Umbraco.Core.Models
         public override bool IsValid()
         {
             var exts = new List<string>();
-            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");
                 exts.Add("vbhtml");
             }
             else
             {
-                exts.Add(UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages ? "master" : "aspx");
+                exts.Add(_templateConfig.UseAspNetMasterPages ? "master" : "aspx");
             }
 
             var dirs = SystemDirectories.Masterpages;
-            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
                 dirs += "," + SystemDirectories.MvcViews;
 
             //Validate file
@@ -181,6 +188,7 @@ namespace Umbraco.Core.Models
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
             MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
+            MasterTemplateAlias = masterTemplate.Alias;
         }
 
         public override object DeepClone()
@@ -211,7 +219,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         private RenderingEngine DetermineRenderingEngine()
         {
-            var engine = UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine;
+            var engine = _templateConfig.DefaultRenderingEngine;
 
             if (Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(Content))
             {
@@ -220,12 +228,13 @@ namespace Umbraco.Core.Models
             }
 
             var viewHelper = new ViewHelper(_viewFileSystem);
+            var masterPageHelper = new MasterPageHelper(_masterPageFileSystem);
 
             switch (engine)
             {
                 case RenderingEngine.Mvc:
                     //check if there's a view in ~/masterpages
-                    if (MasterPageHelper.MasterPageExists(this) && viewHelper.ViewExists(this) == false)
+                    if (masterPageHelper.MasterPageExists(this) && viewHelper.ViewExists(this) == false)
                     {
                         //change this to webforms since there's already a file there for this template alias
                         engine = RenderingEngine.WebForms;
@@ -233,7 +242,7 @@ namespace Umbraco.Core.Models
                     break;
                 case RenderingEngine.WebForms:
                     //check if there's a view in ~/views
-                    if (viewHelper.ViewExists(this) && MasterPageHelper.MasterPageExists(this) == false)
+                    if (viewHelper.ViewExists(this) && masterPageHelper.MasterPageExists(this) == false)
                     {
                         //change this to mvc since there's already a file there for this template alias
                         engine = RenderingEngine.Mvc;

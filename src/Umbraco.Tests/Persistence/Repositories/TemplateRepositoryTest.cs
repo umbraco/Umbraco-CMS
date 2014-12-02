@@ -79,7 +79,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -88,6 +91,63 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.True);    
             }
             
+        }
+
+        [Test]
+        public void Can_Perform_Add_MasterPage_With_Default_Content()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
+                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
+            {
+                // Act
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.WebForms));
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
+
+                //Assert
+                Assert.That(repository.Get("test"), Is.Not.Null);
+                Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.True);
+                Assert.AreEqual(@"<%@ Master Language=""C#"" MasterPageFile=""~/umbraco/masterpages/default.master"" AutoEventWireup=""true"" %>
+
+<asp:Content ContentPlaceHolderID=""ContentPlaceHolderDefault"" runat=""server"">
+
+</asp:Content>
+", template.Content);
+            }
+
+        }
+
+        [Test]
+        public void Can_Perform_Add_MasterPage_With_Default_Content_With_Parent()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
+                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
+            {
+                //NOTE: This has to be persisted first
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.WebForms));
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
+
+                // Act
+                var template2 = new Template("test2", "test2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.WebForms));
+                template2.SetMasterTemplate(template);                
+                repository.AddOrUpdate(template2);
+                unitOfWork.Commit();
+
+                //Assert
+                Assert.That(repository.Get("test2"), Is.Not.Null);
+                Assert.That(_masterPageFileSystem.FileExists("test2.master"), Is.True);
+                Assert.AreEqual(@"<%@ Master Language=""C#"" MasterPageFile=""~/masterpages/test.master"" AutoEventWireup=""true"" %>
+
+", template2.Content);
+            }
+
         }
 
         [Test]
@@ -100,7 +160,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test") { Content = ViewHelper.GetDefaultFileContent() };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -121,11 +184,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test") { Content = ViewHelper.GetDefaultFileContent() };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
-                var template2 = new Template("test", "test") { Content = ViewHelper.GetDefaultFileContent() };
+                var template2 = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template2);
                 unitOfWork.Commit();
 
@@ -145,11 +214,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test") { Content = ViewHelper.GetDefaultFileContent() };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
-                var template2 = new Template("test1", "test1") { Content = ViewHelper.GetDefaultFileContent() };
+                var template2 = new Template("test1", "test1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template2);
                 unitOfWork.Commit();
 
@@ -175,7 +250,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -203,7 +281,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test") { Content = ViewHelper.GetDefaultFileContent() };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -230,7 +311,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -257,7 +341,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var template = new Template("test", "test", _viewsFileSystem) { Content = ViewHelper.GetDefaultFileContent() };
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = ViewHelper.GetDefaultFileContent()
+                };
                 repository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
@@ -298,7 +385,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
                 {
-                    var template = new Template("test", "test") { Content = @"<%@ Master Language=""C#"" %>" };
+                    var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                    {
+                        Content = @"<%@ Master Language=""C#"" %>"
+                    };
                     repository.AddOrUpdate(template);
                     unitOfWork.Commit();
 
@@ -327,9 +417,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var parent = new Template("parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
-                var child = new Template("child", "child") { Content = @"<%@ Master Language=""C#"" %>" };
-                var baby = new Template("baby", "baby") { Content = @"<%@ Master Language=""C#"" %>" };
+                var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var child = new Template("child", "child", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var baby = new Template("baby", "baby", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
                 child.MasterTemplateAlias = parent.Alias;
                 child.MasterTemplateId = new Lazy<int>(() => parent.Id);
                 baby.MasterTemplateAlias = child.Alias;
@@ -360,17 +459,44 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var parent = new Template("parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
+                var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
 
-                var child1 = new Template("child1", "child1") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler1 = new Template("toddler1", "toddler1") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler2 = new Template("toddler2", "toddler2") { Content = @"<%@ Master Language=""C#"" %>" };
-                var baby1 = new Template("baby1", "baby1") { Content = @"<%@ Master Language=""C#"" %>" };
+                var child1 = new Template("child1", "child1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var toddler1 = new Template("toddler1", "toddler1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var toddler2 = new Template("toddler2", "toddler2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var baby1 = new Template("baby1", "baby1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
 
-                var child2 = new Template("child2", "child2") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler3 = new Template("toddler3", "toddler3") { Content = @"<%@ Master Language=""C#"" %>" };
-                var toddler4 = new Template("toddler4", "toddler4") { Content = @"<%@ Master Language=""C#"" %>" };
-                var baby2 = new Template("baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
+                var child2 = new Template("child2", "child2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var toddler3 = new Template("toddler3", "toddler3", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var toddler4 = new Template("toddler4", "toddler4", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
+                var baby2 = new Template("baby2", "baby2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                {
+                    Content = @"<%@ Master Language=""C#"" %>"
+                };
 
 
                 child1.MasterTemplateAlias = parent.Alias;
@@ -432,15 +558,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var parent = new Template("parent", "parent");
-                var child1 = new Template("child1", "child1");
-                var toddler1 = new Template("toddler1", "toddler1");
-                var toddler2 = new Template("toddler2", "toddler2");
-                var baby1 = new Template("baby1", "baby1");
-                var child2 = new Template("child2", "child2");
-                var toddler3 = new Template("toddler3", "toddler3");
-                var toddler4 = new Template("toddler4", "toddler4");
-                var baby2 = new Template("baby2", "baby2");
+                var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var child1 = new Template("child1", "child1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var toddler1 = new Template("toddler1", "toddler1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var toddler2 = new Template("toddler2", "toddler2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var baby1 = new Template("baby1", "baby1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var child2 = new Template("child2", "child2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var toddler3 = new Template("toddler3", "toddler3", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var toddler4 = new Template("toddler4", "toddler4", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var baby2 = new Template("baby2", "baby2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
 
                 child1.MasterTemplateAlias = parent.Alias;
                 child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
@@ -497,11 +623,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var parent = new Template("parent", "parent");
-                var child1 = new Template("child1", "child1");
-                var child2 = new Template("child2", "child2");
-                var toddler1 = new Template("toddler1", "toddler1");
-                var toddler2 = new Template("toddler2", "toddler2");
+                var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var child1 = new Template("child1", "child1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var child2 = new Template("child2", "child2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var toddler1 = new Template("toddler1", "toddler1", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                var toddler2 = new Template("toddler2", "toddler2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
 
                 child1.MasterTemplateAlias = parent.Alias;
                 child1.MasterTemplateId = new Lazy<int>(() => parent.Id);

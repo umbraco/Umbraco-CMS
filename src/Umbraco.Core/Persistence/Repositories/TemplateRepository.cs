@@ -29,6 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IFileSystem _masterpagesFileSystem;
         private IFileSystem _viewsFileSystem;
         private ITemplatesSection _templateConfig;
+        private ViewHelper _viewHelper;
+        private MasterPageHelper _masterPageHelper;
 
         public TemplateRepository(IDatabaseUnitOfWork work)
             : base(work)
@@ -48,6 +50,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
             _templateConfig = templateConfig;
+            _viewHelper = new ViewHelper(_viewsFileSystem);
+            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
         private void EnsureDependencies()
@@ -55,13 +59,15 @@ namespace Umbraco.Core.Persistence.Repositories
             _masterpagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
             _templateConfig = UmbracoConfig.For.UmbracoSettings().Templates;
+            _viewHelper = new ViewHelper(_viewsFileSystem);
+            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
 
         protected override ITemplate PerformGet(int id)
         {
-            return GetAll(new[] {id}).FirstOrDefault();
+            return GetAll(new[] { id }).FirstOrDefault();
         }
 
         protected override IEnumerable<ITemplate> PerformGetAll(params int[] ids)
@@ -70,13 +76,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                sql.Where("umbracoNode.id in (@ids)", new {ids = ids});
+                sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
             else
             {
                 sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
-            
+
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
 
             //look up the simple template definitions that have a master template assigned, this is used 
@@ -162,43 +168,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(ITemplate entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
-            {
-                if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
-                {
-                    string viewName = string.Concat(entity.Alias, ".cshtml");
-                    _viewsFileSystem.AddFile(viewName, stream, true);
-                }
-                else
-                {
-                    string masterpageName = string.Concat(entity.Alias, ".master");
-                    _masterpagesFileSystem.AddFile(masterpageName, stream, true);
-                }
-            }
-
             EnsureValidAlias(entity);
-
-
-            if (entity.Content.IsNullOrWhiteSpace())
-            {
-                //set default content
-                switch (_templateConfig.DefaultRenderingEngine)
-                {
-                    case RenderingEngine.Unknown:
-                    case RenderingEngine.Mvc:
-                        entity.Content = ViewHelper.GetDefaultFileContent();
-                        break;
-                    case RenderingEngine.WebForms:
-                        //TODO: Fill this in
-                        break;
-                }
-            }
 
             //Save to db
             var template = (Template)entity;
             template.AddingEntity();
 
-            var factory = new TemplateFactory(NodeObjectTypeId, _viewsFileSystem);
+            var factory = new TemplateFactory(NodeObjectTypeId, _viewsFileSystem, _masterpagesFileSystem, _templateConfig);
             var dto = factory.BuildDto(template);
 
             //Create the (base) node data - umbracoNode
@@ -227,7 +203,32 @@ namespace Umbraco.Core.Persistence.Repositories
             //Update entity with correct values
             template.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
             template.Path = nodeDto.Path;
-            
+
+            //now do the file work
+
+            if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+            {
+                var result = _viewHelper.CreateView(template, true);
+                if (result != entity.Content)
+                {
+                    entity.Content = result;
+                    //re-persist it... though we don't really care about the templates in the db do we??!!
+                    dto.Design = result;
+                    Database.Update(dto);
+                }
+            }
+            else
+            {
+                var result = _masterPageHelper.CreateMasterPage(template, this, true);
+                if (result != entity.Content)
+                {
+                    entity.Content = result;
+                    //re-persist it... though we don't really care about the templates in the db do we??!!
+                    dto.Design = result;
+                    Database.Update(dto);
+                }
+            }
+
             template.ResetDirtyProperties();
         }
 
@@ -235,34 +236,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             EnsureValidAlias(entity);
 
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
-            {
-                if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
-                {
-                    string viewName = string.Concat(entity.Alias, ".cshtml");
-                    _viewsFileSystem.AddFile(viewName, stream, true);
-                }
-                else
-                {
-                    string masterpageName = string.Concat(entity.Alias, ".master");
-                    _masterpagesFileSystem.AddFile(masterpageName, stream, true);
-                }
-            }
-
+            //store the changed alias if there is one for use with updating files later
+            var originalAlias = entity.Alias;
             if (entity.IsPropertyDirty("Alias"))
             {
                 //we need to check what it currently is before saving and remove that file
                 var current = Get(entity.Id);
-                if (current.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
-                {
-                    string viewName = string.Concat(current.Alias, ".cshtml");
-                    _viewsFileSystem.DeleteFile(viewName);
-                }
-                else
-                {
-                    string masterpageName = string.Concat(current.Alias, ".master");
-                    _masterpagesFileSystem.DeleteFile(masterpageName);
-                }
+                originalAlias = current.Alias;
             }
 
             var template = (Template)entity;
@@ -277,19 +257,44 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 }
-                
+
             }
 
             //Get TemplateDto from db to get the Primary key of the entity
             var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             //Save updated entity to db
-            
+
             template.UpdateDate = DateTime.Now;
             var factory = new TemplateFactory(templateDto.PrimaryKey, NodeObjectTypeId);
             var dto = factory.BuildDto(template);
 
             Database.Update(dto.NodeDto);
             Database.Update(dto);
+            
+            //now do the file work
+
+            if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+            {
+                var result = _viewHelper.UpdateViewFile(entity, originalAlias);
+                if (result != entity.Content)
+                {
+                    entity.Content = result;
+                    //re-persist it... though we don't really care about the templates in the db do we??!!
+                    dto.Design = result;
+                    Database.Update(dto);
+                }
+            }
+            else
+            {
+                var result = _masterPageHelper.UpdateMasterPageFile(entity, originalAlias, this);
+                if (result != entity.Content)
+                {
+                    entity.Content = result;
+                    //re-persist it... though we don't really care about the templates in the db do we??!!
+                    dto.Design = result;
+                    Database.Update(dto);
+                }
+            }
 
             entity.ResetDirtyProperties();
         }
@@ -308,7 +313,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select("*").From<TemplateDto>().Where<TemplateDto>(dto => dto.Master != null || dto.NodeId == entity.Id);
             var dtos = Database.Fetch<TemplateDto>(sql);
             var self = dtos.Single(x => x.NodeId == entity.Id);
-            var allChildren = dtos.Except(new[] {self});
+            var allChildren = dtos.Except(new[] { self });
             var hierarchy = GenerateTemplateHierarchy(self, allChildren);
             //remove ourselves
             hierarchy.Remove(self);
@@ -345,7 +350,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string vbViewName = string.Concat(dto.Alias, ".vbhtml");
             string masterpageName = string.Concat(dto.Alias, ".master");
 
-            var factory = new TemplateFactory(_viewsFileSystem);
+            var factory = new TemplateFactory(_viewsFileSystem, _masterpagesFileSystem, _templateConfig);
             var template = factory.BuildEntity(dto, childDefinitions);
 
             if (dto.Master.HasValue)
@@ -355,7 +360,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (masterTemplate != null)
                 {
                     template.MasterTemplateAlias = masterTemplate.Alias;
-                    template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);    
+                    template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
                 }
             }
 
@@ -517,10 +522,11 @@ namespace Umbraco.Core.Persistence.Repositories
             //in order to do this we need to get all of the templates and then organize, 
             // TODO: unfortunately our db structure does not use the path correctly for templates so we cannot just look
             // up a template tree easily.
+            //TODO: We do use the 'path' now, so this might be able to be fixed up 
 
             //first get all template objects
             var allTemplates = GetAll().ToArray();
-           
+
             var selfTemplate = allTemplates.SingleOrDefault(x => x.Alias == alias);
             if (selfTemplate == null)
             {
@@ -532,7 +538,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select("*").From<TemplateDto>();
             var allDtos = Database.Fetch<TemplateDto>(sql).ToArray();
             var selfDto = allDtos.Single(x => x.NodeId == selfTemplate.Id);
-            
+
             //need to get the top-most node of the current tree
             var top = selfDto;
             while (top.Master.HasValue && top.Master.Value != -1)
@@ -550,7 +556,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         private static TemplateNode WalkTree(TemplateNode current, string alias)
-        {           
+        {
             //now walk the tree to find the node
             if (current.Template.Alias == alias)
             {
@@ -591,18 +597,18 @@ namespace Umbraco.Core.Persistence.Repositories
                     {
                         Parent = parent
                     };
-                
+
                 //add to our list
                 children.Add(child);
 
                 //get this node's children
                 var kids = allDtos.Where(x => x.Master == i).Select(x => x.NodeId).ToArray();
-                
+
                 //recurse
                 child.Children = CreateChildren(child, kids, allTemplates, allDtos);
             }
             return children;
-        } 
+        }
 
         #endregion
 
