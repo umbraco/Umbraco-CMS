@@ -35,15 +35,15 @@
     <key alias="toPublish">Enviar a publicación</key>
     <key alias="translate">Traducir</key>
     <key alias="update">Actualizar</key>
-    <key alias="defaultValue">Default value</key>
+    <key alias="defaultValue">Valor por defecto</key>
   </area>
   <area alias="assignDomain">
-    <key alias="permissionDenied">Permission denied.</key>
+    <key alias="permissionDenied">Permiso denegado.</key>
     <key alias="addNew">Añadir nuevo dominio</key>
-    <key alias="remove">remove</key>
-    <key alias="invalidNode">Invalid node.</key>
-    <key alias="invalidDomain">Invalid domain format.</key>
-    <key alias="duplicateDomain">Domain has already been assigned.</key>
+    <key alias="remove">quitar</key>
+    <key alias="invalidNode">Nodo no válido.</key>
+    <key alias="invalidDomain">Formato de dominio no válido.</key>
+    <key alias="duplicateDomain">Este dominio ya ha sido asignado.</key>
     <key alias="language">Language</key>
     <key alias="domain">Dominio</key>
     <key alias="domainCreated">El nuevo dominio %0% ha sido creado</key>
@@ -52,15 +52,14 @@
     <key alias="domainUpdated">El dominio %0% ha sido actualizado</key>
     <key alias="orEdit">Editar dominios actuales</key>
     <key alias="domainHelp">
-      <![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
-        "https://www.example.com/".<br /><br />One-level paths in domains are supported, eg. "example.com/en". However, they
-        should be avoided. Better use the culture setting above.]]>
+      <![CDATA[p.ej.: "tudominio.com", "www.tudominio.com", "tudominio.com:8080" o
+        "https://www.tudominio.com/".<br /><br />Los dominios de un nivel están soportados, por ej. "example.com/en". De todas formas deberían de evitarse. Mejor usar la configuración cultural especificada arriba.]]>
     </key>
-    <key alias="inherit">Inherit</key>
-    <key alias="setLanguage">Culture</key>
+    <key alias="inherit">Heredar</key>
+    <key alias="setLanguage">Cultura</key>
     <key alias="setLanguageHelp">
-      <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
-      to the current node, unless a domain below applies too.]]>
+      <![CDATA[Configura la cultura para los nodos por debajo del nodo actual,<br /> o hereda la cultura de los nodos padres. También se aplicará<br />
+      para el nodo actual, a menos que un dominio por debajo lo aplique también.]]>
     </key>
     <key alias="setDomains">Domains</key>
   </area>
@@ -68,9 +67,9 @@
     <key alias="atViewingFor">Visualización de</key>
   </area>
   <area alias="buttons">
-    <key alias="select">Select</key>
-    <key alias="selectCurrentFolder">Select current folder</key>
-    <key alias="somethingElse">Do something else</key>
+    <key alias="select">Seleccionar</key>
+    <key alias="selectCurrentFolder">Selecciona la carpeta actual</key>
+    <key alias="somethingElse">Hacer otra cosa</key>
     <key alias="bold">Negrita</key>
     <key alias="deindent">Cancelar Sangría del Párrafo </key>
     <key alias="formFieldInsert">Insertar campo de formulario</key>
@@ -92,30 +91,30 @@
     <key alias="saveAndPublish">Guardar y publicar</key>
     <key alias="saveToPublish">Guardar y enviar para aprobación</key>
     <key alias="showPage">Previsualizar</key>
-    <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
+    <key alias="showPageDisabled">La previsualización está deshabilitada porque no hay ninguna plantilla asignada</key>
     <key alias="styleChoose">Elegir estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
     <key alias="tableInsert">Insertar tabla</key>
   </area>
   <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
-    <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
-    <key alias="contentRepublished">The content has been re-published.</key>
-    <key alias="currentProperty">Current Property</key>
-    <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>
-    <key alias="docTypeChanged">Document Type Changed</key>
-    <key alias="mapProperties">Map Properties</key>
-    <key alias="mapToProperty">Map to Property</key>
-    <key alias="newTemplate">New Template</key>
-    <key alias="newType">New Type</key>
-    <key alias="none">none</key>
-    <key alias="selectedContent">Content</key>
-    <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The document type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
-    <key alias="to">to</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
-    <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
+    <key alias="changeDocTypeInstruction">Para cambiar el tipo de documento al contenido seleccionado, primero selecciona uno de la lista de tipos válidos.</key>
+    <key alias="changeDocTypeInstruction2">Entonces confirma el mapeo de propiedades del tipo actual al nuevo y haz click en Guardar.</key>
+    <key alias="contentRepublished">El contenido se ha vuelto a publicar.</key>
+    <key alias="currentProperty">Propiedad actual</key>
+    <key alias="currentType">Tipo actual</key>
+    <key alias="docTypeCannotBeChanged">El tipo de contenido no se puede cambiar, porque no hay alternativas válidas para este contenido.</key>
+    <key alias="docTypeChanged">Tipo de documento cambiado</key>
+    <key alias="mapProperties">Mapeo de propiedades</key>
+    <key alias="mapToProperty">Mapea a la propiedad</key>
+    <key alias="newTemplate">Nueva plantilla</key>
+    <key alias="newType">Nuevo tipo</key>
+    <key alias="none">ninguno</key>
+    <key alias="selectedContent">Contenido</key>
+    <key alias="selectNewDocType">Selecciona un nuevo Tipo de Documento</key>
+    <key alias="successMessage">El tipo de documento del contenido seleccionado ha sido cambiado correctamente a [new type] y las siguientes propiedades mapeadas:</key>
+    <key alias="to">a</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">No se ha podido completar el mapeo de propiedades porque uno o más propiedades tienen más de un mapeo definido.</key>
+    <key alias="validDocTypesNote">Solo se muestran otros tipos válidos para el contenido actual.</key>
   </area>
   <area alias="content">
     <key alias="about">Acerca de</key>
@@ -142,7 +141,7 @@
     <key alias="nodeName">Título de la página</key>
     <key alias="otherElements">Propiedades</key>
     <key alias="parentNotPublished">Este documento ha sido publicado pero no es visible porque el padre '%0%' no esta publicado</key>
-    <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
+    <key alias="parentNotPublishedAnomaly">Upss: este documento está publicado pero no está en la caché (error interno)</key>
     <key alias="publish">Publicar</key>
     <key alias="publishStatus">Estado de la Publicación</key>
     <key alias="releaseDate">Publicar el</key>
@@ -158,21 +157,21 @@
     <key alias="updateDateDesc" version="7.0">Fecha/hora este documento fue modificado</key>
     <key alias="uploadClear">Eliminar archivo</key>
     <key alias="urls">Vínculo al documento</key>
-    <key alias="memberof">Member of group(s)</key>
-    <key alias="notmemberof">Not a member of group(s)</key>
-    <key alias="childItems" version="7.0">Child items</key>
+    <key alias="memberof">Miembro de grupo(s)</key>
+    <key alias="notmemberof">No es miembreo de grupo(s)</key>
+    <key alias="childItems" version="7.0">Nodos hijo</key>
     <key alias="target" version="7.0">Target</key>
   </area>
   <area alias="media">
-    <key alias="clickToUpload">Click to upload</key>
-    <key alias="dropFilesHere">Drop your files here...</key>
+    <key alias="clickToUpload">Haz click para subir archivos</key>
+    <key alias="dropFilesHere">Arrastra los archivos aquí...</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">¿Dónde quieres crear el nuevo %0%</key>
     <key alias="createUnder">Crear debajo de</key>
     <key alias="updateData">Elije un tipo y un título</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[No hay disponibles tipos de documentos permitidos. Debes habilitarlos en la sección "Ajustes" en <strong>"Tipos de documentos"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[No hay disponibles tipos de medios permitidos. Debes habilitarlos en la sección "Ajustes" en <strong>"Tipos de medios"</strong>.]]></key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Navega en tu sitio Web</key>
@@ -235,23 +234,23 @@
 ]]></key>
   </area>
   <area alias="placeholders">
-    <key alias="username">Introduzca su nombre de usuario</key>
-    <key alias="password">Introduzca su contraseña</key>
-    <key alias="nameentity">Nombre de %0%...</key>
-    <key alias="entername">Introduzca un nombre ...</key>
-    <key alias="search">Buscar ...</key>
-    <key alias="filter">Filtrar ...</key>
+    <key alias="username">Escribe tu nombre de usuario</key>
+    <key alias="password">Escribe tu contraseña</key>
+    <key alias="nameentity">Nombre del %0%...</key>
+    <key alias="entername">Escribe un nombre...</key>
+    <key alias="search">Escribe tu búsqueda...</key>
+    <key alias="filter">Escribe para filtrar resultados...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Tipos de nodos hijos permitidos</key>
-    <key alias="contenttypecompositions">Document Type Compositions</key>
+    <key alias="contenttypecompositions">Composiciones de Tipo de Documento</key>
     <key alias="create">Crear</key>
     <key alias="deletetab">Borrar pestaña</key>
     <key alias="description">Descripción</key>
     <key alias="newtab">Nueva pestaña</key>
     <key alias="tab">Pestaña</key>
     <key alias="thumbnail">Miniatura</key>
-    <key alias="hasListView">Enable list view</key>
+    <key alias="hasListView">Permitir vista de listado</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">añadir prevalor</key>
@@ -450,8 +449,7 @@
     <key alias="runwayInstalledText"><![CDATA[Tienes puestos los cimientos. Selecciona los módulos que desees instalar sobre ellos.<br /> Esta es nuestra lista de módulos recomendados, selecciona los que desees instalar, o mira la <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">lista completa de módulos</a> ]]></key>
     <key alias="runwayOnlyProUsers">Sólo recomendado para usuarios expertos</key>
     <key alias="runwaySimpleSite">Quiero empezar con un sitio web sencillo</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" es un sitio web sencillo que contiene unos tipos de documentos y plantillas básicos. El instalador puede configurar Runway por ti de forma automática, pero fácilmente puedes editarlo, extenderlo o eliminarlo. No es necesario y puedes usar Umbrao perfectamente sin él. Sin embargo, Runway ofrece unos cimientos sencillos basados en buenas prácticas para iniciarte más rápido que nunca. Si eliges instalar Runway, puedes seleccionar bloques de construcción básicos llamados Módulos de Runway de forma opcional para realzar tus páginas de Runway. </> <small> <em>Incluido con Runway:</em> Página de inicio, página de Cómo empezar, página de Instalación de módulos.<br /> <em>Módulos opcionales:</em> Navegación superior, Mapa del sitio, Contacto, Galería. </small> 
-However, Runway offers an easy foundation based on best practices to get you started faster than ever. If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages. </p> <small> <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br /> <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery. </small> ]]></key>
+    <key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" es un sitio web sencillo que contiene unos tipos de documentos y plantillas básicos. El instalador puede configurar Runway por ti de forma automática, pero fácilmente puedes editarlo, extenderlo o eliminarlo. No es necesario y puedes usar Umbrao perfectamente sin él. Sin embargo, Runway ofrece unos cimientos sencillos basados en buenas prácticas para iniciarte más rápido que nunca. Si eliges instalar Runway, puedes seleccionar bloques de construcción básicos llamados Módulos de Runway de forma opcional para realzar tus páginas de Runway. </> <small> <em>Incluido con Runway:</em> Página de inicio, página de Cómo empezar, página de Instalación de módulos.<br /> <em>Módulos opcionales:</em> Navegación superior, Mapa del sitio, Contacto, Galería. </small> ]]></key>
     <key alias="runwayWhatIsRunway">¿Qué es Runway?</key>
     <key alias="step1">Paso 1 de 5. Aceptar los términos de la licencia</key>
     <key alias="step2">Paso 2 de 5. Configuración de la base de datos</key>
@@ -480,15 +478,15 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="renewSession">Renovar su sessión para guardar sus cambios</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday </key>
-    <key alias="greeting2">Happy tubular Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy funky Friday</key>
-    <key alias="greeting6">Happy Caturday</key>
-    <key alias="instruction">Log in below</key>
-    <key alias="timeout">Session timed out</key>
+    <key alias="greeting0">Feliz super domingo</key>
+    <key alias="greeting1">Feliz lunes</key>
+    <key alias="greeting2">Tremendo martes</key>
+    <key alias="greeting3">Maravilloso miércoles</key>
+    <key alias="greeting4">Fantástico jueves</key>
+    <key alias="greeting5">¡Ya es viernes!</key>
+    <key alias="greeting6">Resplandeciente sábado</key>
+    <key alias="instruction">Iniciar sesión</key>
+    <key alias="timeout">La sesión ha caducado</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
 
@@ -628,6 +626,10 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="tab">Pestaña</key>
     <key alias="tabname">Nombre de la pestaña</key>
     <key alias="tabs">Pestañas</key>
+    <key alias="contentTypeEnabled">Tipo de Contenido Maestro activado</key>
+    <key alias="contentTypeUses">Este Tipo de Contenido usa</key>
+    <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
+    <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haga clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
     <key alias="masterDocumentType">Tipo de documento Maestro</key>
     <key alias="createMatchingTemplate">Crear template correspondiente</key>
   </area>
@@ -842,8 +844,8 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="usertype">Tipo de usuario</key>
     <key alias="userTypes">Tipos de usuarios</key>
     <key alias="writer">Redactor</key>
-    <key alias="yourProfile" version="7.0">Your profile</key>
-    <key alias="yourHistory" version="7.0">Your recent history</key>
-    <key alias="sessionExpires" version="7.0">Session expires in</key>
+    <key alias="yourProfile" version="7.0">Tu perfil</key>
+    <key alias="yourHistory" version="7.0">Tu historial reciente</key>
+    <key alias="sessionExpires" version="7.0">La sesión caduca en</key>
   </area>
 </language>
