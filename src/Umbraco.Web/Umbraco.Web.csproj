@@ -268,6 +268,7 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="Editors\ContentModelValidationFilter.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
@@ -547,12 +548,16 @@
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
-    <Compile Include="WebApi\Binders\MemberBinder.cs" />
+    <Compile Include="Editors\Filters\ContentItemBaseFormatter.cs" />
+    <Compile Include="Editors\Filters\ContentItemFormatter.cs" />
+    <Compile Include="Editors\Filters\MediaItemFormatter.cs" />
+    <Compile Include="Editors\Filters\MemberFormatter.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
+    <Compile Include="Editors\Filters\MemberValidationHelper.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoBackOfficeLogoutAttribute.cs" />
@@ -789,16 +794,14 @@
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
-    <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
+    <Compile Include="Editors\Filters\ContentItemBaseBinder.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
-    <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
-    <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
-    <Compile Include="WebApi\Filters\ContentItemValidationHelper.cs" />
+    <Compile Include="Editors\Filters\ContentValidationHelper.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
-    <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
-    <Compile Include="WebApi\Filters\FilterAllowedOutgoingMediaAttribute.cs" />
+    <Compile Include="Editors\Filters\FilterAllowedOutgoingContentAttribute.cs" />
+    <Compile Include="Editors\Filters\FilterAllowedOutgoingMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingDateTimeFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
@@ -806,6 +809,7 @@
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
     <Compile Include="WebApi\JsonCamelCaseFormatter.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
+    <Compile Include="Editors\Filters\ContentModelFormatterConfigurationAttribute.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />

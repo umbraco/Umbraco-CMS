@@ -21,11 +21,11 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
@@ -40,6 +40,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Members)]
     [OutgoingNoHyphenGuidFormat]
+    [ContentModelFormatterConfiguration(typeof(MemberFormatter))]
     public class MemberController : ContentControllerBase
     {
         /// <summary>
@@ -231,9 +232,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>        
         [FileUploadCleanupFilter]
         [MembershipProviderValidationFilter]
-        public MemberDisplay PostSave(
-            [ModelBinder(typeof(MemberBinder))]
-                MemberSave contentItem)
+        [ContentModelValidationFilter(typeof(MemberValidationHelper))]
+        public MemberDisplay PostSave(MemberSave contentItem)
         {
 
             //If we've reached here it means:
