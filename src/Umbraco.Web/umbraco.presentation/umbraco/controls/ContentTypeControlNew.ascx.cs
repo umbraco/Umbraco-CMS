@@ -296,6 +296,8 @@ namespace umbraco.controls
                     IconType = BasePage.speechBubbleIcon.success
                 }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
 
+            var isMediaType = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx");
+
             //Add the async operation to the page
             //NOTE: Must pass in a null and do not pass in a true to the 'executeInParallel', this is changed in .net 4.5 for the better, otherwise you'll get a ysod.
             Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, null, state));
@@ -335,7 +337,11 @@ namespace umbraco.controls
                             if (existingCompsitionIds.Any(x => x.Equals(compositionId))) continue;
 
                             //New Ids will get added to the collection
-                            var compositionType = Services.ContentTypeService.GetContentType(compositionId);
+                            var compositionType = isMediaType
+                                ? Services.ContentTypeService.GetMediaType(compositionId)
+                                    .SafeCast<IContentTypeComposition>()
+                                : Services.ContentTypeService.GetContentType(compositionId)
+                                    .SafeCast<IContentTypeComposition>();
                             var added = _contentType.ContentTypeItem.AddContentType(compositionType);
                             //TODO if added=false then return error message
                         }
@@ -345,7 +351,11 @@ namespace umbraco.controls
                         foreach (var removeId in removeIds)
                         {
                             //Remove ContentTypes that was deselected in the list
-                            var compositionType = Services.ContentTypeService.GetContentType(removeId);
+                            var compositionType = isMediaType
+                                ? Services.ContentTypeService.GetMediaType(removeId)
+                                    .SafeCast<IContentTypeComposition>()
+                                : Services.ContentTypeService.GetContentType(removeId)
+                                    .SafeCast<IContentTypeComposition>();
                             var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
                         }
                     }
@@ -356,11 +366,14 @@ namespace umbraco.controls
                         foreach (var removeId in removeIds)
                         {
                             //Remove ContentTypes that was deselected in the list
-                            var compositionType = Services.ContentTypeService.GetContentType(removeId);
+                            var compositionType = isMediaType
+                                ? Services.ContentTypeService.GetMediaType(removeId)
+                                    .SafeCast<IContentTypeComposition>()
+                                : Services.ContentTypeService.GetContentType(removeId)
+                                    .SafeCast<IContentTypeComposition>();
                             var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
                         }
                     }
-                    
 
                     var tabs = SaveTabs();
                     foreach (var tab in tabs)
@@ -676,7 +689,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             if (Page.IsPostBack == false)
             {
-                var allContentTypes = ApplicationContext.Services.ContentTypeService.GetAllContentTypes().ToArray();
+                var allContentTypes = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx")
+                    ? ApplicationContext.Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray()
+                    : ApplicationContext.Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
 
                 // note: there are many sanity checks missing here and there ;-((
                 // make sure once and for all
