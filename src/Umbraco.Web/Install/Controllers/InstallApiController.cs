@@ -84,15 +84,9 @@ namespace Umbraco.Web.Install.Controllers
         
         public IEnumerable<Package> GetPackages()
         {
-            var r = new org.umbraco.our.Repository();
-            var modules = r.Modules();
-
-            return modules.Select(package => new Package()
-            {
-                Id = package.RepoGuid,
-                Name = package.Text,
-                Thumbnail = package.Thumbnail
-            });
+            var installHelper = new InstallHelper(UmbracoContext);
+            var starterKits = installHelper.GetStarterKits();
+            return starterKits;
         }
 
         /// <summary>

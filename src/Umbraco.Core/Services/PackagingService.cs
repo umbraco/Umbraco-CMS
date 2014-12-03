@@ -336,48 +336,56 @@ namespace Umbraco.Core.Services
                                     ? (from doc in element.Elements("DocumentType") select doc).ToList()
                                     : new List<XElement> { element };
 
-            //NOTE Here we sort the doctype XElements based on dependencies
-            //before creating the doc types - this should also allow for a better structure/inheritance support.
+            //When you are importing a single doc type we have to assume that the depedencies are already there.
+            //Otherwise something like uSync won't work.
             var fields = new List<TopologicalSorter.DependencyField<XElement>>();
-            foreach (var documentType in unsortedDocumentTypes)
+            var isSingleDocTypeImport = unsortedDocumentTypes.Count == 1;
+            if (isSingleDocTypeImport == false)
             {
-                var elementCopy = documentType;
-                var infoElement = elementCopy.Element("Info");
-                var dependencies = new List<string>();
-
-                //Add the Master as a dependency
-                if (elementCopy.Element("Master") != null &&
-                    string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false)
+                //NOTE Here we sort the doctype XElements based on dependencies
+                //before creating the doc types - this should also allow for a better structure/inheritance support.
+                foreach (var documentType in unsortedDocumentTypes)
                 {
-                    dependencies.Add(elementCopy.Element("Master").Value);
-                }
+                    var elementCopy = documentType;
+                    var infoElement = elementCopy.Element("Info");
+                    var dependencies = new List<string>();
 
-                //Add compositions as dependencies
-                var compositionsElement = infoElement.Element("Compositions");
-                if (compositionsElement != null && compositionsElement.HasElements)
-                {
-                    var compositions = compositionsElement.Elements("Composition");
-                    if (compositions.Any())
+                    //Add the Master as a dependency
+                    if (elementCopy.Element("Master") != null &&
+                        string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false)
                     {
-                        foreach (var composition in compositions)
+                        dependencies.Add(elementCopy.Element("Master").Value);
+                    }
+
+                    //Add compositions as dependencies
+                    var compositionsElement = infoElement.Element("Compositions");
+                    if (compositionsElement != null && compositionsElement.HasElements)
+                    {
+                        var compositions = compositionsElement.Elements("Composition");
+                        if (compositions.Any())
                         {
-                            dependencies.Add(composition.Value);
+                            foreach (var composition in compositions)
+                            {
+                                dependencies.Add(composition.Value);
+                            }
                         }
                     }
-                }
-                
-                var field = new TopologicalSorter.DependencyField<XElement>
-                {
-                    Alias = infoElement.Element("Alias").Value,
-                    Item = new Lazy<XElement>(() => elementCopy),
-                    DependsOn = dependencies.ToArray()
-                };
 
-                fields.Add(field);
+                    var field = new TopologicalSorter.DependencyField<XElement>
+                    {
+                        Alias = infoElement.Element("Alias").Value,
+                        Item = new Lazy<XElement>(() => elementCopy),
+                        DependsOn = dependencies.ToArray()
+                    };
+
+                    fields.Add(field);
+                }
             }
 
-            //Sorting the Document Types based on dependencies
-            var documentTypes = TopologicalSorter.GetSortedItems(fields).ToList();
+            //Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
+            var documentTypes = isSingleDocTypeImport
+                ? unsortedDocumentTypes.ToList()
+                : TopologicalSorter.GetSortedItems(fields).ToList();
 
             //Iterate the sorted document types and create them as IContentType objects
             foreach (var documentType in documentTypes)
@@ -438,15 +446,10 @@ namespace Umbraco.Core.Services
                              : _contentTypeService.GetContentType(masterAlias);
             }
 
+            var alias = infoElement.Element("Alias").Value;
             var contentType = parent == null
-                                  ? new ContentType(-1)
-                                        {
-                                            Alias = infoElement.Element("Alias").Value
-                                        }
-                                  : new ContentType(parent)
-                                        {
-                                            Alias = infoElement.Element("Alias").Value
-                                        };
+                                  ? new ContentType(-1) { Alias = alias }
+                                  : new ContentType(parent, alias);
 
             if (parent != null)
                 contentType.AddContentType(parent);
@@ -843,9 +846,15 @@ namespace Umbraco.Core.Services
             var list = dataTypes.Select(x => x.Value).ToList();
             if (list.Any())
             {
-                _dataTypeService.Save(list, userId);
+                //NOTE: As long as we have to deal with the two types of PreValue lists (with/without Keys)
+                //this is a bit of a pain to handle while ensuring that the imported DataTypes has PreValues
+                //place when triggering the save event.
 
-                SavePrevaluesFromXml(list, dataTypeElements);
+                _dataTypeService.Save(list, userId, false);//Save without raising events
+
+                SavePrevaluesFromXml(list, dataTypeElements);//Save the PreValues for the current list of DataTypes
+
+                _dataTypeService.Save(list, userId, true);//Re-save and raise events
             }
 
             if (raiseEvents)

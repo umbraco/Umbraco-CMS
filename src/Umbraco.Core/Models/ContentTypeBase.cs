@@ -48,17 +48,22 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-		protected ContentTypeBase(IContentTypeBase parent)
+		protected ContentTypeBase(IContentTypeBase parent) : this(parent, null)
 		{
-			Mandate.ParameterNotNull(parent, "parent");
+		}
 
-			_parentId = new Lazy<int>(() => parent.Id);
-			_allowedContentTypes = new List<ContentTypeSort>();
-			_propertyGroups = new PropertyGroupCollection();
+        protected ContentTypeBase(IContentTypeBase parent, string alias)
+        {
+            Mandate.ParameterNotNull(parent, "parent");
+
+            _alias = alias;
+            _parentId = new Lazy<int>(() => parent.Id);
+            _allowedContentTypes = new List<ContentTypeSort>();
+            _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
-		}
+        }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);

@@ -26,11 +26,15 @@
         views/dashboard/developer/developerdashboardvideos.html
       </control>
     </tab>
-    <tab caption="Examine Management" xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing">
+    <tab caption="Examine Management" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
+  </section>
+  
+  <section alias="StartupDeveloperDashboardSection" xdt:Locator="Match(alias)">
+      <tab caption="Examine Management" xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing">
       <control>
         views/dashboard/developer/examinemanagement.html
       </control>
-    </tab>
+    </tab>    
   </section>
   
   <section alias="StartupMediaDashboardSection" xdt:Locator="Match(alias)">

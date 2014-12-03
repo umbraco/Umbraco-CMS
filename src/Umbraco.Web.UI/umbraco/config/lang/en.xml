@@ -410,9 +410,9 @@
     <key alias="searchResults">Search results</key>
   </area>
   <area alias="graphicheadline">
-    <key alias="backgroundcolor">Background color</key>
+    <key alias="backgroundcolor">Background colour</key>
     <key alias="bold">Bold</key>
-    <key alias="color">Text color</key>
+    <key alias="color">Text colour</key>
     <key alias="font">Font</key>
     <key alias="text">Text</key>
   </area>
@@ -702,7 +702,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       ]]></key>
   </area>
   <area alias="colorpicker">
-    <key alias="noColors">You have not configured any approved colors</key>
+    <key alias="noColors">You have not configured any approved colours</key>
   </area>
   <area alias="relatedlinks">
     <key alias="addExternal">Add external link</key>
