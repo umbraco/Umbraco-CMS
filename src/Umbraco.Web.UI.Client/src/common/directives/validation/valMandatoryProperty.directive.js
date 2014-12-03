@@ -42,34 +42,20 @@ function valMandatoryProperty(serverValidationManager) {
                     return viewValue;
                 }
                 else {
-                    scope.error = true;
                     ctrl.$setValidity('required', false); // Tell the controlller that the value is invalid
-                    ctrl.errorMsg = "This property is mandatory.";
+                    ctrl.errorMsg = "This property is mandatory";
                     return viewValue;
                 }
             };
 
             // Formatters are invoked when the model is modified in the code.
-            //ctrl.$formatters.unshift(validate);
             ctrl.$formatters.push(validate);
 
             // Parsers are called as soon as the value in the form input is modified
-            //ctrl.$parsers.unshift(validate);
             ctrl.$parsers.push(validate);
 
             // Listen for the forms saving event to validate 
             scope.$on("formSubmitting", function (ev, args) {
-
-                // Calls the validition method defined in the scope
-                if (scope.validateMandatoryProperty()) {
-                    //serverValidationManager.removePropertyError(scope.model.alias, scope.model.label);
-                    // It is necessary to peform a reset since with the removePropertyError() method it is not working
-                    serverValidationManager.reset();
-                }
-                else {
-                    serverValidationManager.addPropertyError(scope.model.alias, scope.model.label, "This property is mandatory");
-                }
-
                 validate(element.val());
             });
 

@@ -29,8 +29,7 @@ angular.module("umbraco")
                 }
             }
 
-            // Method required by the ValidateMandatoryProperty directive 
-            // Returns true if the property editor's has at least one tag selected
+            // Method required by the ValidateMandatoryProperty directive (returns true if the property editor has at least one tag selected)
             $scope.validateMandatoryProperty = function () {
                 return ($scope.currentTags != null && $scope.currentTags.length > 0);
             }
