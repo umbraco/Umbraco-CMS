@@ -84,7 +84,7 @@ namespace Umbraco.Web.Install.Controllers
         
         public IEnumerable<Package> GetPackages()
         {
-            var installHelper = new InstallHelper(UmbracoContext.Current);
+            var installHelper = new InstallHelper(UmbracoContext);
             var starterKits = installHelper.GetStarterKits();
             return starterKits;
         }
