@@ -17,7 +17,7 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function FormsController($scope, $route, $cookies, packageResource) {
+function FormsController($scope, $route, $cookieStore, packageResource) {
     $scope.installForms = function(){
         $scope.state = "Installng package";
         packageResource
@@ -43,7 +43,7 @@ function FormsController($scope, $route, $cookies, packageResource) {
 
     $scope.complete = function(result){
         var url = window.location.href + "?init=true";
-        $cookies.installDone = "true";
+        $cookieStore.put("umbPackageInstallId", result.packageGuid); 
         window.location.reload(true);
     };
 
