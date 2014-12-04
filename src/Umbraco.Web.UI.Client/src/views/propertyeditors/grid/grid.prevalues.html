@@ -17,7 +17,7 @@
                         <div class="preview-row">
                             <div class="preview-col"
                                 ng-class="{last:$last}"
-                                ng-repeat="section in template.sections"
+                                ng-repeat="section in template.sections | filter:zeroWidthFilter"
                                 ng-style="{width: percentage(section.grid) + '%', height: '60px'}">
                                 <div class="preview-cell"></div>
                             </div>
@@ -63,7 +63,7 @@
                             <div class="preview-row">
                                 <div class="preview-col"
                                     ng-class="{last:$last}"
-                                    ng-repeat="area in layout.areas"
+                                    ng-repeat="area in layout.areas | filter:zeroWidthFilter"
                                     ng-style="{width: percentage(area.grid) + '%'}">
 
                                     <div class="preview-cell"></div>

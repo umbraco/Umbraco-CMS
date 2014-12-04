@@ -149,6 +149,9 @@ angular.module("umbraco")
             return ((spans / $scope.model.value.columns) * 100).toFixed(1);
         };
 
+        $scope.zeroWidthFilter = function (cell) {
+                return cell.grid > 0;
+        };
 
         /****************
             Config
