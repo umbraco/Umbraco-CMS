@@ -4,7 +4,9 @@
     {
         Success,
         FailedNoPrivileges,
-        FailedTimedOut,
+
+        //FailedTimedOut, 
+
         FailedNoContextId,
         FailedNoSsl
     }

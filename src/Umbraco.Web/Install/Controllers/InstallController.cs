@@ -57,8 +57,7 @@ namespace Umbraco.Web.Install.Controllers
                 switch (result)
                 {
                     case ValidateRequestAttempt.FailedNoPrivileges:
-                    case ValidateRequestAttempt.FailedTimedOut:
-                    case ValidateRequestAttempt.FailedNoContextId:
+                    case ValidateRequestAttempt.FailedNoContextId: 
                         return Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));                        
                 }
             }            
