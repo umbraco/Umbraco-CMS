@@ -18,7 +18,7 @@ namespace Umbraco.Web
     public static class ImageCropperTemplateExtensions
     {
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
+        /// Gets the ImageProcessor Url by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item, optionally using the specified image format
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -26,16 +26,19 @@ namespace Umbraco.Web
         /// <param name="cropAlias">
         /// The crop alias e.g. thumbnail
         /// </param>
+        /// <param name="format">
+        /// The image format to use. If no format is specified, it will use the media item umbracoExtension property to determine the format.
+        /// </param>
         /// <returns>
         /// The ImageProcessor.Web Url.
         /// </returns>
-        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias)
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, string format = null)
         {
-            return mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
+            return mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true, format: format);
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item, optionally using the specified image format.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -46,12 +49,15 @@ namespace Umbraco.Web
         /// <param name="cropAlias">
         /// The crop alias e.g. thumbnail
         /// </param>
+        /// <param name="format">
+        /// The image format to use. If no format is specified, it will use the media item umbracoExtension property to determine the format.
+        /// </param>
         /// <returns>
         /// The ImageProcessor.Web Url.
         /// </returns>
-        public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
+        public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias, string format = null)
         {
-            return mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+            return mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true, format: format);
         }
 
         /// <summary>
@@ -71,6 +77,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="cropAlias">
         /// The crop alias.
+        /// </param>
+        /// <param name="format">
+        /// The image format to use. If no format is specified, it will use the media item umbracoExtension property to determine the format.
         /// </param>
         /// <param name="quality">
         /// Quality percentage of the output image.
@@ -108,6 +117,7 @@ namespace Umbraco.Web
              int? height = null,
              string propertyAlias = Constants.Conventions.Media.File,
              string cropAlias = null,
+             string format = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,
              ImageCropAnchor? imageCropAnchor = null,
@@ -139,10 +149,23 @@ namespace Umbraco.Web
                 mediaItemUrl = mediaItem.Url;
             }
 
+            //Use the media item's umbracoExtension property to determine the file format
+            //ImageProcessor is hard-coded to use PNG if no format is specified, but that results in huge sizes for JPEG images
+            string mediaItemFormat = null;
+            if(format != null)
+            {
+                mediaItemFormat = format;
+            }
+            else if(mediaItem.HasValue(Constants.Conventions.Media.Extension))
+            {
+                mediaItemFormat = mediaItem.GetPropertyValue<string>(Constants.Conventions.Media.Extension);
+            }
+            
+
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
 
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale)
+                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, mediaItemFormat, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale)
                 : string.Empty;
         }
 
@@ -157,6 +180,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="height">
         /// The height of the output image.
+        /// </param>
+        /// <param name="format">
+        /// The image format to use.
         /// </param>
         /// <param name="quality">
         /// Quality percentage of the output image.
@@ -200,6 +226,7 @@ namespace Umbraco.Web
             int? height = null,
             string imageCropperValue = null,
             string cropAlias = null,
+            string format = null,
             int? quality = null,
             ImageCropMode? imageCropMode = null,
             ImageCropAnchor? imageCropAnchor = null,
@@ -257,7 +284,10 @@ namespace Umbraco.Web
                         imageResizerUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
                     }
                 }
-
+                if (format != null)
+                {
+                    imageResizerUrl.Append("&format=" + format);
+                }
                 if (quality != null)
                 {
                     imageResizerUrl.Append("&quality=" + quality);
