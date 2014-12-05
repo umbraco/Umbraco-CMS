@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Add_MasterPage()
+        public void Can_Perform_Add_MasterPage_Detect_Content()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -79,7 +79,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
-                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, 
+                    //even though the default is MVC, the content is not 
+                    Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
@@ -160,6 +162,27 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
+
+                //Assert
+                Assert.That(repository.Get("test"), Is.Not.Null);
+                Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
+            }
+
+        }
+
+        [Test]
+        public void Can_Perform_Add_View_With_Default_Content()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
+                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
+            {
+                // Act
                 var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
                 {
                     Content = ViewHelper.GetDefaultFileContent()
@@ -170,6 +193,41 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.AreEqual(@"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = null;
+}", template.Content);
+            }
+
+        }
+
+        [Test]
+        public void Can_Perform_Add_View_With_Default_Content_With_Parent()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem,
+                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
+            {
+                //NOTE: This has to be persisted first
+                var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
+
+                // Act
+                var template2 = new Template("test2", "test2", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                template2.SetMasterTemplate(template);
+                repository.AddOrUpdate(template2);
+                unitOfWork.Commit();
+
+                //Assert
+                Assert.That(repository.Get("test2"), Is.Not.Null);
+                Assert.That(_viewsFileSystem.FileExists("test2.cshtml"), Is.True);
+                Assert.AreEqual(@"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = ""test.cshtml"";
+}", template2.Content);
             }
 
         }
