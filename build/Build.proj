@@ -156,8 +156,8 @@
   <Target Name="ZipWebApp" DependsOnTargets="ZipUmbracoExaminePDF" >
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
 
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22" />
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22 -x!dotLess.Core.dll" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22 -x!dotLess.Core.dll" />
 
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>

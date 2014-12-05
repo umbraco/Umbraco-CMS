@@ -12,17 +12,17 @@
                 <li ng-repeat="template in model.value.templates">
 
                     <div ng-click="configureTemplate(template)"
-                        class="preview-rows layout" style="height: 60px; margin-top: 5px; margin-bottom: 20px; float:left">
+                        class="preview-rows layout" style="margin-top: 5px; margin-bottom: 20px; float:left">
 
                         <div class="preview-row">
                             <div class="preview-col"
                                 ng-class="{last:$last}"
-                                ng-repeat="section in template.sections"
-                                ng-style="{width: percentage(section.grid) + '%'}">
+                                ng-repeat="section in template.sections | filter:zeroWidthFilter"
+                                ng-style="{width: percentage(section.grid) + '%', height: '60px'}">
                                 <div class="preview-cell"></div>
                             </div>
                         </div>
-                    </div> 
+                    </div>
 
                     <div>
                         {{template.name}} <br/>
@@ -57,25 +57,25 @@
 
                     <li ng-repeat="layout in model.value.layouts">
 
-                        <div ng-click="configureLayout(layout)" 
+                        <div ng-click="configureLayout(layout)"
                             class="preview-rows columns" style="margin-top: 5px; margin-bottom: 25px; float:left">
 
                             <div class="preview-row">
                                 <div class="preview-col"
                                     ng-class="{last:$last}"
-                                    ng-repeat="area in layout.areas"
+                                    ng-repeat="area in layout.areas | filter:zeroWidthFilter"
                                     ng-style="{width: percentage(area.grid) + '%'}">
-                                    
+
                                     <div class="preview-cell"></div>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
 
                         <div>
                             {{layout.name}}<br />
                             <i class="icon-delete red"></i>
                             <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)">
-                                <localize key="general_delete" /> 
+                                <localize key="general_delete" />
                             </a>
                         </div>
 
@@ -95,13 +95,13 @@
 
     <div style="max-width: 600px">
 
-        <umb-control-group 
-            label="@grid_columns" 
+        <umb-control-group
+            label="@grid_columns"
             description="@grid_columnsDetails">
                 <input type="text" class="" ng-model="model.value.columns" />
         </umb-control-group>
 
-        <umb-control-group 
+        <umb-control-group
             label="@grid_settings"
             description="@grid_settingsDetails">
 

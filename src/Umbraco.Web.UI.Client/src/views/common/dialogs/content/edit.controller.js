@@ -12,16 +12,13 @@ function ContentEditDialogController($scope, editorState, $routeParams, $q, $tim
             scope: $scope,
             content: $scope.content
         }).then(function (content) {
-            //success
-            $scope.busy = false;
-            
+            //success            
             if (dialogOptions.closeOnSave) {
                 $scope.submit(content);
             }
 
         }, function(err) {
             //error
-            $scope.busy = false;
         });
     }
 

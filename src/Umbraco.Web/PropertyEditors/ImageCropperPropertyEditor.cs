@@ -223,9 +223,13 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             json = JObject.Parse((string)p.Value);
                         }
-                        catch (JsonException ex)
+                        catch (JsonException)
                         {
-                            LogHelper.Error<ImageCropperPropertyEditor>("Could not parse the value into a JSON structure! Value: " + p.Value, ex);
+                            //note: we are swallowing this exception because in some cases a normal string/non json value will be passed in which will just be the 
+                            // file path like /media/23454/hello.jpg
+                            // This will happen everytime an image is uploaded via the folder browser and we don't really want to pollute the log since it's not actually
+                            // a problem and we take care of this below.
+                            // see: http://issues.umbraco.org/issue/U4-4756
                         }
                         if (json != null && json["src"] != null)
                         {

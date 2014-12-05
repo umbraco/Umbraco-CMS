@@ -850,7 +850,7 @@ namespace Umbraco.Core.Persistence
 		public IEnumerable<T1> Query<T1, T2, T3, T4>(Sql sql) { return Query<T1>(new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null, sql.SQL, sql.Arguments); }
 
 		// Automagically guess the property relationships between various POCOs and create a delegate that will set them up
-		object GetAutoMapper(Type[] types)
+		Delegate GetAutoMapper(Type[] types)
 		{
 			// Build a key
 			var kb = new StringBuilder();
@@ -865,7 +865,7 @@ namespace Umbraco.Core.Persistence
 			RWLock.EnterReadLock();
 			try
 			{
-				object mapper;
+				Delegate mapper;
 				if (AutoMappers.TryGetValue(key, out mapper))
 					return mapper;
 			}
@@ -879,7 +879,7 @@ namespace Umbraco.Core.Persistence
 			try
 			{
 				// Try again
-				object mapper;
+				Delegate mapper;
 				if (AutoMappers.TryGetValue(key, out mapper))
 					return mapper;
 
@@ -952,22 +952,53 @@ namespace Umbraco.Core.Persistence
 			throw new InvalidOperationException(string.Format("Couldn't find split point between {0} and {1}", typeThis, typeNext));
 		}
 
+
 		// Instance data used by the Multipoco factory delegate - essentially a list of the nested poco factories to call
 		public class MultiPocoFactory
 		{
-			public List<Delegate> m_Delegates;
-			public Delegate GetItem(int index) { return m_Delegates[index]; }
+
+			public MultiPocoFactory(IEnumerable<Delegate> dels)
+			{
+				Delegates = new List<Delegate>(dels);
+			}
+			private List<Delegate> Delegates { get; set; }
+			private Delegate GetItem(int index) { return Delegates[index]; }
+			
+			/// <summary>
+			/// Calls the delegate at the specified index and returns its values
+			/// </summary>
+			/// <param name="index"></param>
+			/// <param name="reader"></param>
+			/// <returns></returns>
+			private object CallDelegate(int index, IDataReader reader)
+			{
+				var d = GetItem(index);
+				var output = d.DynamicInvoke(reader);
+				return output;
+			}
+
+			/// <summary>
+			/// Calls the callback delegate and passes in the output of all delegates as the parameters
+			/// </summary>
+			/// <typeparam name="TRet"></typeparam>
+			/// <param name="callback"></param>
+			/// <param name="dr"></param>
+			/// <param name="count"></param>
+			/// <returns></returns>
+			public TRet CallCallback<TRet>(Delegate callback, IDataReader dr, int count)
+			{
+				var args = new List<object>();
+				for(var i = 0;i<count;i++)
+				{
+					args.Add(CallDelegate(i, dr));
+				}
+				return (TRet)callback.DynamicInvoke(args.ToArray());
+			}
 		}
 
 		// Create a multi-poco factory
-		Func<IDataReader, object, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
-		{
-			var m = new DynamicMethod("petapoco_multipoco_factory", typeof(TRet), new Type[] { typeof(MultiPocoFactory), typeof(IDataReader), typeof(object) }, typeof(MultiPocoFactory));
-			var il = m.GetILGenerator();
-
-			// Load the callback
-			il.Emit(OpCodes.Ldarg_2);
-
+		Func<IDataReader, Delegate, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
+		{			
 			// Call each delegate
 			var dels = new List<Delegate>();
 			int pos = 0;
@@ -976,33 +1007,19 @@ namespace Umbraco.Core.Persistence
 				// Add to list of delegates to call
 				var del = FindSplitPoint(types[i], i + 1 < types.Length ? types[i + 1] : null, sql, r, ref pos);
 				dels.Add(del);
-
-				// Get the delegate
-				il.Emit(OpCodes.Ldarg_0);													// callback,this
-				il.Emit(OpCodes.Ldc_I4, i);													// callback,this,Index
-				il.Emit(OpCodes.Callvirt, typeof(MultiPocoFactory).GetMethod("GetItem"));	// callback,Delegate
-				il.Emit(OpCodes.Ldarg_1);													// callback,delegate, datareader
-
-				// Call Invoke
-				var tDelInvoke = del.GetType().GetMethod("Invoke");
-				il.Emit(OpCodes.Callvirt, tDelInvoke);										// Poco left on stack
 			}
 
-			// By now we should have the callback and the N pocos all on the stack.  Call the callback and we're done
-			il.Emit(OpCodes.Callvirt, Expression.GetFuncType(types.Concat(new Type[] { typeof(TRet) }).ToArray()).GetMethod("Invoke"));
-			il.Emit(OpCodes.Ret);
-
-			// Finish up
-			return (Func<IDataReader, object, TRet>)m.CreateDelegate(typeof(Func<IDataReader, object, TRet>), new MultiPocoFactory() { m_Delegates = dels });
+			var mpFactory = new MultiPocoFactory(dels);
+			return (reader, arg3) => mpFactory.CallCallback<TRet>(arg3, reader, types.Length);
 		}
 
 		// Various cached stuff
 		static Dictionary<string, object> MultiPocoFactories = new Dictionary<string, object>();
-		static Dictionary<string, object> AutoMappers = new Dictionary<string, object>();
+		static Dictionary<string, Delegate> AutoMappers = new Dictionary<string, Delegate>();
 		static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
 
-		// Get (or create) the multi-poco factory for a query
-		Func<IDataReader, object, TRet> GetMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
+		// Get (or create) the multi-poco factory for a query	
+		Func<IDataReader, Delegate, TRet> GetMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
 		{
 			// Build a key string  (this is crap, should address this at some point)
 			var kb = new StringBuilder();
@@ -1024,7 +1041,10 @@ namespace Umbraco.Core.Persistence
 			{
 				object oFactory;
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
-					return (Func<IDataReader, object, TRet>)oFactory;
+				{
+					//mpFactory = oFactory;
+					return (Func<IDataReader, Delegate, TRet>)oFactory;	
+				}					
 			}
 			finally
 			{
@@ -1036,15 +1056,17 @@ namespace Umbraco.Core.Persistence
 			try
 			{
 				// Check again
-				object oFactory;
+				object oFactory; ;
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
-					return (Func<IDataReader, object, TRet>)oFactory;
+				{
+					return (Func<IDataReader, Delegate, TRet>)oFactory;
+				}	
+				
+				// Create the factory				
+				var factory = CreateMultiPocoFactory<TRet>(types, sql, r);
 
-				// Create the factory
-				var Factory = CreateMultiPocoFactory<TRet>(types, sql, r);
-
-				MultiPocoFactories.Add(key, Factory);
-				return Factory;
+				MultiPocoFactories.Add(key, factory);
+				return factory;
 			}
 			finally
 			{
@@ -1054,7 +1076,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Actual implementation of the multi-poco query
-		public IEnumerable<TRet> Query<TRet>(Type[] types, object cb, string sql, params object[] args)
+		public IEnumerable<TRet> Query<TRet>(Type[] types, Delegate cb, string sql, params object[] args)
 		{
 			OpenSharedConnection();
 			try

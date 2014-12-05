@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constuctor for creating a ContentType with the parent's id.
         /// </summary>
-        /// <remarks>You usually only want to use this for creating ContentTypes at the root.</remarks>
+        /// <remarks>Only use this for creating ContentTypes at the root (with ParentId -1).</remarks>
         /// <param name="parentId"></param>
         public ContentType(int parentId) : base(parentId)
         {
@@ -31,10 +31,21 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-		public ContentType(IContentType parent) : base(parent)
+		public ContentType(IContentType parent) : this(parent, null)
 		{
-			_allowedTemplates = new List<ITemplate>();
 		}
+
+        /// <summary>
+        /// Constuctor for creating a ContentType with the parent as an inherited type.
+        /// </summary>
+        /// <remarks>Use this to ensure inheritance from parent.</remarks>
+        /// <param name="parent"></param>
+        /// <param name="alias"></param>
+        public ContentType(IContentType parent, string alias)
+            : base(parent, alias)
+        {
+            _allowedTemplates = new List<ITemplate>();
+        }
 
         private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
         private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);

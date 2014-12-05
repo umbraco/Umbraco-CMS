@@ -18,8 +18,8 @@ angular.module("umbraco.directives")
             element.bind('blur', function(){ update(true); });
 
             $timeout(function() {
-                update();
-            }, 100);
+                update(true);
+            }, 200);
 
 
             //I hate bootstrap tabs

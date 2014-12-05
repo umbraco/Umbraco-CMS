@@ -128,3 +128,4 @@ src/*.boltdata/
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.config.js
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.front.js
 src/umbraco.sln.ide/*
+build/UmbracoCms.*/

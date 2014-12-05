@@ -199,6 +199,34 @@ namespace Umbraco.Tests.Services.Importing {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;
+        ///  &lt;files&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;bootstrap.min.js&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/js&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;bootstrap.min.js&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;jquery.min.js&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/js&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;jquery.min.js&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;top-image.jpg&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/Media/1001&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;top-image.jpg&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;top-im [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Fanoe_Package {
+            get {
+                return ResourceManager.GetString("Fanoe_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
         ///  &lt;files /&gt;
         ///  &lt;info&gt;
         ///    &lt;package&gt;
