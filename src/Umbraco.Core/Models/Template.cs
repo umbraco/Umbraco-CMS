@@ -187,20 +187,30 @@ namespace Umbraco.Core.Models
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
-            MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
-            MasterTemplateAlias = masterTemplate.Alias;
+            if (masterTemplate == null)
+            {
+                MasterTemplateId = new Lazy<int>(() => -1);
+                MasterTemplateAlias = null;
+            }
+            else
+            {
+                MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
+                MasterTemplateAlias = masterTemplate.Alias;
+            }
+           
         }
 
         public override object DeepClone()
         {
-            var clone = (Template)base.DeepClone();
+            //We cannot call in to the base classes to clone because the base File class treats Alias, Name.. differently so we need to manually do the clone
 
-            //need to manually assign since they are readonly properties
-            clone._alias = Alias;
-            clone._name = Name;
+            //Memberwise clone on Entity will work since it doesn't have any deep elements
+            // for any sub class this will work for standard properties as well that aren't complex object's themselves.
+            var clone = (Template)MemberwiseClone();
+            //Automatically deep clone ref properties that are IDeepCloneable
+            DeepCloneHelper.DeepCloneRefProperties(this, clone);           
 
             clone.ResetDirtyProperties(false);
-
             return clone;
         }
 

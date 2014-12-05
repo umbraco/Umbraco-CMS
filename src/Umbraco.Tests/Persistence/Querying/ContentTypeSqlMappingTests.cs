@@ -33,8 +33,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
 
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsTemplate"))));
-                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55554, Alias = "testTemplate1", Design = "", Master = null, PrimaryKey = 22221});
-                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55555, Alias = "testTemplate2", Design = "", Master = null, PrimaryKey = 22222 });
+                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55554, Alias = "testTemplate1", Design = "", PrimaryKey = 22221});
+                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55555, Alias = "testTemplate2", Design = "", PrimaryKey = 22222 });
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsTemplate"))));
 
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsContentType"))));

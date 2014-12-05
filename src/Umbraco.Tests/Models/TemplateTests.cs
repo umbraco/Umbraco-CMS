@@ -2,23 +2,25 @@ using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class TemplateTests
+    public class TemplateTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Template("-1,2,3", "Test", "test")
+            var item = new Template("Test", "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,                
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
-              
+                Path = "-1,3",
+                IsMasterTemplate = true,                
                 MasterTemplateAlias = "master",
                 MasterTemplateId = new Lazy<int>(() => 88)                
             };
@@ -27,6 +29,8 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
+            Assert.AreEqual(clone.Path, item.Path);
+            Assert.AreEqual(clone.IsMasterTemplate, item.IsMasterTemplate);
             Assert.AreEqual(clone.CreateDate, item.CreateDate);
             Assert.AreEqual(clone.Alias, item.Alias);
             Assert.AreEqual(clone.Id, item.Id);
@@ -49,7 +53,7 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var item = new Template("-1,2,3", "Test", "test")
+            var item = new Template("Test", "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,

@@ -63,8 +63,8 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             //TODO: Change this to ParentId: http://issues.umbraco.org/issue/U4-5846
-            if(dto.Master.HasValue)
-                template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
+            if(dto.NodeDto.ParentId > 0)
+                template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -81,9 +81,9 @@ namespace Umbraco.Core.Persistence.Factories
                            NodeDto = BuildNodeDto(entity)
                        };
 
-            if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value != default(int))
+            if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value > 0)
             {
-                dto.Master = entity.MasterTemplateId.Value;
+                dto.NodeDto.ParentId = entity.MasterTemplateId.Value;
             }
 
             if (entity.HasIdentity)

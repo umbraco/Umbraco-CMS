@@ -85,17 +85,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
 
+            if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
+
             //look up the simple template definitions that have a master template assigned, this is used 
             // later to populate the template item's properties
             var childIdsSql = new Sql()
-                .Select("nodeId,alias," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("master"))
+                .Select("nodeId,alias,parentID")
                 .From<TemplateDto>()
-                .Where<TemplateDto>(t => t.Master > 0);
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>(t => t.ParentId > 0);
             var childIds = Database.Fetch<dynamic>(childIdsSql)
                 .Select(x => new UmbracoEntity
                 {
                     Id = x.nodeId,
-                    ParentId = x.master,
+                    ParentId = x.parentID,
                     Name = x.alias
                 });
 
@@ -110,17 +114,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
 
+            if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
+
             //look up the simple template definitions that have a master template assigned, this is used 
             // later to populate the template item's properties
             var childIdsSql = new Sql()
-                .Select("nodeId,alias," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("master"))
+                .Select("nodeId,alias,parentID")
                 .From<TemplateDto>()
-                .Where<TemplateDto>(t => t.Master > 0);
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>(t => t.ParentId > 0);
             var childIds = Database.Fetch<dynamic>(childIdsSql)
                 .Select(x => new UmbracoEntity
                 {
                     Id = x.nodeId,
-                    ParentId = x.master,
+                    ParentId = x.parentID,
                     Name = x.alias
                 });
 
@@ -309,9 +317,10 @@ namespace Umbraco.Core.Persistence.Repositories
             // to it, then in the PersistDeletedTemplate we wouldn't recurse the underlying function, we'd just call 
             // PersistDeletedItem with a Template object and clear it's cache.
 
-            var sql = new Sql();
-            sql.Select("*").From<TemplateDto>().Where<TemplateDto>(dto => dto.Master != null || dto.NodeId == entity.Id);
-            var dtos = Database.Fetch<TemplateDto>(sql);
+            var sql = GetBaseQuery(false).Where<NodeDto>(dto => dto.ParentId > 0 || dto.NodeId == entity.Id);
+
+            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
+
             var self = dtos.Single(x => x.NodeId == entity.Id);
             var allChildren = dtos.Except(new[] { self });
             var hierarchy = GenerateTemplateHierarchy(self, allChildren);
@@ -353,14 +362,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new TemplateFactory(_viewsFileSystem, _masterpagesFileSystem, _templateConfig);
             var template = factory.BuildEntity(dto, childDefinitions);
 
-            if (dto.Master.HasValue)
+            if (dto.NodeDto.ParentId > 0)
             {
                 //TODO: Fix this n+1 query!
-                var masterTemplate = Get(dto.Master.Value);
+                var masterTemplate = Get(dto.NodeDto.ParentId);
                 if (masterTemplate != null)
                 {
                     template.MasterTemplateAlias = masterTemplate.Alias;
-                    template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
+                    template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
                 }
             }
 
@@ -409,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private static List<TemplateDto> GenerateTemplateHierarchy(TemplateDto template, IEnumerable<TemplateDto> allChildTemplates)
         {
             var hierarchy = new List<TemplateDto> { template };
-            foreach (var t in allChildTemplates.Where(x => x.Master == template.NodeId))
+            foreach (var t in allChildTemplates.Where(x => x.NodeDto.ParentId == template.NodeId))
             {
                 hierarchy.AddRange(GenerateTemplateHierarchy(t, allChildTemplates));
             }
@@ -418,27 +427,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void PopulateViewTemplate(ITemplate template, string fileName)
         {
-            string content = string.Empty;
-            string path = string.Empty;
+            string content;
 
             using (var stream = _viewsFileSystem.OpenFile(fileName))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 content = reader.ReadToEnd();
             }
-
-            template.UpdateDate = _viewsFileSystem.GetLastModified(path).UtcDateTime;
-            //Currently set with db values, but will eventually be changed
-            //template.CreateDate = _viewsFileSystem.GetCreated(path).UtcDateTime;
-            //template.Key = new FileInfo(path).Name.EncodeAsGuid();
-
+            template.UpdateDate = _viewsFileSystem.GetLastModified(fileName).UtcDateTime;
             template.Content = content;
         }
 
         private void PopulateMasterpageTemplate(ITemplate template, string fileName)
         {
-            string content = string.Empty;
-            string path = string.Empty;
+            string content;
 
             using (var stream = _masterpagesFileSystem.OpenFile(fileName))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
@@ -446,12 +448,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 content = reader.ReadToEnd();
             }
 
-            template.UpdateDate = _masterpagesFileSystem.GetLastModified(path).UtcDateTime;
-            //Currently set with db values, but will eventually be changed
-            //template.CreateDate = _masterpagesFileSystem.GetCreated(path).UtcDateTime;
-            //template.Key = new FileInfo(path).Name.EncodeAsGuid();
-
-            template.Path = path;
+            template.UpdateDate = _masterpagesFileSystem.GetLastModified(fileName).UtcDateTime;
             template.Content = content;
         }
 
@@ -459,8 +456,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ITemplate Get(string alias)
         {
-            var sql = GetBaseQuery(false)
-                .Where<TemplateDto>(x => x.Alias == alias);
+            var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Alias == alias);
 
             var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
 
@@ -497,12 +493,12 @@ namespace Umbraco.Core.Persistence.Repositories
             List<TemplateDto> found;
             if (masterTemplateId == -1)
             {
-                var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Master == null);
+                var sql = GetBaseQuery(false).Where<NodeDto>(x => x.ParentId <= 0);
                 found = Database.Fetch<TemplateDto, NodeDto>(sql);
             }
             else
             {
-                var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Master == masterTemplateId);
+                var sql = GetBaseQuery(false).Where<NodeDto>(x => x.ParentId == masterTemplateId);
                 found = Database.Fetch<TemplateDto, NodeDto>(sql);
             }
 
@@ -534,20 +530,19 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //then we need to get all template Dto's because those contain the master property
-            var sql = new Sql();
-            sql.Select("*").From<TemplateDto>();
-            var allDtos = Database.Fetch<TemplateDto>(sql).ToArray();
+            var sql = GetBaseQuery(false);
+            var allDtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
             var selfDto = allDtos.Single(x => x.NodeId == selfTemplate.Id);
 
             //need to get the top-most node of the current tree
             var top = selfDto;
-            while (top.Master.HasValue && top.Master.Value != -1)
+            while (top.NodeDto.ParentId > 0)
             {
-                top = allDtos.Single(x => x.NodeId == top.Master.Value);
+                top = allDtos.Single(x => x.NodeId == top.NodeDto.ParentId);
             }
 
             var topNode = new TemplateNode(allTemplates.Single(x => x.Id == top.NodeId));
-            var childIds = allDtos.Where(x => x.Master == top.NodeId).Select(x => x.NodeId);
+            var childIds = allDtos.Where(x => x.NodeDto.ParentId == top.NodeId).Select(x => x.NodeId);
             //This now creates the hierarchy recursively
             topNode.Children = CreateChildren(topNode, childIds, allTemplates, allDtos);
 
@@ -602,7 +597,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 children.Add(child);
 
                 //get this node's children
-                var kids = allDtos.Where(x => x.Master == i).Select(x => x.NodeId).ToArray();
+                var kids = allDtos.Where(x => x.NodeDto.ParentId == i).Select(x => x.NodeId).ToArray();
 
                 //recurse
                 child.Children = CreateChildren(child, kids, allTemplates, allDtos);

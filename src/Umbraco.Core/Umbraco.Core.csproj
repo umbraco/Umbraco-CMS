@@ -390,6 +390,7 @@
     <Compile Include="Persistence\Mappers\TagMapper.cs" />
     <Compile Include="Persistence\Mappers\TemplateMapper.cs" />
     <Compile Include="Persistence\Migrations\DataLossException.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveTemplateMasterColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddMissingForeignKeyForContentType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AlterDataTypePreValueTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenOneZero\AssignMissingPrimaryForMySqlKeys.cs" />

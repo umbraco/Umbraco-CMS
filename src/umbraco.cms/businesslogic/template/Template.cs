@@ -88,6 +88,7 @@ namespace umbraco.cms.businesslogic.template
         #region Constructors
 
         internal Template(ITemplate template)
+            : base(template.Id, true)
         {
             TemplateEntity = template;
         }
@@ -116,7 +117,7 @@ namespace umbraco.cms.businesslogic.template
 
         public string GetRawText()
         {
-            return TemplateEntity.Content;
+            return TemplateEntity.Name;
             //return base.Text;
         }
 
@@ -149,7 +150,7 @@ namespace umbraco.cms.businesslogic.template
             set
             {
                 FlushCache();
-                base.Text = value;
+                TemplateEntity.Name = value;
             }
         }
 
