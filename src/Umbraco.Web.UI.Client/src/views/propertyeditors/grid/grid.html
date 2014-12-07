@@ -60,20 +60,20 @@
                                         <a href style="text-decoration: underline" ng-click="removeRow(section, $index)">Yes</a>
                                     </span>
 
-                                    <i ng-if="!deletePrompt" class="icon icon-trash"></i>
+                                    <i ng-if="!deletePrompt" class="icon icon-trash" title="Delete"></i>
                                 </div>
                             </div>
 
                             <div class="cell-tools-move">
                                 <a class="iconBox"
                                     href>
-                                    <i class="icon icon-navigation"></i>
+                                    <i class="icon icon-navigation" title="Move"></i>
                                 </a>
                             </div>
 
                             <div class="cell-tools-edit" ng-if="hasSettings">
                                 <a href class="iconBox" ng-click="editGridItemSettings(row)">
-                                    <i class="icon icon-settings"></i>
+                                    <i class="icon icon-settings" title="Settings"></i>
                                 </a>
                             </div>
 
@@ -117,7 +117,7 @@
                                                                 <a href style="text-decoration: underline" ng-click="removeControl(area, $index)">Yes</a>
                                                             </span>
 
-                                                            <i ng-show="!deletePrompt" class="icon icon-trash"></i>
+                                                            <i ng-show="!deletePrompt" class="icon icon-trash" title="Delete"></i>
                                                         </div>
                                                     </div>
 
@@ -126,13 +126,13 @@
                                                         <div class="iconBox"
                                                              ng-mouseover="setCurrentMovedControl(control)"
                                                              ng-mouseleave="disableCurrentMovedControl(control)">
-                                                            <i class="icon icon-navigation"></i>
+                                                            <i class="icon icon-navigation" title="Move"></i>
                                                         </div>
                                                     </div>
 
                                                     <div class="cell-tools-edit" ng-if="hasSettings && $first">
                                                         <a href class="iconBox" ng-click="editGridItemSettings(area)">
-                                                            <i class="icon icon-settings"></i>
+                                                            <i class="icon icon-settings" title="Settings"></i>
                                                         </a>
                                                     </div>
                                                 </div>
@@ -165,7 +165,7 @@
 
                                                 <div class="iconBox">
                                                     <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
-                                                        <i class=" icon icon-add"></i>
+                                                        <i class=" icon icon-add" title="Add"></i>
                                                     </a>
                                                 </div>
 
