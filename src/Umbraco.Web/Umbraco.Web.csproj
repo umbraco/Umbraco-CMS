@@ -321,10 +321,13 @@
     <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
+    <Compile Include="Scheduling\IBackgroundTask.cs" />
     <Compile Include="Scheduling\KeepAlive.cs" />
     <Compile Include="Scheduling\LogScrubber.cs" />
     <Compile Include="Scheduling\ScheduledPublishing.cs" />
     <Compile Include="Scheduling\ScheduledTasks.cs" />
+    <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
@@ -750,9 +753,7 @@
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\install\utills\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

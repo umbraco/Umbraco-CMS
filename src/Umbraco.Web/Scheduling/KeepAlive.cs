@@ -8,27 +8,32 @@ namespace Umbraco.Web.Scheduling
 {
     internal class KeepAlive
     {
-        public static void Start(object sender)
+        public static void Start(ApplicationContext appContext)
         {
             using (DisposableTimer.DebugDuration<KeepAlive>(() => "Keep alive executing", () => "Keep alive complete"))
-            {                
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl();
-
-                var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
-
-                try
+            {
+                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(appContext);
+                if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                 {
-                    using (var wc = new WebClient())
+                    LogHelper.Warn<KeepAlive>("No url for service (yet), skip.");
+                }
+                else
+                {
+                    var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
+
+                    try
                     {
-                        wc.DownloadString(url);
+                        using (var wc = new WebClient())
+                        {
+                            wc.DownloadString(url);
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        LogHelper.Error<KeepAlive>("Error in ping", ee);
                     }
                 }
-                catch (Exception ee)
-                {
-                    LogHelper.Error<KeepAlive>("Error in ping", ee);
-                }
             }
-            
         }
     }
 }
