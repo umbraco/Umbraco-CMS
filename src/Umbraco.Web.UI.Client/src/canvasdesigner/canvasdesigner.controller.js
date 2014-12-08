@@ -17,8 +17,8 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     $scope.devices = [
 		{ name: "desktop", css: "desktop", icon: "icon-display", title:"Desktop" },
         { name: "laptop - 1366px", css: "laptop border", icon: "icon-laptop", title:"Laptop" },
-        { name: "iPad portrait - 768px", css: "iPad-portrait border", icon: "icon-ipad", title:"iPad portrait" },
-        { name: "iPad landscape - 1024px", css: "iPad-landscape border", icon: "icon-ipad flip", title: "iPad landscape" },
+        { name: "iPad portrait - 768px", css: "iPad-portrait border", icon: "icon-ipad", title:"Tablet portrait" },
+        { name: "iPad landscape - 1024px", css: "iPad-landscape border", icon: "icon-ipad flip", title: "Tablet landscape" },
         { name: "smartphone portrait - 480px", css: "smartphone-portrait border", icon: "icon-iphone", title:"Smartphone portrait" },
         { name: "smartphone landscape  - 320px", css: "smartphone-landscape border", icon: "icon-iphone flip", title:"Smartphone landscape" }
     ];
