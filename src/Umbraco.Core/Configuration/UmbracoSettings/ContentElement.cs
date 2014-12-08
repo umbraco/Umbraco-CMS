@@ -280,6 +280,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        [ConfigurationProperty("PublishJsonAsXml")]
+        internal InnerTextConfigurationElement<bool> PublishJsonAsXml
+        {
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["PublishJsonAsXml"],
+                    //set the default
+                    false);
+            }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -414,5 +426,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return DefaultDocumentTypeProperty; }
         }
-    }
+
+        bool IContentSection.PublishJsonAsXml
+        {
+            get { return PublishJsonAsXml; }
+        }
+	}
 }
