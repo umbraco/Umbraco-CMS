@@ -609,14 +609,39 @@ Mange hilsner fra Umbraco robotten
     <key alias="reset">Nulstil</key>
   </area>
   <area alias="grid">
-    <key alias="helpSelectLayout">Vælg et layout for at starte</key>
-    <key alias="helpAddRows">Tilføj rækker til dit layout</key>
-    <key alias="helpAddElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
     <key alias="insertControl">Indsæt element</key>
+    <key alias="addRows">Tilføj rækker til dit layout</key>
+    <key alias="addElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
+
     <key alias="clickToEmbed">Klik for at indlejre</key>
     <key alias="clickToInsertImage">Klik for at indsætte et billede</key>
     <key alias="placeholderImageCaption">Billedtekst...</key>
     <key alias="placeholderWriteHere">Skriv her...</key>
+
+    <key alias="gridLayouts">Gridlayout</key>
+    <key alias="gridLayoutsDetail">Et layout er det overordnede arbejdsområde til dit gitter - du vil typisk kun behøve ét eller to</key>
+    <key alias="addGridLayout">Tilføj gitterlayout</key>
+    <key alias="addGridLayoutDetail">Juster dit layout ved at justere kolonnebredder og tilføj yderligere sektioner</key>
+
+    <key alias="rowConfigurations">Rækkekonfigurationer</key>
+    <key alias="rowConfigurationsDetail">Rækker er foruddefinerede celler, der arrangeres vandret</key>
+    <key alias="addRowConfiguration">Tilføj rækkekonfiguration</key>
+    <key alias="addRowConfigurationDetail">Juster rækken ved at indstille cellebredder og tilføje yderligere celler</key>
+
+    <key alias="columns">Kolonner</key>
+    <key alias="columnsDetails">Det totale antaller kolonner i gitteret</key>
+
+    <key alias="settings">Indstillinger</key>
+    <key alias="settingsDetails">Konfigurer, hvilket indstillinger, brugeren kan ændre</key>
+
+
+    <key alias="styles">Typografi</key>
+    <key alias="stylesDetails">Vælg, hvilke typografiværdier, en redaktør kan ændre</key>
+
+    <key alias="settingDialogDetails">Indstillinger gemmes kun, hvis den indtaste json-konfiguration er gyldig</key>
+
+    <key alias="allowAllEditors">Tillad alle editorer</key>
+    <key alias="allowAllRowConfigurations">Tillad alle rækkekonfigurationer</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
