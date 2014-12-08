@@ -100,10 +100,6 @@ namespace Umbraco.Web.Scheduling
             _scrubberRunner.Add(new LogScrubber(appContext, settings));
         }
 
-        private static void PerformLogScrub(ApplicationContext appContext)
-        {
-            _scrubberRunner.Add(new LogScrubber(appContext));
-        }
         /// <summary>
         /// This performs all of the scheduling on the one timer
         /// </summary>

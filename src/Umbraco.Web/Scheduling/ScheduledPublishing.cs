@@ -42,11 +42,10 @@ namespace Umbraco.Web.Scheduling
 
                 _isPublishingRunning = true;
 
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext);
+                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
 
                 try
-                {
-                    var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
+                {                    
 
                     if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                     {
