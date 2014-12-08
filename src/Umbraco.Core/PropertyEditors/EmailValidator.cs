@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Models;
-
-namespace Umbraco.Core.PropertyEditors
+﻿namespace Umbraco.Core.PropertyEditors
 {
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+
+    using umbraco;
+
+    using Umbraco.Core.Models;
+
     /// <summary>
     /// A validator that validates an email address
     /// </summary>
@@ -16,16 +19,15 @@ namespace Umbraco.Core.PropertyEditors
 
             var emailVal = new EmailAddressAttribute();
 
-            if (emailVal.IsValid(asString) == false)
+            if (asString != string.Empty && emailVal.IsValid(asString) == false)
             {
-                //TODO: localize these!
-                yield return new ValidationResult("Email is invalid", new[] { "value" });
+                yield return new ValidationResult(ui.Text("errors", "emailIsInvalid"), new[] { "value" });
             }
         }
 
         public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
-            return Validate(value, null, preValues, editor);
+            return this.Validate(value, null, preValues, editor);
         }
     }
 }
