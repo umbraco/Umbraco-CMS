@@ -2,7 +2,7 @@
 
 	<div class="usky-editor-placeholder" ng-click="setImage()" ng-if="control.value === null">
 		<i class="icon icon-picture"></i>
-		<div ng-id="!control.$inserted" class="help-text">Click to insert image</div>
+        <div ng-id="!control.$inserted" class="help-text"><localize key="grid_clickToInsertImage">Click to insert image</localize></div>
 	</div>
 
 	<div ng-if="control.value">
@@ -11,6 +11,6 @@
 			ng-click="setImage()"
 			ng-src="{{url}}"
 			class="fullSizeImage" />
-		<input type="text" class="caption" ng-model="control.value.caption" placeholder="Image caption..."/>
+        <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>
 </div>

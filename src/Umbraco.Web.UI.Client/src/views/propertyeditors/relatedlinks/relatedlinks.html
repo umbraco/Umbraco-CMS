@@ -3,9 +3,9 @@
         <thead>
             <tr>
                 <td></td>
-                <td>Caption</td>
-                <td>Link</td>
-                <td>New window</td>
+                <td><localize key="relatedlinks_caption">Caption</localize></td>
+                <td><localize key="relatedlinks_link">Link</localize></td>
+                <td><localize key="relatedlinks_newWindow">New window</localize></td>
                 <td></td>
             </tr>
         </thead>
@@ -26,12 +26,12 @@
                     <div ng-show="link.edit">
                         <div ng-show="!link.isInternal">
                             <input type="text" ng-model="link.link" /><br />
-                            or <a href="#" ng-click="switchLinkType($event,link)">choose internal page</a>
+                            <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
                         </div>
 
                         <div ng-show="link.isInternal">
-                            <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)">Choose</a><br />
-                            or <a href="#" ng-click="switchLinkType($event,link)">enter external link</a>
+                            <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)"><localize key="choose">Choose</localize></a><br />
+                            <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
                         </div>
                     </div>
                 </td>
@@ -42,12 +42,12 @@
                 <td>
 
                     <div class="btn-group" ng-show="!link.edit">
-                        <button type="button" class="btn btn-default" ng-click="edit($index)">Edit</button>
-                        <button type="button" class="btn btn-default" ng-click="delete($index)">Delete</button>
+                        <button type="button" class="btn btn-default" ng-click="edit($index)"><localize key="edit">Edit</localize></button>
+                        <button type="button" class="btn btn-default" ng-click="delete($index)"><localize key="delete">Delete</localize></button>
                     </div>
                     <div class="btn-group" ng-show="link.edit">
-                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Cancel</button>
-                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Save</button>
+                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)"><localize key="cancel">Cancel</localize></button>
+                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)"><localize key="buttons_save">Save</localize></button>
                     </div>
 
                 </td>
@@ -56,23 +56,23 @@
         <tfoot>
             <tr>
                     <td></td>
-                    <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" val-highlight="hasError" /></td>
+                    <td><input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder"  val-highlight="hasError" /></td>
                     <td>
                         <div ng-show="addExternal">
-                            <input type="text" ng-model="newLink" placeholder="Enter the link" />
-                            <br /> or
-                            <a href="#" ng-click="switch($event)">choose internal page</a>
+                            <input type="text" ng-model="newLink" localize="placeholder" placeholder="@relatedlinks_externalLinkPlaceholder" />
+                            <br /> <localize key="or">or</localize>
+                            <a href="#" ng-click="switch($event)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
                         </div>
 
                         <div ng-show="!addExternal">
-                            <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)">Choose</a><br />
-                            or <a href="#" ng-click="switch($event)">enter external link</a>
+                            <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)"><localize key="choose">Choose</localize></a><br />
+                            <localize key="or">or</localize> <a href="#" ng-click="switch($event)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
                         </div>
                     </td>
                     <td><input type="checkbox" ng-model="newNewWindow" /> </td>
                     <td>
                         <div class="btn-group">
-                            <button class="btn btn-default" ng-click="add($event)">Add</button>
+                            <button class="btn btn-default" ng-click="add($event)"><localize key="general_add">Add</localize></button>
                         </div>
                     </td>
             </tr>
