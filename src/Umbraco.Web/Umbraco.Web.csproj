@@ -753,7 +753,9 @@
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs" />
+    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\install\utills\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
