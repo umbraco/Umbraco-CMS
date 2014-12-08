@@ -843,6 +843,11 @@ namespace Umbraco.Core.Configuration
 			get { return GetKeyAsNode("/settings/scheduledTasks"); }
 		}
 
+        internal static string ScheduledTasksBaseUrl
+        {
+            get { return GetKey("/settings/scheduledTasks/@baseUrl"); }
+        }
+
 		/// <summary>
 		/// Gets a list of characters that will be replaced when generating urls
 		/// </summary>

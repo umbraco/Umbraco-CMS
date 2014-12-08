@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -11,15 +12,17 @@ namespace Umbraco.Web.Scheduling
         public static void Start(ApplicationContext appContext)
         {
             using (DisposableTimer.DebugDuration<KeepAlive>(() => "Keep alive executing", () => "Keep alive complete"))
-            {
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(appContext);
+            {                
+                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(
+                    appContext);
+
                 if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                 {
                     LogHelper.Warn<KeepAlive>("No url for service (yet), skip.");
                 }
                 else
                 {
-                    var url = string.Format("{0}/ping.aspx", umbracoBaseUrl);
+                    var url = string.Format("{0}ping.aspx", umbracoBaseUrl.EnsureEndsWith('/'));
 
                     try
                     {
@@ -34,6 +37,7 @@ namespace Umbraco.Web.Scheduling
                     }
                 }
             }
+            
         }
     }
 }

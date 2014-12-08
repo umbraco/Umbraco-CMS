@@ -21,6 +21,7 @@ namespace Umbraco.Web.Scheduling
             _appContext = appContext;
         }
 
+
         /// <summary>
         /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
         /// </summary>
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Scheduling
                     }
                     else
                     {
-                        var url = string.Format("{0}/RestServices/ScheduledPublish/Index", umbracoBaseUrl);
+                        var url = string.Format("{0}RestServices/ScheduledPublish/Index", umbracoBaseUrl.EnsureEndsWith('/'));
                         using (var wc = new WebClient())
                         {
                             //pass custom the authorization header
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Scheduling
                 {
                     _isPublishingRunning = false;
                 }
-            }
+            }            
         }
     }
 }
