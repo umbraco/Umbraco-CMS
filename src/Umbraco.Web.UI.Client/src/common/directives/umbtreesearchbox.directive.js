@@ -57,7 +57,7 @@ function treeSearchBox(localizationService, searchService) {
                         performSearch();
                     }
                 });
-            }, 200));
+            }, 20));
 
             var searcher = searchService.searchContent;
             //search
