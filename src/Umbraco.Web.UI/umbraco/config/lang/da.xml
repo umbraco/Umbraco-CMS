@@ -228,6 +228,7 @@
     <key alias="entername">Indtast navn...</key>
     <key alias="search">Søg...</key>
     <key alias="filter">Filtrer...</key>
+    <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
   </area>
   <area alias="editcontenttype">
 	<key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
@@ -596,16 +597,51 @@ Mange hilsner fra Umbraco robotten
     <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Tilføj eksternt link</key>
-    <key alias="addInternal">Tilføj internt link</key>
-    <key alias="addlink">Tilføj</key>
-    <key alias="caption">Billedtekst</key>
-    <key alias="internalPage">Intern side</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Flyt ned</key>
-    <key alias="modeUp">Flyt op</key>
-    <key alias="newWindow">Åben i nyt vindue</key>
-    <key alias="removeLink">Fjern link</key>
+    <key alias="enterExternal">indtast eksternt link</key>
+    <key alias="chooseInternal">vælg en intern side</key>
+    <key alias="caption">Tekst</key>
+    <key alias="link">Link</key>
+    <key alias="newWindow">Nyt vindue</key>
+    <key alias="captionPlaceholder">Indtast en tekst</key>
+    <key alias="externalLinkPlaceholder">Indtast et link</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Nulstil</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Indsæt element</key>
+    <key alias="addRows">Tilføj rækker til dit layout</key>
+    <key alias="addElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
+
+    <key alias="clickToEmbed">Klik for at indlejre</key>
+    <key alias="clickToInsertImage">Klik for at indsætte et billede</key>
+    <key alias="placeholderImageCaption">Billedtekst...</key>
+    <key alias="placeholderWriteHere">Skriv her...</key>
+
+    <key alias="gridLayouts">Gridlayout</key>
+    <key alias="gridLayoutsDetail">Et layout er det overordnede arbejdsområde til dit gitter - du vil typisk kun behøve ét eller to</key>
+    <key alias="addGridLayout">Tilføj gitterlayout</key>
+    <key alias="addGridLayoutDetail">Juster dit layout ved at justere kolonnebredder og tilføj yderligere sektioner</key>
+
+    <key alias="rowConfigurations">Rækkekonfigurationer</key>
+    <key alias="rowConfigurationsDetail">Rækker er foruddefinerede celler, der arrangeres vandret</key>
+    <key alias="addRowConfiguration">Tilføj rækkekonfiguration</key>
+    <key alias="addRowConfigurationDetail">Juster rækken ved at indstille cellebredder og tilføje yderligere celler</key>
+
+    <key alias="columns">Kolonner</key>
+    <key alias="columnsDetails">Det totale antaller kolonner i gitteret</key>
+
+    <key alias="settings">Indstillinger</key>
+    <key alias="settingsDetails">Konfigurer, hvilket indstillinger, brugeren kan ændre</key>
+
+
+    <key alias="styles">Typografi</key>
+    <key alias="stylesDetails">Vælg, hvilke typografiværdier, en redaktør kan ændre</key>
+
+    <key alias="settingDialogDetails">Indstillinger gemmes kun, hvis den indtaste json-konfiguration er gyldig</key>
+
+    <key alias="allowAllEditors">Tillad alle editorer</key>
+    <key alias="allowAllRowConfigurations">Tillad alle rækkekonfigurationer</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
