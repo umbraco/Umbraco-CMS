@@ -49,8 +49,19 @@ namespace Umbraco.Web
             //see: http://issues.umbraco.org/issue/U4-2059
             if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
             {
-                // the keepalive service will use that url
-                ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+                // If (HTTP and SSL not required) or (HTTPS and SSL required), use ports from request to configure OriginalRequestUrl.
+                // Otherwise, user may need to set manually per http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks if non-standard.
+
+                if ((!httpContext.Request.IsSecureConnection && !GlobalSettings.UseSSL) || (httpContext.Request.IsSecureConnection && GlobalSettings.UseSSL))
+                {
+                    // Use port from request.
+                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+                }
+                else
+                {
+                    // Omit port entirely.
+                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}{1}", httpContext.Request.ServerVariables["SERVER_NAME"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+                }
 
                 LogHelper.Info<UmbracoModule>("Setting OriginalRequestUrl: " + ApplicationContext.Current.OriginalRequestUrl);
             }
