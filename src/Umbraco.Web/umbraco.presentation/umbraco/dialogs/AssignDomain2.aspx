@@ -6,6 +6,7 @@
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <umb:JsInclude runat="server" FilePath="Dialogs/AssignDomain2.js" PathNameAlias="UmbracoClient" />
+    <umb:JsInclude runat="server" FilePath="PunyCode/punycode.min.js" PathNameAlias="UmbracoClient" />
     <umb:JsInclude runat="server" FilePath="Application/JQuery/jquery.validate.min.js" PathNameAlias="UmbracoClient" />
     <umb:CssInclude runat="server" FilePath="Dialogs/AssignDomain2.css" PathNameAlias="UmbracoClient" />
     <script type="text/javascript">
