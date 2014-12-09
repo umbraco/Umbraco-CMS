@@ -6,8 +6,10 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using System.Web;
+using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Lucene.Net.Documents;
 using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -136,6 +138,11 @@ namespace UmbracoExamine
 
             DataService.LogService.AddVerboseLog(-1, string.Format("{0} indexer initializing", name));
             
+            //Before we initialize the base provider which is going to setup all of the directory structures based on the index
+            // set, we want to dynamically override the index working folder based on a given token. Currently we only support one
+            // and that is {machinename}
+            ExamineHelper.ReplaceTokensInIndexPath(name, config, "Indexer", () => IndexerData != null);
+
             base.Initialize(name, config);
         }
 
@@ -368,6 +375,9 @@ namespace UmbracoExamine
             }
 
         }
+
+        
+
         #endregion
     }
 }
