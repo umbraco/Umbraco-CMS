@@ -298,8 +298,15 @@ AND umbracoNode.id <> @id",
                 var dbPropertyGroups =
                     Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
                             .Select(x => new Tuple<int, string>(x.Id, x.Text));
-                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name));
+                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name)).ToList();
                 var tabs = dbPropertyGroups.Except(entityPropertyGroups);
+                //Update Tab name downstream to ensure renaming is done properly
+                foreach (var propertyGroup in entityPropertyGroups)
+                {
+                    Database.Update<PropertyTypeGroupDto>("SET Text = @TabName WHERE parentGroupId = @TabId",
+                                                          new { TabId = propertyGroup.Item1, TabName = propertyGroup.Item2 });
+                }
+                //Do Tab updates
                 foreach (var tab in tabs)
                 {
                     Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId = @PropertyGroupId",
