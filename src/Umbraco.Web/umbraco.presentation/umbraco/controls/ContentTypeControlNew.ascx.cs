@@ -426,6 +426,11 @@ namespace umbraco.controls
                         state.SaveArgs.Message = ex.Message;
                         return;
                     }
+                    catch (Exception ex)
+                    {
+                        state.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                        state.SaveArgs.Message = ex.Message;
+                    }
 
                     Trace.Write("ContentTypeControlNew", "task completing");
                 };
