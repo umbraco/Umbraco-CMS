@@ -94,7 +94,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
 		public static ContentType CreateSimpleContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false)
 		{
-			var contentType = parent == null ? new ContentType(-1) : new ContentType(parent);
+			var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, parent.Alias);
 
 			contentType.Alias = alias;
 			contentType.Name = name;
