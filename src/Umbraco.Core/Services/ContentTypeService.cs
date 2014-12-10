@@ -327,6 +327,30 @@ namespace Umbraco.Core.Services
                     string.Join(", ", intersect));
                 throw new Exception(message);
             }
+
+            // find all ancestors
+            var ancestors = new HashSet<IContentTypeComposition>(comparer);
+            stack.Clear();
+            foreach (var z in compo.ContentTypeComposition)
+                stack.Push(z);
+            while (stack.Count > 0)
+            {
+                var c = stack.Pop();
+                ancestors.Add(c);
+                foreach (var z in c.ContentTypeComposition)
+                    stack.Push(z);
+            }
+
+            // ensure that no ancestor has a property with an alias that is used by content type
+            foreach (var a in ancestors)
+            {
+                var intersect = a.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
+                if (intersect.Length == 0) continue;
+
+                var message = string.Format("The following property aliases conflict with ancestors : {0}.",
+                    string.Join(", ", intersect));
+                throw new Exception(message);
+            }
         }
 
         /// <summary>
