@@ -1,7 +1,4 @@
 body.mce-content-body {
-    background-color: #fff;
-    font-family: Verdana,Arial,Helvetica,sans-serif;
-    font-size: 11px;
     scrollbar-3dlight-color: #f0f0ee;
     scrollbar-arrow-color: #676662;
     scrollbar-base-color: #f0f0ee;
@@ -10,11 +7,6 @@ body.mce-content-body {
     scrollbar-highlight-color: #f0f0ee;
     scrollbar-shadow-color: #f0f0ee;
     scrollbar-track-color: #f5f5f5;
-}
-
-td, th {
-    font-family: Verdana,Arial,Helvetica,sans-serif;
-    font-size: 11px;
 }
 
 .mce-object {
