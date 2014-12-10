@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     {
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
-        
+
         /// <summary>
         /// Constuctor for creating a ContentType with the parent's id.
         /// </summary>
@@ -31,9 +31,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-		public ContentType(IContentType parent) : this(parent, null)
-		{
-		}
+        [Obsolete("This method is obsolete, use ContentType(IContentType parent, string alias) instead.", false)]
+        public ContentType(IContentType parent) : this(parent, null)
+        {
+        }
 
         /// <summary>
         /// Constuctor for creating a ContentType with the parent as an inherited type.
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Models
 
         private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
         private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
-        
+
         /// <summary>
         /// Gets or sets the alias of the default Template.
         /// </summary>
@@ -106,7 +107,7 @@ namespace Umbraco.Core.Models
             }
 
             DefaultTemplateId = template.Id;
-            if(_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
+            if (_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
             {
                 var templates = AllowedTemplates.ToList();
                 templates.Add(template);
@@ -140,7 +141,7 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
 
-            if(Key == Guid.Empty)
+            if (Key == Guid.Empty)
                 Key = Guid.NewGuid();
         }
 
@@ -151,7 +152,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         [Obsolete("Use DeepCloneWithResetIdentities instead")]
         public IContentType Clone(string alias)
-        {            
+        {
             return DeepCloneWithResetIdentities(alias);
         }
 

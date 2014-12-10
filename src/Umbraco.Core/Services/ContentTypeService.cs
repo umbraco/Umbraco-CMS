@@ -8,11 +8,13 @@ using System.Threading;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -273,6 +275,84 @@ namespace Umbraco.Core.Services
             
         }
 
+        public void Validate(IContentTypeComposition compo)
+        {
+            using (new WriteLock(Locker))
+            {
+                ValidateLocked(compo);
+            }
+        }
+
+        private void ValidateLocked(IContentTypeComposition compo)
+        {
+            // performs business-level validation of the composition
+            // should ensure that it is absolutely safe to save the composition
+
+            // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
+            // but that cannot be used (conflict with descendants)
+
+            var contentType = compo as IContentType;
+            var mediaType = compo as IMediaType;
+
+            IContentTypeComposition[] allContentTypes;
+            if (contentType != null)
+                allContentTypes = GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+            else if (mediaType != null)
+                allContentTypes = GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+            else
+                throw new Exception("Composition is neither IContentType nor IMediaType?");
+
+            // recursively find all descendants
+            var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
+            var descendants = new HashSet<IContentTypeComposition>(comparer);
+            var stack = new Stack<IContentTypeComposition>();            
+            foreach (var z in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compo.Id))) 
+                stack.Push(z);
+            while (stack.Count > 0)
+            {
+                var c = stack.Pop();
+                descendants.Add(c);
+                foreach (var z in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == c.Id)))
+                    stack.Push(z);
+            }
+
+            // ensure that no descendant has a property with an alias that is used by content type
+            var aliases = compo.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
+            foreach (var d in descendants)
+            {
+                var intersect = d.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
+                if (intersect.Length == 0) continue;
+
+                var message = string.Format("The following property aliases conflict with descendants : {0}.",
+                    string.Join(", ", intersect));
+                throw new Exception(message);
+            }
+
+            // find all ancestors
+            var ancestors = new HashSet<IContentTypeComposition>(comparer);
+            stack.Clear();
+            foreach (var z in compo.ContentTypeComposition)
+                stack.Push(z);
+            while (stack.Count > 0)
+            {
+                var c = stack.Pop();
+                ancestors.Add(c);
+                foreach (var z in c.ContentTypeComposition)
+                    stack.Push(z);
+            }
+
+            // ensure that no ancestor has a property with an alias that is used by content type
+            foreach (var a in ancestors)
+            {
+                var intersect = a.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
+                if (intersect.Length == 0) continue;
+
+                var message = string.Format("The following property aliases conflict with ancestors : {0}.",
+                    string.Join(", ", intersect));
+                throw new Exception(message);
+            }
+        }
+
         /// <summary>
         /// Saves a single <see cref="IContentType"/> object
         /// </summary>
@@ -288,6 +368,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    ValidateLocked(contentType); // throws if invalid
                     contentType.CreatorId = userId;
                     repository.AddOrUpdate(contentType);
 
@@ -317,6 +398,11 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    // all-or-nothing, validate them all first
+                    foreach (var contentType in asArray)
+                    {
+                        ValidateLocked(contentType); // throws if invalid
+                    }
                     foreach (var contentType in asArray)
                     {
                         contentType.CreatorId = userId;
@@ -487,6 +573,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
                 {
+                    ValidateLocked(mediaType); // throws if invalid
                     mediaType.CreatorId = userId;
                     repository.AddOrUpdate(mediaType);
                     uow.Commit();
@@ -517,7 +604,11 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
                 {
-
+                    // all-or-nothing, validate them all first
+                    foreach (var mediaType in asArray)
+                    {
+                        ValidateLocked(mediaType); // throws if invalid
+                    }
                     foreach (var mediaType in asArray)
                     {
                         mediaType.CreatorId = userId;
