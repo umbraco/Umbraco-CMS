@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Services
                 /*,"Navigation"*/);
             cts.Save(ctBase);
 
-            var ctHomePage = new ContentType(ctBase)
+            var ctHomePage = new ContentType(ctBase, ctBase.Alias)
             {
                 Name = "Home Page",
                 Alias = "HomePage",
@@ -487,7 +487,7 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateBannerComponent(ContentType parent)
         {
-            var banner = new ContentType(parent)
+            var banner = new ContentType(parent, parent.Alias)
             {
                 Alias = "banner",
                 Name = "Banner Component",
@@ -535,7 +535,7 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateHomepage(ContentType parent)
         {
-            var contentType = new ContentType(parent)
+            var contentType = new ContentType(parent, parent.Alias)
             {
                 Alias = "homepage",
                 Name = "Homepage",
