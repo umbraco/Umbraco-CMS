@@ -50,8 +50,7 @@ namespace Umbraco.Web
             if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
             {
                 // If (HTTP and SSL not required) or (HTTPS and SSL required), use ports from request to configure OriginalRequestUrl.
-                // Otherwise, user may need to set manually per http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks if non-standard.
-
+                // Otherwise, user may need to set baseUrl manually per http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks if non-standard ports used.
                 if ((!httpContext.Request.IsSecureConnection && !GlobalSettings.UseSSL) || (httpContext.Request.IsSecureConnection && GlobalSettings.UseSSL))
                 {
                     // Use port from request.
