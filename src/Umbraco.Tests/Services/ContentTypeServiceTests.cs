@@ -178,10 +178,11 @@ namespace Umbraco.Tests.Services
                 /*,"Navigation"*/);
             cts.Save(ctBase);
 
-            var ctHomePage = new ContentType(ctBase, ctBase.Alias)
+            const string contentTypeAlias = "HomePage";
+            var ctHomePage = new ContentType(ctBase, contentTypeAlias)
             {
                 Name = "Home Page",
-                Alias = "HomePage",
+                Alias = contentTypeAlias,
                 Icon = "settingDomain.gif",
                 Thumbnail = "folder.png",
                 AllowedAsRoot = true
@@ -191,7 +192,7 @@ namespace Umbraco.Tests.Services
             cts.Save(ctHomePage);
 
             // Act
-            var homeDoc = cs.CreateContent("Home Page", -1, "HomePage");
+            var homeDoc = cs.CreateContent("Home Page", -1, contentTypeAlias);
             cs.SaveAndPublishWithStatus(homeDoc);
 
             // Assert
@@ -572,9 +573,10 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateBannerComponent(ContentType parent)
         {
-            var banner = new ContentType(parent, parent.Alias)
+            const string contentTypeAlias = "banner";
+            var banner = new ContentType(parent, contentTypeAlias)
             {
-                Alias = "banner",
+                Alias = contentTypeAlias,
                 Name = "Banner Component",
                 Description = "ContentType used for Banner Component",
                 Icon = ".sprTreeDoc3",
@@ -620,9 +622,10 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateHomepage(ContentType parent)
         {
-            var contentType = new ContentType(parent, parent.Alias)
+            const string contentTypeAlias = "homepage";
+            var contentType = new ContentType(parent, contentTypeAlias)
             {
-                Alias = "homepage",
+                Alias = contentTypeAlias,
                 Name = "Homepage",
                 Description = "ContentType used for the Homepage",
                 Icon = ".sprTreeDoc3",
