@@ -500,10 +500,7 @@ namespace umbraco
                         () => GetMediaDo(MediaId, Deep));
 
                     if (xml != null)
-                    {
-                    	//removed the use of FromXElement as it was causing GetMedia to return nothing
-                        //return FromXElement(xml, xml.Attribute("nodeTypeAlias").Value);
-                        
+                    {                   
                         //returning the root element of the Media item fixes the problem
                         return xml.CreateNavigator().Select("/");
                     }
@@ -512,9 +509,6 @@ namespace umbraco
                 else
                 {
                     var xml = GetMediaDo(MediaId, Deep);
-                    
-                    //removed the use of FromXElement as it was causing GetMedia to return nothing
-                    //return FromXElement(xml, xml.Attribute("nodeTypeAlias").Value);
                     
                     //returning the root element of the Media item fixes the problem
                     return xml.CreateNavigator().Select("/");
@@ -544,18 +538,6 @@ namespace umbraco
                 deep);
             return serialized;
         }
-
-	/*This was the offending method that I dont think is really necessary 
-	it only returns the innerXML which causes the GetMedia to break */
-	
-        //private static XPathNodeIterator FromXElement(XNode xml, string mediaContentType)
-        //{
-        //    var xp = xml.CreateNavigator();
-        //    var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-        //        ? "/node"
-        //        : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(mediaContentType));
-        //    return xp.Select(xpath);
-        //}
 
         /// <summary>
         /// Get a member as an xml object
