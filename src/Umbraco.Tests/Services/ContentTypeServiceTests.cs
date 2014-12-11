@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Services
                 /*,"Navigation"*/);
             cts.Save(ctBase);
 
-            var ctHomePage = new ContentType(ctBase)
+            var ctHomePage = new ContentType(ctBase, ctBase.Alias)
             {
                 Name = "Home Page",
                 Alias = "HomePage",
@@ -464,6 +464,91 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id);
         }
 
+        [Test]
+        public void Cannot_Add_Duplicate_PropertyType_Alias_To__Referenced_Composition()
+        {
+            //Related the second issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
+
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var parent = MockedContentTypes.CreateSimpleContentType();
+            service.Save(parent);
+            var child = MockedContentTypes.CreateSimpleContentType("simpleChildPage", "Simple Child Page", parent, true);
+            service.Save(child);
+            var composition = MockedContentTypes.CreateMetaContentType();
+            service.Save(composition);
+
+            //Adding Meta-composition to child doc type
+            child.AddContentType(composition);
+            service.Save(child);
+
+            // Act
+            var duplicatePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var added = composition.AddPropertyType(duplicatePropertyType, "Meta");
+            service.Save(composition);
+
+            // Assert
+            Assert.That(added, Is.True);
+            Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
+        }
+
+        [Test]
+        public void Can_Rename_PropertyGroup_With_Inherited_PropertyGroups()
+        {
+            //Related the first issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
+            
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, false, "Content_");
+            service.Save(page);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true);
+            service.Save(contentPage);
+            var composition = MockedContentTypes.CreateMetaContentType();
+            composition.AddPropertyGroup("Content");
+            service.Save(composition);
+            //Adding Meta-composition to child doc type
+            contentPage.AddContentType(composition);
+            service.Save(contentPage);
+
+            // Act
+            var propertyTypeOne = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "testTextbox", Name = "Test Textbox", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var firstOneAdded = contentPage.AddPropertyType(propertyTypeOne, "Content_");
+            var propertyTypeTwo = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "anotherTextbox", Name = "Another Test Textbox", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var secondOneAdded = contentPage.AddPropertyType(propertyTypeTwo, "Content");
+            service.Save(contentPage);
+
+            Assert.That(page.PropertyGroups.Contains("Content_"), Is.True);
+            var propertyGroup = page.PropertyGroups["Content_"];
+            page.PropertyGroups.Add(new PropertyGroup{ Id = propertyGroup.Id, Name = "ContentTab", SortOrder = 0});
+            service.Save(page);
+
+            // Assert
+            Assert.That(firstOneAdded, Is.True);
+            Assert.That(secondOneAdded, Is.True);
+
+            var contentType = service.GetContentType("contentPage");
+            Assert.That(contentType, Is.Not.Null);
+
+            var compositionPropertyGroups = contentType.CompositionPropertyGroups;
+            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(0));
+
+            var propertyTypeCount = contentType.PropertyTypes.Count();
+            var compPropertyTypeCount = contentType.CompositionPropertyTypes.Count();
+            Assert.That(propertyTypeCount, Is.EqualTo(5));
+            Assert.That(compPropertyTypeCount, Is.EqualTo(10));
+        }
+
         private ContentType CreateComponent()
         {
             var component = new ContentType(-1)
@@ -487,7 +572,7 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateBannerComponent(ContentType parent)
         {
-            var banner = new ContentType(parent)
+            var banner = new ContentType(parent, parent.Alias)
             {
                 Alias = "banner",
                 Name = "Banner Component",
@@ -535,7 +620,7 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateHomepage(ContentType parent)
         {
-            var contentType = new ContentType(parent)
+            var contentType = new ContentType(parent, parent.Alias)
             {
                 Alias = "homepage",
                 Name = "Homepage",
