@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
+using Examine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -65,6 +66,7 @@ namespace UmbracoExamine
         /// </summary>
         internal static bool? DisableInitializationCheck = null;
         private readonly LocalTempStorageIndexer _localTempStorageHelper = new LocalTempStorageIndexer();
+        private BaseLuceneSearcher _internalTempStorageSearcher = null;
 
         #region Properties
 
@@ -101,19 +103,6 @@ namespace UmbracoExamine
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            if (config != null && config["useTempStorage"] != null)
-            {
-                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
-                // for websites that are running from a remove file server and file IO latency becomes an issue
-                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<bool>();
-                if (attemptUseTempStorage)
-                {
-                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
-                    var configuredPath = indexSet.IndexPath;
-
-                    _localTempStorageHelper.Initialize(config, configuredPath, base.GetLuceneDirectory(), IndexingAnalyzer);
-                }
-            }
 
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
             {
@@ -161,9 +150,40 @@ namespace UmbracoExamine
             ExamineHelper.ReplaceTokensInIndexPath(name, config, "Indexer", () => IndexerData != null);
 
             base.Initialize(name, config);
+
+            if (config["useTempStorage"] != null)
+            {
+                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
+                // for websites that are running from a remove file server and file IO latency becomes an issue
+                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
+                if (attemptUseTempStorage)
+                {
+                    
+                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
+                    var configuredPath = indexSet.IndexPath;
+
+                    _localTempStorageHelper.Initialize(config, configuredPath, base.GetLuceneDirectory(), IndexingAnalyzer, attemptUseTempStorage.Result);
+                }
+            }
         }
 
         #endregion
+
+        protected override BaseSearchProvider InternalSearcher
+        {
+            get
+            {
+                //if temp local storage is configured use that, otherwise return the default
+                if (_localTempStorageHelper.LuceneDirectory != null)
+                {
+                    //create one if one has not been created already
+                    return _internalTempStorageSearcher 
+                        ?? (_internalTempStorageSearcher = new LuceneSearcher(_localTempStorageHelper.LuceneDirectory, IndexingAnalyzer));
+                }
+
+                return base.InternalSearcher;
+            }
+        }
 
         public override Lucene.Net.Store.Directory GetLuceneDirectory()
         {
@@ -177,19 +197,17 @@ namespace UmbracoExamine
 
         }
 
-        public override IndexWriter GetIndexWriter()
+        protected override IndexWriter CreateIndexWriter()
         {
             //if temp local storage is configured use that, otherwise return the default
             if (_localTempStorageHelper.LuceneDirectory != null)
             {
                 return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
-                    //create the writer with the snapshotter, though that won't make too much a difference because we are not keeping the writer open unless using nrt
-                    // which we are not currently.
-                    _localTempStorageHelper.Snapshotter,
+                    DeletePolicyTracker.Current.GetPolicy(IndexSetName),
                     IndexWriter.MaxFieldLength.UNLIMITED);
             }
 
-            return base.GetIndexWriter();
+            return base.CreateIndexWriter();
         }
 
         ///// <summary>
