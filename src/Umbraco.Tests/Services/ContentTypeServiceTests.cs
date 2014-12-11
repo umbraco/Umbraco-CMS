@@ -244,13 +244,13 @@ namespace Umbraco.Tests.Services
             var global = MockedContentTypes.CreateSimpleContentType("global", "Global");
             service.Save(global);
 
-            var components = MockedContentTypes.CreateSimpleContentType("components", "Components", global);
+            var components = MockedContentTypes.CreateSimpleContentType("components", "Components", global, true);
             service.Save(components);
 
-            var component = MockedContentTypes.CreateSimpleContentType("component", "Component", components);
+            var component = MockedContentTypes.CreateSimpleContentType("component", "Component", components, true);
             service.Save(component);
 
-            var category = MockedContentTypes.CreateSimpleContentType("category", "Category", global);
+            var category = MockedContentTypes.CreateSimpleContentType("category", "Category", global, true);
             service.Save(category);
 
             var success = category.AddContentType(component);
@@ -490,10 +490,10 @@ namespace Umbraco.Tests.Services
                 Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
             };
             var added = composition.AddPropertyType(duplicatePropertyType, "Meta");
-            service.Save(composition);
 
             // Assert
             Assert.That(added, Is.True);
+            Assert.Throws<Exception>(() => service.Save(composition));
             Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
         }
 

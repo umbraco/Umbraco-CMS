@@ -283,7 +283,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private void ValidateLocked(IContentTypeComposition compo)
+        private void ValidateLocked(IContentTypeComposition compositionContentType)
         {
             // performs business-level validation of the composition
             // should ensure that it is absolutely safe to save the composition
@@ -291,8 +291,8 @@ namespace Umbraco.Core.Services
             // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
             // but that cannot be used (conflict with descendants)
 
-            var contentType = compo as IContentType;
-            var mediaType = compo as IMediaType;
+            var contentType = compositionContentType as IContentType;
+            var mediaType = compositionContentType as IMediaType;
 
             IContentTypeComposition[] allContentTypes;
             if (contentType != null)
@@ -306,21 +306,21 @@ namespace Umbraco.Core.Services
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
             var descendants = new HashSet<IContentTypeComposition>(comparer);
             var stack = new Stack<IContentTypeComposition>();            
-            foreach (var z in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compo.Id))) 
-                stack.Push(z);
+            foreach (var composition in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id))) 
+                stack.Push(composition);
             while (stack.Count > 0)
             {
-                var c = stack.Pop();
-                descendants.Add(c);
-                foreach (var z in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == c.Id)))
-                    stack.Push(z);
+                var item = stack.Pop();
+                descendants.Add(item);
+                foreach (var composition in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == item.Id)))
+                    stack.Push(composition);
             }
 
             // ensure that no descendant has a property with an alias that is used by content type
-            var aliases = compo.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
-            foreach (var d in descendants)
+            var aliases = compositionContentType.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
+            foreach (var descendant in descendants)
             {
-                var intersect = d.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
+                var intersect = descendant.CompositionPropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
                 if (intersect.Length == 0) continue;
 
                 var message = string.Format("The following property aliases conflict with descendants : {0}.",
@@ -331,20 +331,20 @@ namespace Umbraco.Core.Services
             // find all ancestors
             var ancestors = new HashSet<IContentTypeComposition>(comparer);
             stack.Clear();
-            foreach (var z in compo.ContentTypeComposition)
-                stack.Push(z);
+            foreach (var composition in compositionContentType.ContentTypeComposition)
+                stack.Push(composition);
             while (stack.Count > 0)
             {
-                var c = stack.Pop();
-                ancestors.Add(c);
-                foreach (var z in c.ContentTypeComposition)
-                    stack.Push(z);
+                var item = stack.Pop();
+                ancestors.Add(item);
+                foreach (var composition in item.ContentTypeComposition)
+                    stack.Push(composition);
             }
 
             // ensure that no ancestor has a property with an alias that is used by content type
-            foreach (var a in ancestors)
+            foreach (var ancestor in ancestors)
             {
-                var intersect = a.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
+                var intersect = ancestor.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
                 if (intersect.Length == 0) continue;
 
                 var message = string.Format("The following property aliases conflict with ancestors : {0}.",
