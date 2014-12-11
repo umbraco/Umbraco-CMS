@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -466,7 +467,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Cannot_Add_Duplicate_PropertyType_Alias_To__Referenced_Composition()
+        public void Cannot_Add_Duplicate_PropertyType_Alias_To_Referenced_Composition()
         {
             //Related the second issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
 
@@ -495,6 +496,98 @@ namespace Umbraco.Tests.Services
             Assert.That(added, Is.True);
             Assert.Throws<Exception>(() => service.Save(composition));
             Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
+        }
+
+        [Test]
+        public void Cannot_Add_Duplicate_PropertyType_Alias_In_Composition_Graph()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var basePage = MockedContentTypes.CreateSimpleContentType("basePage", "Base Page", null, true);
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true);
+            service.Save(advancedPage);
+
+            var metaComposition = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaComposition);
+            var seoComposition = MockedContentTypes.CreateSeoContentType();
+            service.Save(seoComposition);
+
+            var metaAdded = contentPage.AddContentType(metaComposition);
+            service.Save(contentPage);
+            var seoAdded = advancedPage.AddContentType(seoComposition);
+            service.Save(advancedPage);
+
+            // Act
+            var duplicatePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var addedToBasePage = basePage.AddPropertyType(duplicatePropertyType, "Content");
+            var addedToAdvancedPage = advancedPage.AddPropertyType(duplicatePropertyType, "Content");
+            var addedToMeta = metaComposition.AddPropertyType(duplicatePropertyType, "Meta");
+            var addedToSeo = seoComposition.AddPropertyType(duplicatePropertyType, "Seo");
+
+            // Assert
+            Assert.That(metaAdded, Is.True);
+            Assert.That(seoAdded, Is.True);
+
+            Assert.That(addedToBasePage, Is.True);
+            Assert.That(addedToAdvancedPage, Is.False);
+            Assert.That(addedToMeta, Is.True);
+            Assert.That(addedToSeo, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(basePage));
+            Assert.Throws<Exception>(() => service.Save(metaComposition));
+            Assert.Throws<Exception>(() => service.Save(seoComposition));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("meta"));
+            Assert.DoesNotThrow(() => service.GetContentType("seo"));
+        }
+
+        [Test]
+        public void Can_Add_PropertyType_Alias_Which_Exists_In_Composition_Outside_Graph()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var basePage = MockedContentTypes.CreateSimpleContentType("basePage", "Base Page", null, true);
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", basePage, true);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true);
+            service.Save(advancedPage);
+
+            var metaComposition = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaComposition);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            var metaAdded = contentPage.AddContentType(metaComposition);
+            service.Save(contentPage);
+
+            var metaAddedToComposition = contentMetaComposition.AddContentType(metaComposition);
+            service.Save(contentMetaComposition);
+
+            // Act
+            var propertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var addedToContentPage = contentPage.AddPropertyType(propertyType, "Content");
+
+            // Assert
+            Assert.That(metaAdded, Is.True);
+            Assert.That(metaAddedToComposition, Is.True);
+
+            Assert.That(addedToContentPage, Is.True);
+            Assert.DoesNotThrow(() => service.Save(contentPage));
         }
 
         [Test]

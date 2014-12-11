@@ -297,9 +297,11 @@ AND umbracoNode.id <> @id",
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
                 var dbPropertyGroups =
                     Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
-                            .Select(x => new Tuple<int, string>(x.Id, x.Text));
+                            .Select(x => new Tuple<int, string>(x.Id, x.Text))
+                            .ToList();
                 var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name)).ToList();
-                var tabs = dbPropertyGroups.Except(entityPropertyGroups);
+                var tabsToDelete = dbPropertyGroups.Select(x => x.Item1).Except(entityPropertyGroups.Select(x => x.Item1));
+                var tabs = dbPropertyGroups.Where(x => tabsToDelete.Any(y => y == x.Item1));
                 //Update Tab name downstream to ensure renaming is done properly
                 foreach (var propertyGroup in entityPropertyGroups)
                 {
