@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.TagsController" class="umb-editor umb-tags">
 
     <div ng-if="isLoading">
-        <localize key="loading" />...
+        <localize key="loading">Loading</localize>...
     </div>
 
     <div ng-if="!isLoading">
@@ -12,10 +12,10 @@
 
         <input type="text"
                class="typeahead tags-{{model.alias}}"
-               ng-model="$parent.tagToAdd"
+               ng-model="$parent.tagToAdd" 
                ng-keydown="$parent.addTagOnEnter($event)"
-               on-blur="$parent.addTag()"
+               on-blur="$parent.addTag()" 
                localize="placeholder"
-               placeholder="@placeholders_enterTags" />     
+               placeholder="@placeholders_enterTags" />
     </div>
 </div>

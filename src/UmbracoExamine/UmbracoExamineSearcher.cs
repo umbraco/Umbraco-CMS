@@ -7,6 +7,7 @@ using Examine;
 using Examine.LuceneEngine.Config;
 using Examine.Providers;
 using Examine.SearchCriteria;
+using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Umbraco.Core;
 using UmbracoExamine.Config;
@@ -22,18 +23,19 @@ namespace UmbracoExamine
     /// <summary>
     /// An Examine searcher which uses Lucene.Net as the 
     /// </summary>
-	public class UmbracoExamineSearcher : LuceneSearcher
+    public class UmbracoExamineSearcher : LuceneSearcher
     {
 
         private volatile Lucene.Net.Store.Directory _localTempDirectory;
         private static readonly object Locker = new object();
         private string _localTempPath = null;
+        private LocalStorageType _localStorageType = LocalStorageType.Sync;
 
         #region Constructors
 
-		/// <summary>
-		/// Default constructor
-		/// </summary>
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public UmbracoExamineSearcher()
             : base()
         {
@@ -53,7 +55,7 @@ namespace UmbracoExamine
             }
         }
 
-        
+
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
             if (name == null) throw new ArgumentNullException("name");
@@ -67,19 +69,25 @@ namespace UmbracoExamine
                 return;
             }
 
+            //Before we initialize the base provider which is going to setup all of the directory structures based on the index
+            // set, we want to dynamically override the index working folder based on a given token. Currently we only support one
+            // and that is {machinename}
+            ExamineHelper.ReplaceTokensInIndexPath(name, config, "Searcher", () => LuceneIndexFolder != null);
+
             base.Initialize(name, config);
 
             if (config != null && config["useTempStorage"] != null)
             {
                 //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
                 // for websites that are running from a remove file server and file IO latency becomes an issue
-                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<bool>();
+                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
                 if (attemptUseTempStorage)
-                {   
+                {
                     var indexSet = IndexSets.Instance.Sets[IndexSetName];
                     var configuredPath = indexSet.IndexPath;
                     var codegenPath = HttpRuntime.CodegenDir;
                     _localTempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
+                    _localStorageType = attemptUseTempStorage.Result;
                 }
             }
         }
@@ -89,24 +97,24 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="indexPath"></param>
         /// <param name="analyzer"></param>
-		
-		public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
+
+        public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
             : base(indexPath, analyzer)
         {
         }
 
-		/// <summary>
-		/// Constructor to allow for creating an indexer at runtime
-		/// </summary>
-		/// <param name="luceneDirectory"></param>
-		/// <param name="analyzer"></param>
-		
-		public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
-			: base(luceneDirectory, analyzer)
-		{
-		}
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="analyzer"></param>
 
-		#endregion
+        public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
+            : base(luceneDirectory, analyzer)
+        {
+        }
+
+        #endregion
 
         /// <summary>
         /// Used for unit tests
@@ -117,7 +125,7 @@ namespace UmbracoExamine
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
         /// <returns></returns>
-        
+
         protected bool CanInitialize()
         {
             //check the DisableInitializationCheck and ensure that it is not set to true
@@ -130,7 +138,7 @@ namespace UmbracoExamine
                 {
                     return false;
                 }
-            }            
+            }
             return true;
         }
 
@@ -160,6 +168,14 @@ namespace UmbracoExamine
                 .ToArray();
         }
 
+        protected override IndexReader OpenNewReader()
+        {
+            return IndexReader.Open(
+                GetLuceneDirectory(), 
+                DeletePolicyTracker.Current.GetPolicy(IndexSetName), 
+                true);
+        }
+
         protected override Lucene.Net.Store.Directory GetLuceneDirectory()
         {
             //local temp storage is not enabled, just return the default
@@ -172,9 +188,21 @@ namespace UmbracoExamine
                 {
                     if (_localTempDirectory == null)
                     {
-                        _localTempDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
-                            new DirectoryInfo(_localTempPath),
-                            base.GetLuceneDirectory());
+                        switch (_localStorageType)
+                        {
+                            case LocalStorageType.Sync:
+                                _localTempDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
+                                    new DirectoryInfo(_localTempPath),
+                                    base.GetLuceneDirectory());
+                                break;
+                            case LocalStorageType.LocalOnly:
+                                _localTempDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(_localTempPath));
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+
+
                     }
                 }
             }

@@ -705,16 +705,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noColors">You have not configured any approved colours</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Add external link</key>
-    <key alias="addInternal">Add internal link</key>
-    <key alias="addlink">Add</key>
+    <key alias="enterExternal">enter external link</key>
+    <key alias="chooseInternal">choose internal page</key>
     <key alias="caption">Caption</key>
-    <key alias="internalPage">Internal page</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Move Down</key>
-    <key alias="modeUp">Move Up</key>
-    <key alias="newWindow">Open in new window</key>
-    <key alias="removeLink">Remove link</key>
+    <key alias="link">Link</key>
+    <key alias="newWindow">New window</key>
+    <key alias="captionPlaceholder">Enter a new caption</key>
+    <key alias="externalLinkPlaceholder">Enter the link</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Reset</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
@@ -845,12 +845,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">Template</key>
   </area>
 
-
   <area alias="grid">
     <key alias="insertControl">Insert control</key>
     <key alias="addRows">Add rows to your layout</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+    
     <key alias="gridLayouts">Grid layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add grid layout</key>
