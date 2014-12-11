@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
@@ -328,8 +329,33 @@ namespace Umbraco.Core.PropertyEditors
                     return new XText(ConvertDbToString(property, propertyType, dataTypeService));                    
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
+                    var propertyValue = ConvertDbToString(property, propertyType, dataTypeService) ?? string.Empty;
+                    //should we publish JSON as XML and if so, is this JSON data?
+                    if (UmbracoConfig.For.UmbracoSettings().Content.PublishJsonAsXml && string.IsNullOrWhiteSpace(propertyValue) == false && propertyValue.DetectIsJson())
+                    {
+                        try {
+                            var json = propertyValue;
+                            if (json.StartsWith("["))
+                            {
+                                //we'll assume it's an array, in which case we need to add a root (duplicated behavior from umbraco.library)
+                                json = string.Format("{{\"arrayitem\":{0}}}", json);
+                            }
+                            //serialize the JSON data to the content cache as XML
+                            var jsonAsXml = JsonConvert.DeserializeXNode(json, "json", true);
+                            if (jsonAsXml.Root != null)
+                            {
+                                //add attribute so we can positively identify this XML as being serialized JSON
+                                jsonAsXml.Root.Add(new XAttribute("publishedAsXml", true));
+                            }
+                            return jsonAsXml.Root;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.WarnWithException<PropertyValueEditor>(string.Format(@"Property ""{0}"" could not be serialized to the content cache as XML", property.Alias), ex);
+                        }
+                    }
                     //put text in cdata
-                    return new XCData(ConvertDbToString(property, propertyType, dataTypeService));
+                    return new XCData(propertyValue);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
