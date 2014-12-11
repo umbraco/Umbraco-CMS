@@ -501,14 +501,23 @@ namespace umbraco
 
                     if (xml != null)
                     {
-                        return FromXElement(xml, xml.Attribute("nodeTypeAlias").Value);
+                    	//removed the use of FromXElement as it was causing GetMedia to return nothing
+                        //return FromXElement(xml, xml.Attribute("nodeTypeAlias").Value);
+                        
+                        //returning the root element of the Media item fixes the problem
+                        return xml.CreateNavigator().Select("/");
                     }
                         
                 }
                 else
                 {
                     var xml = GetMediaDo(MediaId, Deep);
-                    return FromXElement(xml, xml.Attribute("nodeTypeAlias").Value);
+                    
+                    //removed the use of FromXElement as it was causing GetMedia to return nothing
+                    //return FromXElement(xml, xml.Attribute("nodeTypeAlias").Value);
+                    
+                    //returning the root element of the Media item fixes the problem
+                    return xml.CreateNavigator().Select("/");
                 }
             }
             catch(Exception ex)
@@ -536,14 +545,17 @@ namespace umbraco
             return serialized;
         }
 
-        private static XPathNodeIterator FromXElement(XNode xml, string mediaContentType)
-        {
-            var xp = xml.CreateNavigator();
-            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                ? "/node"
-                : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(mediaContentType));
-            return xp.Select(xpath);
-        }
+	/*This was the offending method that I dont think is really necessary 
+	it only returns the innerXML which causes the GetMedia to break */
+	
+        //private static XPathNodeIterator FromXElement(XNode xml, string mediaContentType)
+        //{
+        //    var xp = xml.CreateNavigator();
+        //    var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+        //        ? "/node"
+        //        : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(mediaContentType));
+        //    return xp.Select(xpath);
+        //}
 
         /// <summary>
         /// Get a member as an xml object
