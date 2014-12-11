@@ -68,7 +68,8 @@ namespace UmbracoExamine.LocalStorage
                     Directory.CreateDirectory(_tempPath);
                 }
 
-                //copy index
+                //copy index if it exists, don't do anything if it's not there
+                if (IndexReader.IndexExists(baseLuceneDirectory) == false) return true;
 
                 using (new IndexWriter(
                     //read from the underlying/default directory, not the temp codegen dir
