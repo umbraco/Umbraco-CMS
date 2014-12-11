@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using System.Xml.XPath;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
@@ -282,13 +283,21 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 //is the property cache value an XML serialized JSON object?
                 var sourceString = source as string;
-                if (string.IsNullOrWhiteSpace(sourceString) == false && sourceString.StartsWith("<jsonAsXml>"))
+                if (string.IsNullOrWhiteSpace(sourceString) == false && sourceString.StartsWith("<json publishedAsXml="))
                 {
                     try
                     {
                         //parse the XML and convert it to JSON data before passing the value to the converter
                         var xml = XElement.Parse((string)source);
-                        var json = JsonConvert.SerializeXNode(xml, Formatting.Indented, true);
+                        //remove the publishedAsXml attribute so it doesn't mess with the JSON conversion below
+                        xml.RemoveAttributes();
+                        var json = JsonConvert.SerializeXNode(xml, Formatting.None, true);
+                        //if the JSON data was wrapped in an "arrayitem" container class, remove it before passing the JSON to the converter
+                        if (json.StartsWith("{\"arrayitem\":") && json.EndsWith("}"))
+                        {
+                            // remove the first 13 characters ({"arrayitem":) and the last brace
+                            json = json.Substring(13, json.Length - 14);
+                        }
                         source = json;
                     }
                     catch (Exception ex)

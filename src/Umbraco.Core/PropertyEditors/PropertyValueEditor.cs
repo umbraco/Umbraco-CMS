@@ -333,11 +333,21 @@ namespace Umbraco.Core.PropertyEditors
                     //should we publish JSON as XML and if so, is this JSON data?
                     if (UmbracoConfig.For.UmbracoSettings().Content.PublishJsonAsXml && string.IsNullOrWhiteSpace(propertyValue) == false && propertyValue.DetectIsJson())
                     {
-                        try
-                        {
+                        try {
+                            var json = propertyValue;
+                            if (json.StartsWith("["))
+                            {
+                                //we'll assume it's an array, in which case we need to add a root (duplicated behavior from umbraco.library)
+                                json = string.Format("{{\"arrayitem\":{0}}}", json);
+                            }
                             //serialize the JSON data to the content cache as XML
-                            var json = JsonConvert.DeserializeXNode(propertyValue, "jsonAsXml", true);
-                            return json.Root;
+                            var jsonAsXml = JsonConvert.DeserializeXNode(json, "json", true);
+                            if (jsonAsXml.Root != null)
+                            {
+                                //add attribute so we can positively identify this XML as being serialized JSON
+                                jsonAsXml.Root.Add(new XAttribute("publishedAsXml", true));
+                            }
+                            return jsonAsXml.Root;
                         }
                         catch (Exception ex)
                         {
