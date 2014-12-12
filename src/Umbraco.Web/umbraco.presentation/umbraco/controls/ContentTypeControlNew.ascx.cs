@@ -16,6 +16,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
@@ -351,8 +352,16 @@ namespace umbraco.controls
                                 var compositionType = isMediaType
                                     ? Services.ContentTypeService.GetMediaType(compositionId).SafeCast<IContentTypeComposition>()
                                     : Services.ContentTypeService.GetContentType(compositionId).SafeCast<IContentTypeComposition>();
-                                var added = _contentType.ContentTypeItem.AddContentType(compositionType);
-                                //TODO if added=false then return error message
+                                try
+                                {
+                                    //TODO if added=false then return error message
+                                    var added = _contentType.ContentTypeItem.AddContentType(compositionType);
+                                }
+                                catch (InvalidCompositionException ex)
+                                {
+                                    state.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                                    state.SaveArgs.Message = ex.Message;
+                                }
                             }
 
                             // then iterate over removed = existing except checked
