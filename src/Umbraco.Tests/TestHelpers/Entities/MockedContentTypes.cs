@@ -6,7 +6,25 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
-        
+        public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
+            ContentType parent = null)
+        {
+            var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
+
+            contentType.Alias = alias;
+            contentType.Name = name;
+            contentType.Description = "ContentType used for basic pages";
+            contentType.Icon = ".sprTreeDoc3";
+            contentType.Thumbnail = "doc2.png";
+            contentType.SortOrder = 1;
+            contentType.CreatorId = 0;
+            contentType.Trashed = false;
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
 
         public static ContentType CreateTextpageContentType(string alias = "textPage", string name = "Text Page")
         {
