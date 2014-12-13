@@ -128,7 +128,7 @@ namespace UmbracoExamine
                     do
                     {
                         int total;
-                        var members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType);
+                        var members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, nodeType).ToArray();
                         memberCount = 0;
                         foreach (var member in members)
                         {

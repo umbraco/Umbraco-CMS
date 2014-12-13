@@ -233,7 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -713,10 +713,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
         {
 
             //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
@@ -735,7 +736,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
-                ProcessQuery, orderBy, orderDirection,
+                ProcessQuery, orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }
