@@ -75,7 +75,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 mediaService = Mock.Of<Umbraco.Core.Services.IMediaService>(
                     x => x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>()) 
+                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<string>()) 
                         ==
                         allRecs);
             }

@@ -136,13 +136,14 @@ namespace Umbraco.Web.Editors
             int pageSize = 0,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
             string filter = "")
         {
             int totalChildren;
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                children = Services.MediaService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
+                children = Services.MediaService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter).ToArray();
             }
             else
             {

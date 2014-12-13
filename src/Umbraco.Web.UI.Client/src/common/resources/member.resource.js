@@ -34,7 +34,8 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 pageNumber: 1,
                 filter: '',
                 orderDirection: "Ascending",
-                orderBy: "LoginName"
+                orderBy: "LoginName",
+                orderBySystemField: true
             };
             if (options === undefined) {
                 options = {};
@@ -56,6 +57,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 { pageSize: options.pageSize },
                 { orderBy: options.orderBy },
                 { orderDirection: options.orderDirection },
+                { orderBySystemField: options.orderBySystemField },
                 { filter: options.filter }
             ];
             if (memberTypeAlias != null) {

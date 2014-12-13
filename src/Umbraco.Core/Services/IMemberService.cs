@@ -28,13 +28,14 @@ namespace Umbraco.Core.Services
         /// <param name="pageIndex">Current page index</param>
         /// <param name="pageSize">Size of the page</param>
         /// <param name="totalRecords">Total number of records found (out)</param>
-        /// <param name="orderBy"></param>
-        /// <param name="orderDirection"></param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="memberTypeAlias"></param>
-        /// <param name="filter"></param>
+        /// <param name="filter">Search text filter</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
+            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "");
         
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
