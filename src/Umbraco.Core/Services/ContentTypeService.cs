@@ -321,6 +321,9 @@ namespace Umbraco.Core.Services
                 {
                     if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
                     dependencies.Add(directReference);
+                    //A direct reference has compositions of its own - these also need to be taken into account
+                    var directReferenceGraph = directReference.CompositionAliases();
+                    allContentTypes.Where(x => directReferenceGraph.Any(y => x.Alias.Equals(y))).ForEach(c => dependencies.Add(c));
                 }
                 //Recursive lookup of indirect references
                 allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == indirectReference.Id)).ForEach(stack.Push);
