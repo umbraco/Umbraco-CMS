@@ -1082,7 +1082,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         private string GetHtmlForNoPropertiesMessageListItem()
         {
-            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab") + "</li></ul>";
+            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab", Security.CurrentUser) + "</li></ul>";
         }
 
         private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
@@ -1136,7 +1136,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType");
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", Security.CurrentUser);
                     e.IconType = BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -1439,7 +1439,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 LoadContentType();
 
-                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated"));
+                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated", Security.CurrentUser));
                 ea.IconType = BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
@@ -1478,7 +1478,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 LoadContentType();
 
-                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted"));
+                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted", Security.CurrentUser));
                 ea.IconType = BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
