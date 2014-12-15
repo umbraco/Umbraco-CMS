@@ -30,7 +30,7 @@ function valMandatoryProperty(serverValidationManager) {
 
             // Check whether the scope has a validateMandatoryProperty() method 
             if (!scope.validateMandatoryProperty) {
-                throw new Error('val-Mandatory-Property directive requires that the scope has a validateMandatoryProperty() method.');
+                throw new Error('val-mandatory-property directive requires that the scope has a validateMandatoryProperty() method.');
             }
 
             // Validation method
