@@ -309,7 +309,7 @@ namespace umbraco.controls
                     Trace.Write("ContentTypeControlNew", "executing task");
 
                     //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
-                    //global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
                     _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
