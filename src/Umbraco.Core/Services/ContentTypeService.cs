@@ -317,13 +317,14 @@ namespace Umbraco.Core.Services
                 dependencies.Add(indirectReference);
                 //Get all compositions for the current indirect reference
                 var directReferences = indirectReference.ContentTypeComposition;
+                
                 foreach (var directReference in directReferences)
                 {
                     if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
                     dependencies.Add(directReference);
                     //A direct reference has compositions of its own - these also need to be taken into account
                     var directReferenceGraph = directReference.CompositionAliases();
-                    allContentTypes.Where(x => directReferenceGraph.Any(y => x.Alias.Equals(y))).ForEach(c => dependencies.Add(c));
+                    allContentTypes.Where(x => directReferenceGraph.Any(y => x.Alias.Equals(y, StringComparison.InvariantCultureIgnoreCase))).ForEach(c => dependencies.Add(c));
                 }
                 //Recursive lookup of indirect references
                 allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == indirectReference.Id)).ForEach(stack.Push);
@@ -331,6 +332,7 @@ namespace Umbraco.Core.Services
 
             foreach (var dependency in dependencies)
             {
+                if (dependency.Id == compositionContentType.Id) continue;
                 var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
                 if (contentTypeDependency == null) continue;
                 var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
