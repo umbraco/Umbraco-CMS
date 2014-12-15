@@ -303,7 +303,8 @@ namespace Umbraco.Core.Services
             else
                 throw new Exception("Composition is neither IContentType nor IMediaType?");
 
-            var compositions = compositionContentType.ContentTypeComposition;
+            var compositionAliases = compositionContentType.CompositionAliases();
+            var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
             var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
             var indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
@@ -327,7 +328,7 @@ namespace Umbraco.Core.Services
 
             foreach (var dependency in dependencies)
             {
-                var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias));
+                var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
                 if (contentTypeDependency == null) continue;
                 var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
                 if (intersect.Length == 0) continue;

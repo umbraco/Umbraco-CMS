@@ -676,6 +676,59 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Rename_PropertyType_Alias_Causing_Conflicts_With_Parents()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+
+            // Act
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content");
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 
+            };
+            var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(basePage);
+            service.Save(contentPage);
+            service.Save(advancedPage);
+
+            //Rename the PropertyType to something that already exists in the Composition - NOTE this should not be allowed and Saving should throw an exception
+            var authorPropertyTypeToRename = advancedPage.PropertyTypes.First(x => x.Alias.Equals("author"));
+            authorPropertyTypeToRename.Alias = "title";
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(titleAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(advancedPage));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
         public void Can_Add_PropertyType_Alias_Which_Exists_In_Composition_Outside_Graph()
         {
             /*
