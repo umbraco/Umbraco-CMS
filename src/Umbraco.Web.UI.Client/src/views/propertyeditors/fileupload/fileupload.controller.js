@@ -71,6 +71,11 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
     initialize();
 
+    // Method required by the ValidateMandatoryProperty directive (returns true if the property editor has at least one one file selected)
+    $scope.validateMandatoryProperty = function () {
+        return ((($scope.persistedFiles != null && $scope.persistedFiles.length > 0) || ($scope.files != null && $scope.files.length > 0)) && !$scope.clearFiles);
+    }
+
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
         if (isCleared == true) {

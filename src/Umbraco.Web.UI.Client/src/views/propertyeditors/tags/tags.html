@@ -16,6 +16,8 @@
                ng-keydown="$parent.addTagOnEnter($event)"
                on-blur="$parent.addTag()"
                localize="placeholder"
-               placeholder="@placeholders_enterTags" />     
+               placeholder="@placeholders_enterTags"/>     
+
+        <div ng-show="false" ng-model="$parent.tagToAdd" val-mandatory-property></div>
     </div>
 </div>
