@@ -750,15 +750,11 @@ namespace Umbraco.Tests.Services
             };
             var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
             service.Save(seoComposition);
-
-
+            
             var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
             var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
             service.Save(advancedPage);
             service.Save(moreAdvancedPage);
-
-            var keywordsPropertyType = metaComposition.PropertyTypes.First(x => x.Alias.Equals("metakeywords"));
-            keywordsPropertyType.Alias = "title";
 
             // Assert
             Assert.That(bodyTextAdded, Is.True);
@@ -767,9 +763,7 @@ namespace Umbraco.Tests.Services
             Assert.That(titleAdded, Is.True);
             Assert.That(seoCompositionAdded, Is.True);
             Assert.That(metaCompositionAdded, Is.True);
-
-            Assert.Throws<Exception>(() => service.Save(metaComposition));
-
+            
             var testPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
             {
                 Alias = "test", Name = "Test", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
