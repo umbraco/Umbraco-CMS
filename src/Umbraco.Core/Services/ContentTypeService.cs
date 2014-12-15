@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -283,7 +284,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private void ValidateLocked(IContentTypeComposition compo)
+        private void ValidateLocked(IContentTypeComposition compositionContentType)
         {
             // performs business-level validation of the composition
             // should ensure that it is absolutely safe to save the composition
@@ -291,8 +292,8 @@ namespace Umbraco.Core.Services
             // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
             // but that cannot be used (conflict with descendants)
 
-            var contentType = compo as IContentType;
-            var mediaType = compo as IMediaType;
+            var contentType = compositionContentType as IContentType;
+            var mediaType = compositionContentType as IMediaType;
 
             IContentTypeComposition[] allContentTypes;
             if (contentType != null)
@@ -302,52 +303,42 @@ namespace Umbraco.Core.Services
             else
                 throw new Exception("Composition is neither IContentType nor IMediaType?");
 
-            // recursively find all descendants
+            var compositionAliases = compositionContentType.CompositionAliases();
+            var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
+            var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
+            var indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
-            var descendants = new HashSet<IContentTypeComposition>(comparer);
-            var stack = new Stack<IContentTypeComposition>();            
-            foreach (var z in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compo.Id))) 
-                stack.Push(z);
+            var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
+            var stack = new Stack<IContentTypeComposition>();
+            indirectReferences.ForEach(stack.Push);//Push indirect references to a stack, so we can add recursively
             while (stack.Count > 0)
             {
-                var c = stack.Pop();
-                descendants.Add(c);
-                foreach (var z in allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == c.Id)))
-                    stack.Push(z);
+                var indirectReference = stack.Pop();
+                dependencies.Add(indirectReference);
+                //Get all compositions for the current indirect reference
+                var directReferences = indirectReference.ContentTypeComposition;
+                
+                foreach (var directReference in directReferences)
+                {
+                    if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
+                    dependencies.Add(directReference);
+                    //A direct reference has compositions of its own - these also need to be taken into account
+                    var directReferenceGraph = directReference.CompositionAliases();
+                    allContentTypes.Where(x => directReferenceGraph.Any(y => x.Alias.Equals(y, StringComparison.InvariantCultureIgnoreCase))).ForEach(c => dependencies.Add(c));
+                }
+                //Recursive lookup of indirect references
+                allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == indirectReference.Id)).ForEach(stack.Push);
             }
 
-            // ensure that no descendant has a property with an alias that is used by content type
-            var aliases = compo.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
-            foreach (var d in descendants)
+            foreach (var dependency in dependencies)
             {
-                var intersect = d.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
+                if (dependency.Id == compositionContentType.Id) continue;
+                var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
+                if (contentTypeDependency == null) continue;
+                var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
                 if (intersect.Length == 0) continue;
 
-                var message = string.Format("The following property aliases conflict with descendants : {0}.",
-                    string.Join(", ", intersect));
-                throw new Exception(message);
-            }
-
-            // find all ancestors
-            var ancestors = new HashSet<IContentTypeComposition>(comparer);
-            stack.Clear();
-            foreach (var z in compo.ContentTypeComposition)
-                stack.Push(z);
-            while (stack.Count > 0)
-            {
-                var c = stack.Pop();
-                ancestors.Add(c);
-                foreach (var z in c.ContentTypeComposition)
-                    stack.Push(z);
-            }
-
-            // ensure that no ancestor has a property with an alias that is used by content type
-            foreach (var a in ancestors)
-            {
-                var intersect = a.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(aliases).ToArray();
-                if (intersect.Length == 0) continue;
-
-                var message = string.Format("The following property aliases conflict with ancestors : {0}.",
+                var message = string.Format("The following PropertyType aliases from the current ContentType conflict with existing PropertyType aliases: {0}.",
                     string.Join(", ", intersect));
                 throw new Exception(message);
             }

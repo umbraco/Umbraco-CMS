@@ -16,6 +16,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
@@ -308,7 +309,7 @@ namespace umbraco.controls
                     Trace.Write("ContentTypeControlNew", "executing task");
 
                     //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
-                    //global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
                     _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
@@ -351,8 +352,16 @@ namespace umbraco.controls
                                 var compositionType = isMediaType
                                     ? Services.ContentTypeService.GetMediaType(compositionId).SafeCast<IContentTypeComposition>()
                                     : Services.ContentTypeService.GetContentType(compositionId).SafeCast<IContentTypeComposition>();
-                                var added = _contentType.ContentTypeItem.AddContentType(compositionType);
-                                //TODO if added=false then return error message
+                                try
+                                {
+                                    //TODO if added=false then return error message
+                                    var added = _contentType.ContentTypeItem.AddContentType(compositionType);
+                                }
+                                catch (InvalidCompositionException ex)
+                                {
+                                    state.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                                    state.SaveArgs.Message = ex.Message;
+                                }
                             }
 
                             // then iterate over removed = existing except checked
@@ -1073,7 +1082,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         private string GetHtmlForNoPropertiesMessageListItem()
         {
-            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab") + "</li></ul>";
+            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab", Security.CurrentUser) + "</li></ul>";
         }
 
         private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
@@ -1127,7 +1136,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType");
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", Security.CurrentUser);
                     e.IconType = BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -1430,7 +1439,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 LoadContentType();
 
-                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated"));
+                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated", Security.CurrentUser));
                 ea.IconType = BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
@@ -1469,7 +1478,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 LoadContentType();
 
-                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted"));
+                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted", Security.CurrentUser));
                 ea.IconType = BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);

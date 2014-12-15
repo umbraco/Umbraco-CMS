@@ -77,6 +77,10 @@ namespace Umbraco.Core.Models
                     var exists = this.Contains(item.Id);
                     if (exists)
                     {
+                        var keyExists = this.Contains(item.Name);
+                        if(keyExists)
+                            throw new Exception(string.Format("Naming conflict: Changing the name of PropertyGroup '{0}' would result in duplicates", item.Name));
+
                         SetItem(IndexOfKey(item.Id), item);
                         return;
                     }

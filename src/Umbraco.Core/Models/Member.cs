@@ -20,7 +20,6 @@ namespace Umbraco.Core.Models
         private string _email;
         private string _rawPasswordValue;
         private object _providerUserKey;
-        private Type _userTypeKey;
 
         /// <summary>
         /// Constructor for creating an empty Member object
@@ -114,7 +113,6 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
         private static readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
         private static readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
-        private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<Member, Type>(x => x.ProviderUserKeyType);
 
         /// <summary>
         /// Gets or sets the Username
@@ -502,38 +500,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets or sets the type of the provider user key.
-        /// </summary>
-        /// <value>
-        /// The type of the provider user key.
-        /// </value>
-        [IgnoreDataMember]
-        internal Type ProviderUserKeyType
-        {
-            get
-            {
-                return _userTypeKey;
-            }
-            private set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _userTypeKey = value;
-                    return _userTypeKey;
-                }, _userTypeKey, UserTypeKeySelector);
-            }
-        }
-
-        /// <summary>
-        /// Sets the type of the provider user key.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        internal void SetProviderUserKeyType(Type type)
-        {
-            ProviderUserKeyType = type;
-        }
-
+      
         /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>
