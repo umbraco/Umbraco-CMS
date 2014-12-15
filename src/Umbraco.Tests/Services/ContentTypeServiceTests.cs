@@ -553,6 +553,68 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Add_Duplicate_PropertyType_Alias_At_Root_Which_Conflicts_With_Third_Levels_Composition()
+        {
+            /*
+             * BasePage, gets 'Title' added but should not be allowed
+             * -- Content Page
+             * ---- Advanced Page -> Content Meta
+             * Content Meta :: Composition, has 'Title'
+             * 
+             * Content Meta has 'Title' PropertyType
+             * Adding 'Title' to BasePage should fail
+            */
+
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            service.Save(basePage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+            
+            var compositionAdded = advancedPage.AddContentType(contentMetaComposition);
+            service.Save(advancedPage);
+
+            //NOTE: It should not be possible to Save 'BasePage' with the Title PropertyType added
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(titleAdded, Is.True);
+            Assert.That(compositionAdded, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(basePage));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
         public void Cannot_Rename_PropertyGroup_On_Child_Avoiding_Conflict_With_Parent_PropertyGroup()
         {
             // Arrange
@@ -616,6 +678,13 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Add_PropertyType_Alias_Which_Exists_In_Composition_Outside_Graph()
         {
+            /*
+             * Meta (Composition)
+             * Content Meta (Composition) has 'Title' -> Meta
+             * BasePage
+             * -- ContentPage gets 'Title' added -> Meta
+             * ---- Advanced Page
+             */
             // Arrange
             var service = ServiceContext.ContentTypeService;
 

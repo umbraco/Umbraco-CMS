@@ -308,15 +308,21 @@ namespace Umbraco.Core.Services
             var indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
             var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
-            foreach (var indirectReference in indirectReferences)
+            var stack = new Stack<IContentTypeComposition>();
+            indirectReferences.ForEach(stack.Push);//Push indirect references to a stack, so we can add recursively
+            while (stack.Count > 0)
             {
+                var indirectReference = stack.Pop();
                 dependencies.Add(indirectReference);
+                //Get all compositions for the current indirect reference
                 var directReferences = indirectReference.ContentTypeComposition;
                 foreach (var directReference in directReferences)
                 {
-                    if(directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
+                    if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
                     dependencies.Add(directReference);
                 }
+                //Recursive lookup of indirect references
+                allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == indirectReference.Id)).ForEach(stack.Push);
             }
 
             foreach (var dependency in dependencies)
