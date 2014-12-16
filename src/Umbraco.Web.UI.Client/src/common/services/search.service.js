@@ -88,7 +88,7 @@ angular.module('umbraco.services')
                 throw "args.term is required";
             }
 
-            return entityResource.search(args.term, "Document", args.searchFrom).then(function (data) {
+            return entityResource.search(args.term, "Document", args.searchFrom, args.canceler).then(function (data) {
                 _.each(data, function (item) {
                     configureContentResult(item);
                 });
@@ -138,7 +138,7 @@ angular.module('umbraco.services')
                 throw "args.term is required";
             }
 
-            return entityResource.searchAll(args.term).then(function (data) {
+            return entityResource.searchAll(args.term, args.canceler).then(function (data) {
 
                 _.each(data, function(resultByType) {
                     switch(resultByType.type) {
