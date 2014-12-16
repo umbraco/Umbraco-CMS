@@ -191,6 +191,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}	
 			}
 
+            LogHelper.Debug<PublishedMediaCache>(
+                "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
+                () => id);
+
 			var media = global::umbraco.library.GetMedia(id, true);
 			if (media != null && media.Current != null)
 			{
@@ -211,6 +215,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}
 				return ConvertFromXPathNavigator(media.Current);
 			}
+
+            LogHelper.Debug<PublishedMediaCache>(
+                "Could not retrieve media {0} from Examine index or from legacy library.GetMedia method",
+                () => id);
 
 			return null;
 		}

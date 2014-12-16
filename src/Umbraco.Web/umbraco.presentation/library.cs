@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -8,35 +9,31 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.XPath;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.propertytype;
-using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
-using umbraco.presentation.cache;
 using umbraco.scripting;
 using umbraco.DataLayer;
-using System.Web.Security;
-using umbraco.cms.businesslogic.language;
 using Umbraco.Core.IO;
-using System.Collections;
-using System.Collections.Generic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.NodeFactory;
+using Language = umbraco.cms.businesslogic.language.Language;
+using Media = umbraco.cms.businesslogic.media.Media;
+using Member = umbraco.cms.businesslogic.member.Member;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
+using Relation = umbraco.cms.businesslogic.relation.Relation;
 using UmbracoContext = umbraco.presentation.UmbracoContext;
-using System.Linq;
 
 namespace umbraco
 {
@@ -470,46 +467,48 @@ namespace umbraco
             {
                 if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                 {
-                    XPathNodeIterator retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var xml = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
                             "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
                         () => GetMediaDo(MediaId, Deep));
 
-                    if (retVal != null)
-                        return retVal;
+                    if (xml != null)
+                    {                   
+                        //returning the root element of the Media item fixes the problem
+                        return xml.CreateNavigator().Select("/");
+                    }
+                        
                 }
                 else
                 {
-                    return GetMediaDo(MediaId, Deep);
+                    var xml = GetMediaDo(MediaId, Deep);
+                    
+                    //returning the root element of the Media item fixes the problem
+                    return xml.CreateNavigator().Select("/");
                 }
-
             }
-            catch
+            catch(Exception ex)
             {
+                LogHelper.Error<library>("An error occurred looking up media", ex);
             }
 
-            XmlDocument xd = new XmlDocument();
+            LogHelper.Debug<library>("No media result for id {0}", () => MediaId);
+
+            var xd = new XmlDocument();
             xd.LoadXml(string.Format("<error>No media is maching '{0}'</error>", MediaId));
             return xd.CreateNavigator().Select("/");
         }
 
-        private static XPathNodeIterator GetMediaDo(int mediaId, bool deep)
+        private static XElement GetMediaDo(int mediaId, bool deep)
         {
-            var m = new Media(mediaId);
-            if (m.nodeObjectType == Media._objectType)
-            {
-                var mXml = new XmlDocument();
-                var xml = m.ToXml(mXml, deep);
-                //This will be null if the media isn't public (meaning it is in the trash)
-                if (xml == null) return null;
-                //TODO: This is an aweful way of loading in XML - it is very slow.
-                mXml.LoadXml(xml.OuterXml);
-                var xp = mXml.CreateNavigator();
-                var xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
-                return xp.Select(xpath);
-            }
-            return null;
+            var media = ApplicationContext.Current.Services.MediaService.GetById(mediaId);
+            if (media == null) return null;
+            var serializer = new EntityXmlSerializer();
+            var serialized = serializer.Serialize(
+                ApplicationContext.Current.Services.MediaService, ApplicationContext.Current.Services.DataTypeService,
+                media, deep);
+            return serialized;
         }
 
         /// <summary>
@@ -525,35 +524,42 @@ namespace umbraco
             {
                 if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                 {
-                    var retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var xml = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
                         () => GetMemberDo(MemberId));
 
-                    if (retVal != null)
-                        return retVal.CreateNavigator().Select("/");
+                    if (xml != null)
+                    {
+                        return xml.CreateNavigator().Select("/");
+                    }
                 }
                 else
                 {
                     return GetMemberDo(MemberId).CreateNavigator().Select("/");
                 }
-
             }
-            catch
+            catch (Exception ex)
             {
+                LogHelper.Error<library>("An error occurred looking up member", ex);
             }
-            XmlDocument xd = new XmlDocument();
+
+            LogHelper.Debug<library>("No member result for id {0}", () => MemberId);
+
+            var xd = new XmlDocument();
             xd.LoadXml(string.Format("<error>No member is maching '{0}'</error>", MemberId));
             return xd.CreateNavigator().Select("/");
         }
 
-        private static XmlDocument GetMemberDo(int MemberId)
+        private static XElement GetMemberDo(int MemberId)
         {
-            Member m = new Member(MemberId);
-            XmlDocument mXml = new XmlDocument();
-            mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
-            return mXml;
+            var member = ApplicationContext.Current.Services.MemberService.GetById(MemberId);
+            if (member == null) return null;
+            var serializer = new EntityXmlSerializer();
+            var serialized = serializer.Serialize(
+                ApplicationContext.Current.Services.DataTypeService, member);
+            return serialized;
         }
 
         /// <summary>
@@ -1352,8 +1358,9 @@ namespace umbraco
                 nav.MoveToId(HttpContext.Current.Items["pageID"].ToString());
                 return nav.Select(".");
             }
-            catch
+            catch (Exception ex)
             {
+                LogHelper.Error<library>("Could not retrieve current xml node", ex);
             }
 
             XmlDocument xd = new XmlDocument();
