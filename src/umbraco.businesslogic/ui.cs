@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using umbraco.BasePages;
+using Umbraco.Core.Services;
 using User = umbraco.BusinessLogic.User;
 
 namespace umbraco
@@ -17,27 +20,25 @@ namespace umbraco
 
     //TODO: Make the User overloads obsolete, then publicize the IUser object
 
-    //TODO: Convert all of this over to Niels K's localization framework and put into Core proj.
-
     /// <summary>
     /// The ui class handles the multilingual text in the umbraco back-end.
     /// Provides access to language settings and language files used in the umbraco back-end.
     /// </summary>
+    [Obsolete("Use the ITextManager instead which is available on most umbraco base classes and also on the ApplicationContext")]
     public class ui
     {
         private static readonly string UmbracoDefaultUiLanguage = GlobalSettings.DefaultUILanguage;
         private static readonly string UmbracoPath = SystemDirectories.Umbraco;
 
-        /// <summary>
-        /// Gets the current Culture for the logged-in users
-        /// </summary>
-        /// <param name="u">The user.</param>
-        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         public static string Culture(User u)
         {
             return Culture(u.Language);
         }
-        
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         internal static string Culture(IUser u)
         {
             return Culture(u.Language);
@@ -56,18 +57,16 @@ namespace umbraco
             }
         }
 
-        /// <summary>
-        /// Check if th user is logged in, if they are, return their language specified in the database.
-        /// If they aren't logged in, check the current thread culture and return it, however if that is
-        /// null, then return the default Umbraco culture.
-        /// </summary>
-        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         private static string GetLanguage()
         {
             var user = UmbracoEnsuredPage.CurrentUser;
             return GetLanguage(user);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         private static string GetLanguage(User u)
         {
             if (u != null)
@@ -77,6 +76,8 @@ namespace umbraco
             return GetLanguage("");
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         private static string GetLanguage(IUser u)
         {
             if (u != null)
@@ -86,6 +87,8 @@ namespace umbraco
             return GetLanguage("");
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         private static string GetLanguage(string userLanguage)
         {
             if (userLanguage.IsNullOrWhiteSpace() == false)
@@ -106,12 +109,16 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key, User u)
         {
-            return GetText(string.Empty, Key, null, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(Key, CultureInfo.GetCultureInfo(GetLanguage(u)));
+
+            //return GetText(string.Empty, Key, null, GetLanguage(u));
         }
 
         internal static string Text(string key, IUser u)
         {
-            return GetText(string.Empty, key, null, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(key, CultureInfo.GetCultureInfo(GetLanguage(u)));
+
+            //return GetText(string.Empty, key, null, GetLanguage(u));
         }
 
         /// <summary>
@@ -121,7 +128,9 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key)
         {
-            return GetText(Key);
+            return ApplicationContext.Current.Services.TextService.Localize(Key, CultureInfo.GetCultureInfo(GetLanguage()));
+
+            //return GetText(Key);
         }
 
         /// <summary>
@@ -133,12 +142,20 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, User u)
         {
-            return GetText(Area, Key, null, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", Area, Key), 
+                CultureInfo.GetCultureInfo(GetLanguage(u)));
+
+            //return GetText(Area, Key, null, GetLanguage(u));
         }
 
         public static string Text(string area, string key, IUser u)
         {
-            return GetText(area, key, null, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", area, key),
+                CultureInfo.GetCultureInfo(GetLanguage(u)));
+
+            //return GetText(area, key, null, GetLanguage(u));
         }
 
         /// <summary>
@@ -149,7 +166,11 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key)
         {
-            return GetText(Area, Key, GetLanguage());
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", Area, Key),
+                CultureInfo.GetCultureInfo(GetLanguage()));
+
+            //return GetText(Area, Key, GetLanguage());
         }
 
         /// <summary>
@@ -162,17 +183,32 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string[] Variables, User u)
         {
-            return GetText(Area, Key, Variables, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", Area, Key),
+                CultureInfo.GetCultureInfo(GetLanguage(u)),
+                ConvertToObjectVars(Variables));
+
+            //return GetText(Area, Key, Variables, GetLanguage(u));
         }
 
         internal static string Text(string area, string key, string[] variables)
         {
-            return GetText(area, key, variables, GetLanguage((IUser)null));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", area, key),
+                CultureInfo.GetCultureInfo(GetLanguage()),
+                ConvertToObjectVars(variables));
+
+            //return GetText(area, key, variables, GetLanguage((IUser)null));
         }
 
         internal static string Text(string area, string key, string[] variables, IUser u)
         {
-            return GetText(area, key, variables, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", area, key),
+                CultureInfo.GetCultureInfo(GetLanguage(u)),
+                ConvertToObjectVars(variables));
+
+            //return GetText(area, key, variables, GetLanguage(u));
         }
 
         /// <summary>
@@ -185,17 +221,32 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string Variable, User u)
         {
-            return GetText(Area, Key, new[] { Variable }, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", Area, Key),
+                CultureInfo.GetCultureInfo(GetLanguage(u)),
+                ConvertToObjectVars(new[] { Variable }));
+
+            //return GetText(Area, Key, new[] { Variable }, GetLanguage(u));
         }
 
         internal static string Text(string area, string key, string variable)
         {
-            return GetText(area, key, new[] { variable }, GetLanguage((IUser)null));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", area, key),
+                CultureInfo.GetCultureInfo(GetLanguage()),
+                ConvertToObjectVars(new[] { variable }));
+
+            //return GetText(area, key, new[] { variable }, GetLanguage((IUser)null));
         }
 
         internal static string Text(string area, string key, string variable, IUser u)
         {
-            return GetText(area, key, new[] { variable }, GetLanguage(u));
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", area, key),
+                CultureInfo.GetCultureInfo(GetLanguage(u)),
+                ConvertToObjectVars(new[] { variable }));
+
+            //return GetText(area, key, new[] { variable }, GetLanguage(u));
         }
 
         /// <summary>
@@ -205,7 +256,9 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string key)
         {
-            return GetText(string.Empty, key, null, GetLanguage());
+            return ApplicationContext.Current.Services.TextService.Localize(key, CultureInfo.GetCultureInfo(GetLanguage()));
+
+            //return GetText(string.Empty, key, null, GetLanguage());
         }
 
         /// <summary>
@@ -216,7 +269,11 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key)
         {
-            return GetText(area, key, null, GetLanguage());
+            return ApplicationContext.Current.Services.TextService.Localize(
+                string.Format("{0}/{1}", area, key), 
+                CultureInfo.GetCultureInfo(GetLanguage()));
+
+            //return GetText(area, key, null, GetLanguage());
         }
 
         /// <summary>
@@ -228,7 +285,12 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string[] variables)
         {
-            return GetText(area, key, variables, GetLanguage());
+            return ApplicationContext.Current.Services.TextService.Localize(
+               string.Format("{0}/{1}", area, key),
+               CultureInfo.GetCultureInfo(GetLanguage()),
+               ConvertToObjectVars(variables));
+
+            //return GetText(area, key, variables, GetLanguage());
         }
 
         /// <summary>
@@ -240,7 +302,12 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string variable)
         {
-            return GetText(area, key, new[] { variable }, GetLanguage());
+            return ApplicationContext.Current.Services.TextService.Localize(
+               string.Format("{0}/{1}", area, key),
+               CultureInfo.GetCultureInfo(GetLanguage()),
+               ConvertToObjectVars(new[] { variable }));
+
+            //return GetText(area, key, new[] { variable }, GetLanguage());
         }
 
         /// <summary>
@@ -254,41 +321,47 @@ namespace umbraco
         /// <remarks>This is the underlying call for all Text/GetText method calls</remarks>
         public static string GetText(string area, string key, string[] variables, string language)
         {
-            if (string.IsNullOrEmpty(key))
-                return string.Empty;
 
-            if (string.IsNullOrEmpty(language))
-                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            return ApplicationContext.Current.Services.TextService.Localize(
+               string.Format("{0}/{1}", area, key),
+               CultureInfo.GetCultureInfo(GetLanguage()),
+               ConvertToObjectVars(variables));
 
-            var langFile = getLanguageFile(language);
 
-            if (langFile != null)
-            {
-                XmlNode node;
-                if (string.IsNullOrEmpty(area))
-                {
-                    node = langFile.SelectSingleNode(string.Format("//key [@alias = '{0}']", key));
-                }
-                else
-                {
-                    node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key));
-                }
+            //if (string.IsNullOrEmpty(key))
+            //    return string.Empty;
 
-                if (node != null)
-                {
-                    if (variables != null && variables.Length > 0)
-                    {
-                        return GetStringWithVars(node, variables);
-                    }
-                    return xmlHelper.GetNodeValue(node);
-                }
-            }
-            return "[" + key + "]";
+            //if (string.IsNullOrEmpty(language))
+            //    language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            //var langFile = getLanguageFile(language);
+
+            //if (langFile != null)
+            //{
+            //    XmlNode node;
+            //    if (string.IsNullOrEmpty(area))
+            //    {
+            //        node = langFile.SelectSingleNode(string.Format("//key [@alias = '{0}']", key));
+            //    }
+            //    else
+            //    {
+            //        node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key));
+            //    }
+
+            //    if (node != null)
+            //    {
+            //        if (variables != null && variables.Length > 0)
+            //        {
+            //            return GetStringWithVars(node, variables);
+            //        }
+            //        return xmlHelper.GetNodeValue(node);
+            //    }
+            //}
+            //return "[" + key + "]";
         }
 
-        private static string GetStringWithVars(XmlNode node, string[] variables)
+        private static string GetStringWithVars(string stringWithVars, string[] variables)
         {
-            var stringWithVars = xmlHelper.GetNodeValue(node);
             var vars = Regex.Matches(stringWithVars, @"\%(\d)\%",
                                      RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             foreach (Match var in vars)
@@ -339,6 +412,12 @@ namespace umbraco
                 return null;
             }
 
+        }
+
+
+        internal static object ConvertToObjectVars(string[] variables)
+        {
+            throw new NotImplementedException();
         }
 
     }

@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -12,6 +14,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
         private Lazy<IUserService> _userService;
@@ -52,6 +55,7 @@ namespace Umbraco.Core.Services
         /// <param name="treeService"></param>
         /// <param name="tagService"></param>
         /// <param name="notificationService"></param>
+        /// <param name="localizedTextService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -69,8 +73,10 @@ namespace Umbraco.Core.Services
             ISectionService sectionService,
             IApplicationTreeService treeService,
             ITagService tagService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ILocalizedTextService localizedTextService)
         {
+            _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);     
             _tagService = new Lazy<ITagService>(() => tagService);     
             _contentService = new Lazy<IContentService>(() => contentService);        
             _mediaService = new Lazy<IMediaService>(() => mediaService);
@@ -118,6 +124,12 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
+
+
+
+            if (_localizedTextService == null)
+                _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
+                    new LocalizedTextServiceFileSources(cache.RuntimeCache, new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/")))));
 
             if (_notificationService == null)
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value));
@@ -174,9 +186,18 @@ namespace Umbraco.Core.Services
 
             if (_tagService == null)
                 _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));
+
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory.Value));
             
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ILocalizedTextService"/>
+        /// </summary>
+        public ILocalizedTextService TextService
+        {
+            get { return _localizedTextService.Value; }
         }
 
         /// <summary>
