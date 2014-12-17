@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
             _dictionarySource = source;
         }
 
-        public string Localize(string key, CultureInfo culture, object variables)
+        public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens)
         {
             Mandate.ParameterNotNull(culture, "culture");
 
@@ -102,15 +102,63 @@ namespace Umbraco.Core.Services
 
             if (_xmlSource != null)
             {
-                return GetFromXmlSource(culture, area, alias);
+                return GetFromXmlSource(culture, area, alias, tokens);
             }
             else
             {
-                return GetFromDictionarySource(culture, area, alias);
+                return GetFromDictionarySource(culture, area, alias, tokens);
             }
         }
 
-        private string GetFromDictionarySource(CultureInfo culture, string area, string key)
+        /// <summary>
+        /// Returns all key/values in storage for the given culture
+        /// </summary>
+        /// <returns></returns>
+        public IDictionary<string, string> GetAllStoredValues(CultureInfo culture)
+        {
+            if (culture == null) throw new ArgumentNullException("culture");
+
+            var result = new Dictionary<string, string>();
+
+            if (_xmlSource != null)
+            {
+                if (_xmlSource.ContainsKey(culture) == false)
+                {
+                    throw new NullReferenceException("The culture specified " + culture + " was not found in any configured sources for this service");
+                }
+
+                //convert all areas + keys to a single key with a '/'
+                var areas = _xmlSource[culture].Value.XPathSelectElements("//area");
+                foreach (var area in areas)
+                {
+                    var keys = area.XPathSelectElements("./key");
+                    foreach (var key in keys)
+                    {
+                        result.Add(string.Format("{0}/{1}", (string) area.Attribute("alias"), (string) key.Attribute("alias")), key.Value);
+                    }
+                }
+            }
+            else
+            {
+                if (_dictionarySource.ContainsKey(culture) == false)
+                {
+                    throw new NullReferenceException("The culture specified " + culture + " was not found in any configured sources for this service");
+                }
+
+                //convert all areas + keys to a single key with a '/'
+                foreach (var area in _dictionarySource[culture])
+                {
+                    foreach (var key in area.Value)
+                    {
+                        result.Add(string.Format("{0}/{1}", area.Key, key.Key), key.Value);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private string GetFromDictionarySource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
@@ -138,11 +186,16 @@ namespace Umbraco.Core.Services
                     .FirstOrDefault();
             }
 
+            if (found != null)
+            {
+                return ParseTokens(found, tokens);
+            }
+
             //NOTE: Based on how legacy works, the default text does not contain the area, just the key
-            return found ?? "[" + key + "]";
+            return "[" + key + "]";
         }
 
-        private string GetFromXmlSource(CultureInfo culture, string area, string key)
+        private string GetFromXmlSource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
         {
             if (_xmlSource.ContainsKey(culture) == false)
             {
@@ -157,13 +210,43 @@ namespace Umbraco.Core.Services
 
             var found = cultureSource.XPathSelectElement(xpath);
 
-            return found == null
-                //NOTE: Based on how legacy works, the default text does not contain the area, just the key
-                ? "[" + key + "]"
-                : found.Value;
+            if (found != null)
+            {
+                return ParseTokens(found.Value, tokens);
+            }
+
+            //NOTE: Based on how legacy works, the default text does not contain the area, just the key
+            return "[" + key + "]";
         }
-     
-   
+
+        /// <summary>
+        /// Parses the tokens in the value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is based on how the legacy ui localized text worked, each token was just a sequential value delimited with a % symbol. 
+        /// For example: hello %0%, you are %1% !
+        /// 
+        /// Since we're going to continue using the same language files for now, the token system needs to remain the same. With our new service
+        /// we support a dictionary which means in the future we can really have any sort of token system. 
+        /// Currently though, the token key's will need to be an integer and sequential - though we aren't going to throw exceptions if that is not the case.
+        /// </remarks>
+        internal string ParseTokens(string value, IDictionary<string, string> tokens)
+        {
+            if (tokens == null || tokens.Any() == false)
+            {
+                return value;
+            }
+
+            foreach (var token in tokens)
+            {
+                value = value.Replace(string.Format("{0}{1}{0}", "%", token.Key), token.Value);
+            }
+
+            return value;
+        }
 
     }
 }

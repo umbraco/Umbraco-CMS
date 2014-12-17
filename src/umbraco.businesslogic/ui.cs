@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
@@ -360,24 +363,25 @@ namespace umbraco
             //return "[" + key + "]";
         }
 
-        private static string GetStringWithVars(string stringWithVars, string[] variables)
-        {
-            var vars = Regex.Matches(stringWithVars, @"\%(\d)\%",
-                                     RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            foreach (Match var in vars)
-            {
-                stringWithVars = stringWithVars.Replace(
-                    var.Value,
-                    variables[Convert.ToInt32(var.Groups[0].Value.Replace("%", ""))]);
-            }
-            return stringWithVars;
-        }
+        //private static string GetStringWithVars(string stringWithVars, string[] variables)
+        //{
+        //    var vars = Regex.Matches(stringWithVars, @"\%(\d)\%",
+        //                             RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        //    foreach (Match var in vars)
+        //    {
+        //        stringWithVars = stringWithVars.Replace(
+        //            var.Value,
+        //            variables[Convert.ToInt32(var.Groups[0].Value.Replace("%", ""))]);
+        //    }
+        //    return stringWithVars;
+        //}
 
         /// <summary>
         /// Gets the language file as a xml document.
         /// </summary>
         /// <param name="language">The language.</param>
         /// <returns></returns>
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public static XmlDocument getLanguageFile(string language)
         {
             var cacheKey = "uitext_" + language;
@@ -414,10 +418,15 @@ namespace umbraco
 
         }
 
-
-        internal static object ConvertToObjectVars(string[] variables)
+        /// <summary>
+        /// Convert an array of strings to a dictionary of indicies -> values
+        /// </summary>
+        /// <param name="variables"></param>
+        /// <returns></returns>
+        internal static IDictionary<string, string> ConvertToObjectVars(string[] variables)
         {
-            throw new NotImplementedException();
+            return variables.Select((s, i) => new {index = i.ToString(CultureInfo.InvariantCulture), value = s})
+                .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
         }
 
     }

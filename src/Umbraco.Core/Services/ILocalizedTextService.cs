@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace Umbraco.Core.Services
 {
@@ -16,11 +18,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="key"></param>
         /// <param name="culture"></param>
-        /// <param name="variables">This can be null</param>
+        /// <param name="tokens">This can be null</param>
         /// <returns></returns>
-        string Localize(string key, CultureInfo culture, 
-            
-            //TODO: Potentially this should be a dictionary to simplify things a little?
-            object variables);
+        string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens);
+
+        /// <summary>
+        /// Returns all key/values in storage for the given culture
+        /// </summary>
+        /// <returns></returns>
+        IDictionary<string, string> GetAllStoredValues(CultureInfo culture);
     }
 }
