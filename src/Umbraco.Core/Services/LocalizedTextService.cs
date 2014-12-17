@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services
             foreach (var fileInfo in _fileSourceFolder.GetFiles("*.xml"))
             {
                 var localCopy = fileInfo;
-                var filename = Path.GetFileNameWithoutExtension(localCopy.FullName);
+                var filename = Path.GetFileNameWithoutExtension(localCopy.FullName).Replace("_", "-");
                 var culture = CultureInfo.GetCultureInfo(filename);
                 //get the lazy value from cache                
                 result.Add(culture, new Lazy<XDocument>(() => _cache.GetCacheItem<XDocument>(
@@ -156,6 +156,15 @@ namespace Umbraco.Core.Services
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns a list of all currently supported cultures
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<CultureInfo> GetSupportedCultures()
+        {
+            return _xmlSource != null ? _xmlSource.Keys : _dictionarySource.Keys;
         }
 
         private string GetFromDictionarySource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)

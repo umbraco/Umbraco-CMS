@@ -27,5 +27,11 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns></returns>
         IDictionary<string, string> GetAllStoredValues(CultureInfo culture);
+
+        /// <summary>
+        /// Returns a list of all currently supported cultures
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<CultureInfo> GetSupportedCultures();
     }
 }

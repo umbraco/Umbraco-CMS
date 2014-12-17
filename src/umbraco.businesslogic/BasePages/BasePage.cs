@@ -275,7 +275,7 @@ namespace umbraco.BasePages
                 StartContentNode = u.StartNodeId,
                 StartMediaNode = u.StartMediaId,
                 Username = u.LoginName,
-                Culture = ui.Culture(u.Language)
+                Culture = ui.Culture(u)
 
             });
 			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);

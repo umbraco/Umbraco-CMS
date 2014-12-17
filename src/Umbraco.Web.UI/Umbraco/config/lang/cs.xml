@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<language alias="cs" intName="Czech" localName="česky" lcid="5" culture="en-GB">
+<language alias="cs" intName="Czech" localName="česky" lcid="5" culture="cs-CZ">
   <creator>
     <name>umbraco</name>
     <link>http://umbraco.org</link>
