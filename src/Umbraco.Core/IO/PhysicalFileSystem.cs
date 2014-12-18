@@ -100,8 +100,19 @@ namespace Umbraco.Core.IO
             if (stream.CanSeek)
                 stream.Seek(0, 0);
 
-            using (var destination = (Stream)File.Create(GetFullPath(fsRelativePath)))
-                stream.CopyTo(destination);
+            using (var memoryStream = new MemoryStream())
+            {
+                //Add the BOM
+                var bom = new byte[] { 0xEF, 0xBB, 0xBF };
+                memoryStream.Write(bom, 0, bom.Length);
+                stream.CopyTo(memoryStream);
+
+                if (memoryStream.CanSeek)
+                    memoryStream.Seek(0, 0);
+
+                using (var destination = (Stream)File.Create(GetFullPath(fsRelativePath)))
+                    memoryStream.CopyTo(destination);
+            }
         }
 
         public IEnumerable<string> GetFiles(string path)
