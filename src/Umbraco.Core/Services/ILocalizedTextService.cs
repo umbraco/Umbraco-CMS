@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
         /// <param name="culture"></param>
         /// <param name="tokens">This can be null</param>
         /// <returns></returns>
-        string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens);
+        string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null);
 
         /// <summary>
         /// Returns all key/values in storage for the given culture

@@ -159,7 +159,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", Area, Key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
-                ConvertToObjectVars(Variables));
+                ConvertToDictionaryVars(Variables));
         }
 
         internal static string Text(string area, string key, string[] variables)
@@ -167,7 +167,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage()),
-                ConvertToObjectVars(variables));
+                ConvertToDictionaryVars(variables));
         }
 
         internal static string Text(string area, string key, string[] variables, IUser u)
@@ -175,7 +175,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
-                ConvertToObjectVars(variables));
+                ConvertToDictionaryVars(variables));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", Area, Key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
-                ConvertToObjectVars(new[] { Variable }));
+                ConvertToDictionaryVars(new[] { Variable }));
         }
 
         internal static string Text(string area, string key, string variable)
@@ -199,7 +199,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage()),
-                ConvertToObjectVars(new[] { variable }));
+                ConvertToDictionaryVars(new[] { variable }));
         }
 
         internal static string Text(string area, string key, string variable, IUser u)
@@ -207,7 +207,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
-                ConvertToObjectVars(new[] { variable }));
+                ConvertToDictionaryVars(new[] { variable }));
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                string.Format("{0}/{1}", area, key),
                GetCultureFromUserLanguage(GetLanguage()),
-               ConvertToObjectVars(variables));
+               ConvertToDictionaryVars(variables));
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                string.Format("{0}/{1}", area, key),
                GetCultureFromUserLanguage(GetLanguage()),
-               ConvertToObjectVars(new[] { variable }));
+               ConvertToDictionaryVars(new[] { variable }));
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace umbraco
             return ApplicationContext.Current.Services.TextService.Localize(
                string.Format("{0}/{1}", area, key),
                GetCultureFromUserLanguage(GetLanguage()),
-               ConvertToObjectVars(variables));
+               ConvertToDictionaryVars(variables));
         }
     
         /// <summary>
@@ -327,8 +327,11 @@ namespace umbraco
         /// </summary>
         /// <param name="variables"></param>
         /// <returns></returns>
-        internal static IDictionary<string, string> ConvertToObjectVars(string[] variables)
+        internal static IDictionary<string, string> ConvertToDictionaryVars(string[] variables)
         {
+            if (variables == null) return null;
+            if (variables.Any() == false) return null;
+
             return variables.Select((s, i) => new {index = i.ToString(CultureInfo.InvariantCulture), value = s})
                 .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
         }

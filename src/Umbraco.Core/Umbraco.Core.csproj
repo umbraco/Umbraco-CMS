@@ -318,7 +318,6 @@
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Services\LocalizedTextService.cs" />
     <Compile Include="Services\ILocalizedTextService.cs" />
-    <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Macros\XsltExtension.cs" />
     <Compile Include="Macros\XsltExtensionAttribute.cs" />
     <Compile Include="Macros\XsltExtensionsResolver.cs" />
@@ -1073,6 +1072,8 @@
     <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
+    <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
+    <Compile Include="Services\LocalizedTextServiceFileSources.cs" />
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
