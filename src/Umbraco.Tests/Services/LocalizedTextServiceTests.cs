@@ -90,6 +90,28 @@ namespace Umbraco.Tests.Services
 
 
         [Test]
+        public void Using_XDocument_Gets_All_Stored_Values_With_Duplicates()
+        {
+            var culture = CultureInfo.GetCultureInfo("en-US");
+            var txtService = new LocalizedTextService(
+                  new Dictionary<CultureInfo, Lazy<XDocument>>
+                {
+                    {
+                        culture, new Lazy<XDocument>(() => new XDocument(
+                            new XElement("language",
+                                new XElement("area", new XAttribute("alias", "testArea1"),
+                                    new XElement("key", new XAttribute("alias", "testKey1"), "testValue1"),
+                                    new XElement("key", new XAttribute("alias", "testKey1"), "testValue1")))))
+                    }
+                });
+
+            var result = txtService.GetAllStoredValues(culture);
+
+            Assert.AreEqual(1, result.Count());
+
+        }
+
+        [Test]
         public void Using_Dictionary_Returns_Text_With_Area()
         {
             var culture = CultureInfo.GetCultureInfo("en-US");

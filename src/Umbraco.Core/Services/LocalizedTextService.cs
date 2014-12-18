@@ -134,7 +134,12 @@ namespace Umbraco.Core.Services
                     var keys = area.XPathSelectElements("./key");
                     foreach (var key in keys)
                     {
-                        result.Add(string.Format("{0}/{1}", (string) area.Attribute("alias"), (string) key.Attribute("alias")), key.Value);
+                        var dictionaryKey = string.Format("{0}/{1}", (string) area.Attribute("alias"), (string) key.Attribute("alias"));
+                        //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+                        if (result.ContainsKey(dictionaryKey) == false)
+                        {
+                            result.Add(dictionaryKey, key.Value);
+                        }
                     }
                 }
             }
@@ -150,7 +155,12 @@ namespace Umbraco.Core.Services
                 {
                     foreach (var key in area.Value)
                     {
-                        result.Add(string.Format("{0}/{1}", area.Key, key.Key), key.Value);
+                        var dictionaryKey = string.Format("{0}/{1}", area.Key, key.Key);
+                        //i don't think it's possible to have duplicates because we're dealing with a dictionary in the first place, but we'll double check here just in case.
+                        if (result.ContainsKey(dictionaryKey) == false)
+                        {
+                            result.Add(dictionaryKey, key.Value);
+                        }
                     }
                 }
             }

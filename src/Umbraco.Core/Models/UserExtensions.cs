@@ -16,6 +16,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>      
         public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
         {
+            if (user == null) throw new ArgumentNullException("user");
+            if (textService == null) throw new ArgumentNullException("textService");
             return GetUserCulture(user.Language, textService);
         }
 
