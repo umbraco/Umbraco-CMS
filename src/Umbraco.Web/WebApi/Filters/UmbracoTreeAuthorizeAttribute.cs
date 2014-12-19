@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
@@ -46,9 +47,47 @@ namespace Umbraco.Web.WebApi.Filters
                 .Distinct()
                 .ToArray();
 
-            return UmbracoContext.Current.Security.CurrentUser != null
-                   && apps.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
+            var result = false;
+            if (UmbracoContext.Current.Security.CurrentUser != null)
+            {
+                result = apps.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
                        app, UmbracoContext.Current.Security.CurrentUser));
+
+                // Special case for recycle bin: exists in content and media, but needs to request details from 
+                // the list view data type configuration via a controller restricted to users that have access to the developer application.
+                // So if the request is for this, allow it even if the user does not have access to the developer application.
+                if (!result)
+                {
+                    if (actionContext.Request.RequestUri.Segments.Length == 6 &&
+                        actionContext.Request.RequestUri.Segments[4].ToLowerInvariant() == "datatype/" &&
+                        actionContext.Request.RequestUri.Segments[5].ToLowerInvariant() == "getbyid" &&
+                        !string.IsNullOrEmpty(actionContext.Request.RequestUri.Query))
+                    {
+                        var querystring = HttpUtility.ParseQueryString(actionContext.Request.RequestUri.Query.ToLowerInvariant());
+                        int requestedId;
+                        if (querystring.ContainsKey("id") && int.TryParse(querystring["id"], out requestedId))
+                        {
+                            string viewingApp = null;
+                            switch (requestedId)
+                            {
+                                case Constants.System.DefaultContentListViewDataTypeId:
+                                    viewingApp = "content";
+                                    break;
+                                case Constants.System.DefaultMediaListViewDataTypeId:
+                                    viewingApp = "media";
+                                    break;
+                            }
+
+                            if (!string.IsNullOrEmpty(viewingApp))
+                            {
+                                result = UmbracoContext.Current.Security.UserHasAppAccess(viewingApp, UmbracoContext.Current.Security.CurrentUser);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }
