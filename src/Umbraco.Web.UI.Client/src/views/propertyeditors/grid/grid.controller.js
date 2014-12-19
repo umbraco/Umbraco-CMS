@@ -389,8 +389,9 @@ angular.module("umbraco")
         };
 
         $scope.percentage = function(spans){
-            return ((spans/12)*100).toFixed(1);
+            return (( spans/ $scope.model.config.items.columns ) *100).toFixed(1);
         };
+
 
 
 
@@ -417,6 +418,13 @@ angular.module("umbraco")
             //settings indicator shortcut
             if($scope.model.config.items.config || $scope.model.config.items.styles){
                 $scope.hasSettings = true;
+            }
+
+            //ensure the grid has a column value set, if nothing is found, set it to 12
+            if($scope.model.config.items.columns && angular.isString($scope.model.config.items.columns)){
+                $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
+            }else{
+                $scope.model.config.items.columns = 12;
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
