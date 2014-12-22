@@ -39,6 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
 
+
             var script = new PartialView(path)
             {
                 //id can be the hash
@@ -46,7 +47,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Content = content,
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
-                UpdateDate = updated
+                UpdateDate = updated,
+                VirtualPath = FileSystem.GetUrl(id)
             };
 
             //on initial construction we don't want to have dirty properties tracked

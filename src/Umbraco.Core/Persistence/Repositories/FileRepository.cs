@@ -140,6 +140,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
             }
         }
 
@@ -153,6 +154,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
             }
         }
 
