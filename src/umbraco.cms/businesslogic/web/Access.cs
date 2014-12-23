@@ -494,7 +494,14 @@ namespace umbraco.cms.businesslogic.web
             return hasAccess;
         }
 
+        [Obsolete("This method has been replaced because of a spelling mistake. Use the HasAccess method instead.", false)]
         public static bool HasAccces(int documentId, object memberId)
+        {
+            // Call the correctly named version of this method
+            return HasAccess(documentId, memberId);
+        }
+
+        public static bool HasAccess(int documentId, object memberId)
         {
             bool hasAccess = false;
             var node = new CMSNode(documentId);
