@@ -511,7 +511,7 @@ namespace umbraco.cms.businesslogic.web
 
                 if (member != null)
                 {
-                    foreach (string role in Roles.GetRolesForUser())
+                    foreach (string role in Roles.GetRolesForUser(member.UserName))
                     {
                         if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
                         {
