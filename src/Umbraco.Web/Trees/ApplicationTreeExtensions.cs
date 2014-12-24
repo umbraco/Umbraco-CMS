@@ -84,12 +84,19 @@ namespace Umbraco.Web.Trees
                 proxiedRouteData,
                 new HttpRequestMessage(HttpMethod.Get, proxiedUrl))
                 {
-                    ControllerDescriptor = new HttpControllerDescriptor(controllerContext.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(instance.GetType()), instance.GetType())
+                    ControllerDescriptor = new HttpControllerDescriptor(controllerContext.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(instance.GetType()), instance.GetType()),
+                    //need to set the same request context otherwise we cannot set the request below (it will throw an exception)
+                    RequestContext = controllerContext.RequestContext
                 };
             
             instance.ControllerContext = proxiedControllerContext;
             instance.Request = controllerContext.Request;
             
+            //now we can change the request context's route data to be the proxied route data - NOTE: we cannot do this directly above
+            // because it will detect that the request context is different throw an exception. This is a change in webapi2, we didn't need
+            // to do this before.
+            instance.RequestContext.RouteData = proxiedRouteData;
+
             //invoke auth filters for this sub request
             var result = await instance.ControllerContext.InvokeAuthorizationFiltersForRequest();
             //if a result is returned it means they are unauthorized, just throw the response.
