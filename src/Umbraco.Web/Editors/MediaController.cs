@@ -20,13 +20,13 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
-using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
@@ -41,6 +41,7 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
+    [ContentModelFormatterConfiguration(typeof(MediaItemFormatter))]
     public class MediaController : ContentControllerBase
     {
         /// <summary>
@@ -214,9 +215,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>        
         [FileUploadCleanupFilter]
         [MediaPostValidate]
-        public MediaItemDisplay PostSave(
-            [ModelBinder(typeof(MediaItemBinder))]
-                MediaItemSave contentItem)
+        [ContentModelValidationFilter(typeof(MediaItemSave), typeof(IMedia))]
+        public MediaItemDisplay PostSave(MediaItemSave contentItem)
         {
             //If we've reached here it means:
             // * Our model has been bound

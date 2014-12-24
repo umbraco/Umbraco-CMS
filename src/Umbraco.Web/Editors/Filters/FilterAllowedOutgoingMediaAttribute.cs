@@ -7,9 +7,8 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.WebApi.Filters
+namespace Umbraco.Web.Editors.Filters
 {
     /// <summary>
     /// This inspects the result of the action that returns a collection of content and removes 
