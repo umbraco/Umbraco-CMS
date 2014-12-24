@@ -119,6 +119,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ClientDependency.1.8.1.0\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
+    <Reference Include="ClientDependency.Core.Mvc">
+      <HintPath>..\packages\ClientDependency-Mvc5.1.8.0.0\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="dotless.Core, Version=1.4.1.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\dotless.1.4.1.0\lib\dotless.Core.dll</HintPath>
