@@ -72,7 +72,7 @@
 
             <tbody ng-show="listViewResultSet.totalItems === 0">
                 <tr>
-                    <td colspan="5">
+                    <td colspan="{{options.includeProperties.length + 3}}">
                         <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
                     </td>
                 </tr>
