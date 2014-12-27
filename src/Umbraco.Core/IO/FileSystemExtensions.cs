@@ -7,13 +7,22 @@ namespace Umbraco.Core.IO
     {
 		public static long GetSize(this IFileSystem fs, string path)
         {
-            using (var s = fs.OpenFile(path))
-            {
-                var size = s.Length;
-                s.Close();
-
-                return size;    
-            }
+			 using (var ms = new MemoryStream())
+			 {
+				 using (var sr = new StreamReader(ms))
+				 {
+					 using (Stream file = fs.OpenFile(path))
+					 {
+						 var bytes = new byte[file.Length];
+						 file.Read(bytes, 0, (int) file.Length);
+						 ms.Write(bytes, 0, (int) file.Length);
+						 file.Close();
+						 ms.Position = 0;
+						 string str = sr.ReadToEnd();
+						 return str.Length;
+					 }
+				 }
+			 }
         }
 
         public static void CopyFile(this IFileSystem fs, string path, string newPath)
