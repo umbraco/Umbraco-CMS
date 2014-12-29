@@ -127,7 +127,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(ITemplate entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            var data = Encoding.UTF8.GetBytes(entity.Content);
+            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+
+            using (var stream = new MemoryStream(withBom))
             {
                 if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
                 {
@@ -184,7 +187,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(ITemplate entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            var data = Encoding.UTF8.GetBytes(entity.Content);
+            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+
+            using (var stream = new MemoryStream(withBom))
             {
                 if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
                 {
