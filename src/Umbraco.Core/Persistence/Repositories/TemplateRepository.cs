@@ -214,9 +214,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //now do the file work
 
-            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
-
-            using (var stream = new MemoryStream(withBom))
             if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
             {
                 var result = _viewHelper.CreateView(template, true);

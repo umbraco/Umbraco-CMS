@@ -51,7 +51,11 @@ namespace Umbraco.Core.IO
             if (_masterPageFileSystem.FileExists(filePath) == false || overWrite)
             {
                 masterpageContent = t.Content.IsNullOrWhiteSpace() ? CreateDefaultMasterPageContent(t, templateRepo) : t.Content;
-                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(masterpageContent)))
+
+                var data = Encoding.UTF8.GetBytes(masterpageContent);
+                var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+
+                using (var ms = new MemoryStream(withBom))
                 {
                     _masterPageFileSystem.AddFile(filePath, ms, true);    
                 }                
@@ -90,7 +94,11 @@ namespace Umbraco.Core.IO
             var template = UpdateMasterPageContent(t, currentAlias);
             UpdateChildTemplates(t, currentAlias, templateRepo);
             var filePath = GetFilePath(t);
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(template)))
+
+            var data = Encoding.UTF8.GetBytes(template);
+            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+
+            using (var ms = new MemoryStream(withBom))
             {
                 _masterPageFileSystem.AddFile(filePath, ms, true);
             }

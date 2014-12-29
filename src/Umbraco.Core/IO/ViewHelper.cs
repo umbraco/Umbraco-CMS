@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
@@ -83,7 +84,10 @@ namespace Umbraco.Core.IO
             var design = template.Content.IsNullOrWhiteSpace() ? EnsureInheritedLayout(template) : template.Content;
             var path = ViewPath(template.Alias);
 
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(design)))
+            var data = Encoding.UTF8.GetBytes(design);
+            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+
+            using (var ms = new MemoryStream(withBom))
             {
                 _viewFileSystem.AddFile(path, ms, true);
             }
@@ -103,7 +107,10 @@ namespace Umbraco.Core.IO
                     _viewFileSystem.DeleteFile(oldFile);
             }
 
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(t.Content)))
+            var data = Encoding.UTF8.GetBytes(t.Content);
+            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+
+            using (var ms = new MemoryStream(withBom))
             {
                 _viewFileSystem.AddFile(path, ms, true);
             }
