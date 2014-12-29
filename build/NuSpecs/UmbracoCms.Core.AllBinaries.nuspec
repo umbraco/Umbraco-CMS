@@ -36,7 +36,6 @@
     <file src="..\_BuildOutput\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
     <file src="..\_BuildOutput\bin\Microsoft.Threading.Tasks.dll" target="lib\Microsoft.Threading.Tasks.dll" />
     <file src="..\_BuildOutput\bin\Microsoft.Threading.Tasks.Extensions.dll" target="lib\Microsoft.Threading.Tasks.Extensions.dll" />
-    <file src="..\_BuildOutput\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
     <file src="..\_BuildOutput\bin\Microsoft.Web.Infrastructure.dll" target="lib\Microsoft.Web.Infrastructure.dll" />
     <file src="..\_BuildOutput\bin\Microsoft.Web.Mvc.FixedDisplayModes.dll" target="lib\Microsoft.Web.Mvc.FixedDisplayModes.dll" />
     <file src="..\_BuildOutput\bin\MiniProfiler.dll" target="lib\MiniProfiler.dll" />
