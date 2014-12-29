@@ -1,3 +1,4 @@
+using System.Runtime.Remoting;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -5,6 +6,8 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Caching;
+using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -178,10 +181,11 @@ namespace Umbraco.Tests.Services
                 /*,"Navigation"*/);
             cts.Save(ctBase);
 
-            var ctHomePage = new ContentType(ctBase)
+            const string contentTypeAlias = "HomePage";
+            var ctHomePage = new ContentType(ctBase, contentTypeAlias)
             {
                 Name = "Home Page",
-                Alias = "HomePage",
+                Alias = contentTypeAlias,
                 Icon = "settingDomain.gif",
                 Thumbnail = "folder.png",
                 AllowedAsRoot = true
@@ -191,7 +195,7 @@ namespace Umbraco.Tests.Services
             cts.Save(ctHomePage);
 
             // Act
-            var homeDoc = cs.CreateContent("Home Page", -1, "HomePage");
+            var homeDoc = cs.CreateContent("Home Page", -1, contentTypeAlias);
             cs.SaveAndPublishWithStatus(homeDoc);
 
             // Assert
@@ -243,13 +247,13 @@ namespace Umbraco.Tests.Services
             var global = MockedContentTypes.CreateSimpleContentType("global", "Global");
             service.Save(global);
 
-            var components = MockedContentTypes.CreateSimpleContentType("components", "Components", global);
+            var components = MockedContentTypes.CreateSimpleContentType("components", "Components", global, true);
             service.Save(components);
 
-            var component = MockedContentTypes.CreateSimpleContentType("component", "Component", components);
+            var component = MockedContentTypes.CreateSimpleContentType("component", "Component", components, true);
             service.Save(component);
 
-            var category = MockedContentTypes.CreateSimpleContentType("category", "Category", global);
+            var category = MockedContentTypes.CreateSimpleContentType("category", "Category", global, true);
             service.Save(category);
 
             var success = category.AddContentType(component);
@@ -464,6 +468,766 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id);
         }
 
+        [Test]
+        public void Cannot_Add_Duplicate_PropertyType_Alias_To_Referenced_Composition()
+        {
+            //Related the second issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
+
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var parent = MockedContentTypes.CreateSimpleContentType();
+            service.Save(parent);
+            var child = MockedContentTypes.CreateSimpleContentType("simpleChildPage", "Simple Child Page", parent, true);
+            service.Save(child);
+            var composition = MockedContentTypes.CreateMetaContentType();
+            service.Save(composition);
+
+            //Adding Meta-composition to child doc type
+            child.AddContentType(composition);
+            service.Save(child);
+
+            // Act
+            var duplicatePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var added = composition.AddPropertyType(duplicatePropertyType, "Meta");
+
+            // Assert
+            Assert.That(added, Is.True);
+            Assert.Throws<Exception>(() => service.Save(composition));
+            Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
+        }
+
+        [Test]
+        public void Cannot_Add_Duplicate_PropertyType_Alias_In_Composition_Graph()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var basePage = MockedContentTypes.CreateSimpleContentType("basePage", "Base Page", null, true);
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true);
+            service.Save(advancedPage);
+
+            var metaComposition = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaComposition);
+            var seoComposition = MockedContentTypes.CreateSeoContentType();
+            service.Save(seoComposition);
+
+            var metaAdded = contentPage.AddContentType(metaComposition);
+            service.Save(contentPage);
+            var seoAdded = advancedPage.AddContentType(seoComposition);
+            service.Save(advancedPage);
+
+            // Act
+            var duplicatePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var addedToBasePage = basePage.AddPropertyType(duplicatePropertyType, "Content");
+            var addedToAdvancedPage = advancedPage.AddPropertyType(duplicatePropertyType, "Content");
+            var addedToMeta = metaComposition.AddPropertyType(duplicatePropertyType, "Meta");
+            var addedToSeo = seoComposition.AddPropertyType(duplicatePropertyType, "Seo");
+
+            // Assert
+            Assert.That(metaAdded, Is.True);
+            Assert.That(seoAdded, Is.True);
+
+            Assert.That(addedToBasePage, Is.True);
+            Assert.That(addedToAdvancedPage, Is.False);
+            Assert.That(addedToMeta, Is.True);
+            Assert.That(addedToSeo, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(basePage));
+            Assert.Throws<Exception>(() => service.Save(metaComposition));
+            Assert.Throws<Exception>(() => service.Save(seoComposition));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("meta"));
+            Assert.DoesNotThrow(() => service.GetContentType("seo"));
+        }
+
+        [Test]
+        public void Cannot_Add_Duplicate_PropertyType_Alias_At_Root_Which_Conflicts_With_Third_Levels_Composition()
+        {
+            /*
+             * BasePage, gets 'Title' added but should not be allowed
+             * -- Content Page
+             * ---- Advanced Page -> Content Meta
+             * Content Meta :: Composition, has 'Title'
+             * 
+             * Content Meta has 'Title' PropertyType
+             * Adding 'Title' to BasePage should fail
+            */
+
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            service.Save(basePage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+            
+            var compositionAdded = advancedPage.AddContentType(contentMetaComposition);
+            service.Save(advancedPage);
+
+            //NOTE: It should not be possible to Save 'BasePage' with the Title PropertyType added
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(titleAdded, Is.True);
+            Assert.That(compositionAdded, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(basePage));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
+        public void Cannot_Rename_PropertyType_Alias_On_Composition_Which_Would_Cause_Conflict_In_Other_Composition()
+        {
+            /*
+             * Meta renames alias to 'title'
+             * Seo has 'Title'
+             * BasePage
+             * -- ContentPage
+             * ---- AdvancedPage -> Seo
+             * ------ MoreAdvanedPage -> Meta
+             */
+
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+            var moreAdvancedPage = MockedContentTypes.CreateBasicContentType("moreAdvancedPage", "More Advanced Page", advancedPage);
+            service.Save(moreAdvancedPage);
+
+            var seoComposition = MockedContentTypes.CreateSeoContentType();
+            service.Save(seoComposition);
+            var metaComposition = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaComposition);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            service.Save(basePage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "Content");
+            service.Save(advancedPage);
+
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
+            service.Save(seoComposition);
+
+            var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
+            var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
+            service.Save(advancedPage);
+            service.Save(moreAdvancedPage);
+
+            var keywordsPropertyType = metaComposition.PropertyTypes.First(x => x.Alias.Equals("metakeywords"));
+            keywordsPropertyType.Alias = "title";
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(titleAdded, Is.True);
+            Assert.That(seoCompositionAdded, Is.True);
+            Assert.That(metaCompositionAdded, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(metaComposition));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("moreAdvancedPage"));
+        }
+
+        [Test]
+        public void Can_Add_Additional_Properties_On_Composition_Once_Composition_Has_Been_Saved()
+        {
+            /*
+             * Meta renames alias to 'title'
+             * Seo has 'Title'
+             * BasePage
+             * -- ContentPage
+             * ---- AdvancedPage -> Seo
+             * ------ MoreAdvancedPage -> Meta
+             */
+
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+            var moreAdvancedPage = MockedContentTypes.CreateBasicContentType("moreAdvancedPage", "More Advanced Page", advancedPage);
+            service.Save(moreAdvancedPage);
+
+            var seoComposition = MockedContentTypes.CreateSeoContentType();
+            service.Save(seoComposition);
+            var metaComposition = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaComposition);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            service.Save(basePage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "Content");
+            service.Save(advancedPage);
+
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
+            service.Save(seoComposition);
+            
+            var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
+            var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
+            service.Save(advancedPage);
+            service.Save(moreAdvancedPage);
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(titleAdded, Is.True);
+            Assert.That(seoCompositionAdded, Is.True);
+            Assert.That(metaCompositionAdded, Is.True);
+            
+            var testPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "test", Name = "Test", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var testAdded = seoComposition.AddPropertyType(testPropertyType, "Content");
+            service.Save(seoComposition);
+
+            Assert.That(testAdded, Is.True);
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("moreAdvancedPage"));
+        }
+
+        [Test]
+        public void Cannot_Rename_PropertyGroup_On_Child_Avoiding_Conflict_With_Parent_PropertyGroup()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content");
+            service.Save(page);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content_");
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, "Details");
+            service.Save(advancedPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            // Act
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+
+            var compositionAdded = contentPage.AddContentType(contentMetaComposition);
+            service.Save(contentPage);
+
+            //Change the name of the tab on the "root" content type 'page'.
+            var propertyGroup = contentPage.PropertyGroups["Content_"];
+            Assert.Throws<Exception>(() => contentPage.PropertyGroups.Add(new PropertyGroup
+            {
+                Id = propertyGroup.Id,
+                Name = "Content",
+                SortOrder = 0
+            }));
+
+            // Assert
+            Assert.That(compositionAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
+        public void Cannot_Rename_PropertyType_Alias_Causing_Conflicts_With_Parents()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+
+            // Act
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content");
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 
+            };
+            var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(basePage);
+            service.Save(contentPage);
+            service.Save(advancedPage);
+
+            //Rename the PropertyType to something that already exists in the Composition - NOTE this should not be allowed and Saving should throw an exception
+            var authorPropertyTypeToRename = advancedPage.PropertyTypes.First(x => x.Alias.Equals("author"));
+            authorPropertyTypeToRename.Alias = "title";
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(titleAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+
+            Assert.Throws<Exception>(() => service.Save(advancedPage));
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
+        public void Can_Add_PropertyType_Alias_Which_Exists_In_Composition_Outside_Graph()
+        {
+            /*
+             * Meta (Composition)
+             * Content Meta (Composition) has 'Title' -> Meta
+             * BasePage
+             * -- ContentPage gets 'Title' added -> Meta
+             * ---- Advanced Page
+             */
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var basePage = MockedContentTypes.CreateSimpleContentType("basePage", "Base Page", null, true);
+            service.Save(basePage);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", basePage, true);
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true);
+            service.Save(advancedPage);
+
+            var metaComposition = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaComposition);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            var metaAdded = contentPage.AddContentType(metaComposition);
+            service.Save(contentPage);
+
+            var metaAddedToComposition = contentMetaComposition.AddContentType(metaComposition);
+            service.Save(contentMetaComposition);
+
+            // Act
+            var propertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var addedToContentPage = contentPage.AddPropertyType(propertyType, "Content");
+
+            // Assert
+            Assert.That(metaAdded, Is.True);
+            Assert.That(metaAddedToComposition, Is.True);
+
+            Assert.That(addedToContentPage, Is.True);
+            Assert.DoesNotThrow(() => service.Save(contentPage));
+        }
+
+        [Test]
+        public void Can_Rename_PropertyGroup_With_Inherited_PropertyGroups()
+        {
+            //Related the first issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
+            
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, false, "Content_");
+            service.Save(page);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true);
+            service.Save(contentPage);
+            var composition = MockedContentTypes.CreateMetaContentType();
+            composition.AddPropertyGroup("Content");
+            service.Save(composition);
+            //Adding Meta-composition to child doc type
+            contentPage.AddContentType(composition);
+            service.Save(contentPage);
+
+            // Act
+            var propertyTypeOne = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "testTextbox", Name = "Test Textbox", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var firstOneAdded = contentPage.AddPropertyType(propertyTypeOne, "Content_");
+            var propertyTypeTwo = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "anotherTextbox", Name = "Another Test Textbox", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var secondOneAdded = contentPage.AddPropertyType(propertyTypeTwo, "Content");
+            service.Save(contentPage);
+
+            Assert.That(page.PropertyGroups.Contains("Content_"), Is.True);
+            var propertyGroup = page.PropertyGroups["Content_"];
+            page.PropertyGroups.Add(new PropertyGroup{ Id = propertyGroup.Id, Name = "ContentTab", SortOrder = 0});
+            service.Save(page);
+
+            // Assert
+            Assert.That(firstOneAdded, Is.True);
+            Assert.That(secondOneAdded, Is.True);
+
+            var contentType = service.GetContentType("contentPage");
+            Assert.That(contentType, Is.Not.Null);
+
+            var compositionPropertyGroups = contentType.CompositionPropertyGroups;
+            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(0));
+
+            var propertyTypeCount = contentType.PropertyTypes.Count();
+            var compPropertyTypeCount = contentType.CompositionPropertyTypes.Count();
+            Assert.That(propertyTypeCount, Is.EqualTo(5));
+            Assert.That(compPropertyTypeCount, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void Can_Rename_PropertyGroup_On_Parent_Without_Causing_Duplicate_PropertyGroups()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content_");
+            service.Save(page);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Contentx");
+            service.Save(contentPage);
+            var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, "Contenty");
+            service.Save(advancedPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+            var compositionAdded = contentPage.AddContentType(contentMetaComposition);
+            service.Save(contentPage);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content_");//Will be added to the parent tab
+            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");//Will be added to the "Content Meta" composition
+            service.Save(contentPage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var descriptionPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "description", Name = "Description", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var keywordsPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "keywords", Name = "Keywords", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content_");//Will be added to an ancestor tab
+            var descriptionAdded = advancedPage.AddPropertyType(descriptionPropertyType, "Contentx");//Will be added to a parent tab
+            var keywordsAdded = advancedPage.AddPropertyType(keywordsPropertyType, "Content");//Will be added to the "Content Meta" composition
+            service.Save(advancedPage);
+
+            //Change the name of the tab on the "root" content type 'page'.
+            var propertyGroup = page.PropertyGroups["Content_"];
+            page.PropertyGroups.Add(new PropertyGroup { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
+            service.Save(page);
+
+            // Assert
+            Assert.That(compositionAdded, Is.True);
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(descriptionAdded, Is.True);
+            Assert.That(keywordsAdded, Is.True);
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+
+            var advancedPageReloaded = service.GetContentType("advancedPage");
+            var contentUnderscoreTabExists = advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content_"));
+            Assert.That(contentUnderscoreTabExists, Is.False);
+
+            var numberOfContentTabs = advancedPageReloaded.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
+            Assert.That(numberOfContentTabs, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void Can_Rename_PropertyGroup_On_Parent_Without_Causing_Duplicate_PropertyGroups_v2()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content_");
+            service.Save(page);
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content");
+            service.Save(contentPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "subtitle", Name = "Subtitle", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = page.AddPropertyType(bodyTextPropertyType, "Content_");
+            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content_");
+            service.Save(page);
+            service.Save(contentPage);
+
+            var compositionAdded = contentPage.AddContentType(contentMetaComposition);
+            service.Save(contentPage);
+
+            //Change the name of the tab on the "root" content type 'page'.
+            var propertyGroup = page.PropertyGroups["Content_"];
+            page.PropertyGroups.Add(new PropertyGroup { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
+            service.Save(page);
+
+            // Assert
+            Assert.That(compositionAdded, Is.True);
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(subtitleAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+        }
+
+        [Test]
+        public void Can_Remove_PropertyGroup_On_Parent_Without_Causing_Duplicate_PropertyGroups()
+        {
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            // Act
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            service.Save(basePage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+
+            var compositionAdded = contentPage.AddContentType(contentMetaComposition);
+            service.Save(contentPage);
+
+            basePage.RemovePropertyGroup("Content");
+            service.Save(basePage);
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(compositionAdded, Is.True);
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+
+            var contentType = service.GetContentType("contentPage");
+            var propertyGroup = contentType.PropertyGroups["Content"];
+            Assert.That(propertyGroup.ParentId.HasValue, Is.False);
+        }
+
+        [Test]
+        public void Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()
+        {
+            /*
+             * BasePage
+             * - Content Page
+             * -- Advanced Page
+             * Content Meta :: Composition
+            */ 
+            
+            // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var basePage = MockedContentTypes.CreateBasicContentType();
+            service.Save(basePage);
+
+            var contentPage = MockedContentTypes.CreateBasicContentType("contentPage", "Content Page", basePage);
+            service.Save(contentPage);
+
+            var advancedPage = MockedContentTypes.CreateBasicContentType("advancedPage", "Advanced Page", contentPage);
+            service.Save(advancedPage);
+
+            var contentMetaComposition = MockedContentTypes.CreateContentMetaContentType();
+            service.Save(contentMetaComposition);
+
+            // Act
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "author", Name = "Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            service.Save(contentPage);
+
+            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            };
+            var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            service.Save(basePage);
+
+            var compositionAdded = contentPage.AddContentType(contentMetaComposition);
+            service.Save(contentPage);
+
+            // Assert
+            Assert.That(bodyTextAdded, Is.True);
+            Assert.That(authorAdded, Is.True);
+            Assert.That(compositionAdded, Is.True);
+
+            Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
+            Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+
+            var contentType = service.GetContentType("contentPage");
+            var propertyGroup = contentType.PropertyGroups["Content"];
+            Assert.That(propertyGroup.ParentId.HasValue, Is.False);
+
+            var numberOfContentTabs = contentType.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
+            Assert.That(numberOfContentTabs, Is.EqualTo(3));
+
+            //Ensure that adding a new PropertyType to the "Content"-tab also adds it to the right group
+
+            var descriptionPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "description", Name = "Description", Description = "", HelpText = "", Mandatory = false, SortOrder = 1,DataTypeDefinitionId = -88
+            };
+            var descriptionAdded = contentType.AddPropertyType(descriptionPropertyType, "Content");
+            service.Save(contentType);
+            Assert.That(descriptionAdded, Is.True);
+
+            var contentPageReloaded = service.GetContentType("contentPage");
+            var propertyGroupReloaded = contentPageReloaded.PropertyGroups["Content"];
+            var hasDescriptionPropertyType = propertyGroupReloaded.PropertyTypes.Contains("description");
+            Assert.That(hasDescriptionPropertyType, Is.True);
+            Assert.That(propertyGroupReloaded.ParentId.HasValue, Is.False);
+
+            var descriptionPropertyTypeReloaded = propertyGroupReloaded.PropertyTypes["description"];
+            Assert.That(descriptionPropertyTypeReloaded.PropertyGroupId.IsValueCreated, Is.False);
+        }
+
         private ContentType CreateComponent()
         {
             var component = new ContentType(-1)
@@ -487,9 +1251,10 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateBannerComponent(ContentType parent)
         {
-            var banner = new ContentType(parent)
+            const string contentTypeAlias = "banner";
+            var banner = new ContentType(parent, contentTypeAlias)
             {
-                Alias = "banner",
+                Alias = contentTypeAlias,
                 Name = "Banner Component",
                 Description = "ContentType used for Banner Component",
                 Icon = ".sprTreeDoc3",
@@ -535,9 +1300,10 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateHomepage(ContentType parent)
         {
-            var contentType = new ContentType(parent)
+            const string contentTypeAlias = "homepage";
+            var contentType = new ContentType(parent, contentTypeAlias)
             {
-                Alias = "homepage",
+                Alias = contentTypeAlias,
                 Name = "Homepage",
                 Description = "ContentType used for the Homepage",
                 Icon = ".sprTreeDoc3",

@@ -8,7 +8,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
-
     internal class LogScrubber : DisposableObject, IBackgroundTask
     {
         private readonly ApplicationContext _appContext;
@@ -48,7 +47,7 @@ namespace Umbraco.Web.Scheduling
             using (DisposableTimer.DebugDuration<LogScrubber>(() => "Log scrubbing executing", () => "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
-            }
+            }           
         }
     }
 }

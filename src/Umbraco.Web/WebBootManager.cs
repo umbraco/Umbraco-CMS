@@ -10,6 +10,7 @@ using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
+using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -47,6 +48,8 @@ namespace Umbraco.Web
     public class WebBootManager : CoreBootManager
     {
         private readonly bool _isForTesting;
+        //NOTE: see the Initialize method for what this is used for
+        private List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
@@ -71,6 +74,13 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Initialize()
         {
+             //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
+            // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
+            // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
+            // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
+            // boot process has completed. It's a hack but it works.
+            ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
+
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -109,7 +119,7 @@ namespace Umbraco.Web
 
             return this;
         }
-
+        
         /// <summary>
         /// Override this method in order to ensure that the UmbracoContext is also created, this can only be 
         /// created after resolution is frozen!
@@ -163,6 +173,18 @@ namespace Umbraco.Web
 
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
+            
+            //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them 
+            // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
+            // initialize during startup, in which case we want it to rebuild the indexes itself.
+            ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
+            if (_indexesToRebuild.Any())
+            {
+                foreach (var indexer in _indexesToRebuild)
+                {
+                    indexer.RebuildIndex();
+                }
+            }
 
             return this;
         }
@@ -398,5 +420,13 @@ namespace Umbraco.Web
                 new DefaultCultureDictionaryFactory());
         }
 
+
+        private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
+        {
+            //store the indexer that needs rebuilding because it's empty for when the boot process 
+            // is complete and cancel this current event so the rebuild process doesn't start right now.
+            args.Cancel = true;
+            _indexesToRebuild.Add(args.Indexer);
+        }
     }
 }

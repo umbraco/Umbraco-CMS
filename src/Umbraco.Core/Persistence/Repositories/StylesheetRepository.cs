@@ -18,10 +18,10 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IDatabaseUnitOfWork _dbwork;
 
         internal StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db, IFileSystem fileSystem)
-			: base(work, fileSystem)
-	    {
+            : base(work, fileSystem)
+        {
             _dbwork = db;
-	    }
+        }
 
         public StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db)
             : this(work, db, new PhysicalFileSystem(SystemDirectories.Css))
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 byte[] bytes = new byte[stream.Length];
                 stream.Position = 0;
-                stream.Read(bytes, 0, (int) stream.Length);
+                stream.Read(bytes, 0, (int)stream.Length);
                 content = Encoding.UTF8.GetString(bytes);
             }
 
@@ -52,20 +52,21 @@ namespace Umbraco.Core.Persistence.Repositories
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
 
             var stylesheet = new Stylesheet(path)
-                                 {
-                                     Content = content,
-                                     Key = path.EncodeAsGuid(),
-                                     CreateDate = created,
-                                     UpdateDate = updated,
-                                     Id = GetStylesheetId(path)
-                                 };
+            {
+                Content = content,
+                Key = path.EncodeAsGuid(),
+                CreateDate = created,
+                UpdateDate = updated,
+                Id = GetStylesheetId(path),
+                VirtualPath = FileSystem.GetUrl(id)
+            };
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             stylesheet.ResetDirtyProperties(false);
 
             return stylesheet;
-            
+
         }
 
         // Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
@@ -77,8 +78,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select("*")
                 .From<NodeDto>()
                 .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
-                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(), 
-                        Alias = path.TrimEnd(".css").Replace("\\", "/") });
+                    new
+                    {
+                        NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
+                        Alias = path.TrimEnd(".css").Replace("\\", "/")
+                    });
             var nodeDto = _dbwork.Database.FirstOrDefault<NodeDto>(sql);
             return nodeDto == null ? 0 : nodeDto.NodeId;
         }
@@ -90,7 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select("*")
                 .From<NodeDto>()
                 .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text in (@aliases)",
-                    new 
+                    new
                     {
                         NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
                         aliases = paths.Select(x => x.TrimEnd(".css").Replace("\\", "/")).ToArray()

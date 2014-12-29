@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
@@ -39,6 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
 
+
             var script = new PartialView(path)
             {
                 //id can be the hash
@@ -46,7 +48,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Content = content,
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
-                UpdateDate = updated
+                UpdateDate = updated,
+                VirtualPath = FileSystem.GetUrl(id)
             };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -76,6 +79,21 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return Get(file);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a stream that is used to write to the file
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures the stream includes a utf8 BOM
+        /// </remarks>
+        protected override Stream GetContentStream(string content)
+        {
+            var data = Encoding.UTF8.GetBytes(content);
+            var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
+            return new MemoryStream(withBom);
         }
     }
 }

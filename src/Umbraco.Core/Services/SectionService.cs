@@ -140,6 +140,8 @@ namespace Umbraco.Core.Services
                                         }
                                     }
                                 }
+
+                                _isInitialized = true;
                             }
                         }
 

@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.UI;
+using dotless.Core.Parser.Tree;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
@@ -47,6 +50,27 @@ namespace Umbraco.Web.Editors
         public ActionResult AuthorizeUpgrade()
         {
             return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml");
+        }
+
+        /// <summary>
+        /// Get the json localized text for a given culture or the culture for the current user
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public JsonNetResult LocalizedText(string culture = null)
+        {
+            var cultureInfo = culture == null 
+                //if the user is logged in, get their culture, otherwise default to 'en'
+                ? User.Identity.IsAuthenticated ? Security.CurrentUser.GetUserCulture(Services.TextService) : CultureInfo.GetCultureInfo("en")
+                : CultureInfo.GetCultureInfo(culture);
+
+            var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
+                //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
+                // in the back office requres the delimiter to be a '_' so we'll just replace it
+                .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
+
+            return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
         }
 
         /// <summary>

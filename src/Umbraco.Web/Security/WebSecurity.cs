@@ -117,7 +117,7 @@ namespace Umbraco.Web.Security
                 StartContentNode = user.StartContentId,
                 StartMediaNode = user.StartMediaId,
                 Username = user.Username,
-                Culture = ui.Culture(user.Language)
+                Culture = ui.Culture(user)
             });
             
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);

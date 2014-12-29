@@ -21,7 +21,6 @@ namespace Umbraco.Web.Scheduling
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
-
         private static bool _isPublishingRunning = false;
 
         public ScheduledTasks(ApplicationContext appContext, IUmbracoSettingsSection settings)
@@ -32,8 +31,6 @@ namespace Umbraco.Web.Scheduling
 
         private void ProcessTasks()
         {
-
-
             var scheduledTasks = _settings.ScheduledTasks.Tasks;
             foreach (var t in scheduledTasks)
             {

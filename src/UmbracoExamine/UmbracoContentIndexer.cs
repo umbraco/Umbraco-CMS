@@ -122,7 +122,7 @@ namespace UmbracoExamine
 
         #region Constants & Fields
 
-        private readonly LocalTempStorageIndexer _localTempStorageHelper = new LocalTempStorageIndexer();
+        
 
         /// <summary>
         /// Used to store the path of a content object
@@ -208,19 +208,7 @@ namespace UmbracoExamine
 
             base.Initialize(name, config);
 
-            if (config != null && config["useTempStorage"] != null)
-            {
-                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
-                // for websites that are running from a remove file server and file IO latency becomes an issue
-                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<bool>();
-                if (attemptUseTempStorage)
-                {
-                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
-                    var configuredPath = indexSet.IndexPath;
-
-                    _localTempStorageHelper.Initialize(config, configuredPath, base.GetLuceneDirectory(), IndexingAnalyzer);
-                }
-            }
+            
 
             
         }
@@ -296,32 +284,7 @@ namespace UmbracoExamine
 
         #region Public methods
 
-        public override Lucene.Net.Store.Directory GetLuceneDirectory()
-        {
-            //if temp local storage is configured use that, otherwise return the default
-            if (_localTempStorageHelper.LuceneDirectory != null)
-            {
-                return _localTempStorageHelper.LuceneDirectory;
-            }
-
-            return base.GetLuceneDirectory();
-
-        }
-
-        public override IndexWriter GetIndexWriter()
-        {
-            //if temp local storage is configured use that, otherwise return the default
-            if (_localTempStorageHelper.LuceneDirectory != null)
-            {
-                return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
-                    //create the writer with the snapshotter, though that won't make too much a difference because we are not keeping the writer open unless using nrt
-                    // which we are not currently.
-                    _localTempStorageHelper.Snapshotter,
-                    IndexWriter.MaxFieldLength.UNLIMITED);
-            }
-
-            return base.GetIndexWriter();
-        }
+        
 
 
         /// <summary>

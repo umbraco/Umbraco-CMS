@@ -55,7 +55,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Path to the File from the root of the site
+        /// Gets or sets the Path to the File from the root of the file's associated IFileSystem
         /// </summary>
         [DataMember]
         public virtual string Path
@@ -91,6 +91,11 @@ namespace Umbraco.Core.Models
                 }, _content, ContentSelector);
             }
         }
+
+        /// <summary>
+        /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
+        /// </summary>
+        public string VirtualPath { get; set; }
 
         /// <summary>
         /// Boolean indicating whether the file could be validated
