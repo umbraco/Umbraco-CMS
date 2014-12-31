@@ -1,12 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Mvc;
-using System.Web.Routing;
-using Microsoft.Web.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Install.Controllers;
 
 namespace Umbraco.Web.Install
