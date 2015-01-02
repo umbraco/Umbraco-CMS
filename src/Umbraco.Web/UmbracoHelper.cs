@@ -26,6 +26,7 @@ using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
 	/// A helper class that provides many useful methods and functionality for using Umbraco in templates
 	/// </summary>
@@ -42,7 +43,7 @@ namespace Umbraco.Web
         /// </summary>
         public TagQuery TagQuery
         {
-            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService)); }
+            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService, _query)); }
         }
 
         /// <summary>
