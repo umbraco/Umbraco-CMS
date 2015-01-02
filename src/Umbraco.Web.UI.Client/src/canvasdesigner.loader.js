@@ -2,7 +2,7 @@ LazyLoad.js([
       '/Umbraco/lib/jquery/jquery-2.0.3.min.js',
       '/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.js',
       '/Umbraco/lib/angular/1.1.5/angular.min.js',
-      '/Umbraco/lib/underscore/underscore.js',
+      '/Umbraco/lib/underscore/underscore-min.js',
       '/Umbraco/js/app.js',
       '/Umbraco/js/umbraco.resources.js',
       '/Umbraco/js/umbraco.services.js',

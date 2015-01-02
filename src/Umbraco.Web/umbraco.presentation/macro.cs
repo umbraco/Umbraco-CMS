@@ -29,6 +29,7 @@ using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
+using Umbraco.Web.Models;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
@@ -1556,13 +1557,13 @@ namespace umbraco
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
                 currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
             {
-                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
+                currentNodeProperty.SetValue(control, GetCurrentNode(), null);
             }
             currentNodeProperty = type.GetProperty("currentNode");
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
                 currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
             {
-                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
+                currentNodeProperty.SetValue(control, GetCurrentNode(), null);
             }
         }
 
@@ -1846,10 +1847,13 @@ namespace umbraco
 
         private static INode GetCurrentNode()
         {
-            var id = Node.getCurrentNodeId();
-            var content = UmbracoContext.Current.ContentCache.GetById(id);
-            //TODO: This should check for null!
-            return CompatibilityHelper.ConvertToNode(content);
+            //Get the current content request
+
+            var content = UmbracoContext.Current.PublishedContentRequest != null
+                    ? UmbracoContext.Current.PublishedContentRequest.PublishedContent
+                    : null;
+        
+            return content == null ? null : LegacyNodeHelper.ConvertToNode(content);
         }
 
         #region Events

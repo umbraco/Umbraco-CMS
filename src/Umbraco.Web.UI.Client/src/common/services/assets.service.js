@@ -230,11 +230,11 @@ angular.module('umbraco.services')
                           asset.state = "loaded";  
                           asset.deferred.resolve(true);
                       }else{
-                          asset.state = "loaded";    
+                          asset.state = "loaded";     
                           angularHelper.safeApply(scope, function () {
                               asset.deferred.resolve(true);
-                          });
-                      }
+                          }); 
+                      } 
                     });    
                 });
             }else{

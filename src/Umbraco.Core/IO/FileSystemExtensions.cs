@@ -2,17 +2,18 @@
 using System.IO;
 
 namespace Umbraco.Core.IO
-{	
+{
     public static class FileSystemExtensions
     {
-		public static long GetSize(this IFileSystem fs, string path)
+        public static long GetSize(this IFileSystem fs, string path)
         {
-            using (var s = fs.OpenFile(path))
+            using (var file = fs.OpenFile(path))
             {
-                var size = s.Length;
-                s.Close();
-
-                return size;    
+                using (var sr = new StreamReader(file))
+                {
+                    var str = sr.ReadToEnd();
+                    return str.Length;
+                }
             }
         }
 
@@ -25,14 +26,14 @@ namespace Umbraco.Core.IO
         }
 
         public static string GetExtension(this IFileSystem fs, string path)
-		{
-			return Path.GetExtension(fs.GetFullPath(path));
-		}
+        {
+            return Path.GetExtension(fs.GetFullPath(path));
+        }
 
         public static string GetFileName(this IFileSystem fs, string path)
-		{
-			return Path.GetFileName(fs.GetFullPath(path));
-		}
+        {
+            return Path.GetFileName(fs.GetFullPath(path));
+        }
 
         //TODO: Currently this is the only way to do this
         internal static void CreateFolder(this IFileSystem fs, string folderPath)

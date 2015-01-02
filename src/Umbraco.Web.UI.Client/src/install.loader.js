@@ -6,7 +6,7 @@ LazyLoad.js( [
       'lib/angular/1.1.5/angular-mobile.min.js',
       'lib/angular/1.1.5/angular-mocks.js',
       'lib/angular/1.1.5/angular-sanitize.min.js',
-      'lib/underscore/underscore.js',
+      'lib/underscore/underscore-min.js',
       'js/umbraco.installer.js'
     ], function () {
         jQuery(document).ready(function () {

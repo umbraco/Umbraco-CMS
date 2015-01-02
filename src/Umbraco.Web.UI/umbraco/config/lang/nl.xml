@@ -788,6 +788,36 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="quickGuide">Quick Guide voor Umbraco template tags</key>
     <key alias="template">Sjabloon</key>
   </area>
+	<area alias="grid">
+		<key alias="insertControl">Item toevoegen</key>
+		<key alias="addRows">Een rij aan de lay-out toevoegen</key>
+		<key alias="addElement"><![CDATA[Klik om te starten op het <i class="icon icon-add blue"></i> teken onderaan en voeg je eerste item toe]]></key>
+
+		<key alias="gridLayouts">Grid lay-outs</key>
+		<key alias="gridLayoutsDetail">Lay-outs zijn het globale werkgebied voor de grid editor. Je hebt meestal maar één of twee verschillende lay-outs nodig</key>
+		<key alias="addGridLayout">Een grid layout toevoegen</key>
+		<key alias="addGridLayoutDetail">De lay-out aanpassen door de kolombreedte aan te passen en extra kolommen toe te voegen</key>
+
+		<key alias="rowConfigurations">Rijconfiguratie</key>
+		<key alias="rowConfigurationsDetail">Rijen zijn voorgedefinieerde cellen die horizontaal zijn gerangschikt</key>
+		<key alias="addRowConfiguration">Een rijconfiguratie toevoegen</key>
+		<key alias="addRowConfigurationDetail">De rijconfiguratie aanpassen door de breedte van de cel in te stellen en extra cellen toe te voegen</key>
+
+		<key alias="columns">Kolommen</key>
+		<key alias="columnsDetails">Het totaal aantal gecombineerde kolommen in de grid layout</key>
+
+		<key alias="settings">Instellingen</key>
+		<key alias="settingsDetails">Configureren welke instellingen de editors kunnen aanpassen</key>
+
+
+		<key alias="styles">Styles</key>
+		<key alias="stylesDetails">Configureren welke stijlen de editors kunnen aanpassen</key>
+
+		<key alias="settingDialogDetails">De instellingen worden enkel bewaard indien de ingevoerde Json geldig is</key>
+
+		<key alias="allowAllEditors">Alle editors toelaten</key>
+		<key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
+	</area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternatief veld</key>
     <key alias="alternativeText">Alternatieve tekst</key>
