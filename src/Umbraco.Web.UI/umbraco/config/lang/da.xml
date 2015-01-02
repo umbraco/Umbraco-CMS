@@ -758,6 +758,37 @@ Mange hilsner fra Umbraco robotten
     <key alias="quickGuide">Lynguide til Umbracos skabelontags</key>
     <key alias="template">Skabelon</key>
   </area>
+  <area alias="grid">
+    <key alias="insertControl">Indsæt kontrol</key>
+    <key alias="addRows">Tilføj rækker til dit layout</key>
+    <key alias="addElement"><![CDATA[For at starte, klik på <i class="icon icon-add blue"></i> herunder og tilføj dit første element]]></key>
+
+    <key alias="gridLayouts">Grid layouts</key>
+    <key alias="gridLayoutsDetail">Layout er det samlede arbejdsområde for grid editoren, normalt behøver du kun én eller to forskellige layouts</key>
+    <key alias="addGridLayout">Tilføj grid layout</key>
+    <key alias="addGridLayoutDetail">Juster layoutet ved at sætte kolonnebredder og tilføje yderligere sektioner</key>
+    
+    <key alias="rowConfigurations">Række konfigurationer</key>
+    <key alias="rowConfigurationsDetail">Rækker er foruddefinerede celler vandret</key>
+    <key alias="addRowConfiguration">Tilføj række konfiguration</key>
+    <key alias="addRowConfigurationDetail">Juster rækken ved at sætte celle bredder og tilføje yderligere celler</key>
+
+    <key alias="columns">Kolonner</key>
+    <key alias="columnsDetails">Samlede antal kolonner i grid layoutet</key>
+    
+    <key alias="settings">Indstillinger</key>
+    <key alias="settingsDetails">Konfigurer hvilke indstillinger redaktører kan ændre</key>
+
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Konfigurer hvilken styling redaktører kan ændre</key>
+
+    <key alias="settingDialogDetails">Indstillingerne vil kun blive gemt, hvis den indtastede JSON konfiguration er gyldig</key>
+
+    <key alias="allowAllEditors">Tillad alle muligheder</key>
+    <key alias="allowAllRowConfigurations">Tillad alle række konfigurationer</key>
+  </area>
+  
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
     <key alias="alternativeText">Alternativ tekst</key>
