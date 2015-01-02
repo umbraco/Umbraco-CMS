@@ -116,8 +116,8 @@ namespace Umbraco.Web
             UrlProvider urlProvider,
             ICultureDictionary cultureDictionary,
             IUmbracoComponentRenderer componentRenderer)
-            : this(umbracoContext)
         {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             if (content == null) throw new ArgumentNullException("content");
             if (typedQuery == null) throw new ArgumentNullException("typedQuery");
             if (dynamicQuery == null) throw new ArgumentNullException("dynamicQuery");
@@ -127,6 +127,7 @@ namespace Umbraco.Web
             if (cultureDictionary == null) throw new ArgumentNullException("cultureDictionary");
             if (componentRenderer == null) throw new ArgumentNullException("componentRenderer");
 
+            _umbracoContext = umbracoContext;
             _tag = tagQuery;
             _dataTypeService = dataTypeService;
             _urlProvider = urlProvider;

@@ -7,6 +7,8 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Dictionary;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -15,6 +17,7 @@ using Umbraco.Core.Services;
 using Moq;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests
 {
@@ -87,5 +90,57 @@ namespace Umbraco.Tests
             Assert.AreEqual(umbCtx, UmbracoContext.Current);
         }
 
+        [Test]
+        public void Can_Mock_Umbraco_Helper()
+        {
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            ApplicationContext.EnsureContext(appCtx, true);
+            
+            var umbCtx = UmbracoContext.EnsureContext(
+                new Mock<HttpContextBase>().Object,
+                appCtx,
+                true);
+
+            var helper = new UmbracoHelper(umbCtx,
+                Mock.Of<IPublishedContent>(),
+                Mock.Of<ITypedPublishedContentQuery>(),
+                Mock.Of<IDynamicPublishedContentQuery>(),
+                Mock.Of<ITagQuery>(),
+                Mock.Of<IDataTypeService>(),
+                new UrlProvider(umbCtx, new[] {Mock.Of<IUrlProvider>()}, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
+                Mock.Of<IUmbracoComponentRenderer>());
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void Can_Mock_Umbraco_Helper_Get_Url()
+        {
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            ApplicationContext.EnsureContext(appCtx, true);
+
+            var umbCtx = UmbracoContext.EnsureContext(
+                new Mock<HttpContextBase>().Object,
+                appCtx,
+                true);
+
+            var urlHelper = new Mock<IUrlProvider>();
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
+                .Returns("/hello/world/1234");
+
+            var helper = new UmbracoHelper(umbCtx,
+                Mock.Of<IPublishedContent>(),
+                Mock.Of<ITypedPublishedContentQuery>(),
+                Mock.Of<IDynamicPublishedContentQuery>(),
+                Mock.Of<ITagQuery>(),
+                Mock.Of<IDataTypeService>(),
+                new UrlProvider(umbCtx, new[]
+                {
+                    urlHelper.Object
+                }, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
+                Mock.Of<IUmbracoComponentRenderer>());
+
+            Assert.AreEqual("/hello/world/1234", helper.Url(1234));
+        }
     }
 }
