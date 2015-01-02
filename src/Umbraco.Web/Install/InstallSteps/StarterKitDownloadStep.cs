@@ -21,16 +21,17 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-        //adding a package guid hardcoded, so we can change the sent package remotely, currently this just points to txt kit
-        //but a future starterkit will be inserted under the same guid on our.
-        private const string PackageGuid = "69E44BEB-15FF-4CEE-8B64-0A7DAE498657";
-
         public override InstallSetupResult Execute(Guid? starterKitId)
         {
             //if there is no value assigned then use the default starter kit
             if (starterKitId.HasValue == false)
             {
-                starterKitId = Guid.Parse(PackageGuid); 
+                var installHelper = new InstallHelper(UmbracoContext.Current);
+                var starterKits = installHelper.GetStarterKits().FirstOrDefault();
+                if (starterKits != null)
+                    starterKitId = starterKits.Id;
+                else
+                    return null;
             }
             else if (starterKitId.Value == Guid.Empty)
             {
@@ -57,7 +58,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             if (repo.HasConnection() == false)
             {
-                throw new InstallException("Cannot connect to repository");                
+                throw new InstallException("Cannot connect to repository");
             }
             var installer = new Installer();
 
@@ -76,7 +77,7 @@ namespace Umbraco.Web.Install.InstallSteps
             var installer = new Installer();
             installer.LoadConfig(packageFile);
             installer.InstallFiles(manifestId, packageFile);
-            
+
         }
 
         public override string View

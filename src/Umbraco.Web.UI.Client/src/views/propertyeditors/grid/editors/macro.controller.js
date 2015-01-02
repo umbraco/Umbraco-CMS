@@ -11,14 +11,12 @@ angular.module("umbraco")
                     macroData: $scope.control.value
                 },
                 callback: function (data) {
-
                     $scope.control.value = {
-                            syntax: data.syntax,
                             macroAlias: data.macroAlias,
                             macroParamsDictionary: data.macroParamsDictionary
                     };
 
-                    $scope.setPreview(data);
+                    $scope.setPreview($scope.control.value );
                 }
             });
     	};
@@ -40,8 +38,7 @@ angular.module("umbraco")
     		if($scope.control.$initializing){
     			$scope.setMacro();
     		}else if($scope.control.value){
-                var parsed = macroService.parseMacroSyntax($scope.control.value.syntax);
-                $scope.setPreview(parsed);
+                $scope.setPreview($scope.control.value);
             }
     	}, 200);
 });
