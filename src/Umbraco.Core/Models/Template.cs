@@ -38,6 +38,7 @@ namespace Umbraco.Core.Models
             _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
             _masterTemplateId = new Lazy<int>(() => -1);
             _viewFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            _masterPageFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _templateConfig = UmbracoConfig.For.UmbracoSettings().Templates;
         }
 
@@ -46,6 +47,7 @@ namespace Umbraco.Core.Models
         {
             if (viewFileSystem == null) throw new ArgumentNullException("viewFileSystem");
             if (masterPageFileSystem == null) throw new ArgumentNullException("masterPageFileSystem");
+            if (templateConfig == null) throw new ArgumentNullException("templateConfig");
             _viewFileSystem = viewFileSystem;
             _masterPageFileSystem = masterPageFileSystem;
             _templateConfig = templateConfig;
@@ -53,11 +55,8 @@ namespace Umbraco.Core.Models
 
         [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
         public Template(string path, string name, string alias)
-            : base(path)
-        {
-            _name = name;
-            _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
-            _masterTemplateId = new Lazy<int>(() => -1);
+            : this(name, alias)
+        {            
         }
 
         [DataMember]
