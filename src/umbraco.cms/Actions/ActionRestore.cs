@@ -9,7 +9,10 @@ namespace umbraco.BusinessLogic.Actions
 	/// </summary>
 	public class ActionRestore : IAction
 	{
+		//create singleton
+#pragma warning disable 612,618
 		private static readonly ActionRestore m_instance = new ActionRestore();
+#pragma warning restore 612,618
 
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
@@ -30,8 +33,7 @@ namespace umbraco.BusinessLogic.Actions
 		{
 			get
 			{
-
-				return '8'; // TODO: Check if this char is available? Is it still used?
+				return 'V';
 			}
 		}
 
@@ -87,6 +89,7 @@ namespace umbraco.BusinessLogic.Actions
 				return true;
 			}
 		}
+
 		#endregion
 	}
 }
