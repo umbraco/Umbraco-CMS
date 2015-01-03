@@ -58,7 +58,6 @@ namespace Umbraco.Core.Models.Membership
 
         private IUserType _userType;
         private string _name;
-        private Type _userTypeKey;
         private List<string> _addedSections;
         private List<string> _removedSections;
         private ObservableCollection<string> _sectionCollection;
@@ -80,7 +79,6 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
         private static readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.AllowedSections);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
-        private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<User, Type>(x => x.ProviderUserKeyType);
         
         private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
         private static readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Email);
@@ -101,37 +99,6 @@ namespace Umbraco.Core.Models.Membership
             set { throw new NotSupportedException("Cannot set the provider user key for a user"); }
         }
 
-        /// <summary>
-        /// Gets or sets the type of the provider user key.
-        /// </summary>
-        /// <value>
-        /// The type of the provider user key.
-        /// </value>
-        [IgnoreDataMember]
-        internal Type ProviderUserKeyType
-        {
-            get
-            {
-                return _userTypeKey;
-            }
-            private set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _userTypeKey = value;
-                    return _userTypeKey;
-                }, _userTypeKey, UserTypeKeySelector);
-            }
-        }
-
-        /// <summary>
-        /// Sets the type of the provider user key.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        internal void SetProviderUserKeyType(Type type)
-        {
-            ProviderUserKeyType = type;
-        }
 
         [DataMember]
         public string Username

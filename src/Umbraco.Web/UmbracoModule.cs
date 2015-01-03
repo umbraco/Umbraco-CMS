@@ -49,14 +49,17 @@ namespace Umbraco.Web
             //see: http://issues.umbraco.org/issue/U4-2059
             if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
             {
-                // the keepalive service will use that url. Check if 443 should be used for HTTPS.
-                if (GlobalSettings.UseSSL)
+                // If (HTTP and SSL not required) or (HTTPS and SSL required), use ports from request to configure OriginalRequestUrl.
+                // Otherwise, user may need to set baseUrl manually per http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks if non-standard ports used.
+                if ((!httpContext.Request.IsSecureConnection && !GlobalSettings.UseSSL) || (httpContext.Request.IsSecureConnection && GlobalSettings.UseSSL))
                 {
-                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], 443, IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+                    // Use port from request.
+                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
                 }
                 else
                 {
-                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+                    // Omit port entirely.
+                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}{1}", httpContext.Request.ServerVariables["SERVER_NAME"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
                 }
 
                 LogHelper.Info<UmbracoModule>("Setting OriginalRequestUrl: " + ApplicationContext.Current.OriginalRequestUrl);
@@ -167,7 +170,7 @@ namespace Umbraco.Web
         /// context and thread principle object
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="e"></param> 
         /// <remarks>
         /// We will set the identity, culture, etc... for any request that is:
         /// * A back office request
@@ -187,6 +190,11 @@ namespace Umbraco.Web
 
             if (ShouldAuthenticateRequest(req, UmbracoContext.Current.OriginalRequestUrl))
             {
+                //TODO: Here we should have an authentication mechanism, this mechanism should be smart in the way that the ASP.Net 5 pipeline works
+                // in which each registered handler will attempt to authenticate and if it fails it will just call Next() so the next handler
+                // executes. If it is successful, it doesn't call next and assigns the current user/principal.
+                // This might actually all be possible with ASP.Net Identity and how it is setup to work already, need to investigate.
+                
                 var ticket = http.GetUmbracoAuthTicket();
 
                 http.AuthenticateCurrentRequest(ticket, ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http) == false);

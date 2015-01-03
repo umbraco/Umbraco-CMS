@@ -6,7 +6,25 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
-        
+        public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
+            ContentType parent = null)
+        {
+            var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
+
+            contentType.Alias = alias;
+            contentType.Name = name;
+            contentType.Description = "ContentType used for basic pages";
+            contentType.Icon = ".sprTreeDoc3";
+            contentType.Thumbnail = "doc2.png";
+            contentType.SortOrder = 1;
+            contentType.CreatorId = 0;
+            contentType.Trashed = false;
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
 
         public static ContentType CreateTextpageContentType(string alias = "textPage", string name = "Text Page")
         {
@@ -65,6 +83,57 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
+        public static ContentType CreateContentMetaContentType()
+        {
+            var contentType = new ContentType(-1)
+            {
+                Alias = "contentMeta",
+                Name = "Content Meta",
+                Description = "ContentType used for Content Meta",
+                Icon = ".sprTreeDoc3",
+                Thumbnail = "doc.png",
+                SortOrder = 1,
+                CreatorId = 0,
+                Trashed = false
+            };
+
+            var metaCollection = new PropertyTypeCollection();
+            metaCollection.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+
+            contentType.PropertyGroups.Add(new PropertyGroup(metaCollection) { Name = "Content", SortOrder = 2 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
+        public static ContentType CreateSeoContentType()
+        {
+            var contentType = new ContentType(-1)
+            {
+                Alias = "seo",
+                Name = "Seo",
+                Description = "ContentType used for Seo",
+                Icon = ".sprTreeDoc3",
+                Thumbnail = "doc.png",
+                SortOrder = 1,
+                CreatorId = 0,
+                Trashed = false
+            };
+
+            var metaCollection = new PropertyTypeCollection();
+            metaCollection.Add(new PropertyType("seotest", DataTypeDatabaseType.Ntext) { Alias = "seokeywords", Name = "Seo Keywords", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            metaCollection.Add(new PropertyType("seotest", DataTypeDatabaseType.Ntext) { Alias = "seodescription", Name = "Seo Description", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -89 });
+
+            contentType.PropertyGroups.Add(new PropertyGroup(metaCollection) { Name = "Seo", SortOrder = 5 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
         public static ContentType CreateSimpleContentType()
         {
             var contentType = new ContentType(-1)
@@ -92,9 +161,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-		public static ContentType CreateSimpleContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false)
+        public static ContentType CreateSimpleContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
 		{
-			var contentType = parent == null ? new ContentType(-1) : new ContentType(parent);
+			var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
 
 			contentType.Alias = alias;
 			contentType.Name = name;
@@ -110,7 +179,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TinyMCEAlias, DataTypeDatabaseType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -87 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = RandomAlias("author", randomizeAliases) , Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
 
-			contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = propertyGroupName, SortOrder = 1 });
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -160,6 +229,27 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                   };
 
             contentType.PropertyGroups.Add(new PropertyGroup(collection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
+        public static ContentType CreateSimpleContentType(string alias, string name, PropertyTypeCollection collection, string propertyGroupName, IContentType parent = null)
+        {
+            var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
+
+            contentType.Alias = alias;
+            contentType.Name = name;
+            contentType.Description = "ContentType used for simple text pages";
+            contentType.Icon = ".sprTreeDoc3";
+            contentType.Thumbnail = "doc2.png";
+            contentType.SortOrder = 1;
+            contentType.CreatorId = 0;
+            contentType.Trashed = false;
+
+            contentType.PropertyGroups.Add(new PropertyGroup(collection) { Name = propertyGroupName, SortOrder = 1 });
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);

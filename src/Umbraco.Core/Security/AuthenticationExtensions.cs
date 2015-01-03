@@ -76,7 +76,7 @@ namespace Umbraco.Core.Security
         /// This will return the current back office identity. 
         /// </summary>
         /// <param name="http"></param>
-        /// <param name="authenticateRequestIfNotFound">
+        /// <param name="authenticateRequestIfNotFound"> 
         /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
         /// request just as is done in the Umbraco module and then set the current identity if it is valid
         /// </param>
@@ -89,12 +89,20 @@ namespace Umbraco.Core.Security
             if (http.User == null) return null; //there's no user at all so no identity
             var identity = http.User.Identity as UmbracoBackOfficeIdentity;
             if (identity != null) return identity;
+
             if (authenticateRequestIfNotFound == false) return null;
+
             //even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated 
             // which would mean something strange is going on that it is not an umbraco identity.
             if (http.User.Identity.IsAuthenticated) return null;
+
+            //So the user is not authed but we've been asked to do the auth if authenticateRequestIfNotFound = true,
+            // which might occur in old webforms style things or for routes that aren't included as a back office request.
+            // in this case, we are just reverting to authing using the cookie.
             
-            //now we just need to try to authenticate the current request
+            // TODO: Even though this is in theory legacy, we have legacy bits laying around and we'd need to do the auth based on 
+            // how the Module will eventually do it (by calling in to any registered authenticators).
+            
             var ticket = http.GetUmbracoAuthTicket();
             if (http.AuthenticateCurrentRequest(ticket, true))
             {

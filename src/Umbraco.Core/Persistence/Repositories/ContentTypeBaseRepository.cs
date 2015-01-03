@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -297,9 +298,38 @@ AND umbracoNode.id <> @id",
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
                 var dbPropertyGroups =
                     Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
-                            .Select(x => new Tuple<int, string>(x.Id, x.Text));
-                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name));
-                var tabs = dbPropertyGroups.Except(entityPropertyGroups);
+                            .Select(x => new Tuple<int, string>(x.Id, x.Text))
+                            .ToList();
+                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name)).ToList();
+                var tabsToDelete = dbPropertyGroups.Select(x => x.Item1).Except(entityPropertyGroups.Select(x => x.Item1));
+                var tabs = dbPropertyGroups.Where(x => tabsToDelete.Any(y => y == x.Item1));
+                //Update Tab name downstream to ensure renaming is done properly
+                foreach (var propertyGroup in entityPropertyGroups)
+                {
+                    Database.Update<PropertyTypeGroupDto>("SET Text = @TabName WHERE parentGroupId = @TabId",
+                                                          new { TabName = propertyGroup.Item2, TabId = propertyGroup.Item1 });
+
+                    var childGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @TabId", new { TabId = propertyGroup.Item1 });
+                    foreach (var childGroup in childGroups)
+                    {
+                        var sibling = Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
+                            new { Id = childGroup.ContentTypeNodeId, Name = propertyGroup.Item2 })
+                            .FirstOrDefault(x => x.ParentGroupId.HasValue == false || x.ParentGroupId.Value.Equals(propertyGroup.Item1) == false);
+                        //If the child group doesn't have a sibling there is no chance of duplicates and we continue
+                        if (sibling == null || (sibling.ParentGroupId.HasValue && sibling.ParentGroupId.Value.Equals(propertyGroup.Item1))) continue;
+
+                        //Since the child group has a sibling with the same name we need to point any PropertyTypes to the sibling
+                        //as this child group is about to leave the party.
+                        Database.Update<PropertyTypeDto>(
+                            "SET propertyTypeGroupId = @PropertyTypeGroupId WHERE propertyTypeGroupId = @PropertyGroupId AND ContentTypeId = @ContentTypeId",
+                            new { PropertyTypeGroupId = sibling.Id, PropertyGroupId = childGroup.Id, ContentTypeId = childGroup.ContentTypeNodeId });
+
+                        //Since the parent group has been renamed and we have duplicates we remove this group
+                        //and leave our sibling in charge of the part.
+                        Database.Delete(childGroup);
+                    }
+                }
+                //Do Tab updates
                 foreach (var tab in tabs)
                 {
                     Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId = @PropertyGroupId",

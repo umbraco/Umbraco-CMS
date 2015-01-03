@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Scheduling
 
                 //wait till the thread is done
                 await tManager;
-
+      
                 foreach (var task in tasks)
                 {
                     Assert.IsTrue(task.Ended != default(DateTime));
@@ -241,6 +241,7 @@ namespace Umbraco.Tests.Scheduling
                 Assert.IsFalse(tManager.IsDisposed);
             }
         }
+       
 
         private class MyTask : BaseTask
         {
