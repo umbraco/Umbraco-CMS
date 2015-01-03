@@ -5,9 +5,9 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 		var node = dialogOptions.currentNode;
 
 		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
-			var relation = data[0];
+			$scope.relation = data[0];
 
-			contentResource.getById(relation.ParentId).then(function (data) {
+			contentResource.getById($scope.relation.ParentId).then(function (data) {
 				$scope.target = data;
 
 			}, function (err) {
@@ -43,7 +43,8 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 						}
 					});
 
-					// TODO: [LK] Call the relationResource to remove the relation (post-delete)
+					// remove the relation, as the item has been restored
+					relationResource.deleteById($scope.relation.Id);
 
 				}, function (err) {
 					$scope.success = false;

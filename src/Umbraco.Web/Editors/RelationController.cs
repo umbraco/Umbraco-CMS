@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -47,6 +48,20 @@ namespace Umbraco.Web.Editors
 			return relations;
 		}
 
-		// TODO: [LK] Add method for deleting/removing the relation
+		[HttpDelete]
+		[HttpPost]
+		public HttpResponseMessage DeleteById(int id)
+		{
+			var foundRelation = GetObjectFromRequest(() => Services.RelationService.GetById(id));
+
+			if (foundRelation == null)
+			{
+				return HandleContentNotFound(id, false);
+			}
+
+			Services.RelationService.Delete(foundRelation);
+
+			return Request.CreateResponse(HttpStatusCode.OK);
+		}
 	}
 }

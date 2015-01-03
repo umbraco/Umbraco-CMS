@@ -28,6 +28,36 @@ function relationResource($q, $http, umbRequestHelper) {
                         "GetByChildId",
                         [{ childId: id, relationTypeAlias: alias }])),
                 "Failed to get relation by child ID " + id + " and type of " + alias);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationResource#deleteById
+         * @methodOf umbraco.resources.relationResource
+         *
+         * @description
+         * Deletes a relation item with a given id
+         *
+         * ##usage
+         * <pre>
+         * relationResource.deleteById(1234)
+         *    .then(function() {
+         *        alert('its gone!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id id of relation item to delete
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        deleteById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "relationApiBaseUrl",
+                        "DeleteById",
+                        [{ id: id }])),
+                'Failed to delete item ' + id);
         }
     };
 }
