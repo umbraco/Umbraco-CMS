@@ -7,13 +7,18 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
 			$scope.relation = data[0];
 
-			contentResource.getById($scope.relation.ParentId).then(function (data) {
-				$scope.target = data;
+			if ($scope.relation.ParentId == -1) {
+				$scope.target = { id: -1, name: "Root" };
 
-			}, function (err) {
-				$scope.success = false;
-				$scope.error = err;
-			});
+			} else {
+				contentResource.getById($scope.relation.ParentId).then(function (data) {
+					$scope.target = data;
+
+				}, function (err) {
+					$scope.success = false;
+					$scope.error = err;
+				});
+			}
 
 		}, function (err) {
 			$scope.success = false;
@@ -21,6 +26,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 		});
 
 		$scope.restore = function () {
+			// this code was copied from `content.move.controller.js`
 			contentResource.move({ parentId: $scope.target.id, id: node.id })
 				.then(function (path) {
 					$scope.error = false;
@@ -42,9 +48,6 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 							navigationService.syncTree({ tree: "content", path: activeNodePath, forceReload: false, activate: true });
 						}
 					});
-
-					// remove the relation, as the item has been restored
-					relationResource.deleteById($scope.relation.Id);
 
 				}, function (err) {
 					$scope.success = false;
