@@ -16,13 +16,13 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models;
@@ -43,6 +43,7 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+    [ContentModelFormatterConfiguration(typeof(ContentItemFormatter))]
     public class ContentController : ContentControllerBase
     {        
         /// <summary>
@@ -199,9 +200,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
-        public ContentItemDisplay PostSave(
-            [ModelBinder(typeof(ContentItemBinder))]
-                ContentItemSave contentItem)
+        [ContentModelValidationFilter(typeof(ContentItemSave), typeof(IContent))]
+        public ContentItemDisplay PostSave(ContentItemSave contentItem)
         {            
             //If we've reached here it means:
             // * Our model has been bound
