@@ -40,7 +40,7 @@ namespace Umbraco.Web.Routing
 
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Warn<DefaultUrlProvider>(
+                LogHelper.Debug<DefaultUrlProvider>(
                     "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
                     () => id);
                 return null;
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Routing
 
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Warn<DefaultUrlProvider>(
+                LogHelper.Debug<DefaultUrlProvider>(
                     "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
                     () => id);
                 return null;
