@@ -68,7 +68,7 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
                             ? new[] {"Cannot generate urls without a current Umbraco Context"}
-                            : content.GetContentUrls()))
+                            : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
