@@ -275,6 +275,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
+    <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Models\ContentEditing\RelationType.cs" />
     <Compile Include="IDynamicPublishedContentQuery.cs" />
     <Compile Include="ITagQuery.cs" />

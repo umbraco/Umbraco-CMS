@@ -13,6 +13,7 @@ namespace umbraco.MacroEngines.Library
     {
         private readonly INode _node;
     	private readonly UmbracoHelper _umbracoHelper;
+        private readonly HtmlStringUtilities _stringUtilities = new HtmlStringUtilities();
 		
 		/// <summary>
 		/// An empty HtmlHelper with a blank ViewContext, used only to access some htmlHelper extension methods
@@ -193,16 +194,16 @@ namespace umbraco.MacroEngines.Library
 
         public string Coalesce(params object[] args)
         {
-        	return _umbracoHelper.Coalesce<DynamicNull>(args);
+            return _stringUtilities.Coalesce<DynamicNull>(args);
         }
 
         public string Concatenate(params object[] args)
         {
-        	return _umbracoHelper.Concatenate<DynamicNull>(args);
+            return _stringUtilities.Concatenate<DynamicNull>(args);
         }
         public string Join(string seperator, params object[] args)
         {
-        	return _umbracoHelper.Join<DynamicNull>(seperator, args);
+            return _stringUtilities.Join<DynamicNull>(seperator, args);
         }
 
         public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
