@@ -82,7 +82,7 @@ namespace Umbraco.Tests
             ApplicationContext.EnsureContext(appCtx, true);
             
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
+                Mock.Of<HttpContextBase>(),
                 appCtx,
                 Mock.Of<IUmbracoSettingsSection>(),
                 true);
@@ -97,7 +97,7 @@ namespace Umbraco.Tests
             ApplicationContext.EnsureContext(appCtx, true);
             
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
+                Mock.Of<HttpContextBase>(),
                 appCtx,
                 true);
 
@@ -120,7 +120,7 @@ namespace Umbraco.Tests
             ApplicationContext.EnsureContext(appCtx, true);
 
             var umbCtx = UmbracoContext.EnsureContext(
-                new Mock<HttpContextBase>().Object,
+                Mock.Of<HttpContextBase>(),
                 appCtx,
                 true);
 
