@@ -43,7 +43,7 @@ namespace Umbraco.Web
         /// </summary>
         public TagQuery TagQuery
         {
-            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService, _query)); }
+            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService, ContentQuery)); }
         }
 
         /// <summary>
