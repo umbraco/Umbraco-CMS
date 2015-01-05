@@ -452,6 +452,24 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Add_Section_To_All_Users()
+        {
+            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+
+            var user1 = ServiceContext.UserService.CreateUserWithIdentity("test1", "test1@test.com", userType);
+            var user2 = ServiceContext.UserService.CreateUserWithIdentity("test2", "test2@test.com", userType);
+
+            //now add the section to all users
+            ServiceContext.UserService.AddSectionToAllUsers("test");
+
+            //assert
+            var result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
+            var result2 = ServiceContext.UserService.GetUserById((int)user2.Id);
+            Assert.IsFalse(result1.AllowedSections.Contains("test"));
+            Assert.IsFalse(result2.AllowedSections.Contains("test"));
+        }
+        
+        [Test]
         public void Get_By_Profile_Username()
         {
             // Arrange
