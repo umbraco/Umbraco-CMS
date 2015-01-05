@@ -54,6 +54,13 @@ namespace Umbraco.Core.Services
         void DeleteSectionFromAllUsers(string sectionAlias);
         
         /// <summary>
+        /// Add a specific section to all users
+        /// </summary>
+        /// <remarks>This is useful when a new section is created to allow all users accessing it</remarks>
+        /// <param name="sectionAlias">Alias of the section to add</param>
+        void AddSectionToAllUsers(string sectionAlias);
+
+        /// <summary>
         /// Get permissions set for a user and optional node ids
         /// </summary>
         /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
