@@ -34,6 +34,9 @@ angular.module("umbraco")
                 if (tagToAdd.length > 0) {
                     if ($scope.currentTags.indexOf(tagToAdd) < 0) {                       
                         $scope.currentTags.push(tagToAdd);
+                        //update the model value, this is required if there's a server validation error, it can
+                        // only then be cleared if the model changes
+                        $scope.model.value = $scope.currentTags;
                     }
                 }
             }
@@ -66,6 +69,9 @@ angular.module("umbraco")
                 var i = $scope.currentTags.indexOf(tag);
                 if (i >= 0) {
                     $scope.currentTags.splice(i, 1);
+                    //update the model value, this is required if there's a server validation error, it can
+                    // only then be cleared if the model changes
+                    $scope.model.value = $scope.currentTags;
                 }
             };
 

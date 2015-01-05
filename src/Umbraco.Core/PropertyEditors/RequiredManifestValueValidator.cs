@@ -21,6 +21,15 @@ namespace Umbraco.Core.PropertyEditors
             else
             {
                 var asString = value.ToString();
+
+                if (editor.ValueEditor.ValueType.InvariantEquals("JSON"))
+                {
+                    if (asString.DetectIsEmptyJson())
+                    {
+                        yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                    }
+                }
+
                 if (asString.IsNullOrWhiteSpace())
                 {
                     yield return new ValidationResult("Value cannot be empty", new[] { "value" });
