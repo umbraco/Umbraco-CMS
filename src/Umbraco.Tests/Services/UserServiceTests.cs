@@ -465,8 +465,8 @@ namespace Umbraco.Tests.Services
             //assert
             var result1 = ServiceContext.UserService.GetUserById((int)user1.Id);
             var result2 = ServiceContext.UserService.GetUserById((int)user2.Id);
-            Assert.IsFalse(result1.AllowedSections.Contains("test"));
-            Assert.IsFalse(result2.AllowedSections.Contains("test"));
+            Assert.IsTrue(result1.AllowedSections.Contains("test"));
+            Assert.IsTrue(result2.AllowedSections.Contains("test"));
         }
         
         [Test]
