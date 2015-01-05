@@ -29,6 +29,7 @@
     * - User
     * - Language
     * - Domain
+    * - DataType
     **/
 function entityResource($q, $http, umbRequestHelper) {
 

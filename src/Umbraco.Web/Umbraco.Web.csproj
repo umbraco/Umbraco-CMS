@@ -555,10 +555,12 @@
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
+    <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
     <Compile Include="Editors\Filters\MemberValidationHelper.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
+    <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoBackOfficeLogoutAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
