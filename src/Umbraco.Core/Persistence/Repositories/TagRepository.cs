@@ -168,8 +168,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string tagGroup)
         {
-            var nodeObjectType = GetNodeObjectType(objectType);
-
             var sql = new Sql()
                 .Select("cmsTagRelationship.nodeId, cmsPropertyType.Alias, cmsPropertyType.id as propertyTypeId, cmsTags.tag, cmsTags.id as tagId, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group"))
                 .From<TagDto>()
@@ -181,8 +179,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, TagRelationshipDto>(left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType)
                 .Where<TagDto>(dto => dto.Group == tagGroup);
+
+            if (objectType != TaggableObjectTypes.All)
+            {
+                var nodeObjectType = GetNodeObjectType(objectType);
+                sql = sql
+                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+            }
 
             return CreateTaggedEntityCollection(
                 ApplicationContext.Current.DatabaseContext.Database.Fetch<dynamic>(sql));
@@ -190,8 +194,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null)
         {
-            var nodeObjectType = GetNodeObjectType(objectType);
-
             var sql = new Sql()
                 .Select("cmsTagRelationship.nodeId, cmsPropertyType.Alias, cmsPropertyType.id as propertyTypeId, cmsTags.tag, cmsTags.id as tagId, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group"))
                 .From<TagDto>()
@@ -203,8 +205,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyTypeDto, TagRelationshipDto>(left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType)
                 .Where<TagDto>(dto => dto.Tag == tag);
+
+            if (objectType != TaggableObjectTypes.All)
+            {
+                var nodeObjectType = GetNodeObjectType(objectType);
+                sql = sql
+                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+            }
 
             if (tagGroup.IsNullOrWhiteSpace() == false)
             {
@@ -233,8 +241,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null)
         {
-            var nodeObjectType = GetNodeObjectType(objectType);
-
             var sql = GetTagsQuerySelect(true);
 
             sql = ApplyRelationshipJoinToTagsQuery(sql);
@@ -243,8 +249,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentDto>()
                 .On<ContentDto, TagRelationshipDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>()
-                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId);
+
+            if (objectType != TaggableObjectTypes.All)
+            {
+                var nodeObjectType = GetNodeObjectType(objectType);
+                sql = sql
+                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+            }
 
             sql = ApplyGroupFilterToTagsQuery(sql, group);
 
