@@ -672,6 +672,27 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
+        
+        /// <summary>
+        /// Add a specific section to all users
+        /// </summary>
+        /// <remarks>This is useful when a new section is created to allow all users accessing it</remarks>
+        /// <param name="sectionAlias">Alias of the section to add</param>
+        public void AddSectionToAllUsers(string sectionAlias)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var allUsers = repository.GetAll();
+                foreach (var user in allUsers.Where(u => !u.AllowedSections.Contains(sectionAlias)))
+                {
+                    //now add the section for each user and commit
+                    user.AddAllowedSection(sectionAlias);
+                    repository.AddOrUpdate(user);
+                }
+                uow.Commit();
+            }
+        }        
 
         /// <summary>
         /// Get permissions set for a user and optional node ids
