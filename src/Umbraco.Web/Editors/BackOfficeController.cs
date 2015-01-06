@@ -213,6 +213,10 @@ namespace Umbraco.Web.Editors
                                         controller => controller.Fetch(string.Empty))
                                 },
                                 {
+                                    "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
+                                        controller => controller.GetById(0))
+                                },
+                                {
                                     "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                                         controller => controller.GetConfiguration())
                                 },
