@@ -3,17 +3,19 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Relation = Umbraco.Web.Models.ContentEditing.Relation;
 
 namespace Umbraco.Web.Editors
 {
 	[PluginController("UmbracoApi")]
 	[UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
-	public class RelationController : ContentControllerBase
+    public class RelationController : UmbracoAuthorizedJsonController
 	{
 		public RelationController()
 			: this(UmbracoContext.Current)
@@ -25,38 +27,40 @@ namespace Umbraco.Web.Editors
 		{
 		}
 
-		public IRelation GetById(int id)
+        public Relation GetById(int id)
 		{
-			return Services.RelationService.GetById(id);
+			return Mapper.Map<IRelation, Relation>(Services.RelationService.GetById(id));
 		}
 
-		[EnsureUserPermissionForContent("childId")]
-		public IEnumerable<IRelation> GetByChildId(int childId, string relationTypeAlias = "")
+        //[EnsureUserPermissionForContent("childId")]
+        public IEnumerable<Relation> GetByChildId(int childId, string relationTypeAlias = "")
 		{
-			var relations = Services.RelationService.GetByChildId(childId);
+		    var relations = Services.RelationService.GetByChildId(childId).ToArray();
 
-			if (relations == null)
+			if (relations.Any() == false)
 			{
-				throw new HttpResponseException(HttpStatusCode.NotFound);
+			    return Enumerable.Empty<Relation>();
 			}
 
-			if (!string.IsNullOrWhiteSpace(relationTypeAlias))
+			if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
 			{
-				return relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias));
+			    return
+			        Mapper.Map<IEnumerable<IRelation>, IEnumerable<Relation>>(
+			            relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)));
 			}
 
-			return relations;
+			return Mapper.Map<IEnumerable<IRelation>, IEnumerable<Relation>>(relations);
 		}
 
 		[HttpDelete]
 		[HttpPost]
 		public HttpResponseMessage DeleteById(int id)
 		{
-			var foundRelation = GetObjectFromRequest(() => Services.RelationService.GetById(id));
+		    var foundRelation = Services.RelationService.GetById(id);
 
 			if (foundRelation == null)
 			{
-				return HandleContentNotFound(id, false);
+			    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No relation found with the specified id");
 			}
 
 			Services.RelationService.Delete(foundRelation);

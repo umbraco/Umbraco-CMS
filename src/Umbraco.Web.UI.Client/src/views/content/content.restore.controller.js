@@ -4,14 +4,29 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 
 		var node = dialogOptions.currentNode;
 
-		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
-			$scope.relation = data[0];
+		$scope.error = null;
+	    $scope.success = false;
 
-			if ($scope.relation.ParentId == -1) {
+		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
+
+            if (data.length == 0) {
+                $scope.success = false;
+                $scope.error = {
+                    errorMsg: "Cannot automatically restore this item",
+                    data: {
+                        Message: "There is no 'restore' relation found for this node. Use the Move menu item to move it manually."
+                    }
+                }
+                return;
+            }
+
+		    $scope.relation = data[0];
+
+			if ($scope.relation.parentId == -1) {
 				$scope.target = { id: -1, name: "Root" };
 
 			} else {
-				contentResource.getById($scope.relation.ParentId).then(function (data) {
+			    contentResource.getById($scope.relation.parentId).then(function (data) {
 					$scope.target = data;
 
 				}, function (err) {
@@ -29,7 +44,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 			// this code was copied from `content.move.controller.js`
 			contentResource.move({ parentId: $scope.target.id, id: node.id })
 				.then(function (path) {
-					$scope.error = false;
+
 					$scope.success = true;
 
 					//first we need to remove the node that launched the dialog
