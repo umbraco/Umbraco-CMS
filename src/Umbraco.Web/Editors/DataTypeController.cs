@@ -31,6 +31,7 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [EnableOverrideAuthorization]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
         public DataTypeDisplay GetByName(string name)
@@ -44,6 +45,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
+        /// </remarks>
+        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
         public DataTypeDisplay GetById(int id)
         {
             var dataType = Services.DataTypeService.GetDataTypeDefinitionById(id);
