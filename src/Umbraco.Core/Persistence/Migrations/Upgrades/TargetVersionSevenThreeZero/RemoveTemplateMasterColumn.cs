@@ -15,6 +15,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
         public override void Up()
         {
 
+            //Don't execute anything if there is no 'master' column - this might occur if the db is already upgraded
+            var cols = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(Context.Database);
+            if (cols.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")) == false)
+            {
+                return;
+            }
+
             //update the parentId column for all templates to be correct so it matches the current 'master' template
             //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
             var templates = Context.Database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());

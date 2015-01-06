@@ -4,92 +4,84 @@ using umbraco.BasePages;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when the content item is to be restored from the recycle bin
-	/// </summary>
-	public class ActionRestore : IAction
-	{
-		//create singleton
-#pragma warning disable 612,618
-		private static readonly ActionRestore m_instance = new ActionRestore();
-#pragma warning restore 612,618
+    /// <summary>
+    /// This action is invoked when the content item is to be restored from the recycle bin
+    /// </summary>
+    public class ActionRestore : IAction
+    {
+        //create singleton
+        private static readonly ActionRestore SingletonInstance = new ActionRestore();
 
-		/// <summary>
-		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
-		/// All Umbraco assemblies should use the singleton instantiation (this.Instance)
-		/// When this applicatio is refactored, this constuctor should be made private.
-		/// </summary>
-		[Obsolete("Use the singleton instantiation instead of a constructor")]
-		public ActionRestore() { }
+        private ActionRestore() { }
 
-		public static ActionRestore Instance
-		{
-			get { return m_instance; }
-		}
+        public static ActionRestore Instance
+        {
+            get { return SingletonInstance; }
+        }
 
-		#region IAction Members
+        #region IAction Members
 
-		public char Letter
-		{
-			get
-			{
-				return 'V';
-			}
-		}
+        public char Letter
+        {
+            get
+            {
+                return 'V';
+            }
+        }
 
-		public string JsFunctionName
-		{
-			get
-			{
-				return null;
-			}
-		}
+        public string JsFunctionName
+        {
+            get
+            {
+                return null;
+            }
+        }
 
-		public string JsSource
-		{
-			get
-			{
+        public string JsSource
+        {
+            get
+            {
 
-				return null;
-			}
-		}
+                return null;
+            }
+        }
 
-		public string Alias
-		{
-			get
-			{
+        public string Alias
+        {
+            get
+            {
 
-				return "restore";
-			}
-		}
+                return "restore";
+            }
+        }
 
-		public string Icon
-		{
-			get
-			{
+        public string Icon
+        {
+            get
+            {
 
-				return "undo";
-			}
-		}
+                return "undo";
+            }
+        }
 
-		public bool ShowInNotifier
-		{
-			get
-			{
+        public bool ShowInNotifier
+        {
+            get
+            {
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		public bool CanBePermissionAssigned
-		{
-			get
-			{
+        public bool CanBePermissionAssigned
+        {
+            get
+            {
 
-				return true;
-			}
-		}
+                return false;
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

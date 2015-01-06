@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Core.Strategies
 {
     public sealed class RelateOnTrashHandler : ApplicationEventHandler
     {
-        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             ContentService.Moved += ContentService_Moved;
             ContentService.Trashed += ContentService_Trashed;
