@@ -78,6 +78,7 @@ namespace Umbraco.Web.Trees
             var proxiedRouteData = new HttpRouteData(
                 controllerContext.RouteData.Route,
                 new HttpRouteValueDictionary(new {action = "GetRootNode", controller = ControllerExtensions.GetControllerName(instance.GetType())}));
+
             //create a proxied controller context
             var proxiedControllerContext = new HttpControllerContext(
                 controllerContext.Configuration,
@@ -86,10 +87,29 @@ namespace Umbraco.Web.Trees
                 {
                     ControllerDescriptor = new HttpControllerDescriptor(controllerContext.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(instance.GetType()), instance.GetType())
                 };
-            
+
+            if (WebApiVersionCheck.WebApiVersion >= Version.Parse("5.0.0"))
+            {
+                //In WebApi2, this is required to be set: 
+                //      proxiedControllerContext.RequestContext = controllerContext.RequestContext
+                // but we need to do this with reflection because of codebase changes between version 4/5
+                var controllerContextRequestContext = controllerContext.GetType().GetProperty("RequestContext").GetValue(controllerContext);
+                proxiedControllerContext.GetType().GetProperty("RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);                
+            }
+
             instance.ControllerContext = proxiedControllerContext;
             instance.Request = controllerContext.Request;
-            
+
+            if (WebApiVersionCheck.WebApiVersion >= Version.Parse("5.0.0"))
+            {
+                //now we can change the request context's route data to be the proxied route data - NOTE: we cannot do this directly above
+                // because it will detect that the request context is different throw an exception. This is a change in webapi2 and we need to set
+                // this with reflection due to codebase changes between version 4/5
+                //      instance.RequestContext.RouteData = proxiedRouteData;
+                var instanceRequestContext = instance.GetType().GetProperty("RequestContext").GetValue(instance);
+                instanceRequestContext.GetType().GetProperty("RouteData").SetValue(instanceRequestContext, proxiedRouteData);
+            }
+
             //invoke auth filters for this sub request
             var result = await instance.ControllerContext.InvokeAuthorizationFiltersForRequest();
             //if a result is returned it means they are unauthorized, just throw the response.

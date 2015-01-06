@@ -1,15 +1,16 @@
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using Lucene.Net.Util;
 using Microsoft.Web.Mvc;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>
+    /// <summary>
 	/// A view engine to look into the App_Plugins folder for views for packaged controllers
 	/// </summary>
-	public class PluginViewEngine : FixedRazorViewEngine
+    public class PluginViewEngine : ReflectedFixedRazorViewEngine
 	{
 		
 		/// <summary>
@@ -47,9 +48,9 @@ namespace Umbraco.Web.Mvc
 					})
 				.ToArray();
 
-			AreaMasterLocationFormats = viewLocationsArray;
+            AreaMasterLocationFormats = viewLocationsArray;
 
-			AreaPartialViewLocationFormats = new[]
+            AreaPartialViewLocationFormats = new[]
 				{
 					//will be used when we have partial view and child action macros
 					string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
