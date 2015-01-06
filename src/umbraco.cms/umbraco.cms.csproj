@@ -211,6 +211,7 @@
     <Compile Include="Actions\ActionUnPublish.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Actions\ActionRestore.cs" />
     <Compile Include="Actions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\datatype\AbstractDataEditorControl.cs" />

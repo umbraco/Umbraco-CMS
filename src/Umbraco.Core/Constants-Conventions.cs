@@ -293,7 +293,7 @@ namespace Umbraco.Core
 			}
             
             /// <summary>
-            /// Defines the alias identifiers for Umbraco relation types.
+            /// Defines the alias identifiers for built-in Umbraco relation types.
             /// </summary>
             public static class RelationTypes
             {
@@ -306,6 +306,16 @@ namespace Umbraco.Core
                 /// ContentType alias for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
+
+                /// <summary>
+                /// ContentType name for default relation type "Relate Parent Document On Delete".
+                /// </summary>
+                public const string RelateParentDocumentOnDeleteName = "Relate Parent Document On Delete";
+
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Parent Document On Delete".
+                /// </summary>
+                public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
             }
 		}
 	}
