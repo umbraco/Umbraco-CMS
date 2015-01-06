@@ -7,12 +7,16 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '^umbProperty'],
+        require: ['ngModel', '?^umbProperty'],
         restrict: "A",
         link: function (scope, element, attr, ctrls) {
 
             var modelCtrl = ctrls[0];
-            var umbPropCtrl = ctrls[1];
+            var umbPropCtrl = ctrls.length > 1 ? ctrls[1] : null;
+            if (!umbPropCtrl) {
+                //we cannot proceed, this validator will be disabled
+                return;
+            }
 
             var watcher = null;
 

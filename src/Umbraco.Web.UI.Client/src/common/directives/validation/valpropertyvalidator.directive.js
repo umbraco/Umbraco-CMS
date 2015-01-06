@@ -20,15 +20,15 @@ function valPropertyValidator(serverValidationManager) {
         },
 
         // The element must have ng-model attribute and be inside an umbProperty directive
-        require: ['ngModel', '^umbProperty'],
+        require: ['ngModel', '?^umbProperty'],
 
         restrict: "A",
 
         link: function (scope, element, attrs, ctrls) {
 
             var modelCtrl = ctrls[0];
-            var propCtrl = ctrls[1];
-
+            var propCtrl = ctrls.length > 1 ? ctrls[1] : null;
+            
             // Check whether the scope has a valPropertyValidator method 
             if (!scope.valPropertyValidator || !angular.isFunction(scope.valPropertyValidator)) {
                 throw new Error('val-property-validator directive must specify a function to call');
@@ -46,12 +46,16 @@ function valPropertyValidator(serverValidationManager) {
                 if (result.isValid === true) {
                     // Tell the controller that the value is valid
                     modelCtrl.$setValidity(result.errorKey, true);
-                    propCtrl.setPropertyError(null);
+                    if (propCtrl) {
+                        propCtrl.setPropertyError(null);
+                    }                    
                 }
                 else {
                     // Tell the controller that the value is invalid
-                    modelCtrl.$setValidity(result.errorKey, false); 
-                    propCtrl.setPropertyError(result.errorMsg);
+                    modelCtrl.$setValidity(result.errorKey, false);
+                    if (propCtrl) {
+                        propCtrl.setPropertyError(result.errorMsg);
+                    }
                 }
             };
 
