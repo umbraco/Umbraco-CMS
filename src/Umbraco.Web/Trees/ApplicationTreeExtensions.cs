@@ -93,8 +93,9 @@ namespace Umbraco.Web.Trees
                 //In WebApi2, this is required to be set: 
                 //      proxiedControllerContext.RequestContext = controllerContext.RequestContext
                 // but we need to do this with reflection because of codebase changes between version 4/5
-                var controllerContextRequestContext = controllerContext.GetType().GetProperty("RequestContext").GetValue(controllerContext);
-                proxiedControllerContext.GetType().GetProperty("RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);                
+                //NOTE: Use TypeHelper here since the reflection is cached
+                var controllerContextRequestContext = TypeHelper.GetProperty(controllerContext.GetType(), "RequestContext").GetValue(controllerContext);
+                TypeHelper.GetProperty(proxiedControllerContext.GetType(), "RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);                
             }
 
             instance.ControllerContext = proxiedControllerContext;
@@ -106,8 +107,9 @@ namespace Umbraco.Web.Trees
                 // because it will detect that the request context is different throw an exception. This is a change in webapi2 and we need to set
                 // this with reflection due to codebase changes between version 4/5
                 //      instance.RequestContext.RouteData = proxiedRouteData;
-                var instanceRequestContext = instance.GetType().GetProperty("RequestContext").GetValue(instance);
-                instanceRequestContext.GetType().GetProperty("RouteData").SetValue(instanceRequestContext, proxiedRouteData);
+                //NOTE: Use TypeHelper here since the reflection is cached
+                var instanceRequestContext = TypeHelper.GetProperty(typeof(ApiController), "RequestContext").GetValue(instance);
+                TypeHelper.GetProperty(instanceRequestContext.GetType(), "RouteData").SetValue(instanceRequestContext, proxiedRouteData);
             }
 
             //invoke auth filters for this sub request
