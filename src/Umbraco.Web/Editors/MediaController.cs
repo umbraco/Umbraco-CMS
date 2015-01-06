@@ -290,9 +290,6 @@ namespace Umbraco.Web.Editors
             Services.MediaService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
-
-
         
         /// <summary>
         /// Change the sort order for media
@@ -390,6 +387,8 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
 
+            var tempFiles = new List<string>();
+
             //get the files
             foreach (var file in result.FileData)
             {
@@ -417,9 +416,15 @@ namespace Umbraco.Web.Editors
                     LogHelper.Warn<MediaController>("Cannot upload file " + file + ", it is not an approved file type");
                 }
 
-                //now we can remove the temp file
-                System.IO.File.Delete(file.LocalFileName);
+                tempFiles.Add(file.LocalFileName);
             }
+
+            //now we can remove the temp files
+            foreach (var tempFile in tempFiles)
+            {
+                System.IO.File.Delete(tempFile);    
+            }
+            
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
