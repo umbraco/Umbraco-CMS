@@ -118,7 +118,7 @@ if ($project) {
 			
 		  $lines = $lastOperation -split "`r`n"		
 			
-		  $installMatch = $lines | ? { $_.StartsWith("------- installing...umbracocms ") } | select -first 1		
+		  $installMatch = $lines | ? { $_.Contains("...umbracocms ") } | select -first 1		
 			
 		  if ($installMatch)		
 		  {		
