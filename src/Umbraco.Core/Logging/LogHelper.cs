@@ -9,6 +9,7 @@ namespace Umbraco.Core.Logging
 	///<summary>
 	/// Used for logging
 	///</summary>
+    [Obsolete("Use UmbracoContext.Current.Application.Services.LoggingService instead")]
 	public static class LogHelper
 	{
 		///<summary>
