@@ -358,15 +358,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void PopulateViewTemplate(ITemplate template, string fileName)
         {
-            string content = string.Empty;
-            string path = string.Empty;
+            string content;
+            var path = string.Empty;
 
             using (var stream = _viewsFileSystem.OpenFile(fileName))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                content = reader.ReadToEnd();
             }
 
             template.Path = _viewsFileSystem.GetRelativePath(fileName);
@@ -380,15 +378,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void PopulateMasterpageTemplate(ITemplate template, string fileName)
         {
-            string content = string.Empty;
-            string path = string.Empty;
-
+            string content;
+            var path = string.Empty;
+            
             using (var stream = _masterpagesFileSystem.OpenFile(fileName))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                content = reader.ReadToEnd();
             }
 
             template.Path = _masterpagesFileSystem.GetRelativePath(fileName);
