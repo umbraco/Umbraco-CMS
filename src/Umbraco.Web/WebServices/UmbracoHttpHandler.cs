@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -20,8 +21,16 @@ namespace Umbraco.Web.WebServices
         }
 
         protected UmbracoHttpHandler(UmbracoContext umbracoContext)
+            : this(LoggerResolver.Current.Logger, umbracoContext)
         {
+        }
+        
+
+        protected UmbracoHttpHandler(ILogger logger, UmbracoContext umbracoContext)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            Logger = logger;
             UmbracoContext = umbracoContext;
             Umbraco = new UmbracoHelper(umbracoContext);
         }
@@ -33,6 +42,8 @@ namespace Umbraco.Web.WebServices
         {
             get { return UmbracoContext.Application; }
         }
+
+        public ILogger Logger { get; private set; }
 
         /// <summary>
         /// Returns the current UmbracoContext

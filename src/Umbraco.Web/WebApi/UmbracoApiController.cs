@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Services;
@@ -21,13 +22,21 @@ namespace Umbraco.Web.WebApi
 
         }
 
-        protected UmbracoApiController(UmbracoContext umbracoContext)
+        protected UmbracoApiController(ILogger logger, UmbracoContext umbracoContext)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
             Umbraco = new UmbracoHelper(umbracoContext);
+            Logger = logger;
             _membershipHelper = new MembershipHelper(UmbracoContext);
+        }
+
+        protected UmbracoApiController(UmbracoContext umbracoContext)
+            : this(LoggerResolver.Current.Logger, umbracoContext)
+        {
+            
         }
 
         private readonly MembershipHelper _membershipHelper;
@@ -40,6 +49,8 @@ namespace Umbraco.Web.WebApi
         {
             return Request.TryGetHttpContext();
         }
+
+        public ILogger Logger { get; private set; }
 
         /// <summary>
         /// Returns the current ApplicationContext

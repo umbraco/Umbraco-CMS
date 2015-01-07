@@ -42,6 +42,12 @@ namespace Umbraco.Web.UI.Pages
         //    get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
         //}
 
+        private ILogger _logger;
+        public ILogger Logger
+        {
+            get { return _logger ?? (_logger = LoggerResolver.Current.Logger); }
+        }
+
 	    private UrlHelper _url;
 		/// <summary>
 		/// Returns a UrlHelper

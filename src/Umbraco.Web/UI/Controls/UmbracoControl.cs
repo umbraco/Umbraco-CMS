@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -15,13 +16,22 @@ namespace Umbraco.Web.UI.Controls
 	/// </summary>
 	public abstract class UmbracoControl : Control
 	{
-		/// <summary>
+
+        protected UmbracoControl(UmbracoContext umbracoContext)
+            : this(LoggerResolver.Current.Logger, umbracoContext)
+        {
+        }
+
+        /// <summary>
         /// Default constructor
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="umbracoContext"></param>
-        protected UmbracoControl(UmbracoContext umbracoContext)
+        protected UmbracoControl(ILogger logger, UmbracoContext umbracoContext)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            Logger = logger;
             UmbracoContext = umbracoContext;
             Umbraco = new UmbracoHelper(umbracoContext);
         }
@@ -39,6 +49,7 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         public UmbracoHelper Umbraco { get; private set; }
 
+        public ILogger Logger { get; private set; }
         public UmbracoContext UmbracoContext { get; private set; }
 
 		protected ApplicationContext ApplicationContext

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -11,10 +12,17 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoController : Controller
     {
-        protected UmbracoController(UmbracoContext umbracoContext)
+        protected UmbracoController(ILogger logger, UmbracoContext umbracoContext)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            Logger = logger;
             UmbracoContext = umbracoContext;
+        }
+
+        protected UmbracoController(UmbracoContext umbracoContext)
+            : this(LoggerResolver.Current.Logger, umbracoContext)
+        {            
         }
 
         protected UmbracoController()
@@ -24,6 +32,7 @@ namespace Umbraco.Web.Mvc
         }
 
         private UmbracoHelper _umbraco;
+
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
@@ -31,6 +40,11 @@ namespace Umbraco.Web.Mvc
         {
             get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
         }
+
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger { get; private set; }
 
         /// <summary>
         /// Returns the current UmbracoContext

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.WebApi;
 
@@ -18,16 +19,23 @@ namespace Umbraco.Web.Mvc
 		private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
 
+        protected PluginController(ILogger logger, UmbracoContext umbracoContext)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            Logger = logger;
+            UmbracoContext = umbracoContext;
+            InstanceId = Guid.NewGuid();
+            Umbraco = new UmbracoHelper(umbracoContext);
+        }
+
 		/// <summary>
 		/// Default constructor
 		/// </summary>
 		/// <param name="umbracoContext"></param>
 		protected PluginController(UmbracoContext umbracoContext)
+            : this(LoggerResolver.Current.Logger, umbracoContext)
 		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-			UmbracoContext = umbracoContext;
-			InstanceId = Guid.NewGuid();
-			Umbraco = new UmbracoHelper(umbracoContext);
 		}
 
 		/// <summary>
@@ -40,7 +48,12 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		public UmbracoHelper Umbraco { get; private set; }
 
-		/// <summary>
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+	    public ILogger Logger { get; private set; }
+
+	    /// <summary>
 		/// Returns the current UmbracoContext
 		/// </summary>
 		public UmbracoContext UmbracoContext { get; private set; }
