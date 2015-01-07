@@ -35,7 +35,7 @@ function valEmail(valEmailExpression) {
     };
 }
 
-angular.module('umbraco.directives')
+angular.module('umbraco.directives.validation')
     .directive("valEmail", valEmail)
     .factory('valEmailExpression', function() {
         return {

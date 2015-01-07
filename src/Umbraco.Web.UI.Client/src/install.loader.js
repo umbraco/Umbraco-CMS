@@ -7,10 +7,11 @@ LazyLoad.js( [
       'lib/angular/1.1.5/angular-mocks.js',
       'lib/angular/1.1.5/angular-sanitize.min.js',
       'lib/underscore/underscore-min.js',
-      'js/umbraco.installer.js'
+      'js/umbraco.installer.js',
+      'js/umbraco.directives.js'
     ], function () {
         jQuery(document).ready(function () {
-            angular.bootstrap(document, ['ngSanitize', 'umbraco.install']);
+            angular.bootstrap(document, ['ngSanitize', 'umbraco.install', 'umbraco.directives.validation']);
         });
     }
 );

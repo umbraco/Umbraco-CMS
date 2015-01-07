@@ -182,4 +182,4 @@ function valPropertyMsg(serverValidationManager) {
         }
     };
 }
-angular.module('umbraco.directives').directive("valPropertyMsg", valPropertyMsg);
+angular.module('umbraco.directives.validation').directive("valPropertyMsg", valPropertyMsg);

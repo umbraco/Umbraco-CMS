@@ -105,4 +105,4 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
         }
     };
 }
-angular.module('umbraco.directives').directive("valFormManager", valFormManager);
+angular.module('umbraco.directives.validation').directive("valFormManager", valFormManager);

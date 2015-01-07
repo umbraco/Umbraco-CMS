@@ -61,4 +61,4 @@ function valRegex() {
         }
     };
 }
-angular.module('umbraco.directives').directive("valRegex", valRegex);
+angular.module('umbraco.directives.validation').directive("valRegex", valRegex);

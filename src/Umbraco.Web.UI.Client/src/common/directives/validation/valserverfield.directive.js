@@ -51,4 +51,4 @@ function valServerField(serverValidationManager) {
         }
     };
 }
-angular.module('umbraco.directives').directive("valServerField", valServerField);
+angular.module('umbraco.directives.validation').directive("valServerField", valServerField);
