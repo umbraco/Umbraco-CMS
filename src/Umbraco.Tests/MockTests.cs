@@ -36,6 +36,7 @@ namespace Umbraco.Tests
                 new Mock<IFileService>().Object,
                 new Mock<ILocalizationService>().Object,
                 new PackagingService(
+                    new Mock<ILogger>().Object,
                     new Mock<IContentService>().Object,
                     new Mock<IContentTypeService>().Object,
                     new Mock<IMediaService>().Object,
@@ -58,7 +59,7 @@ namespace Umbraco.Tests
             new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object,
-                new Mock<INotificationService>().Object, new Mock<ILoggingService>().Object);
+                new Mock<INotificationService>().Object,
                 Mock.Of<ILocalizedTextService>());
             Assert.Pass();
         }
@@ -75,7 +76,7 @@ namespace Umbraco.Tests
         {
             var appCtx = new ApplicationContext(
                 new DatabaseContext(new Mock<IDatabaseFactory>().Object),
-                new ServiceContext(
+                new ServiceContext(                    
                     new Mock<IContentService>().Object,
                     new Mock<IMediaService>().Object,
                     new Mock<IContentTypeService>().Object,
@@ -83,6 +84,7 @@ namespace Umbraco.Tests
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
                     new PackagingService(
+                        new Mock<ILogger>().Object,
                         new Mock<IContentService>().Object,
                         new Mock<IContentTypeService>().Object,
                         new Mock<IMediaService>().Object,
@@ -105,7 +107,7 @@ namespace Umbraco.Tests
                     new Mock<ISectionService>().Object,
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object,
-                    new Mock<INotificationService>().Object, new Mock<ILoggingService>().Object),
+                    new Mock<INotificationService>().Object,
                     Mock.Of<ILocalizedTextService>()),
                 CacheHelper.CreateDisabledCacheHelper());
             

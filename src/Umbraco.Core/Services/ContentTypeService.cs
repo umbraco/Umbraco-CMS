@@ -28,21 +28,28 @@ namespace Umbraco.Core.Services
 	    private readonly RepositoryFactory _repositoryFactory;
 	    private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
+        private readonly ILogger _logger;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion); 
 
-        public ContentTypeService(IContentService contentService, IMediaService mediaService)
-			: this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory(), contentService, mediaService)
+        public ContentTypeService(ILogger logger, IContentService contentService, IMediaService mediaService)
+			: this(logger, new PetaPocoUnitOfWorkProvider(), new RepositoryFactory(), contentService, mediaService)
         {}
 
-        public ContentTypeService(RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
+        public ContentTypeService(ILogger logger, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
+            : this(logger, new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
         { }
 
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
+        public ContentTypeService(ILogger logger, IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (provider == null) throw new ArgumentNullException("provider");
+            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
+            if (contentService == null) throw new ArgumentNullException("contentService");
+            if (mediaService == null) throw new ArgumentNullException("mediaService");
+            _logger = logger;
             _uowProvider = provider;
 	        _repositoryFactory = repositoryFactory;
 	        _contentService = contentService;

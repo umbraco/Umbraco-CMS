@@ -11,6 +11,13 @@ namespace Umbraco.Core.Profiling
     /// </summary>
     internal class LogProfiler : IProfiler
     {
+        private readonly ILogger _logger;
+
+        public LogProfiler(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         public string Render()
         {
             return string.Empty;
@@ -18,8 +25,8 @@ namespace Umbraco.Core.Profiling
 
         public IDisposable Step(string name)
         {
-            LogHelper.Debug(typeof(LogProfiler), "Starting - " + name);
-            return DisposableTimer.Start(l => LogHelper.Info(typeof(LogProfiler), () => name + " (took " + l + "ms)"));
+            _logger.Debug(typeof(LogProfiler), "Starting - " + name);
+            return DisposableTimer.Start(l => _logger.Info(typeof(LogProfiler), () => name + " (took " + l + "ms)"));
         }
 
         public void Start()

@@ -26,6 +26,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : IContentService
     {
+        private readonly ILogger _logger;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly RepositoryFactory _repositoryFactory;
@@ -38,26 +39,28 @@ namespace Umbraco.Core.Services
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         public ContentService()
-            : this(new RepositoryFactory())
+            : this(LoggerResolver.Current.Logger, new RepositoryFactory())
         { }
 
-        public ContentService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, new PublishingStrategy())
+        public ContentService(ILogger logger, RepositoryFactory repositoryFactory)
+            : this(logger, new PetaPocoUnitOfWorkProvider(), repositoryFactory, new PublishingStrategy())
         { }
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory(), new PublishingStrategy())
+        public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider)
+            : this(logger, provider, new RepositoryFactory(), new PublishingStrategy())
         { }
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, new PublishingStrategy())
+        public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+            : this(logger, provider, repositoryFactory, new PublishingStrategy())
         { }
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
+        public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (provider == null) throw new ArgumentNullException("provider");
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+            _logger = logger;
             _uowProvider = provider;
             _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
@@ -65,11 +68,13 @@ namespace Umbraco.Core.Services
             _userService = new UserService(provider, repositoryFactory);
         }
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService, IUserService userService)
+        public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService, IUserService userService)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (provider == null) throw new ArgumentNullException("provider");
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+            _logger = logger;
             _uowProvider = provider;
             _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
@@ -775,7 +780,7 @@ namespace Umbraco.Core.Services
             }
             catch (Exception ex)
             {
-                LogHelper.Error<ContentService>("An error occurred executing RePublishAll", ex);
+                _logger.Error<ContentService>("An error occurred executing RePublishAll", ex);
                 return false;
             }
         }
@@ -795,7 +800,7 @@ namespace Umbraco.Core.Services
             }
             catch (Exception ex)
             {
-                LogHelper.Error<ContentService>("An error occurred executing RePublishAll", ex);
+                _logger.Error<ContentService>("An error occurred executing RePublishAll", ex);
             }
         }
 
@@ -808,7 +813,7 @@ namespace Umbraco.Core.Services
         public bool Publish(IContent content, int userId = 0)
         {
             var result = SaveAndPublishDo(content, userId);
-            LogHelper.Info<ContentService>("Call was made to ContentService.Publish, use PublishWithStatus instead since that method will provide more detailed information on the outcome");
+            _logger.Info<ContentService>("Call was made to ContentService.Publish, use PublishWithStatus instead since that method will provide more detailed information on the outcome");
             return result.Success;
         }
 
@@ -1611,7 +1616,7 @@ namespace Umbraco.Core.Services
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
                 if (content.ParentId != Constants.System.Root && content.ParentId != Constants.System.RecycleBinContent && IsPublishable(content) == false)
                 {
-                    LogHelper.Info<ContentService>(
+                    _logger.Info<ContentService>(
                         string.Format(
                             "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
                             content.Name, content.Id));
@@ -1622,7 +1627,7 @@ namespace Umbraco.Core.Services
                 //Content contains invalid property values and can therefore not be published - fire event?
                 if (!content.IsValid())
                 {
-                    LogHelper.Info<ContentService>(
+                    _logger.Info<ContentService>(
                         string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                                       content.Name, content.Id));
                     result.Add(
@@ -1885,7 +1890,7 @@ namespace Umbraco.Core.Services
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != Constants.System.Root && content.ParentId != Constants.System.RecycleBinContent && IsPublishable(content) == false)
             {
-                LogHelper.Info<ContentService>(
+                _logger.Info<ContentService>(
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
                         content.Name, content.Id));
@@ -1900,7 +1905,7 @@ namespace Umbraco.Core.Services
             //Content contains invalid property values and can therefore not be published - fire event?
             if (content.IsValid() == false)
             {
-                LogHelper.Info<ContentService>(
+                _logger.Info<ContentService>(
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                         content.Name, content.Id));

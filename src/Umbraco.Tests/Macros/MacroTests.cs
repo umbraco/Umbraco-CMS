@@ -3,9 +3,11 @@ using System.IO;
 using System.Web.Caching;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
@@ -25,7 +27,7 @@ namespace Umbraco.Tests.Macros
                 new StaticCacheProvider(),
                 new NullCacheProvider());
             ApplicationContext.Current = new ApplicationContext(cacheHelper);
-            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
+            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler(Mock.Of<ILogger>()))
             {
                 CanResolveBeforeFrozen = true
             };

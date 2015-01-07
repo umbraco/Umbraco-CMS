@@ -334,11 +334,11 @@ namespace Umbraco.Web
                     }
                     catch (Exception e)
                     {
-                        LogHelper.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                        LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
                         return null;
                     }
                 }
-                LogHelper.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                 return null;
             }));
 
