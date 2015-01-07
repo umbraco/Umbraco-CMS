@@ -230,7 +230,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>        
         [FileUploadCleanupFilter]
-        [MembershipProviderValidationFilter]
         public MemberDisplay PostSave(
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)

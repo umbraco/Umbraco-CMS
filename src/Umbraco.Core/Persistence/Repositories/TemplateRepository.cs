@@ -430,7 +430,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string content;
 
             using (var stream = _viewsFileSystem.OpenFile(fileName))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
                 content = reader.ReadToEnd();
             }
@@ -441,9 +441,9 @@ namespace Umbraco.Core.Persistence.Repositories
         private void PopulateMasterpageTemplate(ITemplate template, string fileName)
         {
             string content;
-
+            
             using (var stream = _masterpagesFileSystem.OpenFile(fileName))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
                 content = reader.ReadToEnd();
             }

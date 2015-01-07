@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services
 {
@@ -20,7 +21,15 @@ namespace Umbraco.Core.Services
             if (cache == null) throw new ArgumentNullException("cache");
             if (fileSourceFolder == null) throw new ArgumentNullException("fileSourceFolder");
             _cache = cache;
-            _fileSourceFolder = fileSourceFolder;
+
+            if (fileSourceFolder.Exists == false)
+            {
+                LogHelper.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {0}, therefore no sources will be discovered", () => fileSourceFolder.FullName);
+            }
+            else
+            {
+                _fileSourceFolder = fileSourceFolder;    
+            }
         }
 
         /// <summary>
@@ -30,6 +39,9 @@ namespace Umbraco.Core.Services
         public IDictionary<CultureInfo, Lazy<XDocument>> GetXmlSources()
         {
             var result = new Dictionary<CultureInfo, Lazy<XDocument>>();
+
+            if (_fileSourceFolder == null) return result;
+
             foreach (var fileInfo in _fileSourceFolder.GetFiles("*.xml"))
             {
                 var localCopy = fileInfo;

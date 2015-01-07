@@ -170,9 +170,10 @@ namespace UmbracoExamine
 
         protected override IndexReader OpenNewReader()
         {
+            var directory = GetLuceneDirectory();
             return IndexReader.Open(
-                GetLuceneDirectory(), 
-                DeletePolicyTracker.Current.GetPolicy(IndexSetName), 
+                directory, 
+                DeletePolicyTracker.Current.GetPolicy(directory), 
                 true);
         }
 

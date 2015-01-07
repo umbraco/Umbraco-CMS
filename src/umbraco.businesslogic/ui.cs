@@ -38,6 +38,8 @@ namespace umbraco
         [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         public static string Culture(User u)
         {
+            if (ApplicationContext.Current == null) return string.Empty;
+
             var found = UserExtensions.GetUserCulture(u.Language, ApplicationContext.Current.Services.TextService);
             return found == null ? string.Empty : found.Name;
         }
@@ -46,6 +48,8 @@ namespace umbraco
         [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
         internal static string Culture(IUser u)
         {
+            if (ApplicationContext.Current == null) return string.Empty;
+
             var found = u.GetUserCulture(ApplicationContext.Current.Services.TextService);
             return found == null ? string.Empty : found.Name;
         }
@@ -94,11 +98,15 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key, User u)
         {
+            if (ApplicationContext.Current == null) return "[" + Key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(Key, GetCultureFromUserLanguage(GetLanguage(u)));
         }
 
         internal static string Text(string key, IUser u)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(key, GetCultureFromUserLanguage(GetLanguage(u)));
         }
 
@@ -109,6 +117,8 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key)
         {
+            if (ApplicationContext.Current == null) return "[" + Key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(Key, GetCultureFromUserLanguage(GetLanguage()));
         }
 
@@ -121,6 +131,8 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, User u)
         {
+            if (ApplicationContext.Current == null) return "[" + Key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", Area, Key),
                 GetCultureFromUserLanguage(GetLanguage(u)));
@@ -128,6 +140,8 @@ namespace umbraco
 
         public static string Text(string area, string key, IUser u)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage(u)));
@@ -141,6 +155,8 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key)
         {
+            if (ApplicationContext.Current == null) return "[" + Key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", Area, Key),
                 GetCultureFromUserLanguage(GetLanguage()));
@@ -156,6 +172,8 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string[] Variables, User u)
         {
+            if (ApplicationContext.Current == null) return "[" + Key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", Area, Key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
@@ -164,6 +182,8 @@ namespace umbraco
 
         internal static string Text(string area, string key, string[] variables)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage()),
@@ -172,6 +192,8 @@ namespace umbraco
 
         internal static string Text(string area, string key, string[] variables, IUser u)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
@@ -188,6 +210,8 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string Variable, User u)
         {
+            if (ApplicationContext.Current == null) return "[" + Key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", Area, Key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
@@ -196,6 +220,8 @@ namespace umbraco
 
         internal static string Text(string area, string key, string variable)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage()),
@@ -204,6 +230,8 @@ namespace umbraco
 
         internal static string Text(string area, string key, string variable, IUser u)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage(u)),
@@ -228,6 +256,8 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                 string.Format("{0}/{1}", area, key),
                 GetCultureFromUserLanguage(GetLanguage()));
@@ -242,6 +272,8 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string[] variables)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                string.Format("{0}/{1}", area, key),
                GetCultureFromUserLanguage(GetLanguage()),
@@ -257,6 +289,8 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string variable)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                string.Format("{0}/{1}", area, key),
                GetCultureFromUserLanguage(GetLanguage()),
@@ -274,6 +308,8 @@ namespace umbraco
         /// <remarks>This is the underlying call for all Text/GetText method calls</remarks>
         public static string GetText(string area, string key, string[] variables, string language)
         {
+            if (ApplicationContext.Current == null) return "[" + key + "]";
+
             return ApplicationContext.Current.Services.TextService.Localize(
                string.Format("{0}/{1}", area, key),
                GetCultureFromUserLanguage(GetLanguage()),

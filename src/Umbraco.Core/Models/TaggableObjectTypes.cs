@@ -5,6 +5,7 @@
     /// </summary>
     public enum TaggableObjectTypes
     {
+        All,
         Content,
         Media,
         Member

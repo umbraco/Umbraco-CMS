@@ -84,4 +84,4 @@ function valToggleMsg(serverValidationManager) {
 * @requires formController
 * @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
 **/
-angular.module('umbraco.directives').directive("valToggleMsg", valToggleMsg);
+angular.module('umbraco.directives.validation').directive("valToggleMsg", valToggleMsg);

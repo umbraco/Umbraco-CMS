@@ -91,4 +91,4 @@ function valServer(serverValidationManager) {
         }
     };
 }
-angular.module('umbraco.directives').directive("valServer", valServer);
+angular.module('umbraco.directives.validation').directive("valServer", valServer);

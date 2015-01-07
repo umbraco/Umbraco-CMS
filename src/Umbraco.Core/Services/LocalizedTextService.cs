@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services
 {
@@ -80,7 +81,8 @@ namespace Umbraco.Core.Services
             {
                 if (_xmlSource.ContainsKey(culture) == false)
                 {
-                    throw new NullReferenceException("The culture specified " + culture + " was not found in any configured sources for this service");
+                    LogHelper.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                    return result;
                 }
 
                 //convert all areas + keys to a single key with a '/'
@@ -103,7 +105,8 @@ namespace Umbraco.Core.Services
             {
                 if (_dictionarySource.ContainsKey(culture) == false)
                 {
-                    throw new NullReferenceException("The culture specified " + culture + " was not found in any configured sources for this service");
+                    LogHelper.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                    return result;
                 }
 
                 //convert all areas + keys to a single key with a '/'
@@ -137,7 +140,8 @@ namespace Umbraco.Core.Services
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                throw new NullReferenceException("The culture specified " + culture + " was not found in any configured sources for this service");
+                LogHelper.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                return "[" + key + "]";  
             }
 
             var cultureSource = _dictionarySource[culture];
@@ -174,7 +178,8 @@ namespace Umbraco.Core.Services
         {
             if (_xmlSource.ContainsKey(culture) == false)
             {
-                throw new NullReferenceException("The culture specified " + culture + " was not found in any configured sources for this service");
+                LogHelper.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                return "[" + key + "]";                
             }
 
             var cultureSource = _xmlSource[culture].Value;
