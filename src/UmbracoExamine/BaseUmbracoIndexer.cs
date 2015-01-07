@@ -202,8 +202,9 @@ namespace UmbracoExamine
             //if temp local storage is configured use that, otherwise return the default
             if (_localTempStorageHelper.LuceneDirectory != null)
             {
-                return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
-                    DeletePolicyTracker.Current.GetPolicy(IndexSetName),
+                var directory = GetLuceneDirectory();
+                return new IndexWriter(directory, IndexingAnalyzer,
+                    DeletePolicyTracker.Current.GetPolicy(directory),
                     IndexWriter.MaxFieldLength.UNLIMITED);
             }
 
