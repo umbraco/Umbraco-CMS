@@ -60,7 +60,7 @@ namespace Umbraco.Core.Manifest
         public IEnumerable<PackageManifest> GetManifests()
         {
             //get all Manifest.js files in the appropriate folders
-            var manifestFileContents = GetAllManfifestFileContents(_pluginsDir);
+            var manifestFileContents = GetAllManifestFileContents(_pluginsDir);
             return CreateManifests(manifestFileContents.ToArray());
         }
 
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         /// <param name="currDir"></param>
         /// <returns></returns>
-        private IEnumerable<string> GetAllManfifestFileContents(DirectoryInfo currDir)
+        private IEnumerable<string> GetAllManifestFileContents(DirectoryInfo currDir)
         {
             var depth = FolderDepth(_pluginsDir, currDir);
             
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Manifest
                 var result = new List<string>();
                 foreach (var d in dirs)
                 {
-                    result.AddRange(GetAllManfifestFileContents(d));
+                    result.AddRange(GetAllManifestFileContents(d));
                 }
                 return result;
             }
