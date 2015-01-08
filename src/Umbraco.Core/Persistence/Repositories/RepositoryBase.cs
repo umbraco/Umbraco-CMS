@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -17,16 +18,14 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository
         where TEntity : class, IAggregateRoot
     {
+        protected ILogger Logger { get; private set; }
+
         private readonly IUnitOfWork _work;
         private readonly IRepositoryCacheProvider _cache;
 
-        protected RepositoryBase(IUnitOfWork work)
-            : this(work, RuntimeCacheProvider.Current)
+        protected RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
         {
-        }
-
-        internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
-        {
+            Logger = logger;
             if (work == null) throw new ArgumentNullException("work");
             if (cache == null) throw new ArgumentNullException("cache");
             _work = work;

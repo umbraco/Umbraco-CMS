@@ -10,11 +10,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     internal class BaseDataCreation
     {
         private readonly Database _database;
+        private readonly ILogger _logger;
 
-        public BaseDataCreation(Database database)
+        public BaseDataCreation(Database database, ILogger logger)
         {
             _database = database;
-        } 
+            _logger = logger;
+        }
 
         /// <summary>
         /// Initialize the base data creation by inserting the data foundation for umbraco
@@ -23,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            LogHelper.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
+            _logger.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
 
             if(tableName.Equals("umbracoNode"))
             {

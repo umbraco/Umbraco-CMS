@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -18,15 +19,9 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
         private readonly ILanguageRepository _languageRepository;
-
-		public DictionaryRepository(IDatabaseUnitOfWork work, ILanguageRepository languageRepository)
-			: base(work)
-        {
-            _languageRepository = languageRepository;
-        }
-
-		public DictionaryRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILanguageRepository languageRepository)
-            : base(work, cache)
+        
+		public DictionaryRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, ILanguageRepository languageRepository)
+            : base(work, cache, logger)
         {
             _languageRepository = languageRepository;
         }

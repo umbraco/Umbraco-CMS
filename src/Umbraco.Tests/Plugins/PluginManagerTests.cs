@@ -15,7 +15,6 @@ using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.editorControls;
 using umbraco.MacroEngines;
-using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
@@ -30,8 +29,6 @@ namespace Umbraco.Tests.Plugins
         [SetUp]
         public void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-
             //this ensures its reset
             PluginManager.Current = new PluginManager(false);
 

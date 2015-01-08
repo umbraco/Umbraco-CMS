@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Services
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
 			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
-            ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper);
+            ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger);
 
 			CreateTestData();
 		}

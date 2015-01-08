@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -30,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);            
+            return new MemberTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());            
         }
 
         [Test]

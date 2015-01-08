@@ -3,7 +3,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Macros;
 using umbraco;
@@ -16,8 +15,6 @@ namespace Umbraco.Tests.Resolvers
         [SetUp]
         public void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-
             ActionsResolver.Reset();
 
             // this ensures it's reset

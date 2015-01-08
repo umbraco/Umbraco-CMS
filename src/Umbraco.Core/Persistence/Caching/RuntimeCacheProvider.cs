@@ -10,6 +10,8 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Caching
 {
+    //TODO: Remove this singleton!
+
     /// <summary>
     /// The Runtime Cache provider looks up objects in the Runtime cache for fast retrival
     /// </summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -18,14 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, IRelationTypeRepository relationTypeRepository)
-            : base(work)
-        {
-            _relationTypeRepository = relationTypeRepository;
-        }
-
-        public RelationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IRelationTypeRepository relationTypeRepository)
-            : base(work, cache)
+        public RelationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
+            : base(work, cache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
         }

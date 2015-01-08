@@ -5,6 +5,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Caching
 {
+    //TODO: Remove this singleton!
     internal class NullCacheProvider : IRepositoryCacheProvider
     {
         #region Singleton

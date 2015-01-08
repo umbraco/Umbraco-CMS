@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -24,6 +26,10 @@ namespace Umbraco.Tests.Persistence.Repositories
     [TestFixture]
     public class MediaRepositoryTest : BaseDatabaseFactoryTest
     {
+        public MediaRepositoryTest()
+        {
+        }
+
         [SetUp]
         public override void Initialize()
         {           
@@ -34,9 +40,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
-            var repository = new MediaRepository(unitOfWork, NullCacheProvider.Current, mediaTypeRepository, tagRepository);
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var repository = new MediaRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository);
             return repository;
         }
 

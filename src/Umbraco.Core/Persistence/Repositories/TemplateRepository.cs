@@ -7,6 +7,7 @@ using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -26,26 +27,14 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class TemplateRepository : PetaPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
-        private IFileSystem _masterpagesFileSystem;
-        private IFileSystem _viewsFileSystem;
-        private ITemplatesSection _templateConfig;
-        private ViewHelper _viewHelper;
-        private MasterPageHelper _masterPageHelper;
+        private readonly IFileSystem _masterpagesFileSystem;
+        private readonly IFileSystem _viewsFileSystem;
+        private readonly ITemplatesSection _templateConfig;
+        private readonly ViewHelper _viewHelper;
+        private readonly MasterPageHelper _masterPageHelper;
 
-        public TemplateRepository(IDatabaseUnitOfWork work)
-            : base(work)
-        {
-            EnsureDependencies();
-        }
-
-        public TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
-        {
-            EnsureDependencies();
-        }
-
-        internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
-            : base(work, cache)
+        internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
+            : base(work, cache, logger)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
@@ -54,15 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
-        private void EnsureDependencies()
-        {
-            _masterpagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
-            _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
-            _templateConfig = UmbracoConfig.For.UmbracoSettings().Templates;
-            _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
-        }
-
+        
         #region Overrides of RepositoryBase<int,ITemplate>
 
         protected override ITemplate PerformGet(int id)

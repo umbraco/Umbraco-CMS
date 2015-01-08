@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
 using log4net;
+using log4net.Config;
 
 namespace Umbraco.Core.Logging
 {
@@ -11,6 +13,25 @@ namespace Umbraco.Core.Logging
 	///</summary>
     public class Logger : ILogger
 	{
+        public Logger(FileInfo log4NetConfigFile)
+        {
+            XmlConfigurator.Configure(log4NetConfigFile);
+        }
+
+        private Logger()
+        {
+            
+        }
+
+        /// <summary>
+        /// Creates a logger with the default log4net configuration discovered (i.e. from the web.config)
+        /// </summary>
+        /// <returns></returns>
+        public static Logger CreateWithDefaultLog4NetConfiguration()
+        {
+            return new Logger();
+        }
+
 		///<summary>
 		/// Returns a logger for the type specified
 		///</summary>

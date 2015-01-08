@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -59,7 +60,8 @@ namespace Umbraco.Core.Standalone
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(),
-                        cacheHelper);
+                        cacheHelper,
+                        new DebugDiagnosticsLogger());
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -25,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MediaTypeRepository(unitOfWork, NullCacheProvider.Current);            
+            return new MediaTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());            
         }
 
         [Test]

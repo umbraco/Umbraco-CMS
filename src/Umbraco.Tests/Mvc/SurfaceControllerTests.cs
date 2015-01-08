@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Mvc
                 appCtx,
                 true);
 
-            var ctrl = new TestSurfaceController(umbCtx);
+            var ctrl = new TestSurfaceController(Mock.Of<ILogger>(), umbCtx);
 
             var result = ctrl.Index();
 
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Mvc
                 appCtx,
                 true);
 
-            var ctrl = new TestSurfaceController(umbCtx);
+            var ctrl = new TestSurfaceController(Mock.Of<ILogger>(), umbCtx);
 
             Assert.IsNotNull(ctrl.UmbracoContext);
         }
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.Mvc
                 appCtx,
                 true);
 
-            var ctrl = new TestSurfaceController(umbCtx);
+            var ctrl = new TestSurfaceController(Mock.Of<ILogger>(), umbCtx);
 
             Assert.IsNotNull(ctrl.Umbraco);
         }
@@ -106,7 +107,7 @@ namespace Umbraco.Tests.Mvc
             
             using (var uTest = new DisposableUmbracoTest(appCtx))
             {
-                var ctrl = new TestSurfaceController(uTest.UmbracoContext);
+                var ctrl = new TestSurfaceController(Mock.Of<ILogger>(), uTest.UmbracoContext);
                 var result = ctrl.GetContent(2) as PublishedContentResult;
 
                 Assert.IsNotNull(result);
@@ -116,7 +117,8 @@ namespace Umbraco.Tests.Mvc
 
         public class TestSurfaceController : SurfaceController
         {
-            public TestSurfaceController(UmbracoContext umbracoContext) : base(umbracoContext)
+            public TestSurfaceController(ILogger logger, UmbracoContext umbracoContext)
+                : base(logger, umbracoContext)
             {
             }
 

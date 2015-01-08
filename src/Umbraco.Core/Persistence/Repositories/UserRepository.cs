@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -25,15 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IUserTypeRepository _userTypeRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
-            : base(work)
-        {
-            _userTypeRepository = userTypeRepository;
-            _cacheHelper = cacheHelper;
-        }
-
-        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
-            : base(work, cache)
+        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
+            : base(work, cache, logger)
         {
             _userTypeRepository = userTypeRepository;
             _cacheHelper = cacheHelper;

@@ -7,11 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Web.Routing;
 using System.Xml;
+using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
@@ -74,8 +76,9 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
             new DatabaseContext(dbFactory),
                 //assign the service context
-            new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-            cacheHelper)
+            new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
+            cacheHelper,
+            Logger)
             {
                 IsReady = true
             };
@@ -196,7 +199,9 @@ namespace Umbraco.Tests.TestHelpers
                 () => PluginManager.Current.ResolveDataTypes());
 
             RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true)); //disable all repo caches for tests!
+                new RepositoryFactory(true,  //disable all repo caches for tests!
+                    Logger,
+                    SettingsForTests.GenerateMockSettings())); 
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };

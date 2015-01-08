@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -25,8 +27,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DictionaryRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out LanguageRepository languageRepository)
         {
-            languageRepository = new LanguageRepository(unitOfWork, NullCacheProvider.Current);
-            var dictionaryRepository = new DictionaryRepository(unitOfWork, NullCacheProvider.Current, languageRepository);
+            languageRepository = new LanguageRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var dictionaryRepository = new DictionaryRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), languageRepository);
             return dictionaryRepository;
         }
 
@@ -64,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Read More"));
                 Assert.That(dictionaryItem.Translations.Last().Value, Is.EqualTo("Læs mere"));
             }
-            
+
         }
 
         [Test]
@@ -247,8 +249,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var languageRepository = new LanguageRepository(unitOfWork);
-            var repository = new DictionaryRepository(unitOfWork, languageRepository);
+            var languageRepository = new LanguageRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
+            var repository = new DictionaryRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), languageRepository);
 
             var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNo);

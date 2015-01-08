@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -30,8 +32,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out RelationTypeRepository relationTypeRepository)
         {
-            relationTypeRepository = new RelationTypeRepository(unitOfWork, NullCacheProvider.Current);
-            var repository = new RelationRepository(unitOfWork, NullCacheProvider.Current, relationTypeRepository);
+            relationTypeRepository = new RelationTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var repository = new RelationRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), relationTypeRepository);
             return repository;
         }
 
@@ -279,8 +281,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var relationTypeRepository = new RelationTypeRepository(unitOfWork);
-            var relationRepository = new RelationRepository(unitOfWork, NullCacheProvider.Current, relationTypeRepository);
+            var relationTypeRepository = new RelationTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var relationRepository = new RelationRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), relationTypeRepository);
 
             relationTypeRepository.AddOrUpdate(relateContent);
             relationTypeRepository.AddOrUpdate(relateContentType);

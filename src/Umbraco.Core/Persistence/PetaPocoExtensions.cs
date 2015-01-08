@@ -385,7 +385,10 @@ namespace Umbraco.Core.Persistence
 
         private static void PetaPocoExtensions_NewTable(string tableName, Database db, TableCreationEventArgs e)
         {
-            var baseDataCreation = new BaseDataCreation(db);
+            //argh! this is a hack because all these are extension methods and don't have an ILogger, we don't want to 
+            // always need to think about the LoggerResolver being set (i.e. unit tests) so we'll check if it is otherwise
+            // create a temp logger
+            var baseDataCreation = new BaseDataCreation(db, LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger: new DebugDiagnosticsLogger() );
             baseDataCreation.InitializeBaseData(tableName);
         }
     }

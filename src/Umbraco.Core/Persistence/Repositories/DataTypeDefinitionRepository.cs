@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -27,22 +28,13 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper,
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper, ILogger logger,
             IContentTypeRepository contentTypeRepository)
-			: base(work)
+            : base(work, cache, logger)
         {
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
-        }
-
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper,
-            IContentTypeRepository contentTypeRepository)
-            : base(work, cache)
-        {
-            _cacheHelper = cacheHelper;
-            _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
+            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current, logger);
         }
 
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -446,7 +438,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+                : base(work, cache, logger)
             {
             }
 

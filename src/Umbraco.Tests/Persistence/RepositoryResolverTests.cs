@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Reflection;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.ObjectResolution;
@@ -19,7 +22,9 @@ namespace Umbraco.Tests.Persistence
 		public void Setup()
 		{
 			RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true));  //disable all repo caches for tests!
+                new RepositoryFactory(true,  //disable all repo caches for tests!
+                    Mock.Of<ILogger>(),
+                    Mock.Of<IUmbracoSettingsSection>()));
 
             Resolution.Freeze();
 		}

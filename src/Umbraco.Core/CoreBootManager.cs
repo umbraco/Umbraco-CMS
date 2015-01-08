@@ -80,7 +80,8 @@ namespace Umbraco.Core
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),
                 new PublishingStrategy(),
-                ApplicationCache);
+                ApplicationCache,
+                LoggerResolver.Current.Logger);
 
             CreateApplicationContext(dbContext, serviceContext);
 
@@ -110,7 +111,7 @@ namespace Umbraco.Core
         protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
         {
             //create the ApplicationContext
-            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache);
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache, LoggerResolver.Current.Logger);
         }
 
         /// <summary>
@@ -150,7 +151,7 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual void InitializeLoggerResolver()
         {
-            LoggerResolver.Current = new LoggerResolver(new Logger())
+            LoggerResolver.Current = new LoggerResolver(Logger.CreateWithDefaultLog4NetConfiguration())
             {
                 //This is another special resolver that needs to be resolvable before resolution is frozen
                 //since it is used for profiling the application startup

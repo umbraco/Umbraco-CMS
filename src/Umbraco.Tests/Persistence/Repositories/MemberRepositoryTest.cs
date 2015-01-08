@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -33,10 +35,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
-            memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);
-            memberGroupRepository = new MemberGroupRepository(unitOfWork, NullCacheProvider.Current, CacheHelper.CreateDisabledCacheHelper());
-            var tagRepo = new TagRepository(unitOfWork, NullCacheProvider.Current);
-            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository, memberGroupRepository, tagRepo);
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), CacheHelper.CreateDisabledCacheHelper());
+            var tagRepo = new TagRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), memberTypeRepository, memberGroupRepository, tagRepo);
             return repository;
         }
 

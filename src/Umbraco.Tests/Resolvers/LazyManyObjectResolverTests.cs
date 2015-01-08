@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Resolvers
 {
@@ -16,9 +15,7 @@ namespace Umbraco.Tests.Resolvers
 		[SetUp]
 		public void Initialize()
 		{
-            TestHelper.SetupLog4NetForTests();
- 
-            LazyResolver.Reset();
+		    LazyResolver.Reset();
         }
 
 		[TearDown]

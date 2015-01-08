@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
 
 namespace Umbraco.Tests.Resolvers
@@ -16,9 +15,7 @@ namespace Umbraco.Tests.Resolvers
 		[SetUp]
 		public void Initialize()
 		{
-            TestHelper.SetupLog4NetForTests();
-
-            MacroFieldEditorsResolver.Reset();
+		    MacroFieldEditorsResolver.Reset();
 
 
 			// this ensures it's reset

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -16,13 +17,9 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
-        public RelationTypeRepository(IDatabaseUnitOfWork work)
-            : base(work)
-        {
-        }
 
-        public RelationTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
+        public RelationTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

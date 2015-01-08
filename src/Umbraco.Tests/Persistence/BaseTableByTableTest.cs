@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -20,13 +24,16 @@ namespace Umbraco.Tests.Persistence
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(true));
+            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+
+            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(true,
+                logger,
+                Mock.Of<IUmbracoSettingsSection>()));
 
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
@@ -35,8 +42,9 @@ namespace Umbraco.Tests.Persistence
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),                
-                cacheHelper)
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),                
+                cacheHelper,
+                new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))))
                 {
                     IsReady = true
                 };

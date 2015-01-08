@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -30,27 +31,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
-            : base(work)
+        public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
+            : base(work, cache, logger)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current);
-            EnsureUniqueNaming = true;
-        }
-
-        public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
-            : base(work, cache)
-        {
-            if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
-            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
-            _mediaTypeRepository = mediaTypeRepository;
-            _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current);
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current, logger);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current, logger);
             EnsureUniqueNaming = true;
         }
 

@@ -25,7 +25,6 @@ namespace Umbraco.Tests.Migrations
         [SetUp]
         public override void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;

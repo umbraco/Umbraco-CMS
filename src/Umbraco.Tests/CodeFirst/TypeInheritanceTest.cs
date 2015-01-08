@@ -7,7 +7,6 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.CodeFirst.Attributes;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels.Composition;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CodeFirst
 {
@@ -17,8 +16,6 @@ namespace Umbraco.Tests.CodeFirst
         [SetUp]
         public void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-
             //this ensures its reset
             PluginManager.Current = new PluginManager(false);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -15,13 +16,9 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work)
-			: base(work)
-        {
-        }
-
-		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-			: base(work, cache)
+		
+		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

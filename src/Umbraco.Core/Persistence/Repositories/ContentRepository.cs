@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -34,25 +35,9 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
-        
-        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
-            : base(work)
-        {
-            if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
-            if (templateRepository == null) throw new ArgumentNullException("templateRepository");
-            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
-            _contentTypeRepository = contentTypeRepository;
-            _templateRepository = templateRepository;
-		    _tagRepository = tagRepository;
-            _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
-
-		    EnsureUniqueNaming = true;
-        }
-
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
-            : base(work, cache)
+       
+        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
+            : base(work, cache, logger)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
             if (templateRepository == null) throw new ArgumentNullException("templateRepository");
@@ -61,8 +46,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current, logger);
+            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current, logger);
 
             EnsureUniqueNaming = true;
         }

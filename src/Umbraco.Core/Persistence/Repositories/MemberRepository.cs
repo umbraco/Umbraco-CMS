@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -32,28 +33,16 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
-            : base(work)
+        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
+            : base(work, cache, logger)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, NullCacheProvider.Current);
-        }
-
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
-            : base(work, cache)
-        {
-            if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
-            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
-            _memberTypeRepository = memberTypeRepository;
-            _tagRepository = tagRepository;
-            _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, NullCacheProvider.Current);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current, logger);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, NullCacheProvider.Current, logger);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>

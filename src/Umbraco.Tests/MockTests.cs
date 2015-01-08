@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -45,12 +46,12 @@ namespace Umbraco.Tests
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
                     new Mock<IUserService>().Object,
-                    new RepositoryFactory(true),
+                    new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
                 new Mock<IEntityService>().Object,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                    new RepositoryFactory(true),
+                    new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
                     new Mock<IEntityService>().Object),
                 new Mock<IMemberGroupService>().Object,
                 new Mock<IMemberTypeService>().Object,
@@ -93,12 +94,12 @@ namespace Umbraco.Tests
                         new Mock<IFileService>().Object,
                         new Mock<ILocalizationService>().Object,
                         new Mock<IUserService>().Object,
-                        new RepositoryFactory(true),
+                        new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
                         new Mock<IDatabaseUnitOfWorkProvider>().Object),
                     new Mock<IEntityService>().Object,
                     new RelationService(
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                        new RepositoryFactory(true),
+                        new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
                         new Mock<IEntityService>().Object),
                     new Mock<IMemberGroupService>().Object,
                     new Mock<IMemberTypeService>().Object,
@@ -109,7 +110,8 @@ namespace Umbraco.Tests
                     new Mock<ITagService>().Object,
                     new Mock<INotificationService>().Object,
                     Mock.Of<ILocalizedTextService>()),
-                CacheHelper.CreateDisabledCacheHelper());
+                CacheHelper.CreateDisabledCacheHelper(),
+                Mock.Of<ILogger>());
             
             Assert.Pass();
         }

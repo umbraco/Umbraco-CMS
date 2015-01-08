@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -10,6 +11,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Standalone
 {
+    //TODO: Why does this exist? there's the same thing in the Core proj
+
     internal class ServiceContextManager : IDisposable
     {
         private readonly string _connectionString;
@@ -51,7 +54,8 @@ namespace Umbraco.Web.Standalone
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(),
-                        cacheHelper);
+                        cacheHelper,
+                        new DebugDiagnosticsLogger());
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

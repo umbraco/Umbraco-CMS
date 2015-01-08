@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -15,13 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TagRepository : PetaPocoRepositoryBase<int, ITag>, ITagRepository
     {
-        protected TagRepository(IDatabaseUnitOfWork work)
-            : this(work, RuntimeCacheProvider.Current)
-        {
-        }
-
-        internal TagRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
+        internal TagRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+            : base(work, cache, logger)
         {
         }
 

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.IO;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -25,12 +28,14 @@ namespace Umbraco.Tests.TestHelpers
     public abstract class BaseDatabaseTest
     {
         private Database _database;
+        protected ILogger Logger { get; private set; }
 
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
+
+            Logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
@@ -55,7 +60,9 @@ namespace Umbraco.Tests.TestHelpers
             
 
             RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true));  //disable all repo caches for tests!
+                new RepositoryFactory(true,//disable all repo caches for tests!
+                    Logger,
+                    Mock.Of<IUmbracoSettingsSection>()));  
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
@@ -65,12 +72,15 @@ namespace Umbraco.Tests.TestHelpers
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
+            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-                cacheHelper)
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),
+                cacheHelper,
+                logger)
                 {
                     IsReady = true
                 };

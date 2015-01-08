@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -20,16 +21,9 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
         private readonly CacheHelper _cacheHelper;
-
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper) 
-            : base(work)
-        {
-            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _cacheHelper = cacheHelper;
-        }
-
-        public MemberGroupRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper)
-            : base(work, cache)
+        
+        public MemberGroupRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, CacheHelper cacheHelper)
+            : base(work, cache, logger)
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _cacheHelper = cacheHelper;

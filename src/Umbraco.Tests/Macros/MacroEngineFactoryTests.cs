@@ -5,7 +5,6 @@ using NUnit.Framework;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core;
 using umbraco.interfaces;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Macros
 {
@@ -15,9 +14,7 @@ namespace Umbraco.Tests.Macros
 		[SetUp]
 		public void Initialize()
 		{
-			TestHelper.SetupLog4NetForTests();
-
-			//this ensures its reset
+		    //this ensures its reset
 			PluginManager.Current = new PluginManager(false);
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver

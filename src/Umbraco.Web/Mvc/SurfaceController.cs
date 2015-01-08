@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Web.Security;
@@ -16,6 +17,16 @@ namespace Umbraco.Web.Mvc
     [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="logger"></param>
+        protected SurfaceController(ILogger logger, UmbracoContext umbracoContext)
+            : base(logger, umbracoContext)
+        {
+            _membershipHelper = new MembershipHelper(umbracoContext);
+        }
 
         /// <summary>
         /// Default constructor

@@ -9,7 +9,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -19,9 +18,7 @@ namespace Umbraco.Tests.Migrations
         [SetUp]
         public void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-
-			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
+            MigrationResolver.Current = new MigrationResolver(() => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),
 					typeof(Dummy),

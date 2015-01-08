@@ -15,8 +15,7 @@ namespace Umbraco.Tests.Resolvers
 		[SetUp]
 		public void Initialize()
 		{
-			TestHelper.SetupLog4NetForTests();
-
+			
             PackageActionsResolver.Reset();
 
 			// ensures it's reset

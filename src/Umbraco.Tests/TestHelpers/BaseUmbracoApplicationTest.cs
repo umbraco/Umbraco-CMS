@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -25,6 +27,12 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUmbracoApplicationTest : BaseUmbracoConfigurationTest
     {
+
+        [TestFixtureSetUp]
+        public void InitializeFixture()
+        {
+            Logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+        }
 
         [SetUp]
         public override void Initialize()
@@ -142,8 +150,9 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-                cacheHelper)
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
+                cacheHelper,
+                Logger)
             {
                 IsReady = true
             };
@@ -185,5 +194,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             get { return ApplicationContext.Current; }
         }
+
+        protected ILogger Logger { get; private set; }
     }
 }

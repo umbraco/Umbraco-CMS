@@ -23,7 +23,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
