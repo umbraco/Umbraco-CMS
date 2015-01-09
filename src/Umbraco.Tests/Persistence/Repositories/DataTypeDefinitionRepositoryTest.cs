@@ -376,7 +376,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
                 unitOfWork, NullCacheProvider.Current,
-                CacheHelper.CreateDisabledCacheHelper(),
+                cache,
                 Mock.Of<ILogger>(),
                 new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(),
                     new TemplateRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>())));
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
                 unitOfWork, NullCacheProvider.Current,
-                CacheHelper.CreateDisabledCacheHelper(),
+                cache,
                 Mock.Of<ILogger>(),
                 new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(),
                     new TemplateRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>())));

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -125,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var relationType = repository.Get(2);
+                var relationType = repository.Get(RelationTypeDto.NodeIdSeed);
 
                 // Assert
                 Assert.That(relationType, Is.Not.Null);
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(relationTypes, Is.Not.Null);
                 Assert.That(relationTypes.Any(), Is.True);
                 Assert.That(relationTypes.Any(x => x == null), Is.False);
-                Assert.That(relationTypes.Count(), Is.EqualTo(3));
+                Assert.That(relationTypes.Count(), Is.EqualTo(4));
             }
         }
 
@@ -208,7 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count = repository.Count(query);
 
                 // Assert
-                Assert.That(count, Is.EqualTo(3));
+                Assert.That(count, Is.EqualTo(4));
             }
         }
 

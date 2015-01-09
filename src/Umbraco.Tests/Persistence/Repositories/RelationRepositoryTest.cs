@@ -232,9 +232,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
             {
-
+                
                 // Act
-                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == 2);
+                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
                 var relations = repository.GetByQuery(query);
 
                 // Assert
