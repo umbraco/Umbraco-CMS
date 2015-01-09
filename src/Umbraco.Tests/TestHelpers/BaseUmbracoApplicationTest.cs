@@ -64,6 +64,7 @@ namespace Umbraco.Tests.TestHelpers
 
             using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("teardown"))
             {
+                LoggerResolver.Reset();
                 //reset settings
                 SettingsForTests.Reset();
                 UmbracoContext.Current = null;
@@ -149,9 +150,10 @@ namespace Umbraco.Tests.TestHelpers
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(), Logger, new SqlCeSyntaxProvider()),
+                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger), 
+                    Logger, new SqlCeSyntaxProvider()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
                 cacheHelper,
                 Logger)
             {

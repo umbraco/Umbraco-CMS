@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
@@ -715,7 +717,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
             bool published = contentService.Publish(content, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow = provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {
@@ -783,7 +785,7 @@ namespace Umbraco.Tests.Services
             }
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
             //for testing we need to clear out the contentXml table so we can see if it worked
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow =  provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {
@@ -817,7 +819,7 @@ namespace Umbraco.Tests.Services
             }
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants())).ToList();
             //for testing we need to clear out the contentXml table so we can see if it worked
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow = provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {
@@ -1263,7 +1265,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {	        
-	        var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+	        var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
 
@@ -1373,7 +1375,7 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow = provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {
@@ -1398,7 +1400,7 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow = provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {

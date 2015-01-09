@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -32,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
 
             // Act
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
@@ -48,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
 
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
@@ -67,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
@@ -95,7 +97,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
@@ -116,7 +118,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
@@ -135,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -159,7 +161,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -183,7 +185,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act

@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new TemplateDto
                        {
                            Alias = entity.Alias,
-                           Design = entity.Content,
+                           Design = entity.Content ?? string.Empty,
                            NodeDto = BuildNodeDto(entity)
                        };
 

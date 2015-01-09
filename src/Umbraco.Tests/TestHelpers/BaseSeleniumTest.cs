@@ -58,7 +58,7 @@ namespace Umbraco.Tests.TestHelpers
             var syntaxProvider = new SqlCeSyntaxProvider();
             SqlSyntaxContext.SqlSyntaxProvider = syntaxProvider;
 
-            _database = new UmbracoDatabase(connectionString, "System.Data.SqlServerCe.4.0");
+            _database = new UmbracoDatabase(connectionString, "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
 
             // First remove anything in the database
             var creation = new DatabaseSchemaCreation(_database, Mock.Of<ILogger>(), syntaxProvider);

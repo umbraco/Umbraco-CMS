@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_Data_Upgrade()
         {
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository contentTypeRepository;
             var insertedContent = new List<IContent>();

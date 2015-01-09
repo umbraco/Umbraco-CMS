@@ -227,7 +227,7 @@ namespace Umbraco.Core
 
 					if (currentVersion != configStatus)
 					{
-						LogHelper.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                        Logger.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
 					}
 						
 

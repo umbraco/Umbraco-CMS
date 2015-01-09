@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -43,6 +45,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
 					typeof (UpdateCmsContentVersionTable),
 					typeof (UpdateCmsPropertyTypeGroupTable)
 				});
+
+            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
+            {
+                CanResolveBeforeFrozen = true
+            };
 
 			Resolution.Freeze();
 
@@ -92,6 +99,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             PluginManager.Current = null;
             SqlSyntaxContext.SqlSyntaxProvider = null;
 			MigrationResolver.Reset();
+            LoggerResolver.Reset();
 
             TestHelper.CleanContentDirectories();
 

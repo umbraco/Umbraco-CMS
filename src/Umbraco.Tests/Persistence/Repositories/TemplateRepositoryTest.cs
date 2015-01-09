@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_Detect_Content()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_With_Default_Content()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -237,7 +237,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_Unique_Alias()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_Unique_Alias()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_MasterPage()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -334,7 +334,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_View()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -365,7 +365,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_MasterPage()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -395,7 +395,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_View()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -425,7 +425,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_When_Assigned_To_Doc()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             using (var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
@@ -471,7 +471,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Nested_Templates()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -513,7 +513,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Template_Tree()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -612,7 +612,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Creation()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
@@ -677,7 +677,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Update()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))

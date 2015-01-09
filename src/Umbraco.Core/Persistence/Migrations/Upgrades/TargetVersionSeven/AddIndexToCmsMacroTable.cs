@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -15,7 +16,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToCmsMacroTable(bool skipIndexCheck)
+        internal AddIndexToCmsMacroTable(bool skipIndexCheck, ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
         {
             _skipIndexCheck = skipIndexCheck;
         }

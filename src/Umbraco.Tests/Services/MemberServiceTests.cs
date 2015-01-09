@@ -1066,7 +1066,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow = provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IMemberRepository>(uow))
             {

@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", "MySql.Data.MySqlClient");
+            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", "MySql.Data.MySqlClient", Mock.Of<ILogger>());
         }
 
         public override DatabaseProviders GetDatabaseProvider()

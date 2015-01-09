@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -11,18 +13,13 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class AlterMigrationTests
     {
-        [SetUp]
-        public void SetUp()
-        {
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-        }
 
         [Test]
         public void Drop_Foreign_Key()
         {
             // Arrange
             var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
-            var stub = new DropForeignKeyMigrationStub();
+            var stub = new DropForeignKeyMigrationStub(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
 
             // Act
             stub.GetUpExpressions(context);
@@ -39,7 +36,7 @@ namespace Umbraco.Tests.Migrations
         {
             // Arrange
             var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
-            var stub = new AlterUserTableMigrationStub();
+            var stub = new AlterUserTableMigrationStub(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
 
             // Act
             stub.GetUpExpressions(context);

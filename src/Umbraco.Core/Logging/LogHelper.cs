@@ -7,12 +7,11 @@ using log4net;
 namespace Umbraco.Core.Logging
 {
 	///<summary>
-	/// Used for logging
+	/// Used for logging, ILogger should be used instead but this is available for static access to logging
 	///</summary>
 	/// <remarks>
     /// this wraps ILogger 
 	/// </remarks>
-	[Obsolete("Use ILogger instead which is available on most base classes or accessed via LoggerResolver.Current or injected into WebApi or MVC services via the DependencyResolver")]
 	public static class LogHelper
 	{
 		#region Error

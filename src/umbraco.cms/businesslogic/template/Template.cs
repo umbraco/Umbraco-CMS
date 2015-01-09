@@ -388,7 +388,7 @@ namespace umbraco.cms.businesslogic.template
 
         private static Template MakeNew(string name, User u, Template master, string design)
         {
-            var foundMaster = ApplicationContext.Current.Services.FileService.GetTemplate(master.Id);
+            var foundMaster = master == null ? null : ApplicationContext.Current.Services.FileService.GetTemplate(master.Id);
             var template = ApplicationContext.Current.Services.FileService.CreateTemplateWithIdentity(name, design, foundMaster, u.Id);
 
             var legacyTemplate = new Template(template);

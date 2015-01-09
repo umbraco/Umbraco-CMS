@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence
 		{
 			var method = typeof(RepositoryResolver).GetMethod("ResolveByType", BindingFlags.NonPublic | BindingFlags.Instance);
 			var gMethod = method.MakeGenericMethod(repoType);
-			var repo = gMethod.Invoke(RepositoryResolver.Current, new object[] { PetaPocoUnitOfWorkProvider.CreateUnitOfWork() });
+			var repo = gMethod.Invoke(RepositoryResolver.Current, new object[] { PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>()) });
 			Assert.IsNotNull(repo);
 			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom(repoType, repo.GetType()));
 			repo.DisposeIfDisposable();
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Persistence
         public void Can_Verify_UOW_In_Repository()
         {
             // Arrange
-			var uow = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+			var uow = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
 
             // Act
             var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow);
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Persistence
             Assert.That(isSubclassOf, Is.False);
             Assert.That(isAssignableFrom, Is.True);
 
-			var uow = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
+			var uow = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
             var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow);
             bool subclassOf = repository.GetType().IsSubclassOf(typeof (IRepository<int, IContent>));
 

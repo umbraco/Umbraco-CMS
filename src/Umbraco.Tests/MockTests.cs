@@ -68,7 +68,7 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Db_Context()
         {
-            var dbCtx = new DatabaseContext(new Mock<IDatabaseFactory>().Object);
+            var dbCtx = new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>());
             Assert.Pass();
         }
 
@@ -76,7 +76,7 @@ namespace Umbraco.Tests
         public void Can_Create_App_Context_With_Services()
         {
             var appCtx = new ApplicationContext(
-                new DatabaseContext(new Mock<IDatabaseFactory>().Object),
+                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>()),
                 new ServiceContext(                    
                     new Mock<IContentService>().Object,
                     new Mock<IMediaService>().Object,

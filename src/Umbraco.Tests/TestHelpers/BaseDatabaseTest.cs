@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -76,7 +77,7 @@ namespace Umbraco.Tests.TestHelpers
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
+                new DatabaseContext(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger)),
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),
                 cacheHelper,

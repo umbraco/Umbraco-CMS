@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Services
 
             mediaService.Save(media);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var uow = provider.GetUnitOfWork();
             using (RepositoryResolver.Current.ResolveByType<IMediaRepository>(uow))
             {

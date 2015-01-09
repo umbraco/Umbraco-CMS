@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -45,6 +47,13 @@ namespace Umbraco.Tests.Migrations
 					typeof (UpdateCmsContentVersionTable),
 					typeof (UpdateCmsPropertyTypeGroupTable)
 				}.OrderByDescending(x => x.Name));
+
+            //This is needed because the PluginManager is creating the migration instances with their default ctors
+            LoggerResolver.Current = new LoggerResolver(Logger)
+            {
+                CanResolveBeforeFrozen = true
+            };
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             Resolution.Freeze();
 
@@ -113,7 +122,7 @@ namespace Umbraco.Tests.Migrations
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0");
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
         public DatabaseProviders GetDatabaseProvider()

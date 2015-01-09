@@ -499,7 +499,7 @@ namespace Umbraco.Core
                     throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
                 }
 
-                var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var database = new UmbracoDatabase(_connectionString, ProviderName, _logger);
                 var dbSchema = new DatabaseSchemaCreation(database, _logger, SqlSyntax);
                 _result = dbSchema.ValidateSchema();
             }
@@ -520,7 +520,7 @@ namespace Umbraco.Core
 
                 string message;
 
-                var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var database = new UmbracoDatabase(_connectionString, ProviderName, _logger);
 
                 // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
                 // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
@@ -590,7 +590,7 @@ namespace Umbraco.Core
 
                 _logger.Info<DatabaseContext>("Database upgrade started");
 
-                var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var database = new UmbracoDatabase(_connectionString, ProviderName, _logger);
                 //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);                
 
                 var message = GetResultMessageForMySql();

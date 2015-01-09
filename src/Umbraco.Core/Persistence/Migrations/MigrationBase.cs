@@ -53,12 +53,12 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public ICreateBuilder Create
         {
-            get { return new CreateBuilder(Context); }
+            get { return new CreateBuilder(Context, SqlSyntax); }
         }
 
         public IDeleteBuilder Delete
         {
-            get { return new DeleteBuilder(Context); }
+            get { return new DeleteBuilder(Context, SqlSyntax); }
         }
 
         public IExecuteBuilder Execute

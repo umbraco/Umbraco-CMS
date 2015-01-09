@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -27,6 +28,13 @@ namespace Umbraco.Tests.Migrations
 					typeof (FourElevenMigration),
                     typeof (FiveZeroMigration)                   
 				});
+
+            //This is needed because the PluginManager is creating the migration instances with their default ctors
+            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
+            {
+                CanResolveBeforeFrozen = true
+            };
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
 			Resolution.Freeze();
 
@@ -73,6 +81,7 @@ namespace Umbraco.Tests.Migrations
         [TearDown]
         public void TearDown()
         {	        
+            LoggerResolver.Reset();
             MigrationResolver.Reset();
         }
     }

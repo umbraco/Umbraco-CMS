@@ -70,7 +70,8 @@ namespace Umbraco.Tests.TestHelpers
 
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
-                GetDbProviderName());
+                GetDbProviderName(),
+                Logger);
 
             _appContext = new ApplicationContext(
                 //assign the db context

@@ -17,13 +17,15 @@ namespace Umbraco.Web.Standalone
     {
         private readonly string _connectionString;
         private readonly string _providerName;
+        private readonly ILogger _logger;
         private ServiceContext _serviceContext;
         private readonly StandaloneApplication _application;
 
-        public ServiceContextManager(string connectionString, string providerName, string baseDirectory)
+        public ServiceContextManager(string connectionString, string providerName, string baseDirectory, ILogger logger)
         {
             _connectionString = connectionString;
             _providerName = providerName;
+            _logger = logger;
 
             Trace.WriteLine("Current AppDomain: " + AppDomain.CurrentDomain.FriendlyName);
             Trace.WriteLine("Current AppDomain: " + AppDomain.CurrentDomain.BaseDirectory);
@@ -47,8 +49,8 @@ namespace Umbraco.Web.Standalone
                         //  just not quite sure what this standalone stuff is.
                         new NullCacheProvider());
 
-                    var dbFactory = new DefaultDatabaseFactory(_connectionString, _providerName);
-                    var dbContext = new DatabaseContext(dbFactory);
+                    var dbFactory = new DefaultDatabaseFactory(_connectionString, _providerName, _logger);
+                    var dbContext = new DatabaseContext(dbFactory, _logger);
                     Database.Mapper = new PetaPocoMapper();
                     _serviceContext = new ServiceContext(
                         new PetaPocoUnitOfWorkProvider(dbFactory),

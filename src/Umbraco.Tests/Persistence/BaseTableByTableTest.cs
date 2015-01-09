@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -50,15 +51,16 @@ namespace Umbraco.Tests.Persistence
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntaxProvider;
 
-            var dbContext = new DatabaseContext(new DefaultDatabaseFactory(), _logger, SqlSyntaxProvider);
+            var dbContext = new DatabaseContext(
+                new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, _logger), 
+                _logger, SqlSyntaxProvider);
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
                 cacheHelper,
                 new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))))
                 {
@@ -71,7 +73,6 @@ namespace Umbraco.Tests.Persistence
         [TearDown]
         public virtual void TearDown()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = null;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             //reset the app context
