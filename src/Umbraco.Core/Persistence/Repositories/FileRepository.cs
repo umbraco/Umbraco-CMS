@@ -33,12 +33,12 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return _fileSystem; }
         }
 
-        internal virtual void AddFolder(string folderPath)
+        public virtual void AddFolder(string folderPath)
         {
             _work.RegisterAdded(new Folder(folderPath), this);
         }
 
-        internal virtual void DeleteFolder(string folderPath)
+        public virtual void DeleteFolder(string folderPath)
         {
             _work.RegisterRemoved(new Folder(folderPath), this);
         }

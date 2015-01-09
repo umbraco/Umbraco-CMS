@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class PartialViewRepository : FileRepository<string, PartialView>, IPartialViewRepository
+    internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {
         public PartialViewRepository(IUnitOfWork work)
 			: this(work, new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/"))
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        public override PartialView Get(string id)
+        public override IPartialView Get(string id)
         {
             if (FileSystem.FileExists(id) == false)
             {
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return script;
         }
 
-        public override IEnumerable<PartialView> GetAll(params string[] ids)
+        public override IEnumerable<IPartialView> GetAll(params string[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids.Distinct().ToArray();
