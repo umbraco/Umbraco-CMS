@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence
             var engine = new SqlCeEngine("Datasource=|DataDirectory|test.sdf;Flush Interval=1;");
             engine.CreateDatabase();
             
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             _database = new Database("Datasource=|DataDirectory|test.sdf;Flush Interval=1;",
                                      "System.Data.SqlServerCe.4.0");

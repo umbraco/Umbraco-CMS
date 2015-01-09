@@ -479,7 +479,7 @@ AND umbracoNode.id <> @id",
                                                 pt.Name);
                                         var exception = new InvalidOperationException(message);
 
-                                        LogHelper.Error<ContentTypeBaseRepository<TEntity>>(message, exception);
+                                        Logger.Error<ContentTypeBaseRepository<TEntity>>(message, exception);
                                         throw exception;
                                     });
         }
@@ -496,7 +496,7 @@ AND umbracoNode.id <> @id",
                                                 entity.Name);
                                         var exception = new InvalidOperationException(message);
 
-                                        LogHelper.Error<ContentTypeBaseRepository<TEntity>>(message, exception);
+                                        Logger.Error<ContentTypeBaseRepository<TEntity>>(message, exception);
                                         throw exception;
                                     });
         }
@@ -523,7 +523,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    LogHelper.Warn<ContentTypeBaseRepository<TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.PropertyEditorAlias);
+                    Logger.Warn<ContentTypeBaseRepository<TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.PropertyEditorAlias);
                 }
             }
         }

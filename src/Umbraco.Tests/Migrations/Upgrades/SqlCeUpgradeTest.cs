@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return SqlCeSyntax.Provider;
+            return new SqlCeSyntaxProvider();
         }
 
         public override UmbracoDatabase GetConfiguredDatabase()

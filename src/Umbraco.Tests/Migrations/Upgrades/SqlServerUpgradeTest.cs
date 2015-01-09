@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return SqlServerSyntax.Provider;
+            return new SqlServerSyntaxProvider();
         }
 
         public override UmbracoDatabase GetConfiguredDatabase()

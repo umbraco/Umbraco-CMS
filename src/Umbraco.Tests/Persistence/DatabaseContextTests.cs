@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Persistence
             //re-map the dbcontext to the new conn string
             _dbContext = new DatabaseContext(new DefaultDatabaseFactory(engine.LocalConnectionString, "System.Data.SqlServerCe.4.0"));
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             //Create the umbraco database
 			_dbContext.Database.CreateDatabaseSchema(false);

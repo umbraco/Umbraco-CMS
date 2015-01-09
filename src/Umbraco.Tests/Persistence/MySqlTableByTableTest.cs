@@ -1,7 +1,9 @@
 ﻿using System;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -24,7 +26,7 @@ namespace Umbraco.Tests.Persistence
         {
             base.Initialize();
 
-            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
 
             _database = new Database("Server = 169.254.120.3; Database = testdb; Uid = umbraco; Pwd = umbraco",
                                      "MySql.Data.MySqlClient");

@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -19,7 +21,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return MySqlSyntax.Provider;
+            return new MySqlSyntaxProvider(Mock.Of<ILogger>());
         }
 
         public override UmbracoDatabase GetConfiguredDatabase()

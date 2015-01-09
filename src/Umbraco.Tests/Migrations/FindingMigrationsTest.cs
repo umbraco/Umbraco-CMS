@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Migrations
 
 			Resolution.Freeze();
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
         }
 
         [Test]

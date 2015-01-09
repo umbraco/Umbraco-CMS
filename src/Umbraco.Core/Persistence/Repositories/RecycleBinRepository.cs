@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 catch (Exception ex)
                 {
                     trans.Dispose();
-                    LogHelper.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
+                    Logger.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
                     return false;
                 }
             }
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 catch (Exception e)
                 {
-                    LogHelper.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
+                    Logger.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
                     allsuccess = false;
                 }
             });

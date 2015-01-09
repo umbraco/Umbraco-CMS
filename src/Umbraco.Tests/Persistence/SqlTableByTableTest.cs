@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence
         {
             base.Initialize();           
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlServerSyntaxProvider();
 
             _database = new Database(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco",
                                      "System.Data.SqlClient");

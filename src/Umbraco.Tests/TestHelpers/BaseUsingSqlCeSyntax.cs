@@ -12,7 +12,7 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
             PluginManager.Current = new PluginManager(false);
             MappingResolver.Current = new MappingResolver(
                 () => PluginManager.Current.ResolveAssignedMapperTypes());

@@ -172,7 +172,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                                 entity.Name);
                                         var exception = new Exception(message);
 
-                                        LogHelper.Error<ContentTypeRepository>(message, exception);
+                                        Logger.Error<ContentTypeRepository>(message, exception);
                                         throw exception;
                                     });
 
