@@ -281,5 +281,5 @@ namespace Umbraco.Core.Persistence
         
     }
 
-    internal class TableCreationEventArgs : System.ComponentModel.CancelEventArgs { }
+    
 }

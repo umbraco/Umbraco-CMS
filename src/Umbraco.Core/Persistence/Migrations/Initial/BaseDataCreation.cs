@@ -91,7 +91,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateCmsTaskTypeData();
             }
 
-            LogHelper.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
+            _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
         }
 
         private void CreateUmbracNodeData()

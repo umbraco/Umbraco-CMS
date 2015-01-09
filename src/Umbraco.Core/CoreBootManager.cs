@@ -75,7 +75,7 @@ namespace Umbraco.Core
             //create database and service contexts for the app context
             var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
             Database.Mapper = new PetaPocoMapper();
-            var dbContext = new DatabaseContext(dbFactory);
+            var dbContext = new DatabaseContext(dbFactory, LoggerResolver.Current.Logger);
             var serviceContext = new ServiceContext(
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),

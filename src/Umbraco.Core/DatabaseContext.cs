@@ -42,9 +42,16 @@ namespace Umbraco.Core
         {
         }
 
+        public DatabaseContext(IDatabaseFactory factory, ILogger logger)
+        {         
+            _factory = factory;
+            _logger = logger;
+        }
+
         public DatabaseContext(IDatabaseFactory factory, ILogger logger, ISqlSyntaxProvider sqlSyntax)
         {
             SqlSyntax = sqlSyntax;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
             _factory = factory;
             _logger = logger;
         }

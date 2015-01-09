@@ -74,7 +74,7 @@ namespace Umbraco.Tests.TestHelpers
 
             _appContext = new ApplicationContext(
                 //assign the db context
-            new DatabaseContext(dbFactory),
+            new DatabaseContext(dbFactory, Logger, SqlSyntaxProvider),
                 //assign the service context
             new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
             cacheHelper,
@@ -96,6 +96,11 @@ namespace Umbraco.Tests.TestHelpers
                 //ensure the configuration matches the current version for tests
                 SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
             }
+        }
+
+        protected virtual ISqlSyntaxProvider SqlSyntaxProvider
+        {
+            get { return new SqlCeSyntaxProvider();}
         }
 
         protected override void SetupApplicationContext()
@@ -236,8 +241,10 @@ namespace Umbraco.Tests.TestHelpers
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
+
+                var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntaxProvider);
                 //Create the umbraco database and its base data
-                DatabaseContext.Database.CreateDatabaseSchema(false);
+                schemaHelper.CreateDatabaseSchema(false, ApplicationContext);
 
                 //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
                 // damn db for each test

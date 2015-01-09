@@ -8,26 +8,20 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
+
     public class DatabaseSchemaHelper
     {
         private readonly Database _db;
         private readonly ILogger _logger;
         private readonly ISqlSyntaxProvider _syntaxProvider;
-
-        internal delegate void CreateTableEventHandler(string tableName, Database db, TableCreationEventArgs e, ILogger logger);
-        internal static event CreateTableEventHandler NewTable;
+        private readonly BaseDataCreation _baseDataCreation;
 
         public DatabaseSchemaHelper(Database db, ILogger logger, ISqlSyntaxProvider syntaxProvider)
         {
             _db = db;
             _logger = logger;
             _syntaxProvider = syntaxProvider;
-        }
-
-        private static void OnNewTable(string tablename, Database db, TableCreationEventArgs e, ILogger logger)
-        {
-            CreateTableEventHandler handler = NewTable;
-            if (handler != null) handler(tablename, db, e, logger);
+            _baseDataCreation = new BaseDataCreation(db, logger);
         }
 
         public bool TableExist(string tableName)
@@ -79,22 +73,12 @@ namespace Umbraco.Core.Persistence
 
         internal void CreateDatabaseSchemaDo()
         {
-            NewTable += PetaPocoExtensions_NewTable;
-
             _logger.Info<Database>("Initializing database schema creation");
 
             var creation = new DatabaseSchemaCreation(_db, _logger, _syntaxProvider);
             creation.InitializeDatabaseSchema();
 
             _logger.Info<Database>("Finalized database schema creation");
-
-            NewTable -= PetaPocoExtensions_NewTable;
-        }
-
-        private static void PetaPocoExtensions_NewTable(string tableName, Database db, TableCreationEventArgs e, ILogger logger)
-        {
-            var baseDataCreation = new BaseDataCreation(db, logger);
-            baseDataCreation.InitializeBaseData(tableName);
         }
 
         public void CreateTable<T>(bool overwrite)
@@ -143,27 +127,23 @@ namespace Umbraco.Core.Persistence
                         _logger.Info<Database>(string.Format("Primary Key sql {0}:\n {1}", createdPk, createPrimaryKeySql));
                     }
 
-                    //Fires the NewTable event, which is used internally to insert base data before adding constrants to the schema
-                    if (NewTable != null)
+                    //Turn on identity insert if db provider is not mysql
+                    if (_syntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                        _db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", _syntaxProvider.GetQuotedTableName(tableName))));
+
+                    //Call the NewTable-event to trigger the insert of base/default data
+                    //OnNewTable(tableName, _db, e, _logger);
+
+                    _baseDataCreation.InitializeBaseData(tableName);
+
+                    //Turn off identity insert if db provider is not mysql
+                    if (_syntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                        _db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", _syntaxProvider.GetQuotedTableName(tableName))));
+
+                    //Special case for MySql
+                    if (_syntaxProvider is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
                     {
-                        var e = new TableCreationEventArgs();
-
-                        //Turn on identity insert if db provider is not mysql
-                        if (_syntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                            _db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", _syntaxProvider.GetQuotedTableName(tableName))));
-
-                        //Call the NewTable-event to trigger the insert of base/default data
-                        OnNewTable(tableName, _db, e, _logger);
-
-                        //Turn off identity insert if db provider is not mysql
-                        if (_syntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                            _db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", _syntaxProvider.GetQuotedTableName(tableName))));
-
-                        //Special case for MySql
-                        if (_syntaxProvider is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
-                        {
-                            _db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
-                        }
+                        _db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
                     }
 
                     //Loop through foreignkey statements and execute sql
@@ -205,8 +185,8 @@ namespace Umbraco.Core.Persistence
         public void DropTable(string tableName)
         {
             var sql = new Sql(string.Format(
-                SqlSyntaxContext.SqlSyntaxProvider.DropTable,
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName)));
+                _syntaxProvider.DropTable,
+                _syntaxProvider.GetQuotedTableName(tableName)));
             _db.Execute(sql);
         }
     }

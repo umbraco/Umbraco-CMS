@@ -21,12 +21,15 @@ namespace Umbraco.Tests.Persistence
 
         #region Overrides of BaseTableByTableTest
 
+        protected override ISqlSyntaxProvider SqlSyntaxProvider
+        {
+            get { return new MySqlSyntaxProvider(Mock.Of<ILogger>()); }
+        }
+
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
-
-            SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
 
             _database = new Database("Server = 169.254.120.3; Database = testdb; Uid = umbraco; Pwd = umbraco",
                                      "MySql.Data.MySqlClient");
