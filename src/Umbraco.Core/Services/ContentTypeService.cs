@@ -32,12 +32,14 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion); 
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentTypeService(ILogger logger, IContentService contentService, IMediaService mediaService)
-			: this(logger, new PetaPocoUnitOfWorkProvider(), new RepositoryFactory(), contentService, mediaService)
+			: this(logger, new PetaPocoUnitOfWorkProvider(logger), new RepositoryFactory(), contentService, mediaService)
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentTypeService(ILogger logger, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
             : this(logger, new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
         { }

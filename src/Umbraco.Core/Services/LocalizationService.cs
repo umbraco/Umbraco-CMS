@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -19,17 +21,20 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 	    private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService()
-            : this(new RepositoryFactory())
+            : this(new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()))
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService(RepositoryFactory repositoryFactory)
-			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+			: this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
+            : this(provider, new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()))
         {
         }
 

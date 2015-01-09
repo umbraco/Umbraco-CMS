@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -17,15 +18,18 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService()
             : this(new RepositoryFactory())
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {

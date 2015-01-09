@@ -31,16 +31,19 @@ namespace Umbraco.Core.Services
         private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberService(RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, memberGroupService)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService)
             : this(provider, new RepositoryFactory(), memberGroupService)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
         {
             if (provider == null) throw new ArgumentNullException("provider");
@@ -52,6 +55,7 @@ namespace Umbraco.Core.Services
             _dataTypeService = new DataTypeService(provider, repositoryFactory);
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
             : this(provider, new RepositoryFactory(), memberGroupService, dataTypeService)
         {

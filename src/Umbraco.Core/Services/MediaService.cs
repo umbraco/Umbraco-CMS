@@ -36,11 +36,13 @@ namespace Umbraco.Core.Services
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MediaService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
             _uowProvider = provider;

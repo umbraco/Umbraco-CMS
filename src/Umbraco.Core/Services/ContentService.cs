@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -38,22 +39,27 @@ namespace Umbraco.Core.Services
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService()
-            : this(LoggerResolver.Current.Logger, new RepositoryFactory())
+            : this(LoggerResolver.Current.Logger, new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()))
         { }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService(ILogger logger, RepositoryFactory repositoryFactory)
-            : this(logger, new PetaPocoUnitOfWorkProvider(), repositoryFactory, new PublishingStrategy())
+            : this(logger, new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory, new PublishingStrategy())
         { }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider)
-            : this(logger, provider, new RepositoryFactory(), new PublishingStrategy())
+            : this(logger, provider, new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()), new PublishingStrategy())
         { }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
             : this(logger, provider, repositoryFactory, new PublishingStrategy())
         { }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
         {
             if (logger == null) throw new ArgumentNullException("logger");
