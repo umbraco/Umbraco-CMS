@@ -11,6 +11,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.Persistence
 			RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory(true,  //disable all repo caches for tests!
                     Mock.Of<ILogger>(),
-                    Mock.Of<IUmbracoSettingsSection>()));
+                    SettingsForTests.GenerateMockSettings()));
 
             Resolution.Freeze();
 		}

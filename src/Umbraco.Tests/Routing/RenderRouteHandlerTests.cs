@@ -1,7 +1,9 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -80,7 +82,9 @@ namespace Umbraco.Tests.Routing
                 RenderingEngine = RenderingEngine.Mvc
 			};
 
-			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
+			var handler = new RenderRouteHandler(
+                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()), 
+                routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -116,7 +120,9 @@ namespace Umbraco.Tests.Routing
 					TemplateModel = template
 				};
 
-			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
+			var handler = new RenderRouteHandler(
+                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()), 
+                routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
@@ -152,8 +158,11 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		public class CustomDocumentController : RenderMvcController
 		{
+		    public CustomDocumentController(ILogger logger, UmbracoContext umbracoContext) : base(logger, umbracoContext)
+		    {
+		    }
 
-			public ActionResult HomePage(RenderModel model)
+		    public ActionResult HomePage(RenderModel model)
 			{
 				return View();
 			}
