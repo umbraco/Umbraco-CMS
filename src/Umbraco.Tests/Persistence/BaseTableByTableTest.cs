@@ -21,33 +21,40 @@ namespace Umbraco.Tests.Persistence
     [TestFixture]
     public abstract class BaseTableByTableTest
     {
+        private ILogger _logger;
+        private DatabaseSchemaHelper _schemaHelper;
+
         [SetUp]
         public virtual void Initialize()
         {
+            _logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+            
             TestHelper.InitializeContentDirectories();
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
-
+            
             RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(true,
-                logger,
+                _logger,
                 Mock.Of<IUmbracoSettingsSection>()));
 
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
+            var dbContext = new DatabaseContext(new DefaultDatabaseFactory());
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
+                dbContext,
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),                
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
                 cacheHelper,
                 new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))))
                 {
                     IsReady = true
                 };
+
+            _schemaHelper = new DatabaseSchemaHelper(dbContext.Database, _logger, new SqlCeSyntaxProvider());
 
             Resolution.Freeze();
         }
@@ -71,7 +78,7 @@ namespace Umbraco.Tests.Persistence
         {
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
 
                 //transaction.Complete();
             }
@@ -82,7 +89,7 @@ namespace Umbraco.Tests.Persistence
         {
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<AppDto>();
+                _schemaHelper.CreateTable<AppDto>();
 
                 //transaction.Complete();
             }
@@ -94,7 +101,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<AppTreeDto>();
+                _schemaHelper.CreateTable<AppTreeDto>();
 
                 //transaction.Complete();
             }
@@ -106,8 +113,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentType2ContentTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentType2ContentTypeDto>();
 
                 //transaction.Complete();
             }
@@ -119,9 +126,9 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentTypeAllowedContentTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentTypeAllowedContentTypeDto>();
 
                 //transaction.Complete();
             }
@@ -133,8 +140,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
 
                 //transaction.Complete();
             }
@@ -146,10 +153,10 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<ContentVersionDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<ContentVersionDto>();
 
                 //transaction.Complete();
             }
@@ -161,10 +168,10 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<ContentXmlDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<ContentXmlDto>();
 
                 //transaction.Complete();
             }
@@ -176,8 +183,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<DataTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<DataTypeDto>();
 
                 //transaction.Complete();
             }
@@ -189,9 +196,9 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<DataTypeDto>();
-                Database.CreateTable<DataTypePreValueDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<DataTypeDto>();
+                _schemaHelper.CreateTable<DataTypePreValueDto>();
 
                 //transaction.Complete();
             }
@@ -203,7 +210,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<DictionaryDto>();
+                _schemaHelper.CreateTable<DictionaryDto>();
 
                 //transaction.Complete();
             }
@@ -215,8 +222,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<DictionaryDto>();
-                Database.CreateTable<LanguageTextDto>();
+                _schemaHelper.CreateTable<DictionaryDto>();
+                _schemaHelper.CreateTable<LanguageTextDto>();
 
                 //transaction.Complete();
             }
@@ -228,8 +235,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<TemplateDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<TemplateDto>();
 
                 //transaction.Complete();
             }
@@ -241,11 +248,11 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<TemplateDto>();
-                Database.CreateTable<DocumentDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<TemplateDto>();
+                _schemaHelper.CreateTable<DocumentDto>();
 
                 //transaction.Complete();
             }
@@ -257,10 +264,10 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<TemplateDto>();
-                Database.CreateTable<DocumentTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<TemplateDto>();
+                _schemaHelper.CreateTable<DocumentTypeDto>();
 
                 //transaction.Complete();
             }
@@ -272,8 +279,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<DomainDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<DomainDto>();
 
                 //transaction.Complete();
             }
@@ -285,7 +292,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<LanguageDto>();
+                _schemaHelper.CreateTable<LanguageDto>();
 
                 //transaction.Complete();
             }
@@ -297,7 +304,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<LogDto>();
+                _schemaHelper.CreateTable<LogDto>();
 
                 //transaction.Complete();
             }
@@ -309,7 +316,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<MacroDto>();
+                _schemaHelper.CreateTable<MacroDto>();
 
                 //transaction.Complete();
             }
@@ -321,10 +328,10 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<MemberDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<MemberDto>();
 
                 //transaction.Complete();
             }
@@ -336,11 +343,11 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<MemberDto>();
-                Database.CreateTable<Member2MemberGroupDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<MemberDto>();
+                _schemaHelper.CreateTable<Member2MemberGroupDto>();
 
                 //transaction.Complete();
             }
@@ -352,9 +359,9 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<MemberTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<MemberTypeDto>();
 
                 //transaction.Complete();
             }
@@ -366,11 +373,11 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<ContentVersionDto>();
-                Database.CreateTable<PreviewXmlDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<ContentVersionDto>();
+                _schemaHelper.CreateTable<PreviewXmlDto>();
 
                 //transaction.Complete();
             }
@@ -382,12 +389,12 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<DataTypeDto>();
-                Database.CreateTable<PropertyTypeGroupDto>();
-                Database.CreateTable<PropertyTypeDto>();
-                Database.CreateTable<PropertyDataDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<DataTypeDto>();
+                _schemaHelper.CreateTable<PropertyTypeGroupDto>();
+                _schemaHelper.CreateTable<PropertyTypeDto>();
+                _schemaHelper.CreateTable<PropertyDataDto>();
 
                 //transaction.Complete();
             }
@@ -399,11 +406,11 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<DataTypeDto>();
-                Database.CreateTable<PropertyTypeGroupDto>();
-                Database.CreateTable<PropertyTypeDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<DataTypeDto>();
+                _schemaHelper.CreateTable<PropertyTypeGroupDto>();
+                _schemaHelper.CreateTable<PropertyTypeDto>();
 
                 //transaction.Complete();
             }
@@ -415,9 +422,9 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<PropertyTypeGroupDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<PropertyTypeGroupDto>();
 
                 //transaction.Complete();
             }
@@ -429,9 +436,9 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<RelationTypeDto>();
-                Database.CreateTable<RelationDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<RelationTypeDto>();
+                _schemaHelper.CreateTable<RelationDto>();
 
                 //transaction.Complete();
             }
@@ -443,7 +450,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<RelationTypeDto>();
+                _schemaHelper.CreateTable<RelationTypeDto>();
 
                 //transaction.Complete();
             }
@@ -455,8 +462,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<StylesheetDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<StylesheetDto>();
 
                 //transaction.Complete();
             }
@@ -468,8 +475,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<StylesheetPropertyDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<StylesheetPropertyDto>();
 
                 //transaction.Complete();
             }
@@ -481,7 +488,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<TagDto>();
+                _schemaHelper.CreateTable<TagDto>();
 
                 //transaction.Complete();
             }
@@ -493,15 +500,15 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<ContentDto>();
-                Database.CreateTable<ContentTypeDto>();
-                Database.CreateTable<DataTypeDto>();
-                Database.CreateTable<PropertyTypeGroupDto>();
-                Database.CreateTable<PropertyTypeDto>();
-                Database.CreateTable<TagDto>();
-                Database.CreateTable<TagRelationshipDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<ContentDto>();
+                _schemaHelper.CreateTable<ContentTypeDto>();
+                _schemaHelper.CreateTable<DataTypeDto>();
+                _schemaHelper.CreateTable<PropertyTypeGroupDto>();
+                _schemaHelper.CreateTable<PropertyTypeDto>();
+                _schemaHelper.CreateTable<TagDto>();
+                _schemaHelper.CreateTable<TagRelationshipDto>();
 
                 //transaction.Complete();
             }
@@ -513,11 +520,11 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<UserTypeDto>();
-                Database.CreateTable<UserDto>();
-                Database.CreateTable<TaskTypeDto>();
-                Database.CreateTable<TaskDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<UserTypeDto>();
+                _schemaHelper.CreateTable<UserDto>();
+                _schemaHelper.CreateTable<TaskTypeDto>();
+                _schemaHelper.CreateTable<TaskDto>();
 
                 //transaction.Complete();
             }
@@ -529,7 +536,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<TaskTypeDto>();
+                _schemaHelper.CreateTable<TaskTypeDto>();
 
                 //transaction.Complete();
             }
@@ -541,7 +548,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<UserLoginDto>();
+                _schemaHelper.CreateTable<UserLoginDto>();
 
                 //transaction.Complete();
             }
@@ -553,8 +560,8 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<UserTypeDto>();
-                Database.CreateTable<UserDto>();
+                _schemaHelper.CreateTable<UserTypeDto>();
+                _schemaHelper.CreateTable<UserDto>();
 
                 //transaction.Complete();
             }
@@ -566,7 +573,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<UserTypeDto>();
+                _schemaHelper.CreateTable<UserTypeDto>();
 
                 //transaction.Complete();
             }
@@ -578,9 +585,9 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<UserTypeDto>();
-                Database.CreateTable<UserDto>();
-                Database.CreateTable<User2AppDto>();
+                _schemaHelper.CreateTable<UserTypeDto>();
+                _schemaHelper.CreateTable<UserDto>();
+                _schemaHelper.CreateTable<User2AppDto>();
 
                 //transaction.Complete();
             }
@@ -592,10 +599,10 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<UserTypeDto>();
-                Database.CreateTable<UserDto>();
-                Database.CreateTable<User2NodeNotifyDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<UserTypeDto>();
+                _schemaHelper.CreateTable<UserDto>();
+                _schemaHelper.CreateTable<User2NodeNotifyDto>();
 
                 //transaction.Complete();
             }
@@ -607,10 +614,10 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
-                Database.CreateTable<NodeDto>();
-                Database.CreateTable<UserTypeDto>();
-                Database.CreateTable<UserDto>();
-                Database.CreateTable<User2NodePermissionDto>();
+                _schemaHelper.CreateTable<NodeDto>();
+                _schemaHelper.CreateTable<UserTypeDto>();
+                _schemaHelper.CreateTable<UserDto>();
+                _schemaHelper.CreateTable<User2NodePermissionDto>();
 
                 //transaction.Complete();
             }

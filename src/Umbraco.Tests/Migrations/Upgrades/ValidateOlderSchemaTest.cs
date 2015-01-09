@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations.Initial;
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             // Arrange
             var db = GetConfiguredDatabase();
-            var schema = new DatabaseSchemaCreation(db);
+            var schema = new DatabaseSchemaCreation(db, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
             //Create db schema and data from old Total.sql file for Sql Ce
             string statements = GetDatabaseSpecificSqlScript();
