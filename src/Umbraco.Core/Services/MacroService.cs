@@ -209,5 +209,7 @@ namespace Umbraco.Core.Services
         /// </summary>
 		public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saved;
         #endregion
+
+        
     }
 }

@@ -8,6 +8,18 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IFileService : IService
     {
+        IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
+        void DeletePartialViewFolder(string folderPath);
+        void DeletePartialViewMacroFolder(string folderPath);
+        IPartialView GetPartialView(string path);
+        IPartialView GetPartialViewMacro(string path);
+        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
+        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
+        bool DeletePartialView(string path, int userId = 0);
+        bool DeletePartialViewMacro(string path, int userId = 0);
+        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0);
+        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = 0);
+
         /// <summary>
         /// Gets a list of all <see cref="Stylesheet"/> objects
         /// </summary>

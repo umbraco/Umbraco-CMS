@@ -319,6 +319,7 @@
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggerResolver.cs" />
+    <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />
     <Compile Include="Services\LocalizedTextService.cs" />
     <Compile Include="Services\ILocalizedTextService.cs" />
@@ -411,7 +412,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\ChangePasswordColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IPartialViewMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPartialViewRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRecycleBinRepository.cs" />
     <Compile Include="Persistence\Repositories\PartialViewMacroRepository.cs" />
