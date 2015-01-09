@@ -204,7 +204,11 @@ namespace Umbraco.Web.WebServices
                 var syncPath = "-1,init," + t.Path.Replace("-1,", "");
 
                 return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"),
-                    new { path = syncPath });
+                    new
+                    {
+                        path = syncPath,
+                        contents = t.Design
+                    });
             }
             catch (Exception ex)
             {

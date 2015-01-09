@@ -35,7 +35,6 @@ using umbraco.BusinessLogic.Actions;
 namespace umbraco
 {
     [Obsolete("This is no longer used and will be removed from the codebase in the future")]
-    //[Tree(Constants.Applications.Settings, "templates", "Templates", sortOrder: 1)]
     public class loadTemplates : BaseTree
     {
         public loadTemplates(string application) : base(application) {}

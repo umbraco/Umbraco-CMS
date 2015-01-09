@@ -172,8 +172,6 @@ namespace Umbraco.Core.Persistence.Repositories
             var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
-            //TODO: need to fix:
-            // http://issues.umbraco.org/issue/U4-5846            
             var parent = Get(template.MasterTemplateId.Value);
             if (parent != null)
             {
@@ -236,9 +234,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var template = (Template)entity;
 
-            //TODO: need to fix:
-            // http://issues.umbraco.org/issue/U4-5846
-            // And use the ParentId column instead of the extra template parent id column
             if (entity.IsPropertyDirty("MasterTemplateId"))
             {
                 var parent = Get(template.MasterTemplateId.Value);
@@ -417,6 +412,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             template.UpdateDate = _viewsFileSystem.GetLastModified(fileName).UtcDateTime;
             template.Content = content;
+            template.VirtualPath = _viewsFileSystem.GetUrl(fileName);
         }
 
         private void PopulateMasterpageTemplate(ITemplate template, string fileName)
@@ -431,6 +427,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             template.UpdateDate = _masterpagesFileSystem.GetLastModified(fileName).UtcDateTime;
             template.Content = content;
+            template.VirtualPath = _masterpagesFileSystem.GetUrl(fileName);
         }
 
         #region Implementation of ITemplateRepository
