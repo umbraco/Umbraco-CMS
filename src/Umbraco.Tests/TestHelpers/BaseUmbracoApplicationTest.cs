@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -148,7 +149,7 @@ namespace Umbraco.Tests.TestHelpers
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
+                new DatabaseContext(new DefaultDatabaseFactory(), Logger, new SqlCeSyntaxProvider()),
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
                 cacheHelper,
