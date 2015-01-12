@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
     {
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-	    private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
+        private static readonly Guid RootParentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService()
@@ -42,6 +42,52 @@ namespace Umbraco.Core.Services
         {
 			_repositoryFactory = repositoryFactory;
 		    _uowProvider = provider;
+        }
+
+        /// <summary>
+        /// Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="parentId"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateDictionaryRepository(uow))
+            {
+                //validate the parent
+                if (parentId.HasValue && parentId.Value != Guid.Empty)
+                {
+                    var parent = GetDictionaryItemById(parentId.Value);
+                    if (parent == null)
+                    {
+                        throw new ArgumentException("No parent dictionary item was found with id " + parentId.Value);
+                    }
+                }
+
+                var item = new DictionaryItem(parentId.HasValue ? parentId.Value : RootParentId, key);
+
+                if (defaultValue.IsNullOrWhiteSpace() == false)
+                {
+                    var langs = GetAllLanguages();
+                    var translations = langs.Select(language => new DictionaryTranslation(language, defaultValue))
+                        .Cast<IDictionaryTranslation>()
+                        .ToList();
+
+                    item.Translations = translations;
+                }
+
+                if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(item), this))
+                    return item;
+
+                repository.AddOrUpdate(item);
+                uow.Commit();
+
+                SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(item), this);
+
+                return item;
+            }
         }
 
         /// <summary>

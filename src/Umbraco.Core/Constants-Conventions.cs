@@ -11,6 +11,14 @@ namespace Umbraco.Core
 		/// </summary>
 		public static class Conventions
 		{
+		    public static class Localization
+		    {
+                /// <summary>
+                /// The root id for all top level dictionary items
+                /// </summary>
+                public const string DictionaryItemRootId = "41c7638d-f529-4bff-853e-59a0c2fb1bde";
+		    }
+
 		    public static class DataTypes
 		    {
 		        public const string ListViewPrefix = "List View - ";

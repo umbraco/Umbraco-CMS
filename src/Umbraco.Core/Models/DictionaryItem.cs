@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         private IEnumerable<IDictionaryTranslation> _translations;
 
         public DictionaryItem(string itemKey)
-            : this(new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde"), itemKey)
+            : this(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), itemKey)
         {}
 
         public DictionaryItem(Guid parentId, string itemKey)
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Models
 
             //If ParentId is not set we should default to the root parent id
             if(ParentId == Guid.Empty)
-                _parentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
+                _parentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
         }
         
     }

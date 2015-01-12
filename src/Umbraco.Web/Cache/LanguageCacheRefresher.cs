@@ -36,7 +36,7 @@ namespace Umbraco.Web.Cache
         {
             RuntimeCacheProvider.Current.Clear(typeof(ILanguage));
             //when a language is removed we must also clear the text cache!
-            global::umbraco.cms.businesslogic.language.Item.ClearCache();
+            //global::umbraco.cms.businesslogic.language.Item.ClearCache();
             base.Remove(id);
         }
     }
