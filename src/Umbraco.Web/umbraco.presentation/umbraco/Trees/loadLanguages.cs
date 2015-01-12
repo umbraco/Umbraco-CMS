@@ -47,10 +47,6 @@ namespace umbraco
                 @"
 function openLanguage(id) {
 	UmbClientMgr.contentFrame('settings/editLanguage.aspx?id=' + id);
-}
-
-function openDictionary() {
-	UmbClientMgr.contentFrame('settings/DictionaryItemList.aspx');
 }");
         }
 

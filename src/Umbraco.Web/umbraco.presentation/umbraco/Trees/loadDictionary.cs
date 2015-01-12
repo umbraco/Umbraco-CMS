@@ -53,11 +53,13 @@ namespace umbraco
 		public override void RenderJS(ref StringBuilder Javascript)
         {
             Javascript.Append(
-                @"
+				@"
+			function openDictionary() {
+				UmbClientMgr.contentFrame('settings/DictionaryItemList.aspx');
+			}
 			function openDictionaryItem(id) {
 				UmbClientMgr.contentFrame('settings/editDictionaryItem.aspx?id=' + id);
-			}
-			");
+			}");
         }
 
         public override void Render(ref XmlTree tree)
