@@ -103,101 +103,48 @@ namespace umbraco.cms.businesslogic
             {
                 
             }
+
             internal DictionaryItem(IDictionaryItem item)
             {
                 _dictionaryItem = item;
-                //this.id = id;
-                //this._key = key;
-                //this.UniqueId = item.Key;
-                //this.ParentId = item.ParentId;
             }
 
             private readonly IDictionaryItem _dictionaryItem;
             private DictionaryItem _parent;
-            //private string _key;
-
-
-            //internal Guid UniqueId { get; private set; }
-            //internal Guid ParentId { get; private set; }
-
-            ///// <summary>
-            ///// Used internally to construct a new item object and store in cache
-            ///// </summary>
-            ///// <param name="id"></param>
-            ///// <param name="key"></param>
-            ///// <param name="uniqueKey"></param>
-            ///// <param name="parentId"></param>
-            //internal DictionaryItem(int id, string key, Guid uniqueKey, Guid parentId)
-            //{
-            //    this.id = id;
-            //    this._key = key;
-            //    this.UniqueId = uniqueKey;
-            //    this.ParentId = parentId;
-            //}
-
+           
             public DictionaryItem(string key)
             {
-                //EnsureCache();
-
-                //var item = DictionaryItems.Values.SingleOrDefault(x => x.key == key);
                 _dictionaryItem = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemByKey(key);
 
                 if (_dictionaryItem == null)
                 {
                     throw new ArgumentException("No key " + key + " exists in dictionary");
                 }
-
-                //this.id = item.Id;
-                //this._key = item.ItemKey;
-                //this.ParentId = item.ParentId;
-                //this.UniqueId = item.Key;
             }
 
             public DictionaryItem(Guid id)
             {
-                //EnsureCache();
-
-                //var item = DictionaryItems.Values.SingleOrDefault(x => x.UniqueId == id);
                 _dictionaryItem = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(id);
 
                 if (_dictionaryItem == null)
                 {
                     throw new ArgumentException("No unique id " + id + " exists in dictionary");
                 }
-
-                //this.id = item.Id;
-                //this._key = item.ItemKey;
-                //this.ParentId = item.ParentId;
-                //this.UniqueId = item.Key;
             }
 
             public DictionaryItem(int id)
             {
-                //EnsureCache();
-
                 _dictionaryItem = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(id);
 
                 if (_dictionaryItem == null)
                 {
                     throw new ArgumentException("No id " + id + " exists in dictionary");
                 }
-
-                //this.id = item.Id;
-                //this._key = item.ItemKey;
-                //this.ParentId = item.ParentId;
-                //this.UniqueId = item.Key;
             }
 
             [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
             public bool IsTopMostItem()
-            {
-                //EnsureCache();
-
-                //return DictionaryItems.Values
-                //    .Where(x => x.id == id)
-                //    .Select(x => x.ParentId)
-                //    .SingleOrDefault() == TopLevelParent;
-
+            { 
                 return _dictionaryItem.ParentId == new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
             }
 
@@ -211,8 +158,6 @@ namespace umbraco.cms.businesslogic
                     //EnsureCache();
                     if (_parent == null)
                     {
-                        //var p = DictionaryItems.Values.SingleOrDefault(x => x.UniqueId == this.ParentId);
-
                         var p = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(_dictionaryItem.ParentId);
 
                         if (p == null)
@@ -245,31 +190,17 @@ namespace umbraco.cms.businesslogic
                         .WhereNotNull()
                         .Select(x => new DictionaryItem(x))
                         .ToArray();
-
-                    //EnsureCache();
-                    //return DictionaryItems.Values
-                    //    .Where(x => x.ParentId == this.UniqueId).OrderBy(item => item.key)
-                    //    .ToArray();
                 }
             }
 
             public static bool hasKey(string key)
             {
                 return ApplicationContext.Current.Services.LocalizationService.DictionaryItemExists(key);
-
-                //EnsureCache();
-                //return DictionaryItems.ContainsKey(key);
             }
 
             public bool hasChildren
             {
-                get
-                {
-                    //EnsureCache();
-                    //return DictionaryItems.Values.Any(x => x.ParentId == UniqueId);
-
-                    return Children.Any();
-                }
+                get { return Children.Any(); }
             }
 
             /// <summary>
@@ -281,33 +212,7 @@ namespace umbraco.cms.businesslogic
                 set
                 {
                     if (hasKey(value) == false)
-                    {
-                        //lock (Locker)
-                        //{
-                        //    SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value),
-                        //        SqlHelper.CreateParameter("@Id", id));
-
-                        //    using (IRecordsReader dr =
-                        //        SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
-                        //    SqlHelper.CreateParameter("@id", this.UniqueId)))
-                        //    {
-                        //        if (dr.Read())
-                        //        {
-                        //            //create new dictionaryitem object and put in cache
-                        //            var item = new DictionaryItem(dr.GetInt("pk"),
-                        //                dr.GetString("key"),
-                        //                dr.GetGuid("id"),
-                        //                dr.GetGuid("parent"));
-                        //        }
-                        //        else
-                        //        {
-                        //            throw new DataException("Could not load updated created dictionary item with id " + id);
-                        //        }
-                        //    }
-
-                        //    //finally update this objects value
-                        //    this._key = value;
-                        //}
+                    {                        
                         _dictionaryItem.ItemKey = value;
                     }
                     else
@@ -322,11 +227,6 @@ namespace umbraco.cms.businesslogic
 
                 var translation = _dictionaryItem.Translations.FirstOrDefault(x => x.Language.Id == languageId);
                 return translation == null ? string.Empty : translation.Value;
-
-                //if (Item.hasText(_dictionaryItem.Key, languageId))
-                //    return Item.Text(_dictionaryItem.Key, languageId);
-
-                //return "";
             }
 
             public void setValue(int languageId, string value)
@@ -335,12 +235,6 @@ namespace umbraco.cms.businesslogic
                     _dictionaryItem,
                     ApplicationContext.Current.Services.LocalizationService.GetLanguageById(languageId),
                     value);
-                
-                //if (Item.hasText(_dictionaryItem.Key, languageId))
-                //    Item.setText(languageId, _dictionaryItem.Key, value);
-                //else
-                //    Item.addText(languageId, _dictionaryItem.Key, value);
-                // Calling Save method triggers the Saving event
 
                 Save();
             }
@@ -353,13 +247,6 @@ namespace umbraco.cms.businesslogic
             {
                 var defaultTranslation = _dictionaryItem.Translations.FirstOrDefault(x => x.Language.Id == 1);
                 return defaultTranslation == null ? string.Empty : defaultTranslation.Value;
-
-                //if (Item.hasText(_dictionaryItem.Key, 1))
-                //{
-                //    return Item.Text(_dictionaryItem.Key, 1);
-                //}
-
-                //return string.Empty;
             }
 
             [EditorBrowsable(EditorBrowsableState.Never)]
@@ -371,7 +258,6 @@ namespace umbraco.cms.businesslogic
                 else
                     Item.addText(0, _dictionaryItem.Key, value);
 
-                // Calling Save method triggers the Saving event
                 Save();
             }
 
@@ -390,8 +276,6 @@ namespace umbraco.cms.businesslogic
 
             public static int addKey(string key, string defaultValue)
             {
-                //EnsureCache();
-
                 int retval = CreateKey(key, TopLevelParent, defaultValue);
                 return retval;
             }
@@ -401,16 +285,6 @@ namespace umbraco.cms.businesslogic
                 OnDeleting(EventArgs.Empty);
 
                 ApplicationContext.Current.Services.LocalizationService.Delete(_dictionaryItem);
-
-                //// delete recursive
-                //foreach (DictionaryItem dd in Children)
-                //    dd.delete();
-
-                //// remove all language values from key
-                //Item.removeText(_dictionaryItem.Key);
-
-                //// remove key from database
-                //SqlHelper.ExecuteNonQuery("delete from cmsDictionary where [key] = @key", SqlHelper.CreateParameter("@key", key));
 
                 OnDeleted(EventArgs.Empty);
             }
@@ -515,36 +389,6 @@ namespace umbraco.cms.businesslogic
                         key, parentId, defaultValue);
 
                     return item.Id;
-
-                    //SqlHelper.ExecuteNonQuery("Insert into cmsDictionary (id,parent,[key]) values (@id, @parentId, @dictionaryKey)",
-                    //                          SqlHelper.CreateParameter("@id", newId),
-                    //                          SqlHelper.CreateParameter("@parentId", parentId),
-                    //                          SqlHelper.CreateParameter("@dictionaryKey", key));
-
-                    //using (IRecordsReader dr =
-                    //    SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
-                    //        SqlHelper.CreateParameter("@id", newId)))
-                    //{
-                    //    if (dr.Read())
-                    //    {
-                    //        //create new dictionaryitem object and put in cache
-                    //        var item = new DictionaryItem(dr.GetInt("pk"),
-                    //            dr.GetString("key"),
-                    //            dr.GetGuid("id"),
-                    //            dr.GetGuid("parent"));
-
-                    //        item.setValue(defaultValue);
-
-                    //        item.OnNew(EventArgs.Empty);
-
-                    //        return item.id;
-                    //    }
-                    //    else
-                    //    {
-                    //        throw new DataException("Could not load newly created dictionary item with id " + newId.ToString());
-                    //    }
-                    //}
-
                 }
                 else
                 {
