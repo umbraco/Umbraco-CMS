@@ -45,6 +45,35 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Adds or updates a translation for a dictionary item and language
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="language"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This does not save the item, that needs to be done explicitly
+        /// </remarks>
+        public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value)
+        {
+            if (item == null) throw new ArgumentNullException("item");
+            if (language == null) throw new ArgumentNullException("language");
+
+            var existing = item.Translations.FirstOrDefault(x => x.Language.Id == language.Id);
+            if (existing != null)
+            {
+                existing.Value = value;
+            }
+            else
+            {
+                item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                {
+                    new DictionaryTranslation(language, value)
+                };
+            }
+        }
+
+        /// <summary>
         /// Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
         /// </summary>
         /// <param name="key"></param>

@@ -109,7 +109,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Select("*")
                    .From<DictionaryDto>()
-                   .InnerJoin<LanguageTextDto>()
+                   .LeftJoin<LanguageTextDto>()
                    .On<DictionaryDto, LanguageTextDto>(left => left.UniqueId, right => right.UniqueId);
             }
             return sql;

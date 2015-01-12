@@ -17,11 +17,7 @@ using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.cms.businesslogic
 {
-    /// <summary>
-    /// The Dictionary is used for storing and retrieving language translated textpieces in Umbraco. It uses
-    /// umbraco.cms.businesslogic.language.Item class as storage and can be used from the public website of umbraco
-    /// all text are cached in memory.
-    /// </summary>
+    [Obsolete("Obsolete, Umbraco.Core.Services.ILocalizationService")]
     public class Dictionary
     {
 
@@ -30,6 +26,7 @@ namespace umbraco.cms.businesslogic
         //private static readonly ConcurrentDictionary<string, DictionaryItem> DictionaryItems = new ConcurrentDictionary<string, DictionaryItem>();
         private static readonly Guid TopLevelParent = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database")]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -334,11 +331,11 @@ namespace umbraco.cms.businesslogic
 
             public void setValue(int languageId, string value)
             {
-                foreach (var translation in _dictionaryItem.Translations.Where(x => x.Language.Id == languageId))
-                {
-                    translation.Value = value;
-                }
-
+                ApplicationContext.Current.Services.LocalizationService.AddOrUpdateDictionaryValue(
+                    _dictionaryItem,
+                    ApplicationContext.Current.Services.LocalizationService.GetLanguageById(languageId),
+                    value);
+                
                 //if (Item.hasText(_dictionaryItem.Key, languageId))
                 //    Item.setText(languageId, _dictionaryItem.Key, value);
                 //else

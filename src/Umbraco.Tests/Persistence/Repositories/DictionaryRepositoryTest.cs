@@ -55,16 +55,53 @@ namespace Umbraco.Tests.Persistence.Repositories
             LanguageRepository languageRepository;
             using (var repository = CreateRepository(unitOfWork, out languageRepository))
             {
-                // Act
-                var dictionaryItem = repository.Get(1);
+                var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
+                {
+                    Translations = new List<IDictionaryTranslation>
+                    {
+                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US"), "Hello world")
+                    }
+                };
+
+                repository.AddOrUpdate(dictionaryItem);
+                unitOfWork.Commit();
+
+                //re-get
+                dictionaryItem = repository.Get(dictionaryItem.Id);
+               
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
-                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Read More"));
+                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
                 Assert.That(dictionaryItem.Translations.Any(), Is.True);
                 Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
-                Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Read More"));
-                Assert.That(dictionaryItem.Translations.Last().Value, Is.EqualTo("Læs mere"));
+                Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
+            }
+
+        }
+
+        [Test]
+        public void Can_Perform_Get_On_DictionaryRepository_When_No_Language_Assigned()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            LanguageRepository languageRepository;
+            using (var repository = CreateRepository(unitOfWork, out languageRepository))
+            {
+                var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");                
+
+                repository.AddOrUpdate(dictionaryItem);
+                unitOfWork.Commit();
+
+                //re-get
+                dictionaryItem = repository.Get(dictionaryItem.Id);
+
+
+                // Assert
+                Assert.That(dictionaryItem, Is.Not.Null);
+                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
+                Assert.That(dictionaryItem.Translations.Any(), Is.False);
             }
 
         }

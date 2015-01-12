@@ -190,6 +190,10 @@ namespace Umbraco.Tests.Services
             var item = ServiceContext.LocalizationService.CreateDictionaryItemWithIdentity(
                 "Testing12345", null, "Hellooooo");
 
+            //re-get
+            item = ServiceContext.LocalizationService.GetDictionaryItemById(item.Id);
+
+            Assert.IsNotNull(item);
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
             Assert.AreEqual(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), item.ParentId);
@@ -208,35 +212,40 @@ namespace Umbraco.Tests.Services
         {
             var english = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");
 
-            var item = (IDictionaryItem)new DictionaryItem("Testing123")
-            {
-                Translations = new List<IDictionaryTranslation>
-                               {
-                                   new DictionaryTranslation(english, "Hello world")
-                               }
-            };
+            var item = (IDictionaryItem) new DictionaryItem("Testing123");
             ServiceContext.LocalizationService.Save(item);
 
             //re-get
             item = ServiceContext.LocalizationService.GetDictionaryItemById(item.Id);
 
-            var newTranslations = new List<IDictionaryTranslation>(item.Translations)
+            item.Translations = new List<IDictionaryTranslation>
+            {
+                new DictionaryTranslation(english, "Hello world")
+            };
+
+            ServiceContext.LocalizationService.Save(item);
+
+            Assert.AreEqual(1, item.Translations.Count());
+            foreach (var translation in item.Translations)
+            {
+                Assert.AreEqual("Hello world", translation.Value);
+            }
+
+            item.Translations = new List<IDictionaryTranslation>(item.Translations)
             {
                 new DictionaryTranslation(
                     ServiceContext.LocalizationService.GetLanguageByIsoCode("en-GB"),
                     "My new value")
             };
-            item.Translations = newTranslations;
 
             ServiceContext.LocalizationService.Save(item);
+
             //re-get
             item = ServiceContext.LocalizationService.GetDictionaryItemById(item.Id);
 
             Assert.AreEqual(2, item.Translations.Count());
-            foreach (var translation in item.Translations)
-            {
-                Assert.AreEqual(translation.Language.CultureName == "en-US" ? "Hello world" : "My new value", translation.Value);
-            }
+            Assert.AreEqual("Hello world", item.Translations.First().Value);
+            Assert.AreEqual("My new value", item.Translations.Last().Value);
         }
 
         [Test]
