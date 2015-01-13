@@ -23,7 +23,7 @@ namespace Umbraco.Core.ObjectResolution
         where TResolver : ResolverBase
 	{
 		#region Constructors
-		
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LazyManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
         /// with creation of objects based on an HttpRequest lifetime scope.
@@ -31,9 +31,11 @@ namespace Umbraco.Core.ObjectResolution
         /// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
         /// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
         /// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
-		protected LazyManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-			: base(scope)
-		{ }
+        protected LazyManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+            : base(scope)
+        {
+            Initialize();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LazyManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
@@ -41,9 +43,11 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="httpContext">The HttpContextBase corresponding to the HttpRequest.</param>
         /// <exception cref="ArgumentNullException"><paramref name="httpContext"/> is <c>null</c>.</exception>
-		protected LazyManyObjectsResolverBase(HttpContextBase httpContext)
-			: base(httpContext)
-		{ }
+        protected LazyManyObjectsResolverBase(HttpContextBase httpContext)
+            : base(httpContext)
+        {
+            Initialize();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LazyManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list
@@ -101,23 +105,37 @@ namespace Umbraco.Core.ObjectResolution
 		private readonly List<Lazy<Type>> _lazyTypeList = new List<Lazy<Type>>();
 		private readonly List<Func<IEnumerable<Type>>> _typeListProducerList = new List<Func<IEnumerable<Type>>>();
         private readonly List<Type> _excludedTypesList = new List<Type>(); 
+		private Lazy<List<Type>> _resolvedTypes = null;
+        
+        private void Initialize()
+        {
+            _resolvedTypes = new Lazy<List<Type>>(() =>
+            {
+                var resolvedTypes = new List<Type>();
 
-		private List<Type> _resolvedTypes = null;
-		private readonly ReaderWriterLockSlim _resolvedTypesLock = new ReaderWriterLockSlim();
-		
+                // get the types by evaluating the lazy & producers
+                var types = new List<Type>();
+                types.AddRange(_lazyTypeList.Select(x => x.Value));
+                types.AddRange(_typeListProducerList.SelectMany(x => x()));
+
+                // we need to validate each resolved type now since we could
+                // not do it before evaluating the lazy & producers
+                foreach (var type in types.Where(x => _excludedTypesList.Contains(x) == false))
+                {
+                    AddValidAndNoDuplicate(resolvedTypes, type);
+                }
+
+                return resolvedTypes;
+            });
+        }
+
 		/// <summary>
 		/// Gets a value indicating whether the resolver has resolved types to create instances from.
 		/// </summary>
         /// <remarks>To be used in unit tests.</remarks>
 		public bool HasResolvedTypes
 		{
-			get
-            {
-                using (new ReadLock(_resolvedTypesLock))
-                {
-                    return _resolvedTypes != null;
-                }
-            }
+			get { return _resolvedTypes.IsValueCreated; }
 		}
 
         /// <summary>
@@ -126,32 +144,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <remarks>When called, will get the types from the lazy list.</remarks>
         protected override IEnumerable<Type> InstanceTypes
 		{
-			get
-			{
-				using (var lck = new UpgradeableReadLock(_resolvedTypesLock))
-				{
-					if (_resolvedTypes == null)
-					{
-                        lck.UpgradeToWriteLock();
-
-                        _resolvedTypes = new List<Type>();
-
-                        // get the types by evaluating the lazy & producers
-                        var types = new List<Type>();
-                        types.AddRange(_lazyTypeList.Select(x => x.Value));
-                        types.AddRange(_typeListProducerList.SelectMany(x => x()));
-                        
-                        // we need to validate each resolved type now since we could
-                        // not do it before evaluating the lazy & producers
-                        foreach (var type in types.Where(x => !_excludedTypesList.Contains(x)))
-                        {
-                            AddValidAndNoDuplicate(_resolvedTypes, type);
-                        }
-					}
-
-					return _resolvedTypes;	
-				}				
-			}
+			get { return _resolvedTypes.Value; }
 		}
 
         /// <summary>
