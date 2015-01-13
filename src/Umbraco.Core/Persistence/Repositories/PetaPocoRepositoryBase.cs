@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IAggregateRoot
     {
 		
-		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

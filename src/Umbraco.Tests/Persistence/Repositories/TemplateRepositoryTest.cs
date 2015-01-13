@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
 
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 //NOTE: This has to be persisted first
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 //NOTE: This has to be persisted first
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -305,7 +305,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -336,7 +336,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 // Act
@@ -367,7 +367,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
@@ -397,7 +397,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 var template = new Template("test", "test", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
@@ -428,12 +428,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
-            using (var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
-                var tagRepository = new TagRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
-                var contentTypeRepository = new ContentTypeRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), templateRepository);
-                var contentRepo = new ContentRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+                var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+                var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), templateRepository);
+                var contentRepo = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
 
                 using (contentRepo)
                 {
@@ -473,7 +473,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
@@ -515,7 +515,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc))
@@ -614,7 +614,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
@@ -679,7 +679,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
+            using (var repository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), _masterPageFileSystem, _viewsFileSystem,
                 Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc)))
             {
                 var parent = new Template("parent", "parent", _viewsFileSystem, _masterPageFileSystem, Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));

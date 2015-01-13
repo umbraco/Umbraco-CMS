@@ -61,8 +61,9 @@ namespace Umbraco.Tests.TestHelpers
             
 
             RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true,//disable all repo caches for tests!
+                new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),//disable all repo caches for tests!
                     Logger,
+                    SyntaxProvider,
                     Mock.Of<IUmbracoSettingsSection>()));  
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(

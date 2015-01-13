@@ -22,8 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-        
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

@@ -28,13 +28,13 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper, ILogger logger,
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger,
             IContentTypeRepository contentTypeRepository)
             : base(work, cache, logger)
         {
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current, logger);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger);
         }
 
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -438,7 +438,7 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
                 : base(work, cache, logger)
             {
             }

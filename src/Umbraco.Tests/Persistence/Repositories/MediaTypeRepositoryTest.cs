@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MediaTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MediaTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());            
+            return new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());            
         }
 
         [Test]

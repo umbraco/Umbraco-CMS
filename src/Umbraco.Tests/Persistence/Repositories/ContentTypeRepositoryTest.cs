@@ -39,17 +39,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 
         private ContentTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), templateRepository);
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), templateRepository);
             return contentTypeRepository;
         }
 
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var templateRepo = new TemplateRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
             using (var repository = CreateRepository(unitOfWork))
             {
                 var templates = new[]

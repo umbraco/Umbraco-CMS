@@ -41,7 +41,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService()
-            : this(LoggerResolver.Current.Logger, new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()))
+            : this(LoggerResolver.Current.Logger, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
         { }
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
         public ContentService(ILogger logger, IDatabaseUnitOfWorkProvider provider)
-            : this(logger, provider, new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()), new PublishingStrategy())
+            : this(logger, provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()), new PublishingStrategy())
         { }
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
@@ -1330,9 +1330,9 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
-                //TODO: Don't think we need this here because cache should be cleared by the event listeners
-                // and the correct ICacheRefreshers!?
-                RuntimeCacheProvider.Current.Clear();
+                ////TODO: Don't think we need this here because cache should be cleared by the event listeners
+                //// and the correct ICacheRefreshers!?
+                //RuntimeCacheProvider.Current.Clear();
 
                 return copy;
             }

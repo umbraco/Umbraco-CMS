@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentXmlRepository<TContent> : PetaPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentXmlRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

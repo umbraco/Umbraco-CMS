@@ -126,8 +126,10 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            RuntimeCacheProvider.Current.Clear(typeof(IContent));
-            RuntimeCacheProvider.Current.Clear(typeof(IContentType));
+            //RuntimeCacheProvider.Current.Clear(typeof(IContent));
+            //RuntimeCacheProvider.Current.Clear(typeof(IContentType));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
 
             //all property type cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
@@ -212,18 +214,18 @@ namespace Umbraco.Web.Cache
             {
                 if (payloads.Any(x => x.Type == typeof (IContentType).Name))
                 {
-                    RuntimeCacheProvider.Current.Clear(typeof(IContent));
-                    RuntimeCacheProvider.Current.Clear(typeof(IContentType));    
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
                 }
                 if (payloads.Any(x => x.Type == typeof(IMediaType).Name))
                 {
-                    RuntimeCacheProvider.Current.Clear(typeof(IMedia));
-                    RuntimeCacheProvider.Current.Clear(typeof(IMediaType));
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMedia>();
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMediaType>();
                 }
                 if (payloads.Any(x => x.Type == typeof(IMemberType).Name))
                 {
-                    RuntimeCacheProvider.Current.Clear(typeof(IMember));
-                    RuntimeCacheProvider.Current.Clear(typeof(IMemberType));
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMember>();
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMemberType>();
                 }
                 
 

@@ -5,6 +5,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence
@@ -14,62 +15,50 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
-        private readonly bool _disableAllCache;
         private readonly ILogger _logger;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly CacheHelper _cacheHelper;
         private readonly IUmbracoSettingsSection _settings;
 
         #region Ctors
 
-        public RepositoryFactory(CacheHelper cacheHelper, ILogger logger, IUmbracoSettingsSection settings)
+        public RepositoryFactory(CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUmbracoSettingsSection settings)
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             if (logger == null) throw new ArgumentNullException("logger");
+            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             if (settings == null) throw new ArgumentNullException("settings");
-            _disableAllCache = false;
+
             _cacheHelper = cacheHelper;
             _logger = logger;
+            _sqlSyntax = sqlSyntax;
             _settings = settings;
-        }
-
-        public RepositoryFactory(bool disableAllCache, ILogger logger, IUmbracoSettingsSection settings)
-        {
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (settings == null) throw new ArgumentNullException("settings");
-            _disableAllCache = disableAllCache;
-            _logger = logger;
-            _settings = settings;
-            _cacheHelper = _disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache;
         }
 
         [Obsolete("Use the ctor specifying all dependencies instead")]
         public RepositoryFactory()
-            : this(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings())
+            : this(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
         {
         }
 
-        [Obsolete("Use the ctor specifying an ILogger instead")]
+        [Obsolete("Use the ctor specifying all dependencies instead")]
         public RepositoryFactory(CacheHelper cacheHelper)
-            : this(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings())
+            : this(cacheHelper, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
         {
-            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _disableAllCache = false;
-            _cacheHelper = cacheHelper;
         }
 
-        [Obsolete("Use the ctor specifying an ILogger instead")]
+        [Obsolete("Use the ctor specifying all dependencies instead, NOTE: disableAllCache has zero effect")]        
         public RepositoryFactory(bool disableAllCache, CacheHelper cacheHelper)
-            : this(disableAllCache, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings())
+            : this(cacheHelper, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _cacheHelper = cacheHelper;
         }
 
-        [Obsolete("Use the ctor specifying an ILogger instead")]
+        [Obsolete("Use the ctor specifying all dependencies instead")]
         public RepositoryFactory(bool disableAllCache)
-            : this(disableAllCache, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings())
+            : this(disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
         {
-
         }
 
      
@@ -79,14 +68,14 @@ namespace Umbraco.Core.Persistence
         {
             return new TagRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, _logger);
+                _cacheHelper, _logger);
         }
 
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentRepository(
-                uow,                
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                uow,
+                _cacheHelper,
                 _logger,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
@@ -98,7 +87,7 @@ namespace Umbraco.Core.Persistence
         {
             return new ContentTypeRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger,
                 CreateTemplateRepository(uow));
         }
@@ -107,7 +96,7 @@ namespace Umbraco.Core.Persistence
         {
             return new DataTypeDefinitionRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,                
+                _cacheHelper,                
                 _cacheHelper,
                 _logger,
                 CreateContentTypeRepository(uow));
@@ -117,8 +106,9 @@ namespace Umbraco.Core.Persistence
         {
             return new DictionaryRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger,
+                _sqlSyntax,
                 CreateLanguageRepository(uow));
         }
 
@@ -126,7 +116,7 @@ namespace Umbraco.Core.Persistence
         {
             return new LanguageRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger);
         }
 
@@ -134,7 +124,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MediaRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger,
                 CreateMediaTypeRepository(uow),
                 CreateTagRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
@@ -144,7 +134,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MediaTypeRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger);
         }
 
@@ -152,7 +142,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationRepository(
                 uow,
-                NullCacheProvider.Current,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
                 _logger,
                 CreateRelationTypeRepository(uow));
         }
@@ -161,7 +151,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationTypeRepository(
                 uow,
-                NullCacheProvider.Current,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
                 _logger);
         }
 
@@ -188,7 +178,7 @@ namespace Umbraco.Core.Persistence
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
             return new TemplateRepository(uow, 
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
+                _cacheHelper, 
                 _logger,
                 new PhysicalFileSystem(SystemDirectories.Masterpages),
                 new PhysicalFileSystem(SystemDirectories.MvcViews),
@@ -199,7 +189,7 @@ namespace Umbraco.Core.Persistence
         {
             return new ServerRegistrationRepository(
                 uow,
-                NullCacheProvider.Current,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
                 _logger);
         }
 
@@ -208,7 +198,7 @@ namespace Umbraco.Core.Persistence
             return new UserTypeRepository(
                 uow,
                 //There's not many user types but we query on users all the time so the result needs to be cached
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger);
         }
 
@@ -217,7 +207,7 @@ namespace Umbraco.Core.Persistence
             return new UserRepository(
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger,
                 CreateUserTypeRepository(uow),
                 _cacheHelper);
@@ -225,8 +215,8 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)
         {
-            return new MacroRepository(uow, 
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+            return new MacroRepository(uow,
+                _cacheHelper,
                 _logger);
         }
 
@@ -234,7 +224,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MemberRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+                _cacheHelper,
                 _logger,
                 CreateMemberTypeRepository(uow),
                 CreateMemberGroupRepository(uow),
@@ -243,15 +233,15 @@ namespace Umbraco.Core.Persistence
 
         public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberTypeRepository(uow, 
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
+            return new MemberTypeRepository(uow,
+                _cacheHelper,
                 _logger);
         }
 
         public virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberGroupRepository(uow, 
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
+            return new MemberGroupRepository(uow,
+                _cacheHelper, 
                 _logger,
                 _cacheHelper);
         }

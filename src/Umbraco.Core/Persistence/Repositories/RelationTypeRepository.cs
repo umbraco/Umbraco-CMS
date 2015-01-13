@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
 
-        public RelationTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        public RelationTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

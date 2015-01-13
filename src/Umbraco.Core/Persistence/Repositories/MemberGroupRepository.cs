@@ -21,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
         private readonly CacheHelper _cacheHelper;
-        
-        public MemberGroupRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, CacheHelper cacheHelper)
+
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, CacheHelper cacheHelper)
             : base(work, cache, logger)
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");

@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
     {
-	
-		public MediaTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+
+        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

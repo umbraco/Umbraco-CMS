@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
 {
@@ -28,19 +29,22 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            RuntimeCacheProvider.Current.Clear(typeof (IUserType));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IUserType>();
+            //RuntimeCacheProvider.Current.Clear(typeof (IUserType));
             base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
-            RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
+            //RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
+            //RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
             base.Remove(id);
         }
 

@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
             : base(work, cache, logger)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
@@ -41,8 +41,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, NullCacheProvider.Current, logger);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, NullCacheProvider.Current, logger);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>

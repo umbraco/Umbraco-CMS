@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

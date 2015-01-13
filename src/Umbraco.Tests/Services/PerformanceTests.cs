@@ -75,8 +75,6 @@ namespace Umbraco.Tests.Services
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
-                    //clear the cache to make this test valid
-                    RuntimeCacheProvider.Current.Clear();
 
                     var published = new List<IContent>();
                     //get all content items that are published
@@ -97,8 +95,6 @@ namespace Umbraco.Tests.Services
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
-                    //clear the cache to make this test valid
-                    RuntimeCacheProvider.Current.Clear();
 
                     //get all content items that are published
                     var published = contentSvc.GetAllPublished();
@@ -122,8 +118,7 @@ namespace Umbraco.Tests.Services
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
-                    //clear the cache to make this test valid
-                    RuntimeCacheProvider.Current.Clear();
+                    
                     //get all content items that are published of this type
                     var published = contentSvc.GetContentOfContentType(contentTypeId).Where(content => content.Published);
                     Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
@@ -136,8 +131,6 @@ namespace Umbraco.Tests.Services
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
-                    //clear the cache to make this test valid
-                    RuntimeCacheProvider.Current.Clear();
                     //get all content items that are published of this type
                     var published = contentSvc.GetPublishedContentOfContentType(contentTypeId);
                     Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));

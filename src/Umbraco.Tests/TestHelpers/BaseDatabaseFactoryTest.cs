@@ -205,8 +205,9 @@ namespace Umbraco.Tests.TestHelpers
                 () => PluginManager.Current.ResolveDataTypes());
 
             RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true,  //disable all repo caches for tests!
+                new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),  //disable all repo caches for tests!
                     Logger,
+                    SqlSyntaxProvider,
                     SettingsForTests.GenerateMockSettings())); 
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(

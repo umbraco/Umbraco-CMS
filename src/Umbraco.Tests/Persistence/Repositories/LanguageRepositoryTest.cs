@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -26,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new LanguageRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());            
+            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());            
         }
 
         [Test]
@@ -59,6 +61,58 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(language.HasIdentity, Is.True);
                 Assert.That(language.CultureName, Is.EqualTo("en-US"));
                 Assert.That(language.IsoCode, Is.EqualTo("en-US"));   
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var au = CultureInfo.GetCultureInfo("en-AU");
+                var language = (ILanguage)new Language(au.Name)
+                {
+                    CultureName = au.DisplayName
+                };
+                repository.AddOrUpdate(language);
+                unitOfWork.Commit();
+
+                //re-get 
+                language = repository.GetByIsoCode(au.Name);
+
+                // Assert
+                Assert.That(language, Is.Not.Null);
+                Assert.That(language.HasIdentity, Is.True);
+                Assert.That(language.CultureName, Is.EqualTo(au.DisplayName));
+                Assert.That(language.IsoCode, Is.EqualTo(au.Name));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var au = CultureInfo.GetCultureInfo("en-AU");
+                var language = (ILanguage)new Language(au.Name)
+                {
+                    CultureName = au.DisplayName
+                };
+                repository.AddOrUpdate(language);
+                unitOfWork.Commit();
+
+                //re-get 
+                language = repository.GetByCultureName(au.DisplayName);
+
+                // Assert
+                Assert.That(language, Is.Not.Null);
+                Assert.That(language.HasIdentity, Is.True);
+                Assert.That(language.CultureName, Is.EqualTo(au.DisplayName));
+                Assert.That(language.IsoCode, Is.EqualTo(au.Name));
             }
         }
 

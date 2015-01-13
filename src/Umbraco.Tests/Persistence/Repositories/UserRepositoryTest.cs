@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
-            var repository = new UserRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), userTypeRepository, CacheHelper.CreateDisabledCacheHelper());
+            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 

@@ -2,12 +2,14 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 
@@ -27,8 +29,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DictionaryRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out LanguageRepository languageRepository)
         {
-            languageRepository = new LanguageRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
-            var dictionaryRepository = new DictionaryRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), languageRepository);
+            languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            var dictionaryRepository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), languageRepository);
             return dictionaryRepository;
         }
 
@@ -44,6 +46,72 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Assert
             Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test]
+        public void Can_Perform_Get_By_Key_On_DictionaryRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            LanguageRepository languageRepository;
+            using (var repository = CreateRepository(unitOfWork, out languageRepository))
+            {
+                var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
+                {
+                    Translations = new List<IDictionaryTranslation>
+                    {
+                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US"), "Hello world")
+                    }
+                };
+
+                repository.AddOrUpdate(dictionaryItem);
+                unitOfWork.Commit();
+
+                //re-get
+                dictionaryItem = repository.Get("Testing1235");
+
+                // Assert
+                Assert.That(dictionaryItem, Is.Not.Null);
+                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
+                Assert.That(dictionaryItem.Translations.Any(), Is.True);
+                Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
+                Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
+            }
+
+        }
+
+        [Test]
+        public void Can_Perform_Get_By_UniqueId_On_DictionaryRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            LanguageRepository languageRepository;
+            using (var repository = CreateRepository(unitOfWork, out languageRepository))
+            {
+                var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
+                {
+                    Translations = new List<IDictionaryTranslation>
+                    {
+                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US"), "Hello world")
+                    }
+                };
+
+                repository.AddOrUpdate(dictionaryItem);
+                unitOfWork.Commit();
+
+                //re-get
+                dictionaryItem = repository.Get(dictionaryItem.Key);
+
+                // Assert
+                Assert.That(dictionaryItem, Is.Not.Null);
+                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
+                Assert.That(dictionaryItem.Translations.Any(), Is.True);
+                Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
+                Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
+            }
+
         }
 
         [Test]
@@ -286,8 +354,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var languageRepository = new LanguageRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
-            var repository = new DictionaryRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), languageRepository);
+            var languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            var repository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), languageRepository);
 
             var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNo);

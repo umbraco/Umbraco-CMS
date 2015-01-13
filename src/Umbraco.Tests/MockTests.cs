@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Moq;
@@ -46,12 +47,12 @@ namespace Umbraco.Tests
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
                     new Mock<IUserService>().Object,
-                    new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
+                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
                 new Mock<IEntityService>().Object,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                    new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
+                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                     new Mock<IEntityService>().Object),
                 new Mock<IMemberGroupService>().Object,
                 new Mock<IMemberTypeService>().Object,
@@ -94,12 +95,12 @@ namespace Umbraco.Tests
                         new Mock<IFileService>().Object,
                         new Mock<ILocalizationService>().Object,
                         new Mock<IUserService>().Object,
-                        new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
+                        new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                         new Mock<IDatabaseUnitOfWorkProvider>().Object),
                     new Mock<IEntityService>().Object,
                     new RelationService(
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                        new RepositoryFactory(true, Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>()),
+                        new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                         new Mock<IEntityService>().Object),
                     new Mock<IMemberGroupService>().Object,
                     new Mock<IMemberTypeService>().Object,

@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class TagRepository : PetaPocoRepositoryBase<int, ITag>, ITagRepository
     {
-        internal TagRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        internal TagRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

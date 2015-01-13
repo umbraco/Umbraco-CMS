@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -35,8 +36,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
-       
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
+
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
             : base(work, cache, logger)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -46,8 +47,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current, logger);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current, logger);
+            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger);
+            _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger);
 
             EnsureUniqueNaming = true;
         }
@@ -590,10 +591,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 // then we can use that entity. Otherwise if it is not published (which can be the case
                 // because we only store the 'latest' entries in the cache which might not be the published
                 // version)
-                var fromCache = TryGetFromCache(dto.NodeId);
-                if (fromCache.Success && fromCache.Result.Published)
+                var fromCache = RepositoryCache.RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
+                //var fromCache = TryGetFromCache(dto.NodeId);
+                if (fromCache != null && fromCache.Published)
                 {
-                    yield return fromCache.Result;
+                    yield return fromCache;
                 }
                 else
                 {

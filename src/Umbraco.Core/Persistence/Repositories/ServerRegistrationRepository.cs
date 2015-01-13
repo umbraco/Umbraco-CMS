@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, ServerRegistration>
     {
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

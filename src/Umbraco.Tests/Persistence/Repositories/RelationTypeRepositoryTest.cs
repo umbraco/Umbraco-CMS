@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new RelationTypeRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
+            return new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
+            var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
             repository.AddOrUpdate(relateContent);//Id 2
             repository.AddOrUpdate(relateContentType);//Id 3

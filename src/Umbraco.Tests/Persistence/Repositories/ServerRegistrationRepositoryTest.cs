@@ -3,6 +3,7 @@ using System.Data.SqlServerCe;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ServerRegistrationRepository CreateRepositor(IDatabaseUnitOfWork unitOfWork)
         {
-            return new ServerRegistrationRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
+            return new ServerRegistrationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -245,7 +246,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = new ServerRegistrationRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>()))
+            using (var repository = new ServerRegistrationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>()))
             {
                 repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
                 repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));

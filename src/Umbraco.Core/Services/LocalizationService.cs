@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -23,7 +24,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService()
-            : this(new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()))
+            : this(new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
         {}
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Services
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory(false, LoggerResolver.Current.Logger, UmbracoConfig.For.UmbracoSettings()))
+            : this(provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
         {
         }
 
@@ -141,10 +142,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateDictionaryRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
-                var items = repository.GetByQuery(query);
+                return repository.Get(id);
+                //var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 
@@ -157,10 +159,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateDictionaryRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                var items = repository.GetByQuery(query);
+                return repository.Get(key);
+                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 
@@ -204,10 +207,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateDictionaryRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                var items = repository.GetByQuery(query);
+                return repository.Get(key) != null;
+                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
+                //var items = repository.GetByQuery(query);
 
-                return items.Any();
+                //return items.Any();
             }
         }
 
@@ -279,10 +283,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateLanguageRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<ILanguage>.Builder.Where(x => x.CultureName == cultureName);
-                var items = repository.GetByQuery(query);
+                return repository.GetByCultureName(cultureName);
+                //var query = Query<ILanguage>.Builder.Where(x => x.CultureName == cultureName);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 
@@ -295,10 +300,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateLanguageRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == isoCode);
-                var items = repository.GetByQuery(query);
+                return repository.GetByIsoCode(isoCode);
+                //var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == isoCode);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 

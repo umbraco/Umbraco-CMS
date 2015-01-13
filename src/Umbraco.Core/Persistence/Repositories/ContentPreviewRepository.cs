@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentPreviewRepository<TContent> : PetaPocoRepositoryBase<int, ContentPreviewEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentPreviewRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        public ContentPreviewRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

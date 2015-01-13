@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MemberTypeRepository : ContentTypeBaseRepository<IMemberType>, IMemberTypeRepository
     {
 
-        public MemberTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger)
+        public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
         {
         }

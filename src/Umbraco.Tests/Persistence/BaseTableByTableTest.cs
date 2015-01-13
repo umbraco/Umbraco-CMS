@@ -43,9 +43,10 @@ namespace Umbraco.Tests.Persistence
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
-            
-            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(true,
+
+            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),
                 _logger,
+                new SqlCeSyntaxProvider(),
                 Mock.Of<IUmbracoSettingsSection>()));
 
             //disable cache

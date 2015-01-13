@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
+        public RelationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
             : base(work, cache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
@@ -49,6 +49,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return entity;
         }
+
+        //TODO: Fix N+1 !
 
         protected override IEnumerable<IRelation> PerformGetAll(params int[] ids)
         {

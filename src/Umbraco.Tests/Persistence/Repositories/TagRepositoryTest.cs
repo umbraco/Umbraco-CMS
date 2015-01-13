@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private TagRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
             return tagRepository;
         }
 
@@ -953,18 +953,18 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateContentRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>(), templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 
         private MediaRepository CreateMediaRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            var tagRepository = new TagRepository(unitOfWork, Mock.Of<IRepositoryCacheProvider>(), Mock.Of<ILogger>());
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>());
-            var repository = new MediaRepository(unitOfWork, NullCacheProvider.Current, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            var repository = new MediaRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), mediaTypeRepository, tagRepository);
             return repository;
         }
     }

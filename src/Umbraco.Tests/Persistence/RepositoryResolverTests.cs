@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 
@@ -23,8 +24,9 @@ namespace Umbraco.Tests.Persistence
 		public void Setup()
 		{
 			RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true,  //disable all repo caches for tests!
+                new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),  //disable all repo caches for tests!
                     Mock.Of<ILogger>(),
+                    new SqlCeSyntaxProvider(),
                     SettingsForTests.GenerateMockSettings()));
 
             Resolution.Freeze();

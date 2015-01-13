@@ -31,15 +31,15 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMedia> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMedia> _contentPreviewRepository;
 
-        public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
+        public MediaRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository)
             : base(work, cache, logger)
         {
             if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
             _tagRepository = tagRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, NullCacheProvider.Current, logger);
-            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, NullCacheProvider.Current, logger);
+            _contentXmlRepository = new ContentXmlRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger);
+            _contentPreviewRepository = new ContentPreviewRepository<IMedia>(work, CacheHelper.CreateDisabledCacheHelper(), logger);
             EnsureUniqueNaming = true;
         }
 
