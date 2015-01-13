@@ -11,8 +11,17 @@ namespace umbraco.cms.businesslogic.web
         private string _alias;
         private string _value;
 
+        private Umbraco.Core.Models.StylesheetProperty _stylesheetProperty;
+
         private static readonly Guid ModuleObjectType = new Guid("5555da4f-a123-42b2-4488-dcdfb25e4111");
-        
+
+        internal StylesheetProperty(Umbraco.Core.Models.StylesheetProperty stylesheetProperty)
+            : base(int.MaxValue, true)
+        {
+            if (stylesheetProperty == null) throw new ArgumentNullException("stylesheetProperty");
+            _stylesheetProperty = stylesheetProperty;
+        }
+
         public StylesheetProperty(int id) : base(id)
         {
             InitProperty();

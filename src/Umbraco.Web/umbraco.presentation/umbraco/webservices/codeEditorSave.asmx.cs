@@ -42,7 +42,8 @@ namespace umbraco.presentation.webservices
                 string returnValue;
                 var stylesheet = new StyleSheet(fileID)
                     {
-                        Content = fileContents, Text = fileName
+                        Content = fileContents, 
+                        Text = fileName
                     };
 
                 try

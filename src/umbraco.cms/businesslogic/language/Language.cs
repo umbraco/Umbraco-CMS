@@ -80,7 +80,10 @@ namespace umbraco.cms.businesslogic.language
             if (culture != null)
             {
                 //insert it
-                var lang = new Umbraco.Core.Models.Language(cultureCode);
+                var lang = new Umbraco.Core.Models.Language(cultureCode)
+                {
+                    CultureName = culture.DisplayName
+                };
                 ApplicationContext.Current.Services.LocalizationService.Save(lang);
                 var ct = new Language { _lang = lang };
                 ct.OnNew(new NewEventArgs());

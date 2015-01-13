@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
@@ -61,7 +62,7 @@ namespace umbraco
 
         public override void Render(ref XmlTree tree)
         {            
-            foreach (StyleSheet n in StyleSheet.GetAll())
+            foreach (StyleSheet n in StyleSheet.GetAll().Where(x => x.Id > 0))
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = n.Id.ToString(CultureInfo.InvariantCulture);

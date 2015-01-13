@@ -20,10 +20,6 @@ namespace umbraco.cms.businesslogic
     [Obsolete("Obsolete, Umbraco.Core.Services.ILocalizationService")]
     public class Dictionary
     {
-
-        //private static volatile bool _cacheIsEnsured = false;
-        //private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        //private static readonly ConcurrentDictionary<string, DictionaryItem> DictionaryItems = new ConcurrentDictionary<string, DictionaryItem>();
         private static readonly Guid TopLevelParent = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database")]
@@ -32,48 +28,6 @@ namespace umbraco.cms.businesslogic
             get { return Application.SqlHelper; }
         }
         
-        ///// <summary>
-        ///// Reads all items from the database and stores in local cache
-        ///// </summary>
-        //private static void EnsureCache()
-        //{
-        //    using (var lck = new UpgradeableReadLock(Locker))
-        //    {
-        //        if (_cacheIsEnsured) return;
-
-        //        lck.UpgradeToWriteLock();
-
-        //        using (var dr = SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary"))
-        //        {
-        //            while (dr.Read())
-        //            {
-        //                //create new dictionaryitem object and put in cache
-        //                var item = new DictionaryItem(dr.GetInt("pk"),
-        //                                              dr.GetString("key"),
-        //                                              dr.GetGuid("id"),
-        //                                              dr.GetGuid("parent"));
-
-        //                DictionaryItems.TryAdd(item.key, item);
-        //            }
-        //        }
-
-        //        _cacheIsEnsured = true;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Used by the cache refreshers to clear the cache on distributed servers
-        ///// </summary>
-        //internal static void ClearCache()
-        //{
-        //    using (new WriteLock(Locker))
-        //    {
-        //        DictionaryItems.Clear();
-        //        //ensure the flag is reset so that EnsureCache will re-cache everything
-        //        _cacheIsEnsured = false;
-        //    }
-        //}
-
         /// <summary>
         /// Retrieve a list of toplevel DictionaryItems
         /// </summary>
@@ -84,12 +38,6 @@ namespace umbraco.cms.businesslogic
                 return ApplicationContext.Current.Services.LocalizationService.GetRootDictionaryItems()
                     .Select(x => new DictionaryItem(x))
                     .ToArray();
-
-                //EnsureCache();
-
-                //return DictionaryItems.Values
-                //    .Where(x => x.ParentId == TopLevelParent).OrderBy(item => item.key)
-                //    .ToArray();
             }
         }
 

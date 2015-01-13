@@ -31,25 +31,15 @@ namespace umbraco.cms.businesslogic.template
 
         private readonly ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
         private readonly MasterPageHelper _masterPageHelper = new MasterPageHelper(new PhysicalFileSystem(SystemDirectories.Masterpages));
-        internal ITemplate TemplateEntity;
-        //private string _OutputContentType;
-        //private string _design;
-        //private string _alias;
-        //private string _oldAlias;
+        internal ITemplate TemplateEntity;        
         private int? _mastertemplate;
-        //private bool _hasChildrenInitialized = false;
-        //private bool _hasChildren;
-
+        
         #endregion
 
         #region Static members
 
         public static readonly string UmbracoMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
-        private static Hashtable _templateAliases = new Hashtable();
-        //private static volatile bool _templateAliasesInitialized = false;
-        //private static readonly object TemplateLoaderLocker = new object();
-        //private static readonly Guid ObjectType = new Guid(Constants.ObjectTypes.Template);
-        //private static readonly char[] NewLineChars = Environment.NewLine.ToCharArray();
+        private static Hashtable _templateAliases = new Hashtable();      
 
         #endregion
 
@@ -88,7 +78,7 @@ namespace umbraco.cms.businesslogic.template
         #region Constructors
 
         internal Template(ITemplate template)
-            : base(template.Id, true)
+            : base(template)
         {
             TemplateEntity = template;
         }
