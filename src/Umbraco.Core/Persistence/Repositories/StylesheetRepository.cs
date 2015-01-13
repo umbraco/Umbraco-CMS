@@ -17,17 +17,12 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IDatabaseUnitOfWork _dbwork;
 
-        internal StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db, IFileSystem fileSystem)
+        public StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db, IFileSystem fileSystem)
             : base(work, fileSystem)
         {
             _dbwork = db;
         }
-
-        public StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db)
-            : this(work, db, new PhysicalFileSystem(SystemDirectories.Css))
-        {
-        }
-
+        
         #region Overrides of FileRepository<string,Stylesheet>
 
         public override Stylesheet Get(string id)
@@ -37,14 +32,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new Exception(string.Format("The file {0} was not found", id));
             }
 
-            var content = string.Empty;
+            string content;
 
             using (var stream = FileSystem.OpenFile(id))
+            using(var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                content = reader.ReadToEnd();
             }
 
             var path = FileSystem.GetRelativePath(id);

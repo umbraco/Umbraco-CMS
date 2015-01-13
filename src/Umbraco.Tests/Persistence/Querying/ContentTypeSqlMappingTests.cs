@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Querying
             IDictionary<int, IEnumerable<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssociatedTemplates;
             IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
             var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapContentTypes(
-                new[] {99997, 99998}, DatabaseContext.Database, out allAssociatedTemplates, out allParentContentTypeIds)
+                new[] {99997, 99998}, DatabaseContext.Database, SqlSyntaxProvider, out allAssociatedTemplates, out allParentContentTypeIds)
                 .ToArray();
 
             var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
             var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapMediaTypes(
-                new[] { 99997, 99998 }, DatabaseContext.Database, out allParentContentTypeIds)
+                new[] { 99997, 99998 }, DatabaseContext.Database, SqlSyntaxProvider, out allParentContentTypeIds)
                 .ToArray();
 
             var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             IDictionary<int, PropertyTypeCollection> allPropTypeCollection;
             IDictionary<int, PropertyGroupCollection> allPropGroupCollection;
-            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, DatabaseContext.Database, out allPropTypeCollection, out allPropGroupCollection);
+            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, DatabaseContext.Database, SqlSyntaxProvider, out allPropTypeCollection, out allPropGroupCollection);
 
             var propGroupCollection = allPropGroupCollection[99999];
             var propTypeCollection = allPropTypeCollection[99999];

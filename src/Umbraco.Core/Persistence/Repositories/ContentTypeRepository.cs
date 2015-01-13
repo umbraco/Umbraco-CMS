@@ -21,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
-            : base(work, cache, logger)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
+            : base(work, cache, logger, sqlSyntax)
         {
             _templateRepository = templateRepository;
         }
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContentType PerformGet(int id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(
-                new[] {id}, Database, this, _templateRepository);
+                new[] {id}, Database, SqlSyntaxProvider, this, _templateRepository);
             
             var contentType = contentTypes.SingleOrDefault();
             return contentType;
@@ -42,13 +42,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, this, _templateRepository);
+                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntaxProvider, this, _templateRepository);
             }
             else
             {
                 var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, this, _templateRepository);
+                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntaxProvider, this, _templateRepository);
             }
         }
 

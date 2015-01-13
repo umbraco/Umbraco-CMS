@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -19,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
-            : base(work, cache, logger)
+        public RelationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IRelationTypeRepository relationTypeRepository)
+            : base(work, cache, logger, sqlSyntax)
         {
             _relationTypeRepository = relationTypeRepository;
         }

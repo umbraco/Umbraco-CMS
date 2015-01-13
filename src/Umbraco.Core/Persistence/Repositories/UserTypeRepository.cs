@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -16,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserTypeRepository : PetaPocoRepositoryBase<int, IUserType>, IUserTypeRepository
     {
-        public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        public UserTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 

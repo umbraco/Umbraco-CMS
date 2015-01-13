@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -17,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TDto: class
     {
 
-        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 

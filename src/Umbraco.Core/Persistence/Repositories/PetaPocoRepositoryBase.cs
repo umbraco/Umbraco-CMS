@@ -4,6 +4,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -16,13 +17,16 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-		
-		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger)
+        public ISqlSyntaxProvider SqlSyntaxProvider { get; private set; }
+
+        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntaxProvider)
             : base(work, cache, logger)
         {
+            if (sqlSyntaxProvider == null) throw new ArgumentNullException("sqlSyntaxProvider");
+            SqlSyntaxProvider = sqlSyntaxProvider;
         }
 
-		/// <summary>
+        /// <summary>
 		/// Returns the database Unit of Work added to the repository
 		/// </summary>
 		protected internal new IDatabaseUnitOfWork UnitOfWork
