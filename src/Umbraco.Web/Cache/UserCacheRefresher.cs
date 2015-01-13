@@ -2,7 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Repositories;
 using umbraco.interfaces;
 
@@ -30,7 +30,6 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            //RuntimeCacheProvider.Current.Clear(typeof(IUser));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IUser>();
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
@@ -45,7 +44,6 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            //RuntimeCacheProvider.Current.Delete(typeof (IUser), id);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUser>(id));
 
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));

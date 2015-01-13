@@ -12,7 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -1329,11 +1329,6 @@ namespace Umbraco.Core.Services
                 Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId, relateToOriginal), this);
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
-
-                ////TODO: Don't think we need this here because cache should be cleared by the event listeners
-                //// and the correct ICacheRefreshers!?
-                //RuntimeCacheProvider.Current.Clear();
-
                 return copy;
             }
         }

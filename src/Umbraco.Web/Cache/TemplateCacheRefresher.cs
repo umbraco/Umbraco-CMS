@@ -2,7 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
+
 using umbraco;
 using umbraco.interfaces;
 
@@ -60,7 +60,6 @@ namespace Umbraco.Web.Cache
 
             //need to clear the runtime cache for template instances
             //NOTE: This is temp until we implement the correct ApplicationCache and then we can remove the RuntimeCache, etc...
-            //RuntimeCacheProvider.Current.Clear(typeof(ITemplate));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<ITemplate>();
         }
 

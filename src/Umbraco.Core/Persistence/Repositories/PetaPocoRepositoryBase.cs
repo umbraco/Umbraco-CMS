@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 

@@ -9,7 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
@@ -126,8 +126,6 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            //RuntimeCacheProvider.Current.Clear(typeof(IContent));
-            //RuntimeCacheProvider.Current.Clear(typeof(IContentType));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
 
@@ -179,7 +177,6 @@ namespace Umbraco.Web.Cache
         /// -- CacheKeys.ContentTypePropertiesCacheKey + contentType.Id
         /// - ContentType.RemoveFromDataTypeCache (clears static object/dictionary cache)
         /// - InMemoryCacheProvider.Current.Clear();
-        /// - RuntimeCacheProvider.Current.Clear(); 
         /// - RoutesCache.Clear();        
         /// </remarks>
         private static void ClearContentTypeCache(JsonPayload[] payloads)

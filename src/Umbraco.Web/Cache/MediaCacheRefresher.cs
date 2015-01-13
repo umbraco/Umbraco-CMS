@@ -7,7 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Repositories;
 using umbraco.interfaces;
 using System.Linq;
@@ -171,7 +171,6 @@ namespace Umbraco.Web.Cache
                             int idPartAsInt;
                             if (int.TryParse(idPart, out idPartAsInt))
                             {
-                                //RuntimeCacheProvider.Current.Delete(typeof(IMedia), idPartAsInt);    
                                 ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
                                     RepositoryBase.GetCacheIdKey<IMedia>(idPartAsInt));
                             }

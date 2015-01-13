@@ -4,7 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using umbraco;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Repositories;
 using umbraco.interfaces;
 using System.Linq;
@@ -176,7 +176,6 @@ namespace Umbraco.Web.Cache
                     prefix =>
                     ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(prefix));
 
-            //RuntimeCacheProvider.Current.Clear(typeof (IMacro));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMacro>();
 
             base.RefreshAll();
@@ -192,7 +191,6 @@ namespace Umbraco.Web.Cache
                     alias =>
                     ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(alias));
 
-                //RuntimeCacheProvider.Current.Delete(typeof(IMacro), payload.Id);
                 ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMacro>(payload.Id));
             });
 

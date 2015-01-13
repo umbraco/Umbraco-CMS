@@ -11,7 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;

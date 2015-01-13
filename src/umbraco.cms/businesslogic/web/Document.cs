@@ -10,7 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
@@ -392,7 +392,6 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.DatabaseContext.Database.Execute(
                 "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
             //We need to clear cache for Documents since this is touching the database directly
-            //RuntimeCacheProvider.Current.Clear();
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
         }
 
