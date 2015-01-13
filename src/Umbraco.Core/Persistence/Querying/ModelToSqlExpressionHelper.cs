@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,13 +27,17 @@ namespace Umbraco.Core.Persistence.Querying
                 m.Expression.NodeType == ExpressionType.Parameter 
                 && m.Expression.Type == typeof(T))
             {
-                var field = _mapper.Map(m.Member.Name);
-                return field;
+                var field = _mapper.Map(m.Member.Name, true);
+                if (field.IsNullOrWhiteSpace()) 
+                    throw new InvalidOperationException("The mapper returned an empty field for the member name: " + m.Member.Name);
+                return field;                
             }
 
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
             {
-                var field = _mapper.Map(m.Member.Name);
+                var field = _mapper.Map(m.Member.Name, true);
+                if (field.IsNullOrWhiteSpace()) 
+                    throw new InvalidOperationException("The mapper returned an empty field for the member name: " + m.Member.Name);
                 return field;
             }
             
