@@ -24,10 +24,9 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        
-
         private readonly IDatabaseFactory _factory;
         private readonly ILogger _logger;
+        private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
         private bool _canConnect;
         private volatile bool _connectCheck = false;
@@ -38,22 +37,47 @@ namespace Umbraco.Core
 
         [Obsolete("Use the constructor specifying all dependencies instead")]
         public DatabaseContext(IDatabaseFactory factory)
-            : this(factory, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider)
+            : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
+            {
+                new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
+                new SqlCeSyntaxProvider(), 
+                new SqlServerSyntaxProvider()
+            }))
         {
         }
 
-        public DatabaseContext(IDatabaseFactory factory, ILogger logger)
-        {         
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="logger"></param>
+        /// <param name="syntaxProviders"></param>
+        public DatabaseContext(IDatabaseFactory factory, ILogger logger, SqlSyntaxProviders syntaxProviders)
+        {
+            if (factory == null) throw new ArgumentNullException("factory");
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (syntaxProviders == null) throw new ArgumentNullException("syntaxProviders");
+
             _factory = factory;
             _logger = logger;
+            _syntaxProviders = syntaxProviders;
         }
 
-        public DatabaseContext(IDatabaseFactory factory, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        /// <summary>
+        /// Create a configured DatabaseContext
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="logger"></param>
+        /// <param name="sqlSyntax"></param>
+        /// <param name="providerName"></param>
+        public DatabaseContext(IDatabaseFactory factory, ILogger logger, ISqlSyntaxProvider sqlSyntax, string providerName)
         {
+            _providerName = providerName;
             SqlSyntax = sqlSyntax;
             SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
             _factory = factory;
             _logger = logger;
+            _configured = true;
         }
 
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
@@ -418,11 +442,22 @@ namespace Umbraco.Core
 
         internal void Initialize(string providerName)
         {
+            //only configure once!
+            if (_configured == true) return;
+
             _providerName = providerName;
 
             try
             {
-                SqlSyntax = SqlSyntaxProvidersResolver.Current.GetByProviderNameOrDefault(providerName);
+                if (_syntaxProviders != null)
+                {
+                    SqlSyntax = _syntaxProviders.GetByProviderNameOrDefault(providerName);    
+                }
+                else if (SqlSyntax == null)
+                {
+                    throw new InvalidOperationException("No " + typeof(ISqlSyntaxProvider) + " specified or no " + typeof(SqlSyntaxProviders) + " instance specified");
+                }
+                
                 SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
                 
                 _configured = true;

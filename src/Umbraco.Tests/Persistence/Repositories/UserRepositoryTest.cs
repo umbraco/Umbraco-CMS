@@ -35,23 +35,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
             userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository, CacheHelper.CreateDisabledCacheHelper());
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), userTypeRepository);
             return repository;
         }
 
-        [Test]
-        public void Can_Instantiate_Repository_From_Resolver()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-
-            // Assert
-            Assert.That(repository, Is.Not.Null);
-        }
 
         [Test]
         public void Can_Perform_Add_On_UserRepository()
@@ -188,14 +175,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
                 var id = user.Id;
 
-                var repository2 = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-                repository2.Delete(user);
-                unitOfWork.Commit();
+                using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger))
+                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo))
+                {
+                    repository2.Delete(user);
+                    unitOfWork.Commit();
 
-                var resolved = repository2.Get((int)id);
+                    var resolved = repository2.Get((int) id);
 
-                // Assert
-                Assert.That(resolved, Is.Null);
+                    // Assert
+                    Assert.That(resolved, Is.Null);
+                }
             }
         }
 
@@ -493,20 +483,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            
+            using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger))
+            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, utRepo))
+            { 
 
-            // Act
-            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
-            repository.AddOrUpdate(user1);
-            unitOfWork.Commit();
+                // Act
+                var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+                repository.AddOrUpdate(user1);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.AreEqual(3, user1.DefaultPermissions.Count());
-            Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
-            Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
-            Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
-
+                // Assert
+                Assert.AreEqual(3, user1.DefaultPermissions.Count());
+                Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
+                Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
+                Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
+            }
         }
 
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
@@ -543,11 +534,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userType = MockedUserType.CreateUserType();
-            repository.AddOrUpdate(userType);
-            unitOfWork.Commit();
-            return userType;
+            using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger))
+            {
+                var userType = MockedUserType.CreateUserType();
+                repository.AddOrUpdate(userType);
+                unitOfWork.Commit();
+                return userType;
+            }
         }
     }
 }

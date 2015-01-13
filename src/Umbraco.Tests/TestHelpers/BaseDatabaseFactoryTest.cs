@@ -73,13 +73,15 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName(),
                 Logger);
 
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
+
             _appContext = new ApplicationContext(
                 //assign the db context
-            new DatabaseContext(dbFactory, Logger, SqlSyntaxProvider),
+                new DatabaseContext(dbFactory, Logger, SqlSyntaxProvider, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-            new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
-            cacheHelper,
-            Logger)
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
+                cacheHelper,
+                Logger)
             {
                 IsReady = true
             };
@@ -101,7 +103,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual ISqlSyntaxProvider SqlSyntaxProvider
         {
-            get { return new SqlCeSyntaxProvider();}
+            get { return new SqlCeSyntaxProvider(); }
         }
 
         protected override void SetupApplicationContext()
@@ -131,7 +133,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";            
+            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";
         }
 
         /// <summary>
@@ -143,11 +145,11 @@ namespace Umbraco.Tests.TestHelpers
                 return;
 
             var path = TestHelper.CurrentAssemblyDirectory;
-            
+
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
             ConfigurationManager.AppSettings.Set(
-                Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 GetDbConnectionString());
 
             _dbPath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
@@ -159,7 +161,7 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             //if this is the first test in the session, always ensure a new db file is created
-            if (_isFirstRunInTestSession || File.Exists(_dbPath) == false 
+            if (_isFirstRunInTestSession || File.Exists(_dbPath) == false
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
@@ -185,10 +187,10 @@ namespace Umbraco.Tests.TestHelpers
                     else
                     {
                         var engine = new SqlCeEngine(settings.ConnectionString);
-                        engine.CreateDatabase();   
+                        engine.CreateDatabase();
                     }
                 }
-                
+
             }
 
         }
@@ -203,15 +205,6 @@ namespace Umbraco.Tests.TestHelpers
 
             DataTypesResolver.Current = new DataTypesResolver(
                 () => PluginManager.Current.ResolveDataTypes());
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),  //disable all repo caches for tests!
-                    Logger,
-                    SqlSyntaxProvider,
-                    SettingsForTests.GenerateMockSettings())); 
-
-            SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
 
             MappingResolver.Current = new MappingResolver(
                () => PluginManager.Current.ResolveAssignedMapperTypes());
@@ -238,7 +231,7 @@ namespace Umbraco.Tests.TestHelpers
             // - NewDbFileAndSchemaPerTest
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
-            if (_dbBytes == null && 
+            if (_dbBytes == null &&
                 (_isFirstRunInTestSession
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
@@ -253,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
                 CloseDbConnections();
 
                 _dbBytes = File.ReadAllBytes(_dbPath);
-            }            
+            }
         }
 
         [TestFixtureTearDown]
@@ -278,7 +271,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 SqlSyntaxContext.SqlSyntaxProvider = null;
             }
-            
+
             base.TearDown();
         }
 
@@ -343,15 +336,15 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-	    protected ServiceContext ServiceContext
-	    {
-		    get { return ApplicationContext.Services; }
-	    }
+        protected ServiceContext ServiceContext
+        {
+            get { return ApplicationContext.Services; }
+        }
 
-	    protected DatabaseContext DatabaseContext
-	    {
-		    get { return ApplicationContext.DatabaseContext; }
-	    }
+        protected DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {

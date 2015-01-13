@@ -1067,8 +1067,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-            using (RepositoryResolver.Current.ResolveByType<IMemberRepository>(uow))
+
+            using (var uow = provider.GetUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
             }

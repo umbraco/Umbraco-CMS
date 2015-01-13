@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository);
             return repository;
         }
 
@@ -203,20 +203,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Instantiate_Repository_From_Resolver()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-
-            // Assert
-            Assert.That(repository, Is.Not.Null);
-        }
-
-        [Test]
         public void Can_Perform_Add_On_ContentRepository()
         {
             // Arrange
@@ -304,35 +290,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         }
 
-        [Test]
-        public void Can_Perform_Multiple_Adds_On_ContentRepository_With_RepositoryResolver()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository contentTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
-            {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
-                Content textpage = MockedContent.CreateSimpleContent(contentType);
-
-                // Act
-                contentTypeRepository.AddOrUpdate(contentType);
-                repository.AddOrUpdate(textpage);
-                unitOfWork.Commit();
-
-                var repository2 = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-                Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-                repository2.AddOrUpdate(subpage);
-                unitOfWork.Commit();
-
-                // Assert
-                Assert.That(contentType.HasIdentity, Is.True);
-                Assert.That(textpage.HasIdentity, Is.True);
-                Assert.That(subpage.HasIdentity, Is.True);
-                Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
-            }
-        }
 
         [Test]
         public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
@@ -394,11 +351,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
                 var id = content.Id;
 
-                var repository2 = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-                repository2.Delete(content);
+                repository.Delete(content);
                 unitOfWork.Commit();
 
-                var content1 = repository2.Get(id);
+                var content1 = repository.Get(id);
 
                 // Assert
                 Assert.That(content1, Is.Null);

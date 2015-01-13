@@ -1115,6 +1115,8 @@ namespace Umbraco.Core.Services
 
         private IMediaType FindMediaTypeByAlias(string mediaTypeAlias)
         {
+            Mandate.ParameterNotNullOrEmpty(mediaTypeAlias, "mediaTypeAlias");
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
             {

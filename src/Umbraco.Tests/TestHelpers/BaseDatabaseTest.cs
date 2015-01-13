@@ -59,28 +59,19 @@ namespace Umbraco.Tests.TestHelpers
                     throw;
                 }
             
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),//disable all repo caches for tests!
-                    Logger,
-                    SyntaxProvider,
-                    Mock.Of<IUmbracoSettingsSection>()));  
-
-            SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
-
             Resolution.Freeze();
 
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
             var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
-
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger);
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger)),
+                new DatabaseContext(dbFactory, logger, SqlSyntaxProviders.CreateDefault(logger)),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),
                 cacheHelper,
                 logger)
                 {
@@ -110,8 +101,6 @@ namespace Umbraco.Tests.TestHelpers
 
             //reset the app context
             ApplicationContext.Current = null;
-
-            RepositoryResolver.Reset();
         }
     }
 }

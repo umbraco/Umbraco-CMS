@@ -36,23 +36,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Instantiate_Repository_From_Resolver()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = RepositoryResolver.Current.ResolveByType<ITemplateRepository>(unitOfWork))
-            {
-
-                // Assert
-                Assert.That(repository, Is.Not.Null);
-            }
-
-        }
-
-        [Test]
         public void Can_Instantiate_Repository()
         {
             // Arrange
@@ -433,7 +416,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
                 var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), templateRepository);
-                var contentRepo = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+                var contentRepo = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), contentTypeRepository, templateRepository, tagRepository);
 
                 using (contentRepo)
                 {

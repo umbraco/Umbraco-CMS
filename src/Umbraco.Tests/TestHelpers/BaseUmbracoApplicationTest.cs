@@ -43,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers
             using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init", "init"))
             {
                 TestHelper.InitializeContentDirectories();
-                
+
                 InitializeLegacyMappingsForCoreEditors();
 
                 SetupPluginManager();
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 FreezeResolution();
             }
-            
+
         }
 
         [TearDown]
@@ -73,12 +73,12 @@ namespace Umbraco.Tests.TestHelpers
                 //reset the app context, this should reset most things that require resetting like ALL resolvers
                 ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
                 ApplicationContext.Current = null;
-                ResetPluginManager();                
+                ResetPluginManager();
             }
-            
+
         }
-        
-        private static readonly object Locker = new object();        
+
+        private static readonly object Locker = new object();
 
         private static void InitializeLegacyMappingsForCoreEditors()
         {
@@ -89,9 +89,9 @@ namespace Umbraco.Tests.TestHelpers
                     //Create the legacy prop-eds mapping
                     LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
                 }
-            }         
+            }
         }
-        
+
         /// <summary>
         /// If this class requires auto-mapper mapping initialization then init them
         /// </summary>
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.TestHelpers
                     {
                         mapper.ConfigureMappings(configuration, ApplicationContext);
                     }
-                });      
+                });
             }
         }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (PluginManagerResetRequired)
             {
-                PluginManager.Current = null;    
+                PluginManager.Current = null;
             }
         }
 
@@ -148,12 +148,15 @@ namespace Umbraco.Tests.TestHelpers
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
+            var sqlSyntax = new SqlCeSyntaxProvider();
+            var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger), 
-                    Logger, new SqlCeSyntaxProvider()),
+                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
+                    Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
                 cacheHelper,
                 Logger)
             {

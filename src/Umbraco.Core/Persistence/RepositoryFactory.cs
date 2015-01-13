@@ -79,8 +79,10 @@ namespace Umbraco.Core.Persistence
                 _logger,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
-                CreateTagRepository(uow),
-                _cacheHelper) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateTagRepository(uow))
+            {
+                EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming
+            };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
@@ -172,7 +174,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
-            return new StylesheetRepository(uow, db);
+            return new StylesheetRepository(uow, db, new PhysicalFileSystem(SystemDirectories.Css));
         }
 
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
@@ -209,8 +211,7 @@ namespace Umbraco.Core.Persistence
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
                 _logger,
-                CreateUserTypeRepository(uow),
-                _cacheHelper);
+                CreateUserTypeRepository(uow));
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)

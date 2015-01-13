@@ -75,8 +75,17 @@ namespace Umbraco.Core
             //create database and service contexts for the app context
             var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, LoggerResolver.Current.Logger);
             Database.Mapper = new PetaPocoMapper();
-            var dbContext = new DatabaseContext(dbFactory, LoggerResolver.Current.Logger);
+
+            var dbContext = new DatabaseContext(
+                dbFactory,
+                LoggerResolver.Current.Logger,
+                SqlSyntaxProviders.CreateDefault(LoggerResolver.Current.Logger));
+
+            //initialize the DatabaseContext
+            dbContext.Initialize();
+            
             var serviceContext = new ServiceContext(
+                new RepositoryFactory(ApplicationCache, LoggerResolver.Current.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()), 
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),
                 new PublishingStrategy(),
@@ -89,8 +98,7 @@ namespace Umbraco.Core
 
             InitializeResolvers();
 
-            //initialize the DatabaseContext
-            dbContext.Initialize();
+            
 
             InitializeModelMappers();
 
@@ -300,14 +308,10 @@ namespace Umbraco.Core
             MappingResolver.Current = new MappingResolver(
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(ApplicationCache));
+           
 
-            SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                new[] { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) })
-                {
-                    CanResolveBeforeFrozen = true
-                };
+            //RepositoryResolver.Current = new RepositoryResolver(
+            //    new RepositoryFactory(ApplicationCache));
 
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
                 () => PluginManager.Current.ResolveCacheRefreshers());

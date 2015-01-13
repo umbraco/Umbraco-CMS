@@ -44,24 +44,21 @@ namespace Umbraco.Tests.Persistence
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(),
-                _logger,
-                new SqlCeSyntaxProvider(),
-                Mock.Of<IUmbracoSettingsSection>()));
-
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
 
             var dbContext = new DatabaseContext(
-                new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, _logger), 
-                _logger, SqlSyntaxProvider);
+                new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, _logger),
+                _logger, SqlSyntaxProvider, "System.Data.SqlServerCe.4.0");
+
+            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
                 cacheHelper,
                 new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))))
                 {
@@ -79,7 +76,8 @@ namespace Umbraco.Tests.Persistence
             //reset the app context
             ApplicationContext.Current = null;
 
-            RepositoryResolver.Reset();
+            Resolution.Reset();
+            //RepositoryResolver.Reset();
         }
 
         
