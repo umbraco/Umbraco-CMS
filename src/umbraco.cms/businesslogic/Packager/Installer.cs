@@ -279,7 +279,7 @@ namespace umbraco.cms.businesslogic.packager
                 if (_currentUserId > -1)
                 {
                     Audit.Add(AuditTypes.PackagerInstall,
-                                            string.Format("Package '{0}' files installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
+                                            string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
                                             _currentUserId, -1);
                 }
 
