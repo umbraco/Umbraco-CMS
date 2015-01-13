@@ -286,7 +286,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public int GetUserId()
         {
-            var identity = _httpContext.GetCurrentIdentity(true);
+            var identity = _httpContext.GetCurrentIdentity(false);
             if (identity == null)
                 return -1;
             return Convert.ToInt32(identity.Id);
@@ -298,7 +298,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public string GetSessionId()
         {
-            var identity = _httpContext.GetCurrentIdentity(true);
+            var identity = _httpContext.GetCurrentIdentity(false);
             if (identity == null)
                 return null;
             return identity.SessionId;

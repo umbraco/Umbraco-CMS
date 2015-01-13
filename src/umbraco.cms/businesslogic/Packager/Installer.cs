@@ -6,6 +6,7 @@ using System.Xml;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Packaging;
@@ -42,6 +43,8 @@ namespace umbraco.cms.businesslogic.packager
         private readonly Dictionary<string, string> _conflictingStyleSheetNames = new Dictionary<string, string>();
 
         private readonly List<string> _binaryFileErrors = new List<string>();
+        private int _currentUserId = -1;
+
 
         public string Name { get; private set; }
         public string Version { get; private set; }
@@ -93,6 +96,17 @@ namespace umbraco.cms.businesslogic.packager
         /// Constructor
         /// </summary>
         public Installer()
+        {
+            initialize();
+        }
+
+        public Installer(int currentUserId)
+        {
+            initialize();
+            _currentUserId = currentUserId;
+        }
+
+        private void initialize()
         {
             ContainsBinaryFileErrors = false;
             ContainsTemplateConflicts = false;
@@ -253,11 +267,20 @@ namespace umbraco.cms.businesslogic.packager
 
                         //PPH log file install
                         insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+
                     }
                     catch (Exception ex)
                     {
                         LogHelper.Error<Installer>("Package install error", ex);
                     }
+                }
+
+                // log that a user has install files
+                if (_currentUserId > -1)
+                {
+                    Audit.Add(AuditTypes.PackagerInstall,
+                                            string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
+                                            _currentUserId, -1);
                 }
 
                 insPack.Save();

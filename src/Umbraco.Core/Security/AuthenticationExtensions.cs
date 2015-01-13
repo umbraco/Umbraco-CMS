@@ -78,7 +78,8 @@ namespace Umbraco.Core.Security
         /// <param name="http"></param>
         /// <param name="authenticateRequestIfNotFound"> 
         /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
-        /// request just as is done in the Umbraco module and then set the current identity if it is valid
+        /// request just as is done in the Umbraco module and then set the current identity if it is valid.
+        /// Just like in the UmbracoModule, if this is true then the user's culture will be assigned to the request.
         /// </param>
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null

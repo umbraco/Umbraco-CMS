@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
 
         public PartialViewMacroRepository(IUnitOfWork work)
-            : this(work, new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/")/*, macroRepository*/)
+            : this(work, new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/"))
         {
         }
 
