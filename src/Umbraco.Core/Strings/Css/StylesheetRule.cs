@@ -4,15 +4,8 @@ using System.Text;
 
 namespace Umbraco.Core.Strings.Css
 {
-    public class StylesheetRule
+    internal class StylesheetRule
     {
-        public StylesheetRule()
-        { }
-
-        //public HiveId StylesheetId { get; set; }
-
-        //public HiveId RuleId { get; set; }
-
         public string Name { get; set; }
 
         public string Selector { get; set; }
@@ -22,11 +15,13 @@ namespace Umbraco.Core.Strings.Css
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("/*" + Environment.NewLine);
-            sb.AppendFormat("   Name: {0}" + Environment.NewLine, Name);
-            sb.Append("*/" + Environment.NewLine);
-            sb.AppendFormat("{0} {{" + Environment.NewLine, Selector);
-            sb.Append(string.Join(Environment.NewLine, string.IsNullOrWhiteSpace(Styles) == false ? string.Join(Environment.NewLine, Styles.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None).Select(x => "\t" + x)) + Environment.NewLine : ""));
+            sb.Append("/**");
+            sb.AppendFormat("umb_name:{0}", Name);
+            sb.Append("*/");
+            sb.Append(Environment.NewLine);
+            sb.Append(Selector);
+            sb.Append("{");
+            sb.Append(Styles.IsNullOrWhiteSpace() ? "" : Styles.Trim());
             sb.Append("}");
 
             return sb.ToString();

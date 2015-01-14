@@ -320,7 +320,6 @@
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggerResolver.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
-    <Compile Include="Strings\Css\ReadFilter.cs" />
     <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />
     <Compile Include="Persistence\Repositories\SimpleGetRepository.cs" />
@@ -453,14 +452,7 @@
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentOrderedSet.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentSet.cs" />
-    <Compile Include="Strings\Css\CssOptions.cs" />
-    <Compile Include="Strings\Css\CssParser.cs" />
-    <Compile Include="Strings\Css\CssSyntax.cs" />
-    <Compile Include="Strings\Css\FilterTrie.cs" />
-    <Compile Include="Strings\Css\LineReader.cs" />
-    <Compile Include="Strings\Css\ParseException.cs" />
     <Compile Include="Strings\Css\StylesheetRule.cs" />
-    <Compile Include="Strings\Css\TrieNode.cs" />
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
     <Compile Include="Models\Editors\ContentPropertyData.cs" />

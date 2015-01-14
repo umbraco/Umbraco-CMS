@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Add_On_StylesheetRepository()
+        public void Can_Perform_Add()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
@@ -64,31 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Read_Properties_Of_Stylesheet()
-        {
-            // Arrange
-            var provider = new FileUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
-
-            using (var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem))
-            {
-                var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;} /* Name: Test */ p { font-size: 1em; }" };
-                repository.AddOrUpdate(stylesheet);
-                unitOfWork.Commit();
-
-                //re-get
-                stylesheet = repository.Get(stylesheet.Name);
-                var props = stylesheet.Properties;
-
-
-            }
-
-            
-        }
-
-        [Test]
-        public void Can_Perform_Update_On_StylesheetRepository()
+        public void Can_Perform_Update()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
@@ -116,7 +92,38 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Delete_On_StylesheetRepository()
+        public void Can_Perform_Update_With_Property()
+        {
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+
+            // Act
+            var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+            dbUnitOfWork.Commit();
+
+            stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
+
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+
+            //re-get
+            stylesheet = repository.Get(stylesheet.Name);
+
+            //Assert           
+            Assert.That(stylesheet.Content, Is.EqualTo(@"body { color:#000; } .bold {font-weight:bold;}
+
+/**umb_name:Test*/
+p{font-size:2em;}"));
+            Assert.AreEqual(1, stylesheet.Properties.Count());
+        }
+
+        [Test]
+        public void Can_Perform_Delete()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
@@ -137,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Get_On_StylesheetRepository()
+        public void Can_Perform_Get()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
@@ -156,7 +163,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_GetAll_On_StylesheetRepository()
+        public void Can_Perform_GetAll()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
@@ -180,7 +187,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_GetAll_With_Params_On_StylesheetRepository()
+        public void Can_Perform_GetAll_With_Params()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
@@ -204,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Exists_On_StylesheetRepository()
+        public void Can_Perform_Exists()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();

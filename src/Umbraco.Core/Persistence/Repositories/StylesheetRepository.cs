@@ -130,10 +130,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var dirs = SystemDirectories.Css;
 
             //Validate file
-            var validFile = IOHelper.VerifyEditPath(stylesheet.Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(stylesheet.VirtualPath, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(stylesheet.Path, new List<string> { "css" });
+            var validExtension = IOHelper.VerifyFileExtension(stylesheet.VirtualPath, new List<string> { "css" });
 
             var fileValid = validFile && validExtension;
 

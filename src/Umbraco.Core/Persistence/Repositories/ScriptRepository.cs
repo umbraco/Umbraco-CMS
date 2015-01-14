@@ -105,10 +105,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 dirs += "," + SystemDirectories.MvcViews;*/
 
             //Validate file
-            var validFile = IOHelper.VerifyEditPath(script.Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(script.VirtualPath, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(script.Path, exts);
+            var validExtension = IOHelper.VerifyFileExtension(script.VirtualPath, exts);
 
             return validFile && validExtension;
         }
