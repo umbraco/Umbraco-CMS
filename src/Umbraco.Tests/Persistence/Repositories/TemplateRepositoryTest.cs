@@ -26,10 +26,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private IFileSystem _masterPageFileSystem;
         private IFileSystem _viewsFileSystem;
 
-        private ITemplateRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private ITemplateRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, ITemplatesSection templatesSection = null)
         {
             return new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntaxProvider, _masterPageFileSystem, _viewsFileSystem,
-                Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
+                templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
         }
 
         [SetUp]
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms)))
             {
                 // Act
                 var template = new Template("test", "test");
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms)))
             {
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
