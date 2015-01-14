@@ -19,12 +19,12 @@
                            ng-class="{last:$last, selected:section==currentSection}"
                            ng-repeat="section in currentLayout.sections"
                            ng-click="configureSection(section, currentLayout)"
-                           style="width:{{ percentage(section.grid) }}%">
+                           ng-style="{width: percentage(section.grid) +'%'}">
                         </a>
 
                         <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
                            ng-click="configureSection(undefined, currentLayout)"
-                           style="width:{{ percentage(availableLayoutSpace) }}%">
+                           ng-style="{width: percentage(availableLayoutSpace) + '%'}">
                             <i class="icon icon-add"></i>
                         </a>
 
