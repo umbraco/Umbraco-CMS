@@ -76,14 +76,7 @@ namespace umbraco.cms.businesslogic.web
                 //}
                 //return _properties;
 
-                var tmp = this.ChildrenOfAllObjectTypes;
-                var retVal = new StylesheetProperty[tmp.Length];
-                for (var i = 0; i < tmp.Length; i++)
-                {
-                    //So this will go get cached properties but yet the above call to ChildrenOfAllObjectTypes is not cached :/
-                    retVal[i] = StylesheetProperty.GetStyleSheetProperty(tmp[i].Id);
-                }
-                return retVal;
+                return StylesheetItem.Properties.Select(x => new StylesheetProperty(StylesheetItem, x)).ToArray();
             }
         }
 

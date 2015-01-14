@@ -72,6 +72,8 @@
 			/// </summary>
 			public const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
 
+            internal const string StylesheetProperty = "5555da4f-a123-42b2-4488-dcdfb25e4111";
+
 			/// <summary>
 			/// Guid for the System Root.
 			/// </summary>

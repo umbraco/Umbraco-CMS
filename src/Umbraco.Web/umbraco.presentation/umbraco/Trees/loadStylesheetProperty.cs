@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Web;
@@ -43,8 +44,8 @@ namespace umbraco
         {
             Javascript.Append(
                 @"
-			function openStylesheetProperty(id) {
-				UmbClientMgr.contentFrame('settings/stylesheet/property/editStylesheetProperty.aspx?id=' + id);
+			function openStylesheetProperty(name, prop) {
+				UmbClientMgr.contentFrame('settings/stylesheet/property/editStylesheetProperty.aspx?name=' + name + '&prop=' + prop);
 			}
 			");
         }
@@ -56,9 +57,9 @@ namespace umbraco
             foreach (StylesheetProperty n in sn.Properties)
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = n.Id.ToString();
+                xNode.NodeID = sn.Text + "_" + n.Text; //n.Id.ToString(CultureInfo.InvariantCulture);
                 xNode.Text = n.Text;
-                xNode.Action = "javascript:openStylesheetProperty(" + n.Id + ");";
+                xNode.Action = "javascript:openStylesheetProperty('" + sn.Text + "','" + n.Text + "');";
                 xNode.Icon = "icon-brackets";
                 xNode.OpenIcon = "icon-brackets";
 

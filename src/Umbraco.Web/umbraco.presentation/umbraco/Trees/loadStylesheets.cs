@@ -31,7 +31,7 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "stylesheets", "Stylesheets")]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, "Stylesheets")]
 	public class loadStylesheets : BaseTree
 	{
         public loadStylesheets(string application) : base(application) { }
@@ -65,7 +65,7 @@ namespace umbraco
             foreach (StyleSheet n in StyleSheet.GetAll().Where(x => x.Id > 0))
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = n.Id.ToString(CultureInfo.InvariantCulture);
+                xNode.NodeID = n.Text; //n.Id.ToString(CultureInfo.InvariantCulture);
                 xNode.Text = n.Text;
                 xNode.Action = "javascript:openStylesheet(" + n.Id + ");";
                 loadStylesheetProperty styleSheetPropertyTree = new loadStylesheetProperty(this.app);

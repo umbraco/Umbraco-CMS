@@ -11,20 +11,18 @@ namespace umbraco.cms.businesslogic.web
     [Obsolete("Do not use this, use the Umbraco.Core.Services.IFileService instead to manipulate stylesheets")]
     public class StylesheetProperty : CMSNode
     {
-        private string _alias;
-        private string _value;
+     
+        internal Umbraco.Core.Models.Stylesheet StylesheetItem;
+        internal Umbraco.Core.Models.StylesheetProperty StylesheetProp;
 
-        private Umbraco.Core.Models.Stylesheet _stylesheetItem;
-        private Umbraco.Core.Models.StylesheetProperty _stylesheetProp;
+        private static readonly Guid ModuleObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty);
 
-        private static readonly Guid ModuleObjectType = new Guid("5555da4f-a123-42b2-4488-dcdfb25e4111");
-
-        //internal StylesheetProperty(Umbraco.Core.Models.StylesheetProperty stylesheetProperty)
-        //    : base(int.MaxValue, true)
-        //{
-        //    if (stylesheetProperty == null) throw new ArgumentNullException("stylesheetProperty");
-        //    _stylesheetProperty = stylesheetProperty;
-        //}
+        internal StylesheetProperty(Umbraco.Core.Models.Stylesheet sheet, Umbraco.Core.Models.StylesheetProperty prop)
+            : base(int.MaxValue, true)
+        {
+            StylesheetItem = sheet;
+            StylesheetProp = prop;
+        }
 
         public StylesheetProperty(int id) : base(id)
         {
@@ -44,15 +42,18 @@ namespace umbraco.cms.businesslogic.web
             var foundProp = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<dynamic>(
                 "SELECT parentID FROM cmsStylesheetProperty INNER JOIN umbracoNode ON cmsStylesheetProperty.nodeId = umbracoNode.id WHERE nodeId = @id", new {id = Id});
 
+            if (foundProp == null) throw new ArgumentException(string.Format("No stylesheet property exists with an id '{0}'", Id));
+
             var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<StylesheetDto>(
                 "WHERE nodeId = @id", new {id = foundProp.parentID});
 
             if (found == null) throw new ArgumentException(string.Format("No stylesheet exists with a property with id '{0}'", Id));
 
-            _stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
-            if (_stylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
+            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
 
-            _stylesheetProp = _stylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
+            StylesheetProp = StylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
+            if (StylesheetProp == null) throw new ArgumentException(string.Format("No stylesheet property exists with alias {0}", foundProp.stylesheetPropertyAlias));
         }
 
         //private  void InitProperty() 
@@ -70,32 +71,52 @@ namespace umbraco.cms.businesslogic.web
 
         public StyleSheet StyleSheet() 
         {
-            return new StyleSheet(_stylesheetItem);
+            return new StyleSheet(StylesheetItem);
         }
 
         public void RefreshFromFile()
         {
-            var name = _stylesheetItem.Name;
-            _stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name);
-            if (_stylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}'", name));
+            var name = StylesheetItem.Name;
+            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name);
+            if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}'", name));
 
-            _stylesheetProp = _stylesheetItem.Properties.FirstOrDefault(x => x.Alias == _stylesheetProp.Alias);
+            StylesheetProp = StylesheetItem.Properties.FirstOrDefault(x => x.Alias == StylesheetProp.Alias);
 
             // ping the stylesheet
             //var ss = new StyleSheet(this.Parent.Id);
             //InitProperty();
         }
 
+        /// <summary>
+        /// Human readable name/label
+        /// </summary>
+        public override string Text
+        {
+            get { return StylesheetProp.Name; }
+            set
+            {
+                //Changing the name requires removing the current property and then adding another new one
+
+                if (StylesheetProp.Name != value)
+                {
+                    StylesheetItem.RemoveProperty(StylesheetProp.Name);
+                    var newProp = new Umbraco.Core.Models.StylesheetProperty(value, StylesheetProp.Alias, StylesheetProp.Value);
+                    StylesheetItem.AddProperty(newProp);
+                    StylesheetProp = newProp;
+                }
+            }
+        }
+
         public string Alias 
         {
             get
             {
-                return _stylesheetProp.Alias;
+                return StylesheetProp.Alias;
                 //return _alias;
             }
             set
             {
-                _stylesheetProp.Alias = value;
+                StylesheetProp.Alias = value;
                 //SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyAlias = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
                 //_alias=value;
 
@@ -107,12 +128,12 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                return _stylesheetProp.Value;
+                return StylesheetProp.Value;
                 //return _value;
             }
             set
             {
-                _stylesheetProp.Value = value;
+                StylesheetProp.Value = value;
                 //SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyValue = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
                 //_value = value;
 
@@ -122,11 +143,16 @@ namespace umbraco.cms.businesslogic.web
 
         public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, BusinessLogic.User user)
         {
-            //sheet.StylesheetItem.Properties
+            //we need to create it with a temp place holder!
+            var prop = new Umbraco.Core.Models.StylesheetProperty(Text, "#" + Text.ToSafeAlias(), "");
+            sheet.StylesheetItem.AddProperty(prop);
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet.StylesheetItem);
 
+            //NOTE: Only for backward compatibility do we create data in the db!
             var newNode = CMSNode.MakeNew(sheet.Id, ModuleObjectType, user.Id, 2, Text, Guid.NewGuid());
             SqlHelper.ExecuteNonQuery(String.Format("Insert into cmsStylesheetProperty (nodeId,stylesheetPropertyAlias,stylesheetPropertyValue) values ('{0}','{1}','')", newNode.Id, Text));
-            var ssp = new StylesheetProperty(newNode.Id);
+
+            var ssp = new StylesheetProperty(sheet.StylesheetItem, prop);
             var e = new NewEventArgs();
             ssp.OnNew(e);
             return ssp;
@@ -139,8 +165,10 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel) 
             {
-                SqlHelper.ExecuteNonQuery("delete from cmsStylesheetProperty where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-                base.delete();
+                
+                StylesheetItem.RemoveProperty(Text);
+                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
+
                 FireAfterDelete(e);
             }
         }
@@ -152,7 +180,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                base.Save();
+                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
 
                 FireAfterSave(e);
             }
@@ -166,45 +194,49 @@ namespace umbraco.cms.businesslogic.web
 
         public static StylesheetProperty GetStyleSheetProperty(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                GetCacheKey(id),
-                TimeSpan.FromMinutes(30), () =>
-                    {
-                        try
-                        {
-                            return new StylesheetProperty(id);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    });
+            var foundProp = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<dynamic>(
+               "SELECT parentID FROM cmsStylesheetProperty INNER JOIN umbracoNode ON cmsStylesheetProperty.nodeId = umbracoNode.id WHERE nodeId = @id", new { id = id });
+
+            if (foundProp == null) return null;
+
+            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "SELECT filename FROM cmsStylesheet WHERE nodeId = @id", new { id = foundProp.parentID });
+
+            if (found == null) return null;
+
+            var stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            if (stylesheetItem == null) return null;
+
+            var stylesheetProp = stylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
+            if (stylesheetProp == null) return null;
+
+            return new StylesheetProperty(stylesheetItem, stylesheetProp);
         }
 
-        [Obsolete("Umbraco automatically refreshes the cache when stylesheets and stylesheet properties are saved or deleted")]
-        private void InvalidateCache()
-        {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));            
-        }
+        //[Obsolete("Umbraco automatically refreshes the cache when stylesheets and stylesheet properties are saved or deleted")]
+        //private void InvalidateCache()
+        //{
+        //    ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));            
+        //}
 
-        private static string GetCacheKey(int id)
-        {
-            return CacheKeys.StylesheetPropertyCacheKey + id;
-        }
+        //private static string GetCacheKey(int id)
+        //{
+        //    return CacheKeys.StylesheetPropertyCacheKey + id;
+        //}
 
         // EVENTS
         /// <summary>
         /// The save event handler
         /// </summary>
-        new public delegate void SaveEventHandler(StylesheetProperty sender, SaveEventArgs e);
+        public delegate void SaveEventHandler(StylesheetProperty sender, SaveEventArgs e);
         /// <summary>
         /// The new event handler
         /// </summary>
-        new public delegate void NewEventHandler(StylesheetProperty sender, NewEventArgs e);
+        public delegate void NewEventHandler(StylesheetProperty sender, NewEventArgs e);
         /// <summary>
         /// The delete event handler
         /// </summary>
-        new public delegate void DeleteEventHandler(StylesheetProperty sender, DeleteEventArgs e);
+        public delegate void DeleteEventHandler(StylesheetProperty sender, DeleteEventArgs e);
 
 
         /// <summary>

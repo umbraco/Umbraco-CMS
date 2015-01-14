@@ -78,7 +78,7 @@
 			/// </summary>
 			public const string Dictionary = "dictionary";
 
-            
+            public const string Stylesheets = "stylesheets";
 
             /// <summary>
             /// alias for the template tree.

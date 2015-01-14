@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _dbwork = db;
         }
-        
+
         #region Overrides of FileRepository<string,Stylesheet>
 
         public override Stylesheet Get(string id)
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string content;
 
             using (var stream = FileSystem.OpenFile(id))
-            using(var reader = new StreamReader(stream, Encoding.UTF8))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 content = reader.ReadToEnd();
             }
@@ -152,6 +152,27 @@ namespace Umbraco.Core.Persistence.Repositories
             //return !parser.Errors.Any() && fileValid;
 
             return fileValid;
+        }
+
+        protected override void PersistDeletedItem(Stylesheet entity)
+        {
+            //find any stylesheet props in the db - this is legacy!! we don't really care about the db but we'll try to keep it tidy
+            var props = _dbwork.Database.Fetch<StylesheetPropertyDto>(
+                new Sql().Select("cmsStylesheetProperty.*")
+                    .From("cmsStylesheetProperty")
+                    .InnerJoin("umbracoNode")
+                    .On("cmsStylesheetProperty.nodeId = umbracoNode.id")
+                    .Where("umbracoNode.parentID = @id", new { Id = entity.Id }));
+
+            foreach (var prop in props)
+            {
+                _dbwork.Database.Execute("DELETE FROM cmsStylesheetProperty WHERE nodeId = @Id", new { Id = prop.NodeId });
+                _dbwork.Database.Execute("DELETE FROM umbracoNode WHERE nodeId = @Id AND nodeObjectType = @NodeObjectType", new { Id = prop.NodeId, NodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
+            }
+            _dbwork.Database.Execute("DELETE FROM cmsStylesheet WHERE nodeId = @Id", new { Id = entity.Id });
+            _dbwork.Database.Execute("DELETE FROM umbracoNode WHERE id = @Id AND nodeObjectType = @NodeObjectType", new { Id = entity.Id, NodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });
+
+            base.PersistDeletedItem(entity);
         }
 
         #endregion

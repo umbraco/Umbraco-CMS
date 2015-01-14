@@ -65,7 +65,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
-                    .SyncTree("-1,init," + Request.GetItemAsString("id"), false);
+                    .SyncTree("-1,init," + stylesheet.Text, false);
             }
         }
 

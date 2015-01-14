@@ -3,11 +3,15 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
+using System.Web.Services.Description;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
 
@@ -29,8 +33,27 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            _stylesheetproperty = new businesslogic.web.StylesheetProperty(int.Parse(Request.QueryString["id"]));
+            //NOTE: Check for id for legacy reasons
+            if (Request.QueryString.ContainsKey("id"))
+            {
+                int propId;
+                if (int.TryParse(Request.QueryString["id"], out propId))
+                {
+                    _stylesheetproperty = new businesslogic.web.StylesheetProperty(propId);
+                }
+            }
+            else
+            {
+                var byName = Services.FileService.GetStylesheetByName(Request.QueryString["name"] + ".css");
+                if (byName == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["name"]);
+                var prop = byName.Properties.FirstOrDefault(x => x.Name == Request.QueryString["prop"]);
+                if (prop == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
+                _stylesheetproperty = new StylesheetProperty(byName, prop);
+            }
+
             Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
+
+            var nodePath = string.Format("-1,init,{0},{0}_{1}", _stylesheetproperty.StylesheetItem.Alias, _stylesheetproperty.StylesheetProp.Name);
 
             if (IsPostBack == false)
             {
@@ -40,15 +63,15 @@ namespace umbraco.cms.presentation.settings.stylesheet
                 AliasTxt.Text = _stylesheetproperty.Alias;
 
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheetProperty>().Tree.Alias)
-                    .SyncTree(Request.GetItemAsString("id"), false);
+                    .SetActiveTreeType(Constants.Trees.Stylesheets)
+                    .SyncTree(nodePath, false);
             }
             else
             {
                 //true = force reload from server on post back
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheetProperty>().Tree.Alias)
-                    .SyncTree(Request.GetItemAsString("id"), true);
+                    .SetActiveTreeType(Constants.Trees.Stylesheets)
+                    .SyncTree(nodePath, true);
             }
 
             
@@ -80,7 +103,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _stylesheetproperty.Text = NameTxt.Text;
             _stylesheetproperty.Alias = AliasTxt.Text;
 
-            _stylesheetproperty.StyleSheet().saveCssToFile();
+            //_stylesheetproperty.StyleSheet().saveCssToFile();
 
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
             SetupPreView();

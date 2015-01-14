@@ -1,6 +1,8 @@
 using System;
 using System.Data;
+using System.Linq;
 using System.Web.Security;
+using System.Windows.Forms;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -15,25 +17,25 @@ namespace umbraco
 
         public override bool PerformSave()
         {
-            try
-            {
-                var s = new cms.businesslogic.web.StyleSheet(ParentID);
-                var id = s.AddProperty(Alias, User).Id;
-                _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}", id);
-            }
-            catch
-            {
-                throw new ArgumentException("DER ER SKET EN FEJL MED AT OPRETTE NOGET MED ET PARENT ID : " + ParentID);
-            }
+            var s = new cms.businesslogic.web.StyleSheet(ParentID);
+            var prop = s.AddProperty(Alias, User);
+            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?name={0}&prop={1}", s.Text, prop.Text);
             return true;
         }
 
         public override bool PerformDelete()
         {
-            var sp = new cms.businesslogic.web.StylesheetProperty(ParentID);
-            var s = sp.StyleSheet();
-            s.saveCssToFile();
-            sp.delete();
+            var parts = Alias.Split('_');
+
+            var stylesheet = Umbraco.Core.ApplicationContext.Current.Services.FileService.GetStylesheetByName(parts[0] + ".css");
+            if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name: " + parts[0]);
+
+            var prop = stylesheet.Properties.FirstOrDefault(x => x.Name == parts[1]);
+            if (prop == null) throw new InvalidOperationException("No stylesheet property found by name: " + parts[1]);
+
+            stylesheet.RemoveProperty(prop.Name);
+
+            Umbraco.Core.ApplicationContext.Current.Services.FileService.SaveStylesheet(stylesheet);
 
             return true;
         }
