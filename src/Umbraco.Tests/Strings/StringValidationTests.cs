@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using NUnit.Framework;
 
-namespace Umbraco.Tests.CoreStrings
+namespace Umbraco.Tests.Strings
 {
     [TestFixture]
     public class StringValidationTests

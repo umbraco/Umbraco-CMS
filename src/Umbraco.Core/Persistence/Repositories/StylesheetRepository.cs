@@ -101,6 +101,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 paths.First(p => p.TrimEnd(".css").Replace("\\", "/") == x.Text)));
         }
 
+        //TODO: Get rid of N+1
+
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
@@ -121,6 +123,35 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return Get(file);
                 }
             }
+        }
+
+        public bool ValidateStylesheet(Stylesheet stylesheet)
+        {
+            var dirs = SystemDirectories.Css;
+
+            //Validate file
+            var validFile = IOHelper.VerifyEditPath(stylesheet.Path, dirs.Split(','));
+
+            //Validate extension
+            var validExtension = IOHelper.VerifyFileExtension(stylesheet.Path, new List<string> { "css" });
+
+            var fileValid = validFile && validExtension;
+
+            //var parser = new CssParser(stylesheet.Content);
+
+            //try
+            //{
+            //    var styleSheet = parser.StyleSheet;//Get stylesheet to invoke parsing
+            //}
+            //catch (Exception ex)
+            //{
+            //    //Log exception?
+            //    return false;
+            //}
+
+            //return !parser.Errors.Any() && fileValid;
+
+            return fileValid;
         }
 
         #endregion

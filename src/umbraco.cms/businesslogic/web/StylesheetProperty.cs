@@ -1,88 +1,129 @@
 using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using umbraco.cms.businesslogic.cache;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 
 namespace umbraco.cms.businesslogic.web
 {
+    [Obsolete("Do not use this, use the Umbraco.Core.Services.IFileService instead to manipulate stylesheets")]
     public class StylesheetProperty : CMSNode
     {
         private string _alias;
         private string _value;
 
-        private Umbraco.Core.Models.StylesheetProperty _stylesheetProperty;
+        private Umbraco.Core.Models.Stylesheet _stylesheetItem;
+        private Umbraco.Core.Models.StylesheetProperty _stylesheetProp;
 
         private static readonly Guid ModuleObjectType = new Guid("5555da4f-a123-42b2-4488-dcdfb25e4111");
 
-        internal StylesheetProperty(Umbraco.Core.Models.StylesheetProperty stylesheetProperty)
-            : base(int.MaxValue, true)
-        {
-            if (stylesheetProperty == null) throw new ArgumentNullException("stylesheetProperty");
-            _stylesheetProperty = stylesheetProperty;
-        }
+        //internal StylesheetProperty(Umbraco.Core.Models.StylesheetProperty stylesheetProperty)
+        //    : base(int.MaxValue, true)
+        //{
+        //    if (stylesheetProperty == null) throw new ArgumentNullException("stylesheetProperty");
+        //    _stylesheetProperty = stylesheetProperty;
+        //}
 
         public StylesheetProperty(int id) : base(id)
         {
-            InitProperty();
+            //InitProperty();
         }
 
         public StylesheetProperty(Guid id) : base(id)
         {
-            InitProperty();
+            //InitProperty();
         }
 
-        private  void InitProperty() 
+        /// <summary>
+        /// Sets up the internal data of the CMSNode, used by the various constructors
+        /// </summary>
+        protected override void setupNode()
         {
-            var dr = SqlHelper.ExecuteReader("Select stylesheetPropertyAlias,stylesheetPropertyValue from cmsStylesheetProperty where nodeId = " + this.Id);
-            if (dr.Read())
-            {
-                _alias = dr.GetString("stylesheetPropertyAlias");
-                _value = dr.GetString("stylesheetPropertyValue");
-            } 
-            else
-                throw new ArgumentException("NO DATA EXSISTS");
-            dr.Close();
+            var foundProp = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<dynamic>(
+                "SELECT parentID FROM cmsStylesheetProperty INNER JOIN umbracoNode ON cmsStylesheetProperty.nodeId = umbracoNode.id WHERE nodeId = @id", new {id = Id});
+
+            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<StylesheetDto>(
+                "WHERE nodeId = @id", new {id = foundProp.parentID});
+
+            if (found == null) throw new ArgumentException(string.Format("No stylesheet exists with a property with id '{0}'", Id));
+
+            _stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            if (_stylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
+
+            _stylesheetProp = _stylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
         }
+
+        //private  void InitProperty() 
+        //{
+        //    var dr = SqlHelper.ExecuteReader("Select stylesheetPropertyAlias,stylesheetPropertyValue from cmsStylesheetProperty where nodeId = " + this.Id);
+        //    if (dr.Read())
+        //    {
+        //        _alias = dr.GetString("stylesheetPropertyAlias");
+        //        _value = dr.GetString("stylesheetPropertyValue");
+        //    } 
+        //    else
+        //        throw new ArgumentException("NO DATA EXSISTS");
+        //    dr.Close();
+        //}
 
         public StyleSheet StyleSheet() 
         {
-            return new StyleSheet(this.Parent.Id, true, false);
+            return new StyleSheet(_stylesheetItem);
         }
 
-        public void RefreshFromFile() 
+        public void RefreshFromFile()
         {
+            var name = _stylesheetItem.Name;
+            _stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name);
+            if (_stylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}'", name));
+
+            _stylesheetProp = _stylesheetItem.Properties.FirstOrDefault(x => x.Alias == _stylesheetProp.Alias);
+
             // ping the stylesheet
-            var ss = new StyleSheet(this.Parent.Id);
-            InitProperty();
+            //var ss = new StyleSheet(this.Parent.Id);
+            //InitProperty();
         }
 
         public string Alias 
         {
-            get { return _alias; }
-            set 
+            get
             {
-                SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyAlias = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
-                _alias=value;
+                return _stylesheetProp.Alias;
+                //return _alias;
+            }
+            set
+            {
+                _stylesheetProp.Alias = value;
+                //SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyAlias = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
+                //_alias=value;
 
-                InvalidateCache();
+                //InvalidateCache();
             }
         }
 
         public string value 
         {
-            get { return _value; }
+            get
+            {
+                return _stylesheetProp.Value;
+                //return _value;
+            }
             set
             {
-                SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyValue = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
-                _value = value;
+                _stylesheetProp.Value = value;
+                //SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyValue = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
+                //_value = value;
 
-                InvalidateCache();
+                //InvalidateCache();
             }
         }
 
         public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, BusinessLogic.User user)
         {
+            //sheet.StylesheetItem.Properties
+
             var newNode = CMSNode.MakeNew(sheet.Id, ModuleObjectType, user.Id, 2, Text, Guid.NewGuid());
             SqlHelper.ExecuteNonQuery(String.Format("Insert into cmsStylesheetProperty (nodeId,stylesheetPropertyAlias,stylesheetPropertyValue) values ('{0}','{1}','')", newNode.Id, Text));
             var ssp = new StylesheetProperty(newNode.Id);

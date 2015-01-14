@@ -64,6 +64,30 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Read_Properties_Of_Stylesheet()
+        {
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork(Mock.Of<ILogger>());
+
+            using (var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem))
+            {
+                var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;} /* Name: Test */ p { font-size: 1em; }" };
+                repository.AddOrUpdate(stylesheet);
+                unitOfWork.Commit();
+
+                //re-get
+                stylesheet = repository.Get(stylesheet.Name);
+                var props = stylesheet.Properties;
+
+
+            }
+
+            
+        }
+
+        [Test]
         public void Can_Perform_Update_On_StylesheetRepository()
         {
             // Arrange
@@ -128,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(stylesheet, Is.Not.Null);
             Assert.That(stylesheet.HasIdentity, Is.True);
             Assert.That(stylesheet.Content, Is.EqualTo("body {background:#EE7600; color:#FFF;}"));
-            Assert.That(stylesheet.IsFileValidCss(), Is.True);
+            Assert.That(repository.ValidateStylesheet(stylesheet), Is.True);
         }
 
         [Test]

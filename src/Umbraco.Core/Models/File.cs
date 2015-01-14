@@ -97,11 +97,11 @@ namespace Umbraco.Core.Models
         /// </summary>
         public string VirtualPath { get; set; }
 
-        /// <summary>
-        /// Boolean indicating whether the file could be validated
-        /// </summary>
-        /// <returns>True if file is valid, otherwise false</returns>
-        public abstract bool IsValid();
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
+        public virtual bool IsValid()
+        {
+            return true;
+        }
 
         public override object DeepClone()
         {

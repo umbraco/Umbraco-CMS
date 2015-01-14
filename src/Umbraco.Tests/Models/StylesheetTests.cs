@@ -21,41 +21,61 @@ namespace Umbraco.Tests.Models
             Assert.That(stylesheet.Alias, Is.EqualTo("styles"));
         }
 
-        [Test]
-        public void Can_Validate_Stylesheet()
-        {
-            // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = @"body { color:#000; } .bold {font-weight:bold;}";
+        //[Test]
+        //public void Can_Validate_Stylesheet()
+        //{
+        //    // Arrange
+        //    var stylesheet = new Stylesheet("/css/styles.css");
+        //    stylesheet.Content = @"body { color:#000; } .bold {font-weight:bold;}";
 
-            // Assert
-            Assert.That(stylesheet.IsFileValidCss(), Is.True);
-            Assert.That(stylesheet.IsValid(), Is.True);
-        }
+        //    // Assert
+        //    Assert.That(stylesheet.IsFileValidCss(), Is.True);
+        //    Assert.That(stylesheet.IsValid(), Is.True);
+        //}
 
-        [Test]
-        public void Can_InValidate_Stylesheet()
-        {
-            // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = @"body { color:#000; } .bold font-weight:bold;}";
+        //[Test]
+        //public void Can_InValidate_Stylesheet()
+        //{
+        //    // Arrange
+        //    var stylesheet = new Stylesheet("/css/styles.css");
+        //    stylesheet.Content = @"body { color:#000; } .bold font-weight:bold;}";
 
-            // Assert
-            Assert.That(stylesheet.IsFileValidCss(), Is.False);
-            Assert.That(stylesheet.IsValid(), Is.True);
-        }
+        //    // Assert
+        //    Assert.That(stylesheet.IsFileValidCss(), Is.False);
+        //    Assert.That(stylesheet.IsValid(), Is.True);
+        //}
 
-        [Test]
-        public void Can_Validate_Css3_Stylesheet()
-        {
-            // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = "@media screen and (min-width: 768px) { body {background: red}}";
+        //[Test]
+        //public void Can_Validate_Css3_Stylesheet()
+        //{
+        //    // Arrange
+        //    var stylesheet = new Stylesheet("/css/styles.css");
+        //    stylesheet.Content = "@media screen and (min-width: 768px) { body {background: red}}";
 
-            // Assert
-            Assert.That(stylesheet.IsFileValidCss(), Is.True);
-            Assert.That(stylesheet.IsValid(), Is.True);
-        }
+        //    // Assert
+        //    Assert.That(stylesheet.IsFileValidCss(), Is.True);
+        //    Assert.That(stylesheet.IsValid(), Is.True);
+        //}
+
+//        [Test]
+//        public void Can_Verify_Mixed_Css_Css3_Property_From_Css()
+//        {
+//            // Arrange
+//            var stylesheet = new Stylesheet("/css/styles.css");
+//            stylesheet.Content = @"@media screen and (min-width: 600px) and (min-width: 900px) {
+//                                      .class {
+//                                        background: #666;
+//                                      }
+//                                    }";
+
+//            // Act
+//            var properties = stylesheet.Properties;
+
+//            // Assert
+//            Assert.That(stylesheet.IsFileValidCss(), Is.True);
+//            Assert.That(properties, Is.Not.Null);
+//            Assert.That(properties.Any(), Is.True);
+//        }
 
         [Test]
         public void Can_Get_Properties_From_Css()
@@ -109,26 +129,6 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(firstProperty, Is.True);
             Assert.That(secondProperty, Is.True);
-        }
-
-        [Test]
-        public void Can_Verify_Mixed_Css_Css3_Property_From_Css()
-        {
-            // Arrange
-            var stylesheet = new Stylesheet("/css/styles.css");
-            stylesheet.Content = @"@media screen and (min-width: 600px) and (min-width: 900px) {
-                                      .class {
-                                        background: #666;
-                                      }
-                                    }";
-
-            // Act
-            var properties = stylesheet.Properties;
-
-            // Assert
-            Assert.That(stylesheet.IsFileValidCss(), Is.True);
-            Assert.That(properties, Is.Not.Null);
-            Assert.That(properties.Any(), Is.True);
         }
 
         [Test]

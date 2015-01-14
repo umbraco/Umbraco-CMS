@@ -21,7 +21,7 @@ namespace umbraco.cms.businesslogic.web
     [Obsolete("Use Umbraco.Core.Services.IFileService instead")]
     public class StyleSheet : CMSNode
     {
-        private Stylesheet _stylesheetItem;
+        internal Stylesheet StylesheetItem;
 
         //private string _filename = "";
         //private string _content = "";
@@ -30,7 +30,12 @@ namespace umbraco.cms.businesslogic.web
 
         public string Filename
         {
-            get { return System.IO.Path.GetFileNameWithoutExtension(_stylesheetItem.Path); }
+            get
+            {
+                var path = StylesheetItem.Path;
+                if (path.IsNullOrWhiteSpace()) return string.Empty;
+                return System.IO.Path.GetFileNameWithoutExtension(StylesheetItem.Path);
+            }
             set
             {
                 //NOTE: This has zero affect
@@ -44,10 +49,10 @@ namespace umbraco.cms.businesslogic.web
 
         public string Content
         {
-            get { return _stylesheetItem.Content; }
+            get { return StylesheetItem.Content; }
             set
             {
-                _stylesheetItem.Content = value;
+                StylesheetItem.Content = value;
                 //_content = value;
                 //SqlHelper.ExecuteNonQuery("update cmsStylesheet set content = @content where nodeId = @id", SqlHelper.CreateParameter("@content", this.Content), SqlHelper.CreateParameter("@id", this.Id));
                 //InvalidateCache();
@@ -88,7 +93,7 @@ namespace umbraco.cms.businesslogic.web
             : base(stylesheet)
         {
             if (stylesheet == null) throw new ArgumentNullException("stylesheet");
-            _stylesheetItem = stylesheet;
+            StylesheetItem = stylesheet;
         }
 
         public StyleSheet(Guid id)
@@ -136,8 +141,8 @@ namespace umbraco.cms.businesslogic.web
         /// <value>The create date time.</value>
         public override DateTime CreateDateTime
         {
-            get { return _stylesheetItem.CreateDate; }
-            set { _stylesheetItem.CreateDate = value; }
+            get { return StylesheetItem.CreateDate; }
+            set { StylesheetItem.CreateDate = value; }
         }
         
         /// <summary>
@@ -145,12 +150,12 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         public override string Text
         {
-            get { return _stylesheetItem.Name; }
+            get { return Filename; }
             set
             {
-                var currFileName = System.IO.Path.GetFileName(_stylesheetItem.Path);
-                var newFilePath = _stylesheetItem.Path.TrimEnd(currFileName) + value;
-                _stylesheetItem.Path = newFilePath;
+                var currFileName = System.IO.Path.GetFileName(StylesheetItem.Path);
+                var newFilePath = StylesheetItem.Path.TrimEnd(currFileName) + value;
+                StylesheetItem.Path = newFilePath;
             }
         }
 
@@ -163,7 +168,7 @@ namespace umbraco.cms.businesslogic.web
             FireBeforeSave(e);
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.FileService.SaveStylesheet(_stylesheetItem);
+                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
 
                 FireAfterSave(e);
             }
@@ -178,8 +183,8 @@ namespace umbraco.cms.businesslogic.web
                 "SELECT TOP 1 filename FROM cmsStylesheet WHERE nodeid=" + Id);
             if (found.IsNullOrWhiteSpace()) throw new ArgumentException(string.Format("No stylesheet exists with id '{0}'", Id));
 
-            _stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
-            if (_stylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
+            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
         }
 
         //private void SetupStyleSheet(bool loadFileData, bool updateStyleProperties)
@@ -353,7 +358,7 @@ namespace umbraco.cms.businesslogic.web
             
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.FileService.DeleteStylesheet(_stylesheetItem.Path);
+                ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetItem.Path);
 
                 //File.Delete(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text)));
                 //foreach (var p in Properties.Where(p => p != null))
@@ -370,7 +375,7 @@ namespace umbraco.cms.businesslogic.web
 
         public void saveCssToFile()
         {
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(_stylesheetItem);
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
 
             //if (this.Text.Contains('/'))
             //{

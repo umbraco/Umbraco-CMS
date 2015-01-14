@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual IScriptRepository CreateScriptRepository(IUnitOfWork uow)
         {
-            return new ScriptRepository(uow);
+            return new ScriptRepository(uow, new PhysicalFileSystem(SystemDirectories.Scripts), _settings.Content);
         }
 
         internal virtual IPartialViewRepository CreatePartialViewRepository(IUnitOfWork uow)

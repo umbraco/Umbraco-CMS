@@ -22,8 +22,8 @@ namespace Umbraco.Core.Models
 
         public string Alias { get; set; }
         public string Value { get; set; }
-        public bool IsPartOfAtRule { get; set; }
-
+        
+        //public bool IsPartOfAtRule { get; set; }
         ////This should never be used, it's here because we still have stylesheets based on DB ids and 
         //// we need to wrap the legacy classes
         //internal int Id { get; set; }

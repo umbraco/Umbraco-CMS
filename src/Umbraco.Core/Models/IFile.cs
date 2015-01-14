@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using System;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -33,10 +34,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         string VirtualPath { get; set; }
 
-        /// <summary>
-        /// Boolean indicating whether the file could be validated
-        /// </summary>
-        /// <returns>True if file is valid, otherwise false</returns>
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         bool IsValid();
     }
 }

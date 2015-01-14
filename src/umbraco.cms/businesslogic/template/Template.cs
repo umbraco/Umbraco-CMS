@@ -56,7 +56,7 @@ namespace umbraco.cms.businesslogic.template
 	    {
 		    get
 		    {
-				switch (TemplateEntity.GetTypeOfRenderingEngine())
+				switch (ApplicationContext.Current.Services.FileService.DetermineTemplateRenderingEngine(TemplateEntity))
 				{
 					case RenderingEngine.Mvc:
                         return _viewHelper.GetPhysicalFilePath(TemplateEntity);

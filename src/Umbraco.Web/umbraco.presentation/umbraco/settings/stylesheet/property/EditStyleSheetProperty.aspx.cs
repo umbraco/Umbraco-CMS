@@ -80,11 +80,8 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _stylesheetproperty.Text = NameTxt.Text;
             _stylesheetproperty.Alias = AliasTxt.Text;
 
-            try
-            {
-                _stylesheetproperty.StyleSheet().saveCssToFile();
-            }
-            catch { }
+            _stylesheetproperty.StyleSheet().saveCssToFile();
+
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
             SetupPreView();
 

@@ -129,7 +129,7 @@ namespace Umbraco.Web.Trees
         {
             //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
 
-            return template.GetTypeOfRenderingEngine() == RenderingEngine.WebForms
+            return Services.FileService.DetermineTemplateRenderingEngine(template) == RenderingEngine.WebForms
                 ? "/" + queryStrings.GetValue<string>("application") + "/framed/" +
                   Uri.EscapeDataString("/umbraco/settings/editTemplate.aspx?templateID=" + template.Id)
                 : "/" + queryStrings.GetValue<string>("application") + "/framed/" +

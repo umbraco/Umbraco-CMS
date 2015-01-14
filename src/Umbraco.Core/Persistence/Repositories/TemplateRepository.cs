@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var template = (Template)entity;
             template.AddingEntity();
 
-            var factory = new TemplateFactory(NodeObjectTypeId, _viewsFileSystem, _masterpagesFileSystem, _templateConfig);
+            var factory = new TemplateFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(template);
 
             //Create the (base) node data - umbracoNode
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //now do the file work
 
-            if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
             {
                 var result = _viewHelper.CreateView(template, true);
                 if (result != entity.Content)
@@ -257,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             //now do the file work
 
-            if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
             {
                 var result = _viewHelper.UpdateViewFile(entity, originalAlias);
                 if (result != entity.Content)
@@ -314,7 +314,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //now we can delete this one
             base.PersistDeletedItem(entity);
 
-            if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
             {
                 var viewName = string.Concat(entity.Alias, ".cshtml");
                 _viewsFileSystem.DeleteFile(viewName);
@@ -335,7 +335,7 @@ namespace Umbraco.Core.Persistence.Repositories
             string vbViewName = string.Concat(dto.Alias, ".vbhtml");
             string masterpageName = string.Concat(dto.Alias, ".master");
 
-            var factory = new TemplateFactory(_viewsFileSystem, _masterpagesFileSystem, _templateConfig);
+            var factory = new TemplateFactory();
             var template = factory.BuildEntity(dto, childDefinitions);
 
             if (dto.NodeDto.ParentId > 0)
@@ -558,6 +558,85 @@ namespace Umbraco.Core.Persistence.Repositories
                 top = top.Parent;
             }
             return WalkTree(top, alias);
+        }
+
+        /// <summary>
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// rendering engine to use.
+        /// </summary> 
+        /// <returns></returns>
+        /// <remarks>
+        /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
+        /// </remarks>
+        public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
+        {
+            var engine = _templateConfig.DefaultRenderingEngine;
+
+            if (template.Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(template.Content))
+            {
+                //there is a design but its definitely a webforms design
+                return RenderingEngine.WebForms;
+            }
+
+            var viewHelper = new ViewHelper(_viewsFileSystem);
+            var masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
+
+            switch (engine)
+            {
+                case RenderingEngine.Mvc:
+                    //check if there's a view in ~/masterpages
+                    if (masterPageHelper.MasterPageExists(template) && viewHelper.ViewExists(template) == false)
+                    {
+                        //change this to webforms since there's already a file there for this template alias
+                        engine = RenderingEngine.WebForms;
+                    }
+                    break;
+                case RenderingEngine.WebForms:
+                    //check if there's a view in ~/views
+                    if (viewHelper.ViewExists(template) && masterPageHelper.MasterPageExists(template) == false)
+                    {
+                        //change this to mvc since there's already a file there for this template alias
+                        engine = RenderingEngine.Mvc;
+                    }
+                    break;
+            }
+            return engine;
+        }
+
+        /// <summary>
+        /// Validates a <see cref="ITemplate"/>
+        /// </summary>
+        /// <param name="template"><see cref="ITemplate"/> to validate</param>
+        /// <returns>True if Script is valid, otherwise false</returns>
+        public bool ValidateTemplate(ITemplate template)
+        {
+            var exts = new List<string>();
+            if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
+            {
+                exts.Add("cshtml");
+                exts.Add("vbhtml");
+            }
+            else
+            {
+                exts.Add(_templateConfig.UseAspNetMasterPages ? "master" : "aspx");
+            }
+
+            var dirs = SystemDirectories.Masterpages;
+            if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
+                dirs += "," + SystemDirectories.MvcViews;
+
+            //Validate file
+            var validFile = IOHelper.VerifyEditPath(template.Path, dirs.Split(','));
+
+            //Validate extension
+            var validExtension = IOHelper.VerifyFileExtension(template.Path, exts);
+
+            return validFile && validExtension;
         }
 
         private static IEnumerable<TemplateNode> CreateChildren(TemplateNode parent, IEnumerable<int> childIds, ITemplate[] allTemplates, TemplateDto[] allDtos)
