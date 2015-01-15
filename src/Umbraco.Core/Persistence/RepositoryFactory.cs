@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow, IDatabaseUnitOfWork db)
         {
-            return new StylesheetRepository(uow, db, new PhysicalFileSystem(SystemDirectories.Css));
+            return new StylesheetRepository(uow, new PhysicalFileSystem(SystemDirectories.Css));
         }
 
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
