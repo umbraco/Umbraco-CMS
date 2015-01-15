@@ -15,8 +15,6 @@ namespace umbraco.cms.businesslogic.web
         internal Umbraco.Core.Models.Stylesheet StylesheetItem;
         internal Umbraco.Core.Models.StylesheetProperty StylesheetProp;
 
-        private static readonly Guid ModuleObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty);
-
         internal StylesheetProperty(Umbraco.Core.Models.Stylesheet sheet, Umbraco.Core.Models.StylesheetProperty prop)
             : base(int.MaxValue, true)
         {
@@ -37,21 +35,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         protected override void setupNode()
         {
-            var foundProp = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<dynamic>(
-                "SELECT parentID FROM cmsStylesheetProperty INNER JOIN umbracoNode ON cmsStylesheetProperty.nodeId = umbracoNode.id WHERE nodeId = @id", new {id = Id});
-
-            if (foundProp == null) throw new ArgumentException(string.Format("No stylesheet property exists with an id '{0}'", Id));
-
-            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
-                "SELECT filename FROM cmsStylesheet WHERE nodeId = @id", new { id = foundProp.parentID });
-
-            if (found == null) throw new ArgumentException(string.Format("No stylesheet exists with a property with id '{0}'", Id));
-
-            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found.EnsureEndsWith(".css"));
-            if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
-
-            StylesheetProp = StylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
-            if (StylesheetProp == null) throw new ArgumentException(string.Format("No stylesheet property exists with alias {0}", foundProp.stylesheetPropertyAlias));
+            web.StyleSheet.ThrowNotSupported<StylesheetProperty>();
         }
 
         public StyleSheet StyleSheet() 
@@ -107,10 +91,6 @@ namespace umbraco.cms.businesslogic.web
             sheet.StylesheetItem.AddProperty(prop);
             ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet.StylesheetItem);
 
-            //NOTE: Only for backward compatibility do we create data in the db!
-            var newNode = CMSNode.MakeNew(sheet.Id, ModuleObjectType, user.Id, 2, Text, Guid.NewGuid());
-            SqlHelper.ExecuteNonQuery(String.Format("Insert into cmsStylesheetProperty (nodeId,stylesheetPropertyAlias,stylesheetPropertyValue) values ('{0}','{1}','')", newNode.Id, Text));
-
             var ssp = new StylesheetProperty(sheet.StylesheetItem, prop);
             var e = new NewEventArgs();
             ssp.OnNew(e);
@@ -153,23 +133,8 @@ namespace umbraco.cms.businesslogic.web
 
         public static StylesheetProperty GetStyleSheetProperty(int id)
         {
-            var foundProp = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<dynamic>(
-               "SELECT parentID FROM cmsStylesheetProperty INNER JOIN umbracoNode ON cmsStylesheetProperty.nodeId = umbracoNode.id WHERE nodeId = @id", new { id = id });
-
-            if (foundProp == null) return null;
-
-            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
-                "SELECT filename FROM cmsStylesheet WHERE nodeId = @id", new { id = foundProp.parentID });
-
-            if (found == null) return null;
-
-            var stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found.EnsureEndsWith(".css"));
-            if (stylesheetItem == null) return null;
-
-            var stylesheetProp = stylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
-            if (stylesheetProp == null) return null;
-
-            return new StylesheetProperty(stylesheetItem, stylesheetProp);
+            web.StyleSheet.ThrowNotSupported<StylesheetProperty>();
+            return null;
         }
 
         // EVENTS

@@ -23,11 +23,8 @@ namespace umbraco.cms.businesslogic.web
     {
         internal Stylesheet StylesheetItem;
 
-        //private string _filename = "";
-        //private string _content = "";
-        //private StylesheetProperty[] _properties;
         public static Guid ModuleObjectType = new Guid(Constants.ObjectTypes.Stylesheet);
-
+        
         public string Filename
         {
             get
@@ -38,12 +35,8 @@ namespace umbraco.cms.businesslogic.web
             }
             set
             {
-                //NOTE: This has zero affect
-
-                ////move old file
-                //_filename = value;
-                //SqlHelper.ExecuteNonQuery(string.Format("update cmsStylesheet set filename = '{0}' where nodeId = {1}", _filename, Id));
-                //InvalidateCache();
+                //setting the file name changing it's path
+                StylesheetItem.Path = StylesheetItem.Path.TrimEnd(StylesheetItem.Name) + value.EnsureEndsWith(".css");
             }
         }
 
@@ -57,8 +50,6 @@ namespace umbraco.cms.businesslogic.web
         {
             get { return StylesheetItem.Properties.Select(x => new StylesheetProperty(StylesheetItem, x)).ToArray(); }
         }
-
-        //static bool isInitialized = false;
 
         internal StyleSheet(Stylesheet stylesheet)
             : base(stylesheet)
@@ -147,14 +138,13 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         protected override void setupNode()
         {
-            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
-                "SELECT TOP 1 filename FROM cmsStylesheet WHERE nodeid=" + Id);
-            if (found.IsNullOrWhiteSpace()) throw new ArgumentException(string.Format("No stylesheet exists with id '{0}'", Id));
-
-            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found.EnsureEndsWith(".css"));
-            if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
+            ThrowNotSupported<StyleSheet>();
         }
 
+        internal static void ThrowNotSupported<T>()
+        {
+            throw new NotSupportedException("The legacy " + typeof(T) + " API is no longer functional for retrieving stylesheets based on an integer ID. Stylesheets are no longer persisted in database tables. Use the new Umbraco.Core.Services.IFileSystem APIs instead of working with Umbraco stylesheets.");
+        }
     
         public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
         {
@@ -245,15 +235,8 @@ namespace umbraco.cms.businesslogic.web
 
         public static StyleSheet GetStyleSheet(int id, bool setupStyleProperties, bool loadContentFromFile)
         {
-            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
-                "SELECT TOP 1 filename FROM cmsStylesheet WHERE nodeid=" + id);
-            if (found.IsNullOrWhiteSpace()) return null;
-
-            var s = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found);
-            if (s == null) return null;
-
-            return new StyleSheet(s);
-
+            ThrowNotSupported<StyleSheet>();
+            return null;
         }
 
         [Obsolete("Stylesheet cache is automatically invalidated by Umbraco when a stylesheet is saved or deleted")]
