@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var files = FindAllFiles("");
+                var files = FindAllFiles("", "*.*");
                 foreach (var file in files)
                 {
                     yield return Get(file);

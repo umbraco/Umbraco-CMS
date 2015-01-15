@@ -27,32 +27,31 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<Stylesheet> GetAll()
         {
-            return StyleSheet.GetAll()
+            return Services.FileService.GetStylesheetsAtPath()
                 .Select(x => 
                     new Stylesheet() {
-                        Name = x.Text,
+                        Name = x.Alias,
                         Id = x.Id,
-                        Path = SystemDirectories.Css + "/" + x.Text + ".css" 
+                        Path = x.VirtualPath
                     });
         }
 
-        public IEnumerable<StylesheetRule> GetRules(int id)
-        {
-            var css = StyleSheet.GetStyleSheet(id, true, true);
-            if (css == null)
-                return Enumerable.Empty<StylesheetRule>();
+        //public IEnumerable<StylesheetRule> GetRules(string name)
+        //{
+        //    var css = Services.FileService.GetStylesheetByName(name);
+        //    if (css == null)
+        //        return Enumerable.Empty<StylesheetRule>();
 
-            return css.Properties.Select(x => new StylesheetRule() { Id = x.Id, Name = x.Text, Selector = x.Alias });
-        }
+        //    return css.Properties.Select(x => new StylesheetRule() { Name = x.Name, Selector = x.Alias });
+        //}
         
         public IEnumerable<StylesheetRule> GetRulesByName(string name)
         {
-            var css = StyleSheet.GetByName(name);
-
+            var css = Services.FileService.GetStylesheetByName(name);
             if (css == null)
                 return Enumerable.Empty<StylesheetRule>();
 
-            return css.Properties.Select(x => new StylesheetRule() { Id = x.Id, Name = x.Text, Selector = x.Alias });
+            return css.Properties.Select(x => new StylesheetRule() { Name = x.Name, Selector = x.Alias });
         }
     }
 

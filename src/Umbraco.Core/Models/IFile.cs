@@ -25,6 +25,16 @@ namespace Umbraco.Core.Models
         string Path { get; set; }
 
         /// <summary>
+        /// Gets the original path of the file
+        /// </summary>
+        string OriginalPath { get; }
+
+        /// <summary>
+        /// Called to re-set the OriginalPath to the Path
+        /// </summary>
+        void ResetOriginalPath();
+
+        /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
         string Content { get; set; }

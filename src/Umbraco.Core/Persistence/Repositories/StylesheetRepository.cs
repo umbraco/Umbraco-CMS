@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (FileSystem.FileExists(id) == false)
             {
-                throw new Exception(string.Format("The file {0} was not found", id));
+                return null;
             }
 
             string content;
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
                 UpdateDate = updated,
-                Id = GetStylesheetId(path),
+                Id = path.GetHashCode(),
                 VirtualPath = FileSystem.GetUrl(id)
             };
 
@@ -62,46 +62,44 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
-        // Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
-        //  their Id so listing stylesheets needs to list there Id as well for custom plugins to render the build in editor.
-        //  http://issues.umbraco.org/issue/U4-3258
-        private int GetStylesheetId(string path)
-        {
-            var sql = new Sql()
-                .Select("*")
-                .From<NodeDto>()
-                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
-                    new
-                    {
-                        NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
-                        Alias = path.TrimEnd(".css").Replace("\\", "/")
-                    });
-            var nodeDto = _dbwork.Database.FirstOrDefault<NodeDto>(sql);
-            return nodeDto == null ? 0 : nodeDto.NodeId;
-        }
+        //// Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
+        ////  their Id so listing stylesheets needs to list there Id as well for custom plugins to render the build in editor.
+        ////  http://issues.umbraco.org/issue/U4-3258
+        //private int GetStylesheetId(string path)
+        //{
+        //    var sql = new Sql()
+        //        .Select("*")
+        //        .From<NodeDto>()
+        //        .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
+        //            new
+        //            {
+        //                NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
+        //                Alias = path.TrimEnd(".css").Replace("\\", "/")
+        //            });
+        //    var nodeDto = _dbwork.Database.FirstOrDefault<NodeDto>(sql);
+        //    return nodeDto == null ? 0 : nodeDto.NodeId;
+        //}
 
-        //This should be used later to do GetAll properly without individual selections
-        private IEnumerable<Tuple<int, string>> GetStylesheetIds(string[] paths)
-        {
-            var sql = new Sql()
-                .Select("*")
-                .From<NodeDto>()
-                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text in (@aliases)",
-                    new
-                    {
-                        NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
-                        aliases = paths.Select(x => x.TrimEnd(".css").Replace("\\", "/")).ToArray()
-                    });
-            var dtos = _dbwork.Database.Fetch<NodeDto>(sql);
+        ////This should be used later to do GetAll properly without individual selections
+        //private IEnumerable<Tuple<int, string>> GetStylesheetIds(string[] paths)
+        //{
+        //    var sql = new Sql()
+        //        .Select("*")
+        //        .From<NodeDto>()
+        //        .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text in (@aliases)",
+        //            new
+        //            {
+        //                NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
+        //                aliases = paths.Select(x => x.TrimEnd(".css").Replace("\\", "/")).ToArray()
+        //            });
+        //    var dtos = _dbwork.Database.Fetch<NodeDto>(sql);
 
-            return dtos.Select(x => new Tuple<int, string>(
-                //the id
-                x.NodeId,
-                //the original path requested for the id
-                paths.First(p => p.TrimEnd(".css").Replace("\\", "/") == x.Text)));
-        }
-
-        //TODO: Get rid of N+1
+        //    return dtos.Select(x => new Tuple<int, string>(
+        //        //the id
+        //        x.NodeId,
+        //        //the original path requested for the id
+        //        paths.First(p => p.TrimEnd(".css").Replace("\\", "/") == x.Text)));
+        //}
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
         {
@@ -117,12 +115,24 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var files = FindAllFiles("");
+                var files = FindAllFiles("", "*.css");
                 foreach (var file in files)
                 {
                     yield return Get(file);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified. 
+        /// </summary>
+        /// <param name="rootPath">
+        /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<Stylesheet> GetStylesheetsAtPath(string rootPath = null)
+        {
+            return FileSystem.GetFiles(rootPath ?? string.Empty, "*.css").Select(Get);
         }
 
         public bool ValidateStylesheet(Stylesheet stylesheet)
@@ -157,17 +167,15 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistDeletedItem(Stylesheet entity)
         {
             //find any stylesheet props in the db - this is legacy!! we don't really care about the db but we'll try to keep it tidy
-            var props = _dbwork.Database.Fetch<StylesheetPropertyDto>(
-                new Sql().Select("cmsStylesheetProperty.*")
-                    .From("cmsStylesheetProperty")
-                    .InnerJoin("umbracoNode")
-                    .On("cmsStylesheetProperty.nodeId = umbracoNode.id")
-                    .Where("umbracoNode.parentID = @id", new { Id = entity.Id }));
+            var props = _dbwork.Database.Fetch<NodeDto>(
+                new Sql().Select("*")
+                    .From("umbracoNode")
+                    .Where("umbracoNode.parentID = @id AND nodeObjectType = @NodeObjectType", new { id = entity.Id, NodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) }));
 
             foreach (var prop in props)
             {
                 _dbwork.Database.Execute("DELETE FROM cmsStylesheetProperty WHERE nodeId = @Id", new { Id = prop.NodeId });
-                _dbwork.Database.Execute("DELETE FROM umbracoNode WHERE nodeId = @Id AND nodeObjectType = @NodeObjectType", new { Id = prop.NodeId, NodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
+                _dbwork.Database.Execute("DELETE FROM umbracoNode WHERE id = @Id AND nodeObjectType = @NodeObjectType", new { Id = prop.NodeId, NodeObjectType = new Guid(Constants.ObjectTypes.StylesheetProperty) });
             }
             _dbwork.Database.Execute("DELETE FROM cmsStylesheet WHERE nodeId = @Id", new { Id = entity.Id });
             _dbwork.Database.Execute("DELETE FROM umbracoNode WHERE id = @Id AND nodeObjectType = @NodeObjectType", new { Id = entity.Id, NodeObjectType = new Guid(Constants.ObjectTypes.Stylesheet) });

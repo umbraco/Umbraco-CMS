@@ -65,10 +65,5 @@ namespace Umbraco.Core.Models
             }
         }
 
-
-        //public bool IsPartOfAtRule { get; set; }
-        ////This should never be used, it's here because we still have stylesheets based on DB ids and 
-        //// we need to wrap the legacy classes
-        //internal int Id { get; set; }
     }
 }

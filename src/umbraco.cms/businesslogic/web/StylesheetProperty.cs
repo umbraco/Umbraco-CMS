@@ -26,12 +26,10 @@ namespace umbraco.cms.businesslogic.web
 
         public StylesheetProperty(int id) : base(id)
         {
-            //InitProperty();
         }
 
         public StylesheetProperty(Guid id) : base(id)
         {
-            //InitProperty();
         }
 
         /// <summary>
@@ -44,30 +42,17 @@ namespace umbraco.cms.businesslogic.web
 
             if (foundProp == null) throw new ArgumentException(string.Format("No stylesheet property exists with an id '{0}'", Id));
 
-            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<StylesheetDto>(
-                "WHERE nodeId = @id", new {id = foundProp.parentID});
+            var found = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "SELECT filename FROM cmsStylesheet WHERE nodeId = @id", new { id = foundProp.parentID });
 
             if (found == null) throw new ArgumentException(string.Format("No stylesheet exists with a property with id '{0}'", Id));
 
-            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found.EnsureEndsWith(".css"));
             if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
 
             StylesheetProp = StylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
             if (StylesheetProp == null) throw new ArgumentException(string.Format("No stylesheet property exists with alias {0}", foundProp.stylesheetPropertyAlias));
         }
-
-        //private  void InitProperty() 
-        //{
-        //    var dr = SqlHelper.ExecuteReader("Select stylesheetPropertyAlias,stylesheetPropertyValue from cmsStylesheetProperty where nodeId = " + this.Id);
-        //    if (dr.Read())
-        //    {
-        //        _alias = dr.GetString("stylesheetPropertyAlias");
-        //        _value = dr.GetString("stylesheetPropertyValue");
-        //    } 
-        //    else
-        //        throw new ArgumentException("NO DATA EXSISTS");
-        //    dr.Close();
-        //}
 
         public StyleSheet StyleSheet() 
         {
@@ -81,10 +66,6 @@ namespace umbraco.cms.businesslogic.web
             if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}'", name));
 
             StylesheetProp = StylesheetItem.Properties.FirstOrDefault(x => x.Alias == StylesheetProp.Alias);
-
-            // ping the stylesheet
-            //var ss = new StyleSheet(this.Parent.Id);
-            //InitProperty();
         }
 
         /// <summary>
@@ -109,36 +90,14 @@ namespace umbraco.cms.businesslogic.web
 
         public string Alias 
         {
-            get
-            {
-                return StylesheetProp.Alias;
-                //return _alias;
-            }
-            set
-            {
-                StylesheetProp.Alias = value;
-                //SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyAlias = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
-                //_alias=value;
-
-                //InvalidateCache();
-            }
+            get { return StylesheetProp.Alias; }
+            set { StylesheetProp.Alias = value; }
         }
 
         public string value 
         {
-            get
-            {
-                return StylesheetProp.Value;
-                //return _value;
-            }
-            set
-            {
-                StylesheetProp.Value = value;
-                //SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyValue = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
-                //_value = value;
-
-                //InvalidateCache();
-            }
+            get { return StylesheetProp.Value; }
+            set { StylesheetProp.Value = value; }
         }
 
         public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, BusinessLogic.User user)
@@ -204,7 +163,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (found == null) return null;
 
-            var stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            var stylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found.EnsureEndsWith(".css"));
             if (stylesheetItem == null) return null;
 
             var stylesheetProp = stylesheetItem.Properties.FirstOrDefault(x => x.Alias == foundProp.stylesheetPropertyAlias);
@@ -212,17 +171,6 @@ namespace umbraco.cms.businesslogic.web
 
             return new StylesheetProperty(stylesheetItem, stylesheetProp);
         }
-
-        //[Obsolete("Umbraco automatically refreshes the cache when stylesheets and stylesheet properties are saved or deleted")]
-        //private void InvalidateCache()
-        //{
-        //    ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));            
-        //}
-
-        //private static string GetCacheKey(int id)
-        //{
-        //    return CacheKeys.StylesheetPropertyCacheKey + id;
-        //}
 
         // EVENTS
         /// <summary>

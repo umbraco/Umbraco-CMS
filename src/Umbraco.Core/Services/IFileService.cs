@@ -28,6 +28,15 @@ namespace Umbraco.Core.Services
         IEnumerable<Stylesheet> GetStylesheets(params string[] names);
 
         /// <summary>
+        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified. 
+        /// </summary>
+        /// <param name="rootPath">
+        /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem
+        /// </param>
+        /// <returns></returns>
+        IEnumerable<Stylesheet> GetStylesheetsAtPath(string rootPath = null); 
+        
+        /// <summary>
         /// Gets a <see cref="Stylesheet"/> object by its name
         /// </summary>
         /// <param name="name">Name of the stylesheet incl. extension</param>

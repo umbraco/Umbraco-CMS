@@ -3,6 +3,8 @@ using System.Data;
 using System.Linq;
 using System.Web.Security;
 using System.Windows.Forms;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -17,9 +19,13 @@ namespace umbraco
 
         public override bool PerformSave()
         {
-            var s = new cms.businesslogic.web.StyleSheet(ParentID);
-            var prop = s.AddProperty(Alias, User);
-            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?name={0}&prop={1}", s.Text, prop.Text);
+            var stylesheetName = AdditionalValues["nodeId"].ToString();
+
+            var s = Umbraco.Core.ApplicationContext.Current.Services.FileService.GetStylesheetByName(stylesheetName.EnsureEndsWith(".css"));
+            s.AddProperty(new StylesheetProperty(Alias, "#" + Alias, ""));
+            Umbraco.Core.ApplicationContext.Current.Services.FileService.SaveStylesheet(s);
+
+            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}&prop={1}", s.Name, Alias);
             return true;
         }
 
@@ -27,7 +33,7 @@ namespace umbraco
         {
             var parts = Alias.Split('_');
 
-            var stylesheet = Umbraco.Core.ApplicationContext.Current.Services.FileService.GetStylesheetByName(parts[0] + ".css");
+            var stylesheet = Umbraco.Core.ApplicationContext.Current.Services.FileService.GetStylesheetByName(parts[0].EnsureEndsWith(".css"));
             if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name: " + parts[0]);
 
             var prop = stylesheet.Properties.FirstOrDefault(x => x.Name == parts[1]);
@@ -41,7 +47,7 @@ namespace umbraco
         }
 
         private string _returnUrl = "";
-
+            
         public override string ReturnUrl
         {
             get { return _returnUrl; }

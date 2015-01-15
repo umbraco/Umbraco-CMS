@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
@@ -28,53 +29,26 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
         }
 
-        private businesslogic.web.StylesheetProperty _stylesheetproperty;
-        private DropDownList _ddl = new DropDownList();
+        private Umbraco.Core.Models.StylesheetProperty _stylesheetproperty;
+        private Umbraco.Core.Models.Stylesheet _sheet;
 
-        protected void Page_Load(object sender, EventArgs e)
+        /// <summary>
+        /// Raises the <see cref="E:System.Web.UI.Control.Load"></see> event.
+        /// </summary>
+        /// <param name="e">The <see cref="T:System.EventArgs"></see> object that contains the event data.</param>
+        protected override void OnLoad(EventArgs e)
         {
-            //NOTE: Check for id for legacy reasons
-            if (Request.QueryString.ContainsKey("id"))
-            {
-                int propId;
-                if (int.TryParse(Request.QueryString["id"], out propId))
-                {
-                    _stylesheetproperty = new businesslogic.web.StylesheetProperty(propId);
-                }
-            }
-            else
-            {
-                var byName = Services.FileService.GetStylesheetByName(Request.QueryString["name"] + ".css");
-                if (byName == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["name"]);
-                var prop = byName.Properties.FirstOrDefault(x => x.Name == Request.QueryString["prop"]);
-                if (prop == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
-                _stylesheetproperty = new StylesheetProperty(byName, prop);
-            }
+            base.OnLoad(e);
+
+            _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
+            if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
+
+            var propName = IsPostBack ? OriginalName.Value : Request.QueryString["prop"];
+
+            _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name == propName);
+            if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
 
             Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
-
-            var nodePath = string.Format("-1,init,{0},{0}_{1}", _stylesheetproperty.StylesheetItem.Alias, _stylesheetproperty.StylesheetProp.Name);
-
-            if (IsPostBack == false)
-            {
-                _stylesheetproperty.RefreshFromFile();
-                NameTxt.Text = _stylesheetproperty.Text;
-                Content.Text = _stylesheetproperty.value;
-                AliasTxt.Text = _stylesheetproperty.Alias;
-
-                ClientTools
-                    .SetActiveTreeType(Constants.Trees.Stylesheets)
-                    .SyncTree(nodePath, false);
-            }
-            else
-            {
-                //true = force reload from server on post back
-                ClientTools
-                    .SetActiveTreeType(Constants.Trees.Stylesheets)
-                    .SyncTree(nodePath, true);
-            }
-
-            
 
             var bt = Panel1.Menu.NewButton();
             bt.Click += SaveClick;
@@ -82,33 +56,46 @@ namespace umbraco.cms.presentation.settings.stylesheet
             bt.ToolTip = ui.Text("save");
             bt.ButtonType = uicontrols.MenuButtonType.Primary;
             bt.ID = "save";
-            SetupPreView();
         }
+
 
         protected override void OnPreRender(EventArgs e)
         {
-            prStyles.Attributes["style"] = _stylesheetproperty.value;
+            NameTxt.Text = _stylesheetproperty.Name;
+            Content.Text = _stylesheetproperty.Value;
+            AliasTxt.Text = _stylesheetproperty.Alias;
+            OriginalName.Value = _stylesheetproperty.Name;
+
+            prStyles.Attributes["style"] = _stylesheetproperty.Value;
+
+            var nodePath = string.Format("-1,init,{0},{0}_{1}", _sheet.Alias, _stylesheetproperty.Name);
+
+            ClientTools
+                    .SetActiveTreeType(Constants.Trees.Stylesheets)
+                    .SyncTree(nodePath, IsPostBack);
+
+            prStyles.Attributes["style"] = _stylesheetproperty.Value;
 
             base.OnPreRender(e);
         }
 
-        private void SetupPreView()
-        {
-            prStyles.Attributes["style"] = _stylesheetproperty.value;
-        }
-
         private void SaveClick(object sender, EventArgs e)
         {
-            _stylesheetproperty.value = Content.Text;
-            _stylesheetproperty.Text = NameTxt.Text;
+            _stylesheetproperty.Value = Content.Text;
             _stylesheetproperty.Alias = AliasTxt.Text;
 
-            //_stylesheetproperty.StyleSheet().saveCssToFile();
+            if (_stylesheetproperty.Name != NameTxt.Text)
+            {
+                //to change the name we actually have to remove the property and re-add it as a different one
+                _sheet.AddProperty(new Umbraco.Core.Models.StylesheetProperty(NameTxt.Text, _stylesheetproperty.Alias, _stylesheetproperty.Value));
+                _sheet.RemoveProperty(_stylesheetproperty.Name);
+                //reset our variable 
+                _stylesheetproperty = _sheet.Properties.Single(x => x.Name == NameTxt.Text);
+            }
+
+            Services.FileService.SaveStylesheet(_sheet);
 
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
-            SetupPreView();
-
-            _stylesheetproperty.Save();
         }
 
 
@@ -138,6 +125,8 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.Pane Pane7;
+
+        protected global::System.Web.UI.WebControls.HiddenField OriginalName;
 
         /// <summary>
         /// NameTxt control.

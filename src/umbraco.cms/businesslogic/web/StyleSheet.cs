@@ -50,34 +50,12 @@ namespace umbraco.cms.businesslogic.web
         public string Content
         {
             get { return StylesheetItem.Content; }
-            set
-            {
-                StylesheetItem.Content = value;
-                //_content = value;
-                //SqlHelper.ExecuteNonQuery("update cmsStylesheet set content = @content where nodeId = @id", SqlHelper.CreateParameter("@content", this.Content), SqlHelper.CreateParameter("@id", this.Id));
-                //InvalidateCache();
-            }
+            set { StylesheetItem.Content = value; }
         }
 
         public StylesheetProperty[] Properties
         {
-            get
-            {
-                //if (_properties == null)
-                //{
-                //    var tmp = this.ChildrenOfAllObjectTypes;
-                //    var retVal = new StylesheetProperty[tmp.Length];
-                //    for (var i = 0; i < tmp.Length; i++)
-                //    {
-                //        //So this will go get cached properties but yet the above call to ChildrenOfAllObjectTypes is not cached :/
-                //        retVal[i] = StylesheetProperty.GetStyleSheetProperty(tmp[i].Id);
-                //    }
-                //    _properties = retVal;
-                //}
-                //return _properties;
-
-                return StylesheetItem.Properties.Select(x => new StylesheetProperty(StylesheetItem, x)).ToArray();
-            }
+            get { return StylesheetItem.Properties.Select(x => new StylesheetProperty(StylesheetItem, x)).ToArray(); }
         }
 
         //static bool isInitialized = false;
@@ -92,20 +70,17 @@ namespace umbraco.cms.businesslogic.web
         public StyleSheet(Guid id)
             : base(id)
         {
-            //SetupStyleSheet(true, true);
         }
 
         public StyleSheet(int id)
             : base(id)
         {
-            //SetupStyleSheet(true, true);
         }
 
         [Obsolete("This constructors parameters: setupStyleProperties, loadContentFromFile don't do anything")]
         public StyleSheet(int id, bool setupStyleProperties, bool loadContentFromFile)
             : base(id)
         {
-            //SetupStyleSheet(loadContentFromFile, setupStyleProperties);
         }
 
         /// <summary>
@@ -121,7 +96,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Sort order does nothing for Stylesheets
         /// </summary>
-        [Obsolete("Sort order does nothing for Stylesheets")]
+        [Obsolete("Level does nothing for Stylesheets")]
         public override int Level
         {
             get { return 1; }
@@ -176,94 +151,23 @@ namespace umbraco.cms.businesslogic.web
                 "SELECT TOP 1 filename FROM cmsStylesheet WHERE nodeid=" + Id);
             if (found.IsNullOrWhiteSpace()) throw new ArgumentException(string.Format("No stylesheet exists with id '{0}'", Id));
 
-            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found + ".css");
+            StylesheetItem = ApplicationContext.Current.Services.FileService.GetStylesheetByName(found.EnsureEndsWith(".css"));
             if (StylesheetItem == null) throw new ArgumentException(string.Format("No stylesheet exists with name '{0}.css'", found));
         }
 
-        //private void SetupStyleSheet(bool loadFileData, bool updateStyleProperties)
-        //{
-        //    // Get stylesheet data
-        //    using (var dr = SqlHelper.ExecuteReader("select filename, content from cmsStylesheet where nodeid = " + Id))
-        //    {
-        //        if (dr.Read())
-        //        {
-        //            if (!dr.IsNull("filename"))
-        //                _filename = dr.GetString("filename");
-        //            // Get Content from db or file 
-        //            if (!loadFileData)
-        //            {
-        //                if (!dr.IsNull("content"))
-        //                    _content = dr.GetString("content");
-        //            }
-        //            else if (File.Exists(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
-        //            {
-        //                var propertiesContent = String.Empty;
-
-        //                using (var re = File.OpenText(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
-        //                {
-        //                    string input = null;
-        //                    _content = string.Empty;
-        //                    // NH: Updates the reader to support properties
-        //                    var readingProperties = false;
-
-        //                    while ((input = re.ReadLine()) != null && true)
-        //                    {
-        //                        if (input.Contains("EDITOR PROPERTIES"))
-        //                        {
-        //                            readingProperties = true;
-        //                        }
-        //                        else
-        //                            if (readingProperties)
-        //                            {
-        //                                propertiesContent += input.Replace("\n", "") + "\n";
-        //                            }
-        //                            else
-        //                            {
-        //                                _content += input.Replace("\n", "") + "\n";
-        //                            }
-        //                    }
-        //                }
-
-        //                // update properties
-        //                if (updateStyleProperties)
-        //                {
-        //                    if (propertiesContent != String.Empty)
-        //                    {
-        //                        ParseProperties(propertiesContent);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private void ParseProperties(string propertiesContent)
-        //{
-        //    var m = Regex.Matches(propertiesContent, "([^{]*){([^}]*)}", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
-        //    foreach (Match match in m)
-        //    {
-        //        var groups = match.Groups;
-        //        var cssClass = groups[1].Value.Replace("\n", "").Replace("\r", "").Trim().Trim(Environment.NewLine.ToCharArray());
-        //        var cssCode = groups[2].Value.Trim(Environment.NewLine.ToCharArray());
-        //        foreach (StylesheetProperty sp in this.Properties)
-        //            if (sp.Alias == cssClass && sp.value != cssCode) // check before setting to avoid invalidating cache unecessarily
-        //                sp.value = cssCode;
-        //    }
-        //}
-
+    
         public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
         {
 
             if (FileName.IsNullOrWhiteSpace())
             {
-                FileName = Text;
+                FileName = Text.EnsureEndsWith(".css");
             }
 
             // validate if node ends with css, if it does we'll remove it as we append it later
             if (Text.ToLowerInvariant().EndsWith(".css"))
             {
-                Text = Text.Substring(0, Text.Length - 4);
+                Text = Text.TrimEnd(".css");
             }
 
             var newSheet = new Stylesheet(FileName)
@@ -271,12 +175,6 @@ namespace umbraco.cms.businesslogic.web
                 Content = Content
             };
             ApplicationContext.Current.Services.FileService.SaveStylesheet(newSheet);
-
-            //// Create the umbraco node
-            //var newNode = CMSNode.MakeNew(-1, ModuleObjectType, user.Id, 1, Text, Guid.NewGuid());
-
-            //// Create the stylesheet data
-            //SqlHelper.ExecuteNonQuery(string.Format("insert into cmsStylesheet (nodeId, filename, content) values ('{0}','{1}',@content)", newNode.Id, FileName), SqlHelper.CreateParameter("@content", Content));
 
             var newCss = new StyleSheet(newSheet);
             var e = new NewEventArgs();
@@ -288,53 +186,11 @@ namespace umbraco.cms.businesslogic.web
         public static StyleSheet[] GetAll()
         {
             var retval = ApplicationContext.Current.Services.FileService.GetStylesheets()
+                //Legacy would appear to have only ever loaded the stylesheets at the root level (no sub folders)
+                .Where(x => x.Path.Split(new char[]{'\\'}, StringSplitOptions.RemoveEmptyEntries).Count() == 1)
                 .OrderBy(x => x.Alias)
                 .Select(x => new StyleSheet(x))
                 .ToArray();
-
-            //var dbStylesheets = new ArrayList();
-
-            //var topNodeIds = CMSNode.TopMostNodeIds(ModuleObjectType);
-            ////StyleSheet[] retval = new StyleSheet[topNodeIds.Length];
-            //for (int i = 0; i < topNodeIds.Length; i++)
-            //{
-            //    //retval[i] = new StyleSheet(topNodeIds[i]);
-            //    dbStylesheets.Add(new StyleSheet(topNodeIds[i]).Text.ToLower());
-            //}
-
-            //var fileStylesheets = new ArrayList();
-            //var fileListing = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Css + "/"));
-
-            //foreach (var file in fileListing.GetFiles("*.css"))
-            //{
-            //    if (!dbStylesheets.Contains(file.Name.Replace(file.Extension, "").ToLower()))
-            //    {
-            //        fileStylesheets.Add(file.Name.Replace(file.Extension, ""));
-            //    }
-            //}
-
-            //var retval = new StyleSheet[dbStylesheets.Count + fileStylesheets.Count];
-            //for (int i = 0; i < topNodeIds.Length; i++)
-            //{
-            //    retval[i] = new StyleSheet(topNodeIds[i]);
-
-            //}
-
-            //for (int i = 0; i < fileStylesheets.Count; i++)
-            //{
-
-            //    string content = string.Empty;
-
-            //    using (StreamReader re = File.OpenText(IOHelper.MapPath(string.Format("{0}/{1}.css", SystemDirectories.Css, fileStylesheets[i]))))
-            //    {
-            //        content = re.ReadToEnd();
-            //    }
-
-            //    retval[dbStylesheets.Count + i] = StyleSheet.MakeNew(new umbraco.BusinessLogic.User(0), fileStylesheets[i].ToString(), fileStylesheets[i].ToString(), content);
-            //}
-
-
-            //Array.Sort(retval, 0, retval.Length, new StyleSheetComparer());
 
             return retval;
         }
@@ -353,14 +209,6 @@ namespace umbraco.cms.businesslogic.web
             {
                 ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetItem.Path);
 
-                //File.Delete(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text)));
-                //foreach (var p in Properties.Where(p => p != null))
-                //{
-                //    p.delete();
-                //}
-                //SqlHelper.ExecuteNonQuery("delete from cmsStylesheet where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-                //base.delete();
-
                 FireAfterDelete(e);
             }
 
@@ -369,24 +217,6 @@ namespace umbraco.cms.businesslogic.web
         public void saveCssToFile()
         {
             ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
-
-            //if (this.Text.Contains('/'))
-            //{
-            //    var dir = string.Format("{0}/{1}", IOHelper.MapPath(SystemDirectories.Css), this.Text.Substring(0, this.Text.LastIndexOf('/')));
-            //    if (!Directory.Exists(dir))
-            //        Directory.CreateDirectory(dir);
-            //}
-
-            //using (StreamWriter SW = File.CreateText(IOHelper.MapPath(string.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
-            //{
-            //    string tmpCss = this.Content ;
-            //    tmpCss += "/* EDITOR PROPERTIES - PLEASE DON'T DELETE THIS LINE TO AVOID DUPLICATE PROPERTIES */\n";
-            //    foreach (StylesheetProperty p in this.Properties)
-            //    {
-            //        tmpCss += p + "\n";
-            //    }
-            //    SW.Write(tmpCss);
-            //}
         }
 
         public XmlNode ToXml(XmlDocument xd)
@@ -424,19 +254,6 @@ namespace umbraco.cms.businesslogic.web
 
             return new StyleSheet(s);
 
-            //return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-            //    GetCacheKey(id),
-            //    TimeSpan.FromMinutes(30), () =>
-            //        {
-            //            try
-            //            {
-            //                return new StyleSheet(id, setupStyleProperties, loadContentFromFile);
-            //            }
-            //            catch
-            //            {
-            //                return null;
-            //            }
-            //        });
         }
 
         [Obsolete("Stylesheet cache is automatically invalidated by Umbraco when a stylesheet is saved or deleted")]
@@ -444,14 +261,9 @@ namespace umbraco.cms.businesslogic.web
         {            
         }
 
-        //private static string GetCacheKey(int id)
-        //{
-        //    return CacheKeys.StylesheetCacheKey + id;
-        //}
-
         public static StyleSheet GetByName(string name)
         {
-            var found = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name.EndsWith(".css") ? name : name + ".css");
+            var found = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name.EnsureEndsWith(".css"));
             if (found == null) return null;
             return new StyleSheet(found);
         }
@@ -474,7 +286,7 @@ namespace umbraco.cms.businesslogic.web
                 string alias = xmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
                 var sp = s.Properties.SingleOrDefault(p => p != null && p.Alias == alias);
                 string name = xmlHelper.GetNodeValue(prop.SelectSingleNode("Name"));
-                if (sp == default(StylesheetProperty))
+                if (sp == null)
                 {
                     sp = StylesheetProperty.MakeNew(
                         name,

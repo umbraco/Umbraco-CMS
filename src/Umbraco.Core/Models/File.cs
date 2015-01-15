@@ -14,11 +14,13 @@ namespace Umbraco.Core.Models
     public abstract class File : Entity, IFile
     {
         private string _path;
+        private string _originalPath;
         private string _content = string.Empty; //initialize to empty string, not null
 
         protected File(string path)
         {
             _path = path;
+            _originalPath = _path;
         }
 
         private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Content);
@@ -73,6 +75,22 @@ namespace Umbraco.Core.Models
                     return _path;
                 }, _path, PathSelector);
             }
+        }
+
+        /// <summary>
+        /// Gets the original path of the file
+        /// </summary>
+        public string OriginalPath
+        {
+            get { return _originalPath; }
+        }
+
+        /// <summary>
+        /// Called to re-set the OriginalPath to the Path
+        /// </summary>
+        public void ResetOriginalPath()
+        {
+            _originalPath = _path;
         }
 
         /// <summary>

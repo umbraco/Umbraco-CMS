@@ -39,27 +39,27 @@ namespace umbraco
 			rootNode.NodeType = "init" + TreeAlias;
 			rootNode.NodeID = "init";
         }
-
+         
 		public override void RenderJS(ref StringBuilder Javascript)
         {
             Javascript.Append(
                 @"
 			function openStylesheetProperty(name, prop) {
-				UmbClientMgr.contentFrame('settings/stylesheet/property/editStylesheetProperty.aspx?name=' + name + '&prop=' + prop);
+				UmbClientMgr.contentFrame('settings/stylesheet/property/editStylesheetProperty.aspx?id=' + name + '&prop=' + prop);
 			}
 			");
         }
 
         public override void Render(ref XmlTree tree)
         {
-            StyleSheet sn = new StyleSheet(m_id);
+            var sheet = Services.FileService.GetStylesheetByName(NodeKey.EnsureEndsWith(".css"));
             
-            foreach (StylesheetProperty n in sn.Properties)
+            foreach (var prop in sheet.Properties)
             {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = sn.Text + "_" + n.Text; //n.Id.ToString(CultureInfo.InvariantCulture);
-                xNode.Text = n.Text;
-                xNode.Action = "javascript:openStylesheetProperty('" + sn.Text + "','" + n.Text + "');";
+                var xNode = XmlTreeNode.Create(this);
+                xNode.NodeID = sheet.Alias + "_" + prop.Name;
+                xNode.Text = prop.Name;
+                xNode.Action = "javascript:openStylesheetProperty('" + sheet.Name + "','" + prop.Name + "');";
                 xNode.Icon = "icon-brackets";
                 xNode.OpenIcon = "icon-brackets";
 

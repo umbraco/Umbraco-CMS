@@ -16,17 +16,14 @@ namespace umbraco
         {
 
             int id = -1;
-            var checkingSheet = cms.businesslogic.web.StyleSheet.GetByName(Alias);
-            id = checkingSheet != null 
-                ? checkingSheet.Id 
-                : cms.businesslogic.web.StyleSheet.MakeNew(User, Alias, "", "").Id;            
-            _returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", id);
+            var checkingSheet = cms.businesslogic.web.StyleSheet.GetByName(Alias) ?? cms.businesslogic.web.StyleSheet.MakeNew(User, Alias, "", "");
+            _returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", checkingSheet.Text);
             return true;
         }
 
         public override bool PerformDelete()
         {
-            var s = new cms.businesslogic.web.StyleSheet(ParentID);
+            var s = cms.businesslogic.web.StyleSheet.GetByName(Alias);
             s.delete();
             return true;
         }

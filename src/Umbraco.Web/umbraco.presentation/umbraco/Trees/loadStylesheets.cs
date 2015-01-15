@@ -47,8 +47,8 @@ namespace umbraco
         {
             Javascript.Append(
                 @"
-			function openStylesheet(id) {
-				UmbClientMgr.contentFrame('settings/stylesheet/editStylesheet.aspx?id=' + id);
+			function openStylesheet(name) {
+				UmbClientMgr.contentFrame('settings/stylesheet/editStylesheet.aspx?id=' + name);
 			}
 			");
         }
@@ -62,15 +62,15 @@ namespace umbraco
 
         public override void Render(ref XmlTree tree)
         {            
-            foreach (StyleSheet n in StyleSheet.GetAll().Where(x => x.Id > 0))
+            foreach (var sheet in Services.FileService.GetStylesheetsAtPath())
             {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = n.Text; //n.Id.ToString(CultureInfo.InvariantCulture);
-                xNode.Text = n.Text;
-                xNode.Action = "javascript:openStylesheet(" + n.Id + ");";
-                loadStylesheetProperty styleSheetPropertyTree = new loadStylesheetProperty(this.app);
-                xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(n.Id);
-				xNode.HasChildren = n.HasChildren;
+                var xNode = XmlTreeNode.Create(this);
+                xNode.NodeID = sheet.Alias;
+                xNode.Text = sheet.Alias;
+                xNode.Action = "javascript:openStylesheet('" + sheet.Name + "');";
+                var styleSheetPropertyTree = new loadStylesheetProperty(this.app);
+                xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(sheet.Alias);
+				xNode.HasChildren = sheet.Properties.Any();
                 xNode.Icon = " icon-brackets";
                 xNode.OpenIcon = "icon-brackets";
                 xNode.NodeType = "stylesheet"; //this shouldn't be like this, it should be this.TreeAlias but the ui.config file points to this name.
