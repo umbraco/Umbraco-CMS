@@ -110,12 +110,7 @@ namespace umbraco.cms.businesslogic.web
         public override string Text
         {
             get { return Filename; }
-            set
-            {
-                var currFileName = System.IO.Path.GetFileName(StylesheetItem.Path);
-                var newFilePath = StylesheetItem.Path.TrimEnd(currFileName) + value;
-                StylesheetItem.Path = newFilePath;
-            }
+            set { Filename = value; }
         }
 
         /// <summary>
