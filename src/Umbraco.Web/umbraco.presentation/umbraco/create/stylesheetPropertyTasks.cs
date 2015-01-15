@@ -22,7 +22,7 @@ namespace umbraco
             var stylesheetName = AdditionalValues["nodeId"].ToString();
 
             var s = Umbraco.Core.ApplicationContext.Current.Services.FileService.GetStylesheetByName(stylesheetName.EnsureEndsWith(".css"));
-            s.AddProperty(new StylesheetProperty(Alias, "#" + Alias, ""));
+            s.AddProperty(new StylesheetProperty(Alias, "." + Alias.ToSafeAlias(), ""));
             Umbraco.Core.ApplicationContext.Current.Services.FileService.SaveStylesheet(s);
 
             _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}&prop={1}", s.Name, Alias);
