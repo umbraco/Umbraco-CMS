@@ -5,7 +5,7 @@ namespace Umbraco.Core.Profiling
     /// <summary>
     /// Defines an object for use in the application to profile operations
     /// </summary>
-    internal interface IProfiler
+    public interface IProfiler
     {
         /// <summary>
         /// Render the UI to display the profiler 

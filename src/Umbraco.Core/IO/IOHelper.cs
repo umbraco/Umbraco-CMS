@@ -56,11 +56,11 @@ namespace Umbraco.Core.IO
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
             {				
-				using (var timer = DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
+				using (DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
 				{
 					// find all relative urls (ie. urls that contain ~)
 					var tags = ResolveUrlPattern.Matches(text);
-					LogHelper.Debug(typeof(IOHelper), "After regex: " + timer.Stopwatch.ElapsedMilliseconds + " matched: " + tags.Count);
+					
 					foreach (Match tag in tags)
 					{						
 						string url = "";

@@ -6,7 +6,7 @@ using log4net;
 
 namespace Umbraco.Core.Logging
 {
-	///<summary>
+    ///<summary>
 	/// Used for logging, ILogger should be used instead but this is available for static access to logging
 	///</summary>
 	/// <remarks>

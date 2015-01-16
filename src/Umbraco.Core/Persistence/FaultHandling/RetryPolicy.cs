@@ -198,10 +198,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         protected virtual void OnRetrying(int retryCount, Exception lastError, TimeSpan delay)
         {
             if (this.Retrying != null)
-            {
-                LogHelper.Info<RetryPolicy>(string.Format("Retrying - Count: {0}, Delay: {1}, Exception: {2}",
-                                                          retryCount, delay.TotalMilliseconds, lastError.Message));
-
+            {               
                 this.Retrying(this, new RetryingEventArgs(retryCount, delay, lastError));
             }
         }
