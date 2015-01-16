@@ -88,7 +88,7 @@ namespace Umbraco.Tests.TestHelpers
 
             base.Initialize();
 
-            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("init"))
+            using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("init"))
             {
                 //TODO: Somehow make this faster - takes 5s +
 
@@ -165,8 +165,8 @@ namespace Umbraco.Tests.TestHelpers
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
-
-                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("Remove database file"))
+                
+                using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Remove database file"))
                 {
                     RemoveDatabaseFile(ex =>
                     {
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.TestHelpers
                 }
 
                 //Create the Sql CE database
-                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("Create database file"))
+                using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Create database file"))
                 {
                     if (_dbBytes != null)
                     {
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public override void TearDown()
         {
-            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("teardown"))
+            using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("teardown"))
             {
                 _isFirstTestInFixture = false; //ensure this is false before anything!
 

@@ -12,12 +12,12 @@ namespace Umbraco.Core.Logging
 
         public void Warn(Type callingType, string message, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.Fail(callingType.ToString(), string.Format(message, formatItems.Select(x => x())));
+            System.Diagnostics.Debug.Fail(callingType.ToString(), string.Format(message, formatItems.Select(x => x()).ToArray()));
         }
 
         public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.Fail(callingType.ToString(), string.Format(message + Environment.NewLine + e, formatItems.Select(x => x())));
+            System.Diagnostics.Debug.Fail(callingType.ToString(), string.Format(message + Environment.NewLine + e, formatItems.Select(x => x()).ToArray()));
         }
 
         public void Info(Type callingType, Func<string> generateMessage)
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Logging
 
         public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.WriteLine(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
+            System.Diagnostics.Debug.WriteLine(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));
         }
 
         public void Debug(Type callingType, Func<string> generateMessage)
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Logging
 
         public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.WriteLine(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
+            System.Diagnostics.Debug.WriteLine(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));
         }
     }
 }
