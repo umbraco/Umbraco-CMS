@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.Logging;
 using umbraco.interfaces;
 
 namespace Umbraco.Core.ObjectResolution
@@ -18,11 +19,13 @@ namespace Umbraco.Core.ObjectResolution
 	    private readonly LegacyStartupHandlerResolver _legacyResolver;
 
 	    /// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="applicationEventHandlers"></param>		
-		internal ApplicationEventsResolver(IEnumerable<Type> applicationEventHandlers)
-			: base(applicationEventHandlers)
+	    /// Constructor
+	    /// </summary>
+	    /// <param name="logger"></param>
+	    /// <param name="applicationEventHandlers"></param>
+	    /// <param name="serviceProvider"></param>		
+	    internal ApplicationEventsResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> applicationEventHandlers)
+            : base(serviceProvider, logger, applicationEventHandlers)
 		{
             //create the legacy resolver and only include the legacy types
 	        _legacyResolver = new LegacyStartupHandlerResolver(

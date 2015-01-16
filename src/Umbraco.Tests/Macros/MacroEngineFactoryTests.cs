@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using umbraco.interfaces;
 
 namespace Umbraco.Tests.Macros
@@ -14,14 +18,20 @@ namespace Umbraco.Tests.Macros
 		[SetUp]
 		public void Initialize()
 		{
+            var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+
 		    //this ensures its reset
-			PluginManager.Current = new PluginManager(false);
+		    PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(),
+		        logger,
+		        false)
+		    {
+		        AssembliesToScan = new[]
+		        {
+		            this.GetType().Assembly
+		        }
+		    };
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-			PluginManager.Current.AssembliesToScan = new[]
-				{
-					this.GetType().Assembly
-				};
 		}
 
         [TearDown]

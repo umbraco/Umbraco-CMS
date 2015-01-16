@@ -315,7 +315,7 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(() => PluginManager.Current.ResolveXsltExtensions());
+            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.Current.ResolveXsltExtensions());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
@@ -343,9 +343,11 @@ namespace Umbraco.Web
             }));
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveSurfaceControllers());
 
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
@@ -366,6 +368,7 @@ namespace Umbraco.Web
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 // add all known factories, devs can then modify this list on application
                 // startup either by binding to events or in their own global.asax
                 new[]
@@ -374,6 +377,7 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                     //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider),
                     typeof(CustomRouteUrlProvider)
@@ -388,6 +392,7 @@ namespace Umbraco.Web
                 new ContentLastChanceFinderByNotFoundHandlers());
 
             ContentFinderResolver.Current = new ContentFinderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 // all built-in finders in the correct order, devs can then modify this list
                 // on application startup via an application event handler.
                 typeof(ContentFinderByPageIdQuery),
@@ -411,9 +416,11 @@ namespace Umbraco.Web
             PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(

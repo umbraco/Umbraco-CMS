@@ -32,7 +32,9 @@ namespace Umbraco.Tests.Migrations
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
-			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
+			MigrationResolver.Current = new MigrationResolver(
+                new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                () => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
 					typeof (DeleteAppTables),

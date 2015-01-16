@@ -42,20 +42,19 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init", "init"))
-            {
-                TestHelper.InitializeContentDirectories();
+            TestHelper.InitializeContentDirectories();
 
-                InitializeLegacyMappingsForCoreEditors();
+            SetupCacheHelper();
 
-                SetupPluginManager();
+            InitializeLegacyMappingsForCoreEditors();
 
-                SetupApplicationContext();
+            SetupPluginManager();
 
-                InitializeMappers();
+            SetupApplicationContext();
 
-                FreezeResolution();
-            }
+            InitializeMappers();
+
+            FreezeResolution();
 
         }
 
@@ -64,19 +63,16 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.TearDown();
 
-            using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("teardown"))
-            {
-                LoggerResolver.Reset();
-                //reset settings
-                SettingsForTests.Reset();
-                UmbracoContext.Current = null;
-                TestHelper.CleanContentDirectories();
-                TestHelper.CleanUmbracoSettingsConfig();
-                //reset the app context, this should reset most things that require resetting like ALL resolvers
-                ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
-                ApplicationContext.Current = null;
-                ResetPluginManager();
-            }
+            LoggerResolver.Reset();
+            //reset settings
+            SettingsForTests.Reset();
+            UmbracoContext.Current = null;
+            TestHelper.CleanContentDirectories();
+            TestHelper.CleanUmbracoSettingsConfig();
+            //reset the app context, this should reset most things that require resetting like ALL resolvers
+            ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
+            ApplicationContext.Current = null;
+            ResetPluginManager();
 
         }
 
@@ -142,13 +138,16 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected virtual void SetupCacheHelper()
+        {
+            CacheHelper = CacheHelper.CreateDisabledCacheHelper();
+        }
+
         /// <summary>
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
             var sqlSyntax = new SqlCeSyntaxProvider();
             var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
@@ -158,8 +157,8 @@ namespace Umbraco.Tests.TestHelpers
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
                     Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
-                cacheHelper,
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), CacheHelper, Logger),
+                CacheHelper,
                 ProfilingLogger)
             {
                 IsReady = true
@@ -173,19 +172,23 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (PluginManager.Current == null || PluginManagerResetRequired)
             {
-                PluginManager.Current = new PluginManager(false);
-                PluginManager.Current.AssembliesToScan = new[]
+                PluginManager.Current = new PluginManager(
+                    new ActivatorServiceProvider(),
+                    CacheHelper.RuntimeCache, ProfilingLogger, false)
                 {
-                    Assembly.Load("Umbraco.Core"),
-                    Assembly.Load("umbraco"),
-                    Assembly.Load("Umbraco.Tests"),
-                    Assembly.Load("businesslogic"),
-                    Assembly.Load("cms"),
-                    Assembly.Load("controls"),
-                    Assembly.Load("umbraco.editorControls"),
-                    Assembly.Load("umbraco.MacroEngines"),
-                    Assembly.Load("umbraco.providers"),
-                    Assembly.Load("Umbraco.Web.UI"),
+                    AssembliesToScan = new[]
+                    {
+                        Assembly.Load("Umbraco.Core"),
+                        Assembly.Load("umbraco"),
+                        Assembly.Load("Umbraco.Tests"),
+                        Assembly.Load("businesslogic"),
+                        Assembly.Load("cms"),
+                        Assembly.Load("controls"),
+                        Assembly.Load("umbraco.editorControls"),
+                        Assembly.Load("umbraco.MacroEngines"),
+                        Assembly.Load("umbraco.providers"),
+                        Assembly.Load("Umbraco.Web.UI"),
+                    }
                 };
             }
         }
@@ -208,5 +211,6 @@ namespace Umbraco.Tests.TestHelpers
             get { return ProfilingLogger.Logger; }
         }
         protected ProfilingLogger ProfilingLogger { get; private set; }
+        protected CacheHelper CacheHelper { get; private set; }
     }
 }

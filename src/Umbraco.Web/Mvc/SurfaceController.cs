@@ -21,17 +21,6 @@ namespace Umbraco.Web.Mvc
         /// Default constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="logger"></param>
-        protected SurfaceController(ILogger logger, UmbracoContext umbracoContext)
-            : base(logger, umbracoContext)
-        {
-            _membershipHelper = new MembershipHelper(umbracoContext);
-        }
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
         protected SurfaceController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
@@ -106,7 +95,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected UmbracoPageResult CurrentUmbracoPage()
         {
-            return new UmbracoPageResult();
+            return new UmbracoPageResult(ApplicationContext.ProfilingLogger);
         }
 
         /// <summary>

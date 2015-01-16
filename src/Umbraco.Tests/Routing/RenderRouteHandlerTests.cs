@@ -40,8 +40,10 @@ namespace Umbraco.Tests.Routing
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveSurfaceControllers());
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
 
@@ -158,7 +160,7 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		public class CustomDocumentController : RenderMvcController
 		{
-		    public CustomDocumentController(ILogger logger, UmbracoContext umbracoContext) : base(logger, umbracoContext)
+		    public CustomDocumentController(UmbracoContext umbracoContext) : base(umbracoContext)
 		    {
 		    }
 

@@ -17,21 +17,13 @@ namespace Umbraco.Web.UI.Controls
 	public abstract class UmbracoControl : Control
 	{
 
-        protected UmbracoControl(UmbracoContext umbracoContext)
-            : this(LoggerResolver.Current.Logger, umbracoContext)
-        {
-        }
-
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="logger"></param>
         /// <param name="umbracoContext"></param>
-        protected UmbracoControl(ILogger logger, UmbracoContext umbracoContext)
+        protected UmbracoControl(UmbracoContext umbracoContext)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            Logger = logger;
             UmbracoContext = umbracoContext;
             Umbraco = new UmbracoHelper(umbracoContext);
         }
@@ -49,7 +41,22 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         public UmbracoHelper Umbraco { get; private set; }
 
-        public ILogger Logger { get; private set; }
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
+
         public UmbracoContext UmbracoContext { get; private set; }
 
 		protected ApplicationContext ApplicationContext

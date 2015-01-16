@@ -19,7 +19,9 @@ namespace Umbraco.Tests.Migrations
         [SetUp]
         public void Initialize()
         {
-            MigrationResolver.Current = new MigrationResolver(() => new List<Type>
+            MigrationResolver.Current = new MigrationResolver(
+                new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                () => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),
 					typeof(Dummy),

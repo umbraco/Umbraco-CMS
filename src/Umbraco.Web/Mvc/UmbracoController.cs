@@ -12,17 +12,10 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoController : Controller
     {
-        protected UmbracoController(ILogger logger, UmbracoContext umbracoContext)
-        {
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            Logger = logger;
-            UmbracoContext = umbracoContext;
-        }
-
         protected UmbracoController(UmbracoContext umbracoContext)
-            : this(LoggerResolver.Current.Logger, umbracoContext)
-        {            
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            UmbracoContext = umbracoContext;
         }
 
         protected UmbracoController()
@@ -44,7 +37,18 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns an ILogger
         /// </summary>
-        public ILogger Logger { get; private set; }
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
 
         /// <summary>
         /// Returns the current UmbracoContext

@@ -62,7 +62,7 @@ namespace umbraco
 
         public override void Render(ref XmlTree tree)
         {            
-            foreach (var sheet in Services.FileService.GetStylesheetsAtPath())
+            foreach (var sheet in Services.FileService.GetStylesheets())
             {
                 var xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = sheet.Alias;

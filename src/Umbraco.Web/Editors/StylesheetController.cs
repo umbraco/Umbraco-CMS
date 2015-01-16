@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<Stylesheet> GetAll()
         {
-            return Services.FileService.GetStylesheetsAtPath()
+            return Services.FileService.GetStylesheets()
                 .Select(x => 
                     new Stylesheet() {
                         Name = x.Alias,

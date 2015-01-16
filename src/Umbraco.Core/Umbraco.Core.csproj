@@ -133,6 +133,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
+    <Compile Include="ActivatorServiceProvider.cs" />
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
@@ -314,6 +315,7 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />

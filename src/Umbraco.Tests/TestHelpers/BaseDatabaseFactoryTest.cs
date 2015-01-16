@@ -201,16 +201,19 @@ namespace Umbraco.Tests.TestHelpers
         protected override void FreezeResolution()
         {
             PropertyEditorResolver.Current = new PropertyEditorResolver(
+                new ActivatorServiceProvider(), Logger,
                 () => PluginManager.Current.ResolvePropertyEditors());
 
             DataTypesResolver.Current = new DataTypesResolver(
+                new ActivatorServiceProvider(), Logger,
                 () => PluginManager.Current.ResolveDataTypes());
 
             MappingResolver.Current = new MappingResolver(
+                new ActivatorServiceProvider(), Logger,
                () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             if (PropertyValueConvertersResolver.HasCurrent == false)
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

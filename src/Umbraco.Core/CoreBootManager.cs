@@ -41,13 +41,20 @@ namespace Umbraco.Core
         private bool _isInitialized = false;
         private bool _isStarted = false;
         private bool _isComplete = false;
+        private readonly IServiceProvider _serviceProvider = new ActivatorServiceProvider();
         private readonly UmbracoApplicationBase _umbracoApplication;
         protected ApplicationContext ApplicationContext { get; set; }
         protected CacheHelper ApplicationCache { get; set; }
+        protected PluginManager PluginManager { get; private set; }
 
         protected UmbracoApplicationBase UmbracoApplication
         {
             get { return _umbracoApplication; }
+        }
+
+        protected IServiceProvider ServiceProvider
+        {
+            get { return _serviceProvider; }
         }
 
         public CoreBootManager(UmbracoApplicationBase umbracoApplication)
@@ -69,6 +76,11 @@ namespace Umbraco.Core
             _timer = _profilingLogger.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
             CreateApplicationCache();
+
+            //create and set the plugin manager (I'd much prefer to not use this singleton anymore but many things are using it unfortunately and
+            // the way that it is setup, there must only ever be one per app so without IoC it would be hard to make this not a singleton)
+            PluginManager = new PluginManager(ServiceProvider, ApplicationCache.RuntimeCache, _profilingLogger);
+            PluginManager.Current = PluginManager;
 
             //Create the legacy prop-eds mapping
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
@@ -195,7 +207,9 @@ namespace Umbraco.Core
             //ApplicationStartupHandler.RegisterHandlers();
             //... and set the special flag to let us resolve before frozen resolution
             ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-                PluginManager.Current.ResolveApplicationStartupHandlers())
+                ServiceProvider, 
+                LoggerResolver.Current.Logger,
+                PluginManager.ResolveApplicationStartupHandlers())
             {
                 CanResolveBeforeFrozen = true
             };
@@ -284,11 +298,12 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual void InitializeResolvers()
         {
-            PropertyEditorResolver.Current = new PropertyEditorResolver(() => PluginManager.Current.ResolvePropertyEditors());
-            ParameterEditorResolver.Current = new ParameterEditorResolver(() => PluginManager.Current.ResolveParameterEditors());
+            PropertyEditorResolver.Current = new PropertyEditorResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolvePropertyEditors());
+            ParameterEditorResolver.Current = new ParameterEditorResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveParameterEditors());
 
             //setup the validators resolver with our predefined validators
-            ValidatorsResolver.Current = new ValidatorsResolver(new[]
+            ValidatorsResolver.Current = new ValidatorsResolver(
+                ServiceProvider, LoggerResolver.Current.Logger, new[]
                 {
                     new Lazy<Type>(() => typeof (RequiredManifestValueValidator)),
                     new Lazy<Type>(() => typeof (RegexValidator)),
@@ -308,7 +323,8 @@ namespace Umbraco.Core
                 new DefaultServerMessenger());
 
             MappingResolver.Current = new MappingResolver(
-                () => PluginManager.Current.ResolveAssignedMapperTypes());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveAssignedMapperTypes());
 
            
 
@@ -316,31 +332,39 @@ namespace Umbraco.Core
             //    new RepositoryFactory(ApplicationCache));
 
             CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                () => PluginManager.Current.ResolveCacheRefreshers());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveCacheRefreshers());
 
             DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveDataTypes());
 
             MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-                () => PluginManager.Current.ResolveMacroRenderings());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveMacroRenderings());
 
             PackageActionsResolver.Current = new PackageActionsResolver(
-                () => PluginManager.Current.ResolvePackageActions());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolvePackageActions());
 
             ActionsResolver.Current = new ActionsResolver(
-                () => PluginManager.Current.ResolveActions());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveActions());
 
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
-                () => PluginManager.Current.ResolveTypes<IMigration>());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveTypes<IMigration>());
 
             // todo: remove once we drop IPropertyEditorValueConverter support.
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-                PluginManager.Current.ResolvePropertyEditorValueConverters());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                PluginManager.ResolvePropertyEditorValueConverters());
 
             // need to filter out the ones we dont want!!
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
+                ServiceProvider, LoggerResolver.Current.Logger,
+                PluginManager.ResolveTypes<IPropertyValueConverter>());
 
             // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
@@ -348,6 +372,7 @@ namespace Umbraco.Core
                 new DefaultShortStringHelper().WithDefaultConfig());
 
             UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 typeof(DefaultUrlSegmentProvider));
 
             // by default, no factory is activated

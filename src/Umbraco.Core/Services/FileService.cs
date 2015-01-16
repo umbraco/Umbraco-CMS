@@ -68,21 +68,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified. 
-        /// </summary>
-        /// <param name="rootPath">
-        /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem
-        /// </param>
-        /// <returns></returns>
-        public IEnumerable<Stylesheet> GetStylesheetsAtPath(string rootPath = null)
-        {
-            using (var repository = _repositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), _dataUowProvider.GetUnitOfWork()))
-            {
-                return repository.GetStylesheetsAtPath(rootPath);
-            }
-        }
-
-        /// <summary>
         /// Gets a <see cref="Stylesheet"/> object by its name
         /// </summary>
         /// <param name="name">Name of the stylesheet incl. extension</param>

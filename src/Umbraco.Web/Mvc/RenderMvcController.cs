@@ -25,12 +25,6 @@ namespace Umbraco.Web.Mvc
 			ActionInvoker = new RenderActionInvoker();
 		}
 
-        public RenderMvcController(ILogger logger, UmbracoContext umbracoContext)
-            : base(logger, umbracoContext)
-        {
-
-        }
-
         public RenderMvcController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {

@@ -22,21 +22,13 @@ namespace Umbraco.Web.WebApi
 
         }
 
-        protected UmbracoApiController(ILogger logger, UmbracoContext umbracoContext)
+        protected UmbracoApiController(UmbracoContext umbracoContext)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
             Umbraco = new UmbracoHelper(umbracoContext);
-            Logger = logger;
             _membershipHelper = new MembershipHelper(UmbracoContext);
-        }
-
-        protected UmbracoApiController(UmbracoContext umbracoContext)
-            : this(LoggerResolver.Current.Logger, umbracoContext)
-        {
-            
         }
 
         private readonly MembershipHelper _membershipHelper;
@@ -50,7 +42,21 @@ namespace Umbraco.Web.WebApi
             return Request.TryGetHttpContext();
         }
 
-        public ILogger Logger { get; private set; }
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
 
         /// <summary>
         /// Returns the current ApplicationContext

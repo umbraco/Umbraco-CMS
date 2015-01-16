@@ -168,6 +168,7 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
+    <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
