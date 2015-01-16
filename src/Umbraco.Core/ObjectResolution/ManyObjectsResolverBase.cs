@@ -237,7 +237,14 @@ namespace Umbraco.Core.ObjectResolution
                             // create new instances per HttpContext
                             if (CurrentHttpContext.Items[_httpContextKey] == null)
                             {
-                                CurrentHttpContext.Items[_httpContextKey] = CreateInstances().ToArray();    
+                                var instances = CreateInstances().ToArray();
+                                var disposableInstances = instances.OfType<IDisposable>();
+                                //Ensure anything resolved that is IDisposable is disposed when the request termintates
+                                foreach (var disposable in disposableInstances)
+                                {
+                                    CurrentHttpContext.DisposeOnPipelineCompleted(disposable);
+                                }
+                                CurrentHttpContext.Items[_httpContextKey] = instances;
                             }
                             return (TResolved[])CurrentHttpContext.Items[_httpContextKey];
                             
