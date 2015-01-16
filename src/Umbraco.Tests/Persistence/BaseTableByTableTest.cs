@@ -12,6 +12,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the service context
                 new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
                 cacheHelper,
-                new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))))
+                new ProfilingLogger(new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))), Mock.Of<IProfiler>()))
                 {
                     IsReady = true
                 };

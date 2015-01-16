@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Moq;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using umbraco;
@@ -11,6 +12,8 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.editorControls;
@@ -236,18 +239,18 @@ namespace Umbraco.Tests.Plugins
             var list1 = new[] { f1, f2, f3, f4, f5, f6 };
             var list2 = new[] { f1, f3, f5 };
             var list3 = new[] { f1, f3, f5, f7 };
-
+            
             //Act
-            var hash1 = PluginManager.GetFileHash(list1);
-            var hash2 = PluginManager.GetFileHash(list2);
-            var hash3 = PluginManager.GetFileHash(list3);
+            var hash1 = PluginManager.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash2 = PluginManager.GetFileHash(list2, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            var hash3 = PluginManager.GetFileHash(list3, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //Assert
             Assert.AreNotEqual(hash1, hash2);
             Assert.AreNotEqual(hash1, hash3);
             Assert.AreNotEqual(hash2, hash3);
 
-            Assert.AreEqual(hash1, PluginManager.GetFileHash(list1));
+            Assert.AreEqual(hash1, PluginManager.GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
         }
 
         [Test]

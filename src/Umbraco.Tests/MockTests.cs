@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Moq;
 using Umbraco.Web;
@@ -112,7 +113,7 @@ namespace Umbraco.Tests
                     new Mock<INotificationService>().Object,
                     Mock.Of<ILocalizedTextService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
-                Mock.Of<ILogger>());
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             
             Assert.Pass();
         }

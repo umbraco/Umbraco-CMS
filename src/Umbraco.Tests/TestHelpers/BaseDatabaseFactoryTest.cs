@@ -81,7 +81,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
                 cacheHelper,
-                Logger)
+                ProfilingLogger)
             {
                 IsReady = true
             };

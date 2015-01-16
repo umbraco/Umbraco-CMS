@@ -13,6 +13,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),
                 cacheHelper,
-                logger)
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()))
                 {
                     IsReady = true
                 };

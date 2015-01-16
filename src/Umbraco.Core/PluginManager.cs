@@ -196,7 +196,7 @@ namespace Umbraco.Core
 
                             //add the trees.config - use the contents to create the has since this gets resaved on every app startup!
                             new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
-						}
+						}, _appContext.ProfilingLogger
                     );
                 return _currentAssembliesHash;
             }
@@ -219,9 +219,9 @@ namespace Umbraco.Core
         /// (true will make a hash based on it's contents)
         /// </param>
         /// <returns></returns>
-        internal static long GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders)
+        internal static long GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
         {
-            using (DisposableTimer.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
             {
                 var hashCombiner = new HashCodeCombiner();
 
@@ -250,9 +250,9 @@ namespace Umbraco.Core
             }
         }
 
-        internal static long GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders)
+        internal static long GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, ProfilingLogger logger)
         {
-            using (DisposableTimer.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
             {
                 var hashCombiner = new HashCodeCombiner();
 
@@ -610,7 +610,7 @@ namespace Umbraco.Core
             //we want to know if it fails ever, not how long it took if it is only 0.
 
             var typesAsArray = types.ToArray();
-            //using (DisposableTimer.DebugDuration<PluginManager>(
+            //using (_appContext.ProfilingLogger.DebugDuration<PluginManager>(
             //	String.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
             //	String.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
             //{
@@ -625,7 +625,7 @@ namespace Umbraco.Core
                 catch (Exception ex)
                 {
 
-                    LogHelper.Error<PluginManager>(String.Format("Error creating type {0}", t.FullName), ex);
+                    _appContext.ProfilingLogger.Logger.Error<PluginManager>(String.Format("Error creating type {0}", t.FullName), ex);
 
                     if (throwException)
                     {
@@ -659,9 +659,9 @@ namespace Umbraco.Core
             {
                 var typesFound = new List<Type>();
 
-                using (DisposableTimer.TraceDuration<PluginManager>(
-                    () => String.Format("Starting resolution types of {0}", typeof(T).FullName),
-                    () => String.Format("Completed resolution of types of {0}, found {1}", typeof(T).FullName, typesFound.Count)))
+                using (_appContext.ProfilingLogger.TraceDuration<PluginManager>(
+                    String.Format("Starting resolution types of {0}", typeof(T).FullName),
+                    String.Format("Completed resolution of types of {0}, found {1}", typeof(T).FullName, typesFound.Count)))
                 {
                     //check if the TypeList already exists, if so return it, if not we'll create it
                     var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
@@ -669,7 +669,7 @@ namespace Umbraco.Core
                     //need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
                     if (cacheResult && typeList != null)
                     {
-                        LogHelper.Debug<PluginManager>("Existing typeList found for {0} with resolution type {1}", () => typeof(T), () => resolutionType);
+                        _appContext.ProfilingLogger.Logger.Debug<PluginManager>("Existing typeList found for {0} with resolution type {1}", () => typeof(T), () => resolutionType);
                     }
                     
                     //if we're not caching the result then proceed, or if the type list doesn't exist then proceed
@@ -691,7 +691,7 @@ namespace Umbraco.Core
                             //so in this instance there will never be a result.
                             if (fileCacheResult.Exception != null && fileCacheResult.Exception is CachedPluginNotFoundInFileException)
                             {
-                                LogHelper.Debug<PluginManager>("Tried to find typelist for type {0} and resolution {1} in file cache but the type was not found so loading types by assembly scan ", () => typeof(T), () => resolutionType);
+                                _appContext.ProfilingLogger.Logger.Debug<PluginManager>("Tried to find typelist for type {0} and resolution {1} in file cache but the type was not found so loading types by assembly scan ", () => typeof(T), () => resolutionType);
 
                                 //we don't have a cache for this so proceed to look them up by scanning
                                 LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
@@ -716,7 +716,7 @@ namespace Umbraco.Core
                                             //if there are any exceptions loading types, we have to exist, this should never happen so 
                                             //we will need to revert to scanning for types.
                                             successfullyLoadedFromCache = false;
-                                            LogHelper.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof(T).FullName, ex);
+                                            _appContext.ProfilingLogger.Logger.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof(T).FullName, ex);
                                             break;
                                         }
                                     }
@@ -727,14 +727,14 @@ namespace Umbraco.Core
                                     }
                                     else
                                     {
-                                        LogHelper.Debug<PluginManager>("Loaded plugin types {0} with resolution {1} from persisted cache", () => typeof(T), () => resolutionType);
+                                        _appContext.ProfilingLogger.Logger.Debug<PluginManager>("Loaded plugin types {0} with resolution {1} from persisted cache", () => typeof(T), () => resolutionType);
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            LogHelper.Debug<PluginManager>("Assembly changes detected, loading types {0} for resolution {1} by assembly scan", () => typeof(T), () => resolutionType);
+                            _appContext.ProfilingLogger.Logger.Debug<PluginManager>("Assembly changes detected, loading types {0} for resolution {1} by assembly scan", () => typeof(T), () => resolutionType);
 
                             //we don't have a cache for this so proceed to look them up by scanning
                             LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
@@ -746,7 +746,7 @@ namespace Umbraco.Core
                             //add the type list to the collection
                             var added = _types.Add(typeList);
 
-                            LogHelper.Debug<PluginManager>("Caching of typelist for type {0} and resolution {1} was successful = {2}", () => typeof(T), () => resolutionType, () => added);
+                            _appContext.ProfilingLogger.Logger.Debug<PluginManager>("Caching of typelist for type {0} and resolution {1} was successful = {2}", () => typeof(T), () => resolutionType, () => added);
 
                         }
                     }

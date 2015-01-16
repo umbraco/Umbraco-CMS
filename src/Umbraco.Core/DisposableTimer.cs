@@ -62,7 +62,7 @@ namespace Umbraco.Core
             }
         }
 
-	    protected DisposableTimer(Action<long> callback)
+	    protected internal DisposableTimer(Action<long> callback)
 	    {
 	        if (callback == null) throw new ArgumentNullException("callback");
 	        _callback = callback;

@@ -11,6 +11,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
@@ -32,7 +33,8 @@ namespace Umbraco.Tests.TestHelpers
         [TestFixtureSetUp]
         public void InitializeFixture()
         {
-            Logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+            ProfilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 
         [SetUp]
@@ -158,7 +160,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
                 cacheHelper,
-                Logger)
+                ProfilingLogger)
             {
                 IsReady = true
             };
@@ -201,6 +203,10 @@ namespace Umbraco.Tests.TestHelpers
             get { return ApplicationContext.Current; }
         }
 
-        protected ILogger Logger { get; private set; }
+        protected ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+        protected ProfilingLogger ProfilingLogger { get; private set; }
     }
 }

@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 
 
@@ -28,7 +29,7 @@ namespace Umbraco.Core
         /// <param name="serviceContext"></param>
         /// <param name="cache"></param>
         /// <param name="logger"></param>
-	    public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ILogger logger)
+        public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ProfilingLogger logger)
 	    {
             if (dbContext == null) throw new ArgumentNullException("dbContext");
             if (serviceContext == null) throw new ArgumentNullException("serviceContext");
@@ -36,7 +37,7 @@ namespace Umbraco.Core
             _databaseContext = dbContext;
             _services = serviceContext;
             ApplicationCache = cache;
-            Logger = logger;
+            ProfilingLogger = logger;
 	    }
 
 	    /// <summary>
@@ -47,7 +48,8 @@ namespace Umbraco.Core
         /// <param name="cache"></param>
         [Obsolete("Use the other constructor specifying an ILogger instead")]
         public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache)
-            : this(dbContext, serviceContext, cache, LoggerResolver.Current.Logger)
+            : this(dbContext, serviceContext, cache, 
+                new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler))
         {
         }
 
@@ -96,7 +98,7 @@ namespace Umbraco.Core
 	    /// <remarks>
 	    /// This is NOT thread safe 
 	    /// </remarks>
-        [Obsolete("Use the other method specifying an ILogger instead")]
+        [Obsolete("Use the other method specifying an ProfilingLogger instead")]
 	    public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, bool replaceContext)
         {
             if (ApplicationContext.Current != null)
@@ -124,7 +126,7 @@ namespace Umbraco.Core
 	    /// <remarks>
 	    /// This is NOT thread safe 
 	    /// </remarks>
-        public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ILogger logger, bool replaceContext)
+        public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ProfilingLogger logger, bool replaceContext)
         {
             if (ApplicationContext.Current != null)
             {
@@ -150,10 +152,10 @@ namespace Umbraco.Core
 		public CacheHelper ApplicationCache { get; private set; }
 
         /// <summary>
-        /// Exposes the global ILogger - this should generally not be accessed via the UmbracoContext and should normally just be exposed 
+        /// Exposes the global ProfilingLogger - this should generally not be accessed via the UmbracoContext and should normally just be exposed 
         /// on most base classes or injected with IoC
         /// </summary>
-	    public ILogger Logger { get; private set; }
+        public ProfilingLogger ProfilingLogger { get; private set; }
 
 	    // IsReady is set to true by the boot manager once it has successfully booted
         // note - the original umbraco module checks on content.Instance in umbraco.dll
@@ -227,7 +229,7 @@ namespace Umbraco.Core
 
 					if (currentVersion != configStatus)
 					{
-                        Logger.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                        ProfilingLogger.Logger.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
 					}
 						
 

@@ -7,7 +7,7 @@ using Umbraco.Core.Logging;
 namespace Umbraco.Core.Profiling
 {
     /// <summary>
-    /// A profiler that outputs its results to the LogHelper
+    /// A profiler that outputs its results to an ILogger
     /// </summary>
     internal class LogProfiler : IProfiler
     {
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Profiling
         public IDisposable Step(string name)
         {
             _logger.Debug(typeof(LogProfiler), "Starting - " + name);
-            return DisposableTimer.Start(l => _logger.Info(typeof(LogProfiler), () => name + " (took " + l + "ms)"));
+            return new DisposableTimer(l => _logger.Info(typeof(LogProfiler), () => name + " (took " + l + "ms)"));
         }
 
         public void Start()

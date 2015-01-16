@@ -36,7 +36,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class CoreBootManager : IBootManager
     {
-
+        private ProfilingLogger _profilingLogger;
         private DisposableTimer _timer;
         private bool _isInitialized = false;
         private bool _isStarted = false;
@@ -64,7 +64,9 @@ namespace Umbraco.Core
             InitializeLoggerResolver();
             InitializeProfilerResolver();
 
-            _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
+            _profilingLogger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
+
+            _timer = _profilingLogger.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
             CreateApplicationCache();
 
@@ -119,7 +121,7 @@ namespace Umbraco.Core
         protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
         {
             //create the ApplicationContext
-            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache, LoggerResolver.Current.Logger);
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache, _profilingLogger);
         }
 
         /// <summary>
