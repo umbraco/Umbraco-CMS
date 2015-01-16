@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             Execute.Code(UpdateRelatedLinksDataDo);
         }
 
-        public static string UpdateRelatedLinksDataDo(Database database)
+        public string UpdateRelatedLinksDataDo(Database database)
         {
             if (database != null)
             {
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
                         catch (Exception ex) 
                         {
-                            LogHelper.Error<UpdateRelatedLinksData>("The data stored for property id " + data.Id + " on document " + data.NodeId + 
+                            Logger.Error<UpdateRelatedLinksData>("The data stored for property id " + data.Id + " on document " + data.NodeId + 
                                 " is not valid XML, the data will be removed because it cannot be converted to the new format. The value was: " + data.Text, ex);
 
                             data.Text = "";

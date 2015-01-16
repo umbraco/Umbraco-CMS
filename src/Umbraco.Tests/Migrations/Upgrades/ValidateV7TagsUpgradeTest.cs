@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
 
             var migration = new AlterTagRelationsTable();
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database);
+            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database, Logger);
             migration.GetUpExpressions(migrationContext);
 
             Assert.AreEqual(

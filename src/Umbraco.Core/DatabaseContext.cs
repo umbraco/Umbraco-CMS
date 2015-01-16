@@ -639,7 +639,7 @@ namespace Umbraco.Core
                                                 ? installedVersion
                                                 : new Version(GlobalSettings.ConfigurationStatus);
                 var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(_logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                 var upgraded = runner.Execute(database, true);
                 message = message + "<p>Upgrade completed!</p>";
 

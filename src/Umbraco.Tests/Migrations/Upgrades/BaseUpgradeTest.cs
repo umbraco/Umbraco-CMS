@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             //Setup the MigrationRunner
-            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             bool upgraded = migrationRunner.Execute(db, provider, true);
 
             Assert.That(upgraded, Is.True);

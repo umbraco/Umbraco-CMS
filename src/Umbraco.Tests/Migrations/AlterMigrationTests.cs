@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Migrations
         public void Drop_Foreign_Key()
         {
             // Arrange
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
             var stub = new DropForeignKeyMigrationStub(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
 
             // Act
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Migrations
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
             var stub = new AlterUserTableMigrationStub(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
 
             // Act
