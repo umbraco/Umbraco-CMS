@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         {
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
-                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
                 //This should be 2 because this table has 2 keys
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsContentType2ContentType") && x.Item3.InvariantEquals("PRIMARY")) == 0)

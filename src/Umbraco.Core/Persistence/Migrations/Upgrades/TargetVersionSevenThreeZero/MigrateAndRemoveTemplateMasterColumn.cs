@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
         {
 
             //Don't execute anything if there is no 'master' column - this might occur if the db is already upgraded
-            var cols = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(Context.Database);
+            var cols = SqlSyntax.GetColumnsInSchema(Context.Database);
             if (cols.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")) == false)
             {
                 return;
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             else
             {
                 //These are the old aliases, before removing them, check they exist
-                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
                 if (constraints.Any(x => x.Item1.InvariantEquals("cmsTemplate") && x.Item3.InvariantEquals("FK_cmsTemplate_cmsTemplate")))
                 {
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 //TODO: Hopefully it's not named something else silly in some crazy old versions
             }
 
-            var columns = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
             if (columns.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")))
             {
                 Delete.Column("master").FromTable("cmsTemplate");    
