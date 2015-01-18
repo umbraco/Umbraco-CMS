@@ -88,10 +88,6 @@ angular.module("umbraco.directives")
 
                 element.find("a:first").html(node.name);
 
-                if (!node.menuUrl) {
-                    element.find("a:last").remove();
-                }
-
                 if (node.style) {
                     element.find("i:first").attr("style", node.style);
                 }
