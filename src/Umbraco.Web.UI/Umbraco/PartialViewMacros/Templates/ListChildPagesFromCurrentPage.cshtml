@@ -1,14 +1,14 @@
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
-@* Ensure that the Current Page has children, where the property umbracoNaviHide is not True *@
-@if (CurrentPage.Children.Where("Visible").Any())
+@{ var selection = CurrentPage.Children.Where("Visible"); }
+
+@if (selection.Any())
 {
-    <ul>            
-        @* For each child page under the root node, where the property umbracoNaviHide is not True *@
-        @foreach (var childPage in CurrentPage.Children.Where("Visible"))
+    <ul>
+        @foreach (var item in selection)
         {
             <li>
-                <a href="@childPage.Url">@childPage.Name</a>
+                <a href="@item.Url">@item.Name</a>
             </li>
         }
     </ul>
