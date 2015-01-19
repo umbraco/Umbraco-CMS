@@ -17,13 +17,13 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-        public ISqlSyntaxProvider SqlSyntaxProvider { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
-        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntaxProvider)
+        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger)
         {
-            if (sqlSyntaxProvider == null) throw new ArgumentNullException("sqlSyntaxProvider");
-            SqlSyntaxProvider = sqlSyntaxProvider;
+            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
+            SqlSyntax = sqlSyntax;
         }
 
         /// <summary>

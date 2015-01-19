@@ -314,9 +314,12 @@
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
+    <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
@@ -327,6 +330,9 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\IAuditService.cs" />
+    <Compile Include="Services\ITaskService.cs" />
+    <Compile Include="Services\RepositoryService.cs" />
+    <Compile Include="Services\TaskService.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />

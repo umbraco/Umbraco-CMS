@@ -41,5 +41,8 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
         public string Comment { get; set; }
+
+        [ResultColumn]
+        public TaskTypeDto TaskTypeDto { get; set; }
     }
 }

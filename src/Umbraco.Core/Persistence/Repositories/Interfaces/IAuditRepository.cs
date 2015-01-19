@@ -1,3 +1,4 @@
+using System.Collections;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 

@@ -11,8 +11,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class AuditRepository : PetaPocoRepositoryBase<int, AuditItem>, IAuditRepository
     {
-        public AuditRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntaxProvider)
-            : base(work, cache, logger, sqlSyntaxProvider)
+        public AuditRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 
@@ -68,9 +68,9 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Guid NodeObjectTypeId
         {
             get { throw new NotImplementedException(); }
-        } 
+        }
         #endregion
 
-        
+
     }
 }

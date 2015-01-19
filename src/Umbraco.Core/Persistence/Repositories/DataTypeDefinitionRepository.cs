@@ -150,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name", new {name = entity.Name});
+WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new {name = entity.Name});
             if (exists > 0)
             {
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
@@ -195,7 +195,7 @@ WHERE umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name",
             //Cannot change to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + @"= @name
+WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + @"= @name
 AND umbracoNode.id <> @id", 
                     new { id = entity.Id, name = entity.Name });
             if (exists > 0)

@@ -283,7 +283,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .Select("*")
                .From<NodeDto>()
                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-               .Where("umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+               .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
             var missingRoles = roleNames.Except(existingRoles);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
@@ -306,9 +306,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var assignedSql = new Sql();
             assignedSql.Select(string.Format(
                     "{0},{1},{2}",
-                    SqlSyntaxProvider.GetQuotedColumnName("text"),
-                    SqlSyntaxProvider.GetQuotedColumnName("Member"),
-                    SqlSyntaxProvider.GetQuotedColumnName("MemberGroup")))
+                    SqlSyntax.GetQuotedColumnName("text"),
+                    SqlSyntax.GetQuotedColumnName("Member"),
+                    SqlSyntax.GetQuotedColumnName("MemberGroup")))
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
                 .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select("*")
                     .From<NodeDto>()
                     .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-                    .Where("umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+                    .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
 
             Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",

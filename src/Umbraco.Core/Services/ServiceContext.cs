@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services
             var fileProvider = fileUnitOfWorkProvider;
 
             if (_auditService == null)
-                _auditService = new Lazy<IAuditService>(() => new AuditService(provider, repositoryFactory));
+                _auditService = new Lazy<IAuditService>(() => new AuditService(provider, repositoryFactory, logger));
 
             if (_localizedTextService == null)
                 _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
@@ -141,42 +141,42 @@ namespace Umbraco.Core.Services
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
 
             if (_serverRegistrationService == null)
-                _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory));
+                _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory, logger));
 
             if (_userService == null)
-                _userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory));
+                _userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory, logger));
 
             if (_memberService == null)
-                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, _memberGroupService.Value, _dataTypeService.Value));
+                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(logger, provider, repositoryFactory, publishingStrategy, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, publishingStrategy, _dataTypeService.Value, _userService.Value));
 
             if (_mediaService == null)
-                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, _dataTypeService.Value, _userService.Value));
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, _dataTypeService.Value, _userService.Value));
 
             if (_contentTypeService == null)
-                _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(logger, provider, repositoryFactory, _contentService.Value, _mediaService.Value));
+                _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory, logger, _contentService.Value, _mediaService.Value));
 
             if (_dataTypeService == null)
-                _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory));
+                _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory, logger));
 
             if (_fileService == null)
                 _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory));
 
             if (_localizationService == null)
-                _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory));
+                _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger));
 
             if (_packagingService == null)
                 _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _userService.Value, repositoryFactory, provider));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
-                    provider, repositoryFactory, 
+                    provider, repositoryFactory, logger, 
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value));
 
             if (_relationService == null)
-                _relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory, _entityService.Value));
+                _relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory, logger, _entityService.Value));
 
             if (_treeService == null)
                 _treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(logger, cache));
@@ -185,16 +185,16 @@ namespace Umbraco.Core.Services
                 _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, provider, cache));
 
             if (_macroService == null)
-                _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory));
+                _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory, logger));
 
             if (_memberTypeService == null)
-                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory, _memberService.Value));
+                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory, logger, _memberService.Value));
 
             if (_tagService == null)
-                _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory));
+                _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory, logger));
 
             if (_memberGroupService == null)
-                _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory));
+                _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory, logger));
 
         }
 

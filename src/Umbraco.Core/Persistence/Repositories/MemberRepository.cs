@@ -424,7 +424,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                         .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
 
-                    var deleteSql = SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
@@ -443,7 +443,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
                             .Where<ContentDto>(dto => dto.ContentTypeId == id1);
 
-                        var deleteSql = SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                         Database.Execute(deleteSql);
                     }
                 }
@@ -650,7 +650,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Tuple<string, object[]>> filterCallback = null;
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                sbWhere.Append("AND ((umbracoNode. " + SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ") " +
+                sbWhere.Append("AND ((umbracoNode. " + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ") " +
                                 "OR (cmsMember.LoginName LIKE @0" + args.Count + "))");
                 args.Add("%" + filter + "%");
                 filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());

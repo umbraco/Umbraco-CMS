@@ -64,6 +64,11 @@ namespace Umbraco.Core.Persistence
      
         #endregion
 
+        public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
+        {
+            return new TaskRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+        }
+
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
         {
             return new AuditRepository(uow, _cacheHelper, _logger, _sqlSyntax);

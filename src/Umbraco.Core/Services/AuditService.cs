@@ -1,27 +1,22 @@
 using System;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public sealed class AuditService : IAuditService
+    public sealed class AuditService : RepositoryService, IAuditService
     {
-        private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-
-        public AuditService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+        public AuditService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
+            : base(provider, repositoryFactory, logger)
         {
-            if (provider == null) throw new ArgumentNullException("provider");
-            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
-            _uowProvider = provider;
-            _repositoryFactory = repositoryFactory;
         }
 
         public void Add(AuditType type, string comment, int userId, int objectId)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repo = _repositoryFactory.CreateAuditRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateAuditRepository(uow))
             {
                 repo.AddOrUpdate(new AuditItem(objectId, comment, type, userId));
                 uow.Commit();

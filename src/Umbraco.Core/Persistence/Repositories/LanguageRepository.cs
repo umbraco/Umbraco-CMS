@@ -150,13 +150,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            var cultureNameRepo = new LanguageByCultureNameRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntaxProvider);
+            var cultureNameRepo = new LanguageByCultureNameRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
             return cultureNameRepo.Get(cultureName);
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            var isoRepo = new LanguageByIsoCodeRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntaxProvider);
+            var isoRepo = new LanguageByIsoCodeRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
             return isoRepo.Get(isoCode);
         }
 

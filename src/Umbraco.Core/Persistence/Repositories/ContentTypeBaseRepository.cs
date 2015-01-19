@@ -28,8 +28,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IContentTypeComposition
     {
 
-        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntaxProvider)
-            : base(work, cache, logger, sqlSyntaxProvider)
+        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Cannot add a duplicate content type type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-WHERE cmsContentType." + SqlSyntaxProvider.GetQuotedColumnName("alias") + @"= @alias
+WHERE cmsContentType." + SqlSyntax.GetQuotedColumnName("alias") + @"= @alias
 AND umbracoNode.nodeObjectType = @objectType",
                 new { alias = entity.Alias, objectType = NodeObjectTypeId });
             if (exists > 0)
@@ -184,7 +184,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             //Cannot update to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-WHERE cmsContentType." + SqlSyntaxProvider.GetQuotedColumnName("alias") + @"= @alias
+WHERE cmsContentType." + SqlSyntax.GetQuotedColumnName("alias") + @"= @alias
 AND umbracoNode.nodeObjectType = @objectType
 AND umbracoNode.id <> @id",
                 new { id = dto.NodeId, alias = entity.Alias, objectType = NodeObjectTypeId });

@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
                                "DELETE FROM umbracoUserLogins WHERE userID = @Id",
-                               "DELETE FROM umbracoUser2app WHERE " + SqlSyntaxProvider.GetQuotedColumnName("user") + "=@Id",
+                               "DELETE FROM umbracoUser2app WHERE " + SqlSyntax.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id"
                            };
             return list;
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var section in user.RemovedSections)
                 {
                     //we need to manually delete thsi record because it has a composite key
-                    Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
+                    Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntax.GetQuotedColumnName("user") + "=@UserId",
                         new { Section = section, UserId = (int)user.Id });
                 }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     else
                     {
                         //we need to manually update this record because it has a composite key
-                        Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
+                        Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntax.GetQuotedColumnName("user") + "=@UserId",
                                                      new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });
                     }
                 }
@@ -270,7 +270,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = GetBaseQuery(false);
             var innerSql = GetBaseQuery("umbracoUser.id");
-            innerSql.Where("umbracoUser2app.app = " + SqlSyntaxProvider.GetQuotedValue(sectionAlias));
+            innerSql.Where("umbracoUser2app.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
             sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
 
             return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
@@ -344,7 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>        
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
@@ -356,7 +356,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityIds"></param>
         public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             repo.ReplaceUserPermissions(userId, permissions, entityIds);
         }
 

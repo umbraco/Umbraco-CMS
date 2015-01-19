@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContentType PerformGet(int id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(
-                new[] {id}, Database, SqlSyntaxProvider, this, _templateRepository);
+                new[] {id}, Database, SqlSyntax, this, _templateRepository);
             
             var contentType = contentTypes.SingleOrDefault();
             return contentType;
@@ -42,13 +42,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntaxProvider, this, _templateRepository);
+                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
             }
             else
             {
                 var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntaxProvider, this, _templateRepository);
+                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
             }
         }
 
