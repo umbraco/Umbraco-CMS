@@ -45,7 +45,7 @@
 
         submitSucces: function (t) {
             if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', 'Saving Xslt file failed',"<pre>" + t + "</pre>");
+                top.UmbSpeechBubble.ShowMessage('error', 'Saving XSLT file failed',"<pre>" + t + "</pre>");
             }
             
             var newFilePath = this._opts.nameTxtBox.val();
@@ -57,11 +57,11 @@
                 UmbClientMgr.contentFrame(newLocation);
 
                 //we need to do this after we navigate otherwise the navigation will wait unti lthe message timeout is done!
-                top.UmbSpeechBubble.ShowMessage('save', 'Xslt file saved', '');
+                top.UmbSpeechBubble.ShowMessage('save', 'XSLT file saved', '');
             }
             else {
 
-                top.UmbSpeechBubble.ShowMessage('save', 'Xslt file saved', '');
+                top.UmbSpeechBubble.ShowMessage('save', 'XSLT file saved', '');
                 UmbClientMgr.mainTree().setActiveTreeType('xslt');
                 //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
                 UmbClientMgr.mainTree().syncTree("-1,init," + this._opts.originalFileName, true, null, newFilePath);
@@ -74,7 +74,7 @@
 
         submitFailure: function (t) {
             alert(t);
-            top.UmbSpeechBubble.ShowMessage('warning', 'Xslt file could not be saved', '');
+            top.UmbSpeechBubble.ShowMessage('warning', 'XSLT file could not be saved', '');
         }
     });
 })(jQuery);

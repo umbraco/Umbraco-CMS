@@ -33,12 +33,12 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return _fileSystem; }
         }
 
-        internal virtual void AddFolder(string folderPath)
+        public virtual void AddFolder(string folderPath)
         {
             _work.RegisterAdded(new Folder(folderPath), this);
         }
 
-        internal virtual void DeleteFolder(string folderPath)
+        public virtual void DeleteFolder(string folderPath)
         {
             _work.RegisterRemoved(new Folder(folderPath), this);
         }
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories
         
         protected virtual void PersistNewItem(TEntity entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            using (var stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
                 entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
@@ -140,12 +140,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
             }
         }
 
         protected virtual void PersistUpdatedItem(TEntity entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            using (var stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
                 entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
@@ -153,6 +154,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
             }
         }
 
@@ -165,6 +167,16 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets a stream that is used to write to the file
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        protected virtual Stream GetContentStream(string content)
+        {
+            return new MemoryStream(Encoding.UTF8.GetBytes(content));
+        }
 
         protected IEnumerable<string> FindAllFiles(string path)
         {

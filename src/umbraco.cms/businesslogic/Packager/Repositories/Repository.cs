@@ -6,6 +6,7 @@ using System.Xml;
 using System.IO;
 using System.Net;
 using Umbraco.Core;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
@@ -148,6 +149,15 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         }
 
+        public string fetch(string packageGuid, int userId)
+        {
+            // log
+            Audit.Add(AuditTypes.PackagerInstall,
+                                    string.Format("Package {0} fetched from {1}", packageGuid, this.Guid),
+                                    userId, -1);
+            return fetch(packageGuid);
+        }
+
         public bool HasConnection()
         {
 
@@ -222,6 +232,8 @@ namespace umbraco.cms.businesslogic.packager.repositories
                     return "packages\\" + packageGuid + ".umb";
                 }
             }
+
+            // log
 
             return "";
         }

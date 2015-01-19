@@ -24,13 +24,18 @@ namespace umbraco
             //NOTE: TypeID is the parent id!
             //NOTE: ParentID is aparently a flag to determine if we are to create a template! Hack much ?! :P
             var parentId = TypeID != 0 ? TypeID : -1;
-            var contentType = parentId == -1
-                                  ? new ContentType(-1)
-                                  : new ContentType(ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentId));
-            contentType.CreatorId = User.Id;
+            
             // when creating a content type, enforce PascalCase
             // preserve separator because contentType.Alias will re-alias it
-            contentType.Alias = Alias.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase, ' ');
+            var cleanAlias = Alias.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase, ' ');
+
+            var contentType = parentId == -1
+                                  ? new ContentType(-1)
+                                  : new ContentType(ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentId), cleanAlias);
+
+            contentType.CreatorId = User.Id;
+
+            contentType.Alias = cleanAlias;
             contentType.Name = Alias.Replace("'", "''");
             contentType.Icon = ".sprTreeFolder";
 

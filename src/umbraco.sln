@@ -55,6 +55,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		Release.AspNetCompiler.Debug = "False"
 		SlnRelativePath = "Umbraco.Web.UI.Client\"
 		DefaultWebSiteLanguage = "Visual C#"
+		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"

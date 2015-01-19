@@ -31,7 +31,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             var deferred = $q.defer();
             
-            if (formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
+            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
+
+                args.scope.busy = true;
+
                 args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
                     .then(function (data) {
 
@@ -42,6 +45,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             savedContent: data,
                             rebindCallback: self.reBindChangedProperties(args.content, data)
                         });
+
+                        args.scope.busy = false;
                         deferred.resolve(data);
 
                     }, function (err) {
@@ -50,6 +55,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             err: err,
                             rebindCallback: self.reBindChangedProperties(args.content, err.data)
                         });
+                        args.scope.busy = false;
                         deferred.reject(err);
                     });
             }

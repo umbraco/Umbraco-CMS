@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using System.Web.Mvc.Html;
@@ -102,7 +103,12 @@ namespace Umbraco.Web.Macros
         public string Execute(MacroModel macro, INode node)
         {
             var umbCtx = _getUmbracoContext();
-            return Execute(macro, umbCtx.ContentCache.GetById(node.Id));
+            //NOTE: This is a bit of a nasty hack to check if the INode is actually already based on an IPublishedContent 
+            // (will be the case when using LegacyConvertedNode )
+            return Execute(macro,
+                (node is IPublishedContent)
+                    ? (IPublishedContent)node
+                    : umbCtx.ContentCache.GetById(node.Id));
         }
 
         public string Execute(MacroModel macro, IPublishedContent content)

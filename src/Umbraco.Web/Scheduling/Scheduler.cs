@@ -140,7 +140,6 @@ namespace Umbraco.Web.Scheduling
                 }            
             }            
         }
-
         
     }
 }

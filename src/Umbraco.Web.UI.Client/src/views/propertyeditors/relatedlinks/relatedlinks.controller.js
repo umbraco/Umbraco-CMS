@@ -128,7 +128,7 @@
 
             function getElementIndexByUrl(url) {
                 for (var i = 0; i < $scope.model.value.length; i++) {
-                    if ($scope.model.value[i].link === url) {
+                    if ($scope.model.value[i].link == url) {
                         return i;
                     }
                 }

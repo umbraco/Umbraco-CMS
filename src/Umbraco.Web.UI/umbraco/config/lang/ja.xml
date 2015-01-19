@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="ja" intName="Japanese" localName="日本語" lcid="17" culture="ja-JP">
   <creator>
-    <name>Umbraco</name>
-    <link>http://Umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">ドメインの割り当て</key>
@@ -351,7 +351,7 @@
               <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"UmbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
               <p>
               <strong>再施行</strong>ボタンをクリックして
-              続けます。<br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">
+              続けます。<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
         必要ならISPに連絡するなどしてみてください。
@@ -466,7 +466,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="renewSession">作業を保存して今すぐ更新</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Umbraco にようこそ。ユーザー名とパスワードを入力してください:</key>
   </area>
   <area alias="main">

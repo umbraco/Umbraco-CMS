@@ -130,7 +130,7 @@
       <create assembly="umbraco" type="MediaTypeTasks" />
       <delete assembly="umbraco" type="MediaTypeTasks" />
     </tasks>
-  </nodeType>
+  </nodeType>  
   <nodeType alias="initmember">
     <header>member</header>
     <usercontrol>/create/member.ascx</usercontrol>
@@ -324,13 +324,29 @@
   </nodeType>
   <nodeType alias="partialViews">
     <header>Macro</header>
-    <usercontrol>/Create/PartialView.ascx</usercontrol>
+		<usercontrol>/Create/PartialView.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="PartialViewTasks" />
       <delete assembly="umbraco" type="PartialViewTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="partialViewMacros">
+    <header>Macro</header>
+    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="PartialViewMacroTasks" />
+      <delete assembly="umbraco" type="PartialViewMacroTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="partialViewsFolder">
+    <header>Macro</header>
+    <usercontrol>/Create/PartialView.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="PartialViewTasks" />
+      <delete assembly="umbraco" type="PartialViewTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="partialViewMacrosFolder">
     <header>Macro</header>
     <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
     <tasks>

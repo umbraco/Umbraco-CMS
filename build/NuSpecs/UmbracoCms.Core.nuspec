@@ -1,74 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata>
-        <id>UmbracoCms.Core</id>
-        <version>7.0.0</version>
-        <title>Umbraco Cms Core Binaries</title>
-        <authors>Umbraco HQ</authors>
-        <owners>Umbraco HQ</owners>
-        <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
-        <projectUrl>http://umbraco.com/</projectUrl>
-        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms-package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
-        <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
-        <language>en-US</language>
-        <tags>umbraco</tags>
-        <dependencies>
-            <dependency id="Microsoft.AspNet.Mvc" version="[4.0.40804.0,5.0.0)" />
-            <dependency id="Microsoft.AspNet.WebApi" version="[4.0.30506,5.0.0)" />
-            <dependency id="Microsoft.AspNet.WebApi.WebHost" version="[4.0.30506, 5.0.0)" />
-            <dependency id="Microsoft.AspNet.WebApi.Core" version="[4.0.30506, 5.0.0)" />
-            <dependency id="Microsoft.AspNet.WebApi.Client" version="[4.0.30506, 5.0.0)" />
-            <dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.1" />
-            <dependency id="Microsoft.Net.Http" version="[2.0.20710.0, 3.0.0)" />
-            <dependency id="MiniProfiler" version="[2.1.0, 3.0.0)" />
-            <dependency id="HtmlAgilityPack" version="[1.4.6, 2.0.0)" />
-            <dependency id="Lucene.Net" version="[2.9.4.1, 3.0.0.0)" />
-            <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
-            <dependency id="MySql.Data" version="[6.6.5]" />
-            <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
-            <dependency id="ClientDependency" version="[1.8.0, 2.0.0)" />
-            <dependency id="ClientDependency-Mvc" version="[1.8.0, 2.0.0)" />
-            <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
-			<dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
-            <dependency id="Examine" version="[0.1.57, 1.0.0)" />
-            <dependency id="ImageProcessor" version="[1.9.5, 3.0.0)" />
-            <dependency id="ImageProcessor.Web" version="[3.3.1, 5.0.0)" />
-            <dependency id="dotless" version="[1.4.1, 2.0.0)" />
-        </dependencies>
-    </metadata>
-    <files>
-        <file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\businesslogic.xml" target="lib\businesslogic.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\cms.dll" target="lib\cms.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\controls.xml" target="lib\controls.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\TidyNet.dll" target="lib\TidyNet.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.dll" target="lib\umbraco.DataLayer.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.xml" target="lib\umbraco.DataLayer.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.dll" target="lib\umbraco.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.xml" target="lib\umbraco.xml" />		
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.dll" target="lib\umbraco.editorControls.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.xml" target="lib\umbraco.editorControls.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.dll" target="lib\umbraco.MacroEngines.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.xml" target="lib\umbraco.MacroEngines.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.providers.dll" target="lib\umbraco.providers.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\umbraco.providers.xml" target="lib\umbraco.providers.xml" />
-        <file src="..\_BuildOutput\WebApp\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
-		<file src="tools\install.core.ps1" target="tools\install.ps1" />
-    </files>
+  <metadata>
+    <id>UmbracoCms.Core</id>
+    <version>7.0.0</version>
+    <title>Umbraco Cms Core Binaries</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
+    <projectUrl>http://umbraco.com/</projectUrl>
+    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms-package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
+    <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
+      <dependency id="Microsoft.AspNet.Mvc" version="[4.0.30506.0,5.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi" version="[4.0.30506,5.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="[4.0.30506, 5.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi.Core" version="[4.0.30506, 5.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi.Client" version="[4.0.30506, 5.0.0)" />
+      <dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.1" />
+      <dependency id="Microsoft.Net.Http" version="[2.0.20710.0, 3.0.0)" />
+      <dependency id="MiniProfiler" version="[2.1.0, 3.0.0)" />
+      <dependency id="HtmlAgilityPack" version="[1.4.6, 2.0.0)" />
+      <dependency id="Lucene.Net" version="[2.9.4.1, 3.0.0.0)" />
+      <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
+      <dependency id="MySql.Data" version="[6.6.5]" />
+      <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
+      <dependency id="ClientDependency" version="[1.8.1, 2.0.0)" />
+      <dependency id="ClientDependency-Mvc" version="[1.8.0, 2.0.0)" />
+      <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
+      <dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
+      <dependency id="Examine" version="[0.1.59, 1.0.0)" />
+      <dependency id="ImageProcessor" version="[1.9.5, 3.0.0)" />
+      <dependency id="ImageProcessor.Web" version="[3.3.1, 5.0.0)" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\businesslogic.xml" target="lib\businesslogic.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\cms.dll" target="lib\cms.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\controls.xml" target="lib\controls.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\TidyNet.dll" target="lib\TidyNet.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.dll" target="lib\umbraco.DataLayer.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.xml" target="lib\umbraco.DataLayer.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.dll" target="lib\umbraco.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.xml" target="lib\umbraco.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.dll" target="lib\umbraco.editorControls.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.xml" target="lib\umbraco.editorControls.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.dll" target="lib\umbraco.MacroEngines.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.xml" target="lib\umbraco.MacroEngines.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.providers.dll" target="lib\umbraco.providers.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\umbraco.providers.xml" target="lib\umbraco.providers.xml" />
+    <file src="..\_BuildOutput\WebApp\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
+    <file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
+    <file src="tools\install.core.ps1" target="tools\install.ps1" />
+  </files>
 </package>

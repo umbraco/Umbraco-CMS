@@ -22,10 +22,15 @@ namespace Umbraco.Core.Models
         }
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent)
-            : base(parent)
+            : this(parent, null)
 		{
-		    AddContentType(parent);
 		}
+
+        protected ContentTypeCompositionBase(IContentTypeComposition parent, string alias)
+            : base(parent, alias)
+        {
+            AddContentType(parent);
+        }
 
         private static readonly PropertyInfo ContentTypeCompositionSelector =
             ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(
@@ -74,6 +79,9 @@ namespace Umbraco.Core.Models
         public bool AddContentType(IContentTypeComposition contentType)
         {
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
+                return false;
+
+            if (string.IsNullOrEmpty(Alias) == false && Alias.Equals(contentType.Alias))
                 return false;
 
             if (ContentTypeCompositionExists(contentType.Alias) == false)

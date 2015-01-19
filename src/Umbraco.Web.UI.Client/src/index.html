@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <base href="/belle/" />
@@ -12,7 +12,7 @@
 <body ng-class="{touch:touchDevice}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
         <umb-navigation></umb-navigation>
-        
+
         <section id="contentwrapper">
             <div id="contentcolumn">
                 <div class="content-column-body" ng-view></div>
@@ -22,7 +22,7 @@
     <umb-notifications></umb-notifications>
 
 
-<script src="lib/lazyload/lazyload.min.js"></script>
-<script src="js/loader.js"></script>
+    <script src="lib/rgrove-lazyload/lazyload.js"></script>
+    <script src="js/loader.js"></script>
 </body>
 </html>

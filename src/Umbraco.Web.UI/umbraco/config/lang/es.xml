@@ -1,13 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="es" intName="Spanish" localName="español" lcid="10" culture="es-ES">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://Umbraco.org/documentation/language-files</link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Administrar hostnames</key>
     <key alias="auditTrail">Auditoría</key>
     <key alias="browse">Nodo de Exploración</key>
+    <key alias="changeDocType">Cambiar tipo de documento</key>
     <key alias="copy">Copiar</key>
     <key alias="create">Crear</key>
     <key alias="createPackage">Crear Paquete</key>
@@ -15,8 +16,6 @@
     <key alias="disable">Deshabilitar</key>
     <key alias="emptyTrashcan">Vaciar Papelera</key>
     <key alias="exportDocumentType">Exportar Documento (tipo)</key>
-    <key alias="exportDocumentTypeAsCode">TRANSLATE ME: 'Export to .NET'</key>
-    <key alias="exportDocumentTypeAsCode-Full">TRANSLATE ME: 'Export to .NET'</key>
     <key alias="importDocumentType">Importar Documento (tipo)</key>
     <key alias="importPackage">Importar Paquete</key>
     <key alias="liveEdit">Editar en lienzo</key>
@@ -25,6 +24,7 @@
     <key alias="notify">Notificaciones</key>
     <key alias="protect">Acceso Público</key>
     <key alias="publish">Publicar</key>
+    <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Recargar Nodos</key>
     <key alias="republish">Republicar sitio completo</key>
     <key alias="rights">Permisos</key>
@@ -35,21 +35,41 @@
     <key alias="toPublish">Enviar a publicación</key>
     <key alias="translate">Traducir</key>
     <key alias="update">Actualizar</key>
+    <key alias="defaultValue">Valor por defecto</key>
   </area>
   <area alias="assignDomain">
+    <key alias="permissionDenied">Permiso denegado.</key>
     <key alias="addNew">Añadir nuevo dominio</key>
+    <key alias="remove">quitar</key>
+    <key alias="invalidNode">Nodo no válido.</key>
+    <key alias="invalidDomain">Formato de dominio no válido.</key>
+    <key alias="duplicateDomain">Este dominio ya ha sido asignado.</key>
+    <key alias="language">Language</key>
     <key alias="domain">Dominio</key>
     <key alias="domainCreated">El nuevo dominio %0% ha sido creado</key>
     <key alias="domainDeleted">El dominio %0% ha sido borrado</key>
     <key alias="domainExists">El dominio'%0%' ya ha sido asignado</key>
-    <key alias="domainHelp">p.ej.: tudominio.com, www.tudominio.com</key>
     <key alias="domainUpdated">El dominio %0% ha sido actualizado</key>
     <key alias="orEdit">Editar dominios actuales</key>
+    <key alias="domainHelp">
+      <![CDATA[p.ej.: "tudominio.com", "www.tudominio.com", "tudominio.com:8080" o
+        "https://www.tudominio.com/".<br /><br />Los dominios de un nivel están soportados, por ej. "example.com/en". De todas formas deberían de evitarse. Mejor usar la configuración cultural especificada arriba.]]>
+    </key>
+    <key alias="inherit">Heredar</key>
+    <key alias="setLanguage">Cultura</key>
+    <key alias="setLanguageHelp">
+      <![CDATA[Configura la cultura para los nodos por debajo del nodo actual,<br /> o hereda la cultura de los nodos padres. También se aplicará<br />
+      para el nodo actual, a menos que un dominio por debajo lo aplique también.]]>
+    </key>
+    <key alias="setDomains">Domains</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visualización de</key>
   </area>
   <area alias="buttons">
+    <key alias="select">Seleccionar</key>
+    <key alias="selectCurrentFolder">Selecciona la carpeta actual</key>
+    <key alias="somethingElse">Hacer otra cosa</key>
     <key alias="bold">Negrita</key>
     <key alias="deindent">Cancelar Sangría del Párrafo </key>
     <key alias="formFieldInsert">Insertar campo de formulario</key>
@@ -71,18 +91,44 @@
     <key alias="saveAndPublish">Guardar y publicar</key>
     <key alias="saveToPublish">Guardar y enviar para aprobación</key>
     <key alias="showPage">Previsualizar</key>
+    <key alias="showPageDisabled">La previsualización está deshabilitada porque no hay ninguna plantilla asignada</key>
     <key alias="styleChoose">Elegir estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
     <key alias="tableInsert">Insertar tabla</key>
+	<key alias="returnToList">Volver al listado</key>
+  </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">Para cambiar el tipo de documento al contenido seleccionado, primero selecciona uno de la lista de tipos válidos.</key>
+    <key alias="changeDocTypeInstruction2">Entonces confirma el mapeo de propiedades del tipo actual al nuevo y haz click en Guardar.</key>
+    <key alias="contentRepublished">El contenido se ha vuelto a publicar.</key>
+    <key alias="currentProperty">Propiedad actual</key>
+    <key alias="currentType">Tipo actual</key>
+    <key alias="docTypeCannotBeChanged">El tipo de contenido no se puede cambiar, porque no hay alternativas válidas para este contenido.</key>
+    <key alias="docTypeChanged">Tipo de documento cambiado</key>
+    <key alias="mapProperties">Mapeo de propiedades</key>
+    <key alias="mapToProperty">Mapea a la propiedad</key>
+    <key alias="newTemplate">Nueva plantilla</key>
+    <key alias="newType">Nuevo tipo</key>
+    <key alias="none">ninguno</key>
+    <key alias="selectedContent">Contenido</key>
+    <key alias="selectNewDocType">Selecciona un nuevo Tipo de Documento</key>
+    <key alias="successMessage">El tipo de documento del contenido seleccionado ha sido cambiado correctamente a [new type] y las siguientes propiedades mapeadas:</key>
+    <key alias="to">a</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">No se ha podido completar el mapeo de propiedades porque uno o más propiedades tienen más de un mapeo definido.</key>
+    <key alias="validDocTypesNote">Solo se muestran otros tipos válidos para el contenido actual.</key>
   </area>
   <area alias="content">
+  <key alias="isPublished" version="7.2">Está publicado</key>
     <key alias="about">Acerca de</key>
     <key alias="alias">Link alternativo</key>
     <key alias="alternativeTextHelp">(como describe la imagen sobre el teléfono)</key>
     <key alias="alternativeUrls">Vinculos Alternativos</key>
     <key alias="clickToEdit">Click para editar esta entrada</key>
     <key alias="createBy">Creado por</key>
+    <key alias="createByDesc" version="7.0">Autor original</key>
+    <key alias="updatedBy" version="7.0">Actualizado por</key>
     <key alias="createDate">Creado</key>
+    <key alias="createDateDesc" version="7.0">Fecha/hora de creación del documento</key>
     <key alias="documentType">Tipo de Documento</key>
     <key alias="editing">Editando</key>
     <key alias="expireDate">Remover el</key>
@@ -97,9 +143,11 @@
     <key alias="nodeName">Título de la página</key>
     <key alias="otherElements">Propiedades</key>
     <key alias="parentNotPublished">Este documento ha sido publicado pero no es visible porque el padre '%0%' no esta publicado</key>
+    <key alias="parentNotPublishedAnomaly">Upss: este documento está publicado pero no está en la caché (error interno)</key>
     <key alias="publish">Publicar</key>
     <key alias="publishStatus">Estado de la Publicación</key>
     <key alias="releaseDate">Publicar el</key>
+    <key alias="unpublishDate">Despublicar el</key>
     <key alias="removeDate">Fecha de Eliminación</key>
     <key alias="sortDone">El Orden esta actualizado</key>
     <key alias="sortHelp">Para organizar los nodos, simplemente arrastre los nodos o realice un clic en uno de los encabezados de columna. Puede seleccionar multiple nodos manteniendo presionados "Shift" o "Control" mientras selecciona</key>
@@ -108,17 +156,29 @@
     <key alias="type">Tipo</key>
     <key alias="unPublish">No Publicar</key>
     <key alias="updateDate">Última actualización</key>
+    <key alias="updateDateDesc" version="7.0">Fecha/hora este documento fue modificado</key>
     <key alias="uploadClear">Eliminar archivo</key>
     <key alias="urls">Vínculo al documento</key>
+    <key alias="memberof">Miembro de grupo(s)</key>
+    <key alias="notmemberof">No es miembreo de grupo(s)</key>
+    <key alias="childItems" version="7.0">Nodos hijo</key>
+    <key alias="target" version="7.0">Target</key>
+	<key alias="listViewNoItems">No hay datos que mostrar</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">Haz click para subir archivos</key>
+    <key alias="dropFilesHere">Arrastra los archivos aquí...</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">¿Dónde quieres crear el nuevo %0%</key>
     <key alias="createUnder">Crear debajo de</key>
     <key alias="updateData">Elije un tipo y un título</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[No hay disponibles tipos de documentos permitidos. Debes habilitarlos en la sección "Ajustes" en <strong>"Tipos de documentos"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[No hay disponibles tipos de medios permitidos. Debes habilitarlos en la sección "Ajustes" en <strong>"Tipos de medios"</strong>.]]></key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Navega en tu sitio Web</key>
-    <key alias="dontShowAgain">TRANSLATE ME: '- Hide'</key>
+    <key alias="dontShowAgain">No volver a mostrar</key>
     <key alias="nothinghappens">Si Umbraco no se ha abierto tendrás que permitir ventanas emergentes para este sitio Web</key>
     <key alias="openinnew">se ha abierto en una nueva ventana</key>
     <key alias="restart">Reinicio</key>
@@ -134,11 +194,11 @@
     <key alias="confirmEmptyTrashcan">Por favor seleccione esta casilla para confirmar la eliminación de %0% entrada(s)</key>
     <key alias="confirmlogout">Esta usted seguro?</key>
     <key alias="confirmSure">Esta usted Seguro?</key>
-    <key alias="cut">TRANSLATE ME: 'Cut'</key>
+    <key alias="cut">Cortar</key>
     <key alias="editdictionary">Editar entrada del Diccionario</key>
     <key alias="editlanguage">Editar idioma</key>
     <key alias="insertAnchor">Agregar enlace interno</key>
-    <key alias="insertCharacter">TRANSLATE ME: 'Insert character'</key>
+    <key alias="insertCharacter">Insertar caracter</key>
     <key alias="insertgraphicheadline">Insertar titular gráfico</key>
     <key alias="insertimage">Insertar imagen</key>
     <key alias="insertlink">Insertar enlace</key>
@@ -149,7 +209,7 @@
     <key alias="linkinternal">Enlace interno</key>
     <key alias="linklocaltip">Al usar enlaces locales, insertar "#" delante del enlace</key>
     <key alias="linknewwindow">¿Abrir en nueva ventana?</key>
-    <key alias="macroContainerSettings">TRANSLATE ME: 'Macro Settings'</key>
+    <key alias="macroContainerSettings">Ajustes para la Macro</key>
     <key alias="macroDoesNotHaveProperties">Esta macro no contiene ninguna propiedad que pueda editar</key>
     <key alias="paste">Pegar</key>
     <key alias="permissionsEdit">Editar permisos para</key>
@@ -158,7 +218,7 @@
     <key alias="recycleBinWarning">No podrá recuperar los items una vez sean borrados de la papelera</key>
     <key alias="regexSearchError"><![CDATA[El servicio web <a target='_blank' href='http://regexlib.com'>regexlib.com</a> está experimentando algunos problemas en estos momentos, de los cuales no somos responsables. Pedimos disculpas por las molestias.]]></key>
     <key alias="regexSearchHelp">Buscar una expresión regular para agregar validación a un campo de formulario. Ejemplo: 'correo electrónico', código postal "," url "</key>
-    <key alias="removeMacro">TRANSLATE ME: 'Remove Macro'</key>
+    <key alias="removeMacro">Eliminar macro</key>
     <key alias="requiredField">Campo obligatorio</key>
     <key alias="sitereindexed">El sitio ha sido reindexado</key>
     <key alias="siterepublished">Se ha actualizado la caché y se ha publicado el contenido del sitio web.</key>
@@ -176,14 +236,31 @@
     <key alias="displayName"><![CDATA[nombre de la cultura
 ]]></key>
   </area>
+  <area alias="placeholders">
+    <key alias="username">Escribe tu nombre de usuario</key>
+    <key alias="password">Escribe tu contraseña</key>
+    <key alias="nameentity">Nombre del %0%...</key>
+    <key alias="entername">Escribe un nombre...</key>
+    <key alias="search">Escribe tu búsqueda...</key>
+    <key alias="filter">Escribe para filtrar resultados...</key>
+  </area>
   <area alias="editcontenttype">
+  <key alias="allowAtRoot" version="7.2">Permitir en nodo raíz</key>
+    <key alias="allowAtRootDesc" version="7.2">Sólo tipos de contenido permitidos podrán crearse bajo el nodo raíz de los árboles de Contenido y Media</key>
     <key alias="allowedchildnodetypes">Tipos de nodos hijos permitidos</key>
+    <key alias="contenttypecompositions">Composiciones de Tipo de Documento</key>
     <key alias="create">Crear</key>
     <key alias="deletetab">Borrar pestaña</key>
-    <key alias="description">TRANSLATE ME: 'Description'</key>
+    <key alias="description">Descripción</key>
     <key alias="newtab">Nueva pestaña</key>
     <key alias="tab">Pestaña</key>
-    <key alias="thumbnail">TRANSLATE ME: 'Thumbnail'</key>
+    <key alias="thumbnail">Miniatura</key>
+    <key alias="hasListView">Permitir vista de listado</key>
+	<key alias="hasListViewDesc" version="7.2">Configura el contenido para mostrar un listado de nodos hijos, en lugar de mostrarlos en forma de árbol</key>
+    <key alias="currentListView" version="7.2">Vista de listado actual</key>
+    <key alias="currentListViewDesc" version="7.2">El tipo de vista de listado activa</key>
+    <key alias="createListView" version="7.2">Crear un tipo de listado personalizado</key>
+    <key alias="removeListView" version="7.2">Quitar el tipo de listado personalizado</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">añadir prevalor</key>
@@ -215,7 +292,7 @@
     <key alias="errorRegExpWithoutTab">Debe poner un formato correcto en %0%</key>
   </area>
   <area alias="errors">
-    <key alias="codemirroriewarning">TRANSLATE ME: 'NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.'</key>
+    <key alias="codemirroriewarning">NOTA: Aunque CodeMirror esté activado en los ajustes de configuracion, no se muestra en Internet Explorer debido a que no es lo suficientemente estable.'</key>
     <key alias="contentTypeAliasAndNameNotNull">Debe llenar el alias y el nombre en el propertytype</key>
     <key alias="filePermissionsError">Hay un problema de lectura y escritura al acceder a un archivo o carpeta</key>
     <key alias="missingTitle"><![CDATA[Por favor, introduzca un título
@@ -239,6 +316,7 @@
   <area alias="general">
     <key alias="about">Acerca de</key>
     <key alias="action">Acción</key>
+    <key alias="actions">Acciones</key>
     <key alias="add">Añadir</key>
     <key alias="alias">Alias</key>
     <key alias="areyousure">¿Está seguro?</key>
@@ -268,7 +346,7 @@
     <key alias="edit">Editar</key>
     <key alias="edited">Editado</key>
     <key alias="elements">Elementos</key>
-    <key alias="email">Email</key>
+    <key alias="email">Mail</key>
     <key alias="error">Error</key>
     <key alias="findDocument">Buscar</key>
     <key alias="height">Altura</key>
@@ -282,7 +360,7 @@
     <key alias="language">Idioma</key>
     <key alias="layout">Diseño</key>
     <key alias="loading">Cargando</key>
-    <key alias="locked">TRANSLATE ME: 'Locked'</key>
+    <key alias="locked">Bloqueado</key>
     <key alias="login">Iniciar sesión</key>
     <key alias="logoff">Cerrar sesión</key>
     <key alias="logout">Cerrar sesión</key>
@@ -302,11 +380,11 @@
     <key alias="pleasewait">Un momento por favor...</key>
     <key alias="previous">Anterior</key>
     <key alias="properties">Propiedades</key>
-    <key alias="reciept">Email para recibir los datos del formulario</key>
+    <key alias="reciept">Mail para recibir los datos del formulario</key>
     <key alias="recycleBin">Papelera</key>
     <key alias="remaining">Restantes</key>
     <key alias="rename">Renombrar</key>
-    <key alias="renew">TRANSLATE ME: 'Renew'</key>
+    <key alias="renew">Renovar</key>
     <key alias="retry">Reintentar</key>
     <key alias="rights">Permisos</key>
     <key alias="search">Buscar</key>
@@ -347,7 +425,7 @@
     <key alias="databaseHeader">Configuración de la base de datos</key>
     <key alias="databaseInstall"><![CDATA[Pulse el botón <strong> instalar </ strong> para instalar %0% la base de datos de Umbraco]]></key>
     <key alias="databaseInstallDone"><![CDATA[Se ha copiado Umbraco %0% a la base de datos. Pulse <strong>Próximo</strong> para continuar]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la "connection string" del “web.config” es correcta.</p> <p>Para continuar, edite el "web.config" (bien sea usando Visual Studio o su editor de texto preferido), vaya al final del archivo y añada la cadena de conexión para la base de datos con el nombre (key) "UmbracoDbDSN" y guarde el archivo. </p> <p>Pinche en <strong>reintentar</strong> cuando haya terminado.<br /><a href="http://Umbraco.org/redir/installWebConfig" target="_blank">Pinche aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la "connection string" del “web.config” es correcta.</p> <p>Para continuar, edite el "web.config" (bien sea usando Visual Studio o su editor de texto preferido), vaya al final del archivo y añada la cadena de conexión para la base de datos con el nombre (key) "umbracoDbDSN" y guarde el archivo. </p> <p>Pinche en <strong>reintentar</strong> cuando haya terminado.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Pinche aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este paso, debes conocer la información correspondiente a tu servidor de base de datos ("cadena de conexión").<br /> Por favor, contacta con tu ISP si es necesario. Si estás realizando la instalación en una máquina o servidor local, quizás necesites información de tu administrador de sistemas.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Pinche en <strong>actualizar</strong> para actualizar la base de datos a Umbraco %0%</p> <p> Ningún contenido será borrado de la base de datos y seguirá funcionando después de la actualización </p> ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[La base de datos ha sido actualizada a la versión 0%.<br />Pinche en <strong>Próximo</strong> para continuar. ]]></key>
@@ -381,8 +459,7 @@
     <key alias="runwayInstalledText"><![CDATA[Tienes puestos los cimientos. Selecciona los módulos que desees instalar sobre ellos.<br /> Esta es nuestra lista de módulos recomendados, selecciona los que desees instalar, o mira la <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">lista completa de módulos</a> ]]></key>
     <key alias="runwayOnlyProUsers">Sólo recomendado para usuarios expertos</key>
     <key alias="runwaySimpleSite">Quiero empezar con un sitio web sencillo</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" es un sitio web sencillo que contiene unos tipos de documentos y plantillas básicos. El instalador puede configurar Runway por ti de forma automática, pero fácilmente puedes editarlo, extenderlo o eliminarlo. No es necesario y puedes usar Umbrao perfectamente sin él. Sin embargo, Runway ofrece unos cimientos sencillos basados en buenas prácticas para iniciarte más rápido que nunca. Si eliges instalar Runway, puedes seleccionar bloques de construcción básicos llamados Módulos de Runway de forma opcional para realzar tus páginas de Runway. </> <small> <em>Incluido con Runway:</em> Página de inicio, página de Cómo empezar, página de Instalación de módulos.<br /> <em>Módulos opcionales:</em> Navegación superior, Mapa del sitio, Contacto, Galería. </small> 
-However, Runway offers an easy foundation based on best practices to get you started faster than ever. If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages. </p> <small> <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br /> <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery. </small> ]]></key>
+    <key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" es un sitio web sencillo que contiene unos tipos de documentos y plantillas básicos. El instalador puede configurar Runway por ti de forma automática, pero fácilmente puedes editarlo, extenderlo o eliminarlo. No es necesario y puedes usar Umbrao perfectamente sin él. Sin embargo, Runway ofrece unos cimientos sencillos basados en buenas prácticas para iniciarte más rápido que nunca. Si eliges instalar Runway, puedes seleccionar bloques de construcción básicos llamados Módulos de Runway de forma opcional para realzar tus páginas de Runway. </> <small> <em>Incluido con Runway:</em> Página de inicio, página de Cómo empezar, página de Instalación de módulos.<br /> <em>Módulos opcionales:</em> Navegación superior, Mapa del sitio, Contacto, Galería. </small> ]]></key>
     <key alias="runwayWhatIsRunway">¿Qué es Runway?</key>
     <key alias="step1">Paso 1 de 5. Aceptar los términos de la licencia</key>
     <key alias="step2">Paso 2 de 5. Configuración de la base de datos</key>
@@ -407,13 +484,22 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="displayName">Nombre de cultura</key>
   </area>
   <area alias="lockout">
-    <key alias="lockoutWillOccur">TRANSLATE ME: 'You've been idle and logout will automatically occur in'</key>
-    <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
+    <key alias="lockoutWillOccur">No ha habido ninguna actividad y su sessión se cerrará en </key>
+    <key alias="renewSession">Renovar su sessión para guardar sus cambios</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://Umbraco.org" style="text-decoration: none" target="_blank">Umbraco.org</a></p> ]]></key>
-    <key alias="topText">Bienvenido a Umbraco, escribe tu nombre de usuario y clave en los campos de debajo:</key>
+    <key alias="greeting0">Feliz super domingo</key>
+    <key alias="greeting1">Feliz lunes</key>
+    <key alias="greeting2">Tremendo martes</key>
+    <key alias="greeting3">Maravilloso miércoles</key>
+    <key alias="greeting4">Fantástico jueves</key>
+    <key alias="greeting5">¡Ya es viernes!</key>
+    <key alias="greeting6">Resplandeciente sábado</key>
+    <key alias="instruction">Iniciar sesión</key>
+    <key alias="timeout">La sesión ha caducado</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
+
   <area alias="main">
     <key alias="dashboard">Panel de Administración</key>
     <key alias="sections">Secciones</key>
@@ -429,7 +515,7 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="noNodeSelected">No ha seleccionado ningún nodo. Seleccione un nodo en la lista mostrada arriba antes the pinchar en 'continuar' (continue)</key>
     <key alias="notAllowedByContentType">No se puede colgar el nodo actual bajo el nodo elegido debido a su tipo</key>
     <key alias="notAllowedByPath">El nodo actual no puede moverse a ninguna de sus subpáginas</key>
-    <key alias="notValid">TRANSLATE ME: 'The action isn't allowed since you have insufficient permissions on 1 or more child documents.'</key>
+    <key alias="notValid">Acción no permitida. No tiene permisos suficientes para uno o más subnodos.'</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Edite su notificación para %0%</key>
@@ -499,16 +585,16 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="publishHelp"><![CDATA[Pulsa en <em>aceptar</em> para publicar <strong>%0%</strong> y por lo tanto, hacer que su contenido esté disponible al público.<br/><br /> Puedes publicar esta página y todas sus subpáginas marcando <em>publicar todos los hijos</em> debajo. ]]></key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">TRANSLATE ME: 'Add external link'</key>
-    <key alias="addInternal">TRANSLATE ME: 'Add internal link'</key>
-    <key alias="addlink">TRANSLATE ME: 'Add'</key>
-    <key alias="caption">TRANSLATE ME: 'Caption'</key>
-    <key alias="internalPage">TRANSLATE ME: 'Internal page'</key>
-    <key alias="linkurl">TRANSLATE ME: 'URL'</key>
-    <key alias="modeDown">TRANSLATE ME: 'Move Down'</key>
-    <key alias="modeUp">TRANSLATE ME: 'Move Up'</key>
-    <key alias="newWindow">TRANSLATE ME: 'Open in new window'</key>
-    <key alias="removeLink">TRANSLATE ME: 'Remove link'</key>
+    <key alias="addExternal">Añadir un enlace externo</key>
+    <key alias="addInternal">Añadir un enlace interno</key>
+    <key alias="addlink">Añadir</key>
+    <key alias="caption">Título</key>
+    <key alias="internalPage">Página interna</key>
+    <key alias="linkurl">Enlace</key>
+    <key alias="modeDown">Bajar</key>
+    <key alias="modeUp">Subir</key>
+    <key alias="newWindow">Abrir en una nueva ventana</key>
+    <key alias="removeLink">Quitar el enlace</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Versión actual</key>
@@ -535,6 +621,8 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="statistics">Estadísticas</key>
     <key alias="translation">Traducción</key>
     <key alias="users">Usuarios</key>
+    <key alias="help" version="7.0">Ayuda</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Plantilla por defecto</key>
@@ -548,6 +636,12 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="tab">Pestaña</key>
     <key alias="tabname">Nombre de la pestaña</key>
     <key alias="tabs">Pestañas</key>
+    <key alias="contentTypeEnabled">Tipo de Contenido Maestro activado</key>
+    <key alias="contentTypeUses">Este Tipo de Contenido usa</key>
+    <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
+    <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haga clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
+    <key alias="masterDocumentType">Tipo de documento Maestro</key>
+    <key alias="createMatchingTemplate">Crear template correspondiente</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Ordenación completa.</key>
@@ -621,6 +715,36 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="quickGuide">Guía rápida sobre las etiquetas de plantilla de Umbraco</key>
     <key alias="template">Plantilla</key>
   </area>
+  <area alias="grid">
+    <key alias="insertControl">Insertar control</key>
+    <key alias="addRows">Añade más filas</key>
+    <key alias="addElement"><![CDATA[Para empezar, haz click en <i class="icon icon-add blue"></i> y añade tu primer contenido]]></key>
+
+    <key alias="gridLayouts">Plantillas de Grid</key>
+    <key alias="gridLayoutsDetail">Las plantillas son el área de trabajo para el editor de grids, normalmente sólo necesitas una o dos plantillas diferentes</key>
+    <key alias="addGridLayout">Añadir plantilla de grid</key>
+    <key alias="addGridLayoutDetail">Ajusta la plantilla configurando la anchura de las columnas y añadiendo más secciones</key>
+    
+    <key alias="rowConfigurations">Configuraciones de filas</key>
+    <key alias="rowConfigurationsDetail">Las filas son celdas predefinidas que se disponen horizontalmente</key>
+    <key alias="addRowConfiguration">Añade una configuración de fila</key>
+    <key alias="addRowConfigurationDetail">Ajusta la fila configurando los anchos de cada celda y añadiendo más celdas</key>
+
+    <key alias="columns">Columnas</key>
+    <key alias="columnsDetails">Número total de columnas en la plantilla del grid</key>
+    
+    <key alias="settings">Configuración</key>
+    <key alias="settingsDetails">Configura qué ajustes pueden cambiar los editores</key>
+
+
+    <key alias="styles">Estilos</key>
+    <key alias="stylesDetails">Configura qué estilos pueden cambiar los editores</key>
+
+    <key alias="settingDialogDetails">La configuración sólo se guardará si el json introducido es válido</key>
+
+    <key alias="allowAllEditors">Permitir todos los controles de edición</key>
+    <key alias="allowAllRowConfigurations">Permitir todas las configuraciones de fila</key>
+  </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Campo opcional</key>
     <key alias="alternativeText">Texto opcional</key>
@@ -661,7 +785,7 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="mailBody"><![CDATA[
         Hola %0%. 
 
-        Este email se ha generado automáticamente para informale que %2% ha solicitado que el documento '%1%' sea traducido en '%5%'. 
+        Este mail se ha generado automáticamente para informale que %2% ha solicitado que el documento '%1%' sea traducido en '%5%'. 
 
         Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicie la sesión en umbraco y vaya a http://%3% para ver las tareas pendientes de traducir. 
 
@@ -693,8 +817,8 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="datatype">Tipos de datos</key>
     <key alias="dictionary">Diccionario</key>
     <key alias="installedPackages">Paquetes instalados</key>
-    <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
-    <key alias="installStarterKit">TRANSLATE ME: 'Install starter kit'</key>
+    <key alias="installSkin">Instalar skin</key>
+    <key alias="installStarterKit">Instalar starter kit</key>
     <key alias="languages">Idiomas</key>
     <key alias="localPackage">Instalar paquete local</key>
     <key alias="macros">Macros</key>
@@ -710,7 +834,7 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="repositories">Instalar desde repositorio</key>
     <key alias="runway">Instalar pasarela</key>
     <key alias="runwayModules">Módulos pasarela</key>
-    <key alias="scripting">TRANSLATE ME: 'Scripting Files'</key>
+    <key alias="scripting">Ficheros de script</key>
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Hojas de estilo</key>
     <key alias="templates">Plantillas</key>
@@ -725,8 +849,10 @@ However, Runway offers an easy foundation based on best practices to get you sta
   <area alias="user">
     <key alias="administrators">Administrador</key>
     <key alias="categoryField">Campo de categoria</key>
-    <key alias="changePassword">TRANSLATE ME: 'Change Your Password'</key>
-    <key alias="changePasswordDescription">TRANSLATE ME: 'You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button'</key>
+    <key alias="changePassword">Cambiar contraseña</key>
+    <key alias="newPassword">Change Your Password</key>
+    <key alias="confirmNewPassword">Confirm new password</key>
+    <key alias="changePasswordDescription">Puede cambiar su contraseña para acceder al 'back office' de Umbraco rellenando el siguiente formulario y haciendo clic en el botón 'Cambiar contraseña'</key>
     <key alias="contentChannel">Canal de contenido</key>
     <key alias="descriptionField">Campo descriptivo</key>
     <key alias="disabled">Deshabilitar usuario</key>
@@ -738,13 +864,16 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="mediastartnode">Nodo de comienzo en la libreria de medios</key>
     <key alias="modules">Secciones</key>
     <key alias="noConsole">Deshabilitar acceso a Umbraco</key>
-    <key alias="password">Password</key>
-    <key alias="passwordChanged">TRANSLATE ME: 'Your password has been changed!'</key>
-    <key alias="passwordConfirm">TRANSLATE ME: 'Please confirm the new password'</key>
-    <key alias="passwordEnterNew">TRANSLATE ME: 'Enter your new password'</key>
-    <key alias="passwordIsBlank">TRANSLATE ME: 'Your new password cannot be blank!'</key>
-    <key alias="passwordIsDifferent">TRANSLATE ME: 'There was a difference between the new password and the confirmed password. Please try again!'</key>
-    <key alias="passwordMismatch">TRANSLATE ME: 'The confirmed password doesn't match the new password!'</key>
+    <key alias="password">Contraseña</key>
+    <key alias="resetPassword">Reset password</key>
+    <key alias="passwordChanged">Su contraseña ha sido cambiada</key>
+    <key alias="passwordConfirm">Por favor confirme su nueva contraseña</key>
+    <key alias="passwordEnterNew">Introduzca su nueva contraseña</key>
+    <key alias="passwordIsBlank">La nueva contraseña no puede estar vacía</key>
+    <key alias="passwordCurrent">Current password</key>
+    <key alias="passwordInvalid">Invalid current password</key>
+    <key alias="passwordIsDifferent">La nueva contraseña no coincide con la contraseña de confirmación. Por favor, vuela a intentarlo!'</key>
+    <key alias="passwordMismatch">La contraseña de confirmación no coincide con la nueva contraseña!'</key>
     <key alias="permissionReplaceChildren">Reemplazar los permisos de los nodos hijo</key>
     <key alias="permissionSelectedPages">Estas modificando los permisos para las páginas:</key>
     <key alias="permissionSelectPages">Selecciona las páginas para modificar sus permisos</key>
@@ -755,5 +884,8 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="usertype">Tipo de usuario</key>
     <key alias="userTypes">Tipos de usuarios</key>
     <key alias="writer">Redactor</key>
+    <key alias="yourProfile" version="7.0">Tu perfil</key>
+    <key alias="yourHistory" version="7.0">Tu historial reciente</key>
+    <key alias="sessionExpires" version="7.0">La sesión caduca en</key>
   </area>
 </language>

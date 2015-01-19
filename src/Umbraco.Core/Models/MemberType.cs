@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -21,7 +20,12 @@ namespace Umbraco.Core.Models
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        public MemberType(IContentTypeComposition parent) : base(parent)
+        public MemberType(IContentTypeComposition parent) : this(parent, null)
+        {
+        }
+
+        public MemberType(IContentTypeComposition parent, string alias)
+            : base(parent, alias)
         {
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }

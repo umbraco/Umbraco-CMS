@@ -53,6 +53,14 @@ namespace Umbraco.Core.Services
         void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0);
 
         /// <summary>
+        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
+        void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents);
+
+        /// <summary>
         /// Deletes an <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <remarks>

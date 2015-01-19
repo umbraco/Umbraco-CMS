@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -8,11 +9,13 @@ using System.Threading;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -273,6 +276,74 @@ namespace Umbraco.Core.Services
             
         }
 
+        public void Validate(IContentTypeComposition compo)
+        {
+            using (new WriteLock(Locker))
+            {
+                ValidateLocked(compo);
+            }
+        }
+
+        private void ValidateLocked(IContentTypeComposition compositionContentType)
+        {
+            // performs business-level validation of the composition
+            // should ensure that it is absolutely safe to save the composition
+
+            // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
+            // but that cannot be used (conflict with descendants)
+
+            var contentType = compositionContentType as IContentType;
+            var mediaType = compositionContentType as IMediaType;
+
+            IContentTypeComposition[] allContentTypes;
+            if (contentType != null)
+                allContentTypes = GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+            else if (mediaType != null)
+                allContentTypes = GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+            else
+                throw new Exception("Composition is neither IContentType nor IMediaType?");
+
+            var compositionAliases = compositionContentType.CompositionAliases();
+            var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
+            var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
+            var indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
+            var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
+            var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
+            var stack = new Stack<IContentTypeComposition>();
+            indirectReferences.ForEach(stack.Push);//Push indirect references to a stack, so we can add recursively
+            while (stack.Count > 0)
+            {
+                var indirectReference = stack.Pop();
+                dependencies.Add(indirectReference);
+                //Get all compositions for the current indirect reference
+                var directReferences = indirectReference.ContentTypeComposition;
+                
+                foreach (var directReference in directReferences)
+                {
+                    if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
+                    dependencies.Add(directReference);
+                    //A direct reference has compositions of its own - these also need to be taken into account
+                    var directReferenceGraph = directReference.CompositionAliases();
+                    allContentTypes.Where(x => directReferenceGraph.Any(y => x.Alias.Equals(y, StringComparison.InvariantCultureIgnoreCase))).ForEach(c => dependencies.Add(c));
+                }
+                //Recursive lookup of indirect references
+                allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == indirectReference.Id)).ForEach(stack.Push);
+            }
+
+            foreach (var dependency in dependencies)
+            {
+                if (dependency.Id == compositionContentType.Id) continue;
+                var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
+                if (contentTypeDependency == null) continue;
+                var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
+                if (intersect.Length == 0) continue;
+
+                var message = string.Format("The following PropertyType aliases from the current ContentType conflict with existing PropertyType aliases: {0}.",
+                    string.Join(", ", intersect));
+                throw new Exception(message);
+            }
+        }
+
         /// <summary>
         /// Saves a single <see cref="IContentType"/> object
         /// </summary>
@@ -288,6 +359,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    ValidateLocked(contentType); // throws if invalid
                     contentType.CreatorId = userId;
                     repository.AddOrUpdate(contentType);
 
@@ -317,6 +389,11 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {
+                    // all-or-nothing, validate them all first
+                    foreach (var contentType in asArray)
+                    {
+                        ValidateLocked(contentType); // throws if invalid
+                    }
                     foreach (var contentType in asArray)
                     {
                         contentType.CreatorId = userId;
@@ -487,6 +564,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
                 {
+                    ValidateLocked(mediaType); // throws if invalid
                     mediaType.CreatorId = userId;
                     repository.AddOrUpdate(mediaType);
                     uow.Commit();
@@ -517,7 +595,11 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
                 {
-
+                    // all-or-nothing, validate them all first
+                    foreach (var mediaType in asArray)
+                    {
+                        ValidateLocked(mediaType); // throws if invalid
+                    }
                     foreach (var mediaType in asArray)
                     {
                         mediaType.CreatorId = userId;

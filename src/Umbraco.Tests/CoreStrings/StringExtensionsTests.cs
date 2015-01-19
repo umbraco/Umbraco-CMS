@@ -7,7 +7,7 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Tests.CoreStrings
 {
-	[TestFixture]
+    [TestFixture]
     public class StringExtensionsTests
     {
 	    [SetUp]

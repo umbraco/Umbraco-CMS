@@ -1,21 +1,33 @@
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
+
 @*
-    === Macro Parameters To Create ===
-    Alias:nodeId Name:Node ID    Type:Content Picker
+    Macro to list all child pages under a specific page in the content tree.
+
+    How it works:
+        - Confirm the startNodeId macro parameter has been passed in with a value
+        - Loop through all child pages
+        - Display a list of link to those pages, sorted by the value of the propertyAlias
+
+    Macro Parameters To Create, for this macro to work:
+    Alias:startNodeId     Name:Select starting page    Type:Content Picker
 *@
 
-@if (Model.MacroParameters["startNodeID"] != null)
+@{ var startNodeId = Model.MacroParameters["startNodeId"]; }
+@if (startNodeId != null)
 {
-    @* Get the start node as a dynamic node *@
-    var startNode = Umbraco.Content(Model.MacroParameters["startNodeID"]);
-    
-    if (startNode.Children.Where("Visible").Any())
+    @* Get the starting page *@
+    var startNode = Umbraco.Content(startNodeId);
+    var selection = startNode.Children.Where("Visible");
+
+    if (selection.Any())
     {
         <ul>
-            @foreach (var page in startNode.Children.Where("Visible"))
-            { 
-                <li><a href="@page.Url">@page.Name</a></li>
+            @foreach (var item in selection)
+            {
+                <li>
+                    <a href="@item.Url">@item.Name</a>
+                </li>
             }
         </ul>
-    }    
+    }
 }

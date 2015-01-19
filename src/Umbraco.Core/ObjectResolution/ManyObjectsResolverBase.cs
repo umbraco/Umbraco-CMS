@@ -15,7 +15,7 @@ namespace Umbraco.Core.ObjectResolution
 		where TResolved : class
         where TResolver : ResolverBase
 	{
-		private IEnumerable<TResolved> _applicationInstances = null;
+		private Lazy<IEnumerable<TResolved>> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly string _httpContextKey;
 		private readonly List<Type> _instanceTypes = new List<Type>();
@@ -47,6 +47,8 @@ namespace Umbraco.Core.ObjectResolution
 			if (scope == ObjectLifetimeScope.HttpRequest)
 				_httpContextKey = this.GetType().FullName;
 			_instanceTypes = new List<Type>();
+
+            InitializeAppInstances();
 		}
 
 		/// <summary>
@@ -64,6 +66,8 @@ namespace Umbraco.Core.ObjectResolution
 			_httpContextKey = this.GetType().FullName;
 			CurrentHttpContext = httpContext;
 			_instanceTypes = new List<Type>();
+
+            InitializeAppInstances();
 		}
 
 		/// <summary>
@@ -93,6 +97,11 @@ namespace Umbraco.Core.ObjectResolution
 			_instanceTypes = value.ToList();
 		} 
 		#endregion
+
+        private void InitializeAppInstances()
+        {
+            _applicationInstances = new Lazy<IEnumerable<TResolved>>(() => CreateInstances().ToArray());
+        }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the resolver can resolve objects before resolution is frozen.
@@ -178,30 +187,17 @@ namespace Umbraco.Core.ObjectResolution
                     switch (LifetimeScope)
                     {
                         case ObjectLifetimeScope.HttpRequest:
-                            // create new instances per HttpContext
-                            using (var l = new UpgradeableReadLock(_lock))
-                            {
-                                // create if not already there
-                                if (CurrentHttpContext.Items[_httpContextKey] == null)
-                                {
-                                    l.UpgradeToWriteLock();
-                                    CurrentHttpContext.Items[_httpContextKey] = CreateInstances().ToArray();
-                                }
-                                return (TResolved[])CurrentHttpContext.Items[_httpContextKey];
-                            }
 
-                        case ObjectLifetimeScope.Application:
-                            // create new instances per application
-                            using (var l = new UpgradeableReadLock(_lock))
+                            // create new instances per HttpContext
+                            if (CurrentHttpContext.Items[_httpContextKey] == null)
                             {
-                                // create if not already there
-                                if (_applicationInstances == null)
-                                {
-                                    l.UpgradeToWriteLock();
-                                    _applicationInstances = CreateInstances().ToArray();
-                                }
-                                return _applicationInstances;
+                                CurrentHttpContext.Items[_httpContextKey] = CreateInstances().ToArray();    
                             }
+                            return (TResolved[])CurrentHttpContext.Items[_httpContextKey];
+                            
+                        case ObjectLifetimeScope.Application:
+
+                            return _applicationInstances.Value;
 
                         case ObjectLifetimeScope.Transient:
                         default:

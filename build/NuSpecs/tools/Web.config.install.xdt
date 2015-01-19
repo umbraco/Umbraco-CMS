@@ -6,7 +6,9 @@
     <section name="FileSystemProviders" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <section name="ExamineLuceneIndexSets" type="Examine.LuceneEngine.Config.IndexSets, Examine" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="SetAttributes(type,requirePermission)" />
 
-    <sectionGroup name="applicationSettings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    <sectionGroup name="applicationSettings" xdt:Locator="Match(name)">
+		<section name="umbraco.presentation.Properties.Settings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+	</sectionGroup>
     <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing">
       <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
@@ -154,10 +156,25 @@
       </dependentAssembly>
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.1" />
+        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
       </dependentAssembly>
     </assemblyBinding>
   </runtime>
 
   <system.web.webPages.razor xdt:Transform="Remove" />
+  
+  <location path="umbraco" xdt:Locator="Match(path)" xdt:Transform="InsertIfMissing" />
+  <location path="umbraco" xdt:Locator="Match(path)">
+    <system.webServer xdt:Transform="InsertIfMissing">
+	  <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
+    </system.webServer>
+  </location>
+  
+  <location path="App_Plugins" xdt:Locator="Match(path)" xdt:Transform="InsertIfMissing" />
+  <location path="App_Plugins" xdt:Locator="Match(path)">
+    <system.webServer xdt:Transform="InsertIfMissing">
+	  <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
+    </system.webServer>
+  </location>
+  
 </configuration>

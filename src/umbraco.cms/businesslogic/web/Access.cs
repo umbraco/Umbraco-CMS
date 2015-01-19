@@ -494,7 +494,14 @@ namespace umbraco.cms.businesslogic.web
             return hasAccess;
         }
 
+        [Obsolete("This method has been replaced because of a spelling mistake. Use the HasAccess method instead.", false)]
         public static bool HasAccces(int documentId, object memberId)
+        {
+            // Call the correctly named version of this method
+            return HasAccess(documentId, memberId);
+        }
+
+        public static bool HasAccess(int documentId, object memberId)
         {
             bool hasAccess = false;
             var node = new CMSNode(documentId);
@@ -511,7 +518,7 @@ namespace umbraco.cms.businesslogic.web
 
                 if (member != null)
                 {
-                    foreach (string role in Roles.GetRolesForUser())
+                    foreach (string role in Roles.GetRolesForUser(member.UserName))
                     {
                         if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
                         {

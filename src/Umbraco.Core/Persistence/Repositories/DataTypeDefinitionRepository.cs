@@ -375,16 +375,15 @@ AND umbracoNode.id <> @id",
                 var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
                 if (existing != null)
                 {
-                    existing.Value = pre.Value.Value;
-                    existing.SortOrder = sortOrder;
                     _preValRepository.AddOrUpdate(new PreValueEntity
                     {
                         //setting an id will update it
                         Id = existing.Id,
-                        Alias = existing.Alias,                        
-                        SortOrder = existing.SortOrder,
-                        Value = existing.Value,
                         DataType = dataType,
+                        //These are the new values to update
+                        Alias = pre.Key,
+                        SortOrder = sortOrder,
+                        Value = pre.Value.Value
                     });
                 }
                 else

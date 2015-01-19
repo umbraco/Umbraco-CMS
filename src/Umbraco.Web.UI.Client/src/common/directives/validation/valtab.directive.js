@@ -35,4 +35,4 @@ function valTab() {
         }
     };
 }
-angular.module('umbraco.directives').directive("valTab", valTab);
+angular.module('umbraco.directives.validation').directive("valTab", valTab);

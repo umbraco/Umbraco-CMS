@@ -104,9 +104,9 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core">
+    <Reference Include="ClientDependency.Core, Version=1.8.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency.1.7.1.2\lib\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\packages\ClientDependency.1.8.1.0\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="CookComputing.XmlRpcV2, Version=2.5.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -115,9 +115,9 @@
     <Reference Include="dotless.Core">
       <HintPath>..\packages\dotless.1.4.1.0\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.59.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.57.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.59.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -195,9 +195,9 @@
     <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.40804.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -264,6 +264,8 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="Models\LegacyConvertedNode.cs" />
+    <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
@@ -304,7 +306,6 @@
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
-    <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\CanvasDesignerController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
@@ -325,7 +326,6 @@
     <Compile Include="Editors\TemplateQueryController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
-    <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\DetachedContent.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
     <Compile Include="Models\ImageCropCoordinates.cs" />
@@ -393,7 +393,6 @@
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
-    <Compile Include="Editors\MembershipProviderValidationFilterAttribute.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
     <Compile Include="MembershipProviderExtensions.cs" />
@@ -491,8 +490,6 @@
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Routing\CustomRouteUrlProvider.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
-    <Compile Include="Scheduling\IBackgroundTask.cs" />
-    <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
@@ -544,8 +541,11 @@
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
+    <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
+    <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
+    <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoBackOfficeLogoutAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
@@ -569,10 +569,12 @@
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
+    <Compile Include="Scheduling\IBackgroundTask.cs" />
     <Compile Include="Scheduling\KeepAlive.cs" />
     <Compile Include="Scheduling\LogScrubber.cs" />
     <Compile Include="Scheduling\ScheduledPublishing.cs" />
     <Compile Include="Scheduling\ScheduledTasks.cs" />
+    <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
@@ -725,6 +727,7 @@
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
+    <Compile Include="Models\LegacyNodeHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

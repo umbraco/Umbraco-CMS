@@ -271,7 +271,7 @@ angular.module("umbraco")
 
                     }
                 });
-                
+
         };
 
         // *********************************************
@@ -380,7 +380,7 @@ angular.module("umbraco")
         };
 
         $scope.getEditor = function(alias){
-            return  _.find($scope.availableEditors, function(editor){return editor.alias === alias});
+            return  _.find($scope.availableEditors, function(editor){return editor.alias === alias;});
         };
 
         $scope.removeControl = function (cell, $index) {
@@ -389,8 +389,9 @@ angular.module("umbraco")
         };
 
         $scope.percentage = function(spans){
-            return ((spans/12)*100).toFixed(1);
+            return (( spans/ $scope.model.config.items.columns ) *100).toFixed(1);
         };
+
 
 
 
@@ -417,6 +418,13 @@ angular.module("umbraco")
             //settings indicator shortcut
             if($scope.model.config.items.config || $scope.model.config.items.styles){
                 $scope.hasSettings = true;
+            }
+
+            //ensure the grid has a column value set, if nothing is found, set it to 12
+            if($scope.model.config.items.columns && angular.isString($scope.model.config.items.columns)){
+                $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
+            }else{
+                $scope.model.config.items.columns = 12;
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
@@ -493,7 +501,7 @@ angular.module("umbraco")
 
                 //sync area configuration
                 _.each(original.areas, function(area, areaIndex){
-                    
+
 
                     if(area.grid > 0){
                         var currentArea = row.areas[areaIndex];
@@ -558,6 +566,9 @@ angular.module("umbraco")
             control.$uniqueId = $scope.setUniqueId();
 
             if(!control.$editorPath){
+                var editorConfig = $scope.getEditor(control.editor.alias);
+                control.editor = editorConfig;
+
                 //if its a path
                 if(_.indexOf(control.editor.view, "/") >= 0){
                     control.$editorPath = control.editor.view;

@@ -73,13 +73,11 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             scope: $scope,
             content: $scope.content
         }).then(function (data) {
-            //success
-            $scope.busy = false;
+            //success            
             init($scope.content);
             syncTreeNode($scope.content, data.path);
         }, function (err) {
             //error
-            $scope.busy = false;
             if (err) {
                 editorState.set($scope.content);
             }

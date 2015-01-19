@@ -52,7 +52,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Content = content,
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
-                UpdateDate = updated
+                UpdateDate = updated,
+                VirtualPath = FileSystem.GetUrl(id)
             };
 
             //on initial construction we don't want to have dirty properties tracked

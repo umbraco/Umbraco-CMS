@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
@@ -60,6 +61,61 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var json = editorValue.Value as JArray;
                 return json == null ? null : json.Select(x => x.Value<string>());
+            }
+
+            /// <summary>
+            /// Returns the validator used for the required field validation which is specified on the PropertyType
+            /// </summary>
+            /// <remarks>
+            /// This will become legacy as soon as we implement overridable pre-values.
+            /// 
+            /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
+            /// if they need to do some custom validation, or if the value being validated is a json object.
+            /// </remarks>
+            internal override ManifestValueValidator RequiredValidator
+            {
+                get { return new RequiredTagsValueValidator(); }
+            }
+            
+            /// <summary>
+            /// Custom validator to validate a required value against an empty json value
+            /// </summary>
+            /// <remarks>
+            /// This is required because the Tags property editor is not of type 'JSON', it's just string so the underlying
+            /// validator does not validate against an empty json string
+            /// </remarks>
+            [ValueValidator("Required")]
+            private class RequiredTagsValueValidator : ManifestValueValidator
+            {
+                /// <summary>
+                /// Validates a null value or an empty json value
+                /// </summary>
+                /// <param name="value"></param>
+                /// <param name="config"></param>
+                /// <param name="preValues"></param>
+                /// <param name="editor"></param>
+                /// <returns></returns>
+                public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+                {
+                    if (value == null)
+                    {
+                        yield return new ValidationResult("Value cannot be null", new[] { "value" });
+                    }
+                    else
+                    {
+                        var asString = value.ToString();
+
+                        if (asString.DetectIsEmptyJson())
+                        {
+                            yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                        }
+
+                        if (asString.IsNullOrWhiteSpace())
+                        {
+                            yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                        }
+                    }
+                }
             }
         }
 

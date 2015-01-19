@@ -354,7 +354,7 @@ namespace Umbraco.Tests.TestHelpers
             var ctx = new UmbracoContext(
                 httpContext,
                 ApplicationContext,
-                new PublishedCaches(cache, new PublishedMediaCache()),
+                new PublishedCaches(cache, new PublishedMediaCache(ApplicationContext)),
                 new WebSecurity(httpContext, ApplicationContext));
 
             if (setSingleton)

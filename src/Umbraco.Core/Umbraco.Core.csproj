@@ -99,9 +99,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.40804.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -299,6 +299,9 @@
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Macros\PartialViewMacroResult.cs" />
+    <Compile Include="Models\IPartialView.cs" />
+    <Compile Include="Services\LocalizedTextService.cs" />
+    <Compile Include="Services\ILocalizedTextService.cs" />
     <Compile Include="Macros\XsltExtension.cs" />
     <Compile Include="Macros\XsltExtensionAttribute.cs" />
     <Compile Include="Macros\XsltExtensionsResolver.cs" />
@@ -376,13 +379,14 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddMissingForeignKeyForContentType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AlterDataTypePreValueTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenOneZero\AssignMissingPrimaryForMySqlKeys.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddIndexToUmbracoNodeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\RemoveCmsDocumentAliasColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AssignMissingKeysAndIndexes.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AssignMissingPrimaryForMySqlKeys.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AssignMissingPrimaryForMySqlKeys2.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\ChangePasswordColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IPartialViewMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPartialViewRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRecycleBinRepository.cs" />
     <Compile Include="Persistence\Repositories\PartialViewMacroRepository.cs" />
@@ -1046,6 +1050,8 @@
     <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
+    <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
+    <Compile Include="Services\LocalizedTextServiceFileSources.cs" />
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />

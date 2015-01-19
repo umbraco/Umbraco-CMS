@@ -728,7 +728,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
 
-
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,

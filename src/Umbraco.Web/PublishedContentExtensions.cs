@@ -1,7 +1,3 @@
-// ENABLE THE FIX in 7.0.0
-// TODO if all goes well, remove the obsolete code eventually
-#define FIX_AXES
-
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -911,148 +907,270 @@ namespace Umbraco.Web
         // - the relative order of siblings is the order in which they occur in the children property of their parent node.
         // - children and descendants occur before following siblings.
 
-        // SO, here we want to walk up the tree. which is what AncestorOrSelf does but NOT what AncestorsOrSelf does since
-        // it reverses the list, so basically ancestors are NOT XPath-compliant in Umbraco at the moment -- but fixing that
-        // would be a breaking change. Defining FIX_AXES would fix the situation.
-
+        /// <summary>
+        /// Gets the ancestors of the content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The ancestors of the content, in down-top order.</returns>
+        /// <remarks>Does not consider the content itself.</remarks>
         public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content)
         {
             return content.AncestorsOrSelf(false, null);
         }
 
-        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the ancestors of the content, at a level lesser or equal to a specified level.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The ancestors of the content, at a level lesser or equal to the specified level, in down-top order.</returns>
+        /// <remarks>Does not consider the content itself. Only content that are "high enough" in the tree are returned.</remarks>
+        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int maxLevel)
         {
-            return content.AncestorsOrSelf(false, n => n.Level <= level);
+            return content.AncestorsOrSelf(false, n => n.Level <= maxLevel);
         }
 
+        /// <summary>
+        /// Gets the ancestors of the content, of a specified content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="contentTypeAlias">The content type.</param>
+        /// <returns>The ancestors of the content, of the specified content type, in down-top order.</returns>
+        /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
         public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         {
             return content.AncestorsOrSelf(false, n => n.DocumentTypeAlias == contentTypeAlias);
         }
 
+        /// <summary>
+        /// Gets the ancestors of the content, of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>The ancestors of the content, of the specified content type, in down-top order.</returns>
+        /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
         public static IEnumerable<T> Ancestors<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Ancestors().OfType<T>();
         }
 
-        public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the ancestors of the content, at a level lesser or equal to a specified level, and of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The ancestors of the content, at a level lesser or equal to the specified level, and of the specified
+        /// content type, in down-top order.</returns>
+        /// <remarks>Does not consider the content itself. Only content that are "high enough" in the trees, and of the
+        /// specified content type, are returned.</remarks>
+        public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int maxLevel)
             where T : class, IPublishedContent
         {
-            return content.Ancestors(level).OfType<T>();
+            return content.Ancestors(maxLevel).OfType<T>();
         }
 
+        /// <summary>
+        /// Gets the content and its ancestors.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The content and its ancestors, in down-top order.</returns>
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
         {
             return content.AncestorsOrSelf(true, null);
         }
 
-        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the content and its ancestors, at a level lesser or equal to a specified level.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The content and its ancestors, at a level lesser or equal to the specified level,
+        /// in down-top order.</returns>
+        /// <remarks>Only content that are "high enough" in the tree are returned. So it may or may not begin
+        /// with the content itself, depending on its level.</remarks>
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int maxLevel)
         {
-            return content.AncestorsOrSelf(true, n => n.Level <= level);
+            return content.AncestorsOrSelf(true, n => n.Level <= maxLevel);
         }
 
+        /// <summary>
+        /// Gets the content and its ancestors, of a specified content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="contentTypeAlias">The content type.</param>
+        /// <returns>The content and its ancestors, of the specified content type, in down-top order.</returns>
+        /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
             return content.AncestorsOrSelf(true, n => n.DocumentTypeAlias == contentTypeAlias);
         }
 
+        /// <summary>
+        /// Gets the content and its ancestors, of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>The content and its ancestors, of the specified content type, in down-top order.</returns>
+        /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
         public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.AncestorsOrSelf().OfType<T>();
         }
 
-        public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the content and its ancestor, at a lever lesser or equal to a specified level, and of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The content and its ancestors, at a level lesser or equal to the specified level, and of the specified
+        /// content type, in down-top order.</returns>
+        /// <remarks>May or may not begin with the content itself, depending on its level and content type.</remarks>
+        public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int maxLevel)
             where T : class, IPublishedContent
         {
-            return content.AncestorsOrSelf(level).OfType<T>();
+            return content.AncestorsOrSelf(maxLevel).OfType<T>();
         }
 
+        /// <summary>
+        /// Gets the ancestor of the content, ie its parent.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The ancestor of the content.</returns>
+        /// <remarks>This method is here for consistency purposes but does not make much sense.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content)
         {
             return content.Parent;
         }
 
-        public static IPublishedContent Ancestor(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the nearest ancestor of the content, at a lever lesser or equal to a specified level.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The nearest (in down-top order) ancestor of the content, at a level lesser or equal to the specified level.</returns>
+        /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
+        public static IPublishedContent Ancestor(this IPublishedContent content, int maxLevel)
         {
-            return content.EnumerateAncestors(false).FirstOrDefault(x => x.Level <= level);
+            return content.EnumerateAncestors(false).FirstOrDefault(x => x.Level <= maxLevel);
         }
 
+        /// <summary>
+        /// Gets the nearest ancestor of the content, of a specified content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="contentTypeAlias">The content type alias.</param>
+        /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
+        /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content, string contentTypeAlias)
         {
             return content.EnumerateAncestors(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
         }
 
+        /// <summary>
+        /// Gets the nearest ancestor of the content, of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
+        /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
         public static T Ancestor<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
-            return content.Ancestor() as T;
+            return content.Ancestors<T>().FirstOrDefault();
         }
 
-        public static T Ancestor<T>(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the nearest ancestor of the content, at the specified level and of the specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The ancestor of the content, at the specified level and of the specified content type.</returns>
+        /// <remarks>Does not consider the content itself. If the ancestor at the specified level is
+        /// not of the specified type, returns <c>null</c>.</remarks>
+        public static T Ancestor<T>(this IPublishedContent content, int maxLevel)
             where T : class, IPublishedContent
         {
-            return content.Ancestor(level) as T;
+            return content.Ancestors<T>(maxLevel).FirstOrDefault();
         }
         
-        // note: that one makes no sense and should return self  -- but fixing that
-        // would be a breaking change. Defining FIX_AXES would fix the situation.
+        /// <summary>
+        /// Gets the content or its nearest ancestor.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The content.</returns>
+        /// <remarks>This method is here for consistency purposes but does not make much sense.</remarks>
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content)
         {
-#if FIX_AXES
             return content;
-#else
-            return content.EnumerateAncestors(true).FirstOrDefault(x => x.Level == 1);
-#endif
         }
 
-        public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the content or its nearest ancestor, at a lever lesser or equal to a specified level.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns>The content or its nearest (in down-top order) ancestor, at a level lesser or equal to the specified level.</returns>
+        /// <remarks>May or may not return the content itself depending on its level. May return <c>null</c>.</remarks>
+        public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel)
         {
-            return content.EnumerateAncestors(true).FirstOrDefault(x => x.Level <= level);
+            return content.EnumerateAncestors(true).FirstOrDefault(x => x.Level <= maxLevel);
         }
 
+        /// <summary>
+        /// Gets the content or its nearest ancestor, of a specified content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="contentTypeAlias">The content type.</param>
+        /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
+        /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
             return content.EnumerateAncestors(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
         }
 
+        /// <summary>
+        /// Gets the content or its nearest ancestor, of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
+        /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
         public static T AncestorOrSelf<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
-            return content.AncestorOrSelf() as T;
+            return content.AncestorsOrSelf<T>().FirstOrDefault();
         }
 
-        public static T AncestorOrSelf<T>(this IPublishedContent content, int level)
+        /// <summary>
+        /// Gets the content or its nearest ancestor, at a lever lesser or equal to a specified level, and of a specified content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="maxLevel">The level.</param>
+        /// <returns></returns>
+        public static T AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
             where T : class, IPublishedContent
         {
-            return content.AncestorOrSelf(level) as T;
+            return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
         }
         
-        // broken until we defined FIX_AXES
         internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
-#if FIX_AXES
-            return content.EnumerateAncestors(orSelf).Where(x => func == null || func(x));
-#else
-            var ancestors = new List<IPublishedContent>();
-
-            if (orSelf && (func == null || func(content)))
-                ancestors.Add(content);
-
-            while (content.Level > 1) // while we have a parent, consider the parent
-            {
-                content = content.Parent;
-
-                if ((func == null || func(content)))
-                    ancestors.Add(content);
-            }
-
-            ancestors.Reverse();
-            return ancestors;
-#endif
+            var ancestorsOrSelf = content.EnumerateAncestors(orSelf);
+            return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
         }
 
+        /// <summary>
+        /// Enumerates ancestors of the content, bottom-up.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="orSelf">Indicates whether the content should be included.</param>
+        /// <returns>Enumerates bottom-up ie walking up the tree (parent, grand-parent, etc).</returns>
         internal static IEnumerable<IPublishedContent> EnumerateAncestors(this IPublishedContent content, bool orSelf)
         {
             if (orSelf) yield return content;
@@ -1111,10 +1229,6 @@ namespace Umbraco.Web
         // - every node occurs before all of its children and descendants.
         // - the relative order of siblings is the order in which they occur in the children property of their parent node.
         // - children and descendants occur before following siblings.
-        
-        // SO, here we want to implement a depth-first enumeration of children. Which is what EnumerateDescendants does, but NOT what
-        // DescendantsOrSelf does, so basically descendants are NOT XPath-compliant in Umbraco at the moment -- but fixing that
-        // would be a breaking change. Defining FIX_AXES would fix the situation.
 
         public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content)
         {
@@ -1224,24 +1338,9 @@ namespace Umbraco.Web
             return content.DescendantOrSelf(level) as T;
         }
         
-        // broken until we defined FIX_AXES
         internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
-#if FIX_AXES
             return content.EnumerateDescendants(orSelf).Where(x => func == null || func(x));
-#else
-            var init = (orSelf && (func == null || func(content))) ? new[] { content } : new IPublishedContent[] { };
-
-            var descendants = init
-                .Union(content.Children
-                    .FlattenList(x => x.Children)
-                    .Where(x => func == null || func(x))
-                )
-                .OrderBy(x => x.Level)
-                .ThenBy(x => x.SortOrder);
-
-            return descendants;
-#endif
         }
 
         internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf)
@@ -1279,9 +1378,6 @@ namespace Umbraco.Web
 		{
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
-#if (!FIX_AXES)
-		    number += 1; // legacy is zero-based ie zero == parent
-#endif
 		    return number == 0 ? content : content.EnumerateAncestors(false).Skip(number).FirstOrDefault();
 		}
 
@@ -1305,9 +1401,6 @@ namespace Umbraco.Web
 		{
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
-#if (!FIX_AXES)
-            number += 1; // legacy is zero-based ie zero == first child
-#endif
 		    if (number == 0) return content;
 
             content = content.Children.FirstOrDefault();
@@ -1348,9 +1441,6 @@ namespace Umbraco.Web
 		{
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
-#if (!FIX_AXES)
-            number += 1; // legacy is zero-based ie zero == next, whereas zero should be current
-#endif
             return number == 0 ? content : content.ContentSet.ElementAtOrDefault(content.GetIndex() + number);
         }
 
@@ -1418,10 +1508,6 @@ namespace Umbraco.Web
 		{
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
-#if (!FIX_AXES)
-		    number = -number; // legacy wants negative numbers, should be positive
-            number += 1; // legacy is zero-based ie zero == previous, whereas zero should be current
-#endif
             return number == 0 ? content : content.ContentSet.ElementAtOrDefault(content.GetIndex() - number);
         }
 
@@ -1562,9 +1648,11 @@ namespace Umbraco.Web
             // what else? would need root content to have a special, non-null but hidden,
             // parent...
 
+
+
             var siblings = content.Parent == null
-                       ? UmbracoContext.Current.ContentCache.GetAtRoot()
-                       : content.Parent.Children;
+                ? content.ItemType == PublishedItemType.Media ? UmbracoContext.Current.MediaCache.GetAtRoot() : UmbracoContext.Current.ContentCache.GetAtRoot()
+                : content.Parent.Children;
 
             // make sure we run it once
             return siblings.ToArray();

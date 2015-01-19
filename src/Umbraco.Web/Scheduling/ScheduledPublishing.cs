@@ -42,9 +42,10 @@ namespace Umbraco.Web.Scheduling
 
                 _isPublishingRunning = true;
 
+                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
+
                 try
-                {
-                    var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
+                {                    
 
                     if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                     {
@@ -64,7 +65,9 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ee)
                 {
-                    LogHelper.Error<ScheduledPublishing>("An error occurred with the scheduled publishing", ee);
+                    LogHelper.Error<ScheduledPublishing>(
+                        string.Format("An error occurred with the scheduled publishing. The base url used in the request was: {0}, see http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks documentation for details on setting a baseUrl if this is in error", umbracoBaseUrl)
+                        , ee);
                 }
                 finally
                 {

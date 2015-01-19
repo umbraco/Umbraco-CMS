@@ -133,14 +133,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
             {
-                if (tagGroup.IsNullOrWhiteSpace())
-                {
-                    return repository.GetAll();
-                }
-
-                var query = Query<ITag>.Builder.Where(x => x.Group == tagGroup);
-                var definitions = repository.GetByQuery(query);
-                return definitions;
+                return repository.GetTagsForEntityType(TaggableObjectTypes.All, tagGroup);
             }  
         }
 

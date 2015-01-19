@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class PartialView : File
+    public class PartialView : File, IPartialView
     {
         //public PartialView(): base(string.Empty)
         //{

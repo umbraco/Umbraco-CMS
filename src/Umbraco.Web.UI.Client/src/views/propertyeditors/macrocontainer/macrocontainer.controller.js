@@ -41,7 +41,7 @@ angular.module('umbraco')
 
 			if(index !== null && $scope.renderModel[index]) {
 				var macro = $scope.renderModel[index];
-				dialogData[macroData] = macro;
+				dialogData["macroData"] = macro;
 			}
 			
 			dialogService.macroPicker({

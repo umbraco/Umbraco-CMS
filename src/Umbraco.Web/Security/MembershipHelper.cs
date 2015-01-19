@@ -415,7 +415,7 @@ namespace Umbraco.Web.Security
                 if (member != null)
                 {
                     var propValue = member.Properties[prop.Alias];
-                    if (propValue != null)
+                    if (propValue != null && propValue.Value != null)
                     {
                         value = propValue.Value.ToString();
                     }    

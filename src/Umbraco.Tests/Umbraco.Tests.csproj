@@ -58,9 +58,9 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.57.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.59.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.57.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.59.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -132,9 +132,9 @@
     <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.40804.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -168,6 +168,8 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
+    <Compile Include="CoreStrings\StringValidationTests.cs" />
+    <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
     <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
@@ -280,6 +282,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
     <Compile Include="ServerEnvironmentHelperTests.cs" />
+    <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
@@ -638,7 +641,10 @@
     <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Services\Importing\CompositionsTestPackage-Random.xml" />
+    <Content Include="Services\Importing\CompositionsTestPackage.xml" />
     <Content Include="Services\Importing\Dictionary-Package.xml" />
+    <Content Include="Services\Importing\Fanoe-Package.xml" />
     <Content Include="UmbracoExamine\TestFiles\media.xml" />
     <Content Include="Services\Importing\InheritedDocTypes-Package.xml" />
     <Content Include="Services\Importing\SingleDocType.xml" />

@@ -59,7 +59,7 @@ namespace Umbraco.Core.Sync
                         server.ServerAddress,
                         server.ForcePortnumber.IsNullOrWhiteSpace() ? "80" : server.ForcePortnumber,
                         IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimStart('/'));
-                }                
+                }
             }
 
             // cannot be determined, return null if no config/original url, else use config/original url as base
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Sync
             }
 
             var master = servers.FirstOrDefault();
-            
+
             if (master == null)
             {
                 return CurrentServerEnvironmentStatus.Unknown;
@@ -105,12 +105,12 @@ namespace Umbraco.Core.Sync
             }
 
             if ((appId.IsNullOrWhiteSpace() == false && appId.Trim().InvariantEquals(HttpRuntime.AppDomainAppId))
-                    || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))                
+                    || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))
             {
                 //match by appdid or server name!
-                return CurrentServerEnvironmentStatus.Master;             
+                return CurrentServerEnvironmentStatus.Master;
             }
-            
+
             return CurrentServerEnvironmentStatus.Slave;
         }
 

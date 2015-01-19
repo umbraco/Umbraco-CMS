@@ -38,7 +38,7 @@ namespace Umbraco.Web
         
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
         {
-            return TypedDocumentsbyIds(_contentCache, ids);
+            return TypedDocumentsByIds(_contentCache, ids);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
@@ -102,7 +102,7 @@ namespace Umbraco.Web
         
         public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
         {
-            return TypedDocumentsbyIds(_mediaCache, ids);
+            return TypedDocumentsByIds(_mediaCache, ids);
         }
 
         public IEnumerable<IPublishedContent> TypedMediaAtRoot()
@@ -148,7 +148,7 @@ namespace Umbraco.Web
         //    return doc;
         //}        
 
-        private IEnumerable<IPublishedContent> TypedDocumentsbyIds(ContextualPublishedCache cache, IEnumerable<int> ids)
+        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
         {
             return ids.Select(eachId => TypedDocumentById(eachId, cache));
         }

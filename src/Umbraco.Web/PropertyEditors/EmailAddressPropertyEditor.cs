@@ -21,6 +21,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class EmailAddressePreValueEditor : PreValueEditor
         {
+            //TODO: This doesn't seem necessary since it can be specified at the property type level - this will however be useful if/when
+            // we support overridden property value pre-value options.
             [PreValueField("Required?", "boolean")]
             public bool IsRequired { get; set; }
         }

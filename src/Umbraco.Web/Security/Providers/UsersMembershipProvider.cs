@@ -47,7 +47,7 @@ namespace Umbraco.Web.Security.Providers
         protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {
             //the provider user key is always the int id
-            return entity.AsConcreteMembershipUser(Name);
+            return entity.AsConcreteMembershipUser(Name, true);
         }
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)

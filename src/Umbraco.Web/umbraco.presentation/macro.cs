@@ -30,6 +30,7 @@ using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
+using Umbraco.Web.Models;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;

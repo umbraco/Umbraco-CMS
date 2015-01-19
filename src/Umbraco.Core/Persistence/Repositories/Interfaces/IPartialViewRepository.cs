@@ -2,8 +2,9 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IPartialViewRepository : IRepository<string, PartialView>
+    internal interface IPartialViewRepository : IRepository<string, IPartialView>
     {
-
+        void AddFolder(string folderPath);
+        void DeleteFolder(string folderPath);
     }
 }

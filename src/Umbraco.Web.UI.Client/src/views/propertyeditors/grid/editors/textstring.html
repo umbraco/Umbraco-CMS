@@ -1,7 +1,9 @@
-<div ng-controller="Umbraco.PropertyEditors.Grid.TextStringController">
+<div>
 	<textarea
 		rows="1"
+		umb-auto-resize
+		umb-auto-focus
 		class="textstring input-block-level" id="{{control.uniqueId}}_text"
-		ng-keyup="adjustSize($event)" ng-model="control.value"
-		ng-attr-style="{{control.editor.config.style}}" placeholder="Write here..."></textarea>
+		ng-model="control.value"
+		ng-attr-style="{{control.editor.config.style}}" localize="placeholder" placeholder="@grid_placeholderWriteHere"></textarea>
 </div>

@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata minClientVersion="2.8">
-        <id>UmbracoCms</id>
-        <version>7.0.0</version>
-        <title>Umbraco Cms</title>
-        <authors>Umbraco HQ</authors>
-        <owners>Umbraco HQ</owners>
-        <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
-        <projectUrl>http://umbraco.com/</projectUrl>
-        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
-        <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>
-        <language>en-US</language>
-        <tags>umbraco</tags>
-        <dependencies>
-            <dependency id="UmbracoCms.Core" version="[$version$]" />
-            <dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
-        </dependencies>
-    </metadata>
+  <metadata minClientVersion="2.8">
+    <id>UmbracoCms</id>
+    <version>7.0.0</version>
+    <title>Umbraco Cms</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
+    <projectUrl>http://umbraco.com/</projectUrl>
+    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
+    <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
+      <dependency id="UmbracoCms.Core" version="[$version$]" />
+      <dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
+    </dependencies>
+  </metadata>
   <files>
-	<file src="..\_BuildOutput\Configs\**" target="Content\config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
-	<file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
-	<file src="..\_BuildOutput\WebApp\masterpages\**" target="Content\masterpages" />
-	<file src="..\_BuildOutput\WebApp\media\**" target="Content\media" />
-	<file src="..\_BuildOutput\WebApp\scripts\**" target="Content\scripts" />
-	<file src="..\_BuildOutput\WebApp\usercontrols\**" target="Content\usercontrols" />
-	<file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" exclude="..\_BuildOutput\WebApp\Views\Web.config" />
-	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
-	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
-	<file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
-	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
-	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
-	<file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />	
-	<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
-	<file src="..\_BuildOutput\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
-	<file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\config\splashes" />
-	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
-	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
+    <file src="..\_BuildOutput\Configs\**" target="Content\config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
+    <file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
+    <file src="..\_BuildOutput\WebApp\masterpages\**" target="Content\masterpages" />
+    <file src="..\_BuildOutput\WebApp\media\**" target="Content\media" />
+    <file src="..\_BuildOutput\WebApp\scripts\**" target="Content\scripts" />
+    <file src="..\_BuildOutput\WebApp\usercontrols\**" target="Content\usercontrols" />
+    <file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" exclude="..\_BuildOutput\WebApp\Views\Web.config" />
+    <file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
+    <file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
+    <file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
+    <file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
+    <file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
+    <file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />
+    <file src="..\_BuildOutput\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
+    <file src="..\_BuildOutput\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
+    <file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\config\splashes" />
+    <file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
+    <file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
     <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
