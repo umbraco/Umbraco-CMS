@@ -45,6 +45,62 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Update()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntaxProvider))
+            {
+                var task = new Task(new TaskType("asdfasdf"))
+                {
+                    AssigneeUserId = 0,
+                    Closed = false,
+                    Comment = "hello world",
+                    EntityId = -1,
+                    OwnerUserId = 0
+                };
+
+                repo.AddOrUpdate(task);
+                unitOfWork.Commit();
+
+                //re-get 
+                task = repo.Get(task.Id);
+
+                task.Comment = "blah";
+                task.Closed = true;
+
+                Assert.AreEqual(true, task.Closed);
+                Assert.AreEqual("blah", task.Comment);
+            }            
+        }
+
+        [Test]
+        public void Get_By_Id()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntaxProvider))
+            {
+                var task = new Task(new TaskType("asdfasdf"))
+                {
+                    AssigneeUserId = 0,
+                    Closed = false,
+                    Comment = "hello world",
+                    EntityId = -1,
+                    OwnerUserId = 0
+                };
+
+                repo.AddOrUpdate(task);
+                unitOfWork.Commit();
+
+                //re-get 
+                task = repo.Get(task.Id);
+
+                Assert.IsNotNull(task);
+            }
+        }
+
+        [Test]
         public void Get_All()
         {
             CreateTestData(false, 20);
@@ -74,6 +130,21 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Get_All_With_Node_Id()
+        {
+            CreateTestData(false, 10, -20);
+            CreateTestData(false, 5, -21);
+
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntaxProvider))
+            {
+                var found = repo.GetTasks(itemId:-20).ToArray();
+                Assert.AreEqual(10, found.Count());
+            }
+        }
+
+        [Test]
         public void Get_All_Without_Closed()
         {
             CreateTestData(false, 10);
@@ -88,7 +159,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private void CreateTestData(bool closed, int count)
+        private void CreateTestData(bool closed, int count, int entityId = -1)
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
@@ -101,7 +172,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         AssigneeUserId = 0,
                         Closed = closed,
                         Comment = "hello world " + i,
-                        EntityId = -1,
+                        EntityId = entityId,
                         OwnerUserId = 0
                     });
                     unitOfWork.Commit();

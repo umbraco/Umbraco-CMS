@@ -32,6 +32,18 @@ namespace Umbraco.Core.Services
             }
         }
 
-
+        /// <summary>
+        /// Saves a task
+        /// </summary>
+        /// <param name="task"></param>
+        public void Save(Task task)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateTaskRepository(uow))
+            {
+                repo.AddOrUpdate(task);
+                uow.Commit();
+            }
+        }
     }
 }

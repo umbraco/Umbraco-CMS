@@ -8,5 +8,11 @@ namespace Umbraco.Core.Services
     {
         //IEnumerable<Task> GetTasks(Guid? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false);
         IEnumerable<Task> GetTasks(int? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false);
+
+        /// <summary>
+        /// Saves a task
+        /// </summary>
+        /// <param name="task"></param>
+        void Save(Task task);
     }
 }

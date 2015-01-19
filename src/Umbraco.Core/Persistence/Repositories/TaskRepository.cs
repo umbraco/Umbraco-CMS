@@ -131,7 +131,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(Task entity)
         {
-            throw new NotImplementedException();
+            entity.UpdatingEntity();
+
+            var factory = new TaskFactory();
+            var dto = factory.BuildDto(entity);
+
+            Database.Update(dto);
+
+            entity.ResetDirtyProperties();
         }
 
         //public IEnumerable<Task> GetTasks(Guid? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
