@@ -89,7 +89,7 @@ angular.module("umbraco.directives")
                 element.find("a:first").html(node.name);
 
                 if (!node.menuUrl) {
-                    element.find("a:last").remove();
+                    element.find("a.umb-options").remove();
                 }
 
                 if (node.style) {
