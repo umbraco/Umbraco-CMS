@@ -16,13 +16,13 @@ namespace Umbraco.Core.Services
         {
         }
 
-        public IEnumerable<Task> GetTasks(Guid? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
-        {
-            using (var repo = RepositoryFactory.CreateTaskRepository(UowProvider.GetUnitOfWork()))
-            {
-                return repo.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
-            }
-        }
+        //public IEnumerable<Task> GetTasks(Guid? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
+        //{
+        //    using (var repo = RepositoryFactory.CreateTaskRepository(UowProvider.GetUnitOfWork()))
+        //    {
+        //        return repo.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
+        //    }
+        //}
 
         public IEnumerable<Task> GetTasks(int? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
