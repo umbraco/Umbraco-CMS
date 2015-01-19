@@ -57,7 +57,10 @@ namespace Umbraco.Core.Strategies
                 var relation = new Relation(originalParentId, item.Entity.Id, relationType);
                 relationService.Save(relation);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId), item.Entity.WriterId, item.Entity.Id);
+                ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete,
+                    string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId),
+                    item.Entity.WriterId,
+                    item.Entity.Id);
             }
         }
     }

@@ -21,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ILanguageRepository _languageRepository;
 
-        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntaxProvider, ILanguageRepository languageRepository)
-            : base(work, cache, logger, syntaxProvider)
+        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax, ILanguageRepository languageRepository)
+            : base(work, cache, logger, syntax)
 		{
 		    _languageRepository = languageRepository;
 		}
@@ -224,13 +224,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntaxProvider);
+            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
             return uniqueIdRepo.Get(uniqueId);
         }
 
         public IDictionaryItem Get(string key)
         {
-            var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntaxProvider);
+            var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
             return keyRepo.Get(key);
         }
 
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override string GetBaseWhereClause()
             {
-                return "cmsDictionary." + SqlSyntaxProvider.GetQuotedColumnName("id") + " = @Id";
+                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " = @Id";
             }
 
             protected override IDictionaryItem ConvertToEntity(DictionaryDto dto)
@@ -271,7 +271,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override string GetWhereInClauseForGetAll()
             {
-                return "cmsDictionary." + SqlSyntaxProvider.GetQuotedColumnName("id") + " in (@ids)";
+                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
             }
         }
 
@@ -297,7 +297,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override string GetBaseWhereClause()
             {
-                return "cmsDictionary." + SqlSyntaxProvider.GetQuotedColumnName("key") + " = @Id";
+                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " = @Id";
             }
 
             protected override IDictionaryItem ConvertToEntity(DictionaryDto dto)
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override string GetWhereInClauseForGetAll()
             {
-                return "cmsDictionary." + SqlSyntaxProvider.GetQuotedColumnName("key") + " in (@ids)";
+                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
             }
         }
     }

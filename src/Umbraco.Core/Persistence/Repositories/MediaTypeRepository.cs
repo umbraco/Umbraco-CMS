@@ -60,13 +60,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, SqlSyntaxProvider, this);
+                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, SqlSyntax, this);
             }
             else
             {
                 var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntaxProvider, this);
+                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
             }
         }
 

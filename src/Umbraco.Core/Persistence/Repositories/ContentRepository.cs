@@ -170,7 +170,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             .InnerJoin<DocumentDto>()
                             .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
 
-                    var deleteSql = SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
@@ -186,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             .Where<DocumentDto>(dto => dto.Published)
                             .Where<ContentDto>(dto => dto.ContentTypeId == id1);
 
-                        var deleteSql = SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                         Database.Execute(deleteSql);
                     }
                 }
@@ -346,7 +346,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161     
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
+            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
@@ -614,7 +614,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             repo.ReplaceEntityPermissions(permissionSet);
         }
 
@@ -641,13 +641,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userIds"></param>        
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             repo.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
             return repo.GetPermissionsForEntity(entityId);
         }
 
@@ -709,7 +709,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                sbWhere.Append(" AND (cmsDocument." + SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                sbWhere.Append(" AND (cmsDocument." + SqlSyntax.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
                 args.Add("%" + filter + "%");
             }          
 

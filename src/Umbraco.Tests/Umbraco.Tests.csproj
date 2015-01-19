@@ -168,6 +168,8 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
+    <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
@@ -207,7 +209,6 @@
     <Compile Include="Models\UserTypeTests.cs" />
     <Compile Include="Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
-    <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BootManagers\WebBootManagerTests.cs" />
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
