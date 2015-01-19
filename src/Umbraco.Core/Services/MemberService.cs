@@ -612,7 +612,7 @@ namespace Umbraco.Core.Services
                     contentTypeIds: memberTypeIds.Length == 0 ? null : memberTypeIds);
             }
 
-            Audit.Add(AuditTypes.Publish, "MemberService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+            Audit(AuditType.Publish, "MemberService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
         }
 
         #endregion
@@ -1175,6 +1175,16 @@ namespace Umbraco.Core.Services
                                                       memberTypeAlias));
 
                 return contentType;
+            }
+        }
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
             }
         }
         

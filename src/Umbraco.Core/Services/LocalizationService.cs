@@ -234,7 +234,7 @@ namespace Umbraco.Core.Services
 
             SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 
-	        Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
+	        Audit(AuditType.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace Umbraco.Core.Services
 
             DeletedDictionaryItem.RaiseEvent(new DeleteEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 
-	        Audit.Add(AuditTypes.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
+	        Audit(AuditType.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Umbraco.Core.Services
 
             SavedLanguage.RaiseEvent(new SaveEventArgs<ILanguage>(language, false), this);
 
-	        Audit.Add(AuditTypes.Save, "Save Language performed by user", userId, language.Id);
+	        Audit(AuditType.Save, "Save Language performed by user", userId, language.Id);
         }
 
         /// <summary>
@@ -363,7 +363,17 @@ namespace Umbraco.Core.Services
 
             DeletedLanguage.RaiseEvent(new DeleteEventArgs<ILanguage>(language, false), this);
 
-	        Audit.Add(AuditTypes.Delete, "Delete Language performed by user", userId, language.Id);
+	        Audit(AuditType.Delete, "Delete Language performed by user", userId, language.Id);
+        }
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
+            }
         }
 
         #region Event Handlers

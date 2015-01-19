@@ -192,7 +192,7 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Services
                     Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
+            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
             }
             
-            Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+            Audit(AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
 
@@ -366,7 +366,7 @@ namespace Umbraco.Core.Services
 		        Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this); 		        
 	        }
 
-	        Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+	        Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -388,6 +388,16 @@ namespace Umbraco.Core.Services
         public IEnumerable<IDataType> GetAllDataTypes()
         {
             return DataTypesResolver.Current.DataTypes;
+        }
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
+            }
         }
 
         #region Event Handlers

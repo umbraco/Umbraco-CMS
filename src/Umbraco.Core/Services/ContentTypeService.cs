@@ -378,7 +378,7 @@ namespace Umbraco.Core.Services
                 UpdateContentXmlStructure(contentType);
             }
             SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
-	        Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId, contentType.Id);
+	        Audit(AuditType.Save, string.Format("Save ContentType performed by user"), userId, contentType.Id);
         }
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace Umbraco.Core.Services
                 UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
             }
             SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(asArray, false), this);
-	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId, -1);
+	        Audit(AuditType.Save, string.Format("Save ContentTypes performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace Umbraco.Core.Services
                     DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentType, false), this);
                 }
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId, contentType.Id);
+                Audit(AuditType.Delete, string.Format("Delete ContentType performed by user"), userId, contentType.Id);
             }
         }
 
@@ -482,7 +482,7 @@ namespace Umbraco.Core.Services
                     DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(asArray, false), this);
                 }
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
+                Audit(AuditType.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
             }
         }
         
@@ -584,7 +584,7 @@ namespace Umbraco.Core.Services
             }
 
             SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
-	        Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId, mediaType.Id);
+	        Audit(AuditType.Save, string.Format("Save MediaType performed by user"), userId, mediaType.Id);
         }
 
         /// <summary>
@@ -623,7 +623,7 @@ namespace Umbraco.Core.Services
             }
 
             SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(asArray, false), this);
-			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId, -1);
+			Audit(AuditType.Save, string.Format("Save MediaTypes performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -650,7 +650,7 @@ namespace Umbraco.Core.Services
                     DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaType, false), this);
                 }
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId, mediaType.Id);
+                Audit(AuditType.Delete, string.Format("Delete MediaType performed by user"), userId, mediaType.Id);
             }
         }
 
@@ -685,7 +685,7 @@ namespace Umbraco.Core.Services
                     DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(asArray, false), this);
                 }
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);
+                Audit(AuditType.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);
             }            
         }
 
@@ -742,6 +742,16 @@ namespace Umbraco.Core.Services
 
             }
             return dtd.ToString();
+        }
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
+            }
         }
         
         #region Event Handlers

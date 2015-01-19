@@ -15,15 +15,7 @@ namespace Umbraco.Core.Services
     internal class ServerRegistrationService
     {
         private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-
-        public ServerRegistrationService()
-            : this(new RepositoryFactory())
-        { }
-
-        public ServerRegistrationService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        { }
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;      
 
         public ServerRegistrationService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {

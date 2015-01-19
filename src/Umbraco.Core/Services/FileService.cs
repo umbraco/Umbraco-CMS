@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
                 SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
+            Audit(AuditType.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services
 
                 DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
+                Audit(AuditType.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
             }
         }
 
@@ -188,7 +188,7 @@ namespace Umbraco.Core.Services
                 SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId, -1);
+            Audit(AuditType.Save, string.Format("Save Script performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Services
 
                 DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"), userId, -1);
+                Audit(AuditType.Delete, string.Format("Delete Script performed by user"), userId, -1);
             }
         }
 
@@ -365,7 +365,7 @@ namespace Umbraco.Core.Services
                 SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId, template.Id);
+            Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, template.Id);
         }
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace Umbraco.Core.Services
                 SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId, -1);
+            Audit(AuditType.Save, string.Format("Save Template performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace Umbraco.Core.Services
 
                 DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
+                Audit(AuditType.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
             }
         }
 
@@ -571,7 +571,7 @@ namespace Umbraco.Core.Services
                 CreatedPartialView.RaiseEvent(new NewEventArgs<IPartialView>(partialView, false, partialView.Alias, -1), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
+            Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
 
             return Attempt<IPartialView>.Succeed(partialView);
         }
@@ -616,7 +616,7 @@ namespace Umbraco.Core.Services
 
                 DeletedPartialView.RaiseEvent(new DeleteEventArgs<IPartialView>(partialView, false), this);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete {0} performed by user", partialViewType), userId, -1);
+                Audit(AuditType.Delete, string.Format("Delete {0} performed by user", partialViewType), userId, -1);
             }
 
             return true;
@@ -660,7 +660,7 @@ namespace Umbraco.Core.Services
                 SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
             }
 
-            Audit.Add(AuditTypes.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
+            Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
 
             SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView), this);
 
@@ -698,6 +698,16 @@ namespace Umbraco.Core.Services
         {
             PartialView,
             PartialViewMacro
+        }
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
+            }
         }
 
         #endregion

@@ -63,7 +63,8 @@ namespace Umbraco.Tests
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object,
                 new Mock<INotificationService>().Object,
-                Mock.Of<ILocalizedTextService>());
+                Mock.Of<ILocalizedTextService>(),
+                Mock.Of<IAuditService>());
             Assert.Pass();
         }
 
@@ -111,7 +112,8 @@ namespace Umbraco.Tests
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object,
                     new Mock<INotificationService>().Object,
-                    Mock.Of<ILocalizedTextService>()),
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IAuditService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             

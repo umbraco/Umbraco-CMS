@@ -16,6 +16,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<IAuditService> _auditService; 
         private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
@@ -58,6 +59,7 @@ namespace Umbraco.Core.Services
         /// <param name="tagService"></param>
         /// <param name="notificationService"></param>
         /// <param name="localizedTextService"></param>
+        /// <param name="auditService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -76,8 +78,10 @@ namespace Umbraco.Core.Services
             IApplicationTreeService treeService,
             ITagService tagService,
             INotificationService notificationService,             
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IAuditService auditService)
         {
+            _auditService = new Lazy<IAuditService>(() => auditService);
             _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);     
             _tagService = new Lazy<ITagService>(() => tagService);     
             _contentService = new Lazy<IContentService>(() => contentService);        
@@ -124,7 +128,10 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
-            
+
+            if (_auditService == null)
+                _auditService = new Lazy<IAuditService>(() => new AuditService(provider, repositoryFactory));
+
             if (_localizedTextService == null)
                 _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
                     new LocalizedTextServiceFileSources(cache.RuntimeCache, new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"))),
@@ -189,6 +196,14 @@ namespace Umbraco.Core.Services
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory));
 
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IAuditService"/>
+        /// </summary>
+        public IAuditService AuditService
+        {
+            get { return _auditService.Value; }
         }
 
         /// <summary>

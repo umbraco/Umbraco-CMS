@@ -127,18 +127,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 });
         }
 
-
-        //protected Attempt<TEntity> TryGetFromCache(TId id)
-        //{
-        //    Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
-        //    var rEntity = RepositoryCache.GetById(typeof(TEntity), key);
-        //    if (rEntity != null)
-        //    {
-        //        return Attempt.Succeed((TEntity)rEntity);
-        //    }
-        //    return Attempt<TEntity>.Fail();
-        //}
-
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
         /// <summary>
         /// Gets all entities of type TEntity or a list according to the passed in Ids
@@ -162,19 +150,13 @@ namespace Umbraco.Core.Persistence.Repositories
             if (ids.Any())
             {
                 var entities = ids.Select(x => RepositoryCache.RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
-
-                //var entities = RepositoryCache.GetByIds(
-                //    typeof(TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList())
-                //    .ToArray();
-
+                
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
                     return entities.Select(x => (TEntity)x);
             }
             else
             {
                 var allEntities = RepositoryCache.RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>()).ToArray();
-
-                //var allEntities = RepositoryCache.GetAllByType(typeof(TEntity)).ToArray();
 
                 if (allEntities.Any())
                 {
@@ -204,7 +186,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     var localCopy = entity;
                     RepositoryCache.RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => localCopy);
-                    //RepositoryCache.Save(typeof(TEntity), entity);
                 }
             }
 
@@ -237,11 +218,6 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return true;
             }
-            //var fromCache = TryGetFromCache(id);
-            //if (fromCache.Success)
-            //{
-            //    return true;
-            //}
             return PerformExists(id);
         }
 
@@ -270,13 +246,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 PersistNewItem((TEntity)entity);
                 RepositoryCache.RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
-                //RepositoryCache.Save(typeof(TEntity), entity);
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                //RepositoryCache.Delete(typeof(TEntity), entity);
                 RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
                 throw;
             }
@@ -293,7 +267,6 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 PersistUpdatedItem((TEntity)entity);
                 RepositoryCache.RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
-                //RepositoryCache.Save(typeof(TEntity), entity);
             }
             catch (Exception)
             {
@@ -313,7 +286,6 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual void PersistDeletedItem(IEntity entity)
         {
             PersistDeletedItem((TEntity)entity);
-            //RepositoryCache.Delete(typeof(TEntity), entity);
             RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
         }
 
@@ -326,30 +298,6 @@ namespace Umbraco.Core.Persistence.Repositories
         protected abstract void PersistDeletedItem(TEntity item);
 
         #endregion
-
-        ///// <summary>
-        ///// Internal method that handles the convertion of an object Id
-        ///// to an Integer and then a Guid Id.
-        ///// </summary>
-        ///// <remarks>In the future it should be possible to change this method
-        ///// so it converts from object to guid if/when we decide to go from
-        ///// int to guid based ids.</remarks>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //protected virtual Guid ConvertIdToGuid(TId id)
-        //{
-        //    int i = 0;
-        //    if (int.TryParse(id.ToString(), out i))
-        //    {
-        //        return i.ToGuid();
-        //    }
-        //    return ConvertStringIdToGuid(id.ToString());
-        //}
-
-        //protected virtual Guid ConvertStringIdToGuid(string id)
-        //{
-        //    return id.EncodeAsGuid();
-        //}
 
         /// <summary>
         /// Dispose disposable properties

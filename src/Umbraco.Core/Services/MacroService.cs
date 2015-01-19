@@ -146,7 +146,7 @@ namespace Umbraco.Core.Services
 				Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
 			}
 
-			Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId, -1);
+			Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Services
 		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId, -1);
+	        Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
         }
 
         ///// <summary>
@@ -189,6 +189,16 @@ namespace Umbraco.Core.Services
         //{
         //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
         //}
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
+            }
+        }
 
         #region Event Handlers
         /// <summary>

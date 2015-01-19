@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
 
-            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
+            Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
             return media;
         }
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
 
-            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
+            Audit(AuditType.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
             return media;
         }
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
 
-            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
+            Audit(AuditType.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
 
             return media;
         }
@@ -234,7 +234,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
 
-            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
+            Audit(AuditType.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
 
             return media;
         }
@@ -681,7 +681,7 @@ namespace Umbraco.Core.Services
 
                 Moved.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this);
 
-                Audit.Add(AuditTypes.Move, "Move Media performed by user", userId, media.Id);
+                Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
             }
         }
 
@@ -739,7 +739,7 @@ namespace Umbraco.Core.Services
 
             Trashed.RaiseEvent(new MoveEventArgs<IMedia>(false, moveInfo.ToArray()), this);
 
-            Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
+            Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
         }
 
         /// <summary>
@@ -776,7 +776,7 @@ namespace Umbraco.Core.Services
                         repository.DeleteFiles(files);
                 }
             }
-            Audit.Add(AuditTypes.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
+            Audit(AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
         }
 
         /// <summary>
@@ -821,7 +821,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId, -1);
+                Audit(AuditType.Delete, "Delete Media items by Type performed by user", userId, -1);
             }
         }
 
@@ -861,7 +861,7 @@ namespace Umbraco.Core.Services
                 repository.DeleteFiles(args.MediaFilesToDelete);
             }
 
-            Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId, media.Id);
+            Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
         }
 
         /// <summary>
@@ -885,7 +885,7 @@ namespace Umbraco.Core.Services
 
             DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
 
-            Audit.Add(AuditTypes.Delete, "Delete Media by version date performed by user", userId, -1);
+            Audit(AuditType.Delete, "Delete Media by version date performed by user", userId, -1);
         }
 
         /// <summary>
@@ -916,7 +916,7 @@ namespace Umbraco.Core.Services
 
             DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
 
-            Audit.Add(AuditTypes.Delete, "Delete Media by version performed by user", userId, -1);
+            Audit(AuditType.Delete, "Delete Media by version performed by user", userId, -1);
         }
 
         /// <summary>
@@ -951,7 +951,7 @@ namespace Umbraco.Core.Services
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
 
-            Audit.Add(AuditTypes.Save, "Save Media performed by user", userId, media.Id);
+            Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
         }
 
         /// <summary>
@@ -992,7 +992,7 @@ namespace Umbraco.Core.Services
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
 
-            Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId, -1);
+            Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
         }
 
         /// <summary>
@@ -1046,7 +1046,7 @@ namespace Umbraco.Core.Services
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
 
-            Audit.Add(AuditTypes.Sort, "Sorting Media performed by user", userId, 0);
+            Audit(AuditType.Sort, "Sorting Media performed by user", userId, 0);
 
             return true;
         }
@@ -1068,7 +1068,7 @@ namespace Umbraco.Core.Services
                     contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
             }
 
-            Audit.Add(AuditTypes.Publish, "MediaService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+            Audit(AuditType.Publish, "MediaService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
         }
 
         /// <summary>
@@ -1134,6 +1134,16 @@ namespace Umbraco.Core.Services
                                                       mediaTypeAlias));
 
                 return mediaType;
+            }
+        }
+
+        private void Audit(AuditType type, string message, int userId, int objectId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var auditRepo = _repositoryFactory.CreateAuditRepository(uow))
+            {
+                auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+                uow.Commit();
             }
         }
 
