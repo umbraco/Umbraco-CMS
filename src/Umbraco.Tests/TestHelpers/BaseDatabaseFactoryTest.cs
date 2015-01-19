@@ -201,10 +201,8 @@ namespace Umbraco.Tests.TestHelpers
         protected override void FreezeResolution()
         {
             PropertyEditorResolver.Current = new PropertyEditorResolver(
-                new ActivatorServiceProvider(), Logger,
-                () => PluginManager.Current.ResolvePropertyEditors());
-
-                new ActivatorServiceProvider(), Logger,
+                 new ActivatorServiceProvider(), Logger,
+                 () => PluginManager.Current.ResolvePropertyEditors());
 
             MappingResolver.Current = new MappingResolver(
                 new ActivatorServiceProvider(), Logger,

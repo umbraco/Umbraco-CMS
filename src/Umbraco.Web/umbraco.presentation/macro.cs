@@ -1231,7 +1231,7 @@ namespace umbraco
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-            var ret = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+            var ret = engine.Execute(macro, LegacyNodeHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
             
 			retVal.Result = ret;
 			return retVal;
@@ -1621,6 +1621,17 @@ namespace umbraco
             xslt = xslt.Replace("{0}", namespaceDeclaractions.ToString());
             xslt = xslt.Replace("{1}", namespaceList.ToString());
             return xslt;
+        }
+
+        private static INode GetCurrentNode()
+        {
+            //Get the current content request
+
+            var content = UmbracoContext.Current.PublishedContentRequest != null
+                    ? UmbracoContext.Current.PublishedContentRequest.PublishedContent
+                    : null;
+
+            return content == null ? null : LegacyNodeHelper.ConvertToNode(content);
         }
 
 

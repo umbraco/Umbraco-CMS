@@ -159,7 +159,7 @@ namespace Umbraco.Web.Models
 
         IProperty INode.GetProperty(string alias)
         {
-            return ((INode)this).PropertiesAsList.Cast<global::umbraco.NodeFactory.Property>().FirstOrDefault(p => p.Alias == alias);
+            return ((INode)this).PropertiesAsList.FirstOrDefault(p => p.Alias == alias);
         }
 
         IProperty INode.GetProperty(string alias, out bool propertyExists)

@@ -11,7 +11,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
-using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
+
 using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.cms.businesslogic.propertytype
