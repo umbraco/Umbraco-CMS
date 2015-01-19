@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Web;
 using System.Web.Security;
 using System.Windows.Forms;
 using Umbraco.Core;
@@ -25,7 +26,7 @@ namespace umbraco
             s.AddProperty(new StylesheetProperty(Alias, "." + Alias.ToSafeAlias(), ""));
             Umbraco.Core.ApplicationContext.Current.Services.FileService.SaveStylesheet(s);
 
-            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}&prop={1}", s.Name, Alias);
+            _returnUrl = string.Format("settings/stylesheet/property/EditStyleSheetProperty.aspx?id={0}&prop={1}", HttpUtility.UrlEncode(s.Path), Alias);
             return true;
         }
 

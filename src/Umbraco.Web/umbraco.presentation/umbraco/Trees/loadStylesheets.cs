@@ -64,12 +64,15 @@ namespace umbraco
         {            
             foreach (var sheet in Services.FileService.GetStylesheets())
             {
+                var nodeId = sheet.Path.TrimEnd(".css");
                 var xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = sheet.Alias;
-                xNode.Text = sheet.Alias;
-                xNode.Action = "javascript:openStylesheet('" + sheet.Name + "');";
+                xNode.NodeID = nodeId;
+                xNode.Text = nodeId;
+                xNode.Action = "javascript:openStylesheet('" +
+                    //Needs to be escaped for JS
+                    HttpUtility.UrlEncode(sheet.Path) + "');";
                 var styleSheetPropertyTree = new loadStylesheetProperty(this.app);
-                xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(sheet.Alias);
+                xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(nodeId);
 				xNode.HasChildren = sheet.Properties.Any();
                 xNode.Icon = " icon-brackets";
                 xNode.OpenIcon = "icon-brackets";

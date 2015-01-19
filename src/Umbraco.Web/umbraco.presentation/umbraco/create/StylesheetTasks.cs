@@ -1,6 +1,9 @@
 using System;
 using System.Data;
+using System.Web;
 using System.Web.Security;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -14,10 +17,17 @@ namespace umbraco
     {
         public override bool PerformSave()
         {
+            //normalize path
+            Alias = Alias.Replace("/", "\\");
 
-            int id = -1;
-            var checkingSheet = cms.businesslogic.web.StyleSheet.GetByName(Alias) ?? cms.businesslogic.web.StyleSheet.MakeNew(User, Alias, "", "");
-            _returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", checkingSheet.Text);
+            var sheet = ApplicationContext.Current.Services.FileService.GetStylesheetByName(Alias);
+            if (sheet == null)
+            {
+                sheet = new Stylesheet(Alias.EnsureEndsWith(".css"));
+                ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet);
+            }
+
+            _returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", HttpUtility.UrlEncode(sheet.Path));
             return true;
         }
 

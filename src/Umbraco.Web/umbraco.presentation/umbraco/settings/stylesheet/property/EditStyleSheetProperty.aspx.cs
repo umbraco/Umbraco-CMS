@@ -68,7 +68,9 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             prStyles.Attributes["style"] = _stylesheetproperty.Value;
 
-            var nodePath = string.Format("-1,init,{0},{0}_{1}", _sheet.Alias, _stylesheetproperty.Name);
+            var nodePath = string.Format("-1,init,{0},{0}_{1}", _sheet.Path
+                        //needs a double escape to work with JS
+                        .Replace("\\", "\\\\").TrimEnd(".css"), _stylesheetproperty.Name);
 
             ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)

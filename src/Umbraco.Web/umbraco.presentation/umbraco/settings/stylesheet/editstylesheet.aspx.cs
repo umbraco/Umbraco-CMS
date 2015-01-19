@@ -55,21 +55,19 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
             if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
 
-            var appPath = Request.ApplicationPath;
-            if (appPath == "/")
-                appPath = "";
-            lttPath.Text = "<a target='_blank' href='" + appPath + "/css/" + _sheet.Name + "'>" + appPath +
-                            SystemDirectories.Css + "/" + _sheet.Name + "</a>";
+            lttPath.Text = "<a target='_blank' href='" + _sheet.VirtualPath + "'>" + _sheet.VirtualPath + "</a>";
 
 
             if (IsPostBack == false)
             {
-                NameTxt.Text = _sheet.Alias;
+                NameTxt.Text = _sheet.Path.TrimEnd(".css");
                 editorSource.Text = _sheet.Content;
 
                 ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)
-                    .SyncTree("-1,init," + _sheet.Alias, false);
+                    .SyncTree("-1,init," + _sheet.Path
+                        //needs a double escape to work with JS
+                        .Replace("\\", "\\\\").TrimEnd(".css"), false);
             }
         }
 
