@@ -3,9 +3,29 @@ angular.module("umbraco")
     function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, gridService, imageHelper, $timeout) {
 
         var emptyModel = {
+            styles:[
+                {
+                    label: "Set a background image",
+                    description: "Set a row background",
+                    key: "background-image",
+                    view: "imagepicker",
+                    modifier: "url({0})"
+                }
+            ],
+
+            config:[
+                {
+                    label: "Class",
+                    description: "Set a css class",
+                    key: "class",
+                    view: "textstring"
+                }
+            ],
+
+            columns: 12,
             templates:[
                 {
-                    name: "1 column",
+                    name: "1 column layout",
                     sections: [
                         {
                             grid: 12,
@@ -13,24 +33,13 @@ angular.module("umbraco")
                     ]
                 },
                 {
-                    name: "2 column",
+                    name: "2 column layout",
                     sections: [
                         {
                             grid: 4,
                         },
                         {
                             grid: 8
-                        }
-                    ]
-                },
-                {
-                    name: "2 column reversed",
-                    sections: [
-                        {
-                            grid: 8,
-                        },
-                        {
-                            grid: 4
                         }
                     ]
                 }
@@ -66,171 +75,115 @@ angular.module("umbraco")
         *****************/
 
         $scope.configureTemplate = function(template){
-           if($scope.currentTemplate && $scope.currentTemplate === template){
-                delete $scope.currentTemplate;
-           }else{
-               //if no template is passed in, we can assume we are adding a new one
-               if(template === undefined){
-                    template = {
-                        name: "",
-                        sections:[
+           if(template === undefined){
+                template = {
+                    name: "",
+                    sections:[
 
-                        ]
-                    };
-                    $scope.model.value.templates.push(template);
+                    ]
+                };
+                $scope.model.value.templates.push(template);
+           }    
+           
+           dialogService.open(
+               {
+                   template: "views/propertyEditors/grid/dialogs/layoutconfig.html",
+                   currentLayout: template,
+                   rows: $scope.model.value.layouts,
+                   columns: $scope.model.value.columns
                }
-               $scope.currentTemplate = template;
-            }
+           );
+
         };
+
         $scope.deleteTemplate = function(index){
             $scope.model.value.templates.splice(index, 1);
-        };
-        $scope.closeTemplate = function(){
-           
-           //clean-up
-           _.forEach($scope.currentTemplate.sections, function(section, index){
-                if(section.grid <= 0){
-                    $scope.currentTemplate.sections.splice(index, 1);
-                }
-           });
-
-           $scope.currentTemplate = undefined;
-
-        };
-
-        /****************
-            Section
-        *****************/
-        $scope.configureSection = function(section, template){
-            if($scope.currentSection && $scope.currentSection === section){
-                delete $scope.currentSection;
-            }else{
-               if(section === undefined){
-                    var space = ($scope.availableTemplateSpace > 4) ? 4 : $scope.availableTemplateSpace;
-                    section = {
-                        grid: space
-                    };
-                    template.sections.push(section);
-               }
-               $scope.currentSection = section;
-            }
-        };
-        $scope.deleteSection = function(index){
-            $scope.currentTemplate.sections.splice(index, 1);
-        };
-        $scope.closeSection = function(){
-            $scope.currentSection = undefined;
-        };
-
-
-
-
-        /****************
-            layout
-        *****************/
-
-        $scope.configureLayout = function(layout){
-           if($scope.currentLayout && $scope.currentLayout === layout){
-                delete $scope.currentLayout;
-           }else{
-               //if no template is passed in, we can assume we are adding a new one
-               if(layout === undefined){
-                    layout = {
-                        name: "",
-                        areas:[
-
-                        ]
-                    };
-                    $scope.model.value.layouts.push(layout);
-               }
-               $scope.currentLayout = layout;
-            }
-        };
-        $scope.deleteLayout = function(index){
-            $scope.model.value.layouts.splice(index, 1);
-        };
-        $scope.closeLayout = function(){
-           
-           //clean-up
-           _.forEach($scope.currentLayout.areas, function(area, index){
-                if(area.grid <= 0){
-                    $scope.currentLayout.areas.splice(index, 1);
-                }
-           });
-
-           $scope.currentLayout = undefined;
         };
         
 
         /****************
-            area
+            Row
         *****************/
-        $scope.configureArea = function(area, layout){
-            if($scope.currentArea && $scope.currentArea === area){
-                delete $scope.currentArea;
-            }else{
-               if(area === undefined){
-                    var space = ($scope.availableLayoutSpace > 4) ? 4 : $scope.availableLayoutSpace;
-                    area = {
-                        grid: space
-                    };
-                    layout.areas.push(area);
-               }
-               $scope.currentArea = area;
+
+        $scope.configureLayout = function(layout){
+
+            if(layout === undefined){
+                 layout = {
+                     name: "",
+                     areas:[
+
+                     ]
+                 };
+                 $scope.model.value.layouts.push(layout);
             }
+
+            dialogService.open(
+                {
+                    template: "views/propertyEditors/grid/dialogs/rowconfig.html",
+                    currentRow: layout,
+                    editors: $scope.editors,
+                    columns: $scope.model.value.columns
+                }
+            );
         };
-        $scope.deleteArea = function(index){
-            $scope.currentLayout.areas.splice(index, 1);
+
+
+        $scope.deleteLayout = function(index){
+            $scope.model.value.layouts.splice(index, 1);
         };
-        $scope.closeArea = function(){
-            $scope.currentArea = undefined;
-        };
+        
 
 
         /****************
             utillities
         *****************/
-        $scope.scaleUp = function(section, max){
-           var add = (max > 1) ? 1 : max;
-           section.grid = section.grid+add;
-        };
-        $scope.scaleDown = function(section){
-           var remove = (section.grid > 1) ? 1 : section.grid;
-           section.grid = section.grid-remove;
-        };    
         $scope.toggleCollection = function(collection, toggle){
             if(toggle){
                 collection = [];
             }else{
                 delete collection;
             }
-        }
+        };
+
         $scope.percentage = function(spans){
-            return ((spans/12)*100).toFixed(1);
+            return ((spans / $scope.model.value.columns) * 100).toFixed(1);
+        };
+
+        $scope.zeroWidthFilter = function (cell) {
+                return cell.grid > 0;
         };
 
         /****************
-            watchers
+            Config
         *****************/
-        $scope.$watch("currentTemplate", function(template){
-            if(template){
-                var total = 0;
-                _.forEach(template.sections, function(section){
-                    total = (total + section.grid);
-                });
-                $scope.availableTemplateSpace = 12 - total;
-            }
-        }, true);
 
-        $scope.$watch("currentLayout", function(layout){
-            if(layout){
-                var total = 0;
-                _.forEach(layout.areas, function(area){
-                    total = (total + area.grid);
+        $scope.removeConfigValue = function(collection, index){
+            collection.splice(index, 1);
+        };
+
+        var editConfigCollection = function(configValues, title, callbackOnSave){
+            dialogService.open(
+                {
+                    template: "views/propertyeditors/grid/dialogs/editconfig.html",
+                    config: configValues,
+                    name: title,
+                    callback: function(data){
+                        callbackOnSave(data);
+                    }
                 });
-                $scope.availableLayoutSpace = 12 - total;
-            }
-        }, true);
+        };
+
+        $scope.editConfig = function(){
+            editConfigCollection($scope.model.value.config, "Settings", function(data){
+                $scope.model.value.config = data;
+            });
+	    };
+
+        $scope.editStyles = function(){
+            editConfigCollection($scope.model.value.styles, "Styling", function(data){
+                $scope.model.value.styles = data;
+            });
+        };
 
 
         /****************
@@ -240,9 +193,48 @@ angular.module("umbraco")
             $scope.editors = response.data;
         });
 
-        /* init grid data */  
+
+        /* init grid data */
         if (!$scope.model.value || $scope.model.value === "" || !$scope.model.value.templates) {
             $scope.model.value = emptyModel;
+        } else {
+
+            if (!$scope.model.value.columns) {
+                $scope.model.value.columns = emptyModel.columns;
+            }
+
+
+            if (!$scope.model.value.config) {
+                $scope.model.value.config = [];
+            }
+
+            if (!$scope.model.value.styles) {
+                $scope.model.value.styles = [];
+            }
         }
 
-    })
+        /****************
+            Clean up
+        *****************/
+        $scope.$on("formSubmitting", function (ev, args) {
+            var ts = $scope.model.value.templates;
+            var ls = $scope.model.value.layouts;
+
+            _.each(ts, function(t){
+                _.each(t.sections, function(section, index){
+                   if(section.grid === 0){
+                    t.sections.splice(index, 1);
+                   }
+               });
+            });
+
+            _.each(ls, function(l){
+                _.each(l.areas, function(area, index){
+                   if(area.grid === 0){
+                    l.areas.splice(index, 1);
+                   }
+               });
+            });
+        });
+
+    });

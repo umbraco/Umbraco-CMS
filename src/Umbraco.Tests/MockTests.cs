@@ -42,6 +42,7 @@ namespace Umbraco.Tests
                     new Mock<IDataTypeService>().Object,
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
+                    new Mock<IUserService>().Object,
                     new RepositoryFactory(true),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
                 new Mock<IEntityService>().Object,
@@ -56,7 +57,8 @@ namespace Umbraco.Tests
             new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object,
-                new Mock<INotificationService>().Object);
+                new Mock<INotificationService>().Object,
+                Mock.Of<ILocalizedTextService>());
             Assert.Pass();
         }
 
@@ -87,6 +89,7 @@ namespace Umbraco.Tests
                         new Mock<IDataTypeService>().Object,
                         new Mock<IFileService>().Object,
                         new Mock<ILocalizationService>().Object,
+                        new Mock<IUserService>().Object,
                         new RepositoryFactory(true),
                         new Mock<IDatabaseUnitOfWorkProvider>().Object),
                     new Mock<IEntityService>().Object,
@@ -101,7 +104,8 @@ namespace Umbraco.Tests
                     new Mock<ISectionService>().Object,
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object,
-                    new Mock<INotificationService>().Object),
+                    new Mock<INotificationService>().Object,
+                    Mock.Of<ILocalizedTextService>()),
                 CacheHelper.CreateDisabledCacheHelper());
             
             Assert.Pass();

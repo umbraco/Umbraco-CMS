@@ -50,7 +50,7 @@ namespace Umbraco.Web
             //if there is no current user, then use the admin 
             if (user == null)
             {
-                LogHelper.Warn(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                LogHelper.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
                 user = applicationContext.Services.UserService.GetUserById(0);
                 if (user == null)
                 {

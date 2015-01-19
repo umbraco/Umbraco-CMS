@@ -54,12 +54,12 @@
 <asp:Content ContentPlaceHolderID="body" runat="server" ID="cp1">
     <cc1:TabView ID="UmbracoPanel1" runat="server" Text="Edit xsl" hasMenu="true">
             <cc1:Pane runat="server" ID="pane1">
-                <cc1:CodeArea ID="editorSource" CodeBase="XML" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
+                <cc1:CodeArea ID="editorSource" CodeBase="XML" runat="server" AutoResize="false"  />
             </cc1:Pane>
             
             <cc1:Pane runat="server" ID="pane2">
                  <cc1:PropertyPanel ID="pp_filename" runat="server" Text="Filename">
-                    <asp:TextBox ID="xsltFileName" runat="server" Width="300" CssClass="guiInputText"></asp:TextBox>
+                    <asp:TextBox ID="xsltFileName" runat="server" CssClass="guiInputText"></asp:TextBox>
                 </cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="pp_testing" runat="server" Text="Skip testing (ignore errors)">
                     <asp:CheckBox ID="SkipTesting" runat="server"></asp:CheckBox>

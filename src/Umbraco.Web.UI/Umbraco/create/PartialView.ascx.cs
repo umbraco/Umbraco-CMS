@@ -7,11 +7,12 @@ using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using umbraco.presentation.create;
 
 namespace Umbraco.Web.UI.Umbraco.Create
 {
-	public partial class PartialView : UserControl
+	public partial class PartialView : UI.Controls.UmbracoUserControl
 	{
 		protected override void OnLoad(EventArgs e)
 		{
@@ -19,70 +20,27 @@ namespace Umbraco.Web.UI.Umbraco.Create
 			DataBind();
 
 		    LoadTemplates(PartialViewTemplate);
+
+            // Enable new item in folders to place items in that folder.
+		    if (Request["nodeType"] == "partialViewsFolder")
+		        FileName.Text = Request["nodeId"].EnsureEndsWith('/');
 		}
 
-        private static void LoadTemplates(ListControl list)
+        private void LoadTemplates(ListControl list)
         {
-            var partialViewTemplatePath = new
-            {
-                path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViews/Templates/"),
-                include = new string[]{}
-            };
-            //include these templates from the partial view macro templates!
-            var partialViewMacrosTemplatePath = new
-            {
-                path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViewMacros/Templates/"),
-                include = new[]
-                {
-                    "Breadcrumb", 
-                    "EditProfile", 
-                    "Empty (ForUseWithCustomViews)", 
-                    "Empty", 
-                    "ListAncestorsFromCurrentPage",
-                    "ListChildPagesFromCurrentPage",
-                    "ListChildPagesOrderedByDate",
-                    "ListChildPagesOrderedByName",
-                    "ListChildPagesWithDoctype",
-                    "ListDescendantsFromCurrentPage",
-                    "Login",
-                    "LoginStatus",
-                    "MultinodeTree-picker",
-                    "Navigation",
-                    "RegisterMember",
-                    "SiteMap"
-                }
-            };
-            var paths = new[] { partialViewTemplatePath, partialViewMacrosTemplatePath };
-            const string extension = ".cshtml";
-            var namesAdded = new List<string>();
+            var fileService = (FileService)Services.FileService;
+            var snippets = fileService.GetPartialViewSnippetNames(
+                //ignore these
+                "Gallery", 
+                "ListChildPagesFromChangeableSource", 
+                "ListChildPagesOrderedByProperty",
+                "ListImagesFromMediaFolder");
 
-            list.Items.Clear();
-
-            // always add the options of empty snippets
-            list.Items.Add(new ListItem("Empty", "Empty.cshtml"));
-            list.Items.Add(new ListItem("Empty (For Use With Custom Views)", "Empty (ForUseWithCustomViews).cshtml"));
-            
-            foreach (var pathFilter in paths)
+            foreach (var snippet in snippets)
             {
-                if (Directory.Exists(pathFilter.path) == false) continue;
-                
-                var p = pathFilter;
-                foreach (var fileInfo in new DirectoryInfo(pathFilter.path).GetFiles("*" + extension)
-                    //check if we've already added this name
-                    .Where(f => namesAdded.InvariantContains(f.Name) == false)
-                    //Already adding Empty as the first item, so don't add it again
-                    .Where(f => f.Name.StartsWith("Empty") == false)
-                    //don't add if not in the inclusion list
-                    .Where(f => p.include.Length == 0 || (p.include.Length > 0 && p.include.InvariantContains(f.Name) == false)))
-                {
-                    var filename = Path.GetFileName(fileInfo.FullName);
-                    namesAdded.Add(filename);
-                    var liText = filename.Replace(extension, "").SplitPascalCasing().ToFirstUpperInvariant();
-                    list.Items.Add(new ListItem(liText, filename));
-                }
+                var liText = snippet.SplitPascalCasing().ToFirstUpperInvariant();
+                list.Items.Add(new ListItem(liText, snippet));
             }
-
-            
         }
 
 		protected void SubmitButton_Click(object sender, System.EventArgs e)

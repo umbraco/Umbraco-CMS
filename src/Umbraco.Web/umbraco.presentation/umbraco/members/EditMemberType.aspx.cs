@@ -41,11 +41,13 @@ namespace umbraco.cms.presentation.members
 	        base.OnLoad(e);
 
             _memberType = new businesslogic.member.MemberType(int.Parse(Request.QueryString["id"]));
-            SetupExtraEditorControls();
+            
             ContentTypeControlNew1.InfoTabPage.Controls.Add(Pane1andmore);
 
             if (!IsPostBack)
             {
+                SetupExtraEditorControls();
+
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMemberTypes>().Tree.Alias)
                     .SyncTree(_memberType.Id.ToString(CultureInfo.InvariantCulture), false);

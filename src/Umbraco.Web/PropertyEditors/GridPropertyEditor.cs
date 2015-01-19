@@ -7,7 +7,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid", "grid", HideLabel=true,  IsParameterEditor = false, ValueType="JSON")]
+    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel=true,  IsParameterEditor = false, ValueType="JSON")]
     public class GridPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -23,12 +23,11 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new gridPreValueEditor();
+            return new GridPreValueEditor();
         }
-
     }
 
-    internal class gridPreValueEditor : PreValueEditor
+    internal class GridPreValueEditor : PreValueEditor
     {
         [PreValueField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
         public string Items { get; set; }

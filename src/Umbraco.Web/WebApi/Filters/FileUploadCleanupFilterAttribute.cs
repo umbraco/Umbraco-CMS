@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -11,6 +12,17 @@ namespace Umbraco.Web.WebApi.Filters
     /// </summary>
     internal sealed class FileUploadCleanupFilterAttribute : ActionFilterAttribute
     {
+        private readonly bool _incomingModel;
+
+        /// <summary>
+        /// Constructor specifies if the filter should analyze the incoming or outgoing model
+        /// </summary>
+        /// <param name="incomingModel"></param>
+        public FileUploadCleanupFilterAttribute(bool incomingModel = true)
+        {
+            _incomingModel = incomingModel;
+        }
+
         /// <summary>
         /// Returns true so that other filters can execute along with this one
         /// </summary>
@@ -23,18 +35,40 @@ namespace Umbraco.Web.WebApi.Filters
         {
             base.OnActionExecuted(actionExecutedContext);
 
-            if (actionExecutedContext.ActionContext.ActionArguments.Any())
+            if (_incomingModel)
             {
-                var contentItem = actionExecutedContext.ActionContext.ActionArguments.First().Value as IHaveUploadedFiles;   
-                if (contentItem != null)
+                if (actionExecutedContext.ActionContext.ActionArguments.Any())
                 {
-                    //cleanup any files associated
-                    foreach (var f in contentItem.UploadedFiles)
+                    var contentItem = actionExecutedContext.ActionContext.ActionArguments.First().Value as IHaveUploadedFiles;
+                    if (contentItem != null)
                     {
-                        File.Delete(f.TempFilePath);
+                        //cleanup any files associated
+                        foreach (var f in contentItem.UploadedFiles)
+                        {
+                            File.Delete(f.TempFilePath);
+                        }
                     }
                 }
             }
+            else
+            {
+                var objectContent = actionExecutedContext.Response.Content as ObjectContent;
+                if (objectContent != null)
+                {
+                    var uploadedFiles = objectContent.Value as IHaveUploadedFiles;
+                    if (uploadedFiles != null)
+                    {
+                        //cleanup any files associated
+                        foreach (var f in uploadedFiles.UploadedFiles)
+                        {
+                            File.Delete(f.TempFilePath);
+                            //clear out the temp path so it's not returned in the response
+                            f.TempFilePath = "";
+                        }
+                    }
+                }
+            }
+            
         }
     }
 }

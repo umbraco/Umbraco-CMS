@@ -1,11 +1,45 @@
 var uSkyGridConfig = [
 {
+
+    style:[
+        {
+            label: "Set a background image",
+            description: "Set a row background",
+            key: "background-image",
+            view: "imagepicker",
+            modifier: "url({0})"
+        },
+
+        {
+            label: "Set a font color",
+            description: "Pick a color",
+            key: "color",
+            view: "colorpicker"
+        }
+    ],
+
+    config:[
+        {
+            label: "Preview",
+            description: "Display a live preview",
+            key: "preview",
+            view: "boolean"
+        },
+
+        {
+            label: "Class",
+            description: "Set a css class",
+            key: "class",
+            view: "textstring"
+        }
+    ],
+
     layouts: [
     {
         grid: 12,
         percentage: 100,
-        
-        
+
+
         rows: [
         {
             name: "Single column",
@@ -13,7 +47,7 @@ var uSkyGridConfig = [
                     grid: 12,
                     percentage: 100
                 }]
-        }, 
+        },
 
         {
             name: "Article",
@@ -96,7 +130,7 @@ var uSkyGridConfig = [
     {
         grid: 9,
         percentage: 70,
-        
+
         cellModels: [
         {
             models: [{

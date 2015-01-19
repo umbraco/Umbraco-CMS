@@ -85,6 +85,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Published, expression => expression.Ignore())
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
+                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.Trashed, expression => expression.Ignore())
+                .ForMember(display => display.IsContainer, expression => expression.Ignore())
+                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
 
             //FROM IMember TO MemberBasic
@@ -104,6 +108,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Username,
                     expression => expression.MapFrom(content => content.Username))
+                .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
@@ -111,13 +116,13 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
                 //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
-                .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))                
+                .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
-                .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))                
+                .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
                 .ForMember(
                     dto => dto.Owner,
-                    expression => expression.UseValue(new UserBasic { Name = "Admin", UserId = 0 }))
+                    expression => expression.UseValue(new UserBasic {Name = "Admin", UserId = 0}))
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.UseValue("icon-user"))
@@ -132,10 +137,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.ParentId, expression => expression.Ignore())
                 .ForMember(member => member.Path, expression => expression.Ignore())
                 .ForMember(member => member.SortOrder, expression => expression.Ignore())
-                .ForMember(member => member.AdditionalData, expression => expression.Ignore())                
+                .ForMember(member => member.AdditionalData, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
                 .ForMember(x => x.Updater, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore());
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
@@ -180,7 +187,7 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("general", "email"),
                         Value = display.Email,
                         View = "email",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
+                        Validation = { Mandatory = true }        
                     },
                 new ContentPropertyDisplay
                     {
@@ -252,7 +259,7 @@ namespace Umbraco.Web.Models.Mapping
             if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
             {
                 prop.View = "textbox";
-                prop.Config = new Dictionary<string, object> {{"IsRequired", true}};
+                prop.Validation.Mandatory = true;
             }
             else
             {

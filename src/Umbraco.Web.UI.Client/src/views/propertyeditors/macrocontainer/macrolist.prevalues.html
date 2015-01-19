@@ -1,0 +1,7 @@
+<div ng-controller="Umbraco.PrevalueEditors.MacroList">
+
+    <select multiple ng-multiple="true"
+            ng-model="model.value"
+            ng-options="i.alias as i.name for i in items"></select>
+    
+</div>

@@ -1,0 +1,96 @@
+﻿
+/************************************************************************/
+/* wide -ALIAS- -CSS- */ 
+/************************************************************************/
+
+/***start-lessParam--ALIAS-***/
+@layout-ALIAS-:'';
+/***end-lessParam--ALIAS-***/
+
+/***start-lessStyle--ALIAS-***/
+
+.box1200-ALIAS- () when  (@layout-ALIAS- = box) {
+    width: 1140px;
+}
+
+.box992-ALIAS- () when  (@layout-ALIAS- = box) {
+    width: 940px;
+}
+
+.box768-ALIAS- () when  (@layout-ALIAS- = box) {
+    width: 720px;
+}
+
+.boxFull-ALIAS- () when  (@layout-ALIAS- = box) {
+    width: 100%;
+}
+
+.wide1200-ALIAS- () when  (@layout-ALIAS- = wide) {
+    width: 1140px;
+}
+
+.wide992-ALIAS- () when  (@layout-ALIAS- = wide) {
+    width: 940px;
+}
+
+.wide768-ALIAS- () when  (@layout-ALIAS- = wide) {
+    width: 720px;
+}
+
+.wideFull-ALIAS- () when  (@layout-ALIAS- = wide) {
+    width: 100% !important;
+}
+
+.fullFull-ALIAS- () when  (@layout-ALIAS- = full) {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    -SCHEMACONTAINER- {
+        .wide768-ALIAS-;
+        .boxFull-ALIAS-;
+        .fullFull-ALIAS-;
+    }
+}
+
+@media (min-width: 992px) {
+    -SCHEMACONTAINER- {
+        .wide992-ALIAS-;
+        .boxFull-ALIAS-;
+        .fullFull-ALIAS-;
+    }
+}
+
+@media (min-width: 1200px) {
+    -SCHEMACONTAINER- {
+        .wide1200-ALIAS-;
+        .boxFull-ALIAS-;
+        .fullFull-ALIAS-;
+    }
+}
+
+@media (min-width: 768px) {
+    -SCHEMA- {
+        .box768-ALIAS-;
+        .wideFull-ALIAS-;
+        .fullFull-ALIAS-;
+    }
+}
+
+@media (min-width: 992px) {
+    -SCHEMA- {
+        .box992-ALIAS-;
+        .wideFull-ALIAS-;
+        .fullFull-ALIAS-;
+    }
+}
+
+@media (min-width: 1200px) {
+    -SCHEMA- {
+        .box1200-ALIAS-;
+        .wideFull-ALIAS-;
+        .fullFull-ALIAS-;
+    }
+}
+
+/***end-lessStyle--ALIAS-***/ 

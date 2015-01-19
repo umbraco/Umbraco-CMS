@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -9,6 +10,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -36,6 +38,74 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             var repository = new MediaRepository(unitOfWork, NullCacheProvider.Current, mediaTypeRepository, tagRepository);
             return repository;
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+
+                var mediaType = mediaTypeRepository.Get(1032);
+                
+                for (var i = 0; i < 100; i++)
+                {
+                    var image = MockedMedia.CreateMediaImage(mediaType, -1);
+                    repository.AddOrUpdate(image);
+                }                
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(103, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures_For_Content_Type()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
+
+                var imageMediaType = mediaTypeRepository.Get(1032);
+                var fileMediaType = mediaTypeRepository.Get(1033);
+                var folderMediaType = mediaTypeRepository.Get(1031);
+                
+                for (var i = 0; i < 30; i++)
+                {
+                    var image = MockedMedia.CreateMediaImage(imageMediaType, -1);
+                    repository.AddOrUpdate(image);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var file = MockedMedia.CreateMediaFile(fileMediaType, -1);
+                    repository.AddOrUpdate(file);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+                    repository.AddOrUpdate(folder);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] {1032, 1033});
+
+                Assert.AreEqual(62, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
         }
 
         [Test]

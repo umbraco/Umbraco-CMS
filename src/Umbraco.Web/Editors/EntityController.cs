@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Examine.LuceneEngine;
+using Examine.LuceneEngine.Providers;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -38,13 +40,25 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="type"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
+        /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
         {
+            //TODO: Should we restrict search results based on what app the user has access to?
+            // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
+
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type);
+            return ExamineSearch(query, type, searchFrom);
         }
 
         /// <summary>
@@ -258,8 +272,19 @@ namespace Umbraco.Web.Editors
             return GetResultForAll(type, postFilter, postFilterParams);
         }
 
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType)
+        /// <summary>
+        /// Searches for results based on the entity type
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="entityType"></param>
+        /// <param name="searchFrom">
+        /// A starting point for the search, generally a node id, but for members this is a member type alias
+        /// </param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
+            var sb = new StringBuilder();
+
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
             var fields = new[] { "id", "__NodeId" };
@@ -271,24 +296,56 @@ namespace Umbraco.Web.Editors
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName"};
+                    if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
+                    {
+                        sb.Append("+__NodeTypeAlias:");
+                        sb.Append(searchFrom);
+                        sb.Append(" ");
+                    }
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
+
+                    var mediaSearchFrom = int.MinValue;
+
+                    if (Security.CurrentUser.StartMediaId > 0 ||
+                        //if searchFrom is specified and it is greater than 0
+                        (searchFrom != null && int.TryParse(searchFrom, out mediaSearchFrom) && mediaSearchFrom > 0))
+                    {
+                        sb.Append("+__Path: \\-1*\\,");
+                        sb.Append(mediaSearchFrom > 0
+                            ? mediaSearchFrom.ToString(CultureInfo.InvariantCulture)
+                            : Security.CurrentUser.StartMediaId.ToString(CultureInfo.InvariantCulture));
+                        sb.Append("\\,* ");
+                    }
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
+
+                    var contentSearchFrom = int.MinValue;
+
+                    if (Security.CurrentUser.StartContentId > 0 || 
+                        //if searchFrom is specified and it is greater than 0
+                        (searchFrom != null && int.TryParse(searchFrom, out contentSearchFrom) && contentSearchFrom > 0))
+                    {
+                        sb.Append("+__Path: \\-1*\\,");
+                        sb.Append(contentSearchFrom > 0
+                            ? contentSearchFrom.ToString(CultureInfo.InvariantCulture)
+                            : Security.CurrentUser.StartContentId.ToString(CultureInfo.InvariantCulture));
+                        sb.Append("\\,* ");
+                    }
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = (LuceneSearcher)ExamineManager.Instance.SearchProviderCollection[searcher];
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
             // then __nodeName will be matched normally with wildcards
             // the rest will be normal without wildcards
-            var sb = new StringBuilder();
+            
             
             //check if text is surrounded by single or double quotes, if so, then exact match
             var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
@@ -371,10 +428,12 @@ namespace Umbraco.Web.Editors
             //must match index type
             sb.Append(") +__IndexType:");
             sb.Append(type);
+
             
             var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
             
-            var result = internalSearcher.Search(raw);
+            //limit results to 200 to avoid huge over processing (CPU)
+            var result = internalSearcher.Search(raw, 200);
 
             switch (entityType)
             {
@@ -400,7 +459,12 @@ namespace Umbraco.Web.Editors
             //add additional data
             foreach (var m in mapped)
             {
-                m.Icon = "icon-user";
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == "icon-document")
+                {
+                    m.Icon = "icon-user";
+                }
+
                 var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
@@ -429,7 +493,11 @@ namespace Umbraco.Web.Editors
             //add additional data
             foreach (var m in mapped)
             {
-                m.Icon = "icon-picture";                 
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == "icon-document")
+                {
+                    m.Icon = "icon-picture";                     
+                }
             }
             return mapped;
         } 

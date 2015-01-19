@@ -20,6 +20,7 @@ function initBackEnd($httpBackend, contentMocks, mediaMocks, treeMocks, userMock
     prevaluesMocks.register();
     entityMocks.register();
 
+    $httpBackend.whenGET(/^..\/config\//).passThrough();
 	$httpBackend.whenGET(/^views\//).passThrough();
 	$httpBackend.whenGET(/^js\//).passThrough();
 	$httpBackend.whenGET(/^lib\//).passThrough();

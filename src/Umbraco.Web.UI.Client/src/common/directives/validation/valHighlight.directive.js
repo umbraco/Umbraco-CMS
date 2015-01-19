@@ -27,4 +27,4 @@ function valHighlight($timeout) {
         }
     };
 }
-angular.module('umbraco.directives').directive("valHighlight", valHighlight);
+angular.module('umbraco.directives.validation').directive("valHighlight", valHighlight);

@@ -1,0 +1,14 @@
+﻿
+<div ng-controller="Umbraco.canvasdesigner.margin">
+
+    <div class="box-slider"> 
+        <ul class="box-preview">
+            <li ng-repeat="margin in marginList" class="border-{{margin}}" ng-class="{selected: selectedmargin.name == margin}" ng-click="setSelectedmargin(margin)"></li>
+        </ul>
+    </div>
+
+    <div class="box-slider">
+        <div ui-slider min="0" max="400" step="1" ng-model="selectedmargin.value"></div>
+    </div>
+
+</div>

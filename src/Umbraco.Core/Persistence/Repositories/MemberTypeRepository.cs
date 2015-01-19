@@ -170,6 +170,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             ((MemberType)entity).AddingEntity();
             
+            //set a default icon if one is not specified
+            if (entity.Icon.IsNullOrWhiteSpace())
+            {
+                entity.Icon = "icon-user";
+            }
+
             //By Convention we add 9 stnd PropertyTypes to an Umbraco MemberType
             entity.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
@@ -192,7 +198,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(memberTypeDto);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMemberType entity)
@@ -203,7 +209,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ((MemberType)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -232,7 +238,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(memberTypeDto);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion

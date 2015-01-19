@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -12,7 +12,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     //Now we need to check if this is for media, members or content because that will depend on the resources we use
     var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback, createEditUrlCallback;
     
-    if ($scope.model.config.entityType && $scope.model.config.entityType === "member") {
+    //check the config for the entity type, or the current section name (since the config is only set in c#, not in pre-vals)
+    if (($scope.model.config.entityType && $scope.model.config.entityType === "member") || (appState.getSectionState("currentSection") === "member")) {
         $scope.entityType = "member";
         contentResource = $injector.get('memberResource');
         getContentTypesCallback = $injector.get('memberTypeResource').getTypes;
@@ -26,7 +27,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         };
     }
     else {
-        if ($scope.model.config.entityType && $scope.model.config.entityType === "media") {
+        //check the config for the entity type, or the current section name (since the config is only set in c#, not in pre-vals)
+        if (($scope.model.config.entityType && $scope.model.config.entityType === "media") || (appState.getSectionState("currentSection") === "media")) {
             $scope.entityType = "media";
             contentResource = $injector.get('mediaResource');
             getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;                        
@@ -143,12 +145,20 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.listViewResultSet = data;
 
             //update all values for display
-            _.each($scope.listViewResultSet.items, function(e, index) {
-                setPropertyValues(e);
-            });
+            if ($scope.listViewResultSet.items) {
+                _.each($scope.listViewResultSet.items, function (e, index) {
+                    setPropertyValues(e);
+                });
+            }
 
+            //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
+            // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
+            // available page and then re-load again
             if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
+
+                //reload!
+                $scope.reloadView(id);
             }
 
             $scope.pagination = [];
@@ -250,11 +260,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.bulkStatus = "Starting with delete";
             var current = 1;
 
+            var pluralSuffix = total == 1 ? "" : "s";
+
             for (var i = 0; i < selected.length; i++) {
-                $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
+                $scope.bulkStatus = "Deleted item " + current + " out of " + total + " item" + pluralSuffix;
                 deleteItemCallback(getIdCallback(selected[i])).then(function (data) {
                     if (current === total) {
-                        notificationsService.success("Bulk action", "Deleted " + total + "documents");
+                        notificationsService.success("Bulk action", "Deleted " + total + " item" + pluralSuffix);
                         $scope.bulkStatus = "";
                         $scope.reloadView($scope.contentId);
                         $scope.actionInProgress = false;
@@ -279,13 +291,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.bulkStatus = "Starting with publish";
         var current = 1;
 
+        var pluralSuffix = total == 1 ? "" : "s";
+
         for (var i = 0; i < selected.length; i++) {
-            $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
+            $scope.bulkStatus = "Publishing " + current + " out of " + total + " document" + pluralSuffix;
 
             contentResource.publishById(getIdCallback(selected[i]))
                 .then(function(content) {
                     if (current == total) {
-                        notificationsService.success("Bulk action", "Published " + total + "documents");
+                        notificationsService.success("Bulk action", "Published " + total + " document" + pluralSuffix);
                         $scope.bulkStatus = "";
                         $scope.reloadView($scope.contentId);
                         $scope.actionInProgress = false;
@@ -322,14 +336,16 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.bulkStatus = "Starting with publish";
         var current = 1;
 
+        var pluralSuffix = total == 1 ? "" : "s";
+
         for (var i = 0; i < selected.length; i++) {
-            $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
+            $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " document" + pluralSuffix;
 
             contentResource.unPublish(getIdCallback(selected[i]))
                 .then(function(content) {
 
                     if (current == total) {
-                        notificationsService.success("Bulk action", "Published " + total + "documents");
+                        notificationsService.success("Bulk action", "Unpublished " + total + " document" + pluralSuffix);
                         $scope.bulkStatus = "";
                         $scope.reloadView($scope.contentId);
                         $scope.actionInProgress = false;

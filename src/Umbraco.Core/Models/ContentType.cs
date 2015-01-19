@@ -15,11 +15,11 @@ namespace Umbraco.Core.Models
     {
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
-        
+
         /// <summary>
         /// Constuctor for creating a ContentType with the parent's id.
         /// </summary>
-        /// <remarks>You usually only want to use this for creating ContentTypes at the root.</remarks>
+        /// <remarks>Only use this for creating ContentTypes at the root (with ParentId -1).</remarks>
         /// <param name="parentId"></param>
         public ContentType(int parentId) : base(parentId)
         {
@@ -31,14 +31,26 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-		public ContentType(IContentType parent) : base(parent)
-		{
-			_allowedTemplates = new List<ITemplate>();
-		}
+        [Obsolete("This method is obsolete, use ContentType(IContentType parent, string alias) instead.", false)]
+        public ContentType(IContentType parent) : this(parent, null)
+        {
+        }
+
+        /// <summary>
+        /// Constuctor for creating a ContentType with the parent as an inherited type.
+        /// </summary>
+        /// <remarks>Use this to ensure inheritance from parent.</remarks>
+        /// <param name="parent"></param>
+        /// <param name="alias"></param>
+        public ContentType(IContentType parent, string alias)
+            : base(parent, alias)
+        {
+            _allowedTemplates = new List<ITemplate>();
+        }
 
         private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
         private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
-        
+
         /// <summary>
         /// Gets or sets the alias of the default Template.
         /// </summary>
@@ -95,7 +107,7 @@ namespace Umbraco.Core.Models
             }
 
             DefaultTemplateId = template.Id;
-            if(_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
+            if (_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
             {
                 var templates = AllowedTemplates.ToList();
                 templates.Add(template);
@@ -129,7 +141,7 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
 
-            if(Key == Guid.Empty)
+            if (Key == Guid.Empty)
                 Key = Guid.NewGuid();
         }
 
@@ -140,7 +152,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         [Obsolete("Use DeepCloneWithResetIdentities instead")]
         public IContentType Clone(string alias)
-        {            
+        {
             return DeepCloneWithResetIdentities(alias);
         }
 

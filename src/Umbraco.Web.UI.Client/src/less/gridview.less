@@ -5,12 +5,14 @@
          overflow-y:hidden!important;
       }
 
- IFRAME {overflow:hidden;}  
+IFRAME {overflow:hidden;}
 
 
  // Sortabel
  // -------------------------
+
  .usky-grid .ui-sortable-helper  {
+     position:absolute !important;
      border: dashed 1px #000 !important;
      background: #ccc;
      opacity: 0.4;
@@ -18,7 +20,7 @@
      width: 160px !important;
      overflow: hidden;
      padding: 5px;
-     border-radius:50px;
+     border-radius:5px;
      -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
@@ -29,7 +31,7 @@
      background: none !important;
      color: #999 !important;
      padding: 0 !important;
-     margin: 0 !important;    
+     margin: 0 !important;
  }
 
  .usky-grid .ui-sortable-helper .cell-tools{
@@ -43,8 +45,9 @@
      text-align: center;
      font-size: 85px;
      line-height: 65px;
-     color: @grayLighter;
+     color: @gray;
      vertical-align: middle;
+     background-color:@grayLighter;
  }
 
  .usky-grid .ui-sortable-placeholder:hover{
@@ -66,20 +69,22 @@
  .usky-grid  .right {
      float:right;
  }
- 
+
 
  // general layout components
  // -------------------------
  .usky-grid  .tb {
-     display:table;
      width: 100%;
-     table-layout: fixed;
  }
+
  .usky-grid  .td {
-     display:table-cell;
+     width: 100%;
+     display: inline-block;
      vertical-align:top;
      border-right:1px dashed rgba(182, 182, 182, 0.0);
+     box-sizing: border-box;
  }
+
  .usky-grid .tb:hover .td{
      border-right:1px dashed rgba(182, 182, 182, 0.3);
  }
@@ -87,31 +92,16 @@
      border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
  }
  .usky-grid  .tr {
-     display:table-row;
  }
- .usky-grid  .td2{
-     width: 50%;
- }
- .usky-grid  .td3{
-     width: 33.33%;
- }
- .usky-grid  .td4{
-     width: 25%;
- }
- .usky-grid  .td5{
-     width: 20%;
- }
- .usky-grid  .td6{
-     width: 16.6%;
- }
+
  .usky-grid  .middle {
      text-align: center;
  }
 
- .usky-grid  .mainTb {    
+ .usky-grid  .mainTb {
      border-collapse: separate;
  }
- .usky-grid  .mainTd {    
+ .usky-grid  .mainTd {
      position:relative;
  }
 
@@ -120,10 +110,10 @@
  // COLUMN
  // -------------------------
  .usky-grid  .usky-column {
-     
+
  }
  .usky-grid  .usky-column.last {
-     
+
  }
 
 
@@ -150,6 +140,7 @@
 .usky-grid .usky-cell{
      position: relative;
      border: 1px dashed rgba(0,0,0,0);
+     min-height:127px;
 }
 
 .usky-grid  .cell-tools {
@@ -162,6 +153,7 @@
     right: 0;
     width: 150px;
     opacity: 0.3;
+    z-index: 50;
 }
 
 .usky-grid .cell-tools:hover{
@@ -171,17 +163,19 @@
 .usky-grid  .cell-tools-add {
     position: absolute;
     text-align: center;
-    bottom: -20px;
+    bottom: 0px;
     left: 0;
     right: 0;
-    z-index: 500;
-    opacity: 0.3;
+    margin: 0 45px 1px 0;
+
+    &.emptyArea{
+        margin: 0 0 1px 0;
+    }
 }
 
 .usky-grid  .usky-control:hover .cell-tools-add{
     opacity: 1;
 }
-
 
 .usky-grid  .cell-tools-remove {
     display:inline-block;
@@ -200,12 +194,17 @@
 .usky-grid  .cell-tools-move {
     display:inline-block;
     position: absolute;
-    top: 40px;
+    top: 33px;
     right: 5px;
     z-index: 500;
     cursor: move
 }
 
+.usky-grid .cell-tools-edit{
+    position: absolute;
+    top: 66px;
+    right: 5px;
+}
 
 
 // CONTROL
@@ -216,9 +215,9 @@
     -webkit-transition: all .20s ease-in-out;*/
     position:relative;
     display:block;
-    
+
     /*
-    border: 1px dashed rgba(255, 0, 0, .0);     
+    border: 1px dashed rgba(255, 0, 0, .0);
     border-bottom-width: 1px;
     */
 
@@ -235,19 +234,19 @@
 
 .usky-grid  .usky-control-placeholder:hover{
     /*border: 1px solid rgba(182, 182, 182, 0);*/
-    border-bottom:1px solid rgba(182, 182, 182, 0.0) !important;
+    /*border-bottom:1px solid rgba(182, 182, 182, 0.0) !important;*/
 }
 
-.usky-grid .warnhighlight{
+.usky-grid .warnhighlight, .usky-grid  .td.last.warnhighlight{
      border: 1px dashed @red !important;
 }
 
-.usky-grid .infohighlight{
+.usky-grid .infohighlight, .usky-grid  .td.last.infohighlight{
      border: 1px dashed @blue !important;
 }
 
 .usky-grid .usky-control-inner{
-    min-height: 60px;    
+    min-height: 60px;
 }
 
 
@@ -255,7 +254,7 @@
 // CONTROL PLACEHOLDER
 // -------------------------
 .usky-grid  .usky-control-placeholder {
-    min-height: 50px;
+    min-height: 20px;
     position: relative;
     text-align: center;
     text-align: -moz-center;
@@ -266,7 +265,7 @@
     font-size: 14px; opacity: 0.7; text-align: left;
     padding: 5px;
     border:1px solid rgba(182, 182, 182, 0.3);
-    height: 50px;
+    height: 20px;
 }
 
 .usky-grid  .usky-control-placeholder:hover .placeholder{
@@ -293,7 +292,7 @@
 .usky-grid .usky-editor-placeholder i{
     color: @grayLight;
     font-size: 85px;
-    line-height: 85px;  
+    line-height: 85px;
     display: block;
     margin-bottom: 10px;
 }
@@ -326,17 +325,19 @@
      resize: none;
      font-style: italic;
 }
- 
+
  .usky-grid  .cellPanelRte {
      min-height:60px;
  }
 
-
+ .usky-grid .usky-cell-embed iframe {
+     width: 100%;
+}
 
 // ICONS
 // -------------------------
  .usky-grid  .iconBox {
-     padding: 4px 7px 4px 7px;
+     padding: 4px 6px 4px 6px;
      display: inline-block;
      cursor: pointer;
      border-radius: 200px;
@@ -348,6 +349,7 @@
           background: @blue !important;
           color: white !important;
           border-color: @blue !important;
+          text-decoration:none;
  }
 
  .usky-grid  .iconBox a:hover {
@@ -379,10 +381,8 @@
  .usky-grid  .iconBox i {
      font-size:16px !important;
      color: #5F5F5F;
+     display:block;
  }
-
-
- 
 
 
  .usky-grid  ul {
@@ -450,7 +450,7 @@
      background-color: #F7F7F7 !important;
  }
 
- 
+
  // MEDIA EDITOR
  // -------------------------
  .usky-grid  .fullSizeImage {
@@ -488,18 +488,15 @@
  /**************************************************************************************************/
 
  .usky-grid .usky-cell{
-     
- }
-
- .usky-grid .usky-row{
-     
+    padding-bottom: 15px;
  }
 
  .usky-grid .usky-control{
      margin: 10px 0 0 0;
      padding: 5px;
+     border: 1px dashed transparent;
  }
- 
+
  .usky-grid .usky-templates-columns{
      margin-top: 30px;
  }
@@ -512,7 +509,7 @@
  .usky-grid .usky-control-inner{
     padding: 5px;
     margin-right: 45px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     border: 1px dashed transparent;
  }
 
@@ -526,7 +523,7 @@
      overflow:hidden;
      width:100%;
  }
- 
+
  .usky-grid .uSky-templates-template {
      display:inline-block;
      width:100px;
@@ -538,9 +535,9 @@
      border:5px solid @blue;
  }
 
- .usky-grid .uSky-templates-template .tb { 
-     width:100%; 
-     height:150px; 
+ .usky-grid .uSky-templates-template .tb {
+     width:100%;
+     height:150px;
      padding:10px;
      background-color: @grayLighter;
      border: 5px solid @grayLight;
@@ -548,11 +545,11 @@
      position: relative;
  }
 
- .usky-grid .uSky-templates-template .tr { 
+ .usky-grid .uSky-templates-template .tr {
      height: 100%;
      position: relative;
  }
- 
+
  .usky-grid .uSky-templates-template .tb .uSky-templates-column {
      height:100%;
      border: 1px dashed @grayLight;
@@ -572,38 +569,135 @@
  /* template column */
  /**************************************************************************************************/
 
- .usky-grid .usky-templates-columns .td{
-     border: none !important;
-     vertical-align: middle;
- }
+/* New template preview */
+.usky-grid {
 
- .usky-grid .usky-templates-columns .td i{
-     color: @gray;
-     opacity: 0.8
- }
+	.templates-preview {
+		display: inline-block;
+		width: 100%;
+		text-align: center;
 
+		small {
+			position: absolute;
+			width: 100%;
+			left: 0;
+			bottom: -25px;
+			padding-top: 15px;
+		}
 
- .usky-grid  .mainTbpt:hover {    
-     border-color:@blue;
- }
+		.help-text {
+			margin: 35px 35px 0 0;
+		}
+	}
 
- .usky-grid  .mainTbpt {
-     cursor:pointer;
-     border-spacing: 3px;
-     border-collapse: separate;
-     height: 35px;
-     border: 2px solid @grayLight;  
-     margin:0px;
-     background-color: @grayLighter;
- } 
- .usky-grid  .mainTdpt {    
-     height: 35px;
-     border: 1px dashed @grayLight;  
-     margin:0px;
-     background-color: rgba(228, 228, 228, 0.41);
-     overflow: hidden;
- }
+	.preview-rows {
 
+		display: inline-block;
+		position: relative;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		width: 125px;
+		margin: 35px 40px 15px 0;
+		border: 2px solid @grayLight; /* @grayLight */
+		transition: border 200ms linear;
+
+        &.prevalues-rows {
+            margin: 0px 20px 20px 0px;
+            width: 80px;
+            float:left;
+        }
+
+        &.prevalues-templates {
+            margin: 0px 20px 20px 0px;
+            float:left;
+
+        }
+
+		&:hover {
+			border-color: @blue;
+			cursor: pointer;
+		}
+
+		.preview-row {
+			display: inline-block;
+			width: 100%;
+			vertical-align: bottom;
+		}
+	}
+
+	.preview-rows.layout {
+		padding: 2px;
+
+		.preview-row {
+			height: 100%;
+		}
+
+		.preview-col {
+			height: 180px;
+			border: dashed 1px @grayLight;
+		}
+
+		.preview-cell {
+			background-color: @grayLighter;
+		}
+		.preview-overlay {
+			display: none;
+		}
+	}
+
+	.preview-rows.columns {
+		min-height: 18px;
+		line-height: 11px;
+		padding: 1px;
+
+        &.prevalues-rows {
+            min-height: 30px;
+        }
+	}
+
+    .preview-rows {
+
+        .preview-col {
+
+		    display: block;
+		    float: left;
+		    -webkit-box-sizing: border-box;
+		    -moz-box-sizing: border-box;
+		    box-sizing: border-box;
+		    width: 33.3%; /* temp value */
+		    height: 10px;
+		    margin: 0;
+		    border: 1px solid @white; /* @white */
+
+		    .preview-cell {
+			    display: block;
+			    width: 100%;
+			    height: 100%;
+			    background-color: @grayLight; /* @grayLight */
+			    margin: 0 1px 1px 0;
+		    }
+	    }
+
+        &.prevalues-templates {
+            .preview-col {
+                height: 80px;
+            }
+        }
+
+    }
+
+	.preview-overlay {
+		display: block;
+        width: 100%;
+        position: absolute;
+        height: 100%;
+        top: 0;
+        box-sizing: border-box;
+        left: 0;
+        border: 3px solid white;
+	}
+}
 
  /**************************************************************************************************/
  /* overlay */
@@ -614,14 +708,13 @@
      height: 380px;
      overflow: auto;
      border: 1px solid #ccc;
-     margin-top: -190px;
+     margin-top: -270px;
      margin-left: -150px;
      background: white;
      padding: 7px;
      top: 0;
      left: 50%;
-
-     z-index: 666;
+     z-index: 6660;
      -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
      box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
@@ -674,7 +767,7 @@
  /**************************************************************************************************/
 .usky-grid-configuration .uSky-templates{
     text-align: left;
-}   
+}
 
 .usky-grid-configuration ul{
     display: block;
@@ -686,16 +779,17 @@
     text-align: left;
 }
 
-.usky-grid-configuration .uSky-templates .uSky-templates-template{
-    margin: 0px 20px 20px 0px;
-    width: 60px;
-}
-
 .usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
-    height: 50px;
+    max-height: 50px;
     border-width: 2px !important;
     padding: 0px;
     border-spacing:2px;
+    overflow: hidden;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template span{
+    background: @grayLight;
+    display: inline-block;
 }
 
 .usky-grid-configuration .uSky-templates .uSky-templates-template .tb:hover{
@@ -706,6 +800,8 @@
     display: block;
     float: left;
     margin-left: -1px;
+    border: 1px white solid !important;
+    background: @grayLight;
 }
 
 .usky-grid-configuration .uSky-templates-column.last{
@@ -717,9 +813,14 @@
     font-size: 20px;
     line-height: 70px;
     color: #ccc;
-    text-decoration: none
+    text-decoration: none;
+    background: white;
 }
 
+.usky-grid-configuration .mainTdpt{
+    height: initial;
+    border: none;
+}
 
 .usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
     margin: 0px 50px 20px 0px;
@@ -737,4 +838,3 @@
 }
 
 .usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
-

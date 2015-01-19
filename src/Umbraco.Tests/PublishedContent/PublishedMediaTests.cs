@@ -11,6 +11,7 @@ using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.PublishedContent
         internal static IPublishedContent GetNode(int id, UmbracoContext umbracoContext)
         {
             var ctx = umbracoContext;
-            var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(), ctx);
+            var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application), ctx);
             var doc = cache.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
@@ -112,7 +113,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -141,7 +142,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //ensure it is found
                 var publishedMedia = cache.GetById(3113);
@@ -181,7 +182,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -203,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var ctx = GetUmbracoContext("/test", 1234);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
@@ -247,7 +248,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var ctx = GetUmbracoContext("/test", 1234);
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -266,7 +267,7 @@ namespace Umbraco.Tests.PublishedContent
                 indexer.RebuildIndex();
                 var ctx = GetUmbracoContext("/test", 1234);
                 var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
-                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(searcher, indexer), ctx);
+                var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(ctx.Application, searcher, indexer), ctx);
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -411,6 +412,100 @@ namespace Umbraco.Tests.PublishedContent
             var publishedSubChild1 = GetNode(mSubChild1.Id);
             Assert.IsTrue(publishedSubChild1.AncestorsOrSelf().Select(x => x.Id).ContainsAll(
                 new[] { mSubChild1.Id, mChild1.Id, mRoot.Id }));
+        }
+
+        [Test]
+        public void Convert_From_Legacy_Xml()
+        {
+            var config = SettingsForTests.GenerateMockSettings();
+
+            var contentMock = Mock.Get(config.Content);
+            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
+
+            SettingsForTests.ConfigureSettings(config);
+
+            var nodeId = 2112;
+
+            var xml = XElement.Parse(@"<node id=""2112"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd39"" parentID=""2222"" level=""3"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""1"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Sam's Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112"">
+				<data alias=""umbracoFile""><![CDATA[/media/1234/blah.pdf]]></data>
+				<data alias=""umbracoWidth"">115</data>
+				<data alias=""umbracoHeight"">268</data>
+				<data alias=""umbracoBytes"">10726</data>
+				<data alias=""umbracoExtension"">jpg</data>
+				<node id=""3113"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd33"" parentID=""2112"" level=""4"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""2"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Another Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112,3113"">
+					<data alias=""umbracoFile""><![CDATA[/media/1234/blah.pdf]]></data>
+					<data alias=""umbracoWidth"">115</data>
+					<data alias=""umbracoHeight"">268</data>
+					<data alias=""umbracoBytes"">10726</data>
+					<data alias=""umbracoExtension"">jpg</data>
+				</node>
+			</node>");
+            var node = xml.DescendantsAndSelf("node").Single(x => (int) x.Attribute("id") == nodeId);
+
+            var publishedMedia = new PublishedMediaCache(ApplicationContext);
+
+            var nav = node.CreateNavigator();
+
+            var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/node"), nodeId);
+
+            Assert.AreEqual(nodeId, converted.Id);
+            Assert.AreEqual(3, converted.Level);
+            Assert.AreEqual(1, converted.SortOrder);
+            Assert.AreEqual("Sam's Umbraco Image", converted.Name);
+            Assert.AreEqual("-1,1111,2222,2112", converted.Path);
+        }
+
+        [Test]
+        public void Convert_From_Standard_Xml()
+        {
+            var config = SettingsForTests.GenerateMockSettings();
+
+            var contentMock = Mock.Get(config.Content);
+            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
+
+            SettingsForTests.ConfigureSettings(config);
+
+            var nodeId = 2112;
+
+            var xml = XElement.Parse(@"<Image id=""2112"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd39"" parentID=""2222"" level=""3"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""1"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Sam's Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112"" isDoc="""">
+				<umbracoFile><![CDATA[/media/1234/blah.pdf]]></umbracoFile>
+				<umbracoWidth>115</umbracoWidth>
+				<umbracoHeight>268</umbracoHeight>
+				<umbracoBytes>10726</umbracoBytes>
+				<umbracoExtension>jpg</umbracoExtension>
+				<Image id=""3113"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd33"" parentID=""2112"" level=""4"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""2"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Another Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112,3113"" isDoc="""">
+					<umbracoFile><![CDATA[/media/1234/blah.pdf]]></umbracoFile>
+					<umbracoWidth>115</umbracoWidth>
+					<umbracoHeight>268</umbracoHeight>
+					<umbracoBytes>10726</umbracoBytes>
+					<umbracoExtension>jpg</umbracoExtension>
+				</Image>
+			</Image>");
+            var node = xml.DescendantsAndSelf("Image").Single(x => (int)x.Attribute("id") == nodeId);
+
+            var publishedMedia = new PublishedMediaCache(ApplicationContext);
+
+            var nav = node.CreateNavigator();
+
+            var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/Image"), nodeId);
+
+            Assert.AreEqual(nodeId, converted.Id);
+            Assert.AreEqual(3, converted.Level);
+            Assert.AreEqual(1, converted.SortOrder);
+            Assert.AreEqual("Sam's Umbraco Image", converted.Name);
+            Assert.AreEqual("-1,1111,2222,2112", converted.Path);
+        }
+
+        [Test]
+        public void Detects_Error_In_Xml()
+        {
+            var errorXml = new XElement("error", string.Format("No media is maching '{0}'", 1234));
+            var nav = errorXml.CreateNavigator();
+
+            var publishedMedia = new PublishedMediaCache(ApplicationContext);
+            var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/"), 1234);
+
+            Assert.IsNull(converted);
         }
     }
 

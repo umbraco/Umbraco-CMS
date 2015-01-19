@@ -11,7 +11,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public static bool RecycleBinSmells(this IContentService contentService)
         {
-            return contentService.GetContentInRecycleBin().Any();
+            return contentService.CountChildren(Constants.System.RecycleBinContent) > 0;
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public static bool RecycleBinSmells(this IMediaService mediaService)
         {
-            return mediaService.GetMediaInRecycleBin().Any();
+            return mediaService.CountChildren(Constants.System.RecycleBinMedia) > 0;
         }
     }
 }

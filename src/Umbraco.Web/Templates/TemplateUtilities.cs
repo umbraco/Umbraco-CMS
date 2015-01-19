@@ -15,6 +15,7 @@ namespace Umbraco.Web.Templates
 	/// </summary>
 	public static class TemplateUtilities
 	{
+        //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
         internal static string ParseInternalLinks(string text, bool preview)
 	    {
             // save and set for url provider
@@ -41,6 +42,8 @@ namespace Umbraco.Web.Templates
 	    /// <returns></returns>
 	    public static string ParseInternalLinks(string text)
 		{
+            //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable, better yet, pass in urlprovider, routing context, separately
+
 			//don't attempt to proceed without a context as we cannot lookup urls without one
 			if (UmbracoContext.Current == null || UmbracoContext.Current.RoutingContext == null)
 			{
@@ -69,7 +72,6 @@ namespace Umbraco.Web.Templates
 	    /// The RegEx matches any HTML attribute values that start with a tilde (~), those that match are passed to ResolveUrl to replace the tilde with the application path.
 	    /// </summary>
 	    /// <param name="text"></param>
-	    /// <param name="preview"></param>
 	    /// <returns></returns>
 	    /// <remarks>
 	    /// When used with a Virtual-Directory set-up, this would resolve all URLs correctly.

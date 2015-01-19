@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constuctor for creating a MediaType with the parent's id.
         /// </summary>
-        /// <remarks>You usually only want to use this for creating MediaTypes at the root.</remarks>
+        /// <remarks>Only use this for creating MediaTypes at the root (with ParentId -1).</remarks>
         /// <param name="parentId"></param>
         public MediaType(int parentId) : base(parentId)
         {
@@ -24,9 +24,20 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-		public MediaType(IMediaType parent) : base(parent)
+		public MediaType(IMediaType parent) : this(parent, null)
 		{
 		}
+
+        /// <summary>
+        /// Constuctor for creating a MediaType with the parent as an inherited type.
+        /// </summary>
+        /// <remarks>Use this to ensure inheritance from parent.</remarks>
+        /// <param name="parent"></param>
+        /// <param name="alias"></param>
+        public MediaType(IMediaType parent, string alias)
+            : base(parent, alias)
+        {
+        }
 
         /// <summary>
         /// Method to call when Entity is being saved

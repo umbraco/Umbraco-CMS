@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="he" intName="Hebrew (Israel)" localName="Hebrew" lcid="" culture="he-IL">
   <creator>
-    <name>Umbraco Hebrew 2011</name>
-    <link>http://umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">נהל שמות מתחם</key>
@@ -351,10 +351,10 @@
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
-              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
+              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -370,12 +370,12 @@
       proceed. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">הסיסמה שונתה!</key>
     <key alias="defaultUserText"><![CDATA[
         <p>
-          umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
+          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
           changed to something unique.
         </p>
         <p>
@@ -383,24 +383,24 @@
         </p>
       ]]></key>
     <key alias="greatStart">התחל מכאן, צפה בסרטוני ההדרכה עבור אומברקו</key>
-    <key alias="licenseText">על ידי לחיצה על 'הבא', הנך מאשר את פרטי התקנון כפי שמפורט בתיבת הטקטס למטה. שים לב, הפצה זו של אומברקו כוללת שני גירסאות שונות של רשיון,קוד פתוח ברשיון MIT עבור ה- framework ורשיון umbraco freeware המכסה את ה- UI.</key>
+    <key alias="licenseText">על ידי לחיצה על 'הבא', הנך מאשר את פרטי התקנון כפי שמפורט בתיבת הטקטס למטה. שים לב, הפצה זו של אומברקו כוללת שני גירסאות שונות של רשיון,קוד פתוח ברשיון MIT עבור ה- framework ורשיון Umbraco freeware המכסה את ה- UI.</key>
     <key alias="None">לא הותקן עדיין.</key>
     <key alias="permissionsAffectedFolders">קבצים ותיקיות המושפעים</key>
     <key alias="permissionsAffectedFoldersMoreInfo">מידע נוסף אודות התקנה ורשאות עבור אומרקו ניתן לקרוא כאן</key>
     <key alias="permissionsAffectedFoldersText">על מנת לבצע זאת, יש צורך לאפשר הרשאות ל ASP.NET לערוך את הקצבים או התיקיות הבאות</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
-        You can run umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of umbraco.]]></key>
+        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">איך לפתור</key>
     <key alias="permissionsHowtoResolveLink">לחץ כאן לקרוא את גירסת הטקסט</key>
-    <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for umbraco or read the text version.]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for Umbraco or read the text version.]]></key>
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Your permission settings might be an issue!</strong>
       <br/><br />
-      You can run umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for umbraco!</strong>
+      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for Umbraco!</strong>
           <br /><br />
-          In order to run umbraco, you'll need to update your permission settings.]]></key>
+          In order to run Umbraco, you'll need to update your permission settings.]]></key>
     <key alias="permissionsPerfect"><![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
-              You are ready to run umbraco and install packages!]]></key>
+              You are ready to run Umbraco and install packages!]]></key>
     <key alias="permissionsResolveFolderIssues">פתירת בעיות בתיקיה</key>
     <key alias="permissionsResolveFolderIssuesLink">עקוב אחר הלינק המצורף על מנת לפתור בעיות עם ASP.NET ויצירת תיקיות חדשות.</key>
     <key alias="permissionsSettingUpPermissions">הגדרת הרשאות לתיקיה</key>
@@ -411,7 +411,7 @@
     <key alias="runwayFromScratch">אני רוצה להתחיל מאתר ריק</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
     <key alias="runwayHeader">סיימת להתקין את מערכת אומברקו, מה ברצונך לעשות כעת?</key>
@@ -444,19 +444,19 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Browse your new site</h3>
 You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
-Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the umbraco terminology]]></key>
+Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">אומברקו %0% מותקנת ומוכנה לשימוש</key>
     <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to umbraco</strong>, 
+        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
     <key alias="Unavailable">ההתחברות לבסיס הנתונים נכשלה.</key>
     <key alias="Version3">Umbraco גירסה 3</key>
     <key alias="Version4">Umbraco גירסה 4</key>
     <key alias="watch">צפה</key>
-    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
+    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
                                 <br /><br />
                                 Press <strong>"next"</strong> to start the wizard.]]></key>
   </area>
@@ -469,7 +469,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="renewSession">יש לבצע חידוש פעילות על מנת לשמור על התוכן</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">ברוכים הבאים לאומברקו, יש להזין שם משתמש וסיסמה בשדות למטה:</key>
   </area>
   <area alias="main">
@@ -526,7 +526,7 @@ To manage your website, simply open the umbraco back office and start adding con
 		  </div>
 
 		  <p>Have a nice day!<br /><br />
-			  Cheers from the umbraco robot
+			  Cheers from the Umbraco robot
 		  </p>]]></key>
     <key alias="mailSubject">[%0%] התראות  %1% בוצעו ב %2%</key>
     <key alias="notifications">התראות</key>
@@ -534,7 +534,7 @@ To manage your website, simply open the umbraco back office and start adding con
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[
       בחר חבילה מהמחשב שלך, על ידי לחיצה על כפתור ה "browse"<br />
-         ויש לבחור את החבילה הרצויה. לחבילות umbraco יש בד"כ יש סיומות בשם ".umb" או ".zip".
+         ויש לבחור את החבילה הרצויה. לחבילות Umbraco יש בד"כ יש סיומות בשם ".umb" או ".zip".
       ]]></key>
     <key alias="packageAuthor">יוצר החבילה</key>
     <key alias="packageDemonstration">הדגמה</key>
@@ -570,7 +570,7 @@ To manage your website, simply open the umbraco back office and start adding con
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">תפקיד בסיסי בהגנה</key>
-    <key alias="paAdvancedHelp"><![CDATA[אם הינך רוצה לשלוט בגישה לעמוד על ידי זיהוי תפקיד המשתמש,<br /> על ידי שימוש בקבוצות הקיימות ב umbraco.]]></key>
+    <key alias="paAdvancedHelp"><![CDATA[אם הינך רוצה לשלוט בגישה לעמוד על ידי זיהוי תפקיד המשתמש,<br /> על ידי שימוש בקבוצות הקיימות ב Umbraco.]]></key>
     <key alias="paAdvancedNoGroups"><![CDATA[יש צורך ליצור קבוצה לפני שימוש  <br />בזיהוי תפקיד המשתמש.]]></key>
     <key alias="paErrorPage">עמוד שגיאות</key>
     <key alias="paErrorPageHelp">השתמש בעת התחברות משתמשים וללא אפשרות גישה</key>

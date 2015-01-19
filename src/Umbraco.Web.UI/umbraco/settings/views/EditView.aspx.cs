@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.Controls;
 using umbraco;
@@ -34,7 +36,8 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		public enum ViewEditorType
 		{
 			Template,
-			PartialView
+			PartialView,
+            PartialViewMacro
 		}
 
 		/// <summary>
@@ -42,7 +45,12 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		/// </summary>
 		protected ViewEditorType EditorType
 		{
-			get { return _template == null ? ViewEditorType.PartialView : ViewEditorType.Template; }
+		    get
+		    {
+		        if (_template != null) return ViewEditorType.Template;
+                if (Request.QueryString["treeType"].IsNullOrWhiteSpace() == false && Request.QueryString["treeType"].InvariantEquals("partialViewMacros")) return ViewEditorType.PartialViewMacro;
+		        return ViewEditorType.PartialView;
+		    }
 		}
 
         protected string TemplateTreeSyncPath { get; private set; }
@@ -83,11 +91,11 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
 					var selectedTemplate = string.Empty;
 
-					foreach (Template t in Template.GetAllAsList())
+					foreach (var t in Template.GetAllAsList())
 					{
 						if (t.Id == _template.Id) continue;
 
-						var li = new ListItem(t.Text, t.Id.ToString());
+						var li = new ListItem(t.Text, t.Id.ToString(CultureInfo.InvariantCulture));
 						li.Attributes.Add("id", t.Alias.Replace(" ", "") + ".cshtml");
 						MasterTemplate.Items.Add(li);
 					}
@@ -95,10 +103,11 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					try
 					{
 						if (_template.MasterTemplate > 0)
-							MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+							MasterTemplate.SelectedValue = _template.MasterTemplate.ToString(CultureInfo.InvariantCulture);
 					}
 					catch (Exception ex)
 					{
+                        LogHelper.Error<EditView>("An error occurred setting a master template id", ex);
 					}
 
 					MasterTemplate.SelectedValue = selectedTemplate;
@@ -150,7 +159,10 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			{
 				//we are editing a view (i.e. partial view)
 				OriginalFileName = HttpUtility.UrlDecode(Request.QueryString["file"]);
-                TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
+
+                //TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
+
+                TemplateTreeSyncPath = DeepLink.GetTreePathFromFilePath(OriginalFileName.TrimStart("MacroPartials/").TrimStart("Partials/"));
 			}
 			else
 			{

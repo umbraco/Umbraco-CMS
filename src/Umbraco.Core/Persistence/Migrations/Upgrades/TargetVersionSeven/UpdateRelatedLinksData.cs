@@ -30,14 +30,25 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 var dtSql = new Sql().Select("nodeId").From<DataTypeDto>().Where<DataTypeDto>(dto => dto.PropertyEditorAlias == Constants.PropertyEditors.RelatedLinksAlias);
                 var dataTypeIds = database.Fetch<int>(dtSql);
 
+                if (!dataTypeIds.Any()) return string.Empty;
+
                 var propertyData =
                     database.Fetch<PropertyDataDto>(
                         "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { dataTypeIds = dataTypeIds });
                 if (!propertyData.Any()) return string.Empty;
-                
-                var nodesIdsWithProperty = propertyData.Select(x => x.NodeId).Distinct();
-                var cmsContentXmlEntries = database.Fetch<ContentXmlDto>(
-                        "WHERE nodeId in (@nodeIds)", new { nodeIds = nodesIdsWithProperty });
+
+                var nodesIdsWithProperty = propertyData.Select(x => x.NodeId).Distinct().ToArray();
+
+                var cmsContentXmlEntries = new List<ContentXmlDto>();
+                //We're doing an "IN" query here but SQL server only supports 2100 query parameters so we're going to split on that
+                // It would be better to do this as an INNER join + sub query but I don't have time for that at the moment and this is only run once
+                // so it's not a big deal.
+                var batches = nodesIdsWithProperty.InGroupsOf(2000);
+                foreach (var batch in batches)
+                {
+                    cmsContentXmlEntries.AddRange(database.Fetch<ContentXmlDto>("WHERE nodeId in (@nodeIds)", new { nodeIds = batch }));
+                }
+
                 var propertyTypeIds = propertyData.Select(x => x.PropertyTypeId).Distinct();
                 var propertyTypes = database.Fetch<PropertyTypeDto>(
                     "WHERE id in (@propertyTypeIds)", new { propertyTypeIds = propertyTypeIds });
@@ -46,9 +57,25 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 {
                     if (string.IsNullOrEmpty(data.Text) == false)
                     {
+                        XmlDocument xml;
                         //fetch the current data (that's in xml format)
-                        var xml = new XmlDocument();
-                        xml.LoadXml(data.Text);
+                        try
+                        {
+                            xml = new XmlDocument();
+                            xml.LoadXml(data.Text);
+                        }
+                        catch (Exception ex) 
+                        {
+                            LogHelper.Error<UpdateRelatedLinksData>("The data stored for property id " + data.Id + " on document " + data.NodeId + 
+                                " is not valid XML, the data will be removed because it cannot be converted to the new format. The value was: " + data.Text, ex);
+
+                            data.Text = "";
+                            database.Update(data);
+
+                            UpdateXmlTable(propertyTypes, data, cmsContentXmlEntries, database);
+
+                            continue;
+                        }
 
                         var links = new List<ExpandoObject>();
 
@@ -80,23 +107,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
                         database.Update(data);
 
-                        //now we need to update the cmsContentXml table
-                        var propertyType = propertyTypes.SingleOrDefault(x => x.Id == data.PropertyTypeId);
-                        if (propertyType != null)
-                        {
-                            var xmlItem = cmsContentXmlEntries.SingleOrDefault(x => x.NodeId == data.NodeId);
-                            if (xmlItem != null)
-                            {
-                                var x = XElement.Parse(xmlItem.Xml);
-                                var prop = x.Element(propertyType.Alias);
-                                if (prop != null)
-                                {
-                                    prop.ReplaceAll(new XCData(data.Text));
-                                    database.Update(xmlItem);
-                                }
-                            }
-                        }
-
+                        UpdateXmlTable(propertyTypes, data, cmsContentXmlEntries, database);
 
                     }
                 }
@@ -107,6 +118,26 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         public override void Down()
         {
             throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
+        }
+
+        private static void UpdateXmlTable(List<PropertyTypeDto> propertyTypes, PropertyDataDto data, List<ContentXmlDto> cmsContentXmlEntries, Database database)
+        {
+            //now we need to update the cmsContentXml table
+            var propertyType = propertyTypes.SingleOrDefault(x => x.Id == data.PropertyTypeId);
+            if (propertyType != null)
+            {
+                var xmlItem = cmsContentXmlEntries.SingleOrDefault(x => x.NodeId == data.NodeId);
+                if (xmlItem != null)
+                {
+                    var x = XElement.Parse(xmlItem.Xml);
+                    var prop = x.Element(propertyType.Alias);
+                    if (prop != null)
+                    {
+                        prop.ReplaceAll(new XCData(data.Text));
+                        database.Update(xmlItem);
+                    }
+                }
+            }
         }
     }
 }

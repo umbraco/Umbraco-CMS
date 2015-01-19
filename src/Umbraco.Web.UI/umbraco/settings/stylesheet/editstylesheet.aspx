@@ -40,7 +40,7 @@
 
         <cc1:Pane ID="Pane7" CssClass="pane" runat="server">
             <cc1:PropertyPanel ID="pp_source" runat="server">
-                <cc1:CodeArea ID="editorSource" CodeBase="Css" OffSetX="37" OffSetY="54" AutoResize="true" runat="server" />
+                <cc1:CodeArea ID="editorSource" CodeBase="Css" AutoResize="false" runat="server" />
             </cc1:PropertyPanel>
         </cc1:Pane>
 

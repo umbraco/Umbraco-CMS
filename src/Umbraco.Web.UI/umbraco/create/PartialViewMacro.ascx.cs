@@ -5,13 +5,13 @@ using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using umbraco.presentation.create;
 
 namespace Umbraco.Web.UI.Umbraco.Create
 {
-    public partial class PartialViewMacro : UserControl
+    public partial class PartialViewMacro : UI.Controls.UmbracoUserControl
     {
-
 
         protected override void OnLoad(EventArgs e)
         {
@@ -19,29 +19,20 @@ namespace Umbraco.Web.UI.Umbraco.Create
             DataBind();
 
             LoadTemplates(PartialViewTemplate);
+
+            // Enable new contect item in folders to place items in that folder.
+            if (Request["nodeType"] == "partialViewMacrosFolder")
+                FileName.Text = Request["nodeId"].EnsureEndsWith('/');
         }
 
-        private static void LoadTemplates(ListControl list)
+        private void LoadTemplates(ListControl list)
         {
-            var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViewMacros/Templates/");
-            list.Items.Clear();
-
-            // always add the options of empty snippets
-            list.Items.Add(new ListItem("Empty", "Empty.cshtml"));
-            list.Items.Add(new ListItem("Empty (For Use With Custom Views)", "Empty (ForUseWithCustomViews).cshtml"));
-
-            if (System.IO.Directory.Exists(path))
+            var fileService = (FileService)Services.FileService;
+            var snippets = fileService.GetPartialViewSnippetNames();
+            foreach (var snippet in snippets)
             {
-                const string extension = ".cshtml";
-
-                //Already adding Empty as the first item, so don't add it again
-                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("Empty") == false))
-                {
-                    var filename = System.IO.Path.GetFileName(fileInfo.FullName);
-
-                    var liText = filename.Replace(extension, "").SplitPascalCasing().ToFirstUpperInvariant();
-                    list.Items.Add(new ListItem(liText, filename));
-                }
+                var liText = snippet.SplitPascalCasing().ToFirstUpperInvariant();
+                list.Items.Add(new ListItem(liText, snippet));
             }
         }
 

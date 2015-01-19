@@ -260,7 +260,8 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
                 var entity = repository.Get(id);
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
+                var pathMatch = entity.Path + ",";
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
                 var entities = repository.GetByQuery(query);
 
                 return entities;

@@ -153,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.Properties[propDto.Alias].Id = propId;
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMacro entity)
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         //public IEnumerable<IMacro> GetAll(params string[] aliases)

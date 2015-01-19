@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -589,6 +590,27 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all members
+        /// </summary>
+        /// <param name="memberTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all members = USE WITH CARE!
+        /// </param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        public void RebuildXmlStructures(params int[] memberTypeIds)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                repository.RebuildXmlStructures(
+                    member => _entitySerializer.Serialize(_dataTypeService, member),
+                    contentTypeIds: memberTypeIds.Length == 0 ? null : memberTypeIds);
+            }
+
+            Audit.Add(AuditTypes.Publish, "MemberService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+        }
+
         #endregion
 
         #region IMembershipMemberService Implementation
@@ -1149,88 +1171,6 @@ namespace Umbraco.Core.Services
                                                       memberTypeAlias));
 
                 return contentType;
-            }
-        }
-
-        /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all members
-        /// </summary>
-        /// <param name="memberTypeIds">
-        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
-        /// for all members = USE WITH CARE!
-        /// </param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal void RebuildXmlStructures(params int[] memberTypeIds)
-        {
-            using (new WriteLock(Locker))
-            {
-                var list = new List<IMember>();
-
-                var uow = _uowProvider.GetUnitOfWork();
-
-                //First we're going to get the data that needs to be inserted before clearing anything, this 
-                //ensures that we don't accidentally leave the content xml table empty if something happens
-                //during the lookup process.
-
-                if (memberTypeIds.Any() == false)
-                {
-                    list.AddRange(GetAllMembers());
-                }
-                else
-                {
-                    list.AddRange(memberTypeIds.SelectMany(GetMembersByMemberType));
-                }
-
-                var xmlItems = new List<ContentXmlDto>();
-                foreach (var c in list)
-                {
-                    var xml = _entitySerializer.Serialize(_dataTypeService, c);
-                    xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
-                }
-
-                //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-                using (var tr = uow.Database.GetTransaction())
-                {
-                    if (memberTypeIds.Any() == false)
-                    {
-                        //Remove all member records from the cmsContentXml table (DO NOT REMOVE Content/Media!)
-                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-                        var subQuery = new Sql()
-                            .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<NodeDto>()
-                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
-
-                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                        uow.Database.Execute(deleteSql);
-                    }
-                    else
-                    {
-                        foreach (var id in memberTypeIds)
-                        {
-                            var id1 = id;
-                            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-                            var subQuery = new Sql()
-                                .Select("DISTINCT cmsContentXml.nodeId")
-                                .From<ContentXmlDto>()
-                                .InnerJoin<NodeDto>()
-                                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                                .InnerJoin<ContentDto>()
-                                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
-                                .Where<ContentDto>(dto => dto.ContentTypeId == id1);
-
-                            var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
-                            uow.Database.Execute(deleteSql);
-                        }
-                    }
-
-                    //bulk insert it into the database
-                    uow.Database.BulkInsertRecords(xmlItems, tr);
-
-                    tr.Complete();
-                }
             }
         }
         

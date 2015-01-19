@@ -153,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(sectionDto);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IUser entity)
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion
@@ -251,10 +251,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
-            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
+
             sql.Select("COUNT(*)")
                 .From<UserDto>()
-                .Where<UserDto>(x => x.UserName == escapedUserName);
+                .Where<UserDto>(x => x.UserName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }

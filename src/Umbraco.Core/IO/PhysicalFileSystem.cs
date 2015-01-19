@@ -90,15 +90,17 @@ namespace Umbraco.Core.IO
 
         public void AddFile(string path, Stream stream, bool overrideIfExists)
         {
-            var exists = FileExists(path);
+            var fsRelativePath = GetRelativePath(path);
+
+            var exists = FileExists(fsRelativePath);
             if (exists && overrideIfExists == false) throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
-            
-            EnsureDirectory(Path.GetDirectoryName(path));
+
+            EnsureDirectory(Path.GetDirectoryName(fsRelativePath));
 
             if (stream.CanSeek)
                 stream.Seek(0, 0);
 
-            using (var destination = (Stream)File.Create(GetFullPath(path)))
+            using (var destination = (Stream)File.Create(GetFullPath(fsRelativePath)))
                 stream.CopyTo(destination);
         }
 
@@ -109,12 +111,14 @@ namespace Umbraco.Core.IO
 
         public IEnumerable<string> GetFiles(string path, string filter)
         {
-            path = EnsureTrailingSeparator(GetFullPath(path));
+            var fsRelativePath = GetRelativePath(path);
+
+            var fullPath = EnsureTrailingSeparator(GetFullPath(fsRelativePath));
 
             try
             {
-                if (Directory.Exists(path))
-                    return Directory.EnumerateFiles(path, filter).Select(GetRelativePath);
+                if (Directory.Exists(fullPath))
+                    return Directory.EnumerateFiles(fullPath, filter).Select(GetRelativePath);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -167,6 +171,12 @@ namespace Umbraco.Core.IO
 
         public string GetFullPath(string path)
         {
+            //if the path starts with a '/' then it's most likely not a FS relative path which is required so convert it
+            if (path.StartsWith("/"))
+            {
+                path = GetRelativePath(path);
+            }
+
             return !path.StartsWith(RootPath) 
                 ? Path.Combine(RootPath, path)
                 : path;

@@ -172,11 +172,14 @@ namespace Umbraco.Web.Security
                 if (status != MembershipCreateStatus.Success) return null;
             }
 
-            //Set member online
-            provider.GetUser(model.Username, true);
-
-            //Log them in
-            FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+            if (logMemberIn)
+            {
+                //Set member online
+                provider.GetUser(model.Username, true);
+    
+                //Log them in
+                FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+            }
 
             return membershipUser;
         }
@@ -293,7 +296,6 @@ namespace Umbraco.Web.Security
                 return null;
             }
             var result = GetCurrentPersistedMember();
-            var provider = MPE.GetMembersMembershipProvider();
             return result == null ? null : new MemberPublishedContent(result).CreateModel();
         }
 
@@ -413,7 +415,7 @@ namespace Umbraco.Web.Security
                 if (member != null)
                 {
                     var propValue = member.Properties[prop.Alias];
-                    if (propValue != null)
+                    if (propValue != null && propValue.Value != null)
                     {
                         value = propValue.Value.ToString();
                     }    

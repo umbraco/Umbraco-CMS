@@ -1,17 +1,16 @@
-<div class="cell-tools-menu" 
+<div class="cell-tools-menu"
     ng-style="overlayMenu.style"
-    ng-mouseleave="closeItemOverlay()">
-       
-     <h5>Insert control</h5>
+    delayed-mouseleave="closeItemOverlay()">
+     <h5><localize key="grid_insertControl" /></h5>
 
      <ul class="elements">
         <li ng-repeat="editor in area.$allowedEditors">
             <a ng-click="addControl(editor, overlayMenu.area, overlayMenu.$index)" href>
-                <i class="icon {{editor.icon}}"></i>    
+                <i class="icon {{editor.icon}}"></i>
                 {{editor.name}}</a>
 
                 <pre>{{editor}}</pre>
         </li>
-     </ul>  
+     </ul>
 
 </div>

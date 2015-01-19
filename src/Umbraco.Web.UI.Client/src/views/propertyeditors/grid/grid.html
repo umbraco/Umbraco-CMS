@@ -1,252 +1,251 @@
-<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid">
+<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid" id="usky-grid">
 
-<div ng-if="contentReady">
-    <!-- Template picker -->
-    <div class="uSky-templates tb" ng-show="!model.value || model.value == ''">
-        <div class="tr">
-            <div class="td middle">
-                <div class="uSky-templates-template" 
-                    ng-repeat="template in model.config.items.templates" style="">
-                    <div class="tb" ng-click="addTemplate(template)">
-                        <div class="tr">
-                            <div class="td uSky-templates-column" 
-                                ng-class="{last:$last}" 
-                                ng-repeat="section in template.sections"
-                                style="width:{{ section.$percentage }}%">
-                            </div>
+    <div ng-if="contentReady">
+
+        <!-- Template picker -->
+
+        <div class="templates-preview"
+             ng-show="!model.value || model.value == ''">
+
+            <div class="preview-rows layout"
+                 ng-repeat="template in model.config.items.templates"
+                 ng-click="addTemplate(template)">
+
+                <div class="preview-row">
+
+                    <div class="preview-col"
+                         ng-class="{last:$last}"
+                         ng-repeat="section in template.sections"
+                         ng-style="{width: percentage(section.grid) + '%'}">
+
+                        <div class="preview-cell">
                         </div>
+
                     </div>
+
                 </div>
 
-                <br/>
-                <div class="help-text">To start, select a layout for your grid</div>
-            </div>
-        </div>
-    </div>
-    <!-- template picker end -->
+                <div class="preview-overlay">
+                </div>
 
-    <!-- Grids -->
-    <div class="usky-grid-width">
-        <div class="tb" >
+                <small>{{layout.name}}</small>
 
-            <!-- for each column in model -->
-            <div class="usky-column td"
-                 ng-class="{last:$last}"
-                 ng-repeat="section in model.value.sections"
-                 ng-init="initSection(section)"
-                 style="width:{{section.$percentage}}%">
+            </div> <!-- .templates-preview-rows -->
 
-                <div ui-sortable="sortableOptions" ng-model="section.rows">
+            <p><span class="help-text"><localize key="grid_addRows"/></span></p>
 
-                    <!-- for each row in template section -->
-                    <div ng-repeat="row in section.rows"
-                         class="usky-row"
-                         ng-mouseover="setCurrentRow(row)"
-                         ng-mouseleave="disableCurrentRow()"
-                         ng-class="{'selectedControl':currentRow == row && currentControl === null}">
 
-                        <!-- Row tool -->
-                        <div class="row-tools" ng-animate="'fade'" ng-if="currentRow == row && currentControl === null">
+        </div> <!-- .templates-preview -->
+        <!-- template picker end -->
+        <!-- Grids -->
+        <div class="usky-grid-width">
+            <div class="tb">
 
-                            <!-- delete row -->
-                            <div class="cell-tools-remove">
-                                <div class="iconBox"
-                                     ng-click="deletePrompt = true"
-                                     ng-mouseover="setCurrentRemoveControl(row)"
-                                     ng-mouseover="disableCurrentRemoveControl(row)">
+                <!-- for each column in model -->
+                <div class="usky-column td"
+                     ng-class="{last:$last}"
+                     ng-repeat="section in model.value.sections"
+                     ng-init="initSection(section)"
+                     ng-style="{width: section.$percentage + '%'}">
 
-                                    <span ng-if="deletePrompt">
-                                        Are you sure?
-                                        <a href style="text-decoration: underline" ng-click="removeRow(section, $index)">Yes</a>
-                                    </span>
+                    <div ui-sortable="sortableOptions" ng-model="section.rows">
 
-                                    <i ng-if="!deletePrompt" class="icon icon-trash"></i>
+                        <!-- for each row in template section -->
+                        <div ng-repeat="row in section.rows"
+                             class="usky-row"
+                             ng-mouseenter="setCurrentRow(row)"
+                             ng-mouseleave="disableCurrentRow()">
+
+                            <!-- Row tool -->
+                            <div class="row-tools" ng-animate="'fade'" ng-if="currentRow === row && currentControl === null">
+
+                                <!-- delete row -->
+                                <div class="cell-tools-remove">
+                                    <div class="iconBox"
+                                         ng-click="deletePrompt = true"
+                                         ng-mouseover="setWarnighlightRow(row)"
+                                         ng-mouseleave="disableWarnhighlightRow(row)">
+
+                                        <span ng-if="deletePrompt">
+                                            <localize key="general_areyousure"/>
+                                            <a href style="text-decoration: underline" ng-click="removeRow(section, $index)"><localize key="general_yes"/></a>
+                                        </span>
+
+                                        <i ng-if="!deletePrompt" class="icon icon-trash"></i>
+                                    </div>
                                 </div>
+
+                                <div class="cell-tools-move">
+                                    <a class="iconBox"
+                                       ng-mouseover="setInfohighlightRow(row)"
+                                       ng-mouseleave="disableInfohighlightRow(row)"
+                                       href>
+                                        <i class="icon icon-navigation"></i>
+                                    </a>
+                                </div>
+
+                                <div class="cell-tools-edit" ng-if="hasSettings">
+                                    <a class="iconBox"
+                                       ng-mouseover="setInfohighlightRow(row)"
+                                       ng-mouseleave="disableInfohighlightRow(row)"
+                                       ng-click="editGridItemSettings(row, 'row')"
+                                       href>
+                                        <i class="icon icon-settings"></i>
+                                    </a>
+                                </div>
+
                             </div>
 
-                            <div class="cell-tools-move">
-                                <div class="iconBox"
-                                     ng-mouseover="setCurrentMovedRow(row)"
-                                     ng-mouseleave="disableCurrentMovedRow(row)">
-                                    <i class="icon icon-navigation"></i>
-                                </div>
-                            </div>
-                        </div>
+                            <!-- row container -->
+                            <div class="{{row.cssClass}} mainContainer usky-row-inner"
+                                 ng-class="{last:$last,first:$first,warnhighlight:currentWarnhighlightRow == row, infohighlight:currentInfohighlightRow == row}">
 
-                        <!-- row container -->
-                        <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                             ng-class="{last:$last,first:$first,warnhighlight:currentRemoveControl == row, infohighlight:currentMovedRow == row}">
-                            <div class="mainTb">
-                                <div class="tb">
-                                    <div class="tr">
+                                <div class="mainTb">
+                                    <div class="tb">
+                                        <div class="tr">
 
-                                        <!-- cells in row -->
-                                        <div style="width:{{ area.$percentage }}%"
-                                             ng-class="{last:$last,first:$first}"
-                                             class="td mainTd usky-cell"
-                                             ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
+                                            <!-- Areas in row -->
+                                            <div ng-style="{width: area.$percentage + '%'}"
+                                                 class="td mainTd usky-cell"
+                                                 ng-class="{last:$last,first:$first, infohighlight:currentInfohighlightArea == area,
+                                                            warnhighlight:currentWarnhighlightArea == area}"
+                                                 ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
 
-                                            <!-- if area is empty tools -->
-                                            <div class="usky-control usky-control-placeholder"
-                                                 ng-if="area.controls.length == 0">
-
-                                                <div ng-if="area.allowed && area.allowed.length === 1"
-                                                     ng-init="singleEditor = area.$allowedEditors[0]"
-                                                     class="cell-tools-add-single single-editor-{{singleEditor.alias}}">
-
-                                                     <div class="help-text" style="margin-bottom: 15px">
-                                                            To start, click the <i class=" icon {{singleEditor.icon}} blue">
-                                                        </i> below and add your first {{singleEditor.name}}
-                                                     </div><br/>
-
-                                                     <div class="iconBox">
-                                                        <a href ng-click="addControl(singleEditor, area)">
-                                                            <i class="icon {{singleEditor.icon}}"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-
-
-                                                <div ng-if="!area.allowed || area.allowed.length > 1">
-
-                                                    <div class="help-text" style="margin-bottom: 15px">
-                                                           To start, click the <i class=" icon icon-add blue">
-                                                       </i> below and add your first element
-                                                    </div><br/>
-
-
-                                                    <div class="cell-tools-add" 
-                                                        ng-if="!currentToolsControl" 
-                                                        ng-animate="'fade'">
-                                                        
-                                                        <div class="iconBox">
-                                                            <a href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
-                                                                <i class=" icon icon-add"></i>
-                                                            </a>
-                                                        </div>
-
-                                                        <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
-
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                            <!-- Controls in cell -->
-                                            <div ng-repeat="control in area.controls"
-                                                 ng-mouseover="setCurrentControl(control)"
-                                                 ng-mouseleave="disableCurrentControl(control)"
-                                                 ng-animate="'fade'"
-                                                 class="usky-control">
-
-                                                <!-- Filled cell tools -->
-                                                <div class="cell-tools"
+                                                <!-- Controls in areas -->
+                                                <div ng-repeat="control in area.controls"
+                                                     ng-mouseover="setCurrentControl(control)"
+                                                     ng-mouseleave="disableCurrentControl(control)"
                                                      ng-animate="'fade'"
-                                                     ng-show="control && (currentControl == control)">
+                                                     class="usky-control">
 
-                                                    <!-- delete cell -->
-                                                    <div class="cell-tools-remove">
-                                                        <div class="iconBox"
-                                                             ng-click="deletePrompt = true"
-                                                             ng-mouseover="setCurrentRemoveControl(control)"
-                                                             ng-mouseleave="disableCurrentRemoveControl(control)">
+                                                    <!-- Filled cell tools -->
+                                                    <div class="cell-tools"
+                                                         ng-animate="'fade'"
+                                                         ng-show="control && (currentControl == control)">
+
+                                                        <!-- delete control -->
+                                                        <div class="cell-tools-remove">
+                                                            <div class="iconBox"
+                                                                 ng-click="deletePrompt = true"
+                                                                 ng-mouseover="setWarnhighlightControl(control)"
+                                                                 ng-mouseleave="disableWarnhighlightControl(control)">
 
                                                                 <span ng-show="deletePrompt">
-                                                                    Are you sure?
-                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)">Yes</a>
+                                                                    <localize key="general_areyousure"/>
+                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)"><localize key="general_yes"/></a>
                                                                 </span>
 
                                                                 <i ng-show="!deletePrompt" class="icon icon-trash"></i>
+                                                            </div>
                                                         </div>
+
+                                                        <!-- move control -->
+                                                        <div class="cell-tools-move">
+                                                            <a class="iconBox"
+                                                               ng-mouseover="setInfohighlightControl(control)"
+                                                               ng-mouseleave="disableInfohighlightControl(control)"
+                                                               href>
+                                                                <i class="icon icon-navigation"></i>
+                                                            </a>
+                                                        </div>
+
+                                                        <!-- setting area -->
+                                                        <div class="cell-tools-edit" ng-if="hasSettings && $first">
+                                                            <a class="iconBox"
+                                                               ng-mouseover="setInfohighlightArea(area)"
+                                                               ng-mouseleave="disableInfohighlightArea(area)"
+                                                               ng-click="editGridItemSettings(area, 'cell')"
+                                                               href>
+                                                                <i class="icon icon-settings"></i>
+                                                            </a>
+                                                        </div>
+
                                                     </div>
 
-                                                    <!-- move cell -->
-                                                    <div class="cell-tools-move">
-                                                        <div class="iconBox"
-                                                             ng-mouseover="setCurrentMovedControl(control)"
-                                                             ng-mouseleave="disableCurrentMovedControl(control)">
-                                                            <i class="icon icon-navigation"></i>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="usky-control-inner" ng-class="{last:$last,
-                                                               infohighlight:currentMovedControl == control,
-                                                               warnhighlight:currentRemoveControl == control,
+                                                    <div class="usky-control-inner" ng-class="{last:$last,
+                                                               infohighlight:currentInfohighlightControl == control,
+                                                               warnhighlight:currentWarnhighlightControl == control,
                                                                selectedControl:currentControl == control}">
-                                                    <!-- Redering the editor for specific control -->
-                                                    <div ng-if="control && control.$editorPath"
-                                                         ng-include="control.$editorPath"
-                                                         class="usky-cell usky-cell-{{control.editor.view}}">
+                                                        <!-- Redering the editor for specific control -->
+                                                        <div ng-if="control && control.$editorPath"
+                                                             ng-include="control.$editorPath"
+                                                             class="usky-cell-{{control.editor.view}}">
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <!-- Controls repeat end -->
+                                                <!-- if area is empty tools -->
+                                                <div class="usky-control usky-control-placeholder"
+                                                     ng-if="area.controls.length == 0">
+                                                    <div class="help-text" style="margin-bottom: 15px">
+                                                        <localize key="grid_addElement"/>
+                                                    </div><br />
+                                                </div>
 
-                                                <!-- add stuff -->
-                                                <div class="cell-tools-add" 
-                                                    ng-if="!currentToolsControl && control===currentControl && (area.max === undefined || area.max < area.controls.length)" 
-                                                    ng-animate="'fade'">
-                                                    
-                                                    <div class="iconBox">
-                                                        <a href ng-click="addItemOverlay($event, area, control.$index, control.$uniqueId)">
-                                                            <i class=" icon icon-add"></i>
-                                                        </a>
-                                                    </div>
+                                                <div class="cell-tools-add"
+                                                     ng-class="{emptyArea:area.controls.length == 0}"
+                                                     ng-if="!currentToolsControl"
+                                                     ng-animate="'fade'">
 
-                                                    <div ng-if="overlayMenu.show && overlayMenu.key == control.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
+                                                    <a class="iconBox" href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
+                                                        <i class=" icon icon-add"></i>
+                                                    </a>
+
+                                                    <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
                                                 </div>
 
                                             </div>
-                                            <!-- Controls repeat end -->
-
+                                            <!-- cells repeat end -->
                                         </div>
-                                        <!-- cells repeat end -->
                                     </div>
                                 </div>
                             </div>
+                            <!-- row container end -->
+
                         </div>
-                        <!-- row container end -->
+                        <!-- row repeat -->
 
                     </div>
-                    <!-- row repeat -->
+                    <!-- row sortable end -->
+                    <!-- column tools -->
 
-                </div>
-                <!-- row sortable end -->
-                <!-- column tools -->
-                <div class="usky-templates-columns tb">
+                    <div class="templates-preview">
 
-                    <div class="tr">
-                        <div class="td middle">
-                            <ul>
-                                <li ng-repeat="layout in  section.$allowedLayouts" ng-show="layout.areas.length > 0">
-                                    <div class="tb mainTbpt" ng-click="addRow(section, layout)">
-                                        <div class="tr">
-                                            <div style="width:{{ percentage(area.grid); }}%"
-                                                 class="middle mainTdpt td"
-                                                 ng-repeat="area in layout.areas">
-                                                <i class="icon {{cellPreview(area)}}"></i>
-                                            </div>
-                                        </div>
+                        <div class="preview-rows columns"
+                             ng-repeat="layout in  section.$allowedLayouts"
+                             ng-show="layout.areas.length > 0"
+                             ng-click="addRow(section, layout)">
+
+                            <div class="preview-row">
+
+                                <div class="preview-col" ng-style="{width: percentage(area.grid) + '%'}" ng-repeat="area in layout.areas">
+
+                                    <div class="preview-cell">
                                     </div>
-                                    <small>{{layout.name}}</small>
-                                </li>
-                            </ul>
 
-                        </div>
-                    </div>
-                    <div class="tr">
-                        <div class="td middle">
-                            <br />
-                            <span class="help-text">Add rows to your layout</span>
-                        </div>
-                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="preview-overlay">
+                            </div>
+
+                            <small>{{layout.name}}</small>
+
+                        </div> <!-- .templates-preview-rows -->
+
+                        <p>
+                            <span class="help-text"><localize key="grid_addRows" /></span>
+                        </p>
+
+
+                    </div> <!-- .templates-preview -->
+                    <!-- column tools end -->
+
                 </div>
-                <!-- column tools end -->
-
+                <!-- column repeat end -->
             </div>
-            <!-- column repeat end -->
         </div>
     </div>
-</div>
 
 </div>

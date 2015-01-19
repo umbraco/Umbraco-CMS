@@ -57,7 +57,18 @@ namespace Umbraco.Web.Trees
 		/// <param name="xNode"></param>
 		protected override void OnRenderFolderNode(ref XmlTreeNode xNode)
 		{
-			xNode = null;
+            // We should allow folder hierarchy for organization in large sites.
+            xNode.Action = "javascript:void(0);";
+            xNode.NodeType = "partialViewsFolder";
+            xNode.Menu = new List<IAction>(new IAction[]
+            {
+                ActionNew.Instance, 
+                ContextMenuSeperator.Instance, 
+                ActionDelete.Instance, 
+                ContextMenuSeperator.Instance, 
+                ActionRefresh.Instance
+            });
+            
 		}
 
 		protected virtual void ChangeNodeAction(XmlTreeNode xNode)

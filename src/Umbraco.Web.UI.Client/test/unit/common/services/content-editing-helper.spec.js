@@ -229,7 +229,7 @@ describe('contentEditingHelper tests', function () {
 
             //assert
             expect(changed.length).toBe(2);
-            expect(changed[0].alias).toBe("list");
+            expect(changed[0].alias).toBe("grid");
             expect(changed[1].alias).toBe("bodyText");
         });
 

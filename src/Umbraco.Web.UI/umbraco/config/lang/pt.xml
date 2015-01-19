@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="pt" intName="Portuguese Brazil" localName="Portuguese Brazil" lcid="" culture="pt-BR">
   <creator>
-    <name>Carlos Casalicchio</name>
-    <link>http://www.zueuz.net</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gerenciar hostnames</key>
@@ -119,7 +119,7 @@
   <area alias="dashboard">
     <key alias="browser">Navegue seu site</key>
     <key alias="dontShowAgain">- Esconder</key>
-    <key alias="nothinghappens">Se umbraco não estiver abrindo talvez você precise hablitar pop-ups para este site</key>
+    <key alias="nothinghappens">Se Umbraco não estiver abrindo talvez você precise hablitar pop-ups para este site</key>
     <key alias="openinnew">foi aberto em uma nova janela</key>
     <key alias="restart">Reiniciar</key>
     <key alias="visit">Visitar</key>
@@ -339,8 +339,8 @@
     <key alias="databaseInstall"><![CDATA[Pressione o botão <strong>instalar</strong> para instalar o banco de dados do Umbraco %0%]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% agora foi copiado para seu banco de dados. Pressione <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Banco de dados não encontrado! Favor checar se a informação no "connection string" do "web.config" esteja correta. </p>
-<p>Para prosseguir, favor editar o arquivo "web.config" (usando Visual Studio ou seu editor de texto favorito), role até embaixo, adicione a connection string para seu banco de dados com a chave de nome "umbracoDbDSN" e salve o arquivo </p>
-<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+<p>Para prosseguir, favor editar o arquivo "web.config" (usando Visual Studio ou seu editor de texto favorito), role até embaixo, adicione a connection string para seu banco de dados com a chave de nome "UmbracoDbDSN" e salve o arquivo </p>
+<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Mais informações em como editar o web.config aqui.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este passo, você deve saber algumas informações relativas ao seu servidor de banco de dados ("connection string"). <br /> Favor contatar seu provedor de internet ou hospedagem web se necessário. Se você estiver instalando em uma máquina ou servidor local é possível que você precise dessas informações por um administrador de sistema.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>
@@ -352,12 +352,12 @@
     <key alias="databaseUpgradeDone"><![CDATA[Seu banco de dados foi atualizado para última versão %0%. <br />Pressione <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Seu banco de dados atual está desatualizado! Clique <strong>próximo</strong> para continuar com o assistente de configuração]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>A senha do usuário padrão precisa ser alterada!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>O usuário padrão foi desabilitado ou não tem acesso à umbraco!</strong></p><p>Nenhuma ação posterior precisa ser tomada. Clique <b>Próximo</b> para prosseguir.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>O usuário padrão foi desabilitado ou não tem acesso à Umbraco!</strong></p><p>Nenhuma ação posterior precisa ser tomada. Clique <b>Próximo</b> para prosseguir.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>A senha do usuário padrão foi alterada com sucesso desde a instalação!</strong></p><p>Nenhuma ação posterior é necessária. Clique <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="defaultUserPasswordChanged">Senha foi alterada!</key>
     <key alias="defaultUserText"><![CDATA[
         <p>
-          umbraco cria um usuário padrão com o login <strong>('admin')</strong> e senha <strong>('default')</strong>. É <strong>importante</strong> que a senha seja alterada para algo único.
+          Umbraco cria um usuário padrão com o login <strong>('admin')</strong> e senha <strong>('default')</strong>. É <strong>importante</strong> que a senha seja alterada para algo único.
         </p>
         <p>
           Este passo irá checar a senha do usuário padrão e sugerir uma alteração se necessário.
@@ -365,31 +365,31 @@
       
     ]]></key>
     <key alias="greatStart">Comece com o pé direito, assista nossos vídeos introdutórios</key>
-    <key alias="licenseText">Ao clicar no próximo botão (ou modificando o umbracoConfigurationStatus no web.config), você aceita a licença deste software cmo especificado na caixa abaixo. Note que esta distribuição de umbraco consiste em duas licenças diferentes, a licença aberta MIT para a framework e a licença de software livre (freeware) umbraco que cobre o UI.</key>
+    <key alias="licenseText">Ao clicar no próximo botão (ou modificando o UmbracoConfigurationStatus no web.config), você aceita a licença deste software cmo especificado na caixa abaixo. Note que esta distribuição de Umbraco consiste em duas licenças diferentes, a licença aberta MIT para a framework e a licença de software livre (freeware) Umbraco que cobre o UI.</key>
     <key alias="None">Nenhum instalado ainda.</key>
     <key alias="permissionsAffectedFolders">Pastas e arquivos afetados</key>
-    <key alias="permissionsAffectedFoldersMoreInfo">Mais informações em como configurar permissões para umbraco aqui</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Mais informações em como configurar permissões para Umbraco aqui</key>
     <key alias="permissionsAffectedFoldersText">Você precisa conceder permissão de modificação ASP.NET aos seguintes arquivos/pastas</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Suas permissões estão quase perfeitas!</strong><br /><br />
-Você pode correr umbraco sem problemas, mas não vai ser capaz de instalar pacotes que são recomendados para tirar total vantagem de umbraco.]]></key>
+Você pode correr Umbraco sem problemas, mas não vai ser capaz de instalar pacotes que são recomendados para tirar total vantagem de Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">Como Resolver</key>
     <key alias="permissionsHowtoResolveLink">Clique aqui para ler a versão texto</key>
-    <key alias="permissionsHowtoResolveText"><![CDATA[Assista nosso <strong>vídeo tutorial</strong> sobre configuração de permissões de pastas para umbraco ou leia a versão texto.]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Assista nosso <strong>vídeo tutorial</strong> sobre configuração de permissões de pastas para Umbraco ou leia a versão texto.]]></key>
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Suas permissões podem ser um problema!</strong>
 <br/><br/>
-Você pode correr umbraco sem problemas mas não será capaz de criar pastas ou instalar pacotes que são recomendados para tirar total vantagem de umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Suas permissões não estão prontas para umbraco!</strong>
+Você pode correr Umbraco sem problemas mas não será capaz de criar pastas ou instalar pacotes que são recomendados para tirar total vantagem de Umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Suas permissões não estão prontas para Umbraco!</strong>
 <br /><br />
-Para correr umbraco você vai precisar atualizar as configurações de permissões.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Suas configurações de permissões estão perfeitas!</strong> <br /><br /> Você está pronto para correr o umbraco e instalar pacotes!]]></key>
+Para correr Umbraco você vai precisar atualizar as configurações de permissões.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Suas configurações de permissões estão perfeitas!</strong> <br /><br /> Você está pronto para correr o Umbraco e instalar pacotes!]]></key>
     <key alias="permissionsResolveFolderIssues">Resolvendo problemas de pastas</key>
     <key alias="permissionsResolveFolderIssuesLink">Siga este link para mais informações sobre problemas com ASP.NET e criação de pastas</key>
     <key alias="permissionsSettingUpPermissions">Configurando permissões de pastas</key>
-    <key alias="permissionsText"><![CDATA[umbraco necessita acesso ler/escrever à certos diretórios para que possa guardar arquivos como fotos e PDFs. 
+    <key alias="permissionsText"><![CDATA[Umbraco necessita acesso ler/escrever à certos diretórios para que possa guardar arquivos como fotos e PDFs. 
 Também guarda informações temporárias (cache) para melhorar a performance do seu website.]]></key>
     <key alias="runwayFromScratch">Eu quero começar do zero</key>
     <key alias="runwayFromScratchText"><![CDATA[Seu site está completamente vazio no momento, então isso é perfeito se você deseja começar do zero e criar seus próprios documentos e modelos.
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         Você ainda pode escolher instalar Runway mais tarde. Favor ir à seção Desenvolvedor e selecione pacotes.]]></key>
     <key alias="runwayHeader">Você acabou de configurar uma plataforma Umbraco limpa. O que deseja fazer a seguir?</key>
     <key alias="runwayInstalled">Runway está instalado</key>
@@ -411,23 +411,23 @@ Se escolher instalar Runway você pode opcionalmente selecionar blocos de constr
     <key alias="step1">Passo 1/5 Aceitar Licença</key>
     <key alias="step2">Passo 2/5: Configuração do Banco de Dados</key>
     <key alias="step3">Passo 3/5: Validando Permissões de Arquivos</key>
-    <key alias="step4">Passo 4/5: Checar segurança umbraco</key>
+    <key alias="step4">Passo 4/5: Checar segurança Umbraco</key>
     <key alias="step5">Passo 5/5: Umbraco está pronto para ser usado</key>
-    <key alias="thankYou">Obrigado por escolher umbraco</key>
+    <key alias="thankYou">Obrigado por escolher Umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Navegue seu site</h3>
 Você instalou Runway, então por que não ver como é seu novo website.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ajuda adicional e informações</h3>
-Consiga ajuda de nossa comunidade ganhadora de prêmios, navegue a documentação e assista alguns vídeos grátis sobre como construir um site simples, como usar pacotes e um guia prático sobre a terminologia umbraco]]></key>
+Consiga ajuda de nossa comunidade ganhadora de prêmios, navegue a documentação e assista alguns vídeos grátis sobre como construir um site simples, como usar pacotes e um guia prático sobre a terminologia Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% está instalado e pronto para uso</key>
-    <key alias="theEndInstallFailed"><![CDATA[Para finalizar a instalação você necessita mudar o arquivo <strong>web.config</strong> e atualizar a chave AppSettings <strong>umbracoConfigurationStatus</strong> no final para <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Você pode <strong>iniciar instantâneamente</strong> clicando em "Lançar Umbraco" abaixo. <br/> Se você é <strong>novo com umbraco</strong> você pode encontrar vários recursos em nossa página para iniciantes.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[Para finalizar a instalação você necessita mudar o arquivo <strong>web.config</strong> e atualizar a chave AppSettings <strong>UmbracoConfigurationStatus</strong> no final para <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[Você pode <strong>iniciar instantâneamente</strong> clicando em "Lançar Umbraco" abaixo. <br/> Se você é <strong>novo com Umbraco</strong> você pode encontrar vários recursos em nossa página para iniciantes.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lançar Umbraco</h3>
-Para gerenciar seu website, simplesmente abra a área administrativa do umbraco para começar adicionando conteúdo, atualizando modelos e stylesheets e adicionando nova funcionalidade]]></key>
+Para gerenciar seu website, simplesmente abra a área administrativa do Umbraco para começar adicionando conteúdo, atualizando modelos e stylesheets e adicionando nova funcionalidade]]></key>
     <key alias="Unavailable">Conexão ao banco falhou.</key>
     <key alias="Version3">Umbraco Versão 3</key>
     <key alias="Version4">Umbraco Versão 4</key>
     <key alias="watch">Assistir</key>
-    <key alias="welcomeIntro"><![CDATA[Este assistente irá guiá-lo pelo processo de configuração do <strong>umbraco %0%</strong> para uma nova instalação ou atualizando desde verão 3.0.
+    <key alias="welcomeIntro"><![CDATA[Este assistente irá guiá-lo pelo processo de configuração do <strong>Umbraco %0%</strong> para uma nova instalação ou atualizando desde verão 3.0.
 <br /><br />
 Pressione <strong>"próximo"</strong> para iniciar o assistente.]]></key>
   </area>
@@ -440,7 +440,7 @@ Pressione <strong>"próximo"</strong> para iniciar o assistente.]]></key>
     <key alias="renewSession">Renovar agora para salvar seu trabalho</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Bem vindo(a) à Umbraco, digite seu nome de usuário e senha nas caixas abaixo:</key>
   </area>
   <area alias="main">
@@ -471,7 +471,7 @@ Vá até http://%4%/#/content/content/edit/%5% para editar.
 
       Tenha um bom dia!
 
-      Saudações do robô umbraco]]></key>
+      Saudações do robô Umbraco]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Olá %0%</p>
 
 		  <p>Esta é uma mensagem automatizada para informar que a tarefa <strong>'%1%'</strong> 
@@ -497,14 +497,14 @@ Vá até http://%4%/#/content/content/edit/%5% para editar.
 		  </div>
 
 		  <p>Tenha um bom dia!<br /><br />
-			  Saudações do robô umbraco
+			  Saudações do robô Umbraco
 		  </p>
     ]]></key>
     <key alias="mailSubject">[%0%] Notificação sobre %1% realizada em %2%</key>
     <key alias="notifications">Notificações</key>
   </area>
   <area alias="packager">
-    <key alias="chooseLocalPackageText"><![CDATA[Selecione o pacote em sua máquina clicando no botão Navegar <br /> e localizando o pacote. Pacotes umbraco tem extensão ".umb" ou ".zip".]]></key>
+    <key alias="chooseLocalPackageText"><![CDATA[Selecione o pacote em sua máquina clicando no botão Navegar <br /> e localizando o pacote. Pacotes Umbraco tem extensão ".umb" ou ".zip".]]></key>
     <key alias="packageAuthor">Autor</key>
     <key alias="packageDemonstration">Demonstração</key>
     <key alias="packageDocumentation">Documentação</key>
@@ -526,7 +526,7 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
     <key alias="packageUpgradeDownload">Baixar atualização pelo repositório</key>
     <key alias="packageUpgradeHeader">Atualizar pacote</key>
     <key alias="packageUpgradeInstructions">Instruções de atualização</key>
-    <key alias="packageUpgradeText">Há uma atualizaçào disponível para este pacote. Você pode baixá-lo diretamente do repositório de pacotes do umbraco.</key>
+    <key alias="packageUpgradeText">Há uma atualizaçào disponível para este pacote. Você pode baixá-lo diretamente do repositório de pacotes do Umbraco.</key>
     <key alias="packageVersion">Versão do pacote</key>
     <key alias="viewPackageWebsite">Ver website do pacote</key>
   </area>
@@ -538,7 +538,7 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteção baseada em função</key>
-    <key alias="paAdvancedHelp"><![CDATA[Se você deseja controlar o acesso à página usando autenticação baseada em funções, <br /> usando grupos de membros do umbraco.]]></key>
+    <key alias="paAdvancedHelp"><![CDATA[Se você deseja controlar o acesso à página usando autenticação baseada em funções, <br /> usando grupos de membros do Umbraco.]]></key>
     <key alias="paAdvancedNoGroups"><![CDATA[Você precisa criar um grupo de membros antes que possa usar <br /> autenticação baseada em função.]]></key>
     <key alias="paErrorPage">Página de Erro</key>
     <key alias="paErrorPageHelp">Usado quando as pessoas estão logadas, mas não para ter acesso</key>
@@ -682,9 +682,9 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="insertContentAreaPlaceHolder">Inserir área de conteúdo em espaço reservado</key>
     <key alias="insertDictionaryItem">Inserir item de dicionário</key>
     <key alias="insertMacro">Inserir Macro</key>
-    <key alias="insertPageField">Inserir campo de página umbraco</key>
+    <key alias="insertPageField">Inserir campo de página Umbraco</key>
     <key alias="mastertemplate">Modelo mestre</key>
-    <key alias="quickGuide">Guia rápido para etiquetas de modelos umbraco</key>
+    <key alias="quickGuide">Guia rápido para etiquetas de modelos Umbraco</key>
     <key alias="template">Modelo</key>
   </area>
   <area alias="templateEditor">
@@ -732,12 +732,12 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
 
       Vá para http://%3%/translation/details.aspx?id=%4% para editar.
 
-      Ou visite o umbraco para ter uma visão geral das tarefas de tradução
+      Ou visite o Umbraco para ter uma visão geral das tarefas de tradução
       http://%3%
 
       Tenha um bom dia!
 
-      Saudações do robô umbraco
+      Saudações do robô Umbraco
     ]]></key>
     <key alias="mailSubject">Tarefa de tradução [%0%] para %1%</key>
     <key alias="noTranslators">Nenhum usuário tradutor encontrado. Favor criar um usuário tradutor antes que possa começar a enviar conteúdo para tradução</key>

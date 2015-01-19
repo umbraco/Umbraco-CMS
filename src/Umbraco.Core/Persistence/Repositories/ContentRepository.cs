@@ -4,6 +4,8 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
@@ -166,7 +168,86 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IContent>
-        
+
+        public void RebuildXmlStructures(Func<IContent, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        {
+
+            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+            using (var tr = Database.GetTransaction())
+            {
+                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
+                if (contentTypeIds == null)
+                {
+                    var subQuery = new Sql()
+                            .Select("DISTINCT cmsContentXml.nodeId")
+                            .From<ContentXmlDto>()
+                            .InnerJoin<DocumentDto>()
+                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
+
+                    var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);
+                }
+                else
+                {
+                    foreach (var id in contentTypeIds)
+                    {
+                        var id1 = id;
+                        var subQuery = new Sql()
+                            .Select("cmsDocument.nodeId")
+                            .From<DocumentDto>()
+                            .InnerJoin<ContentDto>()
+                            .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<DocumentDto>(dto => dto.Published)
+                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+
+                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        Database.Execute(deleteSql);
+                    }
+                }
+
+                //now insert the data, again if something fails here, the whole transaction is reversed
+                if (contentTypeIds == null)
+                {
+                    var query = Query<IContent>.Builder.Where(x => x.Published == true);
+                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                }
+                else
+                {
+                    foreach (var contentTypeId in contentTypeIds)
+                    {
+                        //copy local
+                        var id = contentTypeId;
+                        var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ContentTypeId == id && x.Trashed == false);
+                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                    }
+                }
+
+                tr.Complete();
+            }
+        }
+
+        private void RebuildXmlStructuresProcessQuery(Func<IContent, XElement> serializer, IQuery<IContent> query, Transaction tr, int pageSize)
+        {
+            var pageIndex = 0;
+            var total = int.MinValue;
+            var processed = 0;
+            do
+            {
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+
+                var xmlItems = (from descendant in descendants
+                                let xml = serializer(descendant)
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
+
+                //bulk insert it into the database
+                Database.BulkInsertRecords(xmlItems, tr);
+
+                processed += xmlItems.Length;
+
+                pageIndex++;
+            } while (processed < total);
+        }
+
         public override IContent GetByVersion(Guid versionId)
         {
             var sql = GetBaseQuery(false);
@@ -313,7 +394,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             var keyDictionary = new Dictionary<int, int>();
 
@@ -336,13 +417,20 @@ namespace Umbraco.Core.Persistence.Repositories
                 UpdatePropertyTags(entity, _tagRepository);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IContent entity)
         {
             var publishedState = ((Content) entity).PublishedState;
             
+            //check if we need to make any database changes at all
+            if (entity.RequiresSaving(publishedState) == false)
+            {
+                entity.ResetDirtyProperties();
+                return;
+            }
+
             //check if we need to create a new version
             bool shouldCreateNewVersion = entity.ShouldCreateNewVersion(publishedState);
             if (shouldCreateNewVersion)
@@ -362,7 +450,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -446,7 +534,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(((Content)entity).ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             var keyDictionary = new Dictionary<int, int>();
 
@@ -486,7 +574,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 ClearEntityTags(entity, _tagRepository);
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
 
@@ -527,6 +615,14 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return CreateContentFromDto(dto, dto.VersionId, sql);
                 }
             }
+        }
+
+        public int CountPublished()
+        {
+            var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
+                .Where<DocumentDto>(x => x.Published == true)
+                .Where<DocumentDto>(x => x.Newest == true);
+            return Database.ExecuteScalar<int>(sql);
         }
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
@@ -617,16 +713,25 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
+
+            //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
+            // what we always require for a paged result, so we'll ensure it's included in the filter
+
+            var args = new List<object>();
+            var sbWhere = new StringBuilder("AND (cmsDocument.newest = 1)");
+            
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                sbWhere.Append(" AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                args.Add("%" + filter + "%");
+            }          
+
+            Func<Tuple<string, object[]>> filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString(), args.ToArray());
+
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
-                "SELECT cmsDocument.nodeId",
+                new Tuple<string, string>("cmsDocument", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,
-                filter.IsNullOrWhiteSpace()
-
-                //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
-                // what we always require for a paged result, so we'll ensure it's included in the filter
-
-                    ? new Func<string>(() => "AND (cmsDocument.newest = 1)")
-                    : new Func<string>(() => "AND (cmsDocument.newest = 1) AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%')"));
+                filterCallback);
 
         }
         

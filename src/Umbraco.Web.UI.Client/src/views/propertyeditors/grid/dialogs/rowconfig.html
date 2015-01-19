@@ -1,0 +1,92 @@
+<div class="umb-panel usky-grid usky-grid-configuration" 
+ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
+    <div class="umb-panel-body no-header with-footer">
+        <div class="umb-forms-settings">
+
+            <h5><localize key="grid_addRowConfiguration" /></h5>
+            <p><localize key="grid_addRowConfigurationDetail" /></p>
+            
+            <umb-control-group label="@general_name">
+                <input type="text" ng-model="currentRow.name" />
+            </umb-control-group>
+
+            <div class="uSky-templates-template"
+                 style="margin: 0; width: 350px; position: relative;">
+
+                 <div class="tb" style="height: auto; border: none !important; background: none">
+                     <div class="tr">
+
+                         <a class="td uSky-templates-column"
+                             ng-class="{last:$last, selected:cell==currentCell}"
+                             ng-repeat="cell in currentRow.areas"
+                             ng-click="configureCell(cell, currentRow)"
+                             ng-style="{width: percentage(cell.grid) + '%'}">
+                         </a>
+
+                         <a class="td uSky-templates-column add" 
+                             ng-click="configureCell(undefined, currentRow)"
+                             ng-style="{width: percentage(availableRowSpace) + '%'}">
+                             <i class="icon icon-add"></i>
+                         </a>
+                     </div>
+                 </div>
+            </div>
+
+            <div ng-if="currentCell" style="padding-bottom: 50px;">
+
+                <umb-control-group label="@general_width">
+                    <div class="grid-size-scaler" >
+                        <div class="grid-size-scaler">
+                            <a href ng-click="scaleDown(currentCell)">
+                                <i class="icon icon-remove"></i>
+                            </a>
+                            {{currentCell.grid}}
+                            <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
+                                <i class="icon icon-add"></i>
+                            </a>
+                        </div>
+                    </div>
+                </umb-control-group>
+
+
+                <umb-control-group hide-label="true">
+                    <ul class="unstyled">
+                        <li>
+                            <label>
+                                <input type="checkbox"
+                                    ng-model="currentCell.allowAll"
+                                    ng-checked="currentCell.allowed === undefined"
+                                    ng-change="toggleCollection(currentCell.allowed, currentCell.allowAll)" />
+                                    <localize key="grid_allowAllEditors"/>
+                            </label>
+                        </li>
+                    </ul>
+
+                    <div ng-if="currentCell.allowAll === false">
+                        <hr />
+                        <ul class="unstyled">
+                            <li ng-repeat="editor in editors">
+                                <label>
+                                    <input type="checkbox"
+                                        checklist-model="currentCell.allowed"
+                                        checklist-value="editor.alias">
+                                         <i class="icon {{editor.icon}}"></i> {{editor.name}}
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </umb-control-group>
+            </div>            
+        </div>
+    </div>
+
+    <div class="umb-panel-footer">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+                <a href="" ng-click="close()" class="btn btn-primary">
+                    <localize key="general_ok" class="ng-isolate-scope ng-scope">Done</localize>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

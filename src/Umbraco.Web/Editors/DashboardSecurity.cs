@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Dashboard;
@@ -16,7 +17,7 @@ namespace Umbraco.Web.Editors
 
         public static bool AuthorizeAccess(ISection dashboardSection, IUser user, ISectionService sectionService)
         {
-            if (user.Id.ToString() == 0.ToInvariantString())
+            if (user.Id.ToString(CultureInfo.InvariantCulture) == 0.ToInvariantString())
             {
                 return true;
             }
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Editors
 
         public static bool AuthorizeAccess(IDashboardTab dashboardTab, IUser user, ISectionService sectionService)
         {
-            if (user.Id.ToString() == Constants.System.Root.ToInvariantString())
+            if (user.Id.ToString(CultureInfo.InvariantCulture) == Constants.System.Root.ToInvariantString())
             {
                 return true;
             }
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Editors
 
         public static bool AuthorizeAccess(IDashboardControl dashboardTab, IUser user, ISectionService sectionService)
         {
-            if (user.Id.ToString() == Constants.System.Root.ToInvariantString())
+            if (user.Id.ToString(CultureInfo.InvariantCulture) == Constants.System.Root.ToInvariantString())
             {
                 return true;
             }

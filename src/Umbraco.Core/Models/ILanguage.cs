@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
-    public interface ILanguage : IAggregateRoot
+    public interface ILanguage : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Gets or sets the Iso Code for the Language

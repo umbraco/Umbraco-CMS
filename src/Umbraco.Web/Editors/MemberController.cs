@@ -127,7 +127,7 @@ namespace Umbraco.Web.Editors
                 ContentTypeName = listName,
                 Id = listName,
                 IsContainer = true,
-                Name = listName == "all-members" ? "All Members" : listName,
+                Name = listName == Constants.Conventions.MemberTypes.AllMembersListId ? "All Members" : listName,
                 Path = "-1," + listName,
                 ParentId = -1
             };
@@ -230,7 +230,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>        
         [FileUploadCleanupFilter]
-        [MembershipProviderValidationFilter]
         public MemberDisplay PostSave(
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)

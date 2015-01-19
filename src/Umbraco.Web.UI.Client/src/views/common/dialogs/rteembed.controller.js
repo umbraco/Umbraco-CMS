@@ -12,9 +12,9 @@
     var origWidth = 500;
     var origHeight = 300;
     
-    $scope.showPreview = function(){
+    $scope.showPreview = function() {
 
-        if ($scope.form.url != "") {
+        if ($scope.form.url) {
             $scope.form.show = true;
             $scope.form.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
             $scope.form.info = "";
@@ -28,7 +28,7 @@
                     switch (data.Status) {
                         case 0:
                             //not supported
-                            $scope.form.info = "Not Supported";
+                            $scope.form.info = "Not supported";
                             break;
                         case 1:
                             //error
@@ -41,13 +41,16 @@
                             break;
                     }
                 })
-                .error(function() {
+                .error(function () {
+                    $scope.form.supportsDimensions = false;
                     $scope.form.preview = "";
                     $scope.form.info = "Computer says no";
                 });
-
+        } else {
+            $scope.form.supportsDimensions = false;
+            $scope.form.preview = "";
+            $scope.form.info = "Please enter a URL";
         }
-
     };
 
     $scope.changeSize = function (type) {

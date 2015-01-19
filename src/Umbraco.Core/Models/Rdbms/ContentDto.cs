@@ -18,6 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("contentType")]
+        [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
         public int ContentTypeId { get; set; }
 
         [ResultColumn]

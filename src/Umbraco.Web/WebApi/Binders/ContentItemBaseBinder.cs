@@ -62,7 +62,7 @@ namespace Umbraco.Web.WebApi.Binders
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
 
-            var task = Task.Run(() => GetModel(actionContext, bindingContext, provider))
+            var task = Task.Run(() => GetModelAsync(actionContext, bindingContext, provider))
                            .ContinueWith(x =>
                                {
                                    if (x.IsFaulted && x.Exception != null)
@@ -94,7 +94,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="bindingContext"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private async Task<TModelSave> GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
+        private async Task<TModelSave> GetModelAsync(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
         {
             var request = actionContext.Request;
 

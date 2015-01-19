@@ -378,7 +378,7 @@ namespace Umbraco.Web
 		/// <remarks>
 		/// If the RoutingContext is null, this will throw an exception.
 		/// </remarks>
-    	internal UrlProvider UrlProvider
+    	public UrlProvider UrlProvider
     	{
     		get
     		{

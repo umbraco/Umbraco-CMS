@@ -4,7 +4,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public interface IRelationType : IAggregateRoot
+    public interface IRelationType : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Gets or sets the Name of the RelationType

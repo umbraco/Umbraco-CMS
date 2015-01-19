@@ -16,6 +16,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
@@ -122,9 +123,9 @@ namespace umbraco.controls
             pp_compositions.Text = ui.Text("contenttypecompositions", Security.CurrentUser);
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
+            pp_Root.Text = ui.Text("editcontenttype", "allowAtRoot", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "allowAtRootDesc", Security.CurrentUser) + "</small>";
+            pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser) + "<br/><small>" + ui.Text("editcontenttype", "hasListViewDesc", Security.CurrentUser) + "</small>";
 
-            pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser);
-            
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
             {
@@ -141,6 +142,7 @@ namespace umbraco.controls
                 lt_icon.Text = _contentType.IconUrl.TrimStart('.');
 
             checkTxtAliasJs.Text = string.Format("checkAlias('#{0}');", txtAlias.ClientID);
+
         }
         
         /// <summary>
@@ -295,6 +297,8 @@ namespace umbraco.controls
                     IconType = BasePage.speechBubbleIcon.success
                 }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
 
+            var isMediaType = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx");
+
             //Add the async operation to the page
             //NOTE: Must pass in a null and do not pass in a true to the 'executeInParallel', this is changed in .net 4.5 for the better, otherwise you'll get a ysod.
             Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, null, state));
@@ -305,7 +309,7 @@ namespace umbraco.controls
                     Trace.Write("ContentTypeControlNew", "executing task");
 
                     //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
-                    //global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     _contentType.ContentTypeItem.Name = txtName.Text;
                     _contentType.ContentTypeItem.Alias = txtAlias.Text; // raw, contentType.Alias takes care of it
@@ -319,47 +323,73 @@ namespace umbraco.controls
                     var ids = SaveAllowedChildTypes();
                     _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
 
-                    //Saving ContentType Compositions
-                    var compositionIds = SaveCompositionContentTypes();
-                    var existingCompsitionIds = _contentType.ContentTypeItem.CompositionIds().ToList();
-                    if (compositionIds.Any())
+                    // figure out whether compositions are locked
+                    var allContentTypes = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx")
+                        ? ApplicationContext.Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray()
+                        : ApplicationContext.Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == _contentType.Id)).ToArray();
+
+                    // if compositions are locked, do nothing (leave them as they are)
+                    // else process the checkbox list and add/remove compositions accordingly
+
+                    if (isUsing.Length == 0)
                     {
-                        //Iterate ContentType Ids from the save-collection
-                        foreach (var compositionId in compositionIds)
+                        //Saving ContentType Compositions
+                        var compositionIds = SaveCompositionContentTypes();
+                        var existingCompsitionIds = _contentType.ContentTypeItem.CompositionIds().ToList();
+                        if (compositionIds.Any())
                         {
-                            //If the compositionId is the Id of the current ContentType we skip it
-                            if(_contentType.Id.Equals(compositionId)) continue;
+                            // if some compositions were checked in the list, iterate over them
+                            foreach (var compositionId in compositionIds)
+                            {
+                                // ignore if it is the current content type
+                                if (_contentType.Id.Equals(compositionId)) continue;
 
-                            //If the Id already exists we'll just skip it
-                            if (existingCompsitionIds.Any(x => x.Equals(compositionId))) continue;
+                                // ignore if it is already a composition of the content type
+                                if (existingCompsitionIds.Any(x => x.Equals(compositionId))) continue;
 
-                            //New Ids will get added to the collection
-                            var compositionType = Services.ContentTypeService.GetContentType(compositionId);
-                            var added = _contentType.ContentTypeItem.AddContentType(compositionType);
-                            //TODO if added=false then return error message
+                                // add to the content type compositions
+                                var compositionType = isMediaType
+                                    ? Services.ContentTypeService.GetMediaType(compositionId).SafeCast<IContentTypeComposition>()
+                                    : Services.ContentTypeService.GetContentType(compositionId).SafeCast<IContentTypeComposition>();
+                                try
+                                {
+                                    //TODO if added=false then return error message
+                                    var added = _contentType.ContentTypeItem.AddContentType(compositionType);
+                                }
+                                catch (InvalidCompositionException ex)
+                                {
+                                    state.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                                    state.SaveArgs.Message = ex.Message;
+                                }
+                            }
+
+                            // then iterate over removed = existing except checked
+                            var removeIds = existingCompsitionIds.Except(compositionIds);
+                            foreach (var removeId in removeIds)
+                            {
+                                // and remove from the content type composition
+                                var compositionType = isMediaType
+                                    ? Services.ContentTypeService.GetMediaType(removeId).SafeCast<IContentTypeComposition>()
+                                    : Services.ContentTypeService.GetContentType(removeId).SafeCast<IContentTypeComposition>();
+                                var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
+                            }
                         }
-
-                        //Iterate the set except of existing and new Ids
-                        var removeIds = existingCompsitionIds.Except(compositionIds);
-                        foreach (var removeId in removeIds)
+                        else if (existingCompsitionIds.Any())
                         {
-                            //Remove ContentTypes that was deselected in the list
-                            var compositionType = Services.ContentTypeService.GetContentType(removeId);
-                            var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
+                            // else none were checked - if the content type had compositions,
+                            // iterate over them all and remove them
+                            var removeIds = existingCompsitionIds.Except(compositionIds); // except here makes no sense?
+                            foreach (var removeId in removeIds)
+                            {
+                                // remove existing
+                                var compositionType = isMediaType
+                                    ? Services.ContentTypeService.GetMediaType(removeId).SafeCast<IContentTypeComposition>()
+                                    : Services.ContentTypeService.GetContentType(removeId).SafeCast<IContentTypeComposition>();
+                                var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
+                            }
                         }
                     }
-                    else if (existingCompsitionIds.Any())
-                    {
-                        //Iterate the set except of existing and new Ids
-                        var removeIds = existingCompsitionIds.Except(compositionIds);
-                        foreach (var removeId in removeIds)
-                        {
-                            //Remove ContentTypes that was deselected in the list
-                            var compositionType = Services.ContentTypeService.GetContentType(removeId);
-                            var removed = _contentType.ContentTypeItem.RemoveContentType(compositionType.Alias);
-                        }
-                    }
-                    
 
                     var tabs = SaveTabs();
                     foreach (var tab in tabs)
@@ -404,6 +434,11 @@ namespace umbraco.controls
                         //asyncState.SaveArgs.Message = ex.Message;
                         state.SaveArgs.Message = ex.Message;
                         return;
+                    }
+                    catch (Exception ex)
+                    {
+                        state.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                        state.SaveArgs.Message = ex.Message;
                     }
 
                     Trace.Write("ContentTypeControlNew", "task completing");
@@ -641,50 +676,150 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         #region Compositions Pane
 
+        // returns content type compositions, recursively
+        // return each content type once and only once
+        private IEnumerable<IContentTypeComposition> GetIndirect(IContentTypeComposition ctype)
+        {
+            // hashset guarantees unicity on Id
+            var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x.Id == y.Id,
+                x => x.Id));
+
+            var stack = new Stack<IContentTypeComposition>();
+
+            foreach (var x in ctype.ContentTypeComposition)
+                stack.Push(x);
+
+            while (stack.Count > 0)
+            {
+                var x = stack.Pop();
+                all.Add(x);
+                foreach (var y in x.ContentTypeComposition)
+                    stack.Push(y);
+            }
+
+            return all;
+        }
+
         private void SetupCompositionsPane()
         {
             DualContentTypeCompositions.ID = "compositionContentTypes";
             DualContentTypeCompositions.Width = 175;
 
-            int[] compositionIds = _contentType.ContentTypeItem.CompositionIds().ToArray();
-            if (!Page.IsPostBack)
-            {
-                string chosenContentTypeIDs = "";
-                ContentType[] contentTypes = _contentType.GetAll();
-                foreach (ContentType ct in contentTypes.OrderBy(x => x.Text))
-                {
-                    ListItem li = new ListItem(ct.Text, ct.Id.ToString());
-                    if (ct.Id == _contentType.Id)
-                        li.Enabled = false;
+            // fix for 7.2 - only top-level content types can be used as mixins
 
-                    DualContentTypeCompositions.Items.Add(li);
-                    lstContentTypeCompositions.Items.Add(li);
-                    
-                    foreach (int i in compositionIds)
-                    {
-                        if (i == ct.Id)
-                        {
-                            li.Selected = true;
-                            chosenContentTypeIDs += ct.Id + ",";
-                        }
-                    }
+            if (Page.IsPostBack == false)
+            {
+                var allContentTypes = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx")
+                    ? ApplicationContext.Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray()
+                    : ApplicationContext.Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+
+                // note: there are many sanity checks missing here and there ;-((
+                // make sure once and for all
+                //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
+                //    throw new Exception("A parent does not belong to a composition.");
+
+                // find out if any content type uses this content type
+                var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == _contentType.Id)).ToArray();
+                if (isUsing.Length > 0)
+                {
+                    // if it is used then it has to remain top-level
+
+                    // no composition is possible at all
+                    DualContentTypeCompositions.Items.Clear();
+                    lstContentTypeCompositions.Items.Clear();
+                    DualContentTypeCompositions.Value = "";
+
+                    PlaceHolderContentTypeCompositions.Controls.Add(new Literal { Text = "<em>This content type is used as a parent and/or in "
+                        + "a composition, and therefore cannot be composed itself.<br /><br />Used by: " 
+                        + string.Join(", ", isUsing.Select(x => x.Name))
+                        + "</em>" });
                 }
-                DualContentTypeCompositions.Value = chosenContentTypeIDs;
+                else
+                {
+                    // if it is not used then composition is possible
+
+                    // hashset guarantees unicity on Id
+                    var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                        (x, y) => x.Id == y.Id,
+                        x => x.Id));
+
+                    // usable types are those that are top-level
+                    var usableContentTypes = allContentTypes
+                        .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
+                    foreach (var x in usableContentTypes)
+                        list.Add(x);
+
+                    // indirect types are those that we use, directly or indirectly
+                    var indirectContentTypes = GetIndirect(_contentType.ContentTypeItem).ToArray();
+                    foreach (var x in indirectContentTypes)
+                        list.Add(x);
+
+                    // directContentTypes are those we use directly
+                    // they are already in indirectContentTypes, no need to add to the list
+                    var directContentTypes = _contentType.ContentTypeItem.ContentTypeComposition.ToArray();
+
+                    var enabled = usableContentTypes.Select(x => x.Id) // those we can use
+                        .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
+                        .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
+                        .Where(x => x != _contentType.ParentId) // but not the parent
+                        .Distinct()
+                        .ToArray();
+
+                    var wtf = new List<int>();
+                    foreach (var contentType in list.OrderBy(x => x.Name).Where(x => x.Id != _contentType.Id))
+                    {
+                        var li = new ListItem(contentType.Name, contentType.Id.ToInvariantString())
+                        {
+                            // disable parent and anything that's not usable
+                            Enabled = enabled.Contains(contentType.Id),
+                            // select
+                            Selected = indirectContentTypes.Any(x => x.Id == contentType.Id)
+                        };
+
+                        DualContentTypeCompositions.Items.Add(li);
+                        lstContentTypeCompositions.Items.Add(li);
+
+                        if (li.Selected)
+                            wtf.Add(contentType.Id);
+                    }
+                    DualContentTypeCompositions.Value = string.Join(",", wtf);
+                }
             }
+
+            //int[] compositionIds = _contentType.ContentTypeItem.CompositionIds().ToArray();
+            //if (!Page.IsPostBack)
+            //{
+            //    string chosenContentTypeIDs = "";
+            //    ContentType[] contentTypes = _contentType.GetAll();
+            //    foreach (ContentType ct in contentTypes.OrderBy(x => x.Text))
+            //    {
+            //        ListItem li = new ListItem(ct.Text, ct.Id.ToString());
+            //        if (ct.Id == _contentType.Id)
+            //            li.Enabled = false;
+
+            //        DualContentTypeCompositions.Items.Add(li);
+            //        lstContentTypeCompositions.Items.Add(li);
+                    
+            //        foreach (int i in compositionIds)
+            //        {
+            //            if (i == ct.Id)
+            //            {
+            //                li.Selected = true;
+            //                chosenContentTypeIDs += ct.Id + ",";
+            //            }
+            //        }
+            //    }
+            //    DualContentTypeCompositions.Value = chosenContentTypeIDs;
+            //}
         }
 
         private int[] SaveCompositionContentTypes()
         {
-            var tmp = new ArrayList();
-            foreach (ListItem li in lstContentTypeCompositions.Items)
-            {
-                if (li.Selected)
-                    tmp.Add(int.Parse(li.Value));
-            }
-            var ids = new int[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) ids[i] = (int)tmp[i];
-
-            return ids;
+            return lstContentTypeCompositions.Items.Cast<ListItem>()
+                .Where(x => x.Selected)
+                .Select(x => int.Parse(x.Value))
+                .ToArray();
         }
 
         #endregion
@@ -947,7 +1082,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         private string GetHtmlForNoPropertiesMessageListItem()
         {
-            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab") + "</li></ul>";
+            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab", Security.CurrentUser) + "</li></ul>";
         }
 
         private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
@@ -1001,7 +1136,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType");
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", Security.CurrentUser);
                     e.IconType = BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -1081,33 +1216,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 hasAlias = ct.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
             }
             return !hasAlias;
-        }
-
-        /// <summary>
-        /// Removes a PropertyType, but when???
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void dgGenericPropertiesOfTab_itemcommand(object sender, DataGridCommandEventArgs e)
-        {
-            // Delete propertytype from contenttype
-            if (e.CommandName == "Delete")
-            {
-                int propertyId = int.Parse(e.Item.Cells[0].Text);
-                string rawName = string.Empty;
-
-                var propertyType = _contentType.ContentTypeItem.PropertyTypes.FirstOrDefault(x => x.Id == propertyId);
-                if (propertyType != null && string.IsNullOrEmpty(propertyType.Alias) == false)
-                {
-                    rawName = propertyType.Name;
-                    _contentType.ContentTypeItem.RemovePropertyType(propertyType.Alias);
-                    _contentType.Save();
-                }
-
-                RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property ´" + rawName + "´ deleted"));
-       
-                BindDataGenericProperties(false);
-            }
         }
 
         /// <summary>
@@ -1215,7 +1323,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             foreach (DataGridItem dgi in dgTabs.Items)
             {
                 int tabid = int.Parse(dgi.Cells[0].Text);
-                string tabName = ((TextBox)dgi.FindControl("txtTab")).Text.Replace("'", "''");
+                string tabName = ((TextBox) dgi.FindControl("txtTab")).Text;
                 int tabSortOrder;
                 if (Int32.TryParse(((TextBox)dgi.FindControl("txtSortOrder")).Text, out tabSortOrder))
                 {
@@ -1331,7 +1439,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 LoadContentType();
 
-                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated"));
+                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated", Security.CurrentUser));
                 ea.IconType = BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
@@ -1370,7 +1478,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 LoadContentType();
 
-                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted"));
+                var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted", Security.CurrentUser));
                 ea.IconType = BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);

@@ -64,7 +64,7 @@
                     <td>
                         <form class="pull-right" novalidate>
                             <i class="icon-search" ng-click="enterSearch($event)"></i>
-                            <input type="text" ng-model="options.filter" on-keyup="search()" no-dirty-check>
+                            <input type="text" ng-model="options.filter" on-keyup="search()" prevent-enter-submit no-dirty-check>
                         </form>
                     </td>
                 </tr>
@@ -72,7 +72,7 @@
 
             <tbody ng-show="listViewResultSet.totalItems === 0">
                 <tr>
-                    <td colspan="5">
+                    <td colspan="{{options.includeProperties.length + 3}}">
                         <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
                     </td>
                 </tr>

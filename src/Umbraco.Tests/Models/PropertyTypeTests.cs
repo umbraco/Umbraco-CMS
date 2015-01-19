@@ -2,11 +2,12 @@ using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class PropertyTypeTests
+    public class PropertyTypeTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone()

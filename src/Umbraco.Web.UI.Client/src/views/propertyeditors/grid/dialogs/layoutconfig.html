@@ -1,0 +1,116 @@
+<div class="umb-panel usky-grid usky-grid-configuration" ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.LayoutConfigController">
+    <div class="umb-panel-body no-header with-footer">
+        <div class="umb-forms-settings">
+
+            <h5><localize key="grid_addGridLayout" /></h5>
+            <p><localize key="grid_addGridLayoutDetail" /></p>
+            
+            <umb-control-group label="@general_name">
+                <input type="text" ng-model="currentLayout.name" />
+            </umb-control-group>
+
+            <div class="uSky-templates-template"
+                 style="margin: 0; width: 350px; position: relative;">
+
+                <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
+                    <div class="tr">
+
+                        <a class="td uSky-templates-column"
+                           ng-class="{last:$last, selected:section==currentSection}"
+                           ng-repeat="section in currentLayout.sections"
+                           ng-click="configureSection(section, currentLayout)"
+                           ng-style="{width: percentage(section.grid) +'%'}">
+                        </a>
+
+                        <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
+                           ng-click="configureSection(undefined, currentLayout)"
+                           ng-style="{width: percentage(availableLayoutSpace) + '%'}">
+                            <i class="icon icon-add"></i>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div ng-if="currentSection" style="padding-bottom: 50px;">
+
+                <umb-control-group label="@general_width">
+                    <div  class="grid-size-scaler" >
+                        <a href ng-click="scaleDown(currentSection)">
+                            <i class="icon icon-navigation-down"></i>
+                        </a>
+                            {{currentSection.grid}}
+                        <a href ng-click="scaleUp(currentSection, availableLayoutSpace)">
+                            <i class="icon icon-navigation-up"></i>
+                        </a>
+                    </div>
+                </umb-control-group>
+
+
+                <umb-control-group hide-label="true">
+                    <ul class="unstyled">
+                        <li>
+                            <label>
+                                <input type="checkbox"
+                                       ng-model="currentSection.allowAll"
+                                       style="float: left; margin-right: 10px;"
+                                       ng-checked="currentSection.allowed === undefined"
+                                       ng-change="toggleCollection(currentSection.allowed, currentSection.allowAll)" />
+                                       <localize key="grid_allowAllRowConfigurations"/>
+                            </label>
+                        </li>
+                    </ul>
+
+                    <div ng-if="currentSection.allowAll === false">
+                        <hr />
+
+                        <div class="control-group uSky-templates-rows">
+                            <ul class="unstyled"
+                                ui-sortable
+                                ng-model="model.value.templates">
+
+                                <li ng-repeat="row in rows">
+
+                                    <label style="display: block"> 
+                                       <input type="checkbox"
+                                           checklist-model="currentSection.allowed"
+                                           checklist-value="row.name"
+                                           style="float: left; margin-right: 10px;">
+                                          
+                                        <div class="preview-rows columns" style="margin-top: 5px; float:left">
+                                            <div class="preview-row">
+                                                <div class="preview-col"
+                                                    ng-class="{last:$last}"
+                                                    ng-repeat="area in row.areas"
+                                                    ng-style="{width: percentage(area.grid) + '%'}">
+                                                    
+                                                    <div class="preview-cell"></div>
+                                                </div>
+                                            </div>
+                                        </div> 
+
+                                        <div>
+                                            {{row.name}}<br />
+                                            <small>{{row.areas.length}} cells</small><br />
+                                        </div>
+                                    </label> 
+
+                                    <br style="clear: both" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </umb-control-group>
+            </div>            
+        </div>
+    </div>
+    <div class="umb-panel-footer">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+                <a href="" ng-click="close()" class="btn btn-primary">
+                    <localize key="general_ok" class="ng-isolate-scope ng-scope">Done</localize>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

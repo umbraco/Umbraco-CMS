@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
@@ -16,7 +19,7 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Exposes a member object as IPublishedContent
     /// </summary>
-    internal class MemberPublishedContent : PublishedContentBase
+    public sealed class MemberPublishedContent : PublishedContentBase
     {
 
         private readonly IMember _member;
@@ -126,6 +129,14 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedProperty GetProperty(string alias)
         {
+            switch (alias)
+            {
+                case "Email":
+                    return new PropertyResult("Email", Email, PropertyResultType.CustomProperty);
+                case "UserName":
+                    return new PropertyResult("UserName", UserName, PropertyResultType.CustomProperty);
+            }
+
             return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
         }
 

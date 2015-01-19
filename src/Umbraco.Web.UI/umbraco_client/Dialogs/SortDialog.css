@@ -1,6 +1,5 @@
 ﻿#sortableFrame
 {
-    min-height: 270px;
     height: auto;
     overflow: auto;
 }

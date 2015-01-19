@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
@@ -69,7 +70,51 @@ namespace Umbraco.Web.Trees
         /// </summary>
         protected abstract int UserStartNode { get; }
 
-        protected abstract TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings);
+        /// <summary>
+        /// Gets the tree nodes for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>        
+        protected virtual TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
+        {
+            var nodes = new TreeNodeCollection();
+
+            var altStartId = string.Empty;
+            if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
+                altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+
+            //check if a request has been made to render from a specific start node
+            if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+            {
+                id = altStartId;
+
+                //we need to verify that the user has access to view this node, otherwise we'll render an empty tree collection
+                // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access                
+                if (HasPathAccess(id, queryStrings) == false)
+                {
+                    LogHelper.Warn<ContentTreeControllerBase>("The user " + Security.CurrentUser.Username + " does not have access to the tree node " + id);
+                    return new TreeNodeCollection();
+                }
+                
+                // So there's an alt id specified, it's not the root node and the user has access to it, great! But there's one thing we
+                // need to consider: 
+                // If the tree is being rendered in a dialog view we want to render only the children of the specified id, but
+                // when the tree is being rendered normally in a section and the current user's start node is not -1, then 
+                // we want to include their start node in the tree as well.
+                // Therefore, in the latter case, we want to change the id to -1 since we want to render the current user's root node
+                // and the GetChildEntities method will take care of rendering the correct root node.
+                // If it is in dialog mode, then we don't need to change anything and the children will just render as per normal.
+                if (IsDialog(queryStrings) == false && UserStartNode != Constants.System.Root)
+                {
+                    id = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+                }
+            }
+            
+            var entities = GetChildEntities(id);
+            nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));
+            return nodes;
+        }
 
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
 
@@ -108,59 +153,44 @@ namespace Umbraco.Web.Trees
         protected abstract bool HasPathAccess(string id, FormDataCollection queryStrings);
 
         /// <summary>
-        /// This will automatically check if the recycle bin needs to be rendered (i.e. its the first level)
-        /// and will automatically append it to the result of GetChildNodes.
+        /// Ensures the recycle bin is appended when required (i.e. user has access to the root and it's not in dialog mode)
         /// </summary>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// This method is overwritten strictly to render the recycle bin, it should serve no other purpose
+        /// </remarks>
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             //check if we're rendering the root
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
             {
-                //when rendering the root, 3 things can happen:
-                //1. we return -1 children without modifications
-                //2. the user has a non -1 content root set and we return that
-                //3. the tree has a non -1 content root set and we return that - if the user has access to it.
+                var altStartId = string.Empty;
 
-                var hasUserRoot = UserStartNode != Constants.System.Root;
-                var hasTreeRoot = queryStrings.HasKey(TreeQueryStringParameters.StartNodeId);
+                if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
+                    altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
-                //initial id
-                var idToLoad = id;
-
-                //user permission override root
-                if (hasUserRoot)
-                    idToLoad = UserStartNode.ToString(CultureInfo.InvariantCulture);
-
-                //tree overrides root
-                if (hasTreeRoot)
+                //check if a request has been made to render from a specific start node                
+                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
                 {
-                    //but only if the user is allowed to access this node
-                    var altId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
-
-                    //so if we dont have a user content root or the user has access
-                    if (hasUserRoot == false || HasPathAccess(altId, queryStrings))
-                    {
-                        idToLoad = altId;
-                    }
+                    id = altStartId;
                 }
-
-                //load whatever root nodes we concluded was the user/tree root
-                var nodes = GetTreeNodesInternal(idToLoad, queryStrings);                
-
-                //only render the recycle bin if we are not in dialog and the start id is still the root
-                if (IsDialog(queryStrings) == false && idToLoad == Constants.System.Root.ToInvariantString())
+                
+                var nodes = GetTreeNodesInternal(id, queryStrings);
+                
+                //only render the recycle bin if we are not in dialog and the start id id still the root
+                if (IsDialog(queryStrings) == false && id == Constants.System.Root.ToInvariantString())
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
-                        idToLoad,
+                        id,
                         queryStrings,
                         ui.GetText("general", "recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
+
                 }
 
                 return nodes;

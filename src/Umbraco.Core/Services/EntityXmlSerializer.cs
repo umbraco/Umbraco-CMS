@@ -23,18 +23,19 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IContent content, bool deep = false)
+        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
-            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
-            xml.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
+            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService).Name));
+            xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService).Name));
             xml.Add(new XAttribute("writerID", content.WriterId));
             xml.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString(CultureInfo.InvariantCulture)));
             xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Services
             {
                 var descendants = contentService.GetDescendants(content).ToArray();
                 var currentChildren = descendants.Where(x => x.ParentId == content.Id);
-                AddChildXml(contentService, dataTypeService, descendants, currentChildren, xml);
+                AddChildXml(contentService, dataTypeService, userService, descendants, currentChildren, xml);
             }
 
             return xml;
@@ -54,17 +55,18 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="media">Media to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        public XElement Serialize(IMediaService mediaService, IDataTypeService dataTypeService, IMedia media, bool deep = false)
+        public XElement Serialize(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, IMedia media, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
-            xml.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            xml.Add(new XAttribute("writerName", media.GetCreatorProfile(userService).Name));
             xml.Add(new XAttribute("writerID", media.CreatorId));
             xml.Add(new XAttribute("version", media.Version));
             xml.Add(new XAttribute("template", 0));
@@ -74,14 +76,14 @@ namespace Umbraco.Core.Services
             {
                 var descendants = mediaService.GetDescendants(media).ToArray();
                 var currentChildren = descendants.Where(x => x.ParentId == media.Id);
-                AddChildXml(mediaService, dataTypeService, descendants, currentChildren, xml);
+                AddChildXml(mediaService, dataTypeService, userService, descendants, currentChildren, xml);
             }
 
             return xml;
         }
 
         /// <summary>
-        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// Exports an <see cref="IMember"/> item to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="dataTypeService"></param>
         /// <param name="member">Member to export</param>
@@ -248,7 +250,9 @@ namespace Umbraco.Core.Services
             {
                 var tab = new XElement("Tab",
                                        new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name));
+                                       new XElement("Caption", propertyGroup.Name),
+                                       new XElement("SortOrder", propertyGroup.SortOrder));
+
                 tabs.Add(tab);
             }
 
@@ -307,9 +311,17 @@ namespace Umbraco.Core.Services
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
                                     new XElement("IsListView", contentType.IsContainer.ToString()));
 
-            var masterContentType = contentType.CompositionAliases().FirstOrDefault();
-            if (masterContentType != null)
-                info.Add(new XElement("Master", masterContentType));
+            var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
+            if(masterContentType != null)
+                info.Add(new XElement("Master", masterContentType.Alias));
+
+            var compositionsElement = new XElement("Compositions");
+            var compositions = contentType.ContentTypeComposition;
+            foreach (var composition in compositions)
+            {
+                compositionsElement.Add(new XElement("Composition", composition.Alias));
+            }
+            info.Add(compositionsElement);
 
             var allowedTemplates = new XElement("AllowedTemplates");
             foreach (var template in contentType.AllowedTemplates)
@@ -317,6 +329,7 @@ namespace Umbraco.Core.Services
                 allowedTemplates.Add(new XElement("Template", template.Alias));
             }
             info.Add(allowedTemplates);
+
             if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
                 info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
             else
@@ -354,7 +367,8 @@ namespace Umbraco.Core.Services
             {
                 var tab = new XElement("Tab",
                                        new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name));
+                                       new XElement("Caption", propertyGroup.Name),
+                                       new XElement("SortOrder", propertyGroup.SortOrder));
                 tabs.Add(tab);
             }
 
@@ -370,22 +384,23 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="originalDescendants"></param>
         /// <param name="currentChildren"></param>
         /// <param name="currentXml"></param>
-        private void AddChildXml(IMediaService mediaService, IDataTypeService dataTypeService, IMedia[] originalDescendants, IEnumerable<IMedia> currentChildren, XElement currentXml)
+        private void AddChildXml(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, IMedia[] originalDescendants, IEnumerable<IMedia> currentChildren, XElement currentXml)
         {
             foreach (var child in currentChildren)
             {
                 //add the child's xml
-                var childXml = Serialize(mediaService, dataTypeService, child);
+                var childXml = Serialize(mediaService, dataTypeService, userService, child);
                 currentXml.Add(childXml);
                 //copy local (out of closure)
                 var c = child;
                 //get this item's children                
                 var children = originalDescendants.Where(x => x.ParentId == c.Id);
                 //recurse and add it's children to the child xml element
-                AddChildXml(mediaService, dataTypeService, originalDescendants, children, childXml);
+                AddChildXml(mediaService, dataTypeService, userService, originalDescendants, children, childXml);
             }
         }
 
@@ -427,22 +442,23 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="originalDescendants"></param>
         /// <param name="currentChildren"></param>
         /// <param name="currentXml"></param>
-        private void AddChildXml(IContentService contentService, IDataTypeService dataTypeService, IContent[] originalDescendants, IEnumerable<IContent> currentChildren, XElement currentXml)
+        private void AddChildXml(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent[] originalDescendants, IEnumerable<IContent> currentChildren, XElement currentXml)
         {
             foreach (var child in currentChildren)
             {
                 //add the child's xml
-                var childXml = Serialize(contentService, dataTypeService, child);
+                var childXml = Serialize(contentService, dataTypeService, userService, child);
                 currentXml.Add(childXml);
                 //copy local (out of closure)
                 var c = child;
                 //get this item's children                
                 var children = originalDescendants.Where(x => x.ParentId == c.Id);
                 //recurse and add it's children to the child xml element
-                AddChildXml(contentService, dataTypeService, originalDescendants, children, childXml);
+                AddChildXml(contentService, dataTypeService, userService, originalDescendants, children, childXml);
             }
         }
     }

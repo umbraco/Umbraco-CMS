@@ -39,7 +39,10 @@ namespace umbraco.presentation.webservices
             // that executed the request.
             if (hash.IsNullOrWhiteSpace() == false && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
             {
-                var hashedAppId = (machineName + appDomainAppId).ToMd5();
+                var hasher = new HashCodeCombiner();
+                hasher.AddCaseInsensitiveString(machineName);
+                hasher.AddCaseInsensitiveString(appDomainAppId);
+                var hashedAppId = hasher.GetCombinedHashCode();
 
                 //we can only check this in full trust. if it's in medium trust we'll just end up with 
                 // the server refreshing it's cache twice.

@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.UI;
+using dotless.Core.Parser.Tree;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
@@ -19,12 +22,14 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
+    [UmbracoUseHttps]
     public class BackOfficeController : UmbracoController
     {
         /// <summary>
@@ -45,6 +50,27 @@ namespace Umbraco.Web.Editors
         public ActionResult AuthorizeUpgrade()
         {
             return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml");
+        }
+
+        /// <summary>
+        /// Get the json localized text for a given culture or the culture for the current user
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public JsonNetResult LocalizedText(string culture = null)
+        {
+            var cultureInfo = culture == null 
+                //if the user is logged in, get their culture, otherwise default to 'en'
+                ? User.Identity.IsAuthenticated ? Security.CurrentUser.GetUserCulture(Services.TextService) : CultureInfo.GetCultureInfo("en")
+                : CultureInfo.GetCultureInfo(culture);
+
+            var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
+                //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
+                // in the back office requres the delimiter to be a '_' so we'll just replace it
+                .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
+
+            return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
         }
 
         /// <summary>
@@ -115,6 +141,10 @@ namespace Umbraco.Web.Editors
                                         controller => controller.GetEmbed("",0,0))
                                 },
                                 {
+                                    "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UserController>(
+                                        controller => controller.PostDisableUser(0))
+                                },
+                                {
                                     "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(
                                         controller => controller.PostSave(null))
                                 },
@@ -179,16 +209,16 @@ namespace Umbraco.Web.Editors
                                         controller => controller.GetByKey(Guid.Empty))
                                 },
                                 {
+                                    "packageInstallApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
+                                        controller => controller.Fetch(string.Empty))
+                                },
+                                {
                                     "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                                         controller => controller.GetConfiguration())
                                 },
                                 {
                                     "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                                         controller => controller.GetAll())
-                                },
-                                 {
-                                    "templateApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TemplateController>(
-                                        controller => controller.GetById(0))
                                 },
                                 {
                                     "memberTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
@@ -221,6 +251,10 @@ namespace Umbraco.Web.Editors
                                 {
                                     "examineMgmtBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
                                         controller => controller.GetIndexerDetails())
+                                },
+                                {
+                                    "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
+                                        controller => controller.CheckContentXmlTable())
                                 }
                             }
                     },
@@ -241,13 +275,6 @@ namespace Umbraco.Web.Editors
                         "umbracoPlugins", new Dictionary<string, object>
                             {
                                 {"trees", GetTreePluginsMetaData()}
-                            }
-                    },
-                    {
-                        "security", new Dictionary<string, object>
-                            {
-                                {"startContentId", Security.CurrentUser.StartContentId},
-                                {"startMediaId", Security.CurrentUser.StartMediaId}
                             }
                     },
                     {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},

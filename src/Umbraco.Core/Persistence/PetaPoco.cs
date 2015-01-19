@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
@@ -561,7 +562,14 @@ namespace Umbraco.Core.Persistence
 					{
 						object val = cmd.ExecuteScalarWithRetry();
 						OnExecutedCommand(cmd);
-						return (T)Convert.ChangeType(val, typeof(T));
+
+                        if (val == null || val == DBNull.Value)
+                            return default(T);
+
+                        Type t = typeof(T);
+                        Type u = Nullable.GetUnderlyingType(t);
+
+                        return (T)Convert.ChangeType(val, u ?? t);
 					}
 				}
 				finally
@@ -842,7 +850,7 @@ namespace Umbraco.Core.Persistence
 		public IEnumerable<T1> Query<T1, T2, T3, T4>(Sql sql) { return Query<T1>(new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null, sql.SQL, sql.Arguments); }
 
 		// Automagically guess the property relationships between various POCOs and create a delegate that will set them up
-		object GetAutoMapper(Type[] types)
+		Delegate GetAutoMapper(Type[] types)
 		{
 			// Build a key
 			var kb = new StringBuilder();
@@ -857,7 +865,7 @@ namespace Umbraco.Core.Persistence
 			RWLock.EnterReadLock();
 			try
 			{
-				object mapper;
+				Delegate mapper;
 				if (AutoMappers.TryGetValue(key, out mapper))
 					return mapper;
 			}
@@ -871,7 +879,7 @@ namespace Umbraco.Core.Persistence
 			try
 			{
 				// Try again
-				object mapper;
+				Delegate mapper;
 				if (AutoMappers.TryGetValue(key, out mapper))
 					return mapper;
 
@@ -944,22 +952,53 @@ namespace Umbraco.Core.Persistence
 			throw new InvalidOperationException(string.Format("Couldn't find split point between {0} and {1}", typeThis, typeNext));
 		}
 
+
 		// Instance data used by the Multipoco factory delegate - essentially a list of the nested poco factories to call
 		public class MultiPocoFactory
 		{
-			public List<Delegate> m_Delegates;
-			public Delegate GetItem(int index) { return m_Delegates[index]; }
+
+			public MultiPocoFactory(IEnumerable<Delegate> dels)
+			{
+				Delegates = new List<Delegate>(dels);
+			}
+			private List<Delegate> Delegates { get; set; }
+			private Delegate GetItem(int index) { return Delegates[index]; }
+			
+			/// <summary>
+			/// Calls the delegate at the specified index and returns its values
+			/// </summary>
+			/// <param name="index"></param>
+			/// <param name="reader"></param>
+			/// <returns></returns>
+			private object CallDelegate(int index, IDataReader reader)
+			{
+				var d = GetItem(index);
+				var output = d.DynamicInvoke(reader);
+				return output;
+			}
+
+			/// <summary>
+			/// Calls the callback delegate and passes in the output of all delegates as the parameters
+			/// </summary>
+			/// <typeparam name="TRet"></typeparam>
+			/// <param name="callback"></param>
+			/// <param name="dr"></param>
+			/// <param name="count"></param>
+			/// <returns></returns>
+			public TRet CallCallback<TRet>(Delegate callback, IDataReader dr, int count)
+			{
+				var args = new List<object>();
+				for(var i = 0;i<count;i++)
+				{
+					args.Add(CallDelegate(i, dr));
+				}
+				return (TRet)callback.DynamicInvoke(args.ToArray());
+			}
 		}
 
 		// Create a multi-poco factory
-		Func<IDataReader, object, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
-		{
-			var m = new DynamicMethod("petapoco_multipoco_factory", typeof(TRet), new Type[] { typeof(MultiPocoFactory), typeof(IDataReader), typeof(object) }, typeof(MultiPocoFactory));
-			var il = m.GetILGenerator();
-
-			// Load the callback
-			il.Emit(OpCodes.Ldarg_2);
-
+		Func<IDataReader, Delegate, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
+		{			
 			// Call each delegate
 			var dels = new List<Delegate>();
 			int pos = 0;
@@ -968,33 +1007,19 @@ namespace Umbraco.Core.Persistence
 				// Add to list of delegates to call
 				var del = FindSplitPoint(types[i], i + 1 < types.Length ? types[i + 1] : null, sql, r, ref pos);
 				dels.Add(del);
-
-				// Get the delegate
-				il.Emit(OpCodes.Ldarg_0);													// callback,this
-				il.Emit(OpCodes.Ldc_I4, i);													// callback,this,Index
-				il.Emit(OpCodes.Callvirt, typeof(MultiPocoFactory).GetMethod("GetItem"));	// callback,Delegate
-				il.Emit(OpCodes.Ldarg_1);													// callback,delegate, datareader
-
-				// Call Invoke
-				var tDelInvoke = del.GetType().GetMethod("Invoke");
-				il.Emit(OpCodes.Callvirt, tDelInvoke);										// Poco left on stack
 			}
 
-			// By now we should have the callback and the N pocos all on the stack.  Call the callback and we're done
-			il.Emit(OpCodes.Callvirt, Expression.GetFuncType(types.Concat(new Type[] { typeof(TRet) }).ToArray()).GetMethod("Invoke"));
-			il.Emit(OpCodes.Ret);
-
-			// Finish up
-			return (Func<IDataReader, object, TRet>)m.CreateDelegate(typeof(Func<IDataReader, object, TRet>), new MultiPocoFactory() { m_Delegates = dels });
+			var mpFactory = new MultiPocoFactory(dels);
+			return (reader, arg3) => mpFactory.CallCallback<TRet>(arg3, reader, types.Length);
 		}
 
 		// Various cached stuff
 		static Dictionary<string, object> MultiPocoFactories = new Dictionary<string, object>();
-		static Dictionary<string, object> AutoMappers = new Dictionary<string, object>();
+		static Dictionary<string, Delegate> AutoMappers = new Dictionary<string, Delegate>();
 		static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
 
-		// Get (or create) the multi-poco factory for a query
-		Func<IDataReader, object, TRet> GetMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
+		// Get (or create) the multi-poco factory for a query	
+		Func<IDataReader, Delegate, TRet> GetMultiPocoFactory<TRet>(Type[] types, string sql, IDataReader r)
 		{
 			// Build a key string  (this is crap, should address this at some point)
 			var kb = new StringBuilder();
@@ -1016,7 +1041,10 @@ namespace Umbraco.Core.Persistence
 			{
 				object oFactory;
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
-					return (Func<IDataReader, object, TRet>)oFactory;
+				{
+					//mpFactory = oFactory;
+					return (Func<IDataReader, Delegate, TRet>)oFactory;	
+				}					
 			}
 			finally
 			{
@@ -1028,15 +1056,17 @@ namespace Umbraco.Core.Persistence
 			try
 			{
 				// Check again
-				object oFactory;
+				object oFactory; ;
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
-					return (Func<IDataReader, object, TRet>)oFactory;
+				{
+					return (Func<IDataReader, Delegate, TRet>)oFactory;
+				}	
+				
+				// Create the factory				
+				var factory = CreateMultiPocoFactory<TRet>(types, sql, r);
 
-				// Create the factory
-				var Factory = CreateMultiPocoFactory<TRet>(types, sql, r);
-
-				MultiPocoFactories.Add(key, Factory);
-				return Factory;
+				MultiPocoFactories.Add(key, factory);
+				return factory;
 			}
 			finally
 			{
@@ -1046,7 +1076,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Actual implementation of the multi-poco query
-		public IEnumerable<TRet> Query<TRet>(Type[] types, object cb, string sql, params object[] args)
+		public IEnumerable<TRet> Query<TRet>(Type[] types, Delegate cb, string sql, params object[] args)
 		{
 			OpenSharedConnection();
 			try
@@ -1687,8 +1717,32 @@ namespace Umbraco.Core.Persistence
 			}
 			public override object ChangeType(object val) { return val; }
 		}
-		public class PocoData
-		{
+
+        /// <summary>
+        /// Container for a Memory cache object
+        /// </summary>
+        /// <remarks>
+        /// Better to have one memory cache instance than many so it's memory management can be handled more effectively
+        /// http://stackoverflow.com/questions/8463962/using-multiple-instances-of-memorycache
+        /// </remarks>
+        internal class ManagedCache
+        {
+            public ObjectCache GetCache()
+            {
+                return ObjectCache;
+            }
+
+            static readonly ObjectCache ObjectCache = new MemoryCache("NPoco");
+            
+        }
+
+        public class PocoData
+        {
+            //USE ONLY FOR TESTING
+            internal static bool UseLongKeys = false;
+            //USE ONLY FOR TESTING - default is one hr
+            internal static int SlidingExpirationSeconds = 3600;
+            
 			public static PocoData ForObject(object o, string primaryKeyName)
 			{
 				var t = o.GetType();
@@ -1712,7 +1766,7 @@ namespace Umbraco.Core.Persistence
 #endif
 					return ForType(t);
 			}
-			static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
+            
 			public static PocoData ForType(Type t)
 			{
 #if !PETAPOCO_NO_DYNAMIC
@@ -1720,7 +1774,7 @@ namespace Umbraco.Core.Persistence
 					throw new InvalidOperationException("Can't use dynamic types with this method");
 #endif
 				// Check cache
-				RWLock.EnterReadLock();
+				InnerLock.EnterReadLock();
 				PocoData pd;
 				try
 				{
@@ -1729,12 +1783,12 @@ namespace Umbraco.Core.Persistence
 				}
 				finally
 				{
-					RWLock.ExitReadLock();
+					InnerLock.ExitReadLock();
 				}
 
 				
 				// Cache it
-				RWLock.EnterWriteLock();
+				InnerLock.EnterWriteLock();
 				try
 				{
 					// Check again
@@ -1748,7 +1802,7 @@ namespace Umbraco.Core.Persistence
 				}
 				finally
 				{
-					RWLock.ExitWriteLock();
+					InnerLock.ExitWriteLock();
 				}
 
 				return pd;
@@ -1829,224 +1883,237 @@ namespace Umbraco.Core.Persistence
 				return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
 			}
 
+
+
 			// Create factory function that can convert a IDataReader record into a POCO
 			public Delegate GetFactory(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
 			{
-				// Check cache
-				var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
-				RWLock.EnterReadLock();
-				try
-				{
-					// Have we already created it?
-					Delegate factory;
-					if (PocoFactories.TryGetValue(key, out factory))
-						return factory;
-				}
-				finally
-				{
-					RWLock.ExitReadLock();
-				}
 
-				// Take the writer lock
-				RWLock.EnterWriteLock();
+                //TODO: It would be nice to remove the irrelevant SQL parts - for a mapping operation anything after the SELECT clause isn't required. 
+                // This would ensure less duplicate entries that get cached, currently both of these queries would be cached even though they are
+                // returning the same structured data:
+                // SELECT * FROM MyTable ORDER BY MyColumn
+                // SELECT * FROM MyTable ORDER BY MyColumn DESC
 
-				try
-				{
+			    string key;
+			    if (UseLongKeys)
+			    {
+                    key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
+			    }
+			    else
+			    {
+                    //Create a hashed key, we don't want to store so much string data in memory
+                    var combiner = new HashCodeCombiner();
+                    combiner.AddCaseInsensitiveString(sql);
+                    combiner.AddCaseInsensitiveString(connString);
+                    combiner.AddObject(ForceDateTimesToUtc);
+                    combiner.AddInt(firstColumn);
+                    combiner.AddInt(countColumns);
+                    key = combiner.GetCombinedHashCode();
+			    }
+                
 
-					// Check again, just in case
-					Delegate factory;
-					if (PocoFactories.TryGetValue(key, out factory))
-						return factory;
+			    var objectCache = _managedCache.GetCache();
 
-					// Create the method
-					var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), type, new Type[] { typeof(IDataReader) }, true);
-					var il = m.GetILGenerator();
+			    Func<Delegate> factory = () =>
+			    {
+                    // Create the method
+                    var m = new DynamicMethod("petapoco_factory_" + objectCache.GetCount(), type, new Type[] { typeof(IDataReader) }, true);
+                    var il = m.GetILGenerator();
 
 #if !PETAPOCO_NO_DYNAMIC
-					if (type == typeof(object))
-					{
-						// var poco=new T()
-						il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes));			// obj
+                    if (type == typeof(object))
+                    {
+                        // var poco=new T()
+                        il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes));			// obj
 
-						MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
+                        MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
 
-						// Enumerate all fields generating a set assignment for the column
-						for (int i = firstColumn; i < firstColumn + countColumns; i++)
-						{
-							var srcType = r.GetFieldType(i);
+                        // Enumerate all fields generating a set assignment for the column
+                        for (int i = firstColumn; i < firstColumn + countColumns; i++)
+                        {
+                            var srcType = r.GetFieldType(i);
 
-							il.Emit(OpCodes.Dup);						// obj, obj
-							il.Emit(OpCodes.Ldstr, r.GetName(i));		// obj, obj, fieldname
+                            il.Emit(OpCodes.Dup);						// obj, obj
+                            il.Emit(OpCodes.Ldstr, r.GetName(i));		// obj, obj, fieldname
 
-							// Get the converter
-							Func<object, object> converter = null;
-							if (Database.Mapper != null)
-								converter = Database.Mapper.GetFromDbConverter(null, srcType);
-							if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
-								converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
+                            // Get the converter
+                            Func<object, object> converter = null;
+                            if (Database.Mapper != null)
+                                converter = Database.Mapper.GetFromDbConverter(null, srcType);
+                            if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
+                                converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
 
-							// Setup stack for call to converter
-							AddConverterToStack(il, converter);
+                            // Setup stack for call to converter
+                            AddConverterToStack(il, converter);
 
-							// r[i]
-							il.Emit(OpCodes.Ldarg_0);					// obj, obj, fieldname, converter?,    rdr
-							il.Emit(OpCodes.Ldc_I4, i);					// obj, obj, fieldname, converter?,  rdr,i
-							il.Emit(OpCodes.Callvirt, fnGetValue);		// obj, obj, fieldname, converter?,  value
+                            // r[i]
+                            il.Emit(OpCodes.Ldarg_0);					// obj, obj, fieldname, converter?,    rdr
+                            il.Emit(OpCodes.Ldc_I4, i);					// obj, obj, fieldname, converter?,  rdr,i
+                            il.Emit(OpCodes.Callvirt, fnGetValue);		// obj, obj, fieldname, converter?,  value
 
-							// Convert DBNull to null
-							il.Emit(OpCodes.Dup);						// obj, obj, fieldname, converter?,  value, value
-							il.Emit(OpCodes.Isinst, typeof(DBNull));	// obj, obj, fieldname, converter?,  value, (value or null)
-							var lblNotNull = il.DefineLabel();
-							il.Emit(OpCodes.Brfalse_S, lblNotNull);		// obj, obj, fieldname, converter?,  value
-							il.Emit(OpCodes.Pop);						// obj, obj, fieldname, converter?
-							if (converter != null)
-								il.Emit(OpCodes.Pop);					// obj, obj, fieldname, 
-							il.Emit(OpCodes.Ldnull);					// obj, obj, fieldname, null
-							if (converter != null)
-							{
-								var lblReady = il.DefineLabel();
-								il.Emit(OpCodes.Br_S, lblReady);
-								il.MarkLabel(lblNotNull);
-								il.Emit(OpCodes.Callvirt, fnInvoke);
-								il.MarkLabel(lblReady);
-							}
-							else
-							{
-								il.MarkLabel(lblNotNull);
-							}
+                            // Convert DBNull to null
+                            il.Emit(OpCodes.Dup);						// obj, obj, fieldname, converter?,  value, value
+                            il.Emit(OpCodes.Isinst, typeof(DBNull));	// obj, obj, fieldname, converter?,  value, (value or null)
+                            var lblNotNull = il.DefineLabel();
+                            il.Emit(OpCodes.Brfalse_S, lblNotNull);		// obj, obj, fieldname, converter?,  value
+                            il.Emit(OpCodes.Pop);						// obj, obj, fieldname, converter?
+                            if (converter != null)
+                                il.Emit(OpCodes.Pop);					// obj, obj, fieldname, 
+                            il.Emit(OpCodes.Ldnull);					// obj, obj, fieldname, null
+                            if (converter != null)
+                            {
+                                var lblReady = il.DefineLabel();
+                                il.Emit(OpCodes.Br_S, lblReady);
+                                il.MarkLabel(lblNotNull);
+                                il.Emit(OpCodes.Callvirt, fnInvoke);
+                                il.MarkLabel(lblReady);
+                            }
+                            else
+                            {
+                                il.MarkLabel(lblNotNull);
+                            }
 
-							il.Emit(OpCodes.Callvirt, fnAdd);
-						}
-					}
-					else
+                            il.Emit(OpCodes.Callvirt, fnAdd);
+                        }
+                    }
+                    else
 #endif
-						if (type.IsValueType || type == typeof(string) || type == typeof(byte[]))
-						{
-							// Do we need to install a converter?
-							var srcType = r.GetFieldType(0);
-							var converter = GetConverter(ForceDateTimesToUtc, null, srcType, type);
+                        if (type.IsValueType || type == typeof(string) || type == typeof(byte[]))
+                        {
+                            // Do we need to install a converter?
+                            var srcType = r.GetFieldType(0);
+                            var converter = GetConverter(ForceDateTimesToUtc, null, srcType, type);
 
-							// "if (!rdr.IsDBNull(i))"
-							il.Emit(OpCodes.Ldarg_0);										// rdr
-							il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
-							il.Emit(OpCodes.Callvirt, fnIsDBNull);							// bool
-							var lblCont = il.DefineLabel();
-							il.Emit(OpCodes.Brfalse_S, lblCont);
-							il.Emit(OpCodes.Ldnull);										// null
-							var lblFin = il.DefineLabel();
-							il.Emit(OpCodes.Br_S, lblFin);
+                            // "if (!rdr.IsDBNull(i))"
+                            il.Emit(OpCodes.Ldarg_0);										// rdr
+                            il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
+                            il.Emit(OpCodes.Callvirt, fnIsDBNull);							// bool
+                            var lblCont = il.DefineLabel();
+                            il.Emit(OpCodes.Brfalse_S, lblCont);
+                            il.Emit(OpCodes.Ldnull);										// null
+                            var lblFin = il.DefineLabel();
+                            il.Emit(OpCodes.Br_S, lblFin);
 
-							il.MarkLabel(lblCont);
+                            il.MarkLabel(lblCont);
 
-							// Setup stack for call to converter
-							AddConverterToStack(il, converter);
+                            // Setup stack for call to converter
+                            AddConverterToStack(il, converter);
 
-							il.Emit(OpCodes.Ldarg_0);										// rdr
-							il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
-							il.Emit(OpCodes.Callvirt, fnGetValue);							// value
+                            il.Emit(OpCodes.Ldarg_0);										// rdr
+                            il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
+                            il.Emit(OpCodes.Callvirt, fnGetValue);							// value
 
-							// Call the converter
-							if (converter != null)
-								il.Emit(OpCodes.Callvirt, fnInvoke);
+                            // Call the converter
+                            if (converter != null)
+                                il.Emit(OpCodes.Callvirt, fnInvoke);
 
-							il.MarkLabel(lblFin);
-							il.Emit(OpCodes.Unbox_Any, type);								// value converted
-						}
-						else
-						{
-							// var poco=new T()
-							il.Emit(OpCodes.Newobj, type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
+                            il.MarkLabel(lblFin);
+                            il.Emit(OpCodes.Unbox_Any, type);								// value converted
+                        }
+                        else
+                        {
+                            // var poco=new T()
+                            il.Emit(OpCodes.Newobj, type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
 
-							// Enumerate all fields generating a set assignment for the column
-							for (int i = firstColumn; i < firstColumn + countColumns; i++)
-							{
-								// Get the PocoColumn for this db column, ignore if not known
-								PocoColumn pc;
-								if (!Columns.TryGetValue(r.GetName(i), out pc))
-									continue;
+                            // Enumerate all fields generating a set assignment for the column
+                            for (int i = firstColumn; i < firstColumn + countColumns; i++)
+                            {
+                                // Get the PocoColumn for this db column, ignore if not known
+                                PocoColumn pc;
+                                if (!Columns.TryGetValue(r.GetName(i), out pc))
+                                    continue;
 
-								// Get the source type for this column
-								var srcType = r.GetFieldType(i);
-								var dstType = pc.PropertyInfo.PropertyType;
+                                // Get the source type for this column
+                                var srcType = r.GetFieldType(i);
+                                var dstType = pc.PropertyInfo.PropertyType;
 
-								// "if (!rdr.IsDBNull(i))"
-								il.Emit(OpCodes.Ldarg_0);										// poco,rdr
-								il.Emit(OpCodes.Ldc_I4, i);										// poco,rdr,i
-								il.Emit(OpCodes.Callvirt, fnIsDBNull);							// poco,bool
-								var lblNext = il.DefineLabel();
-								il.Emit(OpCodes.Brtrue_S, lblNext);								// poco
+                                // "if (!rdr.IsDBNull(i))"
+                                il.Emit(OpCodes.Ldarg_0);										// poco,rdr
+                                il.Emit(OpCodes.Ldc_I4, i);										// poco,rdr,i
+                                il.Emit(OpCodes.Callvirt, fnIsDBNull);							// poco,bool
+                                var lblNext = il.DefineLabel();
+                                il.Emit(OpCodes.Brtrue_S, lblNext);								// poco
 
-								il.Emit(OpCodes.Dup);											// poco,poco
+                                il.Emit(OpCodes.Dup);											// poco,poco
 
-								// Do we need to install a converter?
-								var converter = GetConverter(ForceDateTimesToUtc, pc, srcType, dstType);
+                                // Do we need to install a converter?
+                                var converter = GetConverter(ForceDateTimesToUtc, pc, srcType, dstType);
 
-								// Fast
-								bool Handled = false;
-								if (converter == null)
-								{
-									var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] { typeof(int) });
-									if (valuegetter != null
-											&& valuegetter.ReturnType == srcType
-											&& (valuegetter.ReturnType == dstType || valuegetter.ReturnType == Nullable.GetUnderlyingType(dstType)))
-									{
-										il.Emit(OpCodes.Ldarg_0);										// *,rdr
-										il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
-										il.Emit(OpCodes.Callvirt, valuegetter);							// *,value
+                                // Fast
+                                bool Handled = false;
+                                if (converter == null)
+                                {
+                                    var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] { typeof(int) });
+                                    if (valuegetter != null
+                                            && valuegetter.ReturnType == srcType
+                                            && (valuegetter.ReturnType == dstType || valuegetter.ReturnType == Nullable.GetUnderlyingType(dstType)))
+                                    {
+                                        il.Emit(OpCodes.Ldarg_0);										// *,rdr
+                                        il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
+                                        il.Emit(OpCodes.Callvirt, valuegetter);							// *,value
 
-										// Convert to Nullable
-										if (Nullable.GetUnderlyingType(dstType) != null)
-										{
-											il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] { Nullable.GetUnderlyingType(dstType) }));
-										}
+                                        // Convert to Nullable
+                                        if (Nullable.GetUnderlyingType(dstType) != null)
+                                        {
+                                            il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] { Nullable.GetUnderlyingType(dstType) }));
+                                        }
 
-										il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true));		// poco
-										Handled = true;
-									}
-								}
+                                        il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true));		// poco
+                                        Handled = true;
+                                    }
+                                }
 
-								// Not so fast
-								if (!Handled)
-								{
-									// Setup stack for call to converter
-									AddConverterToStack(il, converter);
+                                // Not so fast
+                                if (!Handled)
+                                {
+                                    // Setup stack for call to converter
+                                    AddConverterToStack(il, converter);
 
-									// "value = rdr.GetValue(i)"
-									il.Emit(OpCodes.Ldarg_0);										// *,rdr
-									il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
-									il.Emit(OpCodes.Callvirt, fnGetValue);							// *,value
+                                    // "value = rdr.GetValue(i)"
+                                    il.Emit(OpCodes.Ldarg_0);										// *,rdr
+                                    il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
+                                    il.Emit(OpCodes.Callvirt, fnGetValue);							// *,value
 
-									// Call the converter
-									if (converter != null)
-										il.Emit(OpCodes.Callvirt, fnInvoke);
+                                    // Call the converter
+                                    if (converter != null)
+                                        il.Emit(OpCodes.Callvirt, fnInvoke);
 
-									// Assign it
-									il.Emit(OpCodes.Unbox_Any, pc.PropertyInfo.PropertyType);		// poco,poco,value
-									il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true));		// poco
-								}
+                                    // Assign it
+                                    il.Emit(OpCodes.Unbox_Any, pc.PropertyInfo.PropertyType);		// poco,poco,value
+                                    il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true));		// poco
+                                }
 
-								il.MarkLabel(lblNext);
-							}
+                                il.MarkLabel(lblNext);
+                            }
 
-							var fnOnLoaded = RecurseInheritedTypes<MethodInfo>(type, (x) => x.GetMethod("OnLoaded", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
-							if (fnOnLoaded != null)
-							{
-								il.Emit(OpCodes.Dup);
-								il.Emit(OpCodes.Callvirt, fnOnLoaded);
-							}
-						}
+                            var fnOnLoaded = RecurseInheritedTypes<MethodInfo>(type, (x) => x.GetMethod("OnLoaded", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
+                            if (fnOnLoaded != null)
+                            {
+                                il.Emit(OpCodes.Dup);
+                                il.Emit(OpCodes.Callvirt, fnOnLoaded);
+                            }
+                        }
 
-					il.Emit(OpCodes.Ret);
+                    il.Emit(OpCodes.Ret);
 
-					// Cache it, return it
-					var del = m.CreateDelegate(Expression.GetFuncType(typeof(IDataReader), type));
-					PocoFactories.Add(key, del);
-					return del;
-				}
-				finally
-				{
-					RWLock.ExitWriteLock();
-				}
+                    // return it
+                    var del = m.CreateDelegate(Expression.GetFuncType(typeof(IDataReader), type));
+                    
+                    return del;
+			    };
+
+                //lazy usage of AddOrGetExisting ref: http://stackoverflow.com/questions/10559279/how-to-deal-with-costly-building-operations-using-memorycache/15894928#15894928
+                var newValue = new Lazy<Delegate>(factory);
+                // the line belows returns existing item or adds the new value if it doesn't exist
+                var value = (Lazy<Delegate>)objectCache.AddOrGetExisting(key, newValue, new CacheItemPolicy
+                {
+                    //sliding expiration of 1 hr, if the same key isn't used in this 
+                    // timeframe it will be removed from the cache
+                    SlidingExpiration = new TimeSpan(0, 0, SlidingExpirationSeconds)
+                });
+                return (value ?? newValue).Value; // Lazy<T> handles the locking itself
+
 			}
 
 			private static void AddConverterToStack(ILGenerator il, Func<object, object> converter)
@@ -2122,7 +2189,7 @@ namespace Umbraco.Core.Persistence
 				return default(T);
 			}
 
-
+            ManagedCache _managedCache = new ManagedCache();
 			static Dictionary<Type, PocoData> m_PocoDatas = new Dictionary<Type, PocoData>();
 			static List<Func<object, object>> m_Converters = new List<Func<object, object>>();
 			static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) });
@@ -2134,7 +2201,46 @@ namespace Umbraco.Core.Persistence
 			public string[] QueryColumns { get; private set; }
 			public TableInfo TableInfo { get; private set; }
 			public Dictionary<string, PocoColumn> Columns { get; private set; }
-			Dictionary<string, Delegate> PocoFactories = new Dictionary<string, Delegate>();
+            static System.Threading.ReaderWriterLockSlim InnerLock = new System.Threading.ReaderWriterLockSlim();
+            
+            /// <summary>
+            /// Returns a report of the current cache being utilized by PetaPoco
+            /// </summary>
+            /// <returns></returns>
+		    public static string PrintDebugCacheReport(out double totalBytes, out IEnumerable<string> allKeys)
+            {
+                var managedCache = new ManagedCache();
+
+                var sb = new StringBuilder();
+                sb.AppendLine("m_PocoDatas:");
+                foreach (var pocoData in m_PocoDatas)
+                {
+                    sb.AppendFormat("\t{0}\n", pocoData.Key);
+                    sb.AppendFormat("\t\tTable:{0} - Col count:{1}\n", pocoData.Value.TableInfo.TableName, pocoData.Value.QueryColumns.Length);              
+                }
+
+                var cache = managedCache.GetCache();
+                allKeys = cache.Select(x => x.Key).ToArray();
+
+                sb.AppendFormat("\tTotal Poco data count:{0}\n", allKeys.Count());
+
+                var keys = string.Join("", cache.Select(x => x.Key));
+                //Bytes in .Net are stored as utf-16 = unicode little endian
+                totalBytes = Encoding.Unicode.GetByteCount(keys);
+
+                sb.AppendFormat("\tTotal byte for keys:{0}\n", totalBytes);
+                
+                sb.AppendLine("\tAll Poco cache items:");
+
+                foreach (var item in cache)
+                {
+                    sb.AppendFormat("\t\t Key -> {0}\n", item.Key);
+                    sb.AppendFormat("\t\t Value -> {0}\n", item.Value);
+                }
+
+                sb.AppendLine("-------------------END REPORT------------------------");
+                return sb.ToString();
+            }
 		}
 
 

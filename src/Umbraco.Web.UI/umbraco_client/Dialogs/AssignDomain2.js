@@ -52,6 +52,7 @@
             ko.applyBindings(self);
 
             $.validator.addMethod("domain", function (value, element, param) {
+                value = punycode.encode(value);
                 var re = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*)?$/gi;
                 return this.optional(element) || re.test(value);
             }, self._opts.invalidDomain);

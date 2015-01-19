@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -12,6 +14,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
         private Lazy<IUserService> _userService;
@@ -52,6 +55,7 @@ namespace Umbraco.Core.Services
         /// <param name="treeService"></param>
         /// <param name="tagService"></param>
         /// <param name="notificationService"></param>
+        /// <param name="localizedTextService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -69,8 +73,10 @@ namespace Umbraco.Core.Services
             ISectionService sectionService,
             IApplicationTreeService treeService,
             ITagService tagService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ILocalizedTextService localizedTextService)
         {
+            _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);     
             _tagService = new Lazy<ITagService>(() => tagService);     
             _contentService = new Lazy<IContentService>(() => contentService);        
             _mediaService = new Lazy<IMediaService>(() => mediaService);
@@ -119,6 +125,12 @@ namespace Umbraco.Core.Services
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
+
+
+            if (_localizedTextService == null)
+                _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
+                    new LocalizedTextServiceFileSources(cache.RuntimeCache, new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/")))));
+
             if (_notificationService == null)
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value));
 
@@ -132,10 +144,10 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, _dataTypeService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, _dataTypeService.Value, _userService.Value));
 
             if (_mediaService == null)
-                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value, _dataTypeService.Value));
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value, _dataTypeService.Value, _userService.Value));
 
             if (_contentTypeService == null)
                 _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));
@@ -144,13 +156,13 @@ namespace Umbraco.Core.Services
                 _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory.Value));
 
             if (_fileService == null)
-                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory.Value, _macroService.Value));
+                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory.Value));
 
             if (_localizationService == null)
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
 
             if (_packagingService == null)
-                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
+                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _userService.Value, repositoryFactory.Value, provider));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
@@ -164,7 +176,7 @@ namespace Umbraco.Core.Services
                 _treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(cache));
 
             if (_sectionService == null)
-                _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
+                _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, provider, cache));
 
             if (_macroService == null)
                 _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory.Value));
@@ -174,9 +186,18 @@ namespace Umbraco.Core.Services
 
             if (_tagService == null)
                 _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));
+
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory.Value));
             
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ILocalizedTextService"/>
+        /// </summary>
+        public ILocalizedTextService TextService
+        {
+            get { return _localizedTextService.Value; }
         }
 
         /// <summary>

@@ -12,21 +12,7 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class QueryBuilderTests : BaseUsingSqlCeSyntax
     {
-        [Test]
-        public void Dates_Formatted_Properly()
-        {
-            var sql = new Sql();
-            sql.Select("*").From<DocumentDto>();
-
-            var dt = new DateTime(2013, 11, 21, 13, 25, 55);
-
-            var query = Query<IContent>.Builder.Where(x => x.ExpireDate <= dt);
-            var translator = new SqlTranslator<IContent>(sql, query);
-
-            var result = translator.Translate();
-
-            Assert.IsTrue(result.SQL.Contains("[expireDate] <= '2013-11-21 13:25:55'"));
-        }
+        
 
         [Test]
         public void Can_Build_StartsWith_Query_For_IContent()
@@ -43,11 +29,15 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (upper([umbracoNode].[path]) like '-1%')";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (upper([umbracoNode].[path]) LIKE upper(@0))";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
             Assert.That(strResult, Is.EqualTo(expectedResult));
+
+            Assert.AreEqual(1, result.Arguments.Length);
+            Assert.AreEqual("-1%", sql.Arguments[0]);
+
             Console.WriteLine(strResult);
         }
 
@@ -66,11 +56,15 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([umbracoNode].[parentID] = -1)";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([umbracoNode].[parentID] = @0)";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
             Assert.That(strResult, Is.EqualTo(expectedResult));
+
+            Assert.AreEqual(1, result.Arguments.Length);
+            Assert.AreEqual(-1, sql.Arguments[0]);
+
             Console.WriteLine(strResult);
         }
 
@@ -89,11 +83,14 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([cmsContentType].[alias] = 'umbTextpage')";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([cmsContentType].[alias] = @0)";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
             Assert.That(strResult, Is.EqualTo(expectedResult));
+            Assert.AreEqual(1, result.Arguments.Length);
+            Assert.AreEqual("umbTextpage", sql.Arguments[0]);
+
             Console.WriteLine(strResult);
         }
 

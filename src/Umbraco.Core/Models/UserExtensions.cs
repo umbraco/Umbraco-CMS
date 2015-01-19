@@ -1,11 +1,36 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
-    internal static class UserExtensions
+    public static class UserExtensions
     {
+        /// <summary>
+        /// Returns the culture info associated with this user, based on the language they're assigned to in the back office
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="textService"></param>
+        /// <returns></returns>      
+        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            if (textService == null) throw new ArgumentNullException("textService");
+            return GetUserCulture(user.Language, textService);
+        }
+
+        internal static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService)
+        {
+            return textService.GetSupportedCultures()
+                .FirstOrDefault(culture =>
+                    //match on full name first
+                    culture.Name.InvariantEquals(userLanguage.Replace("_", "-")) ||
+                        //then match on the 2 letter name
+                    culture.TwoLetterISOLanguageName.InvariantEquals(userLanguage));
+        } 
+
         /// <summary>
         /// Checks if the user has access to the content item based on their start noe
         /// </summary>

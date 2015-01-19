@@ -1,30 +1,25 @@
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
-	This snippet shows how simple it is to fetch only children of a certain Document Type using Razor. Instead of
-	calling .Children, simply call .AliasOfDocumentType in plural.
-	For instance .Textpages or .NewsArticles (you can find the alias of your Document Type by editing it in the 
-	Settings section).
+    This snippet shows how simple it is to fetch only children of a certain Document Type using Razor.
+    Be sure to change "DocumentTypeAlias" below to match your needs, such as "TextPage" or "NewsItems".
+    (You can find the alias of your Document Type by editing it in the Settings section)
 *@
 
-@{    
-	@*Build a query and return the visible items *@
-    var selection= CurrentPage.Textpages.Where("Visible");
-    
-    @*
-       Example of more querying, if you have a true/false property with the alias of shouldBeFeatured:
-       var selection= Model.Textpages.Where("shouldBeFeatured == true").Where("Visible");
-    *@
-}
+@{  var selection = CurrentPage.Children("DocumentTypeAlias").Where("Visible"); }
+@*
+    As an example of more querying, if you have a true/false property with the alias of shouldBeFeatured:
+    var selection= CurrentPage.Children("DocumentTypeAlias").Where("shouldBeFeatured == true").Where("Visible");
+*@
 
-@*Determine if there are any nodes in the selection, then render list *@
-@if(selection.Any()){
 
-   <ul>
-     @foreach(var page in selection){                
-       <li><a href="@page.Url">@page.Name</a></li> 
-     }                 
-   </ul>             
-
+@if (selection.Any())
+{
+    <ul>
+        @foreach (var item in selection)
+        {
+            <li><a href="@item.Url">@item.Name</a></li>
+        }
+    </ul>
 }
 

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         string Alias { get; }
 
         /// <summary>
-        /// Gets or sets the Path to the File from the root of the site
+        /// Gets or sets the Path to the File from the root of the file's associated IFileSystem
         /// </summary>
         string Path { get; set; }
 
@@ -27,6 +27,11 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Content of a File
         /// </summary>
         string Content { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
+        /// </summary>
+        string VirtualPath { get; set; }
 
         /// <summary>
         /// Boolean indicating whether the file could be validated

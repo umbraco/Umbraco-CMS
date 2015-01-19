@@ -17,12 +17,12 @@
         </li>
 	</ul>
 
-	<ul class="unstyled list-icons">	
-		<li>
+    <ul class="unstyled list-icons" ng-hide="model.config.max && model.config.max > 0 && renderModel.length >= model.config.max">
+        <li>
             <i class="icon icon-add blue"></i>
-			<a href="#" ng-click="add()" prevent-default>
-				 <localize key="general_add">Add</localize>
-			</a>
-		</li>
-	</ul>
+            <a href="#" ng-click="add()" prevent-default>
+                <localize key="general_add">Add</localize>
+            </a>
+        </li>
+    </ul>
 </div>

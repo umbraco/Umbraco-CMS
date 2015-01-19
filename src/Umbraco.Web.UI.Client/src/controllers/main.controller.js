@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale) {
 
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
@@ -83,6 +83,11 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             treeService.clearCache();
         }
 
+        //Load locale file
+        if ($scope.user.locale) {
+            tmhDynamicLocale.set($scope.user.locale);
+        }
+
         if($scope.user.emailHash){
             $timeout(function () {                
                 //yes this is wrong.. 
@@ -105,4 +110,8 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 
 
 //register it
-angular.module('umbraco').controller("Umbraco.MainController", MainController);
+angular.module('umbraco').controller("Umbraco.MainController", MainController).
+        config(function (tmhDynamicLocaleProvider) {
+            //Set url for locale files
+            tmhDynamicLocaleProvider.localeLocationPattern('lib/angular/1.1.5/i18n/angular-locale_{{locale}}.js');
+        });

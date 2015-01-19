@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Sync;
@@ -15,40 +16,22 @@ namespace Umbraco.Web.Scheduling
     // would need to be a publicly available task (URL) which isn't really very good :(
     // We should really be using the AdminTokenAuthorizeAttribute for this stuff
 
-    internal class ScheduledTasks
+    internal class ScheduledTasks : DisposableObject, IBackgroundTask
     {
+        private readonly ApplicationContext _appContext;
+        private readonly IUmbracoSettingsSection _settings;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
         private static bool _isPublishingRunning = false;
 
-        public void Start(ApplicationContext appContext)
+        public ScheduledTasks(ApplicationContext appContext, IUmbracoSettingsSection settings)
         {
-            using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
-            {
-                if (_isPublishingRunning) return;
-
-                _isPublishingRunning = true;
-            
-                try
-                {
-                    ProcessTasks();
-                }
-                catch (Exception ee)
-                {
-                    LogHelper.Error<ScheduledTasks>("Error executing scheduled task", ee);
-                }
-                finally
-                {
-                    _isPublishingRunning = false;
-                }
-            }
-            
+            _appContext = appContext;
+            _settings = settings;
         }
 
-        private static void ProcessTasks()
+        private void ProcessTasks()
         {
-
-
-            var scheduledTasks = UmbracoConfig.For.UmbracoSettings().ScheduledTasks.Tasks;
+            var scheduledTasks = _settings.ScheduledTasks.Tasks;
             foreach (var t in scheduledTasks)
             {
                 var runTask = false;
@@ -75,7 +58,7 @@ namespace Umbraco.Web.Scheduling
             }
         }
 
-        private static bool GetTaskByHttp(string url)
+        private bool GetTaskByHttp(string url)
         {
             var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             
@@ -92,6 +75,36 @@ namespace Umbraco.Web.Scheduling
             }            
 
             return false;
+        }
+
+        /// <summary>
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
+        /// </summary>
+        protected override void DisposeResources()
+        {
+        }
+
+        public void Run()
+        {
+            using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
+            {
+                if (_isPublishingRunning) return;
+
+                _isPublishingRunning = true;
+
+                try
+                {
+                    ProcessTasks();
+                }
+                catch (Exception ee)
+                {
+                    LogHelper.Error<ScheduledTasks>("Error executing scheduled task", ee);
+                }
+                finally
+                {
+                    _isPublishingRunning = false;
+                }
+            }
         }
     }
 }

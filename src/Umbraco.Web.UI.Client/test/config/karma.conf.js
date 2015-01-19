@@ -23,9 +23,9 @@ module.exports = function(karma) {
          'lib/angular/1.2/angular-mocks.js',*/
          
 
-         'lib/underscore/underscore.js',
+         'lib/../build/belle/lib/underscore/underscore-min.js',
          'lib/umbraco/Extensions.js', 
-         'lib/lazyload/lazyload.min.js',
+         'lib/../build/belle/lib/rgrove-lazyload/lazyload.js',
 
 
          'test/config/app.unit.js',

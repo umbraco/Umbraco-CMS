@@ -64,8 +64,21 @@
 
                 top.UmbSpeechBubble.ShowMessage('save', unescape(this._opts.text.fileSavedHeader), unescape(this._opts.text.fileSavedText));
                 UmbClientMgr.mainTree().setActiveTreeType('scripts');
+
+                //we need to create a list of ids for each folder/file. Each folder/file's id is it's full path so we need to build each one.
+                var paths = [];
+                var parts = this._opts.originalFileName.split('/');
+                for (var i = 0;i < parts.length;i++) {
+                    if (paths.length > 0) {
+                        paths.push(paths[i - 1] + "/" + parts[i]);
+                    }
+                    else {
+                        paths.push(parts[i]);
+                    }
+                }
+
                 //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
-                UmbClientMgr.mainTree().syncTree("-1,init," + this._opts.originalFileName, true, null, newFilePath);
+                UmbClientMgr.mainTree().syncTree("-1,init," + paths.join(','), true, null, newFilePath);
                 //set the original file path to the new one
                 this._opts.originalFileName = newFilePath;
             }

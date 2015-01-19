@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
-    public interface IDictionaryItem : IAggregateRoot
+    public interface IDictionaryItem : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Gets or Sets the Parent Id of the Dictionary Item

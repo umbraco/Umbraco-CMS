@@ -14,13 +14,15 @@ LazyLoad.js(
 
         'lib/angular/angular-ui-sortable.js',
 
+        'lib/angular/tmhDynamicLocale.js',
+
         /* App-wide file-upload helper */
         'lib/jquery/jquery.upload/js/jquery.fileupload.js',
         'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
         'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
         
         'lib/bootstrap/js/bootstrap.2.3.2.min.js',
-        'lib/underscore/underscore.js',
+        'lib/underscore/underscore-min.js',
         'lib/umbraco/Extensions.js',
         'lib/umbraco/NamespaceManager.js',
 

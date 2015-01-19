@@ -29,6 +29,7 @@
     * - User
     * - Language
     * - Domain
+    * - DataType
     **/
 function entityResource($q, $http, umbRequestHelper) {
 
@@ -263,15 +264,26 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type) {
-            
+        search: function (query, type, searchFrom, canceler) {
+
+            var args = [{ query: query }, { type: type }];
+            if (searchFrom) {
+                args.push({ searchFrom: searchFrom });
+            }
+
+            var httpConfig = {};
+            if (canceler) {
+                httpConfig["timeout"] = canceler;
+            }
+
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "Search",
-                       [{ query: query }, {type: type}])),
-               'Failed to retrieve entity data for query ' + query);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "Search",
+                        args),
+                    httpConfig),
+                'Failed to retrieve entity data for query ' + query);
         },
         
 
@@ -296,15 +308,21 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        searchAll: function (query) {
+        searchAll: function (query, canceler) {
+
+            var httpConfig = {};
+            if (canceler) {
+                httpConfig["timeout"] = canceler;
+            }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "SearchAll",
-                       [{ query: query }])),
-               'Failed to retrieve entity data for query ' + query);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "entityApiBaseUrl",
+                        "SearchAll",
+                        [{ query: query }]),
+                    httpConfig),
+                'Failed to retrieve entity data for query ' + query);
         }
             
     };

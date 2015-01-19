@@ -658,14 +658,20 @@ namespace Umbraco.Tests.Persistence.Repositories
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
-                                new Tag {Text = "tag2", Group = "test1"}
+                                new Tag {Text = "tag4", Group = "test1"}
                             }, false);
 
                     var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
                     var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
+                    var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
 
                     Assert.AreEqual(3, result1.Count());
                     Assert.AreEqual(2, result2.Count());
+                    Assert.AreEqual(4, result3.Count());
+
+                    Assert.AreEqual(1, result1.Single(x => x.Text == "tag1").NodeCount);
+                    Assert.AreEqual(2, result3.Single(x => x.Text == "tag1").NodeCount);
+                    Assert.AreEqual(1, result3.Single(x => x.Text == "tag4").NodeCount);
 
                 }
             }

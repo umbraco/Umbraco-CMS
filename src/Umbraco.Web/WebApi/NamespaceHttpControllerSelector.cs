@@ -14,12 +14,12 @@ namespace Umbraco.Web.WebApi
     {
         private const string ControllerKey = "controller";
         private readonly HttpConfiguration _configuration;
-        private readonly Lazy<IEnumerable<Type>> _duplicateControllerTypes;
+        private readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptor>> _duplicateControllerTypes;
 
         public NamespaceHttpControllerSelector(HttpConfiguration configuration) : base(configuration)
         {
             _configuration = configuration;
-            _duplicateControllerTypes = new Lazy<IEnumerable<Type>>(GetDuplicateControllerTypes);
+            _duplicateControllerTypes = new Lazy<ConcurrentDictionary<string, HttpControllerDescriptor>>(GetDuplicateControllerTypes);
         }
 
         public override HttpControllerDescriptor SelectController(HttpRequestMessage request)
@@ -52,32 +52,46 @@ namespace Umbraco.Web.WebApi
                 return base.SelectController(request);
 
             //see if this is in our cache
-            var found = _duplicateControllerTypes.Value
-                .Where(x => string.Equals(x.Name, controllerNameAsString + ControllerSuffix, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault(x => namespaces.Contains(x.Namespace));
+            foreach (var ns in namespaces)
+            {
+                HttpControllerDescriptor descriptor;
+                if (_duplicateControllerTypes.Value.TryGetValue(string.Format("{0}-{1}", controllerNameAsString, ns), out descriptor))
+                {
+                    return descriptor;
+                }
+            }
 
-            if (found == null)
-                return base.SelectController(request);
-
-            return new HttpControllerDescriptor(_configuration, controllerNameAsString, found);
+            return base.SelectController(request);
         }
 
-        private IEnumerable<Type> GetDuplicateControllerTypes()
+        private ConcurrentDictionary<string, HttpControllerDescriptor> GetDuplicateControllerTypes()
         {
             var assembliesResolver = _configuration.Services.GetAssembliesResolver();
             var controllersResolver = _configuration.Services.GetHttpControllerTypeResolver();
             var controllerTypes = controllersResolver.GetControllerTypes(assembliesResolver);
 
-            //we have all controller types, so just store the ones with duplicate class names - we don't
-            // want to cache too much and the underlying selector caches everything else
+            var groupedByName = controllerTypes.GroupBy(
+                t => t.Name.Substring(0, t.Name.Length - ControllerSuffix.Length),
+                StringComparer.OrdinalIgnoreCase).Where(x => x.Count() > 1);
 
-            var duplicates = controllerTypes.GroupBy(x => x.Name)
-                .Where(x => x.Count() > 1)
-                .SelectMany(x => x)
-                .ToArray();
+            var duplicateControllers = groupedByName.ToDictionary(
+                g => g.Key,
+                g => g.ToLookup(t => t.Namespace ?? String.Empty, StringComparer.OrdinalIgnoreCase),
+                StringComparer.OrdinalIgnoreCase);
 
-            return duplicates;
+            var result = new ConcurrentDictionary<string, HttpControllerDescriptor>();
+
+            foreach (var controllerTypeGroup in duplicateControllers)
+            {
+                foreach (var controllerType in controllerTypeGroup.Value.SelectMany(controllerTypesGrouping => controllerTypesGrouping))
+                {
+                    result.TryAdd(string.Format("{0}-{1}", controllerTypeGroup.Key, controllerType.Namespace),
+                        new HttpControllerDescriptor(_configuration, controllerTypeGroup.Key, controllerType));
+                }
+            }
+
+            return result;
         }
-        
+
     }
 }

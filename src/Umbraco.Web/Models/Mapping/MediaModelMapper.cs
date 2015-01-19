@@ -26,30 +26,36 @@ namespace Umbraco.Web.Models.Mapping
         {
             //FROM IMedia TO MediaItemDisplay
             config.CreateMap<IMedia, MediaItemDisplay>()
-                  .ForMember(
-                      dto => dto.Owner,
-                      expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
-                  .ForMember(
-                      dto => dto.Icon,
-                      expression => expression.MapFrom(content => content.ContentType.Icon))
-                  .ForMember(
-                      dto => dto.ContentTypeAlias,
-                      expression => expression.MapFrom(content => content.ContentType.Alias))
-                  .ForMember(
-                      dto => dto.IsChildOfListView,
-                      expression => expression.MapFrom(content => content.Parent().ContentType.IsContainer))
-                  .ForMember(
-                      dto => dto.ContentTypeName,
-                      expression => expression.MapFrom(content => content.ContentType.Name))
-                  .ForMember(display => display.Properties, expression => expression.Ignore())
-                  .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
-                  .ForMember(display => display.Notifications, expression => expression.Ignore())
-                  .ForMember(display => display.Errors, expression => expression.Ignore())
-                  .ForMember(display => display.Published, expression => expression.Ignore())
-                  .ForMember(display => display.Updater, expression => expression.Ignore())
-                  .ForMember(display => display.Alias, expression => expression.Ignore())
-                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
-                  .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService));
+                .ForMember(
+                    dto => dto.Owner,
+                    expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
+                .ForMember(
+                    dto => dto.Icon,
+                    expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(
+                    dto => dto.ContentTypeAlias,
+                    expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(
+                    dto => dto.IsChildOfListView,
+                    //TODO: Fix this shorthand .Parent() lookup, at least have an overload to use the current
+                    // application context so it's testable!
+                    expression => expression.MapFrom(content => content.Parent().ContentType.IsContainer))
+                .ForMember(
+                    dto => dto.Trashed,
+                    expression => expression.MapFrom(content => content.Trashed))
+                .ForMember(
+                    dto => dto.ContentTypeName,
+                    expression => expression.MapFrom(content => content.ContentType.Name))
+                .ForMember(display => display.Properties, expression => expression.Ignore())
+                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                .ForMember(display => display.Notifications, expression => expression.Ignore())
+                .ForMember(display => display.Errors, expression => expression.Ignore())
+                .ForMember(display => display.Published, expression => expression.Ignore())
+                .ForMember(display => display.Updater, expression => expression.Ignore())
+                .ForMember(display => display.Alias, expression => expression.Ignore())
+                .ForMember(display => display.IsContainer, expression => expression.Ignore())
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -59,6 +65,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Icon,
                     expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(
+                    dto => dto.Trashed,
+                    expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))

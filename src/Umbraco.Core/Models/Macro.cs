@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Core.Models
             Id = id;
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
-            Alias = alias;
+            Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
             ControlType = controlType;
             ControlAssembly = controlAssembly;
@@ -87,7 +88,7 @@ namespace Umbraco.Core.Models
         {
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
-            Alias = alias;
+            Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
             ControlType = controlType;
             ControlAssembly = controlAssembly;
@@ -207,7 +208,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value;
+                    _alias = value.ToCleanString(CleanStringType.Alias);
                     return _alias;
                 }, _alias, AliasSelector);
             }

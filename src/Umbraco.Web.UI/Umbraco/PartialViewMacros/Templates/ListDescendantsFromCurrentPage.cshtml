@@ -1,24 +1,31 @@
 @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 
-@* Ensure that the Current Page has children, where the property umbracoNaviHide is not True *@
-@if (CurrentPage.Children.Where("Visible").Any())
+@*
+    This snippet creates links for every single page (no matter how deep) below
+    the page currently being viewed by the website visitor, displayed as nested unordered html lists.
+*@
+
+@{ var selection = CurrentPage.Children.Where("Visible"); }
+
+@* Ensure that the Current Page has children *@
+@if (selection.Any())
 {
     @* Get the first page in the children, where the property umbracoNaviHide is not True *@
-    var naviLevel = CurrentPage.Children.Where("Visible").First().Level;
-    
+    var naviLevel = CurrentPage.FirstChild().Where("Visible").Level;
+
     @* Add in level for a CSS hook *@
-    <ul class="level-@naviLevel">            
-        @* For each child page under the root node, where the property umbracoNaviHide is not True *@
-        @foreach (var childPage in CurrentPage.Children.Where("Visible"))
+    <ul class="level-@naviLevel">
+        @* For each child page  where the property umbracoNaviHide is not True *@
+        @foreach (var item in selection)
         {
             <li>
-                <a href="@childPage.Url">@childPage.Name</a>
+                <a href="@item.Url">@item.Name</a>
 
-                @* if the current page has any children, where the property umbracoNaviHide is not True *@
-                @if (childPage.Children.Where("Visible").Any())
-                {                    
+                @* if this child page has any children, where the property umbracoNaviHide is not True *@
+                @if (item.Children.Where("Visible").Any())
+                {
                     @* Call our helper to display the children *@
-                    @childPages(childPage.Children)
+                    @childPages(item.Children)
                 }
             </li>
         }
@@ -26,26 +33,26 @@
 }
 
 
-@helper childPages(dynamic pages)
-    {
+@helper childPages(dynamic selection)
+{
     @* Ensure that we have a collection of pages *@
-    if (pages.Any())
+    if (selection.Any())
     {
         @* Get the first page in pages and get the level *@
-        var naviLevel = pages.First().Level;
-        
+        var naviLevel = selection.First().Level;
+
         @* Add in level for a CSS hook *@
         <ul class="level-@(naviLevel)">
-            @foreach (var page in pages.Where("Visible"))
+            @foreach (var item in selection.Where("Visible"))
             {
                 <li>
-                    <a href="@page.Url">@page.Name</a>
-                    
-                    @* if the current page has any children, where the property umbracoNaviHide is not True *@
-                    @if (page.Children.Where("Visible").Any())
-                    {                        
+                    <a href="@item.Url">@item.Name</a>
+
+                    @* if the this page has any children, where the property umbracoNaviHide is not True *@
+                    @if (item.Children.Where("Visible").Any())
+                    {
                         @* Call our helper to display the children *@
-                        @childPages(page.Children)
+                        @childPages(item.Children)
                     }
                 </li>
             }

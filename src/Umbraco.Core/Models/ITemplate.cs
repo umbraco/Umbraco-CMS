@@ -1,9 +1,11 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core.Models.EntityBase;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a Template File (Masterpage or Mvc View)
     /// </summary>
-    public interface ITemplate : IFile
+    public interface ITemplate : IFile, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Returns the <see cref="RenderingEngine"/> that corresponds to the template file

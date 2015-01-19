@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
     [SqlSyntaxProviderAttribute("System.Data.SqlServerCe.4.0")]
-    public class SqlCeSyntaxProvider : SqlSyntaxProviderBase<SqlCeSyntaxProvider>
+    public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
         public SqlCeSyntaxProvider()
         {
@@ -60,6 +60,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return indexType;
         }
 
+        [Obsolete("Use the overload with the parameter index instead")]
         public override string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
         {
             switch (columnType)
@@ -74,76 +75,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }   
         }
 
-        public override string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnStartsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '{1}%'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }   
-        }
-
-        public override string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEndsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '%{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }   
-        }
-
-        public override string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '%{1}%'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }  
-        }
-
-        public override string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        public override string GetQuotedTableName(string tableName)
-        {
-            return string.Format("[{0}]", tableName);
-        }
-
-        public override string GetQuotedColumnName(string columnName)
-        {
-            return string.Format("[{0}]", columnName);
-        }
-
-        public override string GetQuotedName(string name)
-        {
-            return string.Format("[{0}]", name);
-        }
+        
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
@@ -285,10 +217,10 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             }
         }
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
-        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
+        
     }
 }

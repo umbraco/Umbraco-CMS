@@ -74,11 +74,17 @@ namespace Umbraco.Web.Routing
 		    // set the culture on the thread - once, so it's set when running document lookups
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
-			// find the document & template
-			FindPublishedContentAndTemplate();
+            //find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
+            // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
+            // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
+		    if (_pcr.PublishedContent == null)
+		    {
+                // find the document & template
+                FindPublishedContentAndTemplate();
 
-			// set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+                // set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
+                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+		    }
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event

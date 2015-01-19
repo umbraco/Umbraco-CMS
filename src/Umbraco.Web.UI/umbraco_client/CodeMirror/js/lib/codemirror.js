@@ -1980,6 +1980,7 @@ window.CodeMirror = (function() {
       if (extensions.propertyIsEnumerable(ext) &&
           !instance.propertyIsEnumerable(ext))
         instance[ext] = extensions[ext];
+	for (var i = 0; i < initHooks.length; ++i) initHooks[i](instance);
     return instance;
   } // (end of function CodeMirror)
 
@@ -2076,6 +2077,9 @@ window.CodeMirror = (function() {
   CodeMirror.defineExtension = function(name, func) {
     extensions[name] = func;
   };
+  
+  var initHooks = [];
+  CodeMirror.defineInitHook = function(f) {initHooks.push(f);};
 
   var modeExtensions = CodeMirror.modeExtensions = {};
   CodeMirror.extendMode = function(mode, properties) {

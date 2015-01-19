@@ -12,13 +12,13 @@ namespace UmbracoExamine.DataServices
     {
         public string ProviderName { get; set; }
 
-		[SecuritySafeCritical]
+		
         public void AddInfoLog(int nodeId, string msg)
 		{
 			LogHelper.Info<UmbracoLogService>("{0}, Provider={1}, NodeId={2}", () => msg, () => ProviderName, () => nodeId);
         }
 
-		[SecuritySafeCritical]
+		
         public void AddErrorLog(int nodeId, string msg)
 		{
 			//NOTE: not really the prettiest but since AddErrorLog is legacy code, we cannot change it now to accept a real Exception obj for
@@ -28,7 +28,7 @@ namespace UmbracoExamine.DataServices
 				new Exception(msg));
         }
 
-		[SecuritySafeCritical]
+		
         public void AddVerboseLog(int nodeId, string msg)
         {
 			LogHelper.Debug<UmbracoLogService>("{0}, Provider={1}, NodeId={2}", () => msg, () => ProviderName, () => nodeId);

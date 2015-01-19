@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
 {
@@ -21,10 +22,15 @@ namespace Umbraco.Core.Models
         }
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent)
-            : base(parent)
+            : this(parent, null)
 		{
-		    AddContentType(parent);
 		}
+
+        protected ContentTypeCompositionBase(IContentTypeComposition parent, string alias)
+            : base(parent, alias)
+        {
+            AddContentType(parent);
+        }
 
         private static readonly PropertyInfo ContentTypeCompositionSelector =
             ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(
@@ -75,8 +81,27 @@ namespace Umbraco.Core.Models
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
                 return false;
 
+            if (string.IsNullOrEmpty(Alias) == false && Alias.Equals(contentType.Alias))
+                return false;
+
             if (ContentTypeCompositionExists(contentType.Alias) == false)
             {
+                //Before we actually go ahead and add the ContentType as a Composition we ensure that we don't
+                //end up with duplicate PropertyType aliases - in which case we throw an exception.
+                var conflictingPropertyTypeAliases = CompositionPropertyTypes.SelectMany(
+                    x => contentType.CompositionPropertyTypes
+                        .Where(y => y.Alias.Equals(x.Alias, StringComparison.InvariantCultureIgnoreCase))
+                        .Select(p => p.Alias)).ToList();
+
+                if (conflictingPropertyTypeAliases.Any())
+                    throw new InvalidCompositionException
+                          {
+                              AddedCompositionAlias = contentType.Alias,
+                              ContentTypeAlias = Alias,
+                              PropertyTypeAlias =
+                                  string.Join(", ", conflictingPropertyTypeAliases)
+                          };
+
                 _contentTypeComposition.Add(contentType);
                 OnPropertyChanged(ContentTypeCompositionSelector);
                 return true;

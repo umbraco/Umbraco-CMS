@@ -5,23 +5,14 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebApi;
+using System;
+using System.Diagnostics;
+using Umbraco.Web.Dynamics;
+using Umbraco.Web.Models.TemplateQuery;
 
 namespace Umbraco.Web.Editors
 {
-    using System;
-    using System.Diagnostics;
-    using System.Diagnostics.Eventing.Reader;
-    using System.Drawing;
-
-    using global::umbraco;
-    using global::umbraco.cms.presentation;
-
-    using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-    using Umbraco.Web.Dynamics;
-    using Umbraco.Web.Models.TemplateQuery;
-    using System.Linq.Expressions;
-
-    using Umbraco.Web.Models;
+    
 
     /// <summary>
     /// The API controller used for building content queries within the template
@@ -39,7 +30,7 @@ namespace Umbraco.Web.Editors
         { }
 
 
-        private static readonly IEnumerable<OperathorTerm> _terms = new List<OperathorTerm>()
+        private static readonly IEnumerable<OperathorTerm> Terms = new List<OperathorTerm>()
             {
                 new OperathorTerm("is", Operathor.Equals, new [] {"string"}),
                 new OperathorTerm("is not", Operathor.NotEquals, new [] {"string"}),
@@ -57,7 +48,7 @@ namespace Umbraco.Web.Editors
                 new OperathorTerm("less than or equal to", Operathor.LessThanEqualTo, new [] {"int"})
             };
 
-        private static readonly IEnumerable<PropertyModel> _properties = new List<PropertyModel>()
+        private static readonly IEnumerable<PropertyModel> Properties = new List<PropertyModel>()
             {
                 new PropertyModel() { Name = "Id", Alias = "Id", Type = "int"  },
                 new PropertyModel() { Name = "Name", Alias = "Name", Type = "string"  },
@@ -309,7 +300,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<PropertyModel> GetAllowedProperties()
         {
-            return _properties.OrderBy(x => x.Name);
+            return Properties.OrderBy(x => x.Name);
         }
 
         /// <summary>
@@ -317,7 +308,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<object> GetFilterConditions()
         {
-            return _terms;
+            return Terms;
         }
 
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
 using System.Linq;
 using umbraco.BusinessLogic;
 
@@ -124,15 +123,6 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                if (MasterContentType != 0)
-                    MediaTypeItem.ParentId = MasterContentType;
-
-                foreach (var masterContentType in MasterContentTypes)
-                {
-                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(masterContentType);
-                    MediaTypeItem.AddContentType(contentType);
-                }
-
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(MediaTypeItem, userId);

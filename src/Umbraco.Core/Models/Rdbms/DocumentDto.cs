@@ -45,11 +45,7 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
         public int? TemplateId { get; set; }
-
-        [Column("alias")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string Alias { get; set; }
-
+        
         [Column("newest")]
         [Constraint(Default = "0")]
         [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_newest")]

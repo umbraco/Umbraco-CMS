@@ -63,7 +63,7 @@ namespace Umbraco.Web.Trees
 
             if (systemIds.Contains(dt.Id))
             {
-                node.SetProtectedStyle();
+                node.Icon = "icon-thumbnail-list";
             }
 
             return node;

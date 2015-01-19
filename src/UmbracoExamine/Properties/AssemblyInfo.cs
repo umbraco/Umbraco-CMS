@@ -28,9 +28,7 @@ using System.Security;
 
 //NOTE: WE cannot make change the major version to be the same as Umbraco because of backwards compatibility, however we 
 // will make the minor version the same as the umbraco version 
-[assembly: AssemblyVersion("0.6.0.*")]
-[assembly: AssemblyFileVersion("0.6.0.*")]
-
-[assembly: AllowPartiallyTrustedCallers]
+[assembly: AssemblyVersion("0.7.0.*")]
+[assembly: AssemblyFileVersion("0.7.0.*")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]

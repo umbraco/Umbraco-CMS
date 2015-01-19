@@ -51,7 +51,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 $scope.loaded = true;
                 $scope.content = data;
                 
-                if (data.isChildOfListView) {
+                if (data.isChildOfListView && data.trashed === false) {
                     $scope.listViewPath = ($routeParams.page)
                         ? "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page
                         : "/media/media/edit/" + data.parentId;

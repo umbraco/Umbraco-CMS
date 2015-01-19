@@ -16,16 +16,16 @@ namespace Umbraco.Core.PropertyEditors
 
             var emailVal = new EmailAddressAttribute();
 
-            if (emailVal.IsValid(asString) == false)
+            if (asString != string.Empty && emailVal.IsValid(asString) == false)
             {
-                //TODO: localize these!
+                // TODO: localize these!
                 yield return new ValidationResult("Email is invalid", new[] { "value" });
             }
         }
 
         public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
-            return Validate(value, null, preValues, editor);
+            return this.Validate(value, null, preValues, editor);
         }
     }
 }

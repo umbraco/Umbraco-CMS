@@ -37,7 +37,7 @@ namespace Umbraco.Core.Models
                 var properties = new List<StylesheetProperty>();
                 var parser = new CssParser(Content);
 
-                foreach (CssAtRule statement in parser.StyleSheet.Statements.Where(s => s is CssAtRule))
+                foreach (var statement in parser.StyleSheet.Statements.OfType<CssAtRule>())
                 {
                     var cssBlock = statement.Block;
                     if(cssBlock == null) continue;
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Models
         {
             var properties = new List<StylesheetProperty>();
 
-            foreach (CssRuleSet statement in statements)
+            foreach (var statement in statements.OfType<CssRuleSet>())
             {
                 foreach (var selector in statement.Selectors)
                 {
@@ -113,6 +113,8 @@ namespace Umbraco.Core.Models
         /// Boolean indicating whether the file could be validated
         /// </summary>
         /// <returns>True if file is valid, otherwise false</returns>
+        //TODO: This makes no sense to be here, any validation methods should be at the service level,
+        // when we move Scripts to truly use IFileSystem, then this validation logic doesn't work anymore
         public override bool IsValid()
         {
             var dirs = SystemDirectories.Css;

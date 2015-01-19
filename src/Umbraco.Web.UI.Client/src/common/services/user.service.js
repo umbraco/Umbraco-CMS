@@ -227,6 +227,16 @@ angular.module('umbraco.services')
 
                             var result = { user: data, authenticated: true, lastUserId: lastUserId };
 
+                            //TODO: This is a mega backwards compatibility hack... These variables SHOULD NOT exist in the server variables
+                            // since they are not supposed to be dynamic but I accidentally added them there in 7.1.5 IIRC so some people might
+                            // now be relying on this :(
+                            if (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables) {
+                                Umbraco.Sys.ServerVariables["security"] = {
+                                    startContentId: data.startContentId,
+                                    startMediaId: data.startMediaId
+                                };
+                            }
+
                             if (args && args.broadcastEvent) {
                                 //broadcast a global event, will inform listening controllers to load in the user specific data
                                 eventsService.emit("app.authenticated", result);

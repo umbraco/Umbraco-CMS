@@ -8,7 +8,7 @@ angular.module('umbraco')
 		$scope.ids = [];
 
 
-	    $scope.cfg = {
+	    var config = {
 	        multiPicker: false,
 	        entityType: "Document",
 	        type: "content",
@@ -17,7 +17,7 @@ angular.module('umbraco')
 		
 		if($scope.model.value){
 			$scope.ids = $scope.model.value.split(',');
-			entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
+			entityResource.getByIds($scope.ids, config.entityType).then(function (data) {
 			    _.each(data, function (item, i) {
 					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 					$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
@@ -26,12 +26,13 @@ angular.module('umbraco')
 		}
 		
 
-		$scope.openContentPicker =function(){
-			var d = dialogService.treePicker({
-								section: $scope.cfg.type,
-								treeAlias: $scope.cfg.type,
-								multiPicker: $scope.cfg.multiPicker,
-								callback: populate});
+		$scope.openContentPicker =function() {
+		    var d = dialogService.treePicker({
+		        section: config.type,
+		        treeAlias: config.type,
+		        multiPicker: config.multiPicker,
+		        callback: populate
+		    });
 		};
 
 		$scope.remove =function(index){

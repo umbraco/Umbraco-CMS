@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="it" intName="Italian" localName="italiano" lcid="16" culture="it-IT">
   <creator>
-    <name>The umbraco community</name>
-    <link>http://umbraco.org/documentation/language-files</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gestisci hostnames</key>
@@ -121,7 +121,7 @@
   <area alias="dashboard">
     <key alias="browser"><![CDATA[Naviga il tuo sito web]]></key>
     <key alias="dontShowAgain"><![CDATA[Non mostrare più]]></key>
-    <key alias="nothinghappens"><![CDATA[se umbraco non si sta aprendo, potresti aver bisogno di rimuovere il blocco popup]]></key>
+    <key alias="nothinghappens"><![CDATA[se Umbraco non si sta aprendo, potresti aver bisogno di rimuovere il blocco popup]]></key>
     <key alias="openinnew">hai aperto una nuova finestra</key>
     <key alias="restart">Riavvia</key>
     <key alias="visit">Visita</key>
@@ -266,7 +266,7 @@
     <key alias="findDocument">Trova</key>
     <key alias="folder">Cartella</key>
     <key alias="height">Altezza</key>
-    <key alias="help">Aiuto</key>
+    <key alias="help">Guida</key>
     <key alias="icon">Icona</key>
     <key alias="import">Importa</key>
     <key alias="innerMargin"><![CDATA[Margine interno (inner margin)]]></key>
@@ -343,7 +343,7 @@
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% è stato copiato nel tuo database. Premi <strong>Avanti</strong> per proseguire.]]></key>
     <key alias="databaseNotFound">
       <![CDATA[<p>Database non trovato! Perfavore, controlla che le informazioni della stringa di connessione nel file "web.config" siano corrette.</p>
-<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]>
+<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]>
     </key>
     <key alias="databaseText"><![CDATA[Per completare questo passaggio, devi conoscere alcune informazioni riguardanti il tuo database server ("connection string"). Se è necessario contatta il tuo ISP per reperire le informazioni necessarie. Se stai effettuando l'installazione in locale o su un server, puoi richiederle al tuo amministratore di sistema]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Premi il tasto <strong>aggiorna</strong> per aggiornare il database ad Umbraco %0%</p><p>Non preoccuparti, il contenuto non verrà perso e tutto continuerà a funzionare dopo l'aggiornamento!</p>]]></key>
@@ -355,12 +355,12 @@
     <key alias="defaultUserPasswordChanged"><![CDATA[La password è stata modificata!]]></key>
     <key alias="defaultUserText"><![CDATA[<p>Umbraco crea un utente <strong>('admin')</strong>predefinito e password <strong>('default')</strong>. E' <strong>importante</strong> modificare la password con una personale.</p><p>Questo passaggio controlla la password predefinita e ricorda, se necessario, di modificarla.</p>]]></key>
     <key alias="greatStart"><![CDATA[Parti alla grande, guarda i nostri video introduttivi]]></key>
-    <key alias="licenseText"><![CDATA[Cliccando il pulsante Avanti (o modificando la voce umbracoConfigurationStatus nel file web.config), accettti le condizioni di licenza specificate nel box sottostante. Nota che questa distribuzione di Umbraco è composta da due differenti licenze, la MIT open source per il framework e la Umbraco freeware per la UI.]]></key>
+    <key alias="licenseText"><![CDATA[Cliccando il pulsante Avanti (o modificando la voce UmbracoConfigurationStatus nel file web.config), accettti le condizioni di licenza specificate nel box sottostante. Nota che questa distribuzione di Umbraco è composta da due differenti licenze, la MIT open source per il framework e la Umbraco freeware per la UI.]]></key>
     <key alias="None"><![CDATA[Ancora non installato.]]></key>
     <key alias="permissionsAffectedFolders"><![CDATA[File e directory interessati]]></key>
     <key alias="permissionsAffectedFoldersMoreInfo"><![CDATA[Ulteriori informazioni sull'impostazione dei permessi per Umbraco]]></key>
     <key alias="permissionsAffectedFoldersText"><![CDATA[Devi autorizzare l'utente ASP.NET a modificare i seguenti files/cartelle]]></key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Le impostazioni dei permessi sono perfette!</strong><br /><br />Puoi eseguire umbraco senza problemi, ma potresti non poter installare i pacchetti che sono consigliati per sfruttare tutti i vantaggi offerti da Umbraco.]]></key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Le impostazioni dei permessi sono perfette!</strong><br /><br />Puoi eseguire Umbraco senza problemi, ma potresti non poter installare i pacchetti che sono consigliati per sfruttare tutti i vantaggi offerti da Umbraco.]]></key>
     <key alias="permissionsHowtoResolve"><![CDATA[Risoluzione del problema]]></key>
     <key alias="permissionsHowtoResolveLink"><![CDATA[Clicca qui per leggere la versione testuale]]></key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Guarda il nostro <strong>video tutorial</strong> su come impostare i permessi delle cartelle per Umbraco o leggi la versione testuale.]]></key>
@@ -372,7 +372,7 @@
     <key alias="permissionsSettingUpPermissions"><![CDATA[Impostazione dei permessi delle cartelle]]></key>
     <key alias="permissionsText"><![CDATA[per poter archiviare file come immagini e PDF, Umbraco deve avere accesso in scrittura/modifica ad alcune directory. Inoltre per incrementare le prestazioni del tuo sito, deve essere possibile memorizzare informazioni temporanee (es: cache).]]></key>
     <key alias="runwayFromScratch"><![CDATA[Voglio partire da zero]]></key>
-    <key alias="runwayFromScratchText"><![CDATA[Il tuo sito al momento è completamente vuoto, e questo è il punto di partenza ideale per creare da zero i tuoi tipi documento e i tuoi templates. (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Guarda come</a>) Puoi anche installare eventuali Runway in un secondo momento. Vai nella sezione Developer e scegli Pacchetti.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Il tuo sito al momento è completamente vuoto, e questo è il punto di partenza ideale per creare da zero i tuoi tipi documento e i tuoi templates. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Guarda come</a>) Puoi anche installare eventuali Runway in un secondo momento. Vai nella sezione Developer e scegli Pacchetti.]]></key>
     <key alias="runwayHeader"><![CDATA[Hai configurato una versione pulita della piattaforma Umbraco. Cosa vuoi fare adesso?]]></key>
     <key alias="runwayInstalled">Runway è installato</key>
     <key alias="runwayInstalledText"><![CDATA[
@@ -405,7 +405,7 @@ Hai installato Runway, quindi perché non dare uno sguardo al vostro nuovo sito 
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ulteriori informazioni e assistenza</h3>
 Fatti aiutare dalla nostra community, consulta la documentazione o guarda alcuni video gratuiti su come costruire un semplice sito web, come usare i pacchetti e una guida rapida alla terminologia Umbraco]]></key>
     <key alias="theEndHeader"><![CDATA[Umbraco %0% è installato e pronto per l'uso]]></key>
-    <key alias="theEndInstallFailed"><![CDATA[Per terminare l'installazione, dovrai modificare manualmente il file <strong>/web.config</strong> e aggiornare la chiave AppSetting <strong>umbracoConfigurationStatus</strong> impostando il valore <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[Per terminare l'installazione, dovrai modificare manualmente il file <strong>/web.config</strong> e aggiornare la chiave AppSetting <strong>UmbracoConfigurationStatus</strong> impostando il valore <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess">
       <![CDATA[Puoi <strong>iniziare immediatamente</strong> cliccando sul bottone "Avvia Umbraco". <br />Se sei <strong>nuovo a Umbraco</strong>, si possono trovare un sacco di risorse sulle nostre pagine Getting Started.]]></key>
     <key alias="theEndOpenUmbraco">
@@ -428,7 +428,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Benvenuti in Umbraco, digita il tuo username e la tua password nelle caselle seguenti:</key>
   </area>
   <area alias="main">
@@ -630,7 +630,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="contentTypeTabCreated">Tab creata</key>
     <key alias="contentTypeTabDeleted">Tab eliminata</key>
     <key alias="contentTypeTabDeletedText">Tab con id: %0% eliminata</key>
-    <key alias="contentUnpublished">Contenuto non pubblicato</key>
+    <key alias="contentUnpublished">Contenuto non pubblicare</key>
     <key alias="cssErrorHeader"><![CDATA[Foglio di stile non salvato]]></key>
     <key alias="cssSavedHeader"><![CDATA[Foglio di stile salvato]]></key>
     <key alias="cssSavedText"><![CDATA[Foglio di stile salvato correttamente]]></key>

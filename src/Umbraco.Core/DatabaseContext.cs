@@ -26,6 +26,9 @@ namespace Umbraco.Core
     {
         private readonly IDatabaseFactory _factory;
         private bool _configured;
+        private bool _canConnect;
+        private volatile bool _connectCheck = false;
+        private readonly object _locker = new object();
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
@@ -54,6 +57,32 @@ namespace Umbraco.Core
         public bool IsDatabaseConfigured
         {
             get { return _configured; }
+        }
+
+        /// <summary>
+        /// Determines if the db can be connected to
+        /// </summary>
+        public bool CanConnect
+        {
+            get
+            {
+                if (IsDatabaseConfigured == false) return false;
+
+                //double check lock so that it is only checked once and is fast
+                if (_connectCheck == false)
+                {
+                    lock (_locker)
+                    {
+                        if (_canConnect == false)
+                        {
+                            _canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                            _connectCheck = true;
+                        }
+                    }
+                }
+
+                return _canConnect;
+            }
         }
 
         /// <summary>

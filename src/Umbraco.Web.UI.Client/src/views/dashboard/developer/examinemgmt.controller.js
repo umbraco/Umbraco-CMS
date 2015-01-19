@@ -1,4 +1,4 @@
-function examineMgmtController($scope, umbRequestHelper, $log, $http, $q) {
+function examineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeout) {
 
     $scope.indexerDetails = [];
     $scope.searcherDetails = [];
@@ -19,7 +19,7 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q) {
                     indexer.isProcessing = false;
                 }
                 else {
-                    setTimeout(function() {
+                    $timeout(function () {
                         //don't continue if we've tried 100 times
                         if (indexer.processingAttempts < 100) {
                             checkProcessing(indexer, checkActionName);
@@ -76,7 +76,7 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q) {
 
                     //rebuilding has started, nothing is returned accept a 200 status code.
                     //lets poll to see if it is done.
-                    setTimeout(function () {
+                    $timeout(function () {
                         checkProcessing(indexer, "PostCheckRebuildIndex");
                     }, 1000);
 
@@ -97,7 +97,7 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q) {
 
                     //optimizing has started, nothing is returned accept a 200 status code.
                     //lets poll to see if it is done.
-                    setTimeout(function () {
+                    $timeout(function () {
                         checkProcessing(indexer, "PostCheckOptimizeIndex");
                     }, 1000);
 

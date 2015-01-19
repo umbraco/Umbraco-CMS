@@ -26,12 +26,12 @@ namespace umbraco
             if (masterId > 0)
             {
                 var id = cms.businesslogic.template.Template.MakeNew(Alias, User, new cms.businesslogic.template.Template(masterId)).Id;
-                _returnUrl = string.Format("{1}?templateID={0}", id, editor);
+                _returnUrl = string.Format("{1}?treeType=templates&templateID={0}", id, editor);
             }
             else
             {
                 var id = cms.businesslogic.template.Template.MakeNew(Alias, User).Id;
-                _returnUrl = string.Format("{1}?templateID={0}", id, editor);
+                _returnUrl = string.Format("{1}?treeType=templates&templateID={0}", id, editor);
 
             }
             return true;

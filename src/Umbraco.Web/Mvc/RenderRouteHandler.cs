@@ -117,7 +117,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="requestContext"></param>
         /// <returns></returns>
-        private static PostedDataProxyInfo GetFormInfo(RequestContext requestContext)
+        internal static PostedDataProxyInfo GetFormInfo(RequestContext requestContext)
         {
             if (requestContext == null) throw new ArgumentNullException("requestContext");
 
@@ -201,7 +201,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="requestContext"></param>
         /// <param name="postedInfo"></param>
-        private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo)
+        internal static IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo)
         {
             if (requestContext == null) throw new ArgumentNullException("requestContext");
             if (postedInfo == null) throw new ArgumentNullException("postedInfo");

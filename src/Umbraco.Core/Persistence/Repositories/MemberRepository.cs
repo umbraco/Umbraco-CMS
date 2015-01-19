@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -91,14 +92,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var baseQuery = GetBaseQuery(false);
 
             //check if the query is based on properties or not
-            var query1 = query as Query<IMember>;
-            if (query1 == null)
-                throw new Exception("Query cannot be null");
 
-            var wheres = query1.WhereClauses();
+            var wheres = query.GetWhereClauses();
             //this is a pretty rudimentary check but wil work, we just need to know if this query requires property
             // level queries
-            if (wheres.Any(x => x.Contains("cmsPropertyType")))
+            if (wheres.Any(x => x.Item1.Contains("cmsPropertyType")))
             {
                 var sqlWithProps = GetNodeIdQueryWithPropertyData();
                 var translator = new SqlTranslator<IMember>(sqlWithProps, query);
@@ -246,7 +244,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
             // - this can occur if the member type doesn't contain the built-in properties that the
@@ -348,7 +346,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO ContentType for the Member entity
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);            
+            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);            
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
@@ -419,6 +417,90 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IMembershipUser>
+
+        public void RebuildXmlStructures(Func<IMember, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        {
+
+            //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+            using (var tr = Database.GetTransaction())
+            {
+                //Remove all the data first, if anything fails after this it's no problem the transaction will be reverted
+                if (contentTypeIds == null)
+                {
+                    var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+                    var subQuery = new Sql()
+                        .Select("DISTINCT cmsContentXml.nodeId")
+                        .From<ContentXmlDto>()
+                        .InnerJoin<NodeDto>()
+                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                        .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+
+                    var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    Database.Execute(deleteSql);
+                }
+                else
+                {
+                    foreach (var id in contentTypeIds)
+                    {
+                        var id1 = id;
+                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+                        var subQuery = new Sql()
+                            .Select("DISTINCT cmsContentXml.nodeId")
+                            .From<ContentXmlDto>()
+                            .InnerJoin<NodeDto>()
+                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .InnerJoin<ContentDto>()
+                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
+                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+
+                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        Database.Execute(deleteSql);
+                    }
+                }
+
+                //now insert the data, again if something fails here, the whole transaction is reversed
+                if (contentTypeIds == null)
+                {
+                    var query = Query<IMember>.Builder;
+                    RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                }
+                else
+                {
+                    foreach (var contentTypeId in contentTypeIds)
+                    {
+                        //copy local
+                        var id = contentTypeId;
+                        var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == id && x.Trashed == false);
+                        RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
+                    }
+                }
+
+                tr.Complete();
+            }
+        }
+
+        private void RebuildXmlStructuresProcessQuery(Func<IMember, XElement> serializer, IQuery<IMember> query, Transaction tr, int pageSize)
+        {
+            var pageIndex = 0;
+            var total = int.MinValue;
+            var processed = 0;
+            do
+            {
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+
+                var xmlItems = (from descendant in descendants
+                                let xml = serializer(descendant)
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
+
+                //bulk insert it into the database
+                Database.BulkInsertRecords(xmlItems, tr);
+
+                processed += xmlItems.Length;
+
+                pageIndex++;
+            } while (processed < total);
+        }
 
         public override IMember GetByVersion(Guid versionId)
         {
@@ -534,10 +616,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
-            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
+
             sql.Select("COUNT(*)")
                 .From<MemberDto>()
-                .Where<MemberDto>(x => x.LoginName == escapedUserName);
+                .Where<MemberDto>(x => x.LoginName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
@@ -574,13 +656,21 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
+            var args = new List<object>();
+            var sbWhere = new StringBuilder();
+            Func<Tuple<string, object[]>> filterCallback = null;
+            if (filter.IsNullOrWhiteSpace() == false)
+            {
+                sbWhere.Append("AND ((umbracoNode. " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ") " +
+                                "OR (cmsMember.LoginName LIKE @0" + args.Count + "))");
+                args.Add("%" + filter + "%");
+                filterCallback = () => new Tuple<string, object[]>(sbWhere.ToString().Trim(), args.ToArray());
+            }           
+
             return GetPagedResultsByQuery<MemberDto, Member>(query, pageIndex, pageSize, out totalRecords,
-                "SELECT cmsMember.nodeId",
+                new Tuple<string, string>("cmsMember", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,
-                filter.IsNullOrWhiteSpace()
-                    ? (Func<string>) null
-                    : () => "AND ((umbracoNode. " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE '%" + filter + "%') " +
-                                "OR (cmsMember.LoginName LIKE '%" + filter + "%'))");
+                filterCallback);
         }
         
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
@@ -631,8 +721,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
             //content types
-            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
-                .ToArray();
+            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray()).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column
@@ -642,19 +731,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 .ToArray();
 
             //Go get the property data for each document
-            var docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
+            IEnumerable<DocumentDefinition> docDefs = dtosWithContentTypes.Select(d => new DocumentDefinition(
                 d.dto.NodeId,
                 d.dto.ContentVersionDto.VersionId,
                 d.dto.ContentVersionDto.VersionDate,
                 d.dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                 d.contentType));
 
-            var propertyData = GetPropertyCollection(sql, docDefs);
+            var propertyData = GetPropertyCollection(sql, docDefs); 
 
             return dtosWithContentTypes.Select(d => CreateMemberFromDto(
-                d.dto,
-                contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
-                propertyData[d.dto.NodeId]));
+                        d.dto,
+                        contentTypes.First(ct => ct.Id == d.dto.ContentVersionDto.ContentDto.ContentTypeId),
+                        propertyData[d.dto.NodeId])); 
         }
 
         /// <summary>

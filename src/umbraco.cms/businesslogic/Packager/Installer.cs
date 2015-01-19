@@ -6,6 +6,7 @@ using System.Xml;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Packaging;
@@ -42,6 +43,8 @@ namespace umbraco.cms.businesslogic.packager
         private readonly Dictionary<string, string> _conflictingStyleSheetNames = new Dictionary<string, string>();
 
         private readonly List<string> _binaryFileErrors = new List<string>();
+        private int _currentUserId = -1;
+
 
         public string Name { get; private set; }
         public string Version { get; private set; }
@@ -76,7 +79,7 @@ namespace umbraco.cms.businesslogic.packager
         /// Indicates that the package contains legacy property editors
         /// </summary>
         public bool ContainsLegacyPropertyEditors { get; private set; }
-        
+
         public bool ContainsStyleSheeConflicts { get; private set; }
         public IDictionary<string, string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
 
@@ -93,6 +96,17 @@ namespace umbraco.cms.businesslogic.packager
         /// Constructor
         /// </summary>
         public Installer()
+        {
+            initialize();
+        }
+
+        public Installer(int currentUserId)
+        {
+            initialize();
+            _currentUserId = currentUserId;
+        }
+
+        private void initialize()
         {
             ContainsBinaryFileErrors = false;
             ContainsTemplateConflicts = false;
@@ -138,7 +152,7 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         #region Public Methods
-        
+
         /// <summary>
         /// Imports the specified package
         /// </summary>
@@ -175,7 +189,7 @@ namespace umbraco.cms.businesslogic.packager
                 return tempDir;
             }
         }
-        
+
         public int CreateManifest(string tempDir, string guid, string repoGuid)
         {
             //This is the new improved install rutine, which chops up the process into 3 steps, creating the manifest, moving files, and finally handling umb objects
@@ -253,17 +267,28 @@ namespace umbraco.cms.businesslogic.packager
 
                         //PPH log file install
                         insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+
                     }
                     catch (Exception ex)
                     {
-						LogHelper.Error<Installer>("Package install error", ex);
+                        LogHelper.Error<Installer>("Package install error", ex);
                     }
                 }
 
+                // log that a user has install files
+                if (_currentUserId > -1)
+                {
+                    Audit.Add(AuditTypes.PackagerInstall,
+                                            string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
+                                            _currentUserId, -1);
+                }
+
                 insPack.Save();
+
+                
             }
         }
-        
+
         public void InstallBusinessLogic(int packageId, string tempDir)
         {
             using (DisposableTimer.DebugDuration<Installer>(
@@ -292,7 +317,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 #region DataTypes
                 var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-                if(dataTypeElement != null)
+                if (dataTypeElement != null)
                 {
                     var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
                     foreach (var dataTypeDefinition in dataTypeDefinitions)
@@ -309,7 +334,7 @@ namespace umbraco.cms.businesslogic.packager
                     var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
                     insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
                 }
-                
+
                 #endregion
 
                 #region Dictionary items
@@ -335,7 +360,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                 #endregion
-                
+
                 #region Templates
                 var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
                 if (templateElement != null)
@@ -404,7 +429,7 @@ namespace umbraco.cms.businesslogic.packager
 
                         if (alias.IsNullOrWhiteSpace() == false)
                         {
-                            PackageAction.RunPackageAction(insPack.Data.Name, alias, n);             
+                            PackageAction.RunPackageAction(insPack.Data.Name, alias, n);
                         }
                     }
                 }
@@ -416,22 +441,24 @@ namespace umbraco.cms.businesslogic.packager
                 new ApplicationTreeRegistrar();
 
                 insPack.Save();
+
+                OnPackageBusinessLogicInstalled(insPack);
             }
         }
 
-		/// <summary>
-		/// Remove the temp installation folder
-		/// </summary>
-		/// <param name="packageId"></param>
-		/// <param name="tempDir"></param>
+        /// <summary>
+        /// Remove the temp installation folder
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
-			if (Directory.Exists(tempDir))
-			{
-				Directory.Delete(tempDir, true);
-			}
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
         }
-        
+
         /// <summary>
         /// Reads the configuration of the package from the configuration xmldocument
         /// </summary>
@@ -466,10 +493,10 @@ namespace umbraco.cms.businesslogic.packager
                 {
                     badFile = true;
                 }
-                    
+
                 if (destPath.ToLower().Contains(IOHelper.DirSepChar + "bin"))
                 {
-                    badFile = true;                   
+                    badFile = true;
                 }
 
                 if (destFile.ToLower().EndsWith(".dll"))
@@ -514,9 +541,9 @@ namespace umbraco.cms.businesslogic.packager
                         ContainsMacroConflict = true;
                         if (_conflictingMacroAliases.ContainsKey(m.Name) == false)
                         {
-                            _conflictingMacroAliases.Add(m.Name, alias);    
+                            _conflictingMacroAliases.Add(m.Name, alias);
                         }
-                    }                    
+                    }
                 }
             }
 
@@ -548,8 +575,8 @@ namespace umbraco.cms.businesslogic.packager
                         ContainsStyleSheeConflicts = true;
                         if (_conflictingStyleSheetNames.ContainsKey(s.Text) == false)
                         {
-                            _conflictingStyleSheetNames.Add(s.Text, alias);   
-                        }                        
+                            _conflictingStyleSheetNames.Add(s.Text, alias);
+                        }
                     }
                 }
             }
@@ -566,7 +593,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch { }
         }
-        
+
         /// <summary>
         /// This uses the old method of fetching and only supports the packages.umbraco.org repository.
         /// </summary>
@@ -586,9 +613,9 @@ namespace umbraco.cms.businesslogic.packager
 
             return "packages\\" + Package + ".umb";
         }
-        
+
         #endregion
-        
+
         #region Private Methods
 
         /// <summary>
@@ -655,7 +682,7 @@ namespace umbraco.cms.businesslogic.packager
             string tempDir = IOHelper.MapPath(SystemDirectories.Data) + Path.DirectorySeparatorChar + packageId.ToString();
             //clear the directory if it exists
             if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
-            Directory.CreateDirectory(tempDir);            
+            Directory.CreateDirectory(tempDir);
 
             var s = new ZipInputStream(File.OpenRead(zipName));
 
@@ -697,5 +724,13 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         #endregion
+
+        internal static event EventHandler<InstalledPackage> PackageBusinessLogicInstalled;
+
+        private static void OnPackageBusinessLogicInstalled(InstalledPackage e)
+        {
+            EventHandler<InstalledPackage> handler = PackageBusinessLogicInstalled;
+            if (handler != null) handler(null, e);
+        }
     }
 }

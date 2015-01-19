@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Services;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
@@ -45,7 +46,7 @@ namespace umbraco.presentation.umbraco.webservices
                 if (!String.IsNullOrEmpty(group) && !String.IsNullOrEmpty(id))
                 {
                     sql = @"SELECT TOP (20) tag FROM cmsTags WHERE tag LIKE @prefix AND cmsTags.id not in 
-                        (SELECT tagID FROM cmsTagRelationShip WHERE NodeId = @nodeId) AND cmstags.[group] = @group;";
+                        (SELECT tagID FROM cmsTagRelationShip WHERE NodeId = @nodeId) AND cmstags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + " = @group;";
 
                     rr = SqlHelper.ExecuteReader(sql,
                         SqlHelper.CreateParameter("@count", count),

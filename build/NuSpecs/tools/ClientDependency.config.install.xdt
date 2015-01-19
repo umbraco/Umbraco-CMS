@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<clientDependency xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <fileRegistration>
+    <providers>
+      <add name="CanvasProvider" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    </providers>
+  </fileRegistration>
+</clientDependency>

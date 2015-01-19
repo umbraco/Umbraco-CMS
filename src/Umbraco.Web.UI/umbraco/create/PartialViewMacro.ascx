@@ -4,9 +4,16 @@
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <cc1:Pane runat="server">
-    <cc1:PropertyPanel runat="server" Text="Filename (without .cshtml)">
+    <cc1:PropertyPanel runat="server" Text="Filename (without .cshtml, use / to make folders)">
         <asp:TextBox ID="FileName" runat="server" CssClass="bigInput input-large-type input-block-level"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="*" ControlToValidate="FileName" runat="server">*</asp:RequiredFieldValidator>
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" 
+            CssClass="text-error" Display="Dynamic"
+            ErrorMessage="*" ControlToValidate="FileName" runat="server">*</asp:RequiredFieldValidator>
+        <asp:RegularExpressionValidator runat="server" ID="EndsWithValidator" 
+            CssClass="text-error" Display="Dynamic"
+            ErrorMessage="Cannot end with '/'" ControlToValidate="FileName" ValidationExpression=".*[^/\.]$">
+            Cannot end with '/' or '.'
+        </asp:RegularExpressionValidator>
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server" Text="Choose a snippet:">

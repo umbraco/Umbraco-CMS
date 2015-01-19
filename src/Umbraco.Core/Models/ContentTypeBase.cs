@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -15,6 +16,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public abstract class ContentTypeBase : Entity, IContentTypeBase
     {
         private Lazy<int> _parentId;
@@ -48,17 +50,22 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-		protected ContentTypeBase(IContentTypeBase parent)
+		protected ContentTypeBase(IContentTypeBase parent) : this(parent, null)
 		{
-			Mandate.ParameterNotNull(parent, "parent");
+		}
 
-			_parentId = new Lazy<int>(() => parent.Id);
-			_allowedContentTypes = new List<ContentTypeSort>();
-			_propertyGroups = new PropertyGroupCollection();
+        protected ContentTypeBase(IContentTypeBase parent, string alias)
+        {
+            Mandate.ParameterNotNull(parent, "parent");
+
+            _alias = alias;
+            _parentId = new Lazy<int>(() => parent.Id);
+            _allowedContentTypes = new List<ContentTypeSort>();
+            _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
-		}
+        }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);
@@ -492,7 +499,6 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
         public void RemovePropertyType(string propertyTypeAlias)
         {
-
             //check if the property exist in one of our collections
             if (PropertyGroups.Any(group => group.PropertyTypes.Any(pt => pt.Alias == propertyTypeAlias))
                 || _propertyTypes.Any(x => x.Alias == propertyTypeAlias))
@@ -519,6 +525,7 @@ namespace Umbraco.Core.Models
         public void RemovePropertyGroup(string propertyGroupName)
         {
             PropertyGroups.RemoveItem(propertyGroupName);
+            OnPropertyChanged(PropertyGroupCollectionSelector);
         }
 
         /// <summary>

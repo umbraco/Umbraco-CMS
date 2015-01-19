@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
-    <name>umbraco</name>
-    <link>http://umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Culture and Hostnames</key>
@@ -44,16 +44,16 @@
     <key alias="invalidNode">Invalid node.</key>
     <key alias="invalidDomain">Invalid domain format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
-    <key alias="domain">Domain</key>
     <key alias="language">Language</key>
+    <key alias="domain">Domain</key>
     <key alias="domainCreated">New domain '%0%' has been created</key>
     <key alias="domainDeleted">Domain '%0%' is deleted</key>
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
+    <key alias="domainUpdated">Domain '%0%' has been updated</key>
+    <key alias="orEdit">Edit Current Domains</key>
     <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
         "https://www.example.com/".<br /><br />One-level paths in domains are supported, eg. "example.com/en". However, they
         should be avoided. Better use the culture setting above.]]></key>
-    <key alias="domainUpdated">Domain '%0%' has been updated</key>
-    <key alias="orEdit">Edit Current Domains</key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
@@ -132,7 +132,7 @@
     <key alias="itemChanged">This item has been changed after publication</key>
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
-    <key alias="listViewNoItems" version="7.1.5">There are no items show in the list.</key>
+    <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
     <key alias="mediatype">Media Type</key>
     <key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
@@ -245,8 +245,11 @@
     <key alias="entername">Enter a name...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
+    <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">Allow at root</key>
+    <key alias="allowAtRootDesc" version="7.2">Only Content Types with this checked can be created at the root level of Content and Media trees</key>
     <key alias="allowedchildnodetypes">Allowed child node types</key>
     <key alias="contenttypecompositions">Document Type Compositions</key>
     <key alias="create">Create</key>
@@ -256,8 +259,9 @@
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="hasListView">Enable list view</key>
-    <key alias="customizeListView" version="7.2">Customize list view</key>
+    <key alias="hasListViewDesc" version="7.2">Configures the content item to show a sortable &amp; searchable list of its children, the children will not be shown in the tree</key>
     <key alias="currentListView" version="7.2">Current list view</key>
+    <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
   </area>
@@ -406,9 +410,9 @@
     <key alias="searchResults">Search results</key>
   </area>
   <area alias="graphicheadline">
-    <key alias="backgroundcolor">Background color</key>
+    <key alias="backgroundcolor">Background colour</key>
     <key alias="bold">Bold</key>
-    <key alias="color">Text color</key>
+    <key alias="color">Text colour</key>
     <key alias="font">Font</key>
     <key alias="text">Text</key>
   </area>
@@ -424,11 +428,11 @@
       Press the <strong>install</strong> button to install the Umbraco %0% database
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
-              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
+    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
+              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
-              done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
@@ -443,7 +447,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
       proceed. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
-    <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
@@ -484,11 +488,11 @@
     ]]></key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates. 
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
-    <key alias="runwayHeader">You’ve just set up a clean Umbraco platform. What do you want to do next?</key>
+    <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
     <key alias="runwayInstalled">Runway is installed</key>
     <key alias="runwayInstalledText"><![CDATA[
       You have the foundation in place. Select what modules you wish to install on top of it.<br />
@@ -499,7 +503,7 @@
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
       "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
-        but you can easily edit, extend or remove it. It’s not necessary and you can perfectly use Umbraco without it. However, 
+        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However, 
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
         </p>
@@ -521,7 +525,7 @@ You installed Runway, so why not see how your new website looks.]]></key>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
     <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
+        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
@@ -698,19 +702,19 @@ To manage your website, simply open the Umbraco back office and start adding con
       ]]></key>
   </area>
   <area alias="colorpicker">
-    <key alias="noColors">You have not configured any approved colors</key>
+    <key alias="noColors">You have not configured any approved colours</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Add external link</key>
-    <key alias="addInternal">Add internal link</key>
-    <key alias="addlink">Add</key>
+    <key alias="enterExternal">enter external link</key>
+    <key alias="chooseInternal">choose internal page</key>
     <key alias="caption">Caption</key>
-    <key alias="internalPage">Internal page</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Move Down</key>
-    <key alias="modeUp">Move Up</key>
-    <key alias="newWindow">Open in new window</key>
-    <key alias="removeLink">Remove link</key>
+    <key alias="link">Link</key>
+    <key alias="newWindow">New window</key>
+    <key alias="captionPlaceholder">Enter a new caption</key>
+    <key alias="externalLinkPlaceholder">Enter the link</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Reset</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
@@ -738,6 +742,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
     <key alias="help" version="7.0">Help</key>
+    <key alias="forms">Forms</key>
     <key alias="analytics">Analytics</key>
   </area>
   <area alias="settings">
@@ -757,6 +762,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentTypeUses">This Content Type uses</key>
     <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
+    <key alias="masterDocumentType">Master Document Type</key>
+    <key alias="createMatchingTemplate">Create matching template</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
@@ -837,6 +844,43 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="quickGuide">Quick Guide to Umbraco template tags</key>
     <key alias="template">Template</key>
   </area>
+
+  <area alias="grid">
+    <key alias="insertControl">Insert control</key>
+    <key alias="addRows">Add rows to your layout</key>
+    <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+    
+    <key alias="gridLayouts">Grid layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add grid layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+    
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+  </area>
+
   <area alias="templateEditor">
     <key alias="alternativeField">Alternative field</key>
     <key alias="alternativeText">Alternative Text</key>

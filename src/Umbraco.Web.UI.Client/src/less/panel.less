@@ -34,12 +34,13 @@
 }
 
 .umb-panel.editor-breadcrumb .umb-panel-body, .umb-panel.editor-breadcrumb .umb-bottom-bar {
-    bottom: 30px !Important;
+    bottom: 31px !important;
 }
 
+/*
 .umb-tab-buttons.umb-bottom-bar {
-    bottom: 50px !Important;
-}
+    bottom: 50px !important;
+}*/
 
 .umb-panel-header .umb-headline, .umb-panel-header h1 {
   font-size: 16px;
@@ -186,6 +187,7 @@
     border-top: @grayLight 1px solid;
     display: block;
     margin: 0;
+    overflow: hidden;
 }
 
 .umb-panel-footer-nav li a {
@@ -234,27 +236,48 @@
 
 
 
+
  // Utility classes
 
  //SD: Had to add these because if we want to use the bootstrap text colors
  // in a panel/editor they'll all show up as white on white - so we need to use the 
  // form styles
+.umb-dialog .muted,
 .umb-panel .muted               { color: @grayLight; }
+
+.umb-dialog a.muted:hover,
+.umb-dialog a.muted:focus,
 .umb-panel a.muted:hover,
 .umb-panel a.muted:focus        { color: darken(@grayLight, 10%); }
 
+.umb-dialog .text-warning,
 .umb-panel .text-warning        { color: @formWarningText; }
+
+.umb-dialog a.text-warning:hover,
+.umb-dialog a.text-warning:focus,
 .umb-panel a.text-warning:hover,
 .umb-panel a.text-warning:focus { color: darken(@formWarningText, 10%); }
 
+.umb-dialog .text-error,
 .umb-panel .text-error          { color: @formErrorText; }
+
+.umb-dialog a.text-error:hover,
+.umb-dialog a.text-error:focus,
 .umb-panel a.text-error:hover,
 .umb-panel a.text-error:focus   { color: darken(@formErrorText, 10%); }
 
+.umb-dialog .text-info,
 .umb-panel .text-info           { color: @formInfoText; }
+
+.umb-dialog a.text-info:hover,
+.umb-dialog a.text-info:focus,
 .umb-panel a.text-info:hover,
 .umb-panel a.text-info:focus    { color: darken(@formInfoText, 10%); }
 
+.umb-dialog .text-success,
 .umb-panel .text-success        { color: @formSuccessText; }
+
+.umb-dialog a.text-success:hover,
+.umb-dialog a.text-success:focus,
 .umb-panel a.text-success:hover,
 .umb-panel a.text-success:focus { color: darken(@formSuccessText, 10%); }

@@ -259,11 +259,11 @@ angular.module('umbraco.services').factory("editorState", function() {
          */
         reset: function() {
             current = null;
-        }
+        },
 
         /**
          * @ngdoc function
-         * @name umbraco.services.angularHelper#current
+         * @name umbraco.services.angularHelper#getCurrent
          * @methodOf umbraco.services.editorState
          * @function
          *
@@ -276,7 +276,12 @@ angular.module('umbraco.services').factory("editorState", function() {
          * editorState.current can not be overwritten, you should only read values from it
          * since modifying individual properties should be handled by the property editors
          */
+        getCurrent: function() {
+            return current;
+        }
     };
+
+    //TODO: This shouldn't be removed! use getCurrent() method instead of a hacked readonly property which is confusing.
 
     //create a get/set property but don't allow setting
     Object.defineProperty(state, "current", {

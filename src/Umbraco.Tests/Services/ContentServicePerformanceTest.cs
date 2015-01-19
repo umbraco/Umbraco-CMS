@@ -45,6 +45,9 @@ namespace Umbraco.Tests.Services
             // 5290ms  !!!!!!
             //
             // that is a 96% savings of processing and sql calls!
+            //
+            // ... NOPE, made even more nice changes, it is now...
+            // 4452ms !!!!!!!
 
             var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");                        
             var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "test2");

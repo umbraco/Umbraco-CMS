@@ -1,0 +1,44 @@
+
+<div class="umb-panel" ng-controller="Umbraco.PropertyEditors.GridController.Dialogs.Config">
+
+    <div class="umb-panel-body no-header with-footer compact">
+
+        <umb-pane>
+
+            <div ng-if="config">
+                <h4>Settings</h4>
+                <umb-property
+                    property="configValue"
+                    ng-repeat="configValue in config">
+                    <umb-editor model="configValue" is-pre-value="true"></umb-editor>
+                </umb-property>
+            </div>
+
+
+            <div ng-if="styles">
+                <h4>Style</h4>
+                <umb-property
+                    property="styleValue"
+                    ng-repeat="styleValue in styles">
+                    <umb-editor model="styleValue" is-pre-value="true"></umb-editor>
+                </umb-property>
+            </div>
+
+        </umb-pane>
+    </div>
+
+
+    <div class="umb-panel-footer">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+                <a href ng-click="close()" class="btn btn-link">
+                     <localize key="general_cancel">Cancel</localize>
+                </a>
+
+                <a href ng-click="saveAndClose()" class="btn btn-primary">
+                    <localize key="buttons_save">Save</localize>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

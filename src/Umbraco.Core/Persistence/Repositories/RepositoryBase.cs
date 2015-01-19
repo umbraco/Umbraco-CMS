@@ -14,29 +14,29 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
     /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
-    internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository 
-		where TEntity : class, IAggregateRoot
+    internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository
+        where TEntity : class, IAggregateRoot
     {
-		private readonly IUnitOfWork _work;
+        private readonly IUnitOfWork _work;
         private readonly IRepositoryCacheProvider _cache;
 
-		protected RepositoryBase(IUnitOfWork work)
+        protected RepositoryBase(IUnitOfWork work)
             : this(work, RuntimeCacheProvider.Current)
         {
         }
 
-		internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
+        internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
         {
-		    if (work == null) throw new ArgumentNullException("work");
-		    if (cache == null) throw new ArgumentNullException("cache");
-		    _work = work;
+            if (work == null) throw new ArgumentNullException("work");
+            if (cache == null) throw new ArgumentNullException("cache");
+            _work = work;
             _cache = cache;
         }
 
         /// <summary>
         /// Returns the Unit of Work added to the repository
         /// </summary>
-		protected internal IUnitOfWork UnitOfWork
+        protected internal IUnitOfWork UnitOfWork
         {
             get { return _work; }
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void Delete(TEntity entity)
         {
-            if(_work != null)
+            if (_work != null)
             {
                 _work.RegisterRemoved(entity, this);
             }
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     asEntity.ResetDirtyProperties(false);
                 }
             }
-            
+
             return entity;
         }
 
@@ -120,10 +120,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var rEntity = _cache.GetById(typeof(TEntity), key);
             if (rEntity != null)
             {
-                return Attempt.Succeed((TEntity) rEntity);
+                return Attempt.Succeed((TEntity)rEntity);
             }
             return Attempt<TEntity>.Fail();
-        } 
+        }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
         /// <summary>
@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (ids.Any())
             {
                 var entities = _cache.GetByIds(
-                    typeof (TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList())
+                    typeof(TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList())
                     .ToArray();
 
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
@@ -156,15 +156,15 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var allEntities = _cache.GetAllByType(typeof (TEntity)).ToArray();
-                
+                var allEntities = _cache.GetAllByType(typeof(TEntity)).ToArray();
+
                 if (allEntities.Any())
                 {
                     //Get count of all entities of current type (TEntity) to ensure cached result is correct
                     var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
                     int totalCount = PerformCount(query);
 
-                    if(allEntities.Count() == totalCount)
+                    if (allEntities.Count() == totalCount)
                         return allEntities.Select(x => (TEntity)x);
                 }
             }
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return true;
             }
-            return PerformExists(id);            
+            return PerformExists(id);
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public int Count(IQuery<TEntity> query)
         {
             return PerformCount(query);
-        }       
+        }
 
         #endregion
 
@@ -250,10 +250,10 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                _cache.Delete(typeof (TEntity), entity);
+                _cache.Delete(typeof(TEntity), entity);
                 throw;
             }
-            
+
         }
 
         /// <summary>
@@ -271,10 +271,10 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                _cache.Delete(typeof (TEntity), entity);
+                _cache.Delete(typeof(TEntity), entity);
                 throw;
             }
-            
+
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual Guid ConvertIdToGuid(TId id)
         {
             int i = 0;
-            if(int.TryParse(id.ToString(), out i))
+            if (int.TryParse(id.ToString(), out i))
             {
                 return i.ToGuid();
             }
@@ -321,15 +321,15 @@ namespace Umbraco.Core.Persistence.Repositories
             return id.EncodeAsGuid();
         }
 
-		/// <summary>
-		/// Dispose disposable properties
-		/// </summary>
-		/// <remarks>
-		/// Ensure the unit of work is disposed
-		/// </remarks>
-		protected override void DisposeResources()
-		{
-			UnitOfWork.DisposeIfDisposable();
-		}
+        /// <summary>
+        /// Dispose disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Ensure the unit of work is disposed
+        /// </remarks>
+        protected override void DisposeResources()
+        {
+            UnitOfWork.DisposeIfDisposable();
+        }
     }
 }

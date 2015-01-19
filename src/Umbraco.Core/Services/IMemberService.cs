@@ -13,6 +13,15 @@ namespace Umbraco.Core.Services
     public interface IMemberService : IMembershipMemberService
     {
         /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all documents
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all content
+        /// </param>
+        void RebuildXmlStructures(params int[] contentTypeIds);
+
+        /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
         /// </summary>
         /// <remarks>An <see cref="IMember"/> can be of type <see cref="IMember"/> </remarks>

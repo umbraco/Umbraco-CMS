@@ -7,6 +7,7 @@ var app = angular.module('umbraco', [
     'ngCookies',
     'ngSanitize',
     'ngMobile',
-    'blueimp.fileupload'
+    'blueimp.fileupload',
+    'tmh.dynamicLocale'
 ]);
 var packages = angular.module("umbraco.packages", []);

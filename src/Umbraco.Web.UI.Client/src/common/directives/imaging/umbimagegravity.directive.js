@@ -49,6 +49,8 @@ angular.module("umbraco.directives")
 						if(scope.center){
 							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
 							scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
+						}else{
+							scope.center = { left: 0.5, top: 0.5 };
 						}
 					};	
 

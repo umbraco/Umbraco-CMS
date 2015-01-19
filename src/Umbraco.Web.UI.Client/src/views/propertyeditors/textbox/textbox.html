@@ -2,7 +2,8 @@
     <input type="text" name="textbox" ng-model="model.value" id="{{model.alias}}"
            class="umb-editor umb-textstring textstring"
            val-server="value"
-           ng-required="model.validation.mandatory" />
+           ng-required="model.validation.mandatory"
+           ng-trim="false" />
 
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required">Required</span>
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>

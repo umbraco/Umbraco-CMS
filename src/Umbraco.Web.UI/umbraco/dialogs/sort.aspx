@@ -19,12 +19,12 @@
     <div class="umb-dialog-body">
         <cc1:Pane runat="server">
 
-          <div id="loading" style="display: none;">
+          <div id="loading" style="display: none; margin-bottom: 35px;">
                 <div class="notice">
                     <p><%= umbraco.ui.Text("sort", "sortPleaseWait") %></p>
                 </div>
-                <br />
-                <div style="overflow: hidden; margin-left: -20px; margin-right: -20px;">
+                
+                <div class="umb-loader-wrapper">
                     <cc1:ProgressBar ID="prog1" runat="server" Title="sorting.." />
                 </div>
             </div>

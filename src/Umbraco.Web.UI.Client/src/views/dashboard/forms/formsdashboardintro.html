@@ -1,0 +1,35 @@
+<div ng-controller="Umbraco.Dashboard.FormsDashboardController" class="umb-dashboards-forms-install">
+	<div style="max-width: 800px; text-align: center; margin: auto; padding: 20px; min-height: 800px;">
+
+		<div class="installer-top"> <!-- ADDED -->
+			<i style="font-size: 80px" class="icon icon-umb-contour"></i>
+			<h3>Umbraco Forms</h3>
+		</div> <!-- ADDED -->
+
+		<div class="step-one" ng-hide="state"> <!-- STEP one -->
+
+			<div id="video_1" class="video_player" style="margin-bottom: 40px">
+				<video autoplay loop>
+					<!-- <source src="videos/gif.webm" type="video/webm"> -->
+					<source src="//player.vimeo.com/external/110229004.hd.mp4?s=823f701836260bd08fb783d38389f628" type="video/mp4">
+					Sorry, you don't have HTML5 video and we didn't catch this properly in javascript.
+				</video>
+			</div>
+
+			<p style="font-size: 16px; line-height: 1.5; color: #4c4c4c;">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</p>
+
+			<button class="btn publish btn-install" ng-click="installForms()">Install</button>
+		</div>
+
+		<div class="step-two" ng-if="state"> <!-- STEP two -->
+			<p id="installer" style="font-size: 16px; line-height: 1.5; color: #4c4c4c;">Installing...</p>
+
+			<div class="installing">
+				<div style="width: 99%; overflow: hidden" ng-if="state">
+					<div class="umb-loader"></div>
+					<small>{{state}}</small>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

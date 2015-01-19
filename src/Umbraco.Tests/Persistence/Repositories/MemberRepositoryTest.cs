@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -38,6 +39,76 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository, memberGroupRepository, tagRepo);
             return repository;
         }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            {
+                var memberType1 = CreateTestMemberType();
+                
+                for (var i = 0; i < 100; i++)
+                {
+                    var member = MockedMember.CreateSimpleMember(memberType1, "blah" + i, "blah" + i + "@example.com", "blah", "blah" + i);
+                    repository.AddOrUpdate(member);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures_For_Content_Type()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
+            {
+
+                var memberType1 = CreateTestMemberType("mt1");
+                var memberType2 = CreateTestMemberType("mt2");
+                var memberType3 = CreateTestMemberType("mt3");
+
+                for (var i = 0; i < 30; i++)
+                {
+                    var member = MockedMember.CreateSimpleMember(memberType1, "b1lah" + i, "b1lah" + i + "@example.com", "b1lah", "b1lah" + i);
+                    repository.AddOrUpdate(member);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var member = MockedMember.CreateSimpleMember(memberType2, "b2lah" + i, "b2lah" + i + "@example.com", "b2lah", "b2lah" + i);
+                    repository.AddOrUpdate(member);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var member = MockedMember.CreateSimpleMember(memberType3, "b3lah" + i, "b3lah" + i + "@example.com", "b3lah", "b3lah" + i);
+                    repository.AddOrUpdate(member);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] { memberType1.Id, memberType2.Id });
+
+                Assert.AreEqual(60, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
 
         [Test]
         public void Can_Instantiate_Repository_From_Resolver()
@@ -297,7 +368,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IMemberType CreateTestMemberType()
+        private IMemberType CreateTestMemberType(string alias = null)
         {
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
@@ -305,7 +376,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             MemberGroupRepository memberGroupRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
-                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                var memberType = MockedContentTypes.CreateSimpleMemberType(alias);
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
                 return memberType;

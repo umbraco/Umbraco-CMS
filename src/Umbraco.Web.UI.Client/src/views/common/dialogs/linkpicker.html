@@ -29,14 +29,31 @@
 			</umb-control-group>
 		</umb-pane>
 
-		
+        <umb-tree-search-box hide-search-callback="hideSearch"
+                             search-callback="onSearchResults"
+                             search-from-id="{{searchInfo.searchFromId}}"
+                             search-from-name="{{searchInfo.searchFromName}}"
+                             show-search="{{searchInfo.showSearch}}"
+                             section="{{section}}">
+        </umb-tree-search-box>
+        
+        <br/>
 
-		<umb-tree 
-			section="content" 
-			hideheader="false" 
-			hideoptions="true"
-			eventhandler="dialogTreeEventHandler">
-		</umb-tree>
+        <umb-tree-search-results ng-if="searchInfo.showSearch"
+                                 results="searchInfo.results"
+                                 select-result-callback="selectResult">
+        </umb-tree-search-results>
+        
+	    <div ng-hide="searchInfo.showSearch">
+            <umb-tree section="content"
+                      hideheader="true"
+                      hideoptions="true"
+                      eventhandler="dialogTreeEventHandler"
+                      isdialog="true"
+                      enablecheckboxes="true">
+            </umb-tree>    
+	    </div>
+        
 	</div>
 
 	<div class="umb-panel-footer">

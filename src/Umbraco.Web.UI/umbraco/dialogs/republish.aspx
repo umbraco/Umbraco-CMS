@@ -24,7 +24,9 @@
     </div>     
       
     <div id="progress" style="visibility: hidden;">
-		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
+      <div class="umb-loader-wrapper">
+		    <cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
+      </div>
     </div>
       
     </asp:Panel>

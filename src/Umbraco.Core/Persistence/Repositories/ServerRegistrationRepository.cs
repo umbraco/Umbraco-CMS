@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(ServerRegistration entity)
         {
-            ((Entity)entity).AddingEntity();
+            entity.AddingEntity();
 
             var factory = new ServerRegistrationFactory();
             var dto = factory.BuildDto(entity);
@@ -113,19 +113,19 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(ServerRegistration entity)
         {
-            ((Entity)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var factory = new ServerRegistrationFactory();
             var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
     }

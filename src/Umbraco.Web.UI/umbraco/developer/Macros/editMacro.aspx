@@ -99,11 +99,11 @@
     
     <cc1:Pane ID="Pane1_3" runat="server" Title="Editor settings">
 
-        <cc1:PropertyPanel runat="server" Text="Use in rich text editor">
+        <cc1:PropertyPanel runat="server" Text="Use in rich text editor and the grid">
             <asp:CheckBox ID="macroEditor" runat="server" Text="Yes"></asp:CheckBox>
         </cc1:PropertyPanel>
         
-        <cc1:PropertyPanel runat="server" Text="Render in rich text editor">
+        <cc1:PropertyPanel runat="server" Text="Render in rich text editor and the grid">
              <asp:CheckBox ID="macroRenderContent" runat="server" Text="Yes"></asp:CheckBox>
         </cc1:PropertyPanel>
     </cc1:Pane>
