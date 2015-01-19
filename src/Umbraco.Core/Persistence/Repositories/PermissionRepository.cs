@@ -27,11 +27,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
         private readonly CacheHelper _cache;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache)
+        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache, ISqlSyntaxProvider sqlSyntax)
         {
             _unitOfWork = unitOfWork;
             _cache = cache;
+            _sqlSyntax = sqlSyntax;
         }
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     var whereBuilder = new StringBuilder();
             
                     //where userId = @userId AND
-                    whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("userId"));
+                    whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("userId"));
                     whereBuilder.Append("=");
                     whereBuilder.Append(userId);
 
@@ -64,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         for (var index = 0; index < entityIds.Length; index++)
                         {
                             var entityId = entityIds[index];
-                            whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("nodeId"));
+                            whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("nodeId"));
                             whereBuilder.Append("=");
                             whereBuilder.Append(entityId);
                             if (index < entityIds.Length - 1)

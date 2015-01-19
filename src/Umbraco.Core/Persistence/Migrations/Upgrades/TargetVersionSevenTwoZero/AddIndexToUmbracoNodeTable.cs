@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
 
         public override void Up()
         {
-            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition
                 {
                     TableName = x.Item1,

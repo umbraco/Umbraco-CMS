@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Web.Security;
@@ -16,7 +17,6 @@ namespace Umbraco.Web.Mvc
     [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
-
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected UmbracoPageResult CurrentUmbracoPage()
         {
-            return new UmbracoPageResult();
+            return new UmbracoPageResult(ApplicationContext.ProfilingLogger);
         }
 
         /// <summary>

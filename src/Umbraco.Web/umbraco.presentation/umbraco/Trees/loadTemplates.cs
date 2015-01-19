@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.businesslogic;
+using Umbraco.Core.Services;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
@@ -14,10 +16,12 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "templates", "Templates", sortOrder: 1)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadTemplates : BaseTree
     {
         public loadTemplates(string application) : base(application) {}
+
+        private ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
@@ -165,20 +169,20 @@ namespace umbraco
         private void RenderTemplates(ref XmlTree tree)
         {
             List<Template> templates = null;
-            if (base.m_id == -1)
-                templates = Template.GetAllAsList().FindAll(delegate(Template t) { return !t.HasMasterTemplate; });
+            if (m_id == -1)
+                templates = Template.GetAllAsList().FindAll(t => t.HasMasterTemplate == false);
             else
-                templates = Template.GetAllAsList().FindAll(delegate(Template t) { return t.MasterTemplate == base.m_id; });
+                templates = Template.GetAllAsList().FindAll(t => t.MasterTemplate == m_id);
 
             foreach (Template t in templates)
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = t.Id.ToString();
+                xNode.NodeID = t.Id.ToString(CultureInfo.InvariantCulture);
                 xNode.Text = t.Text;
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
 
-                if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
+                if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && _viewHelper.ViewExists(t.TemplateEntity))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "icon-newspaper-alt";

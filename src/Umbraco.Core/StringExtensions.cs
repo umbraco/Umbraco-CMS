@@ -374,6 +374,11 @@ namespace Umbraco.Core
             return input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
         }
 
+        public static string EnsureEndsWith(this string input, string toEndWith)
+        {
+            return input.EndsWith(toEndWith.ToString(CultureInfo.InvariantCulture)) ? input : input + toEndWith;
+        }
+
         public static bool IsLowerCase(this char ch)
         {
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLowerInvariant();

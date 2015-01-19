@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             Execute.Code(Update);
         }
 
-        internal static string Update(Database database)
+        internal string Update(Database database)
         {
             if (database != null)
             {
@@ -75,7 +75,7 @@ WHERE umbracoNode.nodeObjectType = @objectType";
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<UpdateToNewMemberPropertyAliases>("Exception was thrown when trying to upgrade old member aliases to the new ones", ex);
+                        Logger.Error<UpdateToNewMemberPropertyAliases>("Exception was thrown when trying to upgrade old member aliases to the new ones", ex);
                         throw;
                     }
                 }

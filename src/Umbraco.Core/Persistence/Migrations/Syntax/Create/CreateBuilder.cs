@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using System;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Column;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Constraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
@@ -6,18 +7,27 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Create.ForeignKey;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Table;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 {
     public class CreateBuilder : ICreateBuilder
     {
         private readonly IMigrationContext _context;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly DatabaseProviders[] _databaseProviders;
 
-        public CreateBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
+        public CreateBuilder(IMigrationContext context, ISqlSyntaxProvider sqlSyntax, params DatabaseProviders[] databaseProviders)
         {
             _context = context;
+            _sqlSyntax = sqlSyntax;
             _databaseProviders = databaseProviders;
+        }
+
+        [Obsolete("Use alternate ctor specifying ISqlSyntaxProvider instead")]
+        public CreateBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
+            :this(context, SqlSyntaxContext.SqlSyntaxProvider, databaseProviders)
+        {
         }
 
         public ICreateTableWithColumnSyntax Table(string tableName)
@@ -56,14 +66,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         public ICreateIndexForTableSyntax Index()
         {
-            var expression = new CreateIndexExpression();
+            var expression = new CreateIndexExpression(_sqlSyntax);
             _context.Expressions.Add(expression);
             return new CreateIndexBuilder(expression);
         }
 
         public ICreateIndexForTableSyntax Index(string indexName)
         {
-            var expression = new CreateIndexExpression { Index = { Name = indexName } };
+            var expression = new CreateIndexExpression(_sqlSyntax) { Index = { Name = indexName } };
             _context.Expressions.Add(expression);
             return new CreateIndexBuilder(expression);
         }

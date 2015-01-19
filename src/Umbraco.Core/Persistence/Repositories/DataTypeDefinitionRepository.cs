@@ -5,16 +5,16 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
-using NullCacheProvider = Umbraco.Core.Persistence.Caching.NullCacheProvider;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -27,22 +27,13 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper,
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository)
-			: base(work)
+            : base(work, cache, logger, sqlSyntax)
         {
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
-        }
-
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper,
-            IContentTypeRepository contentTypeRepository)
-            : base(work, cache)
-        {
-            _cacheHelper = cacheHelper;
-            _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, NullCacheProvider.Current);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
         }
 
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -159,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name", new {name = entity.Name});
+WHERE umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name", new {name = entity.Name});
             if (exists > 0)
             {
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
@@ -204,7 +195,7 @@ WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("te
             //Cannot change to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @"= @name
+WHERE umbracoNode." + SqlSyntaxProvider.GetQuotedColumnName("text") + @"= @name
 AND umbracoNode.id <> @id", 
                     new { id = entity.Id, name = entity.Name });
             if (exists > 0)
@@ -446,7 +437,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+                : base(work, cache, logger, sqlSyntax)
             {
             }
 

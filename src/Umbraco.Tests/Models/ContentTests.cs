@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -220,14 +222,14 @@ namespace Umbraco.Tests.Models
             ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
 
-            var runtimeCache = new RuntimeCacheProvider();
-            runtimeCache.Save(typeof(IContent), content);
+            var runtimeCache = new ObjectCacheRuntimeCacheProvider();
+            runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
             {
                 for (int j = 0; j < 1000; j++)
                 {
-                    var clone = runtimeCache.GetById(typeof(IContent), content.Id.ToGuid());
+                    var clone = runtimeCache.GetCacheItem(content.Id.ToString(CultureInfo.InvariantCulture));
                 }
             }
 

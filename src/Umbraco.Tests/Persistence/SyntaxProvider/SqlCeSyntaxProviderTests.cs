@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         [SetUp]
         public void SetUp()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
         }
 
         [Test]
@@ -73,7 +73,7 @@ WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " 
         [Test]
         public void Format_SqlServer_NonClusteredIndexDefinition_AddsNonClusteredDirective()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlServerSyntaxProvider();
 
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IndexType = IndexTypes.NonClustered;
@@ -85,7 +85,7 @@ WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " 
         [Test]
         public void Format_SqlServer_NonClusteredIndexDefinition_UsingIsClusteredFalse_AddsClusteredDirective()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlServerSyntaxProvider();
 
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IsClustered = false;
@@ -97,7 +97,7 @@ WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " 
         [Test]
         public void CreateIndexBuilder_SqlServer_NonClustered_CreatesNonClusteredIndex()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlServerSyntaxProvider();
             var createExpression = new CreateIndexExpression { Index = { Name = "IX_A" } };
             var builder = new CreateIndexBuilder(createExpression);
             builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().NonClustered();
@@ -107,7 +107,7 @@ WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlServerSyntaxProvider();
             var createExpression = new CreateIndexExpression { Index = { Name = "IX_A" } };
             var builder = new CreateIndexBuilder(createExpression);
             builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Unique();
@@ -117,7 +117,7 @@ WHERE ([umbracoNode].[nodeObjectType] = @0)) x)".Replace(Environment.NewLine, " 
         [Test]
         public void CreateIndexBuilder_SqlServer_Clustered_CreatesClusteredIndex()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlServerSyntaxProvider();
             var createExpression = new CreateIndexExpression { Index = { Name = "IX_A" } };
             var builder = new CreateIndexBuilder(createExpression);
             builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Clustered();

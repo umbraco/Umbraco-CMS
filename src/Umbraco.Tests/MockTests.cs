@@ -5,8 +5,12 @@ using System.Text;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Moq;
 using Umbraco.Web;
@@ -35,6 +39,7 @@ namespace Umbraco.Tests
                 new Mock<IFileService>().Object,
                 new Mock<ILocalizationService>().Object,
                 new PackagingService(
+                    new Mock<ILogger>().Object,
                     new Mock<IContentService>().Object,
                     new Mock<IContentTypeService>().Object,
                     new Mock<IMediaService>().Object,
@@ -43,12 +48,12 @@ namespace Umbraco.Tests
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
                     new Mock<IUserService>().Object,
-                    new RepositoryFactory(true),
+                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
                 new Mock<IEntityService>().Object,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                    new RepositoryFactory(true),
+                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                     new Mock<IEntityService>().Object),
                 new Mock<IMemberGroupService>().Object,
                 new Mock<IMemberTypeService>().Object,
@@ -65,7 +70,7 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Db_Context()
         {
-            var dbCtx = new DatabaseContext(new Mock<IDatabaseFactory>().Object);
+            var dbCtx = new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             Assert.Pass();
         }
 
@@ -73,8 +78,8 @@ namespace Umbraco.Tests
         public void Can_Create_App_Context_With_Services()
         {
             var appCtx = new ApplicationContext(
-                new DatabaseContext(new Mock<IDatabaseFactory>().Object),
-                new ServiceContext(
+                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new ServiceContext(                    
                     new Mock<IContentService>().Object,
                     new Mock<IMediaService>().Object,
                     new Mock<IContentTypeService>().Object,
@@ -82,6 +87,7 @@ namespace Umbraco.Tests
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
                     new PackagingService(
+                        new Mock<ILogger>().Object,
                         new Mock<IContentService>().Object,
                         new Mock<IContentTypeService>().Object,
                         new Mock<IMediaService>().Object,
@@ -90,12 +96,12 @@ namespace Umbraco.Tests
                         new Mock<IFileService>().Object,
                         new Mock<ILocalizationService>().Object,
                         new Mock<IUserService>().Object,
-                        new RepositoryFactory(true),
+                        new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                         new Mock<IDatabaseUnitOfWorkProvider>().Object),
                     new Mock<IEntityService>().Object,
                     new RelationService(
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                        new RepositoryFactory(true),
+                        new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
                         new Mock<IEntityService>().Object),
                     new Mock<IMemberGroupService>().Object,
                     new Mock<IMemberTypeService>().Object,
@@ -106,7 +112,8 @@ namespace Umbraco.Tests
                     new Mock<ITagService>().Object,
                     new Mock<INotificationService>().Object,
                     Mock.Of<ILocalizedTextService>()),
-                CacheHelper.CreateDisabledCacheHelper());
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             
             Assert.Pass();
         }

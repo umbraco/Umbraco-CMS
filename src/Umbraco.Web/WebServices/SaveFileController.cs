@@ -163,6 +163,8 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
         {
+            //TODO: Change this over to use the new API - Also this will be migrated to a TemplateEditor or ViewEditor when it's all moved to angular
+
             Template t;
             bool pathChanged = false;
             try
@@ -174,11 +176,12 @@ namespace Umbraco.Web.WebServices
                     Design = templateContents
                 };
 
-                //check if the master page has changed
-                if (t.MasterTemplate != masterTemplateId)
+                //check if the master page has changed - we need to normalize both - if it's 0 or -1, then make it 0... this is easy
+                // to do with Math.Max
+                if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
                 {
-                    pathChanged = true;
-                    t.MasterTemplate = masterTemplateId;
+                    t.MasterTemplate = Math.Max(masterTemplateId, 0);
+                    pathChanged = true;                  
                 }
             }
             catch (ArgumentException ex)
@@ -201,7 +204,11 @@ namespace Umbraco.Web.WebServices
                 var syncPath = "-1,init," + t.Path.Replace("-1,", "");
 
                 return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"),
-                    new { path = syncPath });
+                    new
+                    {
+                        path = syncPath,
+                        contents = t.Design
+                    });
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web.UI;
 using Umbraco.Core.IO;
 using Umbraco.Web;
@@ -7,6 +8,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
@@ -15,7 +17,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
     /// </summary>
     public partial class editstylesheet : UmbracoEnsuredPage
     {
-        private StyleSheet stylesheet;
+        private Umbraco.Core.Models.Stylesheet _sheet;
 
         protected MenuButton SaveButton;
 
@@ -50,22 +52,22 @@ namespace umbraco.cms.presentation.settings.stylesheet
             pp_name.Text = ui.Text("name", UmbracoUser);
             pp_path.Text = ui.Text("path", UmbracoUser);
 
-            stylesheet = new StyleSheet(int.Parse(Request.QueryString["id"]));
-            var appPath = Request.ApplicationPath;
-            if (appPath == "/")
-                appPath = "";
-            lttPath.Text = "<a target='_blank' href='" + appPath + "/css/" + stylesheet.Text + ".css'>" + appPath +
-                            SystemDirectories.Css + "/" + stylesheet.Text + ".css</a>";
+            _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
+            if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
+
+            lttPath.Text = "<a target='_blank' href='" + _sheet.VirtualPath + "'>" + _sheet.VirtualPath + "</a>";
 
 
             if (IsPostBack == false)
             {
-                NameTxt.Text = stylesheet.Text;
-                editorSource.Text = stylesheet.Content;
+                NameTxt.Text = _sheet.Path.TrimEnd(".css");
+                editorSource.Text = _sheet.Content;
 
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
-                    .SyncTree("-1,init," + Request.GetItemAsString("id"), false);
+                    .SetActiveTreeType(Constants.Trees.Stylesheets)
+                    .SyncTree("-1,init," + _sheet.Path
+                        //needs a double escape to work with JS
+                        .Replace("\\", "\\\\").TrimEnd(".css"), false);
             }
         }
 

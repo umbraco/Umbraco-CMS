@@ -12,9 +12,11 @@ namespace Umbraco.Core.Persistence.Mappers
         /// <summary>
         /// Constructor accepting a list of BaseMapper types that are attributed with the MapperFor attribute
         /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="logger"></param>
         /// <param name="assignedMapperTypes"></param>
-        public MappingResolver(Func<IEnumerable<Type>> assignedMapperTypes)
-            : base(assignedMapperTypes)
+        public MappingResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> assignedMapperTypes)
+            : base(serviceProvider, logger, assignedMapperTypes)
         {
             
         }

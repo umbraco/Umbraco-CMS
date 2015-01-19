@@ -19,10 +19,12 @@ namespace Umbraco.Core.Services
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberTypeService(IMemberService memberService)
             : this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory(), memberService)
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberTypeService(RepositoryFactory repositoryFactory, IMemberService memberService)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, memberService)
         { }

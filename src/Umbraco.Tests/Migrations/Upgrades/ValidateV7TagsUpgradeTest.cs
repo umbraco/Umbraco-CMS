@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Persistence.Repositories;
@@ -21,17 +25,17 @@ namespace Umbraco.Tests.Migrations.Upgrades
     {
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntaxProvider, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntaxProvider);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntaxProvider, templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntaxProvider, contentTypeRepository, templateRepository, tagRepository);
             return repository;
         }
 
         [Test]
         public void Validate_Data_Upgrade()
         {
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository contentTypeRepository;
             var insertedContent = new List<IContent>();
@@ -116,7 +120,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
 
             var migration = new AlterTagRelationsTable();
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database);
+            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database, Logger);
             migration.GetUpExpressions(migrationContext);
 
             Assert.AreEqual(

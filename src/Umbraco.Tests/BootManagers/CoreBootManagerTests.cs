@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
@@ -22,7 +25,7 @@ namespace Umbraco.Tests.BootManagers
         public override void Initialize()
         {
             base.Initialize();
-            _testApp = new TestApp();
+            _testApp = new TestApp();            
         }
 
         [TearDown]
@@ -30,10 +33,7 @@ namespace Umbraco.Tests.BootManagers
         {
             base.TearDown();
 
-            _testApp = null;
-            
-            //ApplicationEventsResolver.Reset();
-            //SqlSyntaxProvidersResolver.Reset();
+            _testApp = null;            
         }
 
         protected override void FreezeResolution()
@@ -65,7 +65,9 @@ namespace Umbraco.Tests.BootManagers
             protected override void InitializeApplicationEventsResolver()
             {
                 //create an empty resolver so we can add our own custom ones (don't type find)
-                ApplicationEventsResolver.Current = new ApplicationEventsResolver(new Type[]
+                ApplicationEventsResolver.Current = new ApplicationEventsResolver(
+                    new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                    new Type[]
                     {
                         typeof(LegacyStartupHandler),
                         typeof(TestApplicationEventHandler)
@@ -74,17 +76,7 @@ namespace Umbraco.Tests.BootManagers
                         CanResolveBeforeFrozen = true
                     };
             }
-
-            protected override void InitializeResolvers()
-            {
-                //Do nothing as we don't want to initialize all resolvers in this test
-                //We only include this resolver to not cause trouble for the database context
-                SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                    PluginManager.Current.ResolveSqlSyntaxProviders())
-                                                         {
-                                                             CanResolveBeforeFrozen = true
-                                                         };
-            }
+            
         }
 
         /// <summary>

@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -17,19 +20,22 @@ namespace Umbraco.Core.Services
     {
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-	    private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
+        private static readonly Guid RootParentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService()
-            : this(new RepositoryFactory())
+            : this(new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService(RepositoryFactory repositoryFactory)
-			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+			: this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
+            : this(provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
         {
         }
 
@@ -37,6 +43,81 @@ namespace Umbraco.Core.Services
         {
 			_repositoryFactory = repositoryFactory;
 		    _uowProvider = provider;
+        }
+
+        /// <summary>
+        /// Adds or updates a translation for a dictionary item and language
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="language"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This does not save the item, that needs to be done explicitly
+        /// </remarks>
+        public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value)
+        {
+            if (item == null) throw new ArgumentNullException("item");
+            if (language == null) throw new ArgumentNullException("language");
+
+            var existing = item.Translations.FirstOrDefault(x => x.Language.Id == language.Id);
+            if (existing != null)
+            {
+                existing.Value = value;
+            }
+            else
+            {
+                item.Translations = new List<IDictionaryTranslation>(item.Translations)
+                {
+                    new DictionaryTranslation(language, value)
+                };
+            }
+        }
+
+        /// <summary>
+        /// Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="parentId"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateDictionaryRepository(uow))
+            {
+                //validate the parent
+                if (parentId.HasValue && parentId.Value != Guid.Empty)
+                {
+                    var parent = GetDictionaryItemById(parentId.Value);
+                    if (parent == null)
+                    {
+                        throw new ArgumentException("No parent dictionary item was found with id " + parentId.Value);
+                    }
+                }
+
+                var item = new DictionaryItem(parentId.HasValue ? parentId.Value : RootParentId, key);
+
+                if (defaultValue.IsNullOrWhiteSpace() == false)
+                {
+                    var langs = GetAllLanguages();
+                    var translations = langs.Select(language => new DictionaryTranslation(language, defaultValue))
+                        .Cast<IDictionaryTranslation>()
+                        .ToList();
+
+                    item.Translations = translations;
+                }
+
+                if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(item), this))
+                    return item;
+
+                repository.AddOrUpdate(item);
+                uow.Commit();
+
+                SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(item), this);
+
+                return item;
+            }
         }
 
         /// <summary>
@@ -61,10 +142,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateDictionaryRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
-                var items = repository.GetByQuery(query);
+                return repository.Get(id);
+                //var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 
@@ -77,10 +159,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateDictionaryRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                var items = repository.GetByQuery(query);
+                return repository.Get(key);
+                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 
@@ -124,10 +207,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateDictionaryRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                var items = repository.GetByQuery(query);
+                return repository.Get(key) != null;
+                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
+                //var items = repository.GetByQuery(query);
 
-                return items.Any();
+                //return items.Any();
             }
         }
 
@@ -199,10 +283,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateLanguageRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<ILanguage>.Builder.Where(x => x.CultureName == cultureName);
-                var items = repository.GetByQuery(query);
+                return repository.GetByCultureName(cultureName);
+                //var query = Query<ILanguage>.Builder.Where(x => x.CultureName == cultureName);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 
@@ -215,10 +300,11 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateLanguageRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == isoCode);
-                var items = repository.GetByQuery(query);
+                return repository.GetByIsoCode(isoCode);
+                //var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == isoCode);
+                //var items = repository.GetByQuery(query);
 
-                return items.FirstOrDefault();
+                //return items.FirstOrDefault();
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.ObjectResolution;
 
@@ -14,6 +15,12 @@ namespace Umbraco.Core.PropertyEditors
     /// </remarks>
     public class PropertyEditorResolver : LazyManyObjectsResolverBase<PropertyEditorResolver, PropertyEditor>
     {
+        public PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList)
+            : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
+        {
+        }
+
+        [Obsolete("Use the ctor specifying a PluginManager instead")]
         public PropertyEditorResolver(Func<IEnumerable<Type>> typeListProducerList)
             : base(typeListProducerList, ObjectLifetimeScope.Application)
         {

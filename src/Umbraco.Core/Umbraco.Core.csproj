@@ -133,6 +133,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
+    <Compile Include="ActivatorServiceProvider.cs" />
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
@@ -296,12 +297,24 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
+    <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Macros\PartialViewMacroResult.cs" />
+    <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
+    <Compile Include="Logging\LoggerExtensions.cs" />
+    <Compile Include="Logging\LoggerResolver.cs" />
+    <Compile Include="Logging\ProfilingLogger.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
+    <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
+    <Compile Include="Persistence\DatabaseSchemaHelper.cs" />
+    <Compile Include="Persistence\Repositories\SimpleGetRepository.cs" />
     <Compile Include="Services\LocalizedTextService.cs" />
     <Compile Include="Services\ILocalizedTextService.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\Logger.cs" />
     <Compile Include="Macros\XsltExtension.cs" />
     <Compile Include="Macros\XsltExtensionAttribute.cs" />
     <Compile Include="Macros\XsltExtensionsResolver.cs" />
@@ -376,6 +389,8 @@
     <Compile Include="Persistence\Mappers\TagMapper.cs" />
     <Compile Include="Persistence\Mappers\TemplateMapper.cs" />
     <Compile Include="Persistence\Migrations\DataLossException.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateAndRemoveTemplateMasterColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddRelationTypeForDocumentOnDelete.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AddMissingForeignKeyForContentType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwoZero\AlterDataTypePreValueTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenOneZero\AssignMissingPrimaryForMySqlKeys.cs" />
@@ -403,9 +418,6 @@
     <Compile Include="Persistence\Repositories\ContentXmlRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMemberGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepository.cs" />
-    <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
@@ -429,14 +441,7 @@
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentOrderedSet.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentSet.cs" />
-    <Compile Include="Models\Css\CssCompactor.cs" />
-    <Compile Include="Models\Css\CssParser.cs" />
-    <Compile Include="Models\Css\CssSyntax.cs" />
-    <Compile Include="Models\Css\FileUtility.cs" />
-    <Compile Include="Models\Css\FilterTrie.cs" />
-    <Compile Include="Models\Css\LineReader.cs" />
-    <Compile Include="Models\Css\ParseException.cs" />
-    <Compile Include="Models\Css\TrieNode.cs" />
+    <Compile Include="Strings\Css\StylesheetRule.cs" />
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
     <Compile Include="Models\Editors\ContentPropertyData.cs" />
@@ -517,10 +522,6 @@
     <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
     <Compile Include="ObjectResolution\ResolverCollection.cs" />
     <Compile Include="ObservableDictionary.cs" />
-    <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
-    <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
-    <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
-    <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ModelFactoryConfiguration.cs" />
     <Compile Include="Persistence\Factories\MemberFactory.cs" />
@@ -595,7 +596,6 @@
     <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />
     <Compile Include="Persistence\Factories\DictionaryItemFactory.cs" />
     <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
-    <Compile Include="Persistence\Factories\IEntityFactory.cs" />
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
     <Compile Include="Persistence\Factories\MediaFactory.cs" />
     <Compile Include="Persistence\Factories\MediaTypeFactory.cs" />
@@ -826,7 +826,6 @@
     <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
     <Compile Include="ObjectResolution\LazyManyObjectsResolverBase.cs" />
-    <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
@@ -836,7 +835,7 @@
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxContext.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProvidersResolver.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviders.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
@@ -1053,6 +1052,7 @@
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Services\LocalizedTextServiceFileSources.cs" />
     <Compile Include="Services\MacroService.cs" />
+    <Compile Include="IO\MasterPageHelper.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
     <Compile Include="Services\MemberGroupService.cs" />
@@ -1069,9 +1069,12 @@
     <Compile Include="Services\TagService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
+    <Compile Include="IO\ViewHelper.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneCoreApplication.cs" />
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
+    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
+    <Compile Include="Strategies\RelateOnTrashHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
     <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />

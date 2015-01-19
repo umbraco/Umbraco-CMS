@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UmbracoEntityFactory : IEntityFactory<UmbracoEntity, EntityRepository.UmbracoEntityDto>
+    internal class UmbracoEntityFactory 
     {
         internal void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
         {

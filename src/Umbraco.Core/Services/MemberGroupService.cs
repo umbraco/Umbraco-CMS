@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -14,11 +15,13 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberGroupService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberGroupService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {

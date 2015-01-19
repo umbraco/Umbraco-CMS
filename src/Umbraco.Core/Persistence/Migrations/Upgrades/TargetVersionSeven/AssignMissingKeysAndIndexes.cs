@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //Some very old schemas don't have an index on the cmsContent.nodeId column, I'm not actually sure when it was added but 
             // it is absolutely required to exist in order to have it as a foreign key reference, so we'll need to check it's existence
             // this came to light from this issue: http://issues.umbraco.org/issue/U4-4133
-            var dbIndexes = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             if (Context.CurrentDatabaseProvider == DatabaseProviders.SqlServer 
                 || Context.CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
             {
-                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
                 //This should be 2 because this table has 2 keys
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsPreviewXml") && x.Item3.InvariantStartsWith("PK_")) == 0)

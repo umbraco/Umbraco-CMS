@@ -31,8 +31,6 @@ namespace Umbraco.Tests.TestHelpers
 
         private void Init(ApplicationContext applicationContext, UmbracoContext umbracoContext)
         {
-            TestHelper.SetupLog4NetForTests();
-
             ApplicationContext = applicationContext;
             UmbracoContext = umbracoContext;
 

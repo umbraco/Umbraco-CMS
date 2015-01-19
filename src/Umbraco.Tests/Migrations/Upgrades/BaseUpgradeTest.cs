@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -23,13 +25,14 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
-			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
+			MigrationResolver.Current = new MigrationResolver(
+                new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                () => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
 					typeof (DeleteAppTables),
@@ -44,6 +47,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
 					typeof (UpdateCmsContentVersionTable),
 					typeof (UpdateCmsPropertyTypeGroupTable)
 				});
+
+            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
+            {
+                CanResolveBeforeFrozen = true
+            };
 
 			Resolution.Freeze();
 
@@ -73,7 +81,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             //Setup the MigrationRunner
-            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             bool upgraded = migrationRunner.Execute(db, provider, true);
 
             Assert.That(upgraded, Is.True);
@@ -93,6 +101,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             PluginManager.Current = null;
             SqlSyntaxContext.SqlSyntaxProvider = null;
 			MigrationResolver.Reset();
+            LoggerResolver.Reset();
 
             TestHelper.CleanContentDirectories();
 

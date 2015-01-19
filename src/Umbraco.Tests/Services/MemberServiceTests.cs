@@ -1066,9 +1066,9 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var uow = provider.GetUnitOfWork();
-            using (RepositoryResolver.Current.ResolveByType<IMemberRepository>(uow))
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+
+            using (var uow = provider.GetUnitOfWork())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
             }

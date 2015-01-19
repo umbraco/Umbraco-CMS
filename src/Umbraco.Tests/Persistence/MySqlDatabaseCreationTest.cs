@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
@@ -22,7 +24,7 @@ namespace Umbraco.Tests.Persistence
 
         public override ISqlSyntaxProvider SyntaxProvider
         {
-            get { return MySqlSyntax.Provider; }
+            get { return new MySqlSyntaxProvider(Mock.Of<ILogger>()); }
         }
 
         #endregion

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -15,46 +16,20 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// Creates the built in list view data types
     /// </summary>
-    public class EnsureDefaultListViewDataTypesCreated : ApplicationEventHandler
+    public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHander
     {
-        /// <summary>
-        /// Ensure this is run when not configured
-        /// </summary>
-        protected override bool ExecuteWhenApplicationNotConfigured
-        {
-            get { return true; }
-        }
-
-        /// <summary>
-        /// Ensure this is run when not configured
-        /// </summary>
-        protected override bool ExecuteWhenDatabaseNotConfigured
-        {
-            get { return true; }
-        }
-
-        /// <summary>
-        /// Attach to event on starting
-        /// </summary>
-        /// <param name="umbracoApplication"></param>
-        /// <param name="applicationContext"></param>
-        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            MigrationRunner.Migrated += MigrationRunner_Migrated;
-        }
-
-        void MigrationRunner_Migrated(MigrationRunner sender, Core.Events.MigrationEventArgs e)
+        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             var target720 = new Version(7, 2, 0);
 
             if (e.ConfiguredVersion <= target720)
             {
                 EnsureListViewDataTypeCreated(e);
-                
+
             }
         }
 
-        private void EnsureListViewDataTypeCreated(Core.Events.MigrationEventArgs e)
+        private void EnsureListViewDataTypeCreated(MigrationEventArgs e)
         {
             var exists = e.MigrationContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id=1037");
             if (exists > 0) return;

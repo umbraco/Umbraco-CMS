@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -25,13 +27,14 @@ namespace Umbraco.Tests.Migrations
         [SetUp]
         public override void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
-			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
+			MigrationResolver.Current = new MigrationResolver(
+                new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                () => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
 					typeof (DeleteAppTables),
@@ -47,9 +50,16 @@ namespace Umbraco.Tests.Migrations
 					typeof (UpdateCmsPropertyTypeGroupTable)
 				}.OrderByDescending(x => x.Name));
 
+            //This is needed because the PluginManager is creating the migration instances with their default ctors
+            LoggerResolver.Current = new LoggerResolver(Logger)
+            {
+                CanResolveBeforeFrozen = true
+            };
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
+
             Resolution.Freeze();
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             var engine = new SqlCeEngine("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;");
             engine.CreateDatabase();   
@@ -76,10 +86,10 @@ namespace Umbraco.Tests.Migrations
             var targetVersion = new Version("6.0.0");
             var foundMigrations = MigrationResolver.Current.Migrations;
 
-            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, db);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, db, Logger);
             foreach (MigrationBase migration in migrations)
             {
                 migration.GetUpExpressions(context);
@@ -114,7 +124,7 @@ namespace Umbraco.Tests.Migrations
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0");
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
         public DatabaseProviders GetDatabaseProvider()

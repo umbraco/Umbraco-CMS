@@ -21,11 +21,13 @@ namespace Umbraco.Core.Services
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MacroService()
             : this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory())
         {
         }
-        
+
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MacroService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {

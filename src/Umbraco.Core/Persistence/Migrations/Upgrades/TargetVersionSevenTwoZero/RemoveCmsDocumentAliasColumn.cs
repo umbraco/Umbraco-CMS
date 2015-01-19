@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     {
         public override void Up()
         {
-            var columns = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
 
             if (columns.Any(x => x.ColumnName.InvariantEquals("alias") && x.TableName.InvariantEquals("cmsDocument")))
             {

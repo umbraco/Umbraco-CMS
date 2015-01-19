@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
@@ -120,8 +121,8 @@ namespace Umbraco.Core
             {
                 return;
             }
-
-            LogHelper.Error<UmbracoApplicationBase>("An unhandled exception occurred", exc);
+            
+            Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exc);
 
             OnApplicationError(sender, e);
         }
@@ -140,12 +141,68 @@ namespace Umbraco.Core
         {
             if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
             {
-                LogHelper.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
             }
             OnApplicationEnd(sender, e);
         }
 
         protected abstract IBootManager GetBootManager();
 
+        protected ILogger Logger
+        {
+            get
+            {
+                if (LoggerResolver.HasCurrent && LoggerResolver.Current.HasValue)
+                {
+                    return LoggerResolver.Current.Logger;
+                }
+                return new HttpTraceLogger();
+            }
+        }
+
+        private class HttpTraceLogger : ILogger
+        {
+            public void Error(Type callingType, string message, Exception exception)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Warn(callingType.ToString(), message + Environment.NewLine + exception);
+            }
+
+            public void Warn(Type callingType, string message, params Func<object>[] formatItems)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Warn(callingType.ToString(), string.Format(message, formatItems.Select(x => x())));
+            }
+
+            public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Warn(callingType.ToString(), string.Format(message + Environment.NewLine + e, formatItems.Select(x => x())));
+            }
+
+            public void Info(Type callingType, Func<string> generateMessage)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Write(callingType.ToString(), generateMessage());
+            }
+
+            public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Write(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
+            }
+
+            public void Debug(Type callingType, Func<string> generateMessage)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Write(callingType.ToString(), generateMessage());
+            }
+
+            public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+            {
+                if (HttpContext.Current == null) return;
+                HttpContext.Current.Trace.Write(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
+            }
+        }
     }
 }

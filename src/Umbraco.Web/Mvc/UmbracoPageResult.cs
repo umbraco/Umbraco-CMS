@@ -4,6 +4,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 
 namespace Umbraco.Web.Mvc
 {
@@ -12,7 +14,21 @@ namespace Umbraco.Web.Mvc
 	/// </summary>
 	public class UmbracoPageResult : ActionResult
 	{
-		public override void ExecuteResult(ControllerContext context)
+	    private readonly ProfilingLogger _profilingLogger;
+
+	    public UmbracoPageResult(ProfilingLogger profilingLogger)
+	    {
+	        _profilingLogger = profilingLogger;
+	    }
+
+        [Obsolete("Use the ctor specifying all depenendencies instead")]
+	    public UmbracoPageResult()
+            : this(new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler))
+	    {
+	        
+	    }
+
+	    public override void ExecuteResult(ControllerContext context)
 		{
 			ResetRouteData(context.RouteData);
 
@@ -52,9 +68,9 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Executes the controller action
         /// </summary>
-	    private static void ExecuteControllerAction(ControllerContext context, IController controller)
+	    private void ExecuteControllerAction(ControllerContext context, IController controller)
 	    {
-	        using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
+            using (_profilingLogger.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
 	        {
 	            controller.Execute(context.RequestContext);
 	        }
@@ -75,7 +91,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private static void ValidateRouteData(RouteData routeData)
         {
-            if (!routeData.DataTokens.ContainsKey("umbraco-route-def"))
+            if (routeData.DataTokens.ContainsKey("umbraco-route-def") == false)
             {
                 throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
                                                     " in the context of an Http POST when using a SurfaceController form");

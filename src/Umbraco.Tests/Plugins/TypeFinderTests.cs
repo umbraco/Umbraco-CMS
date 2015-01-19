@@ -19,7 +19,6 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using umbraco.interfaces;
-using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
 
 namespace Umbraco.Tests.Plugins
@@ -39,9 +38,7 @@ namespace Umbraco.Tests.Plugins
 		[SetUp]
 		public void Initialize()
 		{
-			TestHelper.SetupLog4NetForTests();
-
-			_assemblies = new[]
+		    _assemblies = new[]
 			    {
 			        this.GetType().Assembly, 
 			        typeof(ApplicationStartupHandler).Assembly,

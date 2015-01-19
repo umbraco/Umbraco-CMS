@@ -10,11 +10,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     internal class BaseDataCreation
     {
         private readonly Database _database;
+        private readonly ILogger _logger;
 
-        public BaseDataCreation(Database database)
+        public BaseDataCreation(Database database, ILogger logger)
         {
             _database = database;
-        } 
+            _logger = logger;
+        }
 
         /// <summary>
         /// Initialize the base data creation by inserting the data foundation for umbraco
@@ -23,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            LogHelper.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
+            _logger.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
 
             if(tableName.Equals("umbracoNode"))
             {
@@ -89,7 +91,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateCmsTaskTypeData();
             }
 
-            LogHelper.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
+            _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
         }
 
         private void CreateUmbracNodeData()
@@ -268,7 +270,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoRelationTypeData()
         {
-            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), Dual = true, Name = Constants.Conventions.RelationTypes.RelateDocumentOnCopyName });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = true, Name = Constants.Conventions.RelationTypes.RelateDocumentOnCopyName });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 2, Alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName });
         }
 
         private void CreateCmsTaskTypeData()

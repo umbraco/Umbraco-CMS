@@ -21,17 +21,19 @@ namespace Umbraco.Core.Services
     {
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public DataTypeService()
             : this(new RepositoryFactory())
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public DataTypeService(RepositoryFactory repositoryFactory)
 			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public DataTypeService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {

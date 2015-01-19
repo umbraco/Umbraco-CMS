@@ -10,11 +10,7 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUmbracoConfigurationTest
     {
-        [TestFixtureSetUp]
-        public void InitializeFixture()
-        {
-            TestHelper.SetupLog4NetForTests();
-        }
+       
 
         [SetUp]
         public virtual void Initialize()

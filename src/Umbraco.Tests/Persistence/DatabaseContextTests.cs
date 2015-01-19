@@ -2,8 +2,10 @@
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
@@ -19,7 +21,9 @@ namespace Umbraco.Tests.Persistence
 		[SetUp]
 		public void Setup()
 		{
-			_dbContext = new DatabaseContext(new DefaultDatabaseFactory());
+            _dbContext = new DatabaseContext(
+                new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
+                Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
 			ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper())
@@ -76,17 +80,22 @@ namespace Umbraco.Tests.Persistence
             var engine = new SqlCeEngine(settings.ConnectionString.Replace("UmbracoPetaPocoTests", "DatabaseContextTests"));
             engine.CreateDatabase();
 
+            var dbFactory = new DefaultDatabaseFactory(engine.LocalConnectionString, "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
             //re-map the dbcontext to the new conn string
-            _dbContext = new DatabaseContext(new DefaultDatabaseFactory(engine.LocalConnectionString, "System.Data.SqlServerCe.4.0"));
+            _dbContext = new DatabaseContext(
+                dbFactory,
+                Mock.Of<ILogger>(),
+                new SqlCeSyntaxProvider(),
+                dbFactory.ProviderName);
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            var schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
             //Create the umbraco database
-			_dbContext.Database.CreateDatabaseSchema(false);
+            schemaHelper.CreateDatabaseSchema(false, new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()));
 
-			bool umbracoNodeTable = _dbContext.Database.TableExist("umbracoNode");
-			bool umbracoUserTable = _dbContext.Database.TableExist("umbracoUser");
-			bool cmsTagsTable = _dbContext.Database.TableExist("cmsTags");
+            bool umbracoNodeTable = schemaHelper.TableExist("umbracoNode");
+            bool umbracoUserTable = schemaHelper.TableExist("umbracoUser");
+            bool cmsTagsTable = schemaHelper.TableExist("cmsTags");
 
             Assert.That(umbracoNodeTable, Is.True);
             Assert.That(umbracoUserTable, Is.True);

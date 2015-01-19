@@ -20,6 +20,7 @@ namespace Umbraco.Web.Mvc
 	{
 
 		public RenderMvcController()
+            : base()
 		{
 			ActionInvoker = new RenderActionInvoker();
 		}

@@ -1,4 +1,4 @@
-﻿<form name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
+﻿<form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
     <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
 
         <div class="form">

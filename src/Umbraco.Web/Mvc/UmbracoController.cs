@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -24,12 +25,29 @@ namespace Umbraco.Web.Mvc
         }
 
         private UmbracoHelper _umbraco;
+
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
         public UmbracoHelper Umbraco
         {
             get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
+        }
+
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
         }
 
         /// <summary>

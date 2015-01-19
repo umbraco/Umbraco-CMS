@@ -18,8 +18,6 @@ namespace Umbraco.Tests.Resolvers
         [SetUp]
         public void Setup()
         {
-            TestHelper.SetupLog4NetForTests();
-
             ManyResolver.Reset();
         }
 

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
         public override void Up()
         {
 
-            var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             //if the FK doesn't exist
             if (constraints.Any(x => x.Item1.InvariantEquals("cmsContent") && x.Item2.InvariantEquals("contentType") && x.Item3.InvariantEquals("FK_cmsContent_cmsContentType_nodeId")) == false)

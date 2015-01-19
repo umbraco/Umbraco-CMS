@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
@@ -116,7 +117,8 @@ namespace Umbraco.Tests.Mvc
 
         public class TestSurfaceController : SurfaceController
         {
-            public TestSurfaceController(UmbracoContext umbracoContext) : base(umbracoContext)
+            public TestSurfaceController(UmbracoContext umbracoContext)
+                : base(umbracoContext)
             {
             }
 

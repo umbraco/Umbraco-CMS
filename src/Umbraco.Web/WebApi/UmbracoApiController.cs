@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Services;
@@ -39,6 +40,22 @@ namespace Umbraco.Web.WebApi
         protected Attempt<HttpContextBase> TryGetHttpContext()
         {
             return Request.TryGetHttpContext();
+        }
+
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
         }
 
         /// <summary>

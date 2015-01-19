@@ -168,7 +168,9 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
-    <Compile Include="CoreStrings\StringValidationTests.cs" />
+    <Compile Include="Resolvers\ResolverBaseTest.cs" />
+    <Compile Include="Strings\StylesheetHelperTests.cs" />
+    <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
     <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
@@ -282,6 +284,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
     <Compile Include="ServerEnvironmentHelperTests.cs" />
+    <Compile Include="Services\FileServiceTests.cs" />
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
@@ -301,12 +304,12 @@
     <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="PublishedCache\PublishedMediaCacheTests.cs" />
-    <Compile Include="CoreStrings\CmsHelperCasingTests.cs" />
-    <Compile Include="CoreStrings\ShortStringHelperResolverTest.cs" />
-    <Compile Include="CoreStrings\LegacyShortStringHelperTests.cs" />
-    <Compile Include="CoreStrings\DefaultShortStringHelperTests.cs" />
-    <Compile Include="CoreStrings\LegacyStringExtensionsTests.cs" />
-    <Compile Include="CoreStrings\MockShortStringHelper.cs" />
+    <Compile Include="Strings\CmsHelperCasingTests.cs" />
+    <Compile Include="Strings\ShortStringHelperResolverTest.cs" />
+    <Compile Include="Strings\LegacyShortStringHelperTests.cs" />
+    <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
+    <Compile Include="Strings\LegacyStringExtensionsTests.cs" />
+    <Compile Include="Strings\MockShortStringHelper.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
@@ -354,8 +357,6 @@
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="Models\StylesheetTests.cs" />
     <Compile Include="Persistence\BaseTableByTableTest.cs" />
-    <Compile Include="Persistence\Caching\InMemoryCacheProviderTest.cs" />
-    <Compile Include="Persistence\Caching\RuntimeCacheProviderTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
@@ -383,7 +384,6 @@
     <Compile Include="Persistence\Repositories\RelationTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
-    <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\SqlTableByTableTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
@@ -493,7 +493,7 @@
     <Compile Include="IO\FileSystemProviderManagerTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CoreStrings\StringExtensionsTests.cs" />
+    <Compile Include="Strings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />

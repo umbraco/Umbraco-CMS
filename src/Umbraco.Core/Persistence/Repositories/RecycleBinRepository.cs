@@ -7,8 +7,9 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -16,11 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work) : base(work)
-        {
-        }
-
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 
@@ -77,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 catch (Exception ex)
                 {
                     trans.Dispose();
-                    LogHelper.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
+                    Logger.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
                     return false;
                 }
             }
@@ -120,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 catch (Exception e)
                 {
-                    LogHelper.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
+                    Logger.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
                     allsuccess = false;
                 }
             });

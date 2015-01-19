@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class ContentFactory : IEntityFactory<IContent, DocumentDto>
+    internal class ContentFactory
     {
         private readonly IContentType _contentType;
         private readonly Guid _nodeObjectTypeId;

@@ -4,10 +4,12 @@ using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
@@ -819,7 +821,7 @@ namespace umbraco.BusinessLogic
         public void FlushFromCache()
         {
             OnFlushingFromCache(EventArgs.Empty);
-            RuntimeCacheProvider.Current.Clear(typeof (IUser));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IUser>();
         }
 
         /// <summary>

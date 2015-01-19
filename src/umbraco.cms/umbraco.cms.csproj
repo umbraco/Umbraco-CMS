@@ -118,6 +118,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -211,6 +212,7 @@
     <Compile Include="Actions\ActionUnPublish.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Actions\ActionRestore.cs" />
     <Compile Include="Actions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\Files\IFile.cs" />
@@ -247,8 +249,6 @@
     <Compile Include="businesslogic\ProviderBase.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
-    <Compile Include="businesslogic\template\MasterpageHelper.cs" />
-    <Compile Include="businesslogic\template\ViewHelper.cs" />
     <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="helpers\Casing.cs" />

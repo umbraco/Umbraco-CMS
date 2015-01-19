@@ -10,14 +10,16 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -34,25 +36,9 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
-        
-        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
-            : base(work)
-        {
-            if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
-            if (templateRepository == null) throw new ArgumentNullException("templateRepository");
-            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
-            _contentTypeRepository = contentTypeRepository;
-            _templateRepository = templateRepository;
-		    _tagRepository = tagRepository;
-            _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
 
-		    EnsureUniqueNaming = true;
-        }
-
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, CacheHelper cacheHelper)
-            : base(work, cache)
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository)
+            : base(work, cacheHelper, logger, syntaxProvider)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
             if (templateRepository == null) throw new ArgumentNullException("templateRepository");
@@ -61,8 +47,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
             _cacheHelper = cacheHelper;
-            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, NullCacheProvider.Current);
-            _contentXmlRepository = new ContentXmlRepository<IContent>(work, NullCacheProvider.Current);
+            _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, syntaxProvider);
+            _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.CreateDisabledCacheHelper(), logger, syntaxProvider);
 
             EnsureUniqueNaming = true;
         }
@@ -184,7 +170,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             .InnerJoin<DocumentDto>()
                             .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
 
-                    var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                    var deleteSql = SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
                 }
                 else
@@ -200,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             .Where<DocumentDto>(dto => dto.Published)
                             .Where<ContentDto>(dto => dto.ContentTypeId == id1);
 
-                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        var deleteSql = SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                         Database.Execute(deleteSql);
                     }
                 }
@@ -360,7 +346,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161     
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
@@ -605,10 +591,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 // then we can use that entity. Otherwise if it is not published (which can be the case
                 // because we only store the 'latest' entries in the cache which might not be the published
                 // version)
-                var fromCache = TryGetFromCache(dto.NodeId);
-                if (fromCache.Success && fromCache.Result.Published)
+                var fromCache = RepositoryCache.RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
+                //var fromCache = TryGetFromCache(dto.NodeId);
+                if (fromCache != null && fromCache.Published)
                 {
-                    yield return fromCache.Result;
+                    yield return fromCache;
                 }
                 else
                 {
@@ -627,7 +614,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
             repo.ReplaceEntityPermissions(permissionSet);
         }
 
@@ -654,13 +641,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userIds"></param>        
         public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
             repo.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntaxProvider);
             return repo.GetPermissionsForEntity(entityId);
         }
 
@@ -722,7 +709,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             if (filter.IsNullOrWhiteSpace() == false)
             {
-                sbWhere.Append(" AND (cmsDocument." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
+                sbWhere.Append(" AND (cmsDocument." + SqlSyntaxProvider.GetQuotedColumnName("text") + " LIKE @" + args.Count + ")");
                 args.Add("%" + filter + "%");
             }          
 
