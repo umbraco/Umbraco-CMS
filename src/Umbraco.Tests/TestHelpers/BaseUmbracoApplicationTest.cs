@@ -184,7 +184,6 @@ namespace Umbraco.Tests.TestHelpers
                         Assembly.Load("businesslogic"),
                         Assembly.Load("cms"),
                         Assembly.Load("controls"),
-                        Assembly.Load("umbraco.editorControls"),
                         Assembly.Load("umbraco.MacroEngines"),
                         Assembly.Load("umbraco.providers"),
                         Assembly.Load("Umbraco.Web.UI"),
