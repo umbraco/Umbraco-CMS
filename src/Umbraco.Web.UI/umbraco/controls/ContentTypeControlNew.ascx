@@ -25,7 +25,7 @@
     
   <cc2:Pane ID="Pane1" runat="server" Width="216" Height="80">
     <asp:DataGrid ID="dgTabs" Width="100%" runat="server" CellPadding="2" HeaderStyle-CssClass="propertyHeader"
-      ItemStyle-CssClass="propertyContent" GridLines="None" OnItemCommand="dgTabs_ItemCommand" OnPreRender="dgTabs_PreRender"
+      ItemStyle-CssClass="propertyContent" GridLines="None" OnItemCommand="dgTabs_ItemCommand" OnItemDataBound="dgTabs_ItemDataBound" OnPreRender="dgTabs_PreRender"
       HeaderStyle-Font-Bold="True" AutoGenerateColumns="False" CssClass="tabs-table">
       <Columns>
         <asp:BoundColumn DataField="id" Visible="False"></asp:BoundColumn>
