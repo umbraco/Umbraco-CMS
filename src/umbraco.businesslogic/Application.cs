@@ -175,14 +175,7 @@ namespace umbraco.BusinessLogic
             return ApplicationContext.Current.Services.SectionService.GetSections().Select(Mapper.Map<Section, Application>).ToList();
         }
 
-        /// <summary>
-        /// Stores all references to classes that are of type IApplication
-        /// </summary>
-        [Obsolete("RegisterIApplications has been depricated. Please use ApplicationStartupHandler.RegisterHandlers() instead.")]
-        public static void RegisterIApplications()
-        {
-            ApplicationStartupHandler.RegisterHandlers();
-        }
+      
    
         
     }
