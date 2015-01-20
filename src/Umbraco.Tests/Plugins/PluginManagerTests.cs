@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Plugins
             _manager.AssembliesToScan = new[]
 			    {
 			        this.GetType().Assembly, 
-			        typeof(ApplicationStartupHandler).Assembly,
+                    //typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,

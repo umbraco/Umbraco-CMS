@@ -39,16 +39,7 @@ namespace Umbraco.Tests
             PluginManager.Current = null;
         }
 
-		/// <summary>
-		/// Ensures that the media factory finds the correct number of IMediaFactory
-		/// </summary>
-		[Test]
-		public void Find_Media_Factories()
-		{
-			var factories = MediaFactory.Factories;
-			Assert.AreEqual(2, factories.Count());
-		}
-
+		
 		#region Classes for tests
 		public class MediaFactory1 : IMediaFactory
 		{

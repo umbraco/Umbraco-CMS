@@ -1,11 +1,11 @@
-using umbraco.interfaces;
+
 
 namespace Umbraco.Core
 {
     /// <summary>
 	/// Custom IApplicationStartupHandler that auto subscribes to the applications events
 	/// </summary>
-	public interface IApplicationEventHandler : IApplicationStartupHandler
+	public interface IApplicationEventHandler
 	{
 		/// <summary>
 		/// ApplicationContext is created and other static objects that require initialization have been setup

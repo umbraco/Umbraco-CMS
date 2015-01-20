@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Plugins
 		    _assemblies = new[]
 			    {
 			        this.GetType().Assembly, 
-			        typeof(ApplicationStartupHandler).Assembly,
+                    //typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
@@ -67,16 +67,16 @@ namespace Umbraco.Tests.Plugins
 			Assert.AreEqual(2, typesFound.Count());
 		}
 
-        [Test]
-        public void Find_Classes_Of_Type()
-        {
-            var typesFound = TypeFinder.FindClassesOfType<IApplicationStartupHandler>(_assemblies);            
-            var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
+        //[Test]
+        //public void Find_Classes_Of_Type()
+        //{
+        //    var typesFound = TypeFinder.FindClassesOfType<IApplicationStartupHandler>(_assemblies);            
+        //    var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
 
-            Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
-            Assert.AreEqual(5, typesFound.Count());
-            Assert.AreEqual(5, originalTypesFound.Count());
-        }
+        //    Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
+        //    Assert.AreEqual(5, typesFound.Count());
+        //    Assert.AreEqual(5, originalTypesFound.Count());
+        //}
 
         [Test]
         public void Find_Classes_With_Attribute()
