@@ -1686,7 +1686,9 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
-            content = GetById(content.Id); // ensure we have the newest version
+            var newest = GetById(content.Id); // ensure we have the newest version
+            if (content.Version != newest.Version) // but use the original object if it's already the newest version
+                content = newest;
             var published = content.Published ? content : GetPublishedVersion(content.Id); // get the published version
             if (published == null)
                 return false; // already unpublished
