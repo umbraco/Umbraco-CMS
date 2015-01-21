@@ -413,6 +413,9 @@ namespace Umbraco.Web
         /// </summary>
         private void SetupMvcAndWebApi()
         {
+            //don't output the MVC version header (security)
+            MvcHandler.DisableMvcResponseHeader = true;
+
             //set master controller factory
             ControllerBuilder.Current.SetControllerFactory(
                 new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));

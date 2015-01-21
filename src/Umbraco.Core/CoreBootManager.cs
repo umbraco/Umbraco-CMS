@@ -36,7 +36,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class CoreBootManager : IBootManager
     {
-        internal ServiceContainer Container { get; private set; }
+        
         private ServiceContainer _appStartupEvtContainer;
         protected ProfilingLogger ProfilingLogger { get; private set; }
         private DisposableTimer _timer;
@@ -55,13 +55,17 @@ namespace Umbraco.Core
             get { return _umbracoApplication; }
         }
 
+        internal ServiceContainer Container
+        {
+            get { return _umbracoApplication.Container; }
+        }
+
         protected IServiceProvider ServiceProvider { get; private set; }
 
         public CoreBootManager(UmbracoApplicationBase umbracoApplication)
         {
             if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
-            _umbracoApplication = umbracoApplication;
-            Container = new ServiceContainer();
+            _umbracoApplication = umbracoApplication;            
         }
 
         public virtual IBootManager Initialize()
@@ -70,11 +74,10 @@ namespace Umbraco.Core
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
             //Create logger/profiler, and their resolvers, these are special resolvers that can be resolved before frozen so we can start logging
-            var logger = CreateLogger();
-            LoggerResolver.Current = new LoggerResolver(logger) {CanResolveBeforeFrozen = true};
+            LoggerResolver.Current = new LoggerResolver(_umbracoApplication.Logger) { CanResolveBeforeFrozen = true };
             var profiler = CreateProfiler();
             ProfilerResolver.Current = new ProfilerResolver(profiler) {CanResolveBeforeFrozen = true};
-            ProfilingLogger = new ProfilingLogger(logger, profiler);
+            ProfilingLogger = new ProfilingLogger(_umbracoApplication.Logger, profiler);
 
             _timer = ProfilingLogger.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
@@ -85,8 +88,8 @@ namespace Umbraco.Core
             ServiceProvider = new ActivatorServiceProvider();
             PluginManager.Current = PluginManager = new PluginManager(ServiceProvider, _cacheHelper.RuntimeCache, ProfilingLogger, true);
 
-            //build up IoC
-            Container = BuildContainer();
+            //build up core IoC servoces
+            ConfigureCoreServices(Container);
 
             //set the singleton resolved from the core container
             ApplicationContext.Current = ApplicationContext = Container.GetInstance<ApplicationContext>();
@@ -103,8 +106,10 @@ namespace Umbraco.Core
             _appStartupEvtContainer = Container.CreateChildContainer();
             _appStartupEvtContainer.BeginScope();
             _appStartupEvtContainer.RegisterCollection<IApplicationEventHandler, PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
-
+            
+            //build up standard IoC services
             ConfigureServices(Container);
+
             InitializeResolvers();
             InitializeModelMappers();
 
@@ -119,15 +124,14 @@ namespace Umbraco.Core
         /// <summary>
         /// Build the core container which contains all core things requird to build an app context
         /// </summary>
-        private ServiceContainer BuildContainer()
+        private void ConfigureCoreServices(ServiceContainer container)
         {
-            var container = new ServiceContainer();
+            container.Register<ILogger>(factory => _umbracoApplication.Logger, new PerContainerLifetime());
+            container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
+            container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
             container.Register<IUmbracoSettingsSection>(factory => UmbracoConfig.For.UmbracoSettings());
             container.Register<CacheHelper>(factory => _cacheHelper, new PerContainerLifetime());
             container.Register<IRuntimeCacheProvider>(factory => _cacheHelper.RuntimeCache, new PerContainerLifetime());
-            container.Register<ILogger>(factory => ProfilingLogger.Logger, new PerContainerLifetime());
-            container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
-            container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
             container.Register<IServiceProvider, ActivatorServiceProvider>();
             container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());
             container.Register<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()));
@@ -145,8 +149,6 @@ namespace Umbraco.Core
                 factory.GetInstance<CacheHelper>(),
                 factory.GetInstance<ILogger>()));
             container.Register<ApplicationContext>(new PerContainerLifetime());
-
-            return container;
         }
 
         /// <summary>
@@ -206,14 +208,6 @@ namespace Umbraco.Core
                         m.ConfigureMappings(configuration, ApplicationContext);
                     }
                 });
-        }
-
-        /// <summary>
-        /// Creates the application's ILogger
-        /// </summary>
-        protected virtual ILogger CreateLogger()
-        {
-            return Logger.CreateWithDefaultLog4NetConfiguration();
         }
 
         /// <summary>

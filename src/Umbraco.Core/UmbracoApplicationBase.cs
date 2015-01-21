@@ -5,8 +5,10 @@ using System.Web.Hosting;
 using System.Web.Mvc;
 using StackExchange.Profiling;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -20,6 +22,22 @@ namespace Umbraco.Core
     /// </remarks>
     public abstract class UmbracoApplicationBase : System.Web.HttpApplication
     {
+
+        /// <summary>
+        /// Umbraco application's IoC container
+        /// </summary>
+        internal ServiceContainer Container { get; private set; }
+
+        private ILogger _logger;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        protected UmbracoApplicationBase()
+        {
+            //create the container for the application, the boot managers are responsible for registrations
+            Container = new ServiceContainer();         
+        }
 
         public event EventHandler ApplicationStarting;
         public event EventHandler ApplicationStarted;
@@ -40,17 +58,11 @@ namespace Umbraco.Core
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
-            //don't output the MVC version header (security)
-            MvcHandler.DisableMvcResponseHeader = true;
-
             //boot up the application
             GetBootManager()
                 .Initialize()
                 .Startup(appContext => OnApplicationStarting(sender, e))
                 .Complete(appContext => OnApplicationStarted(sender, e));
-
-            //And now we can dispose of our startup handlers - save some memory
-            //ApplicationEventsResolver.Current.Dispose();
         }
 
         /// <summary>
@@ -112,7 +124,7 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationError(object sender, EventArgs e)
         {
-            EventHandler handler = ApplicationError;
+            var handler = ApplicationError;
             if (handler != null) handler(this, EventArgs.Empty);
         }
 
@@ -141,7 +153,7 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationEnd(object sender, EventArgs e)
         {
-            EventHandler handler = ApplicationEnd;
+            var handler = ApplicationEnd;
             if (handler != null) handler(this, EventArgs.Empty);
         }
 
@@ -156,61 +168,13 @@ namespace Umbraco.Core
 
         protected abstract IBootManager GetBootManager();
 
-        protected ILogger Logger
+        /// <summary>
+        /// Returns the logger instance for the application - this will be used throughout the entire app
+        /// </summary>
+        public virtual ILogger Logger
         {
-            get
-            {
-                if (LoggerResolver.HasCurrent && LoggerResolver.Current.HasValue)
-                {
-                    return LoggerResolver.Current.Logger;
-                }
-                return new HttpTraceLogger();
-            }
+            get { return _logger ?? (_logger = Logging.Logger.CreateWithDefaultLog4NetConfiguration()); }
         }
 
-        private class HttpTraceLogger : ILogger
-        {
-            public void Error(Type callingType, string message, Exception exception)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Warn(callingType.ToString(), message + Environment.NewLine + exception);
-            }
-
-            public void Warn(Type callingType, string message, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Warn(callingType.ToString(), string.Format(message, formatItems.Select(x => x())));
-            }
-
-            public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Warn(callingType.ToString(), string.Format(message + Environment.NewLine + e, formatItems.Select(x => x())));
-            }
-
-            public void Info(Type callingType, Func<string> generateMessage)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(callingType.ToString(), generateMessage());
-            }
-
-            public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
-            }
-
-            public void Debug(Type callingType, Func<string> generateMessage)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(callingType.ToString(), generateMessage());
-            }
-
-            public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
-            }
-        }
     }
 }
