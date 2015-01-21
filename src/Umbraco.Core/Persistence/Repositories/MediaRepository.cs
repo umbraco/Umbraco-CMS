@@ -217,7 +217,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         var id = contentTypeId;
                         var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == id && x.Trashed == false);
                         RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
-                    }                    
+                    }
                 }
 
                 tr.Complete();
@@ -434,7 +434,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return Constants.System.RecycleBinMedia; }
         }
-      
+
         #endregion
 
         /// <summary>
@@ -581,6 +581,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return currentName;
         }
 
-        
+        /// <summary>
+        /// Dispose disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Ensure the unit of work is disposed
+        /// </remarks>
+        protected override void DisposeResources()
+        {
+            _mediaTypeRepository.Dispose();
+            _tagRepository.Dispose();
+            _contentXmlRepository.Dispose();
+            _contentPreviewRepository.Dispose();
+        }
     }
 }

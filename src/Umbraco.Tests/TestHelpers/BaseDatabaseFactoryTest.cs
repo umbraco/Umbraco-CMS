@@ -73,11 +73,11 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName(),
                 Logger);
 
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
 
             _appContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(dbFactory, Logger, SqlSyntaxProvider, "System.Data.SqlServerCe.4.0"),
+                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
                 new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
                 cacheHelper,
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual ISqlSyntaxProvider SqlSyntaxProvider
+        protected virtual ISqlSyntaxProvider SqlSyntax
         {
             get { return new SqlCeSyntaxProvider(); }
         }
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.TestHelpers
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
 
-                var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntaxProvider);
+                var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntax);
                 //Create the umbraco database and its base data
                 schemaHelper.CreateDatabaseSchema(false, ApplicationContext);
 

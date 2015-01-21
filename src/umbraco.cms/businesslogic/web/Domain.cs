@@ -20,6 +20,7 @@ namespace umbraco.cms.businesslogic.web
     /// <summary>
     /// Summary description for Domain.
     /// </summary>
+    [Obsolete("Use Umbraco.Core.Models.IDomain instead")]
     public class Domain
     {
         private Language _language;

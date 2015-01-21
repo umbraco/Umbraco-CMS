@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IDataTypeDefinition PerformGet(int id)
         {
-            return GetAll(new[] {id}).FirstOrDefault();
+            return GetAll(new[] { id }).FirstOrDefault();
         }
 
         protected override IEnumerable<IDataTypeDefinition> PerformGetAll(params int[] ids)
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new {name = entity.Name});
+WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { name = entity.Name });
             if (exists > 0)
             {
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
@@ -196,7 +196,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new {na
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
 WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + @"= @name
-AND umbracoNode.id <> @id", 
+AND umbracoNode.id <> @id",
                     new { id = entity.Id, name = entity.Name });
             if (exists > 0)
             {
@@ -254,7 +254,7 @@ AND umbracoNode.id <> @id",
             }
 
             //Delete the pre-values
-            Database.Delete<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = entity.Id});
+            Database.Delete<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = entity.Id });
 
             //Delete Content specific data
             Database.Delete<DataTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
@@ -329,7 +329,7 @@ AND umbracoNode.id <> @id",
 
         public void AddOrUpdatePreValues(IDataTypeDefinition dataType, IDictionary<string, PreValue> values)
         {
-            var currentVals = new DataTypePreValueDto[]{};
+            var currentVals = new DataTypePreValueDto[] { };
             if (dataType.HasIdentity)
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
@@ -337,7 +337,7 @@ AND umbracoNode.id <> @id",
                                    .From<DataTypePreValueDto>()
                                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
                                    .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
-                currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();    
+                currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
             //already existing, need to be updated
@@ -409,7 +409,7 @@ AND umbracoNode.id <> @id",
             //the key will be: "UmbracoPreValDATATYPEID-CSVOFPREVALIDS
 
             var key = GetPrefixedCacheKey(dataTypeId)
-                      + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());                      
+                      + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());
 
             //store into cache
             _cacheHelper.RuntimeCache.InsertCacheItem(key, () => collection,
@@ -429,7 +429,7 @@ AND umbracoNode.id <> @id",
             public string Value { get; set; }
             public string Alias { get; set; }
             public IDataTypeDefinition DataType { get; set; }
-            public int SortOrder { get; set; }         
+            public int SortOrder { get; set; }
         }
 
         /// <summary>
@@ -476,7 +476,7 @@ AND umbracoNode.id <> @id",
             protected override Guid NodeObjectTypeId
             {
                 get { throw new NotImplementedException(); }
-            } 
+            }
             #endregion
 
             protected override void PersistDeletedItem(PreValueEntity entity)
@@ -579,6 +579,17 @@ AND id <> @id",
             }
         }
 
+        /// <summary>
+        /// Dispose disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Ensure the unit of work is disposed
+        /// </remarks>
+        protected override void DisposeResources()
+        {
+            _contentTypeRepository.Dispose();
+            _preValRepository.Dispose();
+        }
     }
 
 

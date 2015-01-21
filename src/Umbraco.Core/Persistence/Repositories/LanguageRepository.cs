@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<LanguageDto>();
+               .From<LanguageDto>(SqlSyntax);
             return sql;
         }
 
@@ -200,6 +200,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// Inner repository for looking up languages by culture name, this deals with caching by a string key
+        /// </summary>
         private class LanguageByCultureNameRepository : SimpleGetRepository<string, ILanguage, LanguageDto>
         {
             private readonly LanguageRepository _languageRepository;
