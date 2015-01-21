@@ -25,11 +25,7 @@ namespace umbraco.cms.businesslogic.web
     public class Domain
     {
         public IDomain DomainEntity { get; set; }
-        //private Language _language;
-        //private string _name;
-        //private int _root;
-        //private int _id;
-
+       
 		/// <summary>
 		/// Empty ctor used for unit tests to create a custom domain
 		/// </summary>
@@ -59,22 +55,6 @@ namespace umbraco.cms.businesslogic.web
                 throw new Exception(string.Format("Domain name '{0}' does not exists", DomainName));
             }
         }
-
-        //private void InitDomain(int id)
-        //{
-        //    using (IRecordsReader dr = SqlHelper.ExecuteReader(
-        //        "select domainDefaultLanguage, domainRootStructureID, domainName from umbracoDomains where id = @ID",
-        //        SqlHelper.CreateParameter("@ID", id)))
-        //    {
-        //        if (dr.Read())
-        //        {
-        //            _id = id;
-        //            _language = new Language(dr.GetInt("domainDefaultLanguage"));
-        //            _name = dr.GetString("domainName");
-        //            _root = dr.GetInt("domainRootStructureID");
-        //        }
-        //    }
-        //}
 
         public string Name
         {
@@ -144,34 +124,6 @@ namespace umbraco.cms.businesslogic.web
         {
             return ApplicationContext.Current.Services.DomainService.GetAll(includeWildcards)
                 .Select(x => new Domain(x));
-
-            //var domains = ApplicationContext.Current.ApplicationCache.GetCacheItem(
-            //    CacheKeys.DomainCacheKey,
-            //    TimeSpan.FromMinutes(30),
-            //    () =>
-            //        {
-            //            var result = new List<Domain>();
-            //            using (var dr = SqlHelper.ExecuteReader("SELECT id, domainName FROM umbracoDomains ORDER BY id"))
-            //            {
-            //                while (dr.Read())
-            //                {
-            //                    var domainName = dr.GetString("domainName");
-            //                    var domainId = dr.GetInt("id");
-            //                    if (result.Find(d => d.Name == domainName) == null)
-            //                        result.Add(new Domain(domainId));
-            //                    else
-            //                    {
-            //                        LogHelper.Warn<Domain>(string.Format("Domain already exists in list ({0})", domainName));
-            //                    }
-            //                }
-            //            }
-            //            return result;
-            //        });
-
-            //if (!includeWildcards)
-            //    domains = domains.Where(d => !d.IsWildcard).ToList();
-
-            //return domains;
         }
 
         public static Domain GetDomain(string DomainName)
@@ -219,20 +171,6 @@ namespace umbraco.cms.businesslogic.web
                 DefaultLanguage = lang
             };
             ApplicationContext.Current.Services.DomainService.Save(domain);
-
-            //if (Exists(DomainName.ToLower()))
-            //    throw new Exception("Domain " + DomainName + " already exists!");
-            
-            ////need to check if the language exists first
-            //if (Language.GetAllAsList().SingleOrDefault(x => x.id == LanguageId) == null)
-            //{
-            //    throw new ArgumentException("No language exists for the LanguageId specified");
-            //}
-                
-            //SqlHelper.ExecuteNonQuery("insert into umbracoDomains (domainDefaultLanguage, domainRootStructureID, domainName) values (@domainDefaultLanguage, @domainRootStructureID, @domainName)",
-            //                          SqlHelper.CreateParameter("@domainDefaultLanguage", LanguageId),
-            //                          SqlHelper.CreateParameter("@domainRootStructureID", RootNodeId),
-            //                          SqlHelper.CreateParameter("@domainName", DomainName.ToLower()));
 
             var e = new NewEventArgs();
             var legacyModel = new Domain(domain);
@@ -292,7 +230,7 @@ namespace umbraco.cms.businesslogic.web
         /// <returns>A value indicating whether the domain is a wildcard domain.</returns>
         public bool IsWildcard
         {
-            get { return string.IsNullOrWhiteSpace(Name) || Name.StartsWith("*"); }
+            get { return DomainEntity.IsWildcard; }
         }
 
         #endregion
