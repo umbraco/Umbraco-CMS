@@ -341,7 +341,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Using_Dictionary_Throws_When_No_Culture_Found()
+        public void Using_Dictionary_Returns_Default_Text__When_No_Culture_Found()
         {
             var culture = CultureInfo.GetCultureInfo("en-US");
             var txtService = new LocalizedTextService(
@@ -360,7 +360,7 @@ namespace Umbraco.Tests.Services
                     }
                 });
 
-            Assert.Throws<NullReferenceException>(() => txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
+            Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
         }
 
         [Test]
