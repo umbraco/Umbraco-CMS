@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -111,6 +112,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 var factory = new DomainModelFactory();
                 repo.PersistUpdatedItem(factory.BuildEntity(entity));
                 entity.ResetDirtyProperties();
+            }
+        }
+
+        public bool Exists(string domainName)
+        {
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            {
+                var query = new Query<CacheableDomain>().Where(x => x.DomainName.InvariantEquals(domainName));
+                return repo.GetByQuery(query).Any();
             }
         }
 
@@ -235,6 +245,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override void PersistNewItem(CacheableDomain entity)
             {
+                var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName", new {domainName = entity.DomainName});
+                if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
+
                 entity.AddingEntity();
 
                 var factory = new DomainModelFactory();

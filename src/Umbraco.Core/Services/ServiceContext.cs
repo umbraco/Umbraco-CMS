@@ -16,6 +16,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<IDomainService> _domainService; 
         private Lazy<IAuditService> _auditService; 
         private Lazy<ILocalizedTextService> _localizedTextService;
         private Lazy<ITagService> _tagService;
@@ -60,6 +61,7 @@ namespace Umbraco.Core.Services
         /// <param name="notificationService"></param>
         /// <param name="localizedTextService"></param>
         /// <param name="auditService"></param>
+        /// <param name="domainService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -79,7 +81,8 @@ namespace Umbraco.Core.Services
             ITagService tagService,
             INotificationService notificationService,             
             ILocalizedTextService localizedTextService,
-            IAuditService auditService)
+            IAuditService auditService,
+            IDomainService domainService)
         {
             _auditService = new Lazy<IAuditService>(() => auditService);
             _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);     
@@ -100,6 +103,7 @@ namespace Umbraco.Core.Services
             _memberService = new Lazy<IMemberService>(() => memberService);
             _userService = new Lazy<IUserService>(() => userService);
             _notificationService = new Lazy<INotificationService>(() => notificationService);
+            _domainService = new Lazy<IDomainService>(() => domainService);
         }
 
         internal ServiceContext(
@@ -128,6 +132,9 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
+
+            if (_domainService == null)
+                _domainService = new Lazy<IDomainService>(() => new DomainService(provider, repositoryFactory, logger));
 
             if (_auditService == null)
                 _auditService = new Lazy<IAuditService>(() => new AuditService(provider, repositoryFactory, logger));
@@ -196,6 +203,14 @@ namespace Umbraco.Core.Services
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory, logger));
 
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IDomainService"/>
+        /// </summary>
+        public IDomainService DomainService
+        {
+            get { return _domainService.Value; }
         }
 
         /// <summary>

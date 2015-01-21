@@ -343,6 +343,7 @@
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\IAuditService.cs" />
+    <Compile Include="Services\IDomainService.cs" />
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\TaskService.cs" />

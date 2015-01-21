@@ -54,6 +54,7 @@ namespace Umbraco.Tests
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
+                    Mock.Of<ILogger>(), 
                     new Mock<IEntityService>().Object),
                 new Mock<IMemberGroupService>().Object,
                 new Mock<IMemberTypeService>().Object,
@@ -64,7 +65,8 @@ namespace Umbraco.Tests
                 new Mock<ITagService>().Object,
                 new Mock<INotificationService>().Object,
                 Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IAuditService>());
+                Mock.Of<IAuditService>(),
+                Mock.Of<IDomainService>());
             Assert.Pass();
         }
 
@@ -103,6 +105,7 @@ namespace Umbraco.Tests
                     new RelationService(
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,
                         new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), Mock.Of<IUmbracoSettingsSection>()),
+                        Mock.Of<ILogger>(), 
                         new Mock<IEntityService>().Object),
                     new Mock<IMemberGroupService>().Object,
                     new Mock<IMemberTypeService>().Object,
@@ -113,7 +116,8 @@ namespace Umbraco.Tests
                     new Mock<ITagService>().Object,
                     new Mock<INotificationService>().Object,
                     Mock.Of<ILocalizedTextService>(),
-                    Mock.Of<IAuditService>()),
+                    Mock.Of<IAuditService>(),
+                    Mock.Of<IDomainService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             

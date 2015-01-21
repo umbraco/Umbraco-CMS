@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -83,6 +84,39 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("test.com", domain.DomainName);
                 Assert.AreEqual(content.Id, domain.RootContent.Id);
                 Assert.AreEqual(lang.Id, domain.DefaultLanguage.Id);
+            }
+
+
+        }
+
+        [Test]
+        public void Cant_Create_Duplicate_Domain_Name()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            ContentType ct;
+            var contentId = CreateTestData("en-AU", out ct);
+
+            ContentRepository contentRepo;
+            LanguageRepository langRepo;
+            ContentTypeRepository contentTypeRepo;
+
+            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            {
+                var lang = langRepo.GetByIsoCode("en-AU");
+                var content = contentRepo.Get(contentId);
+
+                var domain1 = (IDomain)new UmbracoDomain { RootContent = content, DefaultLanguage = lang, DomainName = "test.com" };
+                repo.AddOrUpdate(domain1);
+                unitOfWork.Commit();
+
+                var domain2 = (IDomain)new UmbracoDomain { RootContent = content, DefaultLanguage = lang, DomainName = "test.com" };
+                repo.AddOrUpdate(domain2);
+
+                Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
+
+
             }
 
 

@@ -22,12 +22,6 @@ using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
-    public interface IDomainService : IService
-    {
-        IEnumerable<IDomain> GetAll(bool includeWildcards);
-        IEnumerable<IDomain> GetDomainsForContent(int contentId, bool includeWildcards);
-    }
-
     /// <summary>
     /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
