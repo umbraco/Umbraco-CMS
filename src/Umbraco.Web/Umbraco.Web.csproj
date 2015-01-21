@@ -264,6 +264,10 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="LightInject\LightInjectExtensions.cs" />
+    <Compile Include="LightInject\Mvc\LightInject.Mvc.cs" />
+    <Compile Include="LightInject\WebApi\LightInject.WebApi.cs" />
+    <Compile Include="LightInject\Web\LightInject.Web.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
     <Compile Include="Models\ContentEditing\RelationType.cs" />
     <Compile Include="Models\LegacyConvertedNode.cs" />

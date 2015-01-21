@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
@@ -160,7 +162,7 @@ namespace Umbraco.Tests.Routing
 			// must lookup domain else lookup by url fails
 			pcr.Engine.FindDomain();
 
-			var lookup = new ContentFinderByNiceUrl();
+            var lookup = new ContentFinderByNiceUrl(Logger);
 			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
@@ -199,7 +201,7 @@ namespace Umbraco.Tests.Routing
 			pcr.Engine.FindDomain();
 			Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
-			var lookup = new ContentFinderByNiceUrl();
+            var lookup = new ContentFinderByNiceUrl(Logger);
 			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);

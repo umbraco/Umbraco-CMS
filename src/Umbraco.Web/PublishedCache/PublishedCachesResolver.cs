@@ -1,13 +1,27 @@
+using System;
+using System.Linq.Expressions;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.PublishedCache
 {
+    //TODO: REmove this requirement, just use normal IoC and publicize IPublishedCaches
+
 	/// <summary>
 	/// Resolves the IPublishedCaches object.
 	/// </summary>
-	internal sealed class PublishedCachesResolver : SingleObjectResolverBase<PublishedCachesResolver, IPublishedCaches>
+	internal sealed class PublishedCachesResolver : ContainerSingleObjectResolver<PublishedCachesResolver, IPublishedCaches>
 	{
-        /// <summary>
+	    /// <summary>
+	    /// Initializes the resolver to use IoC
+	    /// </summary>
+	    /// <param name="container"></param>
+	    /// <param name="implementationType"></param>
+	    public PublishedCachesResolver(IServiceContainer container, Type implementationType) : base(container, implementationType)
+	    {
+	    }
+
+	    /// <summary>
         /// Initializes a new instance of the <see cref="PublishedCachesResolver"/> class with caches.
         /// </summary>
         /// <param name="caches">The caches.</param>
@@ -16,7 +30,16 @@ namespace Umbraco.Web.PublishedCache
 			: base(caches)
 		{ }
 
-        /// <summary>
+	    /// <summary>
+	    /// Initializes the resolver to use IoC
+	    /// </summary>
+	    /// <param name="container"></param>
+	    /// <param name="implementationType"></param>
+	    public PublishedCachesResolver(IServiceContainer container, Expression<Func<IServiceFactory, IPublishedCaches>> implementationType) : base(container, implementationType)
+	    {
+	    }
+
+	    /// <summary>
         /// Sets the caches.
         /// </summary>
         /// <param name="caches">The caches.</param>

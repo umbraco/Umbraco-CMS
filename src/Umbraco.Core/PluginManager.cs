@@ -46,7 +46,7 @@ namespace Umbraco.Core
         /// <param name="detectChanges"></param>
         /// <param name="serviceProvider"></param>
         /// <param name="runtimeCache"></param>
-        internal PluginManager(IServiceProvider serviceProvider, IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
+        public PluginManager(IServiceProvider serviceProvider, IRuntimeCacheProvider runtimeCache, ProfilingLogger logger, bool detectChanges = true)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
             if (runtimeCache == null) throw new ArgumentNullException("runtimeCache");
@@ -494,7 +494,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal IEnumerable<Type> ResolveApplicationStartupHandlers()
         {
-            return ResolveTypes<IApplicationStartupHandler>();
+            return ResolveTypes<IApplicationEventHandler>();
         }
 
         /// <summary>

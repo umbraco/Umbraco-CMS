@@ -12,6 +12,13 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
     public class ContentFinderByNiceUrl : IContentFinder
     {
+	    protected ILogger Logger { get; private set; }
+
+	    public ContentFinderByNiceUrl(ILogger logger)
+	    {
+	        Logger = logger;
+	    }
+
 	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
@@ -21,7 +28,7 @@ namespace Umbraco.Web.Routing
         {
 			string route;
 			if (docRequest.HasDomain)
-				route = docRequest.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.GetAbsolutePathDecoded());
+				route = docRequest.Domain.RootNodeId + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.GetAbsolutePathDecoded());
 			else
 				route = docRequest.Uri.GetAbsolutePathDecoded();
 
@@ -37,17 +44,17 @@ namespace Umbraco.Web.Routing
 		/// <returns>The document node, or null.</returns>
         protected IPublishedContent FindContent(PublishedContentRequest docreq, string route)
         {
-			LogHelper.Debug<ContentFinderByNiceUrl>("Test route \"{0}\"", () => route);
+			Logger.Debug<ContentFinderByNiceUrl>("Test route \"{0}\"", () => route);
 
 		    var node = docreq.RoutingContext.UmbracoContext.ContentCache.GetByRoute(route);
             if (node != null)
             {
                 docreq.PublishedContent = node;
-                LogHelper.Debug<ContentFinderByNiceUrl>("Got content, id={0}", () => node.Id);
+                Logger.Debug<ContentFinderByNiceUrl>("Got content, id={0}", () => node.Id);
             }
             else
             {
-                LogHelper.Debug<ContentFinderByNiceUrl>("No match.");
+                Logger.Debug<ContentFinderByNiceUrl>("No match.");
             }
 
 		    return node;

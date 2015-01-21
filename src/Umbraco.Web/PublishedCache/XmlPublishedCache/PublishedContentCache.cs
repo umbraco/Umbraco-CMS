@@ -22,6 +22,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     internal class PublishedContentCache : IPublishedContentCache
     {
+        public PublishedContentCache()
+        {            
+        }
+
         #region Routes cache
 
         private readonly RoutesCache _routesCache = new RoutesCache(!UnitTesting);

@@ -294,8 +294,12 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="LightInject\LightInject.cs" />
+    <Compile Include="LightInject\LightInjectExtensions.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
+    <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
@@ -316,6 +320,7 @@
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\TaskService.cs" />
+    <Compile Include="Strategies\ManifestWatcherHandler.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />

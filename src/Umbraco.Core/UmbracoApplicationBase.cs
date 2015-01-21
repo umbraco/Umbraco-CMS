@@ -21,13 +21,19 @@ namespace Umbraco.Core
     public abstract class UmbracoApplicationBase : System.Web.HttpApplication
     {
 
-        public static event EventHandler ApplicationStarting;
-        public static event EventHandler ApplicationStarted;
+        public event EventHandler ApplicationStarting;
+        public event EventHandler ApplicationStarted;
 
         /// <summary>
         /// Called when the HttpApplication.Init() is fired, allows developers to subscribe to the HttpApplication events
         /// </summary>
+        /// <remarks>
+        /// Needs to be static otherwise null refs occur - though I don't know why
+        /// </remarks>
         public static event EventHandler ApplicationInit;
+        public static event EventHandler ApplicationError;
+        public static event EventHandler ApplicationEnd;
+        
 
         /// <summary>
         /// Boots up the Umbraco application
@@ -44,7 +50,7 @@ namespace Umbraco.Core
                 .Complete(appContext => OnApplicationStarted(sender, e));
 
             //And now we can dispose of our startup handlers - save some memory
-            ApplicationEventsResolver.Current.Dispose();
+            //ApplicationEventsResolver.Current.Dispose();
         }
 
         /// <summary>
@@ -106,7 +112,8 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationError(object sender, EventArgs e)
         {
-
+            EventHandler handler = ApplicationError;
+            if (handler != null) handler(this, EventArgs.Empty);
         }
 
         protected void Application_Error(object sender, EventArgs e)
@@ -134,7 +141,8 @@ namespace Umbraco.Core
         /// <param name="e"></param>
         protected virtual void OnApplicationEnd(object sender, EventArgs e)
         {
-
+            EventHandler handler = ApplicationEnd;
+            if (handler != null) handler(this, EventArgs.Empty);
         }
 
         protected void Application_End(object sender, EventArgs e)

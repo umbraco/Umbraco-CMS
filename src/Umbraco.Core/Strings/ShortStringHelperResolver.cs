@@ -1,12 +1,37 @@
+using System;
+using System.Linq.Expressions;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Strings
 {
-	/// <summary>
+    /// <summary>
     /// Resolves the IShortStringHelper object
-	/// </summary>
-    public sealed class ShortStringHelperResolver : SingleObjectResolverBase<ShortStringHelperResolver, IShortStringHelper>
-	{
+    /// </summary>
+    public sealed class ShortStringHelperResolver : ContainerSingleObjectResolver<ShortStringHelperResolver, IShortStringHelper>
+    {
+        /// <summary>
+        /// Initializes the resolver to use IoC
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="implementationType"></param>
+        internal ShortStringHelperResolver(IServiceContainer container, Type implementationType)
+            : base(container, implementationType)
+        {
+            Resolution.Frozen += (sender, args) => Value.Freeze();
+        }
+
+        /// <summary>
+        /// Initializes the resolver to use IoC
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="implementationType"></param>
+        internal ShortStringHelperResolver(IServiceContainer container, Expression<Func<IServiceFactory, IShortStringHelper>> implementationType)
+            : base(container, implementationType)
+        {
+            Resolution.Frozen += (sender, args) => Value.Freeze();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ShortStringHelperResolver"/> class with an instance of a helper.
         /// </summary>
@@ -17,24 +42,24 @@ namespace Umbraco.Core.Strings
         {
             Resolution.Frozen += (sender, args) => Value.Freeze();
         }
-        
+
         /// <summary>
-		/// Sets the helper.
-		/// </summary>
+        /// Sets the helper.
+        /// </summary>
         /// <param name="helper">The helper.</param>
-		/// <remarks>For developers, at application startup.</remarks>
+        /// <remarks>For developers, at application startup.</remarks>
         public void SetHelper(IShortStringHelper helper)
-		{
+        {
             Value = helper;
-		}
+        }
 
-		/// <summary>
-		/// Gets the helper.
-		/// </summary>
+        /// <summary>
+        /// Gets the helper.
+        /// </summary>
         public IShortStringHelper Helper
-		{
-			get { return Value; }
-		}
+        {
+            get { return Value; }
+        }
 
-	}
+    }
 }

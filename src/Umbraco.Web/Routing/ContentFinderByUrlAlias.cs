@@ -19,6 +19,13 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
     public class ContentFinderByUrlAlias : IContentFinder
     {
+        protected ILogger Logger { get; private set; }
+
+        public ContentFinderByUrlAlias(ILogger logger)
+	    {
+	        Logger = logger;
+	    }
+
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
@@ -37,7 +44,7 @@ namespace Umbraco.Web.Routing
 				if (node != null)
 				{					
 					docRequest.PublishedContent = node;
-					LogHelper.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContent.Id);
+					Logger.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContent.Id);
 				}
 			}
 

@@ -1,3 +1,6 @@
+using System;
+using System.Linq.Expressions;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Dictionary
@@ -5,14 +8,34 @@ namespace Umbraco.Core.Dictionary
 	/// <summary>
 	/// Resolves the current CultureDictionaryFactory
 	/// </summary>
-	public sealed class CultureDictionaryFactoryResolver : SingleObjectResolverBase<CultureDictionaryFactoryResolver, ICultureDictionaryFactory>
+	public sealed class CultureDictionaryFactoryResolver : ContainerSingleObjectResolver<CultureDictionaryFactoryResolver, ICultureDictionaryFactory>
 	{
-		internal CultureDictionaryFactoryResolver(ICultureDictionaryFactory factory)
+	    /// <summary>
+	    /// Initializes the resolver to use IoC
+	    /// </summary>
+	    /// <param name="container"></param>
+	    /// <param name="implementationType"></param>
+        internal CultureDictionaryFactoryResolver(IServiceContainer container, Type implementationType)
+            : base(container, implementationType)
+	    {
+	    }
+
+	    internal CultureDictionaryFactoryResolver(ICultureDictionaryFactory factory)
 			: base(factory)
 		{
 		}
 
-		/// <summary>
+	    /// <summary>
+	    /// Initializes the resolver to use IoC
+	    /// </summary>
+	    /// <param name="container"></param>
+	    /// <param name="implementationType"></param>
+        internal CultureDictionaryFactoryResolver(IServiceContainer container, Expression<Func<IServiceFactory, ICultureDictionaryFactory>> implementationType)
+            : base(container, implementationType)
+	    {
+	    }
+
+	    /// <summary>
 		/// Can be used by developers at runtime to set their ICultureDictionaryFactory at app startup
 		/// </summary>
 		/// <param name="factory"></param>

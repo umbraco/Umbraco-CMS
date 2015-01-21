@@ -23,16 +23,16 @@ namespace Umbraco.Core.Standalone
 
         }
 
-        protected override void InitializeApplicationEventsResolver()
-        {
-            base.InitializeApplicationEventsResolver();
+        //protected override void InitializeApplicationEventsResolver()
+        //{
+        //    base.InitializeApplicationEventsResolver();
 
-            foreach (var type in _handlersToAdd)
-                ApplicationEventsResolver.Current.AddType(type);
+        //    foreach (var type in _handlersToAdd)
+        //        ApplicationEventsResolver.Current.AddType(type);
 
-            foreach (var type in _handlersToRemove)
-                ApplicationEventsResolver.Current.RemoveType(type);
-        }
+        //    foreach (var type in _handlersToRemove)
+        //        ApplicationEventsResolver.Current.RemoveType(type);
+        //}
 
         protected override void InitializeResolvers()
         {

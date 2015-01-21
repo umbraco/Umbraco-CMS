@@ -27,7 +27,12 @@ namespace Umbraco.Web.Scheduling
         private static volatile bool _started = false;
         private static readonly object Locker = new object();
 
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        /// <summary>
+        /// Overridable method to execute when the ApplicationContext is created and other static objects that require initialization have been setup
+        /// </summary>
+        /// <param name="umbracoApplication"></param>
+        /// <param name="applicationContext"></param>
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             if (umbracoApplication.Context == null)
                 return;

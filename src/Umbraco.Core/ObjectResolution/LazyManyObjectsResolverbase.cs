@@ -39,34 +39,11 @@ namespace Umbraco.Core.ObjectResolution
         {
             Initialize();
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : base(scope)
-        {
-            Initialize();
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(HttpContextBase httpContext)
-            : base(httpContext)
-        {
-            Initialize();
-        }
-
+       
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Lazy<Type>> lazyTypeList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : this(serviceProvider, logger, scope)
         {
             AddTypes(lazyTypeList);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(IEnumerable<Lazy<Type>> lazyTypeList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, lazyTypeList, scope)
-        {
         }
 
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
@@ -75,38 +52,17 @@ namespace Umbraco.Core.ObjectResolution
             _typeListProducerList.Add(typeListProducerList);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, typeListProducerList, scope)
-        {
-        }
-
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext, IEnumerable<Lazy<Type>> lazyTypeList)
             : this(serviceProvider, logger, httpContext)
         {
             AddTypes(lazyTypeList);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(HttpContextBase httpContext, IEnumerable<Lazy<Type>> lazyTypeList)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, httpContext, lazyTypeList)
-        {
-        }
-
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext, Func<IEnumerable<Type>> typeListProducerList)
             : this(serviceProvider, logger, httpContext)
         {
             _typeListProducerList.Add(typeListProducerList);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected LazyManyObjectsResolverBase(HttpContextBase httpContext, Func<IEnumerable<Type>> typeListProducerList)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, httpContext, typeListProducerList)
-        {
-        }
+        }       
 
         #endregion
 

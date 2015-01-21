@@ -14,6 +14,7 @@ using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
@@ -23,6 +24,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Install;
+using Umbraco.Web.LightInject;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
@@ -31,6 +33,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Scheduling;
@@ -38,6 +41,8 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
+using TypeHelper = Umbraco.Core.TypeHelper;
+using Umbraco.Core.LightInject;
 
 
 namespace Umbraco.Web
@@ -49,7 +54,7 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
         //NOTE: see the Initialize method for what this is used for
-        private List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
+        private readonly List<IIndexer> _indexesToRebuild = new List<IIndexer>();
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
@@ -74,7 +79,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Initialize()
         {
-             //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
+            //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
             // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
             // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
@@ -82,6 +87,9 @@ namespace Umbraco.Web
             ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
 
             base.Initialize();
+
+            //setup mvc and webapi services
+            SetupMvcAndWebApi();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
             ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
@@ -94,32 +102,17 @@ namespace Umbraco.Web
                 ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);
             }
 
-            //set master controller factory
-            ControllerBuilder.Current.SetControllerFactory(
-                new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
-
-            //set the render view engine
-            ViewEngines.Engines.Add(new RenderViewEngine());
-            //set the plugin view engine
-            ViewEngines.Engines.Add(new PluginViewEngine());
-
-            //set model binder
-            ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
-
-            ////add the profiling action filter
-            //GlobalFilters.Filters.Add(new ProfilingActionFilter());
-
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
             renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
 
-            InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
+            var insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();
 
             return this;
         }
-        
+
         /// <summary>
         /// Override this method in order to ensure that the UmbracoContext is also created, this can only be 
         /// created after resolution is frozen!
@@ -140,20 +133,9 @@ namespace Umbraco.Web
         /// <summary>
         /// Ensure the current profiler is the web profiler
         /// </summary>
-        protected override void InitializeProfilerResolver()
+        protected override IProfiler CreateProfiler()
         {
-            base.InitializeProfilerResolver();
-
-            //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
-        }
-
-        /// <summary>
-        /// Adds custom types to the ApplicationEventsResolver
-        /// </summary>
-        protected override void InitializeApplicationEventsResolver()
-        {
-            base.InitializeApplicationEventsResolver();
+            return new WebProfiler();
         }
 
         /// <summary>
@@ -171,9 +153,6 @@ namespace Umbraco.Web
 
             base.Complete(afterComplete);
 
-            //Now, startup all of our legacy startup handler
-            ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
-            
             //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them 
             // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
             // initialize during startup, in which case we want it to rebuild the indexes itself.
@@ -205,10 +184,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Creates the application cache based on the HttpRuntime cache
         /// </summary>
-        protected override void CreateApplicationCache()
+        protected override CacheHelper CreateApplicationCache()
         {
             //create a web-based cache helper
-            ApplicationCache = new CacheHelper();
+            return new CacheHelper();
         }
 
         /// <summary>
@@ -235,7 +214,7 @@ namespace Umbraco.Web
             //plugin controllers must come first because the next route will catch many things
             RoutePluginControllers();
         }
-        
+
         private void RoutePluginControllers()
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
@@ -309,13 +288,33 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Called to customize the IoC container
+        /// </summary>
+        /// <param name="container"></param>
+        internal override void ConfigureServices(ServiceContainer container)
+        {
+            base.ConfigureServices(container);
+
+            //IoC setup for LightInject for mvc/webapi
+            Container.EnableMvc();
+            Container.RegisterMvcControllers(PluginManager);
+            container.EnablePerWebRequestScope();
+            container.EnableWebApi(GlobalConfiguration.Configuration);
+            container.RegisterApiControllers(PluginManager);
+
+            //register other services
+            container.Register<IPublishedContentCache, PublishedContentCache>();
+            container.Register<IPublishedMediaCache, PublishedMediaCache>();
+        }
+
+        /// <summary>
         /// Initializes all web based and core resolves 
         /// </summary>
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.Current.ResolveXsltExtensions());
+            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveXsltExtensions());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
@@ -334,21 +333,21 @@ namespace Umbraco.Web
                     }
                     catch (Exception e)
                     {
-                        LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                        ProfilingLogger.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
                         return null;
                     }
                 }
-                LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                ProfilingLogger.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                 return null;
             }));
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveSurfaceControllers());
+                ServiceProvider, ProfilingLogger.Logger,
+                PluginManager.ResolveSurfaceControllers());
 
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveUmbracoApiControllers());
+                ServiceProvider, ProfilingLogger.Logger,
+                PluginManager.ResolveUmbracoApiControllers());
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
@@ -360,15 +359,10 @@ namespace Umbraco.Web
             PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.TextStringValueConverter>();
             PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.MarkdownEditorValueConverter>();
 
-            PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
-                new PublishedCache.XmlPublishedCache.PublishedContentCache(),
-                new PublishedCache.XmlPublishedCache.PublishedMediaCache(ApplicationContext)));
-
-            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector), 
-                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
+            PublishedCachesResolver.Current = new PublishedCachesResolver(Container, typeof(PublishedCaches));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                ServiceProvider, ProfilingLogger.Logger,
                 // add all known factories, devs can then modify this list on application
                 // startup either by binding to events or in their own global.asax
                 new[]
@@ -377,44 +371,66 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
-                    //typeof(AliasUrlProvider), // not enabled by default
+                ServiceProvider, ProfilingLogger.Logger,
+                //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider),
                     typeof(CustomRouteUrlProvider)
                 );
 
-            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(new ContentFinderByLegacy404());
+            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(Container, typeof(ContentFinderByLegacy404));
 
             ContentFinderResolver.Current = new ContentFinderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                Container, ProfilingLogger.Logger,
                 // all built-in finders in the correct order, devs can then modify this list
                 // on application startup via an application event handler.
                 typeof(ContentFinderByPageIdQuery),
                 typeof(ContentFinderByNiceUrl),
                 typeof(ContentFinderByIdPath),
-                typeof (ContentFinderByNiceUrlAndTemplate),
-                typeof (ContentFinderByProfile),
-                typeof (ContentFinderByUrlAlias)
+                typeof(ContentFinderByNiceUrlAndTemplate),
+                typeof(ContentFinderByProfile),
+                typeof(ContentFinderByUrlAlias)
 
             );
 
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(Container, typeof(SiteDomainHelper));
 
-            // ain't that a bit dirty?
+            // ain't that a bit dirty? YES
             PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveThumbnailProviders());
+                Container, ProfilingLogger.Logger,
+                PluginManager.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveImageUrlProviders());
+                ServiceProvider, ProfilingLogger.Logger,
+                PluginManager.ResolveImageUrlProviders());
 
-            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
-                new DefaultCultureDictionaryFactory());
+            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(Container, typeof(DefaultCultureDictionaryFactory));
         }
 
+        /// <summary>
+        /// Sets up MVC/WebApi services
+        /// </summary>
+        private void SetupMvcAndWebApi()
+        {
+            //set master controller factory
+            ControllerBuilder.Current.SetControllerFactory(
+                new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
+
+            //set the render view engine
+            ViewEngines.Engines.Add(new RenderViewEngine());
+            //set the plugin view engine
+            ViewEngines.Engines.Add(new PluginViewEngine());
+
+            //set model binder
+            ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
+
+            ////add the profiling action filter
+            //GlobalFilters.Filters.Add(new ProfilingActionFilter());
+
+            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector),
+                new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
+        }
 
         private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
         {

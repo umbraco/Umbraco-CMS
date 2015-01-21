@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Umbraco.Core.LightInject;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -46,6 +47,12 @@ namespace Umbraco.Core.ObjectResolution
 	        : base(() => Reset())
 	    {
 
+	    }
+
+        internal ResolverBase(IServiceContainer container)
+            : base(() => Reset())
+	    {
+	        
 	    }
 
 	    /// <summary>

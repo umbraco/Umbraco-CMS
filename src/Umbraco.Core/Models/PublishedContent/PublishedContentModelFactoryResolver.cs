@@ -1,12 +1,24 @@
-﻿using Umbraco.Core.ObjectResolution;
+﻿using System;
+using Umbraco.Core.LightInject;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
     /// Resolves the IPublishedContentModelFactory object.
     /// </summary>
-    public class PublishedContentModelFactoryResolver : SingleObjectResolverBase<PublishedContentModelFactoryResolver, IPublishedContentModelFactory>
+    public class PublishedContentModelFactoryResolver : ContainerSingleObjectResolver<PublishedContentModelFactoryResolver, IPublishedContentModelFactory>
     {
+        /// <summary>
+        /// Initializes the resolver to use IoC
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="implementationType"></param>
+        internal PublishedContentModelFactoryResolver(IServiceContainer container, Type implementationType)
+            : base(container, implementationType)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentModelFactoryResolver"/>.
         /// </summary>
@@ -23,6 +35,15 @@ namespace Umbraco.Core.Models.PublishedContent
         internal PublishedContentModelFactoryResolver(IPublishedContentModelFactory factory)
             : base(factory)
         { }
+
+        /// <summary>
+        /// Initialize the resolver to use IoC, when using this contructor the type must be set manually
+        /// </summary>
+        /// <param name="container"></param>
+        internal PublishedContentModelFactoryResolver(IServiceContainer container)
+            : base(container)
+        {
+        }
 
         /// <summary>
         /// Sets the factory.

@@ -39,14 +39,14 @@ namespace Umbraco.Web.Standalone
             //var editorControlsAssemblyName = typeof(uploadField).Assembly.FullName;
         }
 
-        protected override void InitializeApplicationEventsResolver()
-        {
-            base.InitializeApplicationEventsResolver();
-            foreach (var type in _handlersToAdd)
-                ApplicationEventsResolver.Current.AddType(type);
-            foreach (var type in _handlersToRemove)
-                ApplicationEventsResolver.Current.RemoveType(type);
-        }
+        //protected override void InitializeApplicationEventsResolver()
+        //{
+        //    base.InitializeApplicationEventsResolver();
+        //    foreach (var type in _handlersToAdd)
+        //        ApplicationEventsResolver.Current.AddType(type);
+        //    foreach (var type in _handlersToRemove)
+        //        ApplicationEventsResolver.Current.RemoveType(type);
+        //}
 
         protected override void InitializeResolvers()
         {
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Standalone
 
             ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver();
 			ContentFinderResolver.Current = new ContentFinderResolver(
-                ServiceProvider, LoggerResolver.Current.Logger,
+                Container, LoggerResolver.Current.Logger,
 				typeof (ContentFinderByPageIdQuery),
 				typeof (ContentFinderByNiceUrl),
 				typeof (ContentFinderByIdPath)

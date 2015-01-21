@@ -12,8 +12,15 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 {
 	[WeightedPlugin(1000)]
     public class ImageThumbnailProvider : AbstractThumbnailProvider
-    {        
-        protected override IEnumerable<string> SupportedExtensions
+    {
+	    private readonly MediaFileSystem _mediaFileSystem;
+
+	    public ImageThumbnailProvider(MediaFileSystem mediaFileSystem)
+	    {
+	        _mediaFileSystem = mediaFileSystem;
+	    }
+
+	    protected override IEnumerable<string> SupportedExtensions
         {
             get { return new List<string> { ".jpeg", ".jpg", ".gif", ".bmp", ".png", ".tiff", ".tif" }; }
         }
@@ -37,7 +44,7 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 
             try
             {
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                var fs = _mediaFileSystem;
                 var relativeThumbPath = fs.GetRelativePath(tmpThumbUrl);
                 if (!fs.FileExists(relativeThumbPath))
                     return false;

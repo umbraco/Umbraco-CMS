@@ -10,19 +10,18 @@ namespace Umbraco.Core.Profiling
     /// <summary>
     /// A profiler used for web based activity based on the MiniProfiler framework
     /// </summary>
-    internal class WebProfiler : IProfiler
+    internal class WebProfiler : ApplicationEventHandler, IProfiler
     {
-
         /// <summary>
-        /// Constructor
+        ///Binds to application events to enable the MiniProfiler
         /// </summary>
-        /// <remarks>
-        /// Binds to application events to enable the MiniProfiler
-        /// </remarks>
-        internal WebProfiler()
+        /// <param name="umbracoApplication"></param>
+        /// <param name="applicationContext"></param>
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
         }
+
 
         /// <summary>
         /// Handle the Init event o fthe UmbracoApplication which allows us to subscribe to the HttpApplication events

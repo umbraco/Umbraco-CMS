@@ -8,6 +8,13 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	public class ContentFinderByLegacy404 : IContentFinder
 	{
+        private readonly ILogger _logger;
+
+        public ContentFinderByLegacy404(ILogger logger)
+	    {
+	        _logger = logger;
+	    }
+
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
@@ -15,7 +22,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TryFindContent(PublishedContentRequest pcr)
 		{
-			LogHelper.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
+			_logger.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
 
             // TODO - replace the whole logic and stop calling into library!
 			var error404 = global::umbraco.library.GetCurrentNotFoundPageId();
@@ -25,17 +32,17 @@ namespace Umbraco.Web.Routing
 
 			if (id > 0)
 			{
-				LogHelper.Debug<ContentFinderByLegacy404>("Got id={0}.", () => id);
+				_logger.Debug<ContentFinderByLegacy404>("Got id={0}.", () => id);
 
 				content = pcr.RoutingContext.UmbracoContext.ContentCache.GetById(id);
 
-			    LogHelper.Debug<ContentFinderByLegacy404>(content == null
+			    _logger.Debug<ContentFinderByLegacy404>(content == null
 			        ? "Could not find content with that id."
 			        : "Found corresponding content.");
 			}
 			else
 			{
-				LogHelper.Debug<ContentFinderByLegacy404>("Got nothing.");
+				_logger.Debug<ContentFinderByLegacy404>("Got nothing.");
 			}
 
 			pcr.PublishedContent = content;

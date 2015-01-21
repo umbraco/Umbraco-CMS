@@ -34,21 +34,6 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// Returns an instance of the default controller instance.
-        /// </summary>
-        public IRenderMvcController GetControllerInstance()
-        {
-            //try the dependency resolver, then the activator
-            var instance = DependencyResolver.Current.GetService(Value) ?? Activator.CreateInstance(Value);
-            var result = instance as IRenderMvcController;
-            if (result == null)
-            {
-                throw new InvalidOperationException("Could not create an instance of " + Value + " for the default " + typeof(IRenderMvcController).Name);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Sets the default RenderMvcController type
         /// </summary>
         /// <param name="controllerType"></param>

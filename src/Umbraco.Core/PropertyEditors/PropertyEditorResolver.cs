@@ -20,12 +20,6 @@ namespace Umbraco.Core.PropertyEditors
         {
         }
 
-        [Obsolete("Use the ctor specifying a PluginManager instead")]
-        public PropertyEditorResolver(Func<IEnumerable<Type>> typeListProducerList)
-            : base(typeListProducerList, ObjectLifetimeScope.Application)
-        {
-        }
-
         /// <summary>
         /// Returns the property editors
         /// </summary>
