@@ -51,6 +51,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoLanguage.id in (@ids)", new { ids = ids });
             }
 
+            //this needs to be sorted since that is the way legacy worked - default language is the first one!!
+            //even though legacy didn't sort, it should be by id
+            sql.OrderBy<LanguageDto>(dto => dto.Id, SqlSyntax);
+
+            
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
         }
 

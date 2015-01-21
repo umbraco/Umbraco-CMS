@@ -64,8 +64,8 @@ namespace umbraco.cms.businesslogic.web
 
         public Language Language
         {
-            get { return new Language(DomainEntity.DefaultLanguage); }
-            set { DomainEntity.DefaultLanguage = value.LanguageEntity; }
+            get { return new Language(DomainEntity.Language); }
+            set { DomainEntity.Language = value.LanguageEntity; }
         }
 
         public int RootNodeId
@@ -168,7 +168,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 DomainName = DomainName,
                 RootContent = content,
-                DefaultLanguage = lang
+                Language = lang
             };
             ApplicationContext.Current.Services.DomainService.Save(domain);
 

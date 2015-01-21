@@ -15,12 +15,12 @@ namespace Umbraco.Core.Models
         private ILanguage _language;
         private string _domainName;
 
-        private static readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, ILanguage>(x => x.DefaultLanguage);
+        private static readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, ILanguage>(x => x.Language);
         private static readonly PropertyInfo DomainNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, string>(x => x.DomainName);
         private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, IContent>(x => x.RootContent);
 
         [DataMember]
-        public ILanguage DefaultLanguage
+        public ILanguage Language
         {
             get { return _language; }
             set

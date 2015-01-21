@@ -46,11 +46,15 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
+            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
-            var domainUri = pos == 0 ? null : DomainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
+            var domainUri = pos == 0 
+                ? null
+                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
 
             // assemble the url from domainUri (maybe null) and path
             return AssembleUrl(domainUri, path, current, mode).ToString();
@@ -84,11 +88,13 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
+            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
-            var domainUris = pos == 0 ? null : DomainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
+            var domainUris = pos == 0 ? null : domainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
 
             // assemble the alternate urls from domainUris (maybe empty) and path
             return AssembleUrls(domainUris, path).Select(uri => uri.ToString());

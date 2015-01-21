@@ -44,7 +44,11 @@ namespace Umbraco.Web.Routing
 			Uri = uri;
 			RoutingContext = routingContext;
 
-			_engine = new PublishedContentRequestEngine(this);
+			_engine = new PublishedContentRequestEngine(
+                routingContext.UmbracoContext.Application.Services.DomainService,
+                routingContext.UmbracoContext.Application.Services.LocalizationService, 
+                routingContext.UmbracoContext.Application.ProfilingLogger,
+                this);
 
             RenderingEngine = RenderingEngine.Unknown;
 		}
@@ -94,7 +98,7 @@ namespace Umbraco.Web.Routing
 			if (Prepared != null)
 				Prepared(this, EventArgs.Empty);
 
-		    if (!HasPublishedContent)
+		    if (HasPublishedContent == false)
                 Is404 = true; // safety
 
 		    _readonly = true;
@@ -334,10 +338,17 @@ namespace Umbraco.Web.Routing
 
 		#region Domain and Culture
 
-		/// <summary>
+	    [Obsolete("Do not use this property, use the non-legacy UmbracoDomain property instead")]
+	    public Domain Domain
+	    {
+	        get { return new Domain(UmbracoDomain); }
+	    }
+
+        //TODO: Should we publicize the setter now that we are using a non-legacy entity??
+        /// <summary>
         /// Gets or sets the content request's domain.
         /// </summary>
-        public Domain Domain { get; internal set; }
+        public IDomain UmbracoDomain { get; internal set; }
 
 		/// <summary>
 		/// Gets or sets the content request's domain Uri.
@@ -350,7 +361,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public bool HasDomain
 		{
-			get { return Domain != null; }
+			get { return UmbracoDomain != null; }
 		}
 
 	    private CultureInfo _culture;
@@ -432,7 +443,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets a value indicating whether the content request triggers a redirect (permanent or not).
         /// </summary>
-        public bool IsRedirect { get { return !string.IsNullOrWhiteSpace(RedirectUrl); } }
+        public bool IsRedirect { get { return string.IsNullOrWhiteSpace(RedirectUrl) == false; } }
 
         /// <summary>
         /// Gets or sets a value indicating whether the redirect is permanent.

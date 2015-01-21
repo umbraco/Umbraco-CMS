@@ -294,7 +294,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     {
                         Id = cacheableDomain.Id,
                         //lookup from repo - this will be cached
-                        DefaultLanguage = cacheableDomain.DefaultLanguageId.HasValue ? langItems.FirstOrDefault(l => l.Id == cacheableDomain.DefaultLanguageId.Value) : null,
+                        Language = cacheableDomain.DefaultLanguageId.HasValue ? langItems.FirstOrDefault(l => l.Id == cacheableDomain.DefaultLanguageId.Value) : null,
                         DomainName = cacheableDomain.DomainName,
                         //lookup from repo - this will be cached
                         RootContent = cacheableDomain.RootContentId.HasValue ? contentItems.FirstOrDefault(l => l.Id == cacheableDomain.RootContentId.Value) : null,
@@ -309,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     Id = cacheableDomain.Id,
                     //lookup from repo - this will be cached
-                    DefaultLanguage = cacheableDomain.DefaultLanguageId.HasValue ? languageRepository.Get(cacheableDomain.DefaultLanguageId.Value) : null,
+                    Language = cacheableDomain.DefaultLanguageId.HasValue ? languageRepository.Get(cacheableDomain.DefaultLanguageId.Value) : null,
                     DomainName = cacheableDomain.DomainName,
                     //lookup from repo - this will be cached
                     RootContent = cacheableDomain.RootContentId.HasValue ? contentRepository.Get(cacheableDomain.RootContentId.Value) : null
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var domain = new CacheableDomain
                 {
                     Id = entity.Id,
-                    DefaultLanguageId = entity.DefaultLanguage == null ? null : (int?)entity.DefaultLanguage.Id,
+                    DefaultLanguageId = entity.Language == null ? null : (int?)entity.Language.Id,
                     DomainName = entity.DomainName,
                     RootContentId = entity.RootContent == null ? null : (int?)entity.RootContent.Id
                 };
