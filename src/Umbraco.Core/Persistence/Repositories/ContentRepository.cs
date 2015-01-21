@@ -631,6 +631,17 @@ namespace Umbraco.Core.Persistence.Repositories
             repo.ReplaceEntityPermissions(permissionSet);
         }
 
+        public void ClearPublished(IContent content)
+        {
+            // race cond!
+            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId=@id AND published=@published", new { id = content.Id, published = true });
+            foreach (var documentDto in documentDtos)
+            {
+                documentDto.Published = false;
+                Database.Update(documentDto);
+            }
+        }
+
         public IContent GetByLanguage(int id, string language)
         {
             var sql = GetBaseQuery(false);
