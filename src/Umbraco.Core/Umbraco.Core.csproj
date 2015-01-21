@@ -324,6 +324,7 @@
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
+    <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
@@ -340,6 +341,7 @@
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
+    <Compile Include="Services\DomainService.cs" />
     <Compile Include="Services\IAuditService.cs" />
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\RepositoryService.cs" />

@@ -72,13 +72,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return "umbracoDomains.id = @Id";
         }
 
+        protected override void PersistDeletedItem(IDomain entity)
+        {
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            {
+                var factory = new DomainModelFactory();
+                repo.PersistDeletedItem(factory.BuildEntity(entity));
+            }
+        }
+
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            var list = new List<string>
-                {
-                    "DELETE FROM umbracoDomain WHERE id = @Id"
-                };
-            return list;
+            throw new NotImplementedException();
         }
 
         protected override Guid NodeObjectTypeId
@@ -119,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        public IEnumerable<IDomain> GetDomainsForContent(int contentId, bool includeWildcards)
+        public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
             using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
             {
@@ -216,7 +221,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                return _domainRepo.GetDeleteClauses();
+                var list = new List<string>
+                {
+                    "DELETE FROM umbracoDomains WHERE id = @Id"
+                };
+                return list;
             }
 
             protected override Guid NodeObjectTypeId

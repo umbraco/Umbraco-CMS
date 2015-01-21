@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using umbraco.cms.businesslogic.contentitem;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -82,6 +83,41 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("test.com", domain.DomainName);
                 Assert.AreEqual(content.Id, domain.RootContent.Id);
                 Assert.AreEqual(lang.Id, domain.DefaultLanguage.Id);
+            }
+
+
+        }
+
+        [Test]
+        public void Can_Delete()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            ContentType ct;
+            var contentId = CreateTestData("en-AU", out ct);
+
+            ContentRepository contentRepo;
+            LanguageRepository langRepo;
+            ContentTypeRepository contentTypeRepo;
+
+            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            {
+                var lang = langRepo.GetByIsoCode("en-AU");
+                var content = contentRepo.Get(contentId);
+
+                var domain = (IDomain)new UmbracoDomain { RootContent = content, DefaultLanguage = lang, DomainName = "test.com" };
+                repo.AddOrUpdate(domain);
+                unitOfWork.Commit();
+
+                repo.Delete(domain);
+                unitOfWork.Commit();
+
+                //re-get
+                domain = repo.Get(domain.Id);
+
+
+                Assert.IsNull(domain);                
             }
 
 
@@ -234,6 +270,108 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var all = repo.GetAll(false);
 
                 Assert.AreEqual(5, all.Count());
+            }
+        }
+
+        [Test]
+        public void Get_All_For_Content()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            ContentType ct;
+            var contentId = CreateTestData("en-AU", out ct);
+
+            ContentRepository contentRepo;
+            LanguageRepository langRepo;
+            ContentTypeRepository contentTypeRepo;
+
+            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            {
+                var contentItems = new List<IContent>();
+
+                var lang = langRepo.GetByIsoCode("en-AU");
+                contentItems.Add(contentRepo.Get(contentId));
+                
+                //more test data (3 content items total)
+                for (int i = 0; i < 2; i++)
+                {
+                    var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
+                    contentRepo.AddOrUpdate(c);
+                    unitOfWork.Commit();
+                    contentItems.Add(c);
+                }
+                
+                for (int i = 0; i < 10; i++)
+                {
+                    var domain = (IDomain)new UmbracoDomain
+                    {
+                        RootContent = (i % 2 == 0) ? contentItems[0] : contentItems[1],
+                        DefaultLanguage = lang,
+                        DomainName = (i % 2 == 0) ? "test " + i + ".com" : ("*" + i)
+                    };
+                    repo.AddOrUpdate(domain);
+                    unitOfWork.Commit();
+                }
+
+                var all1 = repo.GetAssignedDomains(contentItems[0].Id, true);
+                Assert.AreEqual(5, all1.Count());
+                
+                var all2 = repo.GetAssignedDomains(contentItems[1].Id, true);
+                Assert.AreEqual(5, all2.Count());
+
+                var all3 = repo.GetAssignedDomains(contentItems[2].Id, true);
+                Assert.AreEqual(0, all3.Count());
+            }
+        }
+
+        [Test]
+        public void Get_All_For_Content_Without_Wildcards()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            ContentType ct;
+            var contentId = CreateTestData("en-AU", out ct);
+
+            ContentRepository contentRepo;
+            LanguageRepository langRepo;
+            ContentTypeRepository contentTypeRepo;
+
+            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            {
+                var contentItems = new List<IContent>();
+
+                var lang = langRepo.GetByIsoCode("en-AU");
+                contentItems.Add(contentRepo.Get(contentId));
+
+                //more test data (3 content items total)
+                for (int i = 0; i < 2; i++)
+                {
+                    var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
+                    contentRepo.AddOrUpdate(c);
+                    unitOfWork.Commit();
+                    contentItems.Add(c);
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var domain = (IDomain)new UmbracoDomain
+                    {
+                        RootContent = (i % 2 == 0) ? contentItems[0] : contentItems[1],
+                        DefaultLanguage = lang,
+                        DomainName = (i % 2 == 0) ? "test " + i + ".com" : ("*" + i)
+                    };
+                    repo.AddOrUpdate(domain);
+                    unitOfWork.Commit();
+                }
+
+                var all1 = repo.GetAssignedDomains(contentItems[0].Id, false);
+                Assert.AreEqual(5, all1.Count());
+
+                var all2 = repo.GetAssignedDomains(contentItems[1].Id, false);
+                Assert.AreEqual(0, all2.Count());
+
             }
         }
 
