@@ -13,6 +13,33 @@ namespace Umbraco.Tests.Persistence.Repositories
     public class TaskRepositoryTest : BaseDatabaseFactoryTest
     {
         [Test]
+        public void Can_Delete()
+        {
+             var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            {
+                var created = DateTime.Now;
+                var task = new Task(new TaskType("asdfasdf"))
+                {
+                    AssigneeUserId = 0,
+                    Closed = false,
+                    Comment = "hello world",
+                    EntityId = -1,
+                    OwnerUserId = 0
+                };
+                repo.AddOrUpdate(task);
+                unitOfWork.Commit();
+
+                repo.Delete(task);
+                unitOfWork.Commit();
+
+                task = repo.Get(task.Id);
+                Assert.IsNull(task);
+            }
+        }
+
+        [Test]
         public void Can_Add()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);

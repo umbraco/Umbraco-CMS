@@ -6,6 +6,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 using umbraco.DataLayer;
 
 namespace umbraco.cms.businesslogic.task
@@ -17,11 +18,13 @@ namespace umbraco.cms.businesslogic.task
     /// 
     /// Tasks can in umbraco be used for setting up simple workflows, and contains basic controls structures to determine if the task is completed or not.
     /// </summary>
+    [Obsolete("Use Umbraco.Core.Service.ITaskService instead")]
     public class Task
     {
 
+        internal Umbraco.Core.Models.Task TaskEntity;
+
         #region Properties
-        private int _id;
 
         /// <summary>
         /// Gets or sets the id.
@@ -29,20 +32,18 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The id.</value>
         public int Id
         {
-            get { return _id; }
-            set { _id = value; }
+            get { return TaskEntity.Id; }
+            set { TaskEntity.Id = value; }
         }
-
-        private bool _closed;
-
+        
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Task"/> is closed.
         /// </summary>
         /// <value><c>true</c> if closed; otherwise, <c>false</c>.</value>
         public bool Closed
         {
-            get { return _closed; }
-            set { _closed = value; }
+            get { return TaskEntity.Closed; }
+            set { TaskEntity.Closed = value; }
         }
 	
 
@@ -54,8 +55,12 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The node.</value>
         public CMSNode Node
         {
-            get { return _node; }
-            set { _node = value; }
+            get { return _node ?? (_node = new CMSNode(TaskEntity.EntityId)); }
+            set
+            {
+                _node = value;
+                TaskEntity.EntityId = value.Id;
+            }
         }
 
         private TaskType _type;
@@ -66,8 +71,15 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The type.</value>
         public TaskType Type
         {
-            get { return _type; }
-            set { _type = value; }
+            get { return _type ?? (_type = new TaskType(TaskEntity.TaskType)); }
+            set
+            {
+                _type = value;
+                TaskEntity.TaskType = new Umbraco.Core.Models.TaskType(_type.Alias)
+                {
+                    Id = _type.Id
+                };
+            }
         }
 	
 
@@ -79,33 +91,32 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The parent user.</value>
         public User ParentUser
         {
-            get { return _parentUser; }
-            set { _parentUser = value; }
+            get { return _parentUser ?? (_parentUser = new User(TaskEntity.OwnerUserId)); }
+            set
+            {
+                _parentUser = value;
+                TaskEntity.OwnerUserId = _parentUser.Id;
+            }
         }
-
-        private string _comment;
-
+        
         /// <summary>
         /// Gets or sets the comment.
         /// </summary>
         /// <value>The comment.</value>
         public string Comment
         {
-            get { return _comment; }
-            set { _comment = value; }
+            get { return TaskEntity.Comment; }
+            set { TaskEntity.Comment = value; }
         }
 	
-
-        private DateTime _date;
-
         /// <summary>
         /// Gets or sets the date.
         /// </summary>
         /// <value>The date.</value>
         public DateTime Date
         {
-            get { return _date; }
-            set { _date = value; }
+            get { return TaskEntity.CreateDate; }
+            set { TaskEntity.CreateDate = value; }
         }
 	
         private User _user;
@@ -116,8 +127,12 @@ namespace umbraco.cms.businesslogic.task
         /// <value>The user.</value>
         public User User
         {
-            get { return _user; }
-            set { _user = value; }
+            get { return _user ?? (_user = new User(TaskEntity.AssigneeUserId)); }
+            set
+            {
+                _user = value;
+                TaskEntity.OwnerUserId = _user.Id;
+            }
         }
 
         /// <summary>
@@ -140,26 +155,19 @@ namespace umbraco.cms.businesslogic.task
         {
         }
 
+        internal Task(Umbraco.Core.Models.Task task)
+        {
+            TaskEntity = task;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Task"/> class.
         /// </summary>
         /// <param name="TaskId">The task id.</param>
         public Task(int TaskId)
         {
-			using (IRecordsReader dr =
-				SqlHelper.ExecuteReader(
-				"select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where id = @id",
-				SqlHelper.CreateParameter("@id", TaskId)))
-			{
-                if (dr.Read())
-                {
-                    PopulateTaskFromReader(dr);
-                }
-                else
-                {
-                    throw new ArgumentException("Task with id: '" + TaskId + "' not found");
-                }
-			}
+            TaskEntity = ApplicationContext.Current.Services.TaskService.GetTaskById(TaskId);
+            if (TaskEntity == null) throw new NullReferenceException("No task found with id " + TaskId);
         }
 
         #endregion
@@ -172,61 +180,17 @@ namespace umbraco.cms.businesslogic.task
         /// </summary>
         public void Delete()
         {
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTask WHERE id = @id", SqlHelper.CreateParameter("@id", this._id));
+            ApplicationContext.Current.Services.TaskService.Delete(TaskEntity);
         }
 
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
-            //error checking
-            if (Node == null) throw new ArgumentNullException("Node");
-            if (ParentUser == null) throw new ArgumentNullException("ParentUser");
-            if (User == null) throw new ArgumentNullException("User");
-
-            if (Id == 0)
-            {
-                // The method is synchronized
-                SqlHelper.ExecuteNonQuery(
-                    "insert into cmsTask (closed, taskTypeId, nodeId, parentUserId, userId, comment) values (@closed, @taskTypeId, @nodeId, @parentUserId, @userId, @comment)",
-                    SqlHelper.CreateParameter("@closed", Closed),
-                    SqlHelper.CreateParameter("@taskTypeId", Type.Id),
-                    SqlHelper.CreateParameter("@nodeId", Node.Id),
-                    SqlHelper.CreateParameter("@parentUserId", ParentUser.Id),
-                    SqlHelper.CreateParameter("@userId", User.Id),
-                    SqlHelper.CreateParameter("@comment", Comment));
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTask");
-            }
-            else
-            {
-                SqlHelper.ExecuteNonQuery(
-                    "update cmsTask set closed = @closed, taskTypeId = @taskTypeId, nodeId = @nodeId, parentUserId = @parentUserId, userId = @userId, comment = @comment where id = @id",
-                    SqlHelper.CreateParameter("@closed", Closed),
-                    SqlHelper.CreateParameter("@taskTypeId", Type.Id),
-                    SqlHelper.CreateParameter("@nodeId", Node.Id),
-                    SqlHelper.CreateParameter("@parentUserId", ParentUser.Id),
-                    SqlHelper.CreateParameter("@userId", User.Id),
-                    SqlHelper.CreateParameter("@comment", Comment),
-                    SqlHelper.CreateParameter("@id", Id));
-            }
+            ApplicationContext.Current.Services.TaskService.Save(TaskEntity);
         }
 
-        #endregion
-
-        #region Private methods
-        private void PopulateTaskFromReader(IRecordsReader dr)
-        {
-            _id = dr.GetInt("id");
-            Type = new TaskType((int)dr.GetByte("taskTypeId"));
-            Node = new CMSNode(dr.GetInt("nodeId"));
-            ParentUser = User.GetUser(dr.GetInt("parentUserId"));
-            User = User.GetUser(dr.GetInt("userId"));
-            Date = dr.GetDateTime("DateTime");
-            Comment = dr.GetString("comment");
-            Closed = dr.GetBoolean("closed");
-        } 
         #endregion
 
         #region static methods
@@ -238,19 +202,17 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static Tasks GetTasksByType(int taskType)
         {
-            var sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where taskTypeId = @taskTypeId";
-            Tasks tasks = new Tasks();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@taskTypeId", taskType)))
+            var foundTaskType = ApplicationContext.Current.Services.TaskService.GetTaskTypeById(taskType);
+            if (foundTaskType == null) return null;
+
+            var result = new Tasks();
+            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(taskTypeAlias: foundTaskType.Alias);
+            foreach (var task in tasks)
             {
-                while (dr.Read())
-                {
-                    var t = new Task();
-                    t.PopulateTaskFromReader(dr);
-                    tasks.Add(t);
-                }
+                result.Add(new Task(task));
             }
 
-            return tasks;
+            return result;
         }
 
         /// <summary>
@@ -260,19 +222,14 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static Tasks GetTasks(int nodeId)
         {
-            var sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where nodeId = @nodeId";
-            Tasks tasks = new Tasks();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@nodeId", nodeId)))
+            var result = new Tasks();
+            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(itemId:nodeId);
+            foreach (var task in tasks)
             {
-                while (dr.Read())
-                {
-                    var t = new Task();
-                    t.PopulateTaskFromReader(dr);
-                    tasks.Add(t);
-                }                    
+                result.Add(new Task(task));
             }
 
-            return tasks;
+            return result;
         }
 
         /// <summary>
@@ -281,26 +238,16 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="User">The User who have the tasks assigned</param>
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
-        public static Tasks GetTasks(User User, bool IncludeClosed) {
-            string sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where userId = @userId";
-            if (!IncludeClosed)
-                sql += " and closed = 0";
-            sql += " order by DateTime desc";
+        public static Tasks GetTasks(User User, bool IncludeClosed) 
+        {
+            var result = new Tasks();
+            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(assignedUser:User.Id, includeClosed:IncludeClosed);
+            foreach (var task in tasks)
+            {
+                result.Add(new Task(task));
+            }
 
-            Tasks tasks = new Tasks();
-			using (IRecordsReader dr = SqlHelper.ExecuteReader(
-				sql,
-				SqlHelper.CreateParameter("@userId", User.Id)))
-			{
-                while (dr.Read())
-                {
-                    var t = new Task();
-                    t.PopulateTaskFromReader(dr);
-                    tasks.Add(t);
-                }   				
-			}
-
-            return tasks;
+            return result;
         }
 
         /// <summary>
@@ -309,25 +256,15 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="User">The User who have the tasks assigned</param>
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
-        public static Tasks GetOwnedTasks(User User, bool IncludeClosed) {
-            string sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where parentUserId = @userId";
-            if (!IncludeClosed)
-                sql += " and closed = 0";
-            sql += " order by DateTime desc";
-
-            Tasks tasks = new Tasks();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                sql,
-                SqlHelper.CreateParameter("@userId", User.Id))) {
-                    while (dr.Read())
-                    {
-                        var t = new Task();
-                        t.PopulateTaskFromReader(dr);
-                        tasks.Add(t);
-                    }   
+        public static Tasks GetOwnedTasks(User User, bool IncludeClosed) 
+        {
+            var result = new Tasks();
+            var tasks = ApplicationContext.Current.Services.TaskService.GetTasks(ownerUser:User.Id, includeClosed: IncludeClosed);
+            foreach (var task in tasks)
+            {
+                result.Add(new Task(task));
             }
-
-            return tasks;
+            return result;
         }
 
         #endregion

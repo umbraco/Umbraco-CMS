@@ -66,7 +66,9 @@ namespace Umbraco.Core.Persistence
 
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
         {
-            return new TaskRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+            return new TaskRepository(uow, 
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _logger, _sqlSyntax);
         }
 
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
@@ -266,6 +268,13 @@ namespace Umbraco.Core.Persistence
         public IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
         {
             return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax, CreateContentRepository(uow), CreateLanguageRepository(uow));
+        }
+
+        public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)
+        {
+            return new TaskTypeRepository(uow, 
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _logger, _sqlSyntax);
         }
     }
 }

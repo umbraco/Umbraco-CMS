@@ -324,6 +324,7 @@
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
+    <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
@@ -332,6 +333,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
+    <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />

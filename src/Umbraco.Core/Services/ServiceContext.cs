@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
@@ -16,6 +17,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<ITaskService> _taskService; 
         private Lazy<IDomainService> _domainService; 
         private Lazy<IAuditService> _auditService; 
         private Lazy<ILocalizedTextService> _localizedTextService;
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Services
         private Lazy<INotificationService> _notificationService;
 
         /// <summary>
-        /// public ctor - will generally just be used for unit testing
+        /// public ctor - will generally just be used for unit testing all items are optional and if not specified, the defaults will be used
         /// </summary>
         /// <param name="contentService"></param>
         /// <param name="mediaService"></param>
@@ -62,48 +64,51 @@ namespace Umbraco.Core.Services
         /// <param name="localizedTextService"></param>
         /// <param name="auditService"></param>
         /// <param name="domainService"></param>
+        /// <param name="taskService"></param>
         public ServiceContext(
-            IContentService contentService, 
-            IMediaService mediaService, 
-            IContentTypeService contentTypeService, 
-            IDataTypeService dataTypeService, 
-            IFileService fileService, 
-            ILocalizationService localizationService, 
-            IPackagingService packagingService, 
-            IEntityService entityService,
-            IRelationService relationService,
-            IMemberGroupService memberGroupService,
-            IMemberTypeService memberTypeService,
-            IMemberService memberService,
-            IUserService userService,
-            ISectionService sectionService,
-            IApplicationTreeService treeService,
-            ITagService tagService,
-            INotificationService notificationService,             
-            ILocalizedTextService localizedTextService,
-            IAuditService auditService,
-            IDomainService domainService)
+            IContentService contentService = null,
+            IMediaService mediaService = null,
+            IContentTypeService contentTypeService = null,
+            IDataTypeService dataTypeService = null,
+            IFileService fileService = null,
+            ILocalizationService localizationService = null,
+            IPackagingService packagingService = null,
+            IEntityService entityService = null,
+            IRelationService relationService = null,
+            IMemberGroupService memberGroupService = null,
+            IMemberTypeService memberTypeService = null,
+            IMemberService memberService = null,
+            IUserService userService = null,
+            ISectionService sectionService = null,
+            IApplicationTreeService treeService = null,
+            ITagService tagService = null,
+            INotificationService notificationService = null,
+            ILocalizedTextService localizedTextService = null,
+            IAuditService auditService = null,
+            IDomainService domainService = null,
+            ITaskService taskService = null)
         {
-            _auditService = new Lazy<IAuditService>(() => auditService);
-            _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);     
-            _tagService = new Lazy<ITagService>(() => tagService);     
-            _contentService = new Lazy<IContentService>(() => contentService);        
-            _mediaService = new Lazy<IMediaService>(() => mediaService);
-            _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
-            _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
-            _fileService = new Lazy<IFileService>(() => fileService);
-            _localizationService = new Lazy<ILocalizationService>(() => localizationService);
-            _packagingService = new Lazy<IPackagingService>(() => packagingService);
-            _entityService = new Lazy<IEntityService>(() => entityService);
-            _relationService = new Lazy<IRelationService>(() => relationService);
-            _sectionService = new Lazy<ISectionService>(() => sectionService);
-            _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
-            _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
-            _treeService = new Lazy<IApplicationTreeService>(() => treeService);
-            _memberService = new Lazy<IMemberService>(() => memberService);
-            _userService = new Lazy<IUserService>(() => userService);
-            _notificationService = new Lazy<INotificationService>(() => notificationService);
-            _domainService = new Lazy<IDomainService>(() => domainService);
+            if (_auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
+            if (_localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
+            if (_tagService != null) _tagService = new Lazy<ITagService>(() => tagService);
+            if (_contentService != null) _contentService = new Lazy<IContentService>(() => contentService);
+            if (_mediaService != null) _mediaService = new Lazy<IMediaService>(() => mediaService);
+            if (_contentTypeService != null) _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
+            if (_dataTypeService != null) _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
+            if (_fileService != null) _fileService = new Lazy<IFileService>(() => fileService);
+            if (_localizationService != null) _localizationService = new Lazy<ILocalizationService>(() => localizationService);
+            if (_packagingService != null) _packagingService = new Lazy<IPackagingService>(() => packagingService);
+            if (_entityService != null) _entityService = new Lazy<IEntityService>(() => entityService);
+            if (_relationService != null) _relationService = new Lazy<IRelationService>(() => relationService);
+            if (_sectionService != null) _sectionService = new Lazy<ISectionService>(() => sectionService);
+            if (_memberGroupService != null) _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
+            if (_memberTypeService != null) _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
+            if (_treeService != null) _treeService = new Lazy<IApplicationTreeService>(() => treeService);
+            if (_memberService != null) _memberService = new Lazy<IMemberService>(() => memberService);
+            if (_userService != null) _userService = new Lazy<IUserService>(() => userService);
+            if (_notificationService != null) _notificationService = new Lazy<INotificationService>(() => notificationService);
+            if (_domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
+            if (_taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
         }
 
         internal ServiceContext(
@@ -132,6 +137,9 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
+
+            if (_taskService == null)
+                _taskService = new Lazy<ITaskService>(() => new TaskService(provider, repositoryFactory, logger));
 
             if (_domainService == null)
                 _domainService = new Lazy<IDomainService>(() => new DomainService(provider, repositoryFactory, logger));
@@ -203,6 +211,14 @@ namespace Umbraco.Core.Services
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory, logger));
 
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ITaskService"/>
+        /// </summary>
+        public ITaskService TaskService
+        {
+            get { return _taskService.Value; }
         }
 
         /// <summary>
