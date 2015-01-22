@@ -19,9 +19,9 @@ namespace Umbraco.Tests.Routing
         {
             SetupDomainServiceMock(new[]
             {
-                new UmbracoDomain {Id = 1, DomainName = "domain1.com/", Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
-                new UmbracoDomain {Id = 1, DomainName = "domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
-                new UmbracoDomain {Id = 1, DomainName = "domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}}
+                new UmbracoDomain("domain1.com/") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}}
             });
         }
 
@@ -29,15 +29,15 @@ namespace Umbraco.Tests.Routing
         {
             SetupDomainServiceMock(new[]
             {
-                new UmbracoDomain {Id = 1, DomainName = "domain1.com/", Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
-                new UmbracoDomain {Id = 1, DomainName = "domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
-                new UmbracoDomain {Id = 1, DomainName = "domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
-                new UmbracoDomain {Id = 1, DomainName = "*1001", Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
-                new UmbracoDomain {Id = 1, DomainName = "*10011", Language = new Language("cs-CZ"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
-                new UmbracoDomain {Id = 1, DomainName = "*100112", Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 100112}},
-                new UmbracoDomain {Id = 1, DomainName = "*1001122", Language = new Language("da-DK"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001122}},
-                new UmbracoDomain {Id = 1, DomainName = "*10012", Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
-                new UmbracoDomain {Id = 1, DomainName = "*10031", Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}}
+                new UmbracoDomain("domain1.com/") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("*1001") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("*10011") {Id = 1, Language = new Language("cs-CZ"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("*100112") {Id = 1, Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 100112}},
+                new UmbracoDomain("*1001122") {Id = 1, Language = new Language("da-DK"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001122}},
+                new UmbracoDomain("*10012") {Id = 1, Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("*10031") {Id = 1, Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}}
             });
         }
 

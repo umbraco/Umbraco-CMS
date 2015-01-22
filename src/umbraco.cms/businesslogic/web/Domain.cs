@@ -164,9 +164,8 @@ namespace umbraco.cms.businesslogic.web
             var lang = ApplicationContext.Current.Services.LocalizationService.GetLanguageById(LanguageId);
             if (lang == null) throw new NullReferenceException("No language exists with id " + LanguageId);
 
-            var domain = new UmbracoDomain
+            var domain = new UmbracoDomain(DomainName)
             {
-                DomainName = DomainName,
                 RootContent = content,
                 Language = lang
             };

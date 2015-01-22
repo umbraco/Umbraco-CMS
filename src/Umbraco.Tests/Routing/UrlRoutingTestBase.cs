@@ -40,9 +40,9 @@ namespace Umbraco.Tests.Routing
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
                 .Returns((bool incWildcards) => new[]
                 {
-                    new UmbracoDomain{Id = 1,DomainName = "domain1.com/", Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)){ Id = 1001}}, 
-                    new UmbracoDomain{Id = 1,DomainName = "domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)){ Id = 10011}}, 
-                    new UmbracoDomain{Id = 1,DomainName = "domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)){ Id = 10012}}
+                    new UmbracoDomain("domain1.com/"){Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)){ Id = 1001}}, 
+                    new UmbracoDomain("domain1.com/en"){Id = 1, Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)){ Id = 10011}}, 
+                    new UmbracoDomain("domain1.com/fr"){Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)){ Id = 10012}}
                 });
             return svcCtx;
         }

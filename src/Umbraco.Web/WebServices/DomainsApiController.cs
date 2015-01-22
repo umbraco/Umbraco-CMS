@@ -58,9 +58,8 @@ namespace Umbraco.Web.WebServices
                 else
                 {
                     // yet there is a race condition here...
-                    var newDomain = new UmbracoDomain
+                    var newDomain = new UmbracoDomain("*" + model.NodeId)
                     {
-                        DomainName = "*" + model.NodeId,
                         Language = Services.LocalizationService.GetLanguageById(model.Language),
                         RootContent = Services.ContentService.GetById(model.NodeId)
                     };
@@ -110,9 +109,8 @@ namespace Umbraco.Web.WebServices
                 else
                 {
                     // yet there is a race condition here...
-                    var newDomain = new UmbracoDomain
+                    var newDomain = new UmbracoDomain(name)
                     {
-                        DomainName = name,
                         Language = Services.LocalizationService.GetLanguageById(domainModel.Lang),
                         RootContent = Services.ContentService.GetById(model.NodeId)
                     };

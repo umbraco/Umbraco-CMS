@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Services
                             },
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             var result = txtService.GetAllStoredValues(culture);
 
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             var result = txtService.Localize("testArea/testKey", culture);
 
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             var result = txtService.Localize("testKey", culture);
 
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             var result = txtService.Localize("testArea/doNotFind", culture);
 
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             var result = txtService.Localize("doNotFind", culture);
 
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             var result = txtService.Localize("testKey", culture,
                 new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
@@ -359,7 +359,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                });
+                }, Mock.Of<ILogger>());
 
             Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
         }

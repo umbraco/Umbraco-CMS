@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Routing
 		{
 		    SetupDomainServiceMock(new[]
 		    {
-		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/", Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
+		        new UmbracoDomain("domain1.com/") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
 		    });
 
 		    //var langEn = Language.GetByCultureCode("en-US");
@@ -56,12 +56,12 @@ namespace Umbraco.Tests.Routing
 		{
 		    SetupDomainServiceMock(new[]
 		    {
-		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
-		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)) {Id = 10011}},
-		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)) {Id = 10012}},
-		        new UmbracoDomain {Id = 1, DomainName = "domain3.com/", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1003}},
-		        new UmbracoDomain {Id = 1, DomainName = "domain3.com/en", Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)) {Id = 10031}},
-		        new UmbracoDomain {Id = 1, DomainName = "domain3.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)) {Id = 10032}}
+		        new UmbracoDomain("domain1.com/") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+		        new UmbracoDomain("domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)) {Id = 10011}},
+		        new UmbracoDomain("domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)) {Id = 10012}},
+		        new UmbracoDomain("http://domain3.com/") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1003}},
+		        new UmbracoDomain("http://domain3.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)) {Id = 10031}},
+		        new UmbracoDomain("http://domain3.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)) {Id = 10032}}
 		    });
 
 		    //var langEn = Language.GetByCultureCode("en-US");

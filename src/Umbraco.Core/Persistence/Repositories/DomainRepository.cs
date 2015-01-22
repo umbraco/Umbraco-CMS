@@ -290,12 +290,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 return cacheableDomains
                     .WhereNotNull()
-                    .Select(cacheableDomain => new UmbracoDomain
+                    .Select(cacheableDomain => new UmbracoDomain(cacheableDomain.DomainName)
                     {
                         Id = cacheableDomain.Id,
                         //lookup from repo - this will be cached
                         Language = cacheableDomain.DefaultLanguageId.HasValue ? langItems.FirstOrDefault(l => l.Id == cacheableDomain.DefaultLanguageId.Value) : null,
-                        DomainName = cacheableDomain.DomainName,
                         //lookup from repo - this will be cached
                         RootContent = cacheableDomain.RootContentId.HasValue ? contentItems.FirstOrDefault(l => l.Id == cacheableDomain.RootContentId.Value) : null,
                     });
@@ -305,12 +304,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (cacheableDomain == null) return null;
 
-                return new UmbracoDomain
+                return new UmbracoDomain(cacheableDomain.DomainName)
                 {
                     Id = cacheableDomain.Id,
                     //lookup from repo - this will be cached
                     Language = cacheableDomain.DefaultLanguageId.HasValue ? languageRepository.Get(cacheableDomain.DefaultLanguageId.Value) : null,
-                    DomainName = cacheableDomain.DomainName,
                     //lookup from repo - this will be cached
                     RootContent = cacheableDomain.RootContentId.HasValue ? contentRepository.Get(cacheableDomain.RootContentId.Value) : null
                 };

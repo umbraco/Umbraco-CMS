@@ -11,6 +11,11 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class UmbracoDomain : Entity, IDomain
     {
+        public UmbracoDomain(string domainName)
+        {
+            _domainName = domainName;
+        }
+
         private IContent _content;
         private ILanguage _language;
         private string _domainName;
