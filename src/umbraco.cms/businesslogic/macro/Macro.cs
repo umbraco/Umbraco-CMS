@@ -379,7 +379,6 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		/// <param name="Name">Userfriendly name</param>
 		/// <returns>The newly macro</returns>
-        [MethodImpl(MethodImplOptions.Synchronized)]
 		public static Macro MakeNew(string Name) 
 		{
 		    var macro = new Umbraco.Core.Models.Macro

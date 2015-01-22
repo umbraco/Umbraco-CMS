@@ -184,7 +184,6 @@ namespace umbraco.BusinessLogic
         /// <param name="name"></param>
         /// <param name="defaultPermissions"></param>
         /// <param name="alias"></param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static UserType MakeNew(string name, string defaultPermissions, string alias)
         {
             //ensure that the current alias does not exist
