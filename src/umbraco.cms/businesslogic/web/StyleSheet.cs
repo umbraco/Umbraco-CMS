@@ -9,6 +9,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using Umbraco.Core;
 using File = System.IO.File;
@@ -21,7 +22,7 @@ namespace umbraco.cms.businesslogic.web
     [Obsolete("Use Umbraco.Core.Services.IFileService instead")]
     public class StyleSheet : CMSNode
     {
-        internal Stylesheet StylesheetItem;
+        internal Stylesheet StylesheetEntity;
 
         public static Guid ModuleObjectType = new Guid(Constants.ObjectTypes.Stylesheet);
         
@@ -29,33 +30,33 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                var path = StylesheetItem.Path;
+                var path = StylesheetEntity.Path;
                 if (path.IsNullOrWhiteSpace()) return string.Empty;
-                return System.IO.Path.GetFileNameWithoutExtension(StylesheetItem.Path);
+                return System.IO.Path.GetFileNameWithoutExtension(StylesheetEntity.Path);
             }
             set
             {
                 //setting the file name changing it's path
-                StylesheetItem.Path = StylesheetItem.Path.TrimEnd(StylesheetItem.Name) + value.EnsureEndsWith(".css");
+                StylesheetEntity.Path = StylesheetEntity.Path.TrimEnd(StylesheetEntity.Name) + value.EnsureEndsWith(".css");
             }
         }
 
         public string Content
         {
-            get { return StylesheetItem.Content; }
-            set { StylesheetItem.Content = value; }
+            get { return StylesheetEntity.Content; }
+            set { StylesheetEntity.Content = value; }
         }
 
         public StylesheetProperty[] Properties
         {
-            get { return StylesheetItem.Properties.Select(x => new StylesheetProperty(StylesheetItem, x)).ToArray(); }
+            get { return StylesheetEntity.Properties.Select(x => new StylesheetProperty(StylesheetEntity, x)).ToArray(); }
         }
 
         internal StyleSheet(Stylesheet stylesheet)
             : base(stylesheet)
         {
             if (stylesheet == null) throw new ArgumentNullException("stylesheet");
-            StylesheetItem = stylesheet;
+            StylesheetEntity = stylesheet;
         }
 
         public StyleSheet(Guid id)
@@ -100,8 +101,8 @@ namespace umbraco.cms.businesslogic.web
         /// <value>The create date time.</value>
         public override DateTime CreateDateTime
         {
-            get { return StylesheetItem.CreateDate; }
-            set { StylesheetItem.CreateDate = value; }
+            get { return StylesheetEntity.CreateDate; }
+            set { StylesheetEntity.CreateDate = value; }
         }
         
         /// <summary>
@@ -122,7 +123,7 @@ namespace umbraco.cms.businesslogic.web
             FireBeforeSave(e);
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
+                ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetEntity);
 
                 FireAfterSave(e);
             }
@@ -192,7 +193,7 @@ namespace umbraco.cms.businesslogic.web
             
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetItem.Path);
+                ApplicationContext.Current.Services.FileService.DeleteStylesheet(StylesheetEntity.Path);
 
                 FireAfterDelete(e);
             }
@@ -201,31 +202,14 @@ namespace umbraco.cms.businesslogic.web
 
         public void saveCssToFile()
         {
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetItem);
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(StylesheetEntity);
         }
 
         public XmlNode ToXml(XmlDocument xd)
         {
-            XmlNode doc = xd.CreateElement("Stylesheet");
-            doc.AppendChild(xmlHelper.addTextNode(xd, "Name", this.Text));
-            doc.AppendChild(xmlHelper.addTextNode(xd, "FileName", this.Filename));
-            doc.AppendChild(xmlHelper.addCDataNode(xd, "Content", this.Content));
-
-            if (this.Properties.Length > 0)
-            {
-                XmlNode properties = xd.CreateElement("Properties");
-                foreach (StylesheetProperty sp in this.Properties)
-                {
-                    XmlElement prop = xd.CreateElement("Property");
-                    prop.AppendChild(xmlHelper.addTextNode(xd, "Name", sp.Text));
-                    prop.AppendChild(xmlHelper.addTextNode(xd, "Alias", sp.Alias));
-                    prop.AppendChild(xmlHelper.addTextNode(xd, "Value", sp.value));
-                    properties.AppendChild(prop);
-                }
-                doc.AppendChild(properties);
-            }
-
-            return doc;
+            var serializer = new EntityXmlSerializer();
+            var xml = serializer.Serialize(StylesheetEntity);
+            return xml.GetXmlNode(xd);
         }
 
         public static StyleSheet GetStyleSheet(int id, bool setupStyleProperties, bool loadContentFromFile)

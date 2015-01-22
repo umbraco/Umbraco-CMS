@@ -88,10 +88,10 @@ namespace umbraco.cms.businesslogic.web
         {
             //we need to create it with a temp place holder!
             var prop = new Umbraco.Core.Models.StylesheetProperty(Text, "#" + Text.ToSafeAlias(), "");
-            sheet.StylesheetItem.AddProperty(prop);
-            ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet.StylesheetItem);
+            sheet.StylesheetEntity.AddProperty(prop);
+            ApplicationContext.Current.Services.FileService.SaveStylesheet(sheet.StylesheetEntity);
 
-            var ssp = new StylesheetProperty(sheet.StylesheetItem, prop);
+            var ssp = new StylesheetProperty(sheet.StylesheetEntity, prop);
             var e = new NewEventArgs();
             ssp.OnNew(e);
             return ssp;
