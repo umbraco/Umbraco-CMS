@@ -250,6 +250,8 @@ namespace umbraco.cms.businesslogic.macro
 		    }
 		}
 
+        //TODO: Fix this, this should wrap a new API!
+
         public static Macro Import(XmlNode n)
         {
             var alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -9,8 +10,6 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    //TODO: Add events!
-
     public class DomainService : RepositoryService, IDomainService
     {
         public DomainService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
@@ -29,12 +28,18 @@ namespace Umbraco.Core.Services
 
         public void Delete(IDomain domain)
         {
+            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDomain>(domain), this))
+                return;
+
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateDomainRepository(uow))
             {
                 repository.Delete(domain);
-                uow.Commit();
+                uow.Commit();               
             }
+
+            var args = new DeleteEventArgs<IDomain>(domain, false);
+            Deleted.RaiseEvent(args, this);
         }
 
         public IDomain GetByName(string name)
@@ -77,8 +82,8 @@ namespace Umbraco.Core.Services
         {
             if (raiseEvents)
             {
-                //if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-                //    return;
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDomain>(domainEntity), this))
+                    return;
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -88,8 +93,32 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            //if (raiseEvents)
-            //    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false), this);
         }
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>		
+        public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleted;
+      
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saved;
+
+      
+        #endregion
     }
 }

@@ -17,7 +17,7 @@ using Umbraco.Core;
 namespace umbraco.cms.businesslogic.datatype
 {
 
-    
+    //TODO: Wrap as much of this api as possible so that we don't need to listen to legacy events!
 
     /// <summary>
     /// Datatypedefinitions is the basic buildingblocks of umbraco's documents/medias/members generic datastructure 

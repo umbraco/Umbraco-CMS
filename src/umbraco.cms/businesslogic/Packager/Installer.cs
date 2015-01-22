@@ -352,6 +352,7 @@ namespace umbraco.cms.businesslogic.packager
                 #region Macros
                 foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
                 {
+                    //TODO: Fix this, this should not use the legacy API
                     Macro m = Macro.Import(n);
 
                     if (m != null)

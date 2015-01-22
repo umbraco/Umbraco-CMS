@@ -648,7 +648,7 @@ namespace Umbraco.Web.Cache
 
         #region Domain Cache
 
-        public static void RefreshDomainCache(this DistributedCache dc, Domain domain)
+        public static void RefreshDomainCache(this DistributedCache dc, IDomain domain)
         {
             if (domain != null)
             {
@@ -656,7 +656,7 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        public static void RemoveDomainCache(this DistributedCache dc, Domain domain)
+        public static void RemoveDomainCache(this DistributedCache dc, IDomain domain)
         {
             if (domain != null)
             {
