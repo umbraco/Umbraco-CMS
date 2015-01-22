@@ -5,6 +5,7 @@ using System.Threading;
 
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Web.PublishedCache;
 using umbraco.cms.businesslogic.web;
@@ -16,6 +17,19 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class DefaultUrlProvider : IUrlProvider
     {
+        private readonly IRequestHandlerSection _requestSettings;
+
+        [Obsolete("Use the ctor that specifies the IRequestHandlerSection")]
+        public DefaultUrlProvider()
+            : this(UmbracoConfig.For.UmbracoSettings().RequestHandler)
+        {            
+        }
+
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings)
+        {
+            _requestSettings = requestSettings;
+        }
+
         #region GetUrl
 
         /// <summary>
@@ -112,7 +126,7 @@ namespace Umbraco.Web.Routing
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
-                mode = UmbracoConfig.For.UmbracoSettings().RequestHandler.UseDomainPrefixes
+                mode = _requestSettings.UseDomainPrefixes
                     ? UrlProviderMode.Absolute
                     : UrlProviderMode.Auto;
             }

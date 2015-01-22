@@ -2,62 +2,78 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.language;
 using System.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+
 	[TestFixture]
-	public class ContentFinderByNiceUrlWithDomainsTests : BaseRoutingTest
+    public class ContentFinderByNiceUrlWithDomainsTests : UrlRoutingTestBase
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
+        //public override void Initialize()
+        //{
+        //    base.Initialize();
 
-            // ensure we can create them although the content is not in the database
-            TestHelper.DropForeignKeys("umbracoDomains");
+        //    // ensure we can create them although the content is not in the database
+        //    TestHelper.DropForeignKeys("umbracoDomains");
             
-            InitializeLanguagesAndDomains();
-		}
+        //    InitializeLanguagesAndDomains();
+        //}
 
-		void InitializeLanguagesAndDomains()
-		{
-			var domains = Domain.GetDomains();
-			foreach (var d in domains)
-				d.Delete();
+        //void InitializeLanguagesAndDomains()
+        //{
+        //    var domains = Domain.GetDomains();
+        //    foreach (var d in domains)
+        //        d.Delete();
 
-			var langs = Language.GetAllAsList();
-			foreach (var l in langs.Skip(1))
-				l.Delete();
+        //    var langs = Language.GetAllAsList();
+        //    foreach (var l in langs.Skip(1))
+        //        l.Delete();
 
-			Language.MakeNew("fr-FR");
-		}
+        //    Language.MakeNew("fr-FR");
+        //}
 
 		void SetDomains3()
 		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
+		    SetupDomainServiceMock(new[]
+		    {
+		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/", Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
+		    });
 
-			Domain.MakeNew("domain1.com/", 1001, langEn.id);
+		    //var langEn = Language.GetByCultureCode("en-US");
+		    //var langFr = Language.GetByCultureCode("fr-FR");
+
+		    //Domain.MakeNew("domain1.com/", 1001, langEn.id);
 		}
 
 		void SetDomains4()
 		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
+		    SetupDomainServiceMock(new[]
+		    {
+		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)) {Id = 10011}},
+		        new UmbracoDomain {Id = 1, DomainName = "domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)) {Id = 10012}},
+		        new UmbracoDomain {Id = 1, DomainName = "domain3.com/", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1003}},
+		        new UmbracoDomain {Id = 1, DomainName = "domain3.com/en", Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)) {Id = 10031}},
+		        new UmbracoDomain {Id = 1, DomainName = "domain3.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)) {Id = 10032}}
+		    });
 
-			Domain.MakeNew("domain1.com/", 1001, langEn.id);
-			Domain.MakeNew("domain1.com/en", 10011, langEn.id);
-			Domain.MakeNew("domain1.com/fr", 10012, langFr.id);
+		    //var langEn = Language.GetByCultureCode("en-US");
+		    //var langFr = Language.GetByCultureCode("fr-FR");
 
-			Domain.MakeNew("http://domain3.com/", 1003, langEn.id);
-			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
-			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
+		    //Domain.MakeNew("domain1.com/", 1001, langEn.id);
+		    //Domain.MakeNew("domain1.com/en", 10011, langEn.id);
+		    //Domain.MakeNew("domain1.com/fr", 10012, langFr.id);
+
+		    //Domain.MakeNew("http://domain3.com/", 1003, langEn.id);
+		    //Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
+		    //Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
 		}
 
 		protected override string GetXmlContent(int templateId)

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
+using GlobalSettings = umbraco.GlobalSettings;
 using IOHelper = Umbraco.Core.IO.IOHelper;
 using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 
@@ -24,8 +27,8 @@ namespace Umbraco.Web
 
         private bool _replacing;
         private bool? _previewing;
-        private Lazy<ContextualPublishedContentCache> _contentCache;
-        private Lazy<ContextualPublishedMediaCache> _mediaCache;
+        private readonly Lazy<ContextualPublishedContentCache> _contentCache;
+        private readonly Lazy<ContextualPublishedMediaCache> _mediaCache;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -34,6 +37,57 @@ namespace Umbraco.Web
         private static UmbracoContext _umbracoContext;
 
         #region EnsureContext methods
+
+        #region Obsolete
+        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity)
+        {
+            return EnsureContext(httpContext, applicationContext, webSecurity, false);
+        }
+        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext)
+        {
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), false);
+        }
+        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            bool replaceContext)
+        {
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext);
+        }
+        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity,
+            bool replaceContext)
+        {
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext, null);
+        }
+        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity,
+            bool replaceContext,
+            bool? preview)
+        {
+            return EnsureContext(httpContext, applicationContext, webSecurity, UmbracoConfig.For.UmbracoSettings(), replaceContext, preview);
+        } 
+        #endregion
+
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
         /// context is created and assigned.
@@ -41,6 +95,7 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
         /// <param name="webSecurity"></param>
+        /// <param name="umbracoSettings"></param>
         /// <returns>
         /// The Singleton context object
         /// </returns>
@@ -53,10 +108,13 @@ namespace Umbraco.Web
         public static UmbracoContext EnsureContext(
             HttpContextBase httpContext,
             ApplicationContext applicationContext,
-            WebSecurity webSecurity)
+            WebSecurity webSecurity,
+            IUmbracoSettingsSection umbracoSettings)
         {
-            return EnsureContext(httpContext, applicationContext, webSecurity, false);
+            return EnsureContext(httpContext, applicationContext, webSecurity, umbracoSettings, false);
         }
+
+        
 
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
@@ -64,6 +122,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
+        /// <param name="umbracoSettings"></param>
         /// <returns>
         /// The Singleton context object
         /// </returns>
@@ -75,10 +134,13 @@ namespace Umbraco.Web
         /// </remarks>
         public static UmbracoContext EnsureContext(
             HttpContextBase httpContext,
-            ApplicationContext applicationContext)
+            ApplicationContext applicationContext,
+            IUmbracoSettingsSection umbracoSettings)
         {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), false);
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, false);
         }
+
+       
 
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
@@ -86,6 +148,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
+        /// <param name="umbracoSettings"></param>
         /// <param name="replaceContext">
         /// if set to true will replace the current singleton with a new one, this is generally only ever used because
         /// during application startup the base url domain will not be available so after app startup we'll replace the current
@@ -103,10 +166,14 @@ namespace Umbraco.Web
         public static UmbracoContext EnsureContext(
             HttpContextBase httpContext,
             ApplicationContext applicationContext,
+            IUmbracoSettingsSection umbracoSettings,
             bool replaceContext)
         {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext);
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, replaceContext);
         }
+
+        
+        
 
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
@@ -115,6 +182,7 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
         /// <param name="webSecurity"></param>
+        /// <param name="umbracoSettings"></param>
         /// <param name="replaceContext">
         /// if set to true will replace the current singleton with a new one, this is generally only ever used because
         /// during application startup the base url domain will not be available so after app startup we'll replace the current
@@ -133,10 +201,13 @@ namespace Umbraco.Web
             HttpContextBase httpContext,
             ApplicationContext applicationContext,
             WebSecurity webSecurity,
+            IUmbracoSettingsSection umbracoSettings,
             bool replaceContext)
         {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext, null);
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, replaceContext, null);
         }
+
+        
 
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
@@ -145,6 +216,7 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
         /// <param name="webSecurity"></param>
+        /// <param name="umbracoSettings"></param>
         /// <param name="replaceContext">
         /// if set to true will replace the current singleton with a new one, this is generally only ever used because
         /// during application startup the base url domain will not be available so after app startup we'll replace the current
@@ -164,12 +236,13 @@ namespace Umbraco.Web
             HttpContextBase httpContext,
             ApplicationContext applicationContext,
             WebSecurity webSecurity,
+            IUmbracoSettingsSection umbracoSettings,
             bool replaceContext,
             bool? preview)
         {
             if (UmbracoContext.Current != null)
             {
-                if (!replaceContext)
+                if (replaceContext == false)
                     return UmbracoContext.Current;
                 UmbracoContext.Current._replacing = true;
             }
@@ -189,8 +262,9 @@ namespace Umbraco.Web
                 // create the nice urls provider
                 // there's one per request because there are some behavior parameters that can be changed
                 new Lazy<UrlProvider>(
-                    () => new UrlProvider(
+                    () => new UrlProvider(                        
                         umbracoContext,
+                        umbracoSettings.WebRouting,
                         UrlProviderResolver.Current.Providers),
                     false));
 

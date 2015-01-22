@@ -12,7 +12,7 @@ using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
-	/// <summary>
+    /// <summary>
 	/// Common helper properties and methods useful to testing
 	/// </summary>
 	public static class TestHelper

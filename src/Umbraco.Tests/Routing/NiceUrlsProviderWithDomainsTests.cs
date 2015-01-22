@@ -1,107 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.language;
-
+using System.Configuration;
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
-	public class NiceUrlsProviderWithDomainsTests : BaseRoutingTest
+    public class NiceUrlsProviderWithDomainsTests : UrlRoutingTestBase
 	{
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            //generate new mock settings and assign so we can configure in individual tests
-            _umbracoSettings = SettingsForTests.GenerateMockSettings();
-            SettingsForTests.ConfigureSettings(_umbracoSettings);
-
-            // ensure we can create them although the content is not in the database
-            TestHelper.DropForeignKeys("umbracoDomains");            
-        }
-
-        private IUmbracoSettingsSection _umbracoSettings;
-
         protected override void FreezeResolution()
         {
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
         }
 
-		void InitializeLanguagesAndDomains()
-		{
-			var domains = Domain.GetDomains();
-			foreach (var d in domains)
-				d.Delete();
-
-			var langs = Language.GetAllAsList();
-			foreach (var l in langs.Skip(1))
-				l.Delete();
-
-			Language.MakeNew("fr-FR");
-		}
 
 		void SetDomains1()
 		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
 
-			Domain.MakeNew("domain1.com", 1001, langFr.id);
+            SetupDomainServiceMock(new[]
+		    {
+		        new UmbracoDomain {Id = 1, DomainName = "domain1.com", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
+		    });
 		}
 
-		void SetDomains2()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
+        void SetDomains2()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/foo", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
+            });
+        }
 
-			Domain.MakeNew("http://domain1.com/foo", 1001, langFr.id);
-		}
+        void SetDomains3()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}}
+            });
+        }
 
-		void SetDomains3()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
+        void SetDomains4()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain3.com/", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1003}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain3.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain3.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10032}}
+            });
+        }
 
-			Domain.MakeNew("http://domain1.com/", 10011, langFr.id);
-		}
-
-		void SetDomains4()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/", 1001, langEn.id);
-			Domain.MakeNew("http://domain1.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1.com/fr", 10012, langFr.id);
-
-			Domain.MakeNew("http://domain3.com/", 1003, langEn.id);
-			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
-			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
-		}
-
-		void SetDomains5()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1a.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1b.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1.com/fr", 10012, langFr.id);
-			Domain.MakeNew("http://domain1a.com/fr", 10012, langFr.id);
-			Domain.MakeNew("http://domain1b.com/fr", 10012, langFr.id);
-
-			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
-			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
-		}
+        void SetDomains5()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1a.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1b.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1a.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain1b.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain3.com/en", Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}},
+                new UmbracoDomain {Id = 1, DomainName = "http://domain3.com/fr", Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10032}}
+            });
+        }
 
 		protected override string GetXmlContent(int templateId)
 		{
@@ -201,14 +174,15 @@ namespace Umbraco.Tests.Routing
 		[TestCase(10011, "https://domain1.com", false, "/1001-1/")]
 		public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+		    var request = Mock.Get(settings.RequestHandler);
+		    request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+			var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			InitializeLanguagesAndDomains();
 			SetDomains1();
 
 			var currentUri = new Uri(currentUrl);
@@ -231,14 +205,15 @@ namespace Umbraco.Tests.Routing
 		[TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
 		public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+		    var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			InitializeLanguagesAndDomains();
 			SetDomains2();
 
 			var currentUri = new Uri(currentUrl);
@@ -253,15 +228,16 @@ namespace Umbraco.Tests.Routing
 		[TestCase(1002, "http://domain1.com", false, "/1002/")]
 		public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+		    var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			InitializeLanguagesAndDomains();
-			SetDomains3();
+            SetDomains3();
 
 			var currentUri = new Uri(currentUrl);
 			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
@@ -281,14 +257,15 @@ namespace Umbraco.Tests.Routing
 		[TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
 		public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+		    var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
             
-			InitializeLanguagesAndDomains();
 			SetDomains4();
 
 			var currentUri = new Uri(currentUrl);
@@ -299,14 +276,15 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Get_Nice_Url_DomainsAndCache()
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+		    var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			InitializeLanguagesAndDomains();
 			SetDomains4();
 
 			string ignore;
@@ -361,21 +339,20 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Get_Nice_Url_Relative_Or_Absolute()
 		{
-			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+            var requestMock = Mock.Get(settings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+		    var routingContext = GetRoutingContext("http://domain1.com/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			InitializeLanguagesAndDomains();
 			SetDomains4();
-
-            //mock the Umbraco settings that we need
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
             
             Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
 			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
-
+           
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
@@ -391,12 +368,12 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Get_Nice_Url_Alternate()
 		{
-			var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111);
+            var settings = SettingsForTests.GenerateMockSettings();
+			var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111,umbracoSettings:settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			InitializeLanguagesAndDomains();
 			SetDomains5();
 
 		    var url = routingContext.UrlProvider.GetUrl(100111, true);
