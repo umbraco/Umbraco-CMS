@@ -247,12 +247,6 @@ namespace umbraco.presentation.webservices
 
         }
 
-        public string Tidy(string textToTidy)
-        {
-            AuthorizeRequest(true);
-            return library.Tidy(helper.Request("StringToTidy"), true);
-        }
-
         private static string SaveCss(string fileName, string fileContents, int fileId)
         {
             string returnValue;

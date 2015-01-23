@@ -14,16 +14,6 @@ namespace umbraco.webservices
 	[WebService(Namespace="http://umbraco.org/webservices/")]
     public class Developer : UmbracoAuthorizedWebService
 	{
-		
-		[WebMethod]
-		public string BootStrapTidy(string html, string ContextID)
-		{
-            //pretty sure this is legacy and it used to throw an exception so we'll continue to do the same
-            //true = throw if invalid
-		    AuthorizeRequest(true);
-
-			return cms.helpers.xhtml.BootstrapTidy(html);
-		}
 
 		[WebMethod]
 		public XmlNode GetMacros(string Login, string Password)

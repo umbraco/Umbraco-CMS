@@ -167,10 +167,6 @@
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="TidyNet, Version=1.0.0.0, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Tidy.Net.1.0.0\lib\TidyNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -372,9 +368,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="helpers\url.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="helpers\xhtml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

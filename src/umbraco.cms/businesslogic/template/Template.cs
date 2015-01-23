@@ -473,11 +473,11 @@ namespace umbraco.cms.businesslogic.template
                 // test for macro alias
                 if (elementName == "?UMBRACO_MACRO")
                 {
-                    Hashtable tags = helpers.xhtml.ReturnAttributes(match.Value);
+                    var tags = XmlHelper.GetAttributesFromElement(match.Value);
                     if (tags["macroAlias"] != null)
-                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroAlias"].ToString()) + elementAttributes;
+                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroAlias"]) + elementAttributes;
                     else if (tags["macroalias"] != null)
-                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroalias"].ToString()) + elementAttributes;
+                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroalias"]) + elementAttributes;
                 }
                 string newElement = "<" + newElementName + " runat=\"server\" " + elementAttributes.Trim() + ">";
                 if (elementAttributes.EndsWith("/"))

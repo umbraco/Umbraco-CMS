@@ -189,25 +189,7 @@ namespace umbraco
         public static bool CloneXmlCacheOnPublish
         {
             get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether rich text editor content should be parsed by tidy.
-        /// </summary>
-        /// <value><c>true</c> if content is parsed; otherwise, <c>false</c>.</value>
-        public static bool TidyEditorContent
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent; }
-        }
-
-        /// <summary>
-        /// Gets the encoding type for the tidyied content.
-        /// </summary>
-        /// <value>The encoding type as string.</value>
-        public static string TidyCharEncoding
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.TidyCharEncoding; }
-        }
+        }       
 
         /// <summary>
         /// Gets the property context help option, this can either be 'text', 'icon' or 'none'

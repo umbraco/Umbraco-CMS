@@ -1843,18 +1843,6 @@ namespace umbraco
         }
 
 
-
-        /// <summary>
-        /// Cleans the spified string with tidy
-        /// </summary>
-        /// <param name="StringToTidy">The string to tidy.</param>
-        /// <param name="LiveEditing">if set to <c>true</c> [Live Editing].</param>
-        /// <returns></returns>
-        public static string Tidy(string StringToTidy, bool LiveEditing)
-        {
-            return cms.helpers.xhtml.TidyHtml(StringToTidy);
-        }
-
         internal static string GetCurrentNotFoundPageId()
         {
             //XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
