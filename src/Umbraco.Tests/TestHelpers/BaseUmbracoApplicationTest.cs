@@ -66,7 +66,9 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<ILogger>(factory => Logger);
             Container.Register<CacheHelper>(factory => CacheHelper);
             Container.Register<ProfilingLogger>(factory => ProfilingLogger);
+            var settings = SettingsForTests.GetDefault();
             Container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault(), new PerContainerLifetime());
+            Container.Register<IContentSection>(factory => settings.Content, new PerContainerLifetime());
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
 

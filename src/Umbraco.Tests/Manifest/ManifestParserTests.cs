@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(TestHelper.MapPathForTest("~/App_Plugins")));
+            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")));
         }
         
         [Test]

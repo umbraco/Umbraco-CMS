@@ -14,6 +14,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
@@ -205,7 +206,7 @@ namespace Umbraco.Tests.TestHelpers
             PropertyEditorResolver.Current = new PropertyEditorResolver(
                  Container, Logger,
                  () => PluginManager.Current.ResolvePropertyEditors(),
-                 new ManifestBuilder(new ManifestParser(Logger, new DirectoryInfo(TestHelper.MapPathForTest("~/App_Plugins")))));
+                 new ManifestBuilder(new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")))));
 
             MappingResolver.Current = new MappingResolver(
                 Container, Logger,

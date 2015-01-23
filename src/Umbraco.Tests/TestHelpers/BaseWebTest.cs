@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Web.Routing;
 using System.Xml;
+using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
@@ -77,5 +78,14 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
+        {
+            Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+
+            base.FreezeResolution();
+        }
     }
 }
