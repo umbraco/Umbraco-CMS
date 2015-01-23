@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the service context
                 new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
                 cacheHelper,
-                new ProfilingLogger(new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))), Mock.Of<IProfiler>()))
+                new ProfilingLogger(_logger, Mock.Of<IProfiler>()))
                 {
                     IsReady = true
                 };
@@ -89,6 +89,31 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<NodeDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoAccess_Table()
+        {
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<NodeDto>();
+                DatabaseSchemaHelper.CreateTable<AccessDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoAccessRule_Table()
+        {
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<NodeDto>();
+                DatabaseSchemaHelper.CreateTable<AccessDto>();
+                DatabaseSchemaHelper.CreateTable<AccessRuleDto>();
 
                 //transaction.Complete();
             }
