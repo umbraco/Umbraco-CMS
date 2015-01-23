@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
-using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.member;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
-using Macro = umbraco.cms.businesslogic.macro.Macro;
-using Member = umbraco.cms.businesslogic.member.Member;
-using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.Cache
 {
@@ -46,11 +38,7 @@ namespace Umbraco.Web.Cache
             UserService.DeletedUser += UserServiceDeletedUser;
 
             //Bind to dictionary events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
-            global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.New += DictionaryItemNew;
-            global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.Saving +=DictionaryItemSaving;
-            global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.Deleted +=DictionaryItemDeleted;
             LocalizationService.DeletedDictionaryItem += LocalizationServiceDeletedDictionaryItem;
             LocalizationService.SavedDictionaryItem += LocalizationServiceSavedDictionaryItem;
 
@@ -60,27 +48,17 @@ namespace Umbraco.Web.Cache
             DataTypeService.Saved += DataTypeServiceSaved;
 
             //Bind to stylesheet events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
-            global::umbraco.cms.businesslogic.web.StylesheetProperty.AfterSave += StylesheetPropertyAfterSave;
-            global::umbraco.cms.businesslogic.web.StylesheetProperty.AfterDelete += StylesheetPropertyAfterDelete;
-            global::umbraco.cms.businesslogic.web.StyleSheet.AfterDelete += StyleSheetAfterDelete;
-            global::umbraco.cms.businesslogic.web.StyleSheet.AfterSave += StyleSheetAfterSave;
             FileService.SavedStylesheet += FileServiceSavedStylesheet;
             FileService.DeletedStylesheet += FileServiceDeletedStylesheet;
 
             //Bind to domain events
 
-            Domain.AfterSave += DomainAfterSave;
-            Domain.AfterDelete += DomainAfterDelete;
-            Domain.New += DomainNew;
+            DomainService.Saved += DomainService_Saved;
+            DomainService.Deleted += DomainService_Deleted;
 
             //Bind to language events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
-            global::umbraco.cms.businesslogic.language.Language.AfterDelete += LanguageAfterDelete;
-            global::umbraco.cms.businesslogic.language.Language.New += LanguageNew;
-            global::umbraco.cms.businesslogic.language.Language.AfterSave += LanguageAfterSave;
             LocalizationService.SavedLanguage += LocalizationServiceSavedLanguage;
             LocalizationService.DeletedLanguage += LocalizationServiceDeletedLanguage;
 
@@ -95,23 +73,19 @@ namespace Umbraco.Web.Cache
 
             //Bind to permission events
 
+            //TODO: Wrap legacy permissions so we can get rid of this
             Permission.New += PermissionNew;
             Permission.Updated += PermissionUpdated;
             Permission.Deleted += PermissionDeleted;
             PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
 
             //Bind to template events
-            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
-            Template.AfterSave += TemplateAfterSave;
-            Template.AfterDelete += TemplateAfterDelete;
             FileService.SavedTemplate += FileServiceSavedTemplate;
             FileService.DeletedTemplate += FileServiceDeletedTemplate;
 
             //Bind to macro events
 
-            Macro.AfterSave += MacroAfterSave;
-            Macro.AfterDelete += MacroAfterDelete;
             MacroService.Saved += MacroServiceSaved;
             MacroService.Deleted += MacroServiceDeleted;
 
@@ -143,6 +117,8 @@ namespace Umbraco.Web.Cache
             //public access events
             Access.AfterSave += Access_AfterSave;
         }
+
+       
 
         #region Public access event handlers
 
@@ -255,41 +231,41 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region ApplicationTree event handlers
-        static void ApplicationTreeNew(ApplicationTree sender, System.EventArgs e)
+        static void ApplicationTreeNew(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
         }
 
-        static void ApplicationTreeUpdated(ApplicationTree sender, System.EventArgs e)
+        static void ApplicationTreeUpdated(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
         }
 
-        static void ApplicationTreeDeleted(ApplicationTree sender, System.EventArgs e)
+        static void ApplicationTreeDeleted(ApplicationTree sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationTreeCache();
         } 
         #endregion
 
         #region Application event handlers
-        static void ApplicationNew(Section sender, System.EventArgs e)
+        static void ApplicationNew(Section sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         }
 
-        static void ApplicationDeleted(Section sender, System.EventArgs e)
+        static void ApplicationDeleted(Section sender, EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         } 
         #endregion
 
         #region UserType event handlers
-        static void UserServiceDeletedUserType(IUserService sender, Core.Events.DeleteEventArgs<Core.Models.Membership.IUserType> e)
+        static void UserServiceDeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserTypeCache(x.Id));
         }
 
-        static void UserServiceSavedUserType(IUserService sender, Core.Events.SaveEventArgs<Core.Models.Membership.IUserType> e)
+        static void UserServiceSavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
         }
@@ -298,40 +274,25 @@ namespace Umbraco.Web.Cache
         
         #region Dictionary event handlers
 
-        static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, Core.Events.SaveEventArgs<IDictionaryItem> e)
+        static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDictionaryCache(x.Id));
         }
 
-        static void LocalizationServiceDeletedDictionaryItem(ILocalizationService sender, Core.Events.DeleteEventArgs<IDictionaryItem> e)
+        static void LocalizationServiceDeletedDictionaryItem(ILocalizationService sender, DeleteEventArgs<IDictionaryItem> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDictionaryCache(x.Id));
         }
 
-        static void DictionaryItemDeleted(global::umbraco.cms.businesslogic.Dictionary.DictionaryItem sender, System.EventArgs e)
-        {
-            DistributedCache.Instance.RemoveDictionaryCache(sender.id);
-        }
-
-        static void DictionaryItemSaving(global::umbraco.cms.businesslogic.Dictionary.DictionaryItem sender, System.EventArgs e)
-        {
-            DistributedCache.Instance.RefreshDictionaryCache(sender.id);
-        }
-
-        static void DictionaryItemNew(global::umbraco.cms.businesslogic.Dictionary.DictionaryItem sender, System.EventArgs e)
-        {
-            DistributedCache.Instance.RefreshDictionaryCache(sender.id);
-        } 
-
         #endregion
 
         #region DataType event handlers
-        static void DataTypeServiceSaved(IDataTypeService sender, Core.Events.SaveEventArgs<IDataTypeDefinition> e)
+        static void DataTypeServiceSaved(IDataTypeService sender, SaveEventArgs<IDataTypeDefinition> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDataTypeCache(x));
         }
 
-        static void DataTypeServiceDeleted(IDataTypeService sender, Core.Events.DeleteEventArgs<IDataTypeDefinition> e)
+        static void DataTypeServiceDeleted(IDataTypeService sender, DeleteEventArgs<IDataTypeDefinition> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDataTypeCache(x));
         }
@@ -339,52 +300,31 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Stylesheet and stylesheet property event handlers
-        static void StylesheetPropertyAfterSave(global::umbraco.cms.businesslogic.web.StylesheetProperty sender, SaveEventArgs e)
-        {
-            DistributedCache.Instance.RefreshStylesheetPropertyCache(sender);
-        }
-
-        static void StylesheetPropertyAfterDelete(global::umbraco.cms.businesslogic.web.StylesheetProperty sender, DeleteEventArgs e)
-        {
-            DistributedCache.Instance.RemoveStylesheetPropertyCache(sender);
-        }
-
-        static void FileServiceDeletedStylesheet(IFileService sender, Core.Events.DeleteEventArgs<Stylesheet> e)
+     
+        static void FileServiceDeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveStylesheetCache(x));
         }
 
-        static void FileServiceSavedStylesheet(IFileService sender, Core.Events.SaveEventArgs<Stylesheet> e)
+        static void FileServiceSavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshStylesheetCache(x));
         }
 
-        static void StyleSheetAfterSave(StyleSheet sender, SaveEventArgs e)
-        {
-            DistributedCache.Instance.RefreshStylesheetCache(sender);
-        }
-
-        static void StyleSheetAfterDelete(StyleSheet sender, DeleteEventArgs e)
-        {
-            DistributedCache.Instance.RemoveStylesheetCache(sender);
-        } 
         #endregion
 
         #region Domain event handlers
-        static void DomainNew(Domain sender, NewEventArgs e)
+
+        static void DomainService_Saved(IDomainService sender, SaveEventArgs<IDomain> e)
         {
-            DistributedCache.Instance.RefreshDomainCache(sender);
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDomainCache(x));
         }
 
-        static void DomainAfterDelete(Domain sender, DeleteEventArgs e)
+        static void DomainService_Deleted(IDomainService sender, DeleteEventArgs<IDomain> e)
         {
-            DistributedCache.Instance.RemoveDomainCache(sender);
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDomainCache(x));
         }
 
-        static void DomainAfterSave(Domain sender, SaveEventArgs e)
-        {
-            DistributedCache.Instance.RefreshDomainCache(sender);
-        } 
         #endregion
 
         #region Language event handlers
@@ -393,7 +333,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void LocalizationServiceDeletedLanguage(ILocalizationService sender, Core.Events.DeleteEventArgs<ILanguage> e)
+        static void LocalizationServiceDeletedLanguage(ILocalizationService sender, DeleteEventArgs<ILanguage> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveLanguageCache(x));
         }
@@ -403,40 +343,11 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void LocalizationServiceSavedLanguage(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
+        static void LocalizationServiceSavedLanguage(ILocalizationService sender, SaveEventArgs<ILanguage> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshLanguageCache(x));
         }
-
-        /// <summary>
-        /// Fires when a langauge is saved
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void LanguageAfterSave(global::umbraco.cms.businesslogic.language.Language sender, SaveEventArgs e)
-        {
-            DistributedCache.Instance.RefreshLanguageCache(sender);
-        }
-
-        /// <summary>
-        /// Fires when a langauge is created
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void LanguageNew(global::umbraco.cms.businesslogic.language.Language sender, NewEventArgs e)
-        {
-            DistributedCache.Instance.RefreshLanguageCache(sender);
-        }
-
-        /// <summary>
-        /// Fires when a langauge is deleted
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void LanguageAfterDelete(global::umbraco.cms.businesslogic.language.Language sender, DeleteEventArgs e)
-        {
-            DistributedCache.Instance.RemoveLanguageCache(sender);
-        } 
+      
         #endregion
 
         #region Content/media/member Type event handlers
@@ -445,7 +356,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceDeletedMediaType(IContentTypeService sender, Core.Events.DeleteEventArgs<IMediaType> e)
+        static void ContentTypeServiceDeletedMediaType(IContentTypeService sender, DeleteEventArgs<IMediaType> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveMediaTypeCache(x));
         }
@@ -455,7 +366,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceDeletedContentType(IContentTypeService sender, Core.Events.DeleteEventArgs<IContentType> e)
+        static void ContentTypeServiceDeletedContentType(IContentTypeService sender, DeleteEventArgs<IContentType> e)
         {
             e.DeletedEntities.ForEach(contentType => DistributedCache.Instance.RemoveContentTypeCache(contentType));
         }
@@ -465,7 +376,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void MemberTypeServiceDeleted(IMemberTypeService sender, Core.Events.DeleteEventArgs<IMemberType> e)
+        static void MemberTypeServiceDeleted(IMemberTypeService sender, DeleteEventArgs<IMemberType> e)
         {
             e.DeletedEntities.ForEach(contentType => DistributedCache.Instance.RemoveMemberTypeCache(contentType));
         }
@@ -475,7 +386,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, Core.Events.SaveEventArgs<IMediaType> e)
+        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, SaveEventArgs<IMediaType> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMediaTypeCache(x));
         }
@@ -485,7 +396,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentTypeServiceSavedContentType(IContentTypeService sender, Core.Events.SaveEventArgs<IContentType> e)
+        static void ContentTypeServiceSavedContentType(IContentTypeService sender, SaveEventArgs<IContentType> e)
         {
             e.SavedEntities.ForEach(contentType => DistributedCache.Instance.RefreshContentTypeCache(contentType));
         }
@@ -495,7 +406,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void MemberTypeServiceSaved(IMemberTypeService sender, Core.Events.SaveEventArgs<IMemberType> e)
+        static void MemberTypeServiceSaved(IMemberTypeService sender, SaveEventArgs<IMemberType> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMemberTypeCache(x));
         }
@@ -561,7 +472,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void FileServiceDeletedTemplate(IFileService sender, Core.Events.DeleteEventArgs<ITemplate> e)
+        static void FileServiceDeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveTemplateCache(x.Id));
         }
@@ -571,35 +482,16 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void FileServiceSavedTemplate(IFileService sender, Core.Events.SaveEventArgs<ITemplate> e)
+        static void FileServiceSavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshTemplateCache(x.Id));
         }
-        
-        /// <summary>
-        /// Removes cache for template
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void TemplateAfterDelete(Template sender, DeleteEventArgs e)
-        {
-            DistributedCache.Instance.RemoveTemplateCache(sender.Id);
-        }
-
-        /// <summary>
-        /// Refresh cache for template
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void TemplateAfterSave(Template sender, SaveEventArgs e)
-        {
-            DistributedCache.Instance.RefreshTemplateCache(sender.Id);
-        } 
+      
         #endregion
 
         #region Macro event handlers
 
-        void MacroServiceDeleted(IMacroService sender, Core.Events.DeleteEventArgs<IMacro> e)
+        void MacroServiceDeleted(IMacroService sender, DeleteEventArgs<IMacro> e)
         {
             foreach (var entity in e.DeletedEntities)
             {
@@ -607,33 +499,14 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        void MacroServiceSaved(IMacroService sender, Core.Events.SaveEventArgs<IMacro> e)
+        void MacroServiceSaved(IMacroService sender, SaveEventArgs<IMacro> e)
         {
             foreach (var entity in e.SavedEntities)
             {
                 DistributedCache.Instance.RefreshMacroCache(entity);
             }
         }
-        
-        /// <summary>
-        /// Flush macro from cache
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void MacroAfterDelete(Macro sender, DeleteEventArgs e)
-        {
-            DistributedCache.Instance.RemoveMacroCache(sender);
-        }
-
-        /// <summary>
-        /// Flush macro from cache
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void MacroAfterSave(Macro sender, SaveEventArgs e)
-        {
-            DistributedCache.Instance.RefreshMacroCache(sender);
-        } 
+  
         #endregion
 
         #region Media event handlers

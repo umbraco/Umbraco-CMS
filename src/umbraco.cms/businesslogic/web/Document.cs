@@ -312,7 +312,6 @@ namespace umbraco.cms.businesslogic.web
         /// <remarks>
         /// This method is thread safe
         /// </remarks>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
@@ -655,14 +654,12 @@ namespace umbraco.cms.businesslogic.web
         /// This method needs to be marked with [MethodImpl(MethodImplOptions.Synchronized)]
         /// because we execute multiple queries affecting the same data, if two thread are to do this at the same time for the same node we may have problems
         /// </remarks>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
             return PublishWithResult(u, true);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         internal bool PublishWithResult(User u, bool omitCacheRefresh)
         {

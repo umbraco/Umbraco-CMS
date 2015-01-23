@@ -4,72 +4,41 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.language;
+using System.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    class DomainsAndCulturesTests : BaseRoutingTest
+    class DomainsAndCulturesTests : UrlRoutingTestBase
     {
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            // ensure we can create them although the content is not in the database
-            TestHelper.DropForeignKeys("umbracoDomains");
-
-            InitializeLanguagesAndDomains();
-        }
-
-        void InitializeLanguagesAndDomains()
-        {
-            var domains = Domain.GetDomains(true); // we want wildcards too here
-            foreach (var d in domains)
-                d.Delete();
-
-            var langs = Language.GetAllAsList();
-            foreach (var l in langs.Skip(1))
-                l.Delete();
-
-            // en-US is there by default
-            Language.MakeNew("fr-FR");
-            Language.MakeNew("de-DE");
-
-            Language.MakeNew("da-DK");
-            Language.MakeNew("cs-CZ");
-            Language.MakeNew("nl-NL");
-        }
-
         void SetDomains1()
         {
-            var langEn = Language.GetByCultureCode("en-US");
-            var langFr = Language.GetByCultureCode("fr-FR");
-            var langDe = Language.GetByCultureCode("de-DE");
-
-            Domain.MakeNew("domain1.com/", 1001, langDe.id);
-            Domain.MakeNew("domain1.com/en", 10011, langEn.id);
-            Domain.MakeNew("domain1.com/fr", 10012, langFr.id);
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("domain1.com/") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}}
+            });
         }
 
         void SetDomains2()
         {
-            SetDomains1();
-
-            var langDk = Language.GetByCultureCode("da-DK");
-            var langCz = Language.GetByCultureCode("cs-CZ");
-            var langNl = Language.GetByCultureCode("nl-NL");
-
-            Domain.MakeNew("*1001", 1001, langDk.id);
-            Domain.MakeNew("*10011", 10011, langCz.id);
-            Domain.MakeNew("*100112", 100112, langNl.id);
-            Domain.MakeNew("*1001122", 1001122, langDk.id);
-            Domain.MakeNew("*10012", 10012, langNl.id);
-            Domain.MakeNew("*10031", 10031, langNl.id);
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("domain1.com/") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("*1001") {Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("*10011") {Id = 1, Language = new Language("cs-CZ"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("*100112") {Id = 1, Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 100112}},
+                new UmbracoDomain("*1001122") {Id = 1, Language = new Language("da-DK"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001122}},
+                new UmbracoDomain("*10012") {Id = 1, Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("*10031") {Id = 1, Language = new Language("nl-NL"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}}
+            });
         }
 
         protected override string GetXmlContent(int templateId)
@@ -183,8 +152,8 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
-            SettingsForTests.HideTopLevelNodeFromPath = false;
-            var finder = new ContentFinderByNiceUrl(Logger);
+            SettingsForTests.HideTopLevelNodeFromPath = false; 
+            var finder = new ContentFinderByNiceUrl();
             var result = finder.TryFindContent(pcr);
 
             Assert.IsTrue(result);
@@ -227,7 +196,7 @@ namespace Umbraco.Tests.Routing
 
             // find document
             SettingsForTests.HideTopLevelNodeFromPath = false;
-            var finder = new ContentFinderByNiceUrl(Logger);
+            var finder = new ContentFinderByNiceUrl();
             var result = finder.TryFindContent(pcr);
 
             // apply wildcard domain

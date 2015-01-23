@@ -46,10 +46,13 @@ namespace Umbraco.Core.Services
         /// Initializes with a source of a dictionary of culture -> areas -> sub dictionary of keys/values
         /// </summary>
         /// <param name="source"></param>
-        public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source)
+        /// <param name="logger"></param>
+        public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source, ILogger logger)
         {            
             if (source == null) throw new ArgumentNullException("source");
+            if (logger == null) throw new ArgumentNullException("logger");
             _dictionarySource = source;
+            _logger = logger;
         }
 
         public string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null)

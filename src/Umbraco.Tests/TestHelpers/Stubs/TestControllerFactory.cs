@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
@@ -34,20 +36,26 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 			if (t == null)
 				return null;
 
+	        var possibleParams = new object[]
+	        {
+	            _umbracoContext, _logger
+	        };
 	        var ctors = t.GetConstructors();
-	        if (ctors.Any(x =>
+	        foreach (var ctor in ctors.OrderByDescending(x => x.GetParameters().Count()))
 	        {
-	            var parameters = x.GetParameters();
-	            if (parameters.Length != 2) return false;
-	            return parameters.First().ParameterType == typeof (ILogger) && parameters.Last().ParameterType == typeof (UmbracoContext);
-	        }))
-	        {
-                return Activator.CreateInstance(t, new object[]{_logger, _umbracoContext}) as IController;
+	            var args = new List<object>();
+	            var allParams = ctor.GetParameters().ToArray();
+	            foreach (var parameter in allParams)
+	            {
+	                var found = possibleParams.SingleOrDefault(x => x.GetType() == parameter.ParameterType);
+	                if (found != null) args.Add(found);
+	            }
+	            if (args.Count == allParams.Length)
+	            {
+                    return Activator.CreateInstance(t, args.ToArray()) as IController;
+	            }
 	        }
-	        else
-	        {
-                return Activator.CreateInstance(t) as IController;    
-	        }
+	        return null;
 		}
 
 		public System.Web.SessionState.SessionStateBehavior GetControllerSessionBehavior(RequestContext requestContext, string controllerName)

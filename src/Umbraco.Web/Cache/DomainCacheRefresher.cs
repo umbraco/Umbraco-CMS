@@ -40,8 +40,6 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.DomainCacheKey);
-
             // SD: we need to clear the routes cache here!             
             //
             // zpqrtbnk: no, not here, in fact the caches should subsribe to refresh events else we

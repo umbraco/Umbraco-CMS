@@ -203,6 +203,23 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var relationTypeRepository = RepositoryFactory.CreateRelationTypeRepository(uow))
+            {
+                var rtQuery = new Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
+                var relationType = relationTypeRepository.GetByQuery(rtQuery).FirstOrDefault();
+                if (relationType == null) return Enumerable.Empty<IRelation>();
+
+                using (var relationRepo = RepositoryFactory.CreateRelationRepository(uow))
+                {
+                    var query = new Query<IRelation>().Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
+                    return relationRepo.GetByQuery(query);
+                }
+            }
+        }
+
         /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by the Name of the <see cref="RelationType"/>
         /// </summary>

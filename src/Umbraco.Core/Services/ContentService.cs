@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentService : RepositoryService, IContentService
     {
-       
+
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
@@ -1698,6 +1698,13 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
+            var newest = GetById(content.Id); // ensure we have the newest version
+            if (content.Version != newest.Version) // but use the original object if it's already the newest version
+                content = newest;
+            var published = content.Published ? content : GetPublishedVersion(content.Id); // get the published version
+            if (published == null)
+                return false; // already unpublished
+
             var unpublished = _publishingStrategy.UnPublish(content, userId);
             if (unpublished)
             {
@@ -1706,6 +1713,9 @@ namespace Umbraco.Core.Services
                 {
                     content.WriterId = userId;
                     repository.AddOrUpdate(content);
+                    // is published is not newest, reset the published flag on published version
+                    if (published.Version != content.Version)
+                        repository.ClearPublished(published);
                     repository.DeleteContentXml(content);
 
                     uow.Commit();

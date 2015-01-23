@@ -4,7 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Services.Description;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic.Actions;
@@ -41,9 +44,9 @@ namespace Umbraco.Web.WebServices
             }
 
             model.Valid = true;
-            var domains = Routing.DomainHelper.GetNodeDomains(model.NodeId, true);
-            var languages = global::umbraco.cms.businesslogic.language.Language.GetAllAsList().ToArray();
-            var language = model.Language > 0 ? languages.FirstOrDefault(l => l.id == model.Language) : null;
+            var domains = Services.DomainService.GetAssignedDomains(model.NodeId, true).ToArray();
+            var languages = Services.LocalizationService.GetAllLanguages().ToArray();
+            var language = model.Language > 0 ? languages.FirstOrDefault(l => l.Id == model.Language) : null;
 
             // process wildcard
 
@@ -52,28 +55,43 @@ namespace Umbraco.Web.WebServices
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
                     wildcard.Language = language;
-                else // yet there is a race condition here...
-                    Domain.MakeNew("*" + model.NodeId, model.NodeId, model.Language);
+                else
+                {
+                    // yet there is a race condition here...
+                    var newDomain = new UmbracoDomain("*" + model.NodeId)
+                    {
+                        Language = Services.LocalizationService.GetLanguageById(model.Language),
+                        RootContent = Services.ContentService.GetById(model.NodeId)
+                    };
+                    Services.DomainService.Save(newDomain);
+                }
+                    
             }
             else
             {
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
-                    wildcard.Delete();
+                {
+                    Services.DomainService.Delete(wildcard);
+                }
+                    
             }
 
             // process domains
 
             // delete every (non-wildcard) domain, that exists in the DB yet is not in the model
-            foreach (var domain in domains.Where(d => d.IsWildcard == false && model.Domains.All(m => m.Name.Equals(d.Name, StringComparison.OrdinalIgnoreCase) == false)))
-                domain.Delete();
+            foreach (var domain in domains.Where(d => d.IsWildcard == false && model.Domains.All(m => m.Name.InvariantEquals(d.DomainName) == false)))
+            {
+                Services.DomainService.Delete(domain);
+            }
+                
 
             var names = new List<string>();
 
             // create or update domains in the model
             foreach (var domainModel in model.Domains.Where(m => string.IsNullOrWhiteSpace(m.Name) == false))
             {
-                language = languages.FirstOrDefault(l => l.id == domainModel.Lang);
+                language = languages.FirstOrDefault(l => l.Id == domainModel.Lang);
                 if (language == null)
                     continue;
                 var name = domainModel.Name.ToLowerInvariant();
@@ -83,13 +101,21 @@ namespace Umbraco.Web.WebServices
                     continue;
                 }
                 names.Add(name);
-                var domain = domains.FirstOrDefault(d => d.Name.Equals(domainModel.Name, StringComparison.OrdinalIgnoreCase));
+                var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
                     domain.Language = language;
-                else if (Domain.Exists(domainModel.Name))
+                else if (Services.DomainService.Exists(domainModel.Name))
                     domainModel.Duplicate = true;
-                else // yet there is a race condition here...
-                    Domain.MakeNew(name, model.NodeId, domainModel.Lang);
+                else
+                {
+                    // yet there is a race condition here...
+                    var newDomain = new UmbracoDomain(name)
+                    {
+                        Language = Services.LocalizationService.GetLanguageById(domainModel.Lang),
+                        RootContent = Services.ContentService.GetById(model.NodeId)
+                    };
+                    Services.DomainService.Save(newDomain);
+                } 
             }
 
             model.Valid = model.Domains.All(m => m.Duplicate == false);

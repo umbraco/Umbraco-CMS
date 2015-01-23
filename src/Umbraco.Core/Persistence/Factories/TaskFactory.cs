@@ -10,8 +10,6 @@ namespace Umbraco.Core.Persistence.Factories
     /// </summary>
     internal class TaskFactory
     {
-       
-
         public Task BuildEntity(TaskDto dto)
         {
             var entity = new Task(new TaskType(dto.TaskTypeDto.Alias) { Id = dto.TaskTypeDto.Id })

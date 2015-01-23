@@ -51,6 +51,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("umbracoLanguage.id in (@ids)", new { ids = ids });
             }
 
+            //this needs to be sorted since that is the way legacy worked - default language is the first one!!
+            //even though legacy didn't sort, it should be by id
+            sql.OrderBy<LanguageDto>(dto => dto.Id, SqlSyntax);
+
+            
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
         }
 
@@ -70,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<LanguageDto>();
+               .From<LanguageDto>(SqlSyntax);
             return sql;
         }
 
@@ -200,6 +205,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// Inner repository for looking up languages by culture name, this deals with caching by a string key
+        /// </summary>
         private class LanguageByCultureNameRepository : SimpleGetRepository<string, ILanguage, LanguageDto>
         {
             private readonly LanguageRepository _languageRepository;

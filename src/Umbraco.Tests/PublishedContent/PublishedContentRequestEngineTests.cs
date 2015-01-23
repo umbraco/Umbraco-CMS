@@ -16,7 +16,11 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ctor_Throws_On_Null_PCR()
         {
-            Assert.Throws<ArgumentException>(() => new PublishedContentRequestEngine(null));
+            Assert.Throws<ArgumentException>(() => new PublishedContentRequestEngine(
+                ServiceContext.DomainService,
+                ServiceContext.LocalizationService,
+                ProfilingLogger,
+                null));
         }
 
         [Test]
@@ -25,6 +29,9 @@ namespace Umbraco.Tests.PublishedContent
             var routeCtx = GetRoutingContext("/test");
 
             var pcre = new PublishedContentRequestEngine(
+                ServiceContext.DomainService,
+                ServiceContext.LocalizationService,
+                ProfilingLogger,
                 new PublishedContentRequest(
                     routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx));
 
@@ -42,7 +49,11 @@ namespace Umbraco.Tests.PublishedContent
             pcr.PublishedContent = pc.Object;
             pcr.Culture = new CultureInfo("en-AU");
             pcr.SetRedirect("/hello");
-            var pcre = new PublishedContentRequestEngine(pcr);
+            var pcre = new PublishedContentRequestEngine(
+                ServiceContext.DomainService,
+                ServiceContext.LocalizationService,
+                ProfilingLogger,
+                pcr);
 
             var result = pcre.ConfigureRequest();
             Assert.IsFalse(result);
@@ -57,7 +68,11 @@ namespace Umbraco.Tests.PublishedContent
             var pc = GetPublishedContentMock();
             pcr.PublishedContent = pc.Object;
             pcr.Culture = new CultureInfo("en-AU");
-            var pcre = new PublishedContentRequestEngine(pcr);
+            var pcre = new PublishedContentRequestEngine(
+                ServiceContext.DomainService,
+                ServiceContext.LocalizationService,
+                ProfilingLogger,
+                pcr);
 
             pcre.ConfigureRequest();
             
@@ -74,7 +89,11 @@ namespace Umbraco.Tests.PublishedContent
             var pc = GetPublishedContentMock();
             pcr.Culture = new CultureInfo("en-AU");
             pcr.PublishedContent = pc.Object;
-            var pcre = new PublishedContentRequestEngine(pcr);
+            var pcre = new PublishedContentRequestEngine(
+                ServiceContext.DomainService,
+                ServiceContext.LocalizationService,
+                ProfilingLogger,
+                pcr);
 
             pcre.ConfigureRequest();
 

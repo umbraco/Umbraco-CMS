@@ -46,6 +46,14 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return _cache; }
         }
 
+        /// <summary>
+        /// The runtime cache used for this repo - by standard this is the runtime cache exposed by the CacheHelper but can be overridden
+        /// </summary>
+        protected virtual IRuntimeCacheProvider RuntimeCache
+        {
+            get { return _cache.RuntimeCache; }
+        }
+
         public static string GetCacheIdKey<T>(object id)
         {
             return string.Format("{0}{1}", GetCacheTypeKey<T>(), id);
@@ -77,7 +85,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Adds or Updates an entity of type TEntity
         /// </summary>
-        /// <remarks>This method is backed by an <see cref="IRepositoryCacheProvider"/> cache</remarks>
+        /// <remarks>This method is backed by an <see cref="IRuntimeCacheProvider"/> cache</remarks>
         /// <param name="entity"></param>
         public void AddOrUpdate(TEntity entity)
         {
@@ -105,13 +113,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected abstract TEntity PerformGet(TId id);
         /// <summary>
-        /// Gets an entity by the passed in Id
+        /// Gets an entity by the passed in Id utilizing the repository's runtime cache
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            return RepositoryCache.RuntimeCache.GetCacheItem<TEntity>(
+            return RuntimeCache.GetCacheItem<TEntity>(
                 GetCacheIdKey<TEntity>(id), () =>
                 {
                     var entity = PerformGet(id);
@@ -149,14 +157,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                var entities = ids.Select(x => RepositoryCache.RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
+                var entities = ids.Select(x => RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
                 
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
                     return entities.Select(x => (TEntity)x);
             }
             else
             {
-                var allEntities = RepositoryCache.RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>()).ToArray();
+                var allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>()).ToArray();
 
                 if (allEntities.Any())
                 {
@@ -185,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (entity != null)
                 {
                     var localCopy = entity;
-                    RepositoryCache.RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => localCopy);
+                    RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => localCopy);
                 }
             }
 
@@ -213,7 +221,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            var fromCache = RepositoryCache.RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(id));
+            var fromCache = RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(id));
             if (fromCache != null)
             {
                 return true;
@@ -245,13 +253,13 @@ namespace Umbraco.Core.Persistence.Repositories
             try
             {
                 PersistNewItem((TEntity)entity);
-                RepositoryCache.RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
+                RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+                RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
                 throw;
             }
 
@@ -266,14 +274,14 @@ namespace Umbraco.Core.Persistence.Repositories
             try
             {
                 PersistUpdatedItem((TEntity)entity);
-                RepositoryCache.RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
+                RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
                 //RepositoryCache.Delete(typeof(TEntity), entity);
-                RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+                RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
                 throw;
             }
 
@@ -286,7 +294,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual void PersistDeletedItem(IEntity entity)
         {
             PersistDeletedItem((TEntity)entity);
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
         }
 
         #endregion

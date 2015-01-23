@@ -782,5 +782,20 @@ namespace Umbraco.Core.Persistence.Repositories
             ((Entity)member).ResetDirtyProperties(false);
             return member;
         }
+
+        /// <summary>
+        /// Dispose disposable properties
+        /// </summary>
+        /// <remarks>
+        /// Ensure the unit of work is disposed
+        /// </remarks>
+        protected override void DisposeResources()
+        {
+            _memberTypeRepository.Dispose();
+            _tagRepository.Dispose();
+            _memberGroupRepository.Dispose();
+            _contentXmlRepository.Dispose();
+            _contentPreviewRepository.Dispose();
+        }
     }
 }

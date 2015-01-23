@@ -10,6 +10,7 @@ using System.Linq;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Runtime.CompilerServices;
@@ -250,27 +251,17 @@ namespace umbraco.cms.businesslogic
 
             public XmlNode ToXml(XmlDocument xd)
             {
-
-                XmlNode dictionaryItem = xd.CreateElement("DictionaryItem");
-                dictionaryItem.Attributes.Append(xmlHelper.addAttribute(xd, "Key", this.key));
-                foreach (Language lang in Language.GetAllAsList())
-                {
-                    XmlNode itemValue = xmlHelper.addCDataNode(xd, "Value", this.Value(lang.id));
-                    itemValue.Attributes.Append(xmlHelper.addAttribute(xd, "LanguageId", lang.id.ToString(CultureInfo.InvariantCulture)));
-                    itemValue.Attributes.Append(xmlHelper.addAttribute(xd, "LanguageCultureAlias", lang.CultureAlias));
-                    dictionaryItem.AppendChild(itemValue);
-                }
-
+                var serializer = new EntityXmlSerializer();
+                var xml = serializer.Serialize(_dictionaryItem);
+                var xmlNode = xml.GetXmlNode(xd);
                 if (this.hasChildren)
                 {
-                    foreach (DictionaryItem di in this.Children)
+                    foreach (var di in this.Children)
                     {
-                        dictionaryItem.AppendChild(di.ToXml(xd));
+                        xmlNode.AppendChild(di.ToXml(xd));
                     }
                 }
-
-
-                return dictionaryItem;
+                return xmlNode;
             }
 
             public static DictionaryItem Import(XmlNode xmlData)

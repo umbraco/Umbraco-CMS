@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                sql.Where("cmsTask.id IN (@ids)", new {ids = ids});
+                sql.Where("cmsTask.id IN (@ids)", new { ids = ids });
             }
 
             var factory = new TaskFactory();
@@ -109,10 +109,10 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.AddingEntity();
 
             //ensure the task type exists
-            var taskType = Database.SingleOrDefault<TaskTypeDto>("Where alias = @alias", new {alias = entity.TaskType.Alias});
+            var taskType = Database.SingleOrDefault<TaskTypeDto>("Where alias = @alias", new { alias = entity.TaskType.Alias });
             if (taskType == null)
             {
-                var taskTypeId = Convert.ToInt32(Database.Insert(new TaskTypeDto {Alias = entity.TaskType.Alias}));
+                var taskTypeId = Convert.ToInt32(Database.Insert(new TaskTypeDto { Alias = entity.TaskType.Alias }));
                 entity.TaskType.Id = taskTypeId;
             }
             else
@@ -141,19 +141,6 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
         }
 
-        //public IEnumerable<Task> GetTasks(Guid? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
-        //{
-        //    var sql = GetGetTasksQuery(assignedUser, ownerUser, taskTypeAlias, includeClosed);
-        //    if (itemId.HasValue)
-        //    {
-        //        sql.Where<NodeDto>(dto => dto.UniqueId == itemId.Value);
-        //    }
-
-        //    var dtos = Database.Fetch<TaskDto, TaskTypeDto>(sql);
-        //    var entities = Mapper.Map<IEnumerable<Task>>(dtos);
-        //    return entities;
-        //}
-
         public IEnumerable<Task> GetTasks(int? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
             var sql = GetGetTasksQuery(assignedUser, ownerUser, taskTypeAlias, includeClosed);
@@ -181,11 +168,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             if (ownerUser.HasValue)
             {
-                sql.Where<TaskDto>(dto => dto.UserId == ownerUser.Value);
+                sql.Where<TaskDto>(dto => dto.ParentUserId == ownerUser.Value);
             }
             if (assignedUser.HasValue)
             {
-                sql.Where<TaskDto>(dto => dto.ParentUserId == assignedUser.Value);
+                sql.Where<TaskDto>(dto => dto.UserId == assignedUser.Value);
             }
             return sql;
         }

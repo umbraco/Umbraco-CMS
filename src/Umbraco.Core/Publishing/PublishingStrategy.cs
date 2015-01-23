@@ -303,32 +303,7 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IContent content, int userId)
         {
-            if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
-            {
-                LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' will not be un-published, the event was cancelled.", content.Name, content.Id));
-                return false;
-            }
-                
-
-            //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
-            //Otherwise it would remain released == published
-            if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
-            {
-                content.ReleaseDate = null;
-
-                LogHelper.Info<PublishingStrategy>(
-                    string.Format(
-                        "Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
-                        content.Name, content.Id));
-            }
-
-            content.ChangePublishedState(PublishedState.Unpublished);
-
-            LogHelper.Info<PublishingStrategy>(
-                string.Format("Content '{0}' with Id '{1}' has been unpublished.",
-                              content.Name, content.Id));
-            return true;
+            return UnPublishInternal(content, userId).Success;
         }
 
         /// <summary>
@@ -337,43 +312,47 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/></param>
         /// <param name="userId">Id of the User issueing the unpublish operation</param>
         /// <returns>A list of publish statuses</returns>
-        internal IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
+        private IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
         {
-            var result = new List<Attempt<PublishStatus>>();
+            return content.Select(x => UnPublishInternal(x, userId));
+        }
 
-            //Only update content thats already been published
-            foreach (var item in content.Where(x => x.Published == true))
+        private Attempt<PublishStatus> UnPublishInternal(IContent content, int userId)
+        {
+            // content should (is assumed to ) be the newest version, which may not be published
+            // don't know how to test this, so it's not verified
+            // NOTE
+            // if published != newest, then the published flags need to be reseted by whoever is calling that method
+            // at the moment it's done by the content service
+
+            //Fire UnPublishing event
+            if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
             {
-                //Fire UnPublishing event
-                if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
-                {
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", item.Name, item.Id));
-                    result.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedCancelledByEvent)));
-                    continue;
-                }
-
-                //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
-                //Otherwise it would remain released == published
-                if (item.ReleaseDate.HasValue && item.ReleaseDate.Value <= DateTime.Now)
-                {
-                    item.ReleaseDate = null;
-
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
-                                      item.Name, item.Id));
-                }
-
-                item.ChangePublishedState(PublishedState.Unpublished);
-
                 LogHelper.Info<PublishingStrategy>(
-                    string.Format("Content '{0}' with Id '{1}' has been unpublished.",
-                                  item.Name, item.Id));
-
-                result.Add(Attempt.Succeed(new PublishStatus(item)));
+                    string.Format("Content '{0}' with Id '{1}' will not be unpublished, the event was cancelled.", content.Name, content.Id));
+                return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
             }
 
-            return result;
+            //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
+            //Otherwise it would remain released == published
+            if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
+            {
+                content.ReleaseDate = null;
+
+                LogHelper.Info<PublishingStrategy>(
+                    string.Format("Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
+                                  content.Name, content.Id));
+            }
+
+            // if newest is published, unpublish
+            if (content.Published)
+                content.ChangePublishedState(PublishedState.Unpublished);
+
+            LogHelper.Info<PublishingStrategy>(
+                string.Format("Content '{0}' with Id '{1}' has been unpublished.",
+                              content.Name, content.Id));
+
+            return Attempt.Succeed(new PublishStatus(content));
         }
 
         /// <summary>

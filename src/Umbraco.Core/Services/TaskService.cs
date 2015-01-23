@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -16,13 +17,50 @@ namespace Umbraco.Core.Services
         {
         }
 
-        //public IEnumerable<Task> GetTasks(Guid? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
-        //{
-        //    using (var repo = RepositoryFactory.CreateTaskRepository(UowProvider.GetUnitOfWork()))
-        //    {
-        //        return repo.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
-        //    }
-        //}
+        public TaskType GetTaskTypeByAlias(string taskTypeAlias)
+        {
+            using (var repo = RepositoryFactory.CreateTaskTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repo.GetByQuery(new Query<TaskType>().Where(type => type.Alias == taskTypeAlias)).FirstOrDefault();
+            }
+        }
+
+        public TaskType GetTaskTypeById(int id)
+        {
+            using (var repo = RepositoryFactory.CreateTaskTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repo.Get(id);
+            }
+        }
+
+        public void Save(TaskType taskType)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateTaskTypeRepository(uow))
+            {
+                repo.AddOrUpdate(taskType);
+                uow.Commit();
+            }
+        }
+
+        public void Delete(TaskType taskTypeEntity)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateTaskTypeRepository(uow))
+            {
+                repo.Delete(taskTypeEntity);
+                uow.Commit();
+            }
+        }
+
+        public IEnumerable<TaskType> GetAllTaskTypes()
+        {
+            using (var repo = RepositoryFactory.CreateTaskTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repo.GetAll();
+            }
+        }
+
 
         public IEnumerable<Task> GetTasks(int? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
@@ -43,6 +81,24 @@ namespace Umbraco.Core.Services
             {
                 repo.AddOrUpdate(task);
                 uow.Commit();
+            }
+        }
+
+        public void Delete(Task task)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateTaskRepository(uow))
+            {
+                repo.Delete(task);
+                uow.Commit();
+            }
+        }
+
+        public Task GetTaskById(int id)
+        {
+            using (var repo = RepositoryFactory.CreateTaskRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repo.Get(id);
             }
         }
     }

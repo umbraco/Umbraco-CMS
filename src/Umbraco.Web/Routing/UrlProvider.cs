@@ -19,8 +19,9 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
+        /// <param name="routingSettings"></param>
         /// <param name="urlProviders">The list of url providers.</param>
-        internal UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders)
+        internal UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
         {
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Routing
             var provider = UrlProviderMode.Auto;
             Mode = provider;
 
-            if (Enum<UrlProviderMode>.TryParse(UmbracoConfig.For.UmbracoSettings().WebRouting.UrlProviderMode, out provider))
+            if (Enum<UrlProviderMode>.TryParse(routingSettings.UrlProviderMode, out provider))
             {
                 Mode = provider;
             }            

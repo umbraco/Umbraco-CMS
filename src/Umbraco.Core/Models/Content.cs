@@ -160,10 +160,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Language of the data contained within this Content object.
         /// </summary>
-        /// <remarks>
-        /// Left internal until multilingual support is implemented.
-        /// </remarks>
-        [DataMember]
+        [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public string Language
         {
             get { return _language; }

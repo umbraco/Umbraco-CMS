@@ -1,111 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.language;
-
+using System.Configuration;
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
-	[TestFixture]
-	public class NiceUrlsProviderWithDomainsTests : BaseRoutingTest
-	{
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            //generate new mock settings and assign so we can configure in individual tests
-            _umbracoSettings = SettingsForTests.GenerateMockSettings();
-            SettingsForTests.ConfigureSettings(_umbracoSettings);
-
-            // ensure we can create them although the content is not in the database
-            TestHelper.DropForeignKeys("umbracoDomains");            
-        }
-
-        private IUmbracoSettingsSection _umbracoSettings;
-
+    [TestFixture]
+    public class NiceUrlsProviderWithDomainsTests : UrlRoutingTestBase
+    {
         protected override void FreezeResolution()
         {
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
         }
 
-		void InitializeLanguagesAndDomains()
-		{
-			var domains = Domain.GetDomains();
-			foreach (var d in domains)
-				d.Delete();
 
-			var langs = Language.GetAllAsList();
-			foreach (var l in langs.Skip(1))
-				l.Delete();
+        void SetDomains1()
+        {
 
-			Language.MakeNew("fr-FR");
-		}
+            SetupDomainServiceMock(new[]
+		    {
+		        new UmbracoDomain("domain1.com") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
+		    });
+        }
 
-		void SetDomains1()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
+        void SetDomains2()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("http://domain1.com/foo") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}}
+            });
+        }
 
-			Domain.MakeNew("domain1.com", 1001, langFr.id);
-		}
+        void SetDomains3()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("http://domain1.com/") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}}
+            });
+        }
 
-		void SetDomains2()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
+        void SetDomains4()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("http://domain1.com/") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}},
+                new UmbracoDomain("http://domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("http://domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("http://domain3.com/") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1003}},
+                new UmbracoDomain("http://domain3.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}},
+                new UmbracoDomain("http://domain3.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10032}}
+            });
+        }
 
-			Domain.MakeNew("http://domain1.com/foo", 1001, langFr.id);
-		}
+        void SetDomains5()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("http://domain1.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("http://domain1a.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("http://domain1b.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}},
+                new UmbracoDomain("http://domain1.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("http://domain1a.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("http://domain1b.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}},
+                new UmbracoDomain("http://domain3.com/en") {Id = 1, Language = new Language("en-US"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}},
+                new UmbracoDomain("http://domain3.com/fr") {Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10032}}
+            });
+        }
 
-		void SetDomains3()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/", 10011, langFr.id);
-		}
-
-		void SetDomains4()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/", 1001, langEn.id);
-			Domain.MakeNew("http://domain1.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1.com/fr", 10012, langFr.id);
-
-			Domain.MakeNew("http://domain3.com/", 1003, langEn.id);
-			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
-			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
-		}
-
-		void SetDomains5()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1a.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1b.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1.com/fr", 10012, langFr.id);
-			Domain.MakeNew("http://domain1a.com/fr", 10012, langFr.id);
-			Domain.MakeNew("http://domain1b.com/fr", 10012, langFr.id);
-
-			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
-			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
-		}
-
-		protected override string GetXmlContent(int templateId)
-		{
-			return @"<?xml version=""1.0"" encoding=""utf-8""?>
+        protected override string GetXmlContent(int templateId)
+        {
+            return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[ 
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
@@ -184,229 +157,233 @@ namespace Umbraco.Tests.Routing
 		</Doc>
 	</Doc>
 </root>";
-		}
+        }
 
-		// with one simple domain "domain1.com"
-		// basic tests
-		[TestCase(1001, "http://domain1.com", false, "/")]
-		[TestCase(10011, "http://domain1.com", false, "/1001-1/")]
-		[TestCase(1002, "http://domain1.com", false, "/1002/")]
-		// absolute tests
-		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/")]
-		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/1001-1/")]
-		// different current tests
-		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/")]
-		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/1001-1/")]
-		[TestCase(1001, "https://domain1.com", false, "/")]
-		[TestCase(10011, "https://domain1.com", false, "/1001-1/")]
-		public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+        // with one simple domain "domain1.com"
+        // basic tests
+        [TestCase(1001, "http://domain1.com", false, "/")]
+        [TestCase(10011, "http://domain1.com", false, "/1001-1/")]
+        [TestCase(1002, "http://domain1.com", false, "/1002/")]
+        // absolute tests
+        [TestCase(1001, "http://domain1.com", true, "http://domain1.com/")]
+        [TestCase(10011, "http://domain1.com", true, "http://domain1.com/1001-1/")]
+        // different current tests
+        [TestCase(1001, "http://domain2.com", false, "http://domain1.com/")]
+        [TestCase(10011, "http://domain2.com", false, "http://domain1.com/1001-1/")]
+        [TestCase(1001, "https://domain1.com", false, "/")]
+        [TestCase(10011, "https://domain1.com", false, "/1001-1/")]
+        public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-		    SettingsForTests.UseDirectoryUrls = true;
-		    SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
-
-			InitializeLanguagesAndDomains();
-			SetDomains1();
-
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
-
-		// with one complete domain "http://domain1.com/foo"
-		// basic tests
-		[TestCase(1001, "http://domain1.com", false, "/foo/")]
-		[TestCase(10011, "http://domain1.com", false, "/foo/1001-1/")]
-		[TestCase(1002, "http://domain1.com", false, "/1002/")]
-		// absolute tests
-		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/foo/")]
-		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/foo/1001-1/")]
-		// different current tests
-		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/foo/")]
-		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1/")]
-		[TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo/")]
-		[TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
-		public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			InitializeLanguagesAndDomains();
-			SetDomains2();
+            SetDomains1();
 
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
+            var currentUri = new Uri(currentUrl);
+            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            Assert.AreEqual(expected, result);
+        }
 
-		// with one domain, not at root
-		[TestCase(1001, "http://domain1.com", false, "/1001/")]
-		[TestCase(10011, "http://domain1.com", false, "/")]
-		[TestCase(100111, "http://domain1.com", false, "/1001-1-1/")]
-		[TestCase(1002, "http://domain1.com", false, "/1002/")]
-		public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+        // with one complete domain "http://domain1.com/foo"
+        // basic tests
+        [TestCase(1001, "http://domain1.com", false, "/foo/")]
+        [TestCase(10011, "http://domain1.com", false, "/foo/1001-1/")]
+        [TestCase(1002, "http://domain1.com", false, "/1002/")]
+        // absolute tests
+        [TestCase(1001, "http://domain1.com", true, "http://domain1.com/foo/")]
+        [TestCase(10011, "http://domain1.com", true, "http://domain1.com/foo/1001-1/")]
+        // different current tests
+        [TestCase(1001, "http://domain2.com", false, "http://domain1.com/foo/")]
+        [TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1/")]
+        [TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo/")]
+        [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
+        public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
-
-			InitializeLanguagesAndDomains();
-			SetDomains3();
-
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
-
-		// with nested domains
-		[TestCase(1001, "http://domain1.com", false, "/")]
-		[TestCase(10011, "http://domain1.com", false, "/en/")]
-		[TestCase(100111, "http://domain1.com", false, "/en/1001-1-1/")]
-		[TestCase(10012, "http://domain1.com", false, "/fr/")]
-		[TestCase(100121, "http://domain1.com", false, "/fr/1001-2-1/")]
-		[TestCase(10013, "http://domain1.com", false, "/1001-3/")]
-		[TestCase(1002, "http://domain1.com", false, "/1002/")]
-		[TestCase(1003, "http://domain3.com", false, "/")]
-		[TestCase(10031, "http://domain3.com", false, "/en/")]
-		[TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
-		public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
-            
-			InitializeLanguagesAndDomains();
-			SetDomains4();
 
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
+            SetDomains2();
 
-		[Test]
-		public void Get_Nice_Url_DomainsAndCache()
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+            var currentUri = new Uri(currentUrl);
+            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            Assert.AreEqual(expected, result);
+        }
+
+        // with one domain, not at root
+        [TestCase(1001, "http://domain1.com", false, "/1001/")]
+        [TestCase(10011, "http://domain1.com", false, "/")]
+        [TestCase(100111, "http://domain1.com", false, "/1001-1-1/")]
+        [TestCase(1002, "http://domain1.com", false, "/1002/")]
+        public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-			InitializeLanguagesAndDomains();
-			SetDomains4();
+            SetDomains3();
 
-			string ignore;
-			ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain2.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain2.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain2.com"), false);
-			ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain2.com"), false);
+            var currentUri = new Uri(currentUrl);
+            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            Assert.AreEqual(expected, result);
+        }
+
+        // with nested domains
+        [TestCase(1001, "http://domain1.com", false, "/")]
+        [TestCase(10011, "http://domain1.com", false, "/en/")]
+        [TestCase(100111, "http://domain1.com", false, "/en/1001-1-1/")]
+        [TestCase(10012, "http://domain1.com", false, "/fr/")]
+        [TestCase(100121, "http://domain1.com", false, "/fr/1001-2-1/")]
+        [TestCase(10013, "http://domain1.com", false, "/1001-3/")]
+        [TestCase(1002, "http://domain1.com", false, "/1002/")]
+        [TestCase(1003, "http://domain3.com", false, "/")]
+        [TestCase(10031, "http://domain3.com", false, "/en/")]
+        [TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
+        public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+
+            SetDomains4();
+
+            var currentUri = new Uri(currentUrl);
+            var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void Get_Nice_Url_DomainsAndCache()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var request = Mock.Get(settings.RequestHandler);
+            request.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+
+            SetDomains4();
+
+            string ignore;
+            ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain2.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain2.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain2.com"), false);
+            ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain2.com"), false);
 
             var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual(7, cachedRoutes.Count);
 
-			var cachedIds = cache.RoutesCache.GetCachedIds();
-			Assert.AreEqual(7, cachedIds.Count);
+            var cachedIds = cache.RoutesCache.GetCachedIds();
+            Assert.AreEqual(7, cachedIds.Count);
 
-			CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
-			CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
-			CheckRoute(cachedRoutes, cachedIds, 100111, "10011/1001-1-1");
-			CheckRoute(cachedRoutes, cachedIds, 10012, "10012/");
-			CheckRoute(cachedRoutes, cachedIds, 100121, "10012/1001-2-1");
-			CheckRoute(cachedRoutes, cachedIds, 10013, "1001/1001-3");
-			CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
+            CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
+            CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
+            CheckRoute(cachedRoutes, cachedIds, 100111, "10011/1001-1-1");
+            CheckRoute(cachedRoutes, cachedIds, 10012, "10012/");
+            CheckRoute(cachedRoutes, cachedIds, 100121, "10012/1001-2-1");
+            CheckRoute(cachedRoutes, cachedIds, 10013, "1001/1001-3");
+            CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
 
-			// use the cache
-			Assert.AreEqual("/", routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en/", routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr/", routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1001-3/", routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1002/", routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false));
+            // use the cache
+            Assert.AreEqual("/", routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/en/", routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/fr/", routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/1001-3/", routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false));
+            Assert.AreEqual("/1002/", routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false));
 
-			Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
-		}
+            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
+        }
 
-		void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
-		{
-			Assert.IsTrue(routes.ContainsKey(id));
-			Assert.AreEqual(route, routes[id]);
-			Assert.IsTrue(ids.ContainsKey(route));
-			Assert.AreEqual(id, ids[route]);
-		}
+        void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
+        {
+            Assert.IsTrue(routes.ContainsKey(id));
+            Assert.AreEqual(route, routes[id]);
+            Assert.IsTrue(ids.ContainsKey(route));
+            Assert.AreEqual(id, ids[route]);
+        }
 
-		[Test]
-		public void Get_Nice_Url_Relative_Or_Absolute()
-		{
-			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
+        [Test]
+        public void Get_Nice_Url_Relative_Or_Absolute()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var requestMock = Mock.Get(settings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var routingContext = GetRoutingContext("http://domain1.com/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			InitializeLanguagesAndDomains();
-			SetDomains4();
+            SetDomains4();
 
-            //mock the Umbraco settings that we need
-            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
-            
             Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
             routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
 
-			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
-		}
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
+        }
 
-		[Test]
-		public void Get_Nice_Url_Alternate()
-		{
-			var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111);
+        [Test]
+        public void Get_Nice_Url_Alternate()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111, umbracoSettings: settings);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			InitializeLanguagesAndDomains();
-			SetDomains5();
+            SetDomains5();
 
-		    var url = routingContext.UrlProvider.GetUrl(100111, true);
+            var url = routingContext.UrlProvider.GetUrl(100111, true);
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
 
-			var result = routingContext.UrlProvider.GetOtherUrls(100111).ToArray();
-			
-			Assert.AreEqual(2, result.Count());
-			Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
-			Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
-		}
-	}
+            var result = routingContext.UrlProvider.GetOtherUrls(100111).ToArray();
+
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
+            Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
+        }
+    }
 }
