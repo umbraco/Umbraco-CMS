@@ -95,29 +95,6 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_umbracoApp_Table()
-        {
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<AppDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoAppTree_Table()
-        {
-            
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<AppTreeDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
         public void Can_Create_cmsContentType2ContentType_Table()
         {
             

@@ -1018,7 +1018,6 @@
     <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProvidersResolver.cs" />
-    <Compile Include="UI\Controls\FolderBrowser.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrl.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlAndTemplate.cs" />
@@ -1643,7 +1642,6 @@
     <Compile Include="WebServices\DomainsApiController.cs" />
     <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
-    <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\TagsController.cs" />
     <Compile Include="WebServices\ScheduledPublishController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />

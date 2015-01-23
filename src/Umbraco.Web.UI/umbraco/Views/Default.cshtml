@@ -25,7 +25,7 @@
     <title ng-bind="$root.locationTitle">Umbraco</title>
     
     @{ Html.RequiresCss("assets/css/umbraco.css", "Umbraco");}
-    @{ Html.RequiresCss("tree/treeicons.css", "UmbracoClient");}
+    @{ Html.RequiresCss("lib/umbraco/legacytreeicons.css", "Umbraco");}
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
