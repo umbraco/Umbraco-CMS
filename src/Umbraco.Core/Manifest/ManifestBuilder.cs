@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -11,9 +13,14 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class ManifestBuilder
     {
+        public ManifestBuilder(ManifestParser parser)
+        {
+            if (parser == null) throw new ArgumentNullException("parser");
+            _parser = parser;
+        }
 
-        private static readonly ConcurrentDictionary<string, object> StaticCache = new ConcurrentDictionary<string, object>();
-        
+        private readonly ManifestParser _parser;
+        private static readonly ConcurrentDictionary<string, object> StaticCache = new ConcurrentDictionary<string, object>();        
         private const string ManifestKey = "manifests";
         private const string PropertyEditorsKey = "propertyeditors";
         private const string ParameterEditorsKey = "parametereditors";
@@ -21,7 +28,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Returns all property editors found in the manfifests
         /// </summary>
-        internal static IEnumerable<PropertyEditor> PropertyEditors
+        internal IEnumerable<PropertyEditor> PropertyEditors
         {
             get
             {
@@ -34,7 +41,7 @@ namespace Umbraco.Core.Manifest
                             {
                                 if (manifest.PropertyEditors != null)
                                 {
-                                    editors.AddRange(ManifestParser.GetPropertyEditors(manifest.PropertyEditors));    
+                                    editors.AddRange(_parser.GetPropertyEditors(manifest.PropertyEditors));    
                                 }
                                 
                             }
@@ -46,7 +53,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Returns all parameter editors found in the manfifests and all property editors that are flagged to be parameter editors
         /// </summary>
-        internal static IEnumerable<ParameterEditor> ParameterEditors
+        internal IEnumerable<ParameterEditor> ParameterEditors
         {
             get
             {
@@ -59,7 +66,7 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.ParameterEditors != null)
                             {
-                                editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));    
+                                editors.AddRange(_parser.GetParameterEditors(manifest.ParameterEditors));    
                             }
                         }
                         return editors;
@@ -70,13 +77,9 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Ensures the manifests are found and loaded into memory
         /// </summary>
-        private static IEnumerable<PackageManifest> GetManifests()
+        private IEnumerable<PackageManifest> GetManifests()
         {
-            return (IEnumerable<PackageManifest>) StaticCache.GetOrAdd(ManifestKey, s =>
-                {
-                    var parser = new ManifestParser(new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")));
-                    return parser.GetManifests();
-                });
+            return (IEnumerable<PackageManifest>) StaticCache.GetOrAdd(ManifestKey, s => _parser.GetManifests());
         }
 
     }

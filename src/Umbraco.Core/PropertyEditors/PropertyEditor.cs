@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
@@ -15,13 +16,20 @@ namespace Umbraco.Core.PropertyEditors
     /// </remarks>
     public class PropertyEditor : IParameterEditor
     {
+        /// <summary>
+        /// Exposes a logger
+        /// </summary>
+        protected ILogger Logger { get; private set; }
+
         private readonly PropertyEditorAttribute _attribute;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public PropertyEditor()             
+        public PropertyEditor(ILogger logger)             
         {
+            if (logger == null) throw new ArgumentNullException("logger");
+            Logger = logger;
             //assign properties based on the attribute if it is found
             _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
             if (_attribute != null)

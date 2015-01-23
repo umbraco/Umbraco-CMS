@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
@@ -21,11 +22,20 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class ImageCropperPropertyValueEditor : PropertyValueEditorWrapper
     {
-        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
+        private readonly ILogger _logger;
+        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentConfig;
+
+        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentConfig)
+            : base(wrapped)
         {
-
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
+            if (contentConfig == null) throw new ArgumentNullException("contentConfig");
+            _logger = logger;
+            _mediaFileSystem = mediaFileSystem;
+            _contentConfig = contentConfig;
         }
-
 
         /// <summary>
         /// Overrides the deserialize value so that we can save the file accordingly
@@ -43,8 +53,6 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
-
-
             string oldFile = string.Empty;
             string newFile = string.Empty;
             JObject newJson = null;
@@ -60,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors
                 catch (Exception ex)
                 {
                     //for some reason the value is invalid so continue as if there was no value there
-                    LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not parse current db value to a JObject", ex);
+                    _logger.WarnWithException<ImageCropperPropertyValueEditor>("Could not parse current db value to a JObject", ex);
                 }
 
                 if (oldJson != null && oldJson["src"] != null)
@@ -83,7 +91,7 @@ namespace Umbraco.Web.PropertyEditors
             //if not alike, that means we have a new file, or delete the current one... 
             if (string.IsNullOrEmpty(newFile) || editorValue.AdditionalData.ContainsKey("files"))
             {
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                var fs = _mediaFileSystem;
 
                 //if we have an existing file, delete it
                 if (string.IsNullOrEmpty(oldFile) == false)
@@ -106,7 +114,7 @@ namespace Umbraco.Web.PropertyEditors
                             var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
                             //try to reuse the folder number from the current file
-                            var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                            var subfolder = _contentConfig.UploadAllowDirectories
                                                 ? oldFile.Replace(fs.GetUrl("/"), "").Split('/')[0]
                                                 : oldFile.Substring(oldFile.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
 
@@ -117,7 +125,7 @@ namespace Umbraco.Web.PropertyEditors
                                                      : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
                             //set a file name or full path
-                            var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                            var fileName = _contentConfig.UploadAllowDirectories
                                                ? Path.Combine(numberedFolder, name)
                                                : numberedFolder + "-" + name;
 
@@ -140,13 +148,13 @@ namespace Umbraco.Web.PropertyEditors
 
             return editorValue.Value.ToString();
         }
-        
-        
+
+
 
         public override string ConvertDbToString(Property property, PropertyType propertyType, Core.Services.IDataTypeService dataTypeService)
         {
-            if(property.Value == null || string.IsNullOrEmpty(property.Value.ToString()))
-               return null;
+            if (property.Value == null || string.IsNullOrEmpty(property.Value.ToString()))
+                return null;
 
             //if we dont have a json structure, we will get it from the property type
             var val = property.Value.ToString();
@@ -155,10 +163,10 @@ namespace Umbraco.Web.PropertyEditors
 
             var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId).FirstOrDefault();
             var crops = !string.IsNullOrEmpty(config) ? config : "[]";
-            var newVal = "{src: '" + val + "', crops: " + crops + "}"; 
+            var newVal = "{src: '" + val + "', crops: " + crops + "}";
             return newVal;
         }
     }
 
-        
+
 }

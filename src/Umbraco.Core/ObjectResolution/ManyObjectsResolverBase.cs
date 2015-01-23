@@ -39,10 +39,27 @@ namespace Umbraco.Core.ObjectResolution
         {
             if (logger == null) throw new ArgumentNullException("logger");
             if (types == null) throw new ArgumentNullException("types");
+            CanResolveBeforeFrozen = false;
             _instanceTypes = types.ToList();
             LifetimeScope = scope;
             Logger = logger;
         }
+
+        /// <summary>
+        /// Hack: This is purely here to allow for the lazy container resolver to be used, we'll need to refactor all of this slowly till we're
+        /// happy with the outcome
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="scope"></param>
+        internal ManyObjectsResolverBase(ILogger logger, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
+            CanResolveBeforeFrozen = false;            
+            Logger = logger;
+            LifetimeScope = scope;            
+            _instanceTypes = new List<Type>();
+        }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,

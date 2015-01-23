@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 
@@ -12,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "Legacy Media Picker", "INT", "mediapicker")]
     public class MediaPickerPropertyEditor : PropertyEditor
     {
-        public MediaPickerPropertyEditor()
+        public MediaPickerPropertyEditor(ILogger logger) : base(logger)
         {
             InternalPreValues = new Dictionary<string, object>
                 {

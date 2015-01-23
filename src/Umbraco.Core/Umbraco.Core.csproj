@@ -304,6 +304,7 @@
     <Compile Include="LightInject\LightInjectExtensions.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="ObjectResolution\ContainerLazyManyObjectsResolver.cs" />
     <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />

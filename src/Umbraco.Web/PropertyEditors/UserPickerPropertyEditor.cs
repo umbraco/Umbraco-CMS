@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -11,7 +12,8 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IDictionary<string, object> _defaultPreValues;
 
-        public UserPickerPropertyEditor()
+        public UserPickerPropertyEditor(ILogger logger)
+            : base(logger)
         {
             _defaultPreValues = new Dictionary<string, object>
                 {

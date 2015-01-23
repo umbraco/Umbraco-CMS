@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
@@ -15,6 +16,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias, "Dropdown list multiple, publish keys", "dropdown")]
     public class DropDownMultipleWithKeysPropertyEditor : DropDownPropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public DropDownMultipleWithKeysPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new PublishValuesMultipleValueEditor(true, base.CreateValueEditor());

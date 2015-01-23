@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
@@ -24,8 +25,16 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class FileUploadPropertyValueEditor : PropertyValueEditorWrapper
     {
-        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
+        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSettings;
+
+        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
+            : base(wrapped)
         {
+            if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
+            if (contentSettings == null) throw new ArgumentNullException("contentSettings");
+            _mediaFileSystem = mediaFileSystem;
+            _contentSettings = contentSettings;
         }
 
         /// <summary>
@@ -63,15 +72,15 @@ namespace Umbraco.Web.PropertyEditors
                 clear = json["clearFiles"].Value<bool>();
             }
 
-            var currentPersistedValues = new string[] {};
+            var currentPersistedValues = new string[] { };
             if (string.IsNullOrEmpty(currentValue.ToString()) == false)
             {
-                currentPersistedValues = currentValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                currentPersistedValues = currentValue.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             var newValue = new List<string>();
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = _mediaFileSystem;
 
             if (clear)
             {
@@ -82,7 +91,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
                 return "";
             }
-            
+
             //check for any files
             if (editorValue.AdditionalData.ContainsKey("files"))
             {
@@ -111,7 +120,7 @@ namespace Umbraco.Web.PropertyEditors
 
                         var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-                        var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                        var subfolder = _contentSettings.UploadAllowDirectories
                                             ? currentPersistedFile.Replace(fs.GetUrl("/"), "").Split('/')[0]
                                             : currentPersistedFile.Substring(currentPersistedFile.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
 
@@ -120,7 +129,7 @@ namespace Umbraco.Web.PropertyEditors
                                                  ? subfolderId.ToString(CultureInfo.InvariantCulture)
                                                  : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                        var fileName = _contentSettings.UploadAllowDirectories
                                            ? Path.Combine(numberedFolder, name)
                                            : numberedFolder + "-" + name;
 
@@ -157,15 +166,15 @@ namespace Umbraco.Web.PropertyEditors
                             savedFilePaths.Add(umbracoFile.Url);
                         }
                         //now remove the temp file
-                        File.Delete(file.TempFilePath);   
+                        File.Delete(file.TempFilePath);
                     }
-                    
+
                     //Remove any files that are no longer saved for this item
                     foreach (var toRemove in currentPersistedValues.Except(savedFilePaths))
                     {
                         fs.DeleteFile(fs.GetRelativePath(toRemove), true);
                     }
-                    
+
 
                     return string.Join(",", newValue);
                 }

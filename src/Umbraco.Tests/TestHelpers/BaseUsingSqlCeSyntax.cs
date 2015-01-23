@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Mappers;
@@ -16,13 +17,15 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
+            var container = new ServiceContainer();
+
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
             PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
                 logger,
                 false);
             MappingResolver.Current = new MappingResolver(
-                new ActivatorServiceProvider(), logger.Logger,
+                container, logger.Logger,
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             Resolution.Freeze();

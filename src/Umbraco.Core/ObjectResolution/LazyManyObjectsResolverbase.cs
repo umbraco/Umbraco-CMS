@@ -26,6 +26,20 @@ namespace Umbraco.Core.ObjectResolution
         #region Constructors
 
         /// <summary>
+        /// Hack: This is purely here to allow for the lazy container resolver to be used, we'll need to refactor all of this slowly till we're
+        /// happy with the outcome
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="typeListProducerList"></param>
+        /// <param name="scope"></param>
+        internal LazyManyObjectsResolverBase(ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+            : base(logger, scope)
+        {
+            _typeListProducerList.Add(typeListProducerList);
+            Initialize();
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
         /// and an optional lifetime scope.
         /// </summary>
@@ -39,7 +53,7 @@ namespace Umbraco.Core.ObjectResolution
         {
             Initialize();
         }
-       
+
         protected LazyManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Lazy<Type>> lazyTypeList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : this(serviceProvider, logger, scope)
         {
@@ -62,7 +76,7 @@ namespace Umbraco.Core.ObjectResolution
             : this(serviceProvider, logger, httpContext)
         {
             _typeListProducerList.Add(typeListProducerList);
-        }       
+        }
 
         #endregion
 

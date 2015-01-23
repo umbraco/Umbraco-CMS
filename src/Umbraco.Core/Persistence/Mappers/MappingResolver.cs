@@ -2,21 +2,22 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal class MappingResolver : LazyManyObjectsResolverBase<MappingResolver, BaseMapper>
+    internal class MappingResolver : ContainerLazyManyObjectsResolver<MappingResolver, BaseMapper>
     {
         /// <summary>
         /// Constructor accepting a list of BaseMapper types that are attributed with the MapperFor attribute
         /// </summary>
-        /// <param name="serviceProvider"></param>
+        /// <param name="container"></param>
         /// <param name="logger"></param>
         /// <param name="assignedMapperTypes"></param>
-        public MappingResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> assignedMapperTypes)
-            : base(serviceProvider, logger, assignedMapperTypes)
+        public MappingResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> assignedMapperTypes)
+            : base(container, logger, assignedMapperTypes)
         {
             
         }

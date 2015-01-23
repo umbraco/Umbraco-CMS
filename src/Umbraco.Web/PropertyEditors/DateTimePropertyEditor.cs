@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -8,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = "DATETIME")]
     public class DateTimePropertyEditor : PropertyEditor
     {
-        public DateTimePropertyEditor()
+        public DateTimePropertyEditor(ILogger logger): base(logger)
         {
             _defaultPreVals = new Dictionary<string, object>
                 {

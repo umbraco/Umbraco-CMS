@@ -1,17 +1,28 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Manifest
 {    
     [TestFixture]
     public class ManifestParserTests
     {
+
+        private ManifestParser _parser;
+
+        [SetUp]
+        public void Setup()
+        {
+            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(TestHelper.MapPathForTest("~/App_Plugins")));
+        }
         
         [Test]
         public void Parse_Property_Editors_With_Pre_Vals()
@@ -48,7 +59,7 @@ namespace Umbraco.Tests.Manifest
 			}
     }
 ]");
-            var parser = ManifestParser.GetPropertyEditors(a);
+            var parser = _parser.GetPropertyEditors(a);
 
             Assert.AreEqual(1, parser.Count());
             Assert.AreEqual(2, parser.ElementAt(0).PreValueEditor.Fields.Count());
@@ -90,7 +101,7 @@ namespace Umbraco.Tests.Manifest
         }
     }
 ]");
-            var parser = ManifestParser.GetPropertyEditors(a);
+            var parser = _parser.GetPropertyEditors(a);
 
             Assert.AreEqual(2, parser.Count());
 
@@ -142,7 +153,7 @@ namespace Umbraco.Tests.Manifest
         }
     }
 ]");
-            var parser = ManifestParser.GetPropertyEditors(a);
+            var parser = _parser.GetPropertyEditors(a);
 
             Assert.AreEqual(1, parser.Count(x => x.IsParameterEditor));
 
@@ -169,7 +180,7 @@ namespace Umbraco.Tests.Manifest
         view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
     }
 ]");
-            var parser = ManifestParser.GetParameterEditors(a);
+            var parser = _parser.GetParameterEditors(a);
 
             Assert.AreEqual(2, parser.Count());
             Assert.AreEqual("parameter1", parser.ElementAt(0).Alias);
@@ -246,7 +257,7 @@ namespace Umbraco.Tests.Manifest
         public void Get_Folder_Depth(string baseFolder, string currFolder, int expected)
         {
             Assert.AreEqual(expected,
-                ManifestParser.FolderDepth(
+                _parser.FolderDepth(
                 new DirectoryInfo(baseFolder), 
                 new DirectoryInfo(currFolder)));
         }
@@ -268,7 +279,7 @@ propertyEditors: [],
 //and here's the javascript
 javascript: ['~/test.js', '~/test2.js']}";
 
-            var result = ManifestParser.CreateManifests(null, content4);
+            var result = _parser.CreateManifests(null, content4);
 
             Assert.AreEqual(1, result.Count()); 
         }
@@ -280,7 +291,7 @@ javascript: ['~/test.js', '~/test2.js']}";
 propertyEditors: []/*we have empty property editors**/, 
 javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js']}";
 
-            var result = ManifestParser.CreateManifests(null, content4);
+            var result = _parser.CreateManifests(null, content4);
 
             Assert.AreEqual(1, result.Count());
         }
@@ -293,7 +304,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 propertyEditors: []/*we have empty property editors**/, 
 javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js' }";
 
-            var result = ManifestParser.CreateManifests(null, content4);
+            var result = _parser.CreateManifests(null, content4);
 
             //an error has occurred and been logged but processing continues
             Assert.AreEqual(0, result.Count());
@@ -307,7 +318,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var content3 = "{javascript: ['~/test.js', '~/test2.js']}";
             var content4 = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
 
-            var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4);
+            var result = _parser.CreateManifests(null, content1, content2, content3, content4);
 
             Assert.AreEqual(4, result.Count());
             Assert.AreEqual(0, result.ElementAt(1).JavaScriptInitialize.Count);
@@ -323,7 +334,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var content3 = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
             var content4 = "{propertyEditors: [], css: ['~/stylesheet.css', '~/random-long-name.css']}";
 
-            var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4);
+            var result = _parser.CreateManifests(null, content1, content2, content3, content4);
 
             Assert.AreEqual(4, result.Count());
             Assert.AreEqual(0, result.ElementAt(1).StylesheetInitialize.Count);

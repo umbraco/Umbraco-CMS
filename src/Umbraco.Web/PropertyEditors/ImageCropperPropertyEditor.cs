@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -16,30 +17,24 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = "JSON", HideLabel = false)]
-    public class ImageCropperPropertyEditor : PropertyEditor
+    public class ImageCropperPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
+        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSettings;
 
-        /// <summary>
-        /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
-        /// if we find any attached to the current media item.
-        /// </summary>
-        /// <remarks>
-        /// I think this kind of logic belongs on this property editor, I guess it could exist elsewhere but it all has to do with the cropper.
-        /// </remarks>
-        static ImageCropperPropertyEditor()
+        public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
+            : base(logger)
         {
-            MediaService.Saving += MediaServiceSaving;
-            MediaService.Created += MediaServiceCreated;
-            ContentService.Copied += ContentServiceCopied;
+            if (mediaFileSystem == null) throw new ArgumentNullException("mediaFileSystem");
+            if (contentSettings == null) throw new ArgumentNullException("contentSettings");
+            _mediaFileSystem = mediaFileSystem;
+            _contentSettings = contentSettings;
 
-            MediaService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.EmptiedRecycleBin += (sender, args) =>
-                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
-            ContentService.Deleted += (sender, args) =>
-                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.EmptiedRecycleBin += (sender, args) =>
-                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+            _internalPreValues = new Dictionary<string, object>
+                {
+                    {"focalPoint", "{left: 0.5, top: 0.5}"},
+                    {"src", ""}
+                };
         }
 
         /// <summary>
@@ -49,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
         protected override PropertyValueEditor CreateValueEditor()
         {
             var baseEditor = base.CreateValueEditor();
-            return new ImageCropperPropertyValueEditor(baseEditor);
+            return new ImageCropperPropertyValueEditor(baseEditor, Logger, _mediaFileSystem, _contentSettings);
         }
 
         protected override PreValueEditor CreatePreValueEditor()
@@ -58,20 +53,11 @@ namespace Umbraco.Web.PropertyEditors
         }
 
 
-        public ImageCropperPropertyEditor()
-        {
-            _internalPreValues = new Dictionary<string, object>
-                {
-                    {"focalPoint", "{left: 0.5, top: 0.5}"},
-                    {"src", ""}
-                };
-        }
-
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>
         /// <param name="allPropertyData"></param>
-        static IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
+        IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
         {
             var list = new List<string>();
             //Get all values for any image croppers found
@@ -88,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + cropperVal, ex);
+                    Logger.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + cropperVal, ex);
                     continue;
                 }
 
@@ -104,7 +90,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Ensures any files associated are removed
         /// </summary>
         /// <param name="deletedEntities"></param>
-        static IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
+        IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
         {
             var list = new List<string>();
             foreach (var property in deletedEntities.SelectMany(deletedEntity => deletedEntity
@@ -120,7 +106,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value, ex);
+                    Logger.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value, ex);
                     continue;
                 }
 
@@ -137,12 +123,12 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
         {
             if (e.Original.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias))
             {
                 bool isUpdated = false;
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                var fs = _mediaFileSystem;
 
                 //Loop through properties to check if the content contains media that should be deleted
                 foreach (var property in e.Original.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias
@@ -156,7 +142,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value.ToString(), ex);
+                        Logger.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value.ToString(), ex);
                         continue;
                     }
 
@@ -193,12 +179,12 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        static void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
         {
             AutoFillProperties(e.Entity);
         }
 
-        static void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
+        void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
         {
             foreach (var m in e.SavedEntities)
             {
@@ -206,12 +192,12 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        static void AutoFillProperties(IContentBase model)
+        void AutoFillProperties(IContentBase model)
         {
             foreach (var p in model.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias))
             {
                 var uploadFieldConfigNode =
-                    UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
+                    _contentSettings.ImageAutoFillProperties
                                         .FirstOrDefault(x => x.Alias == p.Alias);
 
                 if (uploadFieldConfigNode != null)
@@ -263,5 +249,38 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
             public string Crops { get; set; }
         }
+
+        #region Application event handler, used to bind to events on startup
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+        }
+
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+        }
+
+        /// <summary>
+        /// We're going to bind to the MediaService Saving event so that we can populate the umbracoFile size, type, etc... label fields
+        /// if we find any attached to the current media item.
+        /// </summary>
+        /// <remarks>
+        /// I think this kind of logic belongs on this property editor, I guess it could exist elsewhere but it all has to do with the cropper.
+        /// </remarks>
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            MediaService.Saving += MediaServiceSaving;
+            MediaService.Created += MediaServiceCreated;
+            ContentService.Copied += ContentServiceCopied;
+
+            MediaService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            MediaService.EmptiedRecycleBin += (sender, args) =>
+                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+            ContentService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            ContentService.EmptiedRecycleBin += (sender, args) =>
+                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+        }
+        #endregion
     }
 }

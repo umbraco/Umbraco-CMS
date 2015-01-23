@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 
@@ -12,6 +13,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MacroContainerAlias, "Macro container", "macrocontainer", ValueType = "TEXT")]
     public class MacroContainerPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public MacroContainerPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         /// <summary>
         /// Creates a pre value editor instance
         /// </summary>

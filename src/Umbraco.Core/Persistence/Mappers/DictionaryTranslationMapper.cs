@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Mappers
     /// </summary>
     [MapperFor(typeof(DictionaryTranslation))]
     [MapperFor(typeof(IDictionaryTranslation))]
-    public class DictionaryTranslationMapper : BaseMapper
+    public sealed class DictionaryTranslationMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 

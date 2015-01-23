@@ -19,6 +19,8 @@ namespace Umbraco.Core.ObjectResolution
     {
         private readonly IServiceContainer _container;
 
+        //TODO: Get rid of these - pretty sure all tests will still fail with these pass throughs, need to update
+        // all tests that use resolvers to use a real container - then update most tests that are not integration tests to not use any resolvers!
         #region Constructors used for test - ONLY so that a container is not required and will just revert to using the normal ManyObjectsResolverBase
         [Obsolete("Used for tests only - should remove")]
         internal ContainerManyObjectsResolver(ILogger logger, IEnumerable<Type> types, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)

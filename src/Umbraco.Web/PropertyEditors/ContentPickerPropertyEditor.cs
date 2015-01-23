@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -8,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     public class ContentPickerPropertyEditor : PropertyEditor
     {
 
-        public ContentPickerPropertyEditor()
+        public ContentPickerPropertyEditor(ILogger logger) : base(logger)
         {
             _internalPreValues = new Dictionary<string, object>
                 {                 

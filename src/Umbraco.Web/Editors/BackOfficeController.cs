@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
         public JavaScriptResult Application()
         {
             var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(plugins);
+            var parser = new ManifestParser(Logger, plugins);
             var initJs = new JsInitialization(parser);
             var initCss = new CssInitialization(parser);
 
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Editors
         public JsonNetResult GetManifestAssetList()
         {
             var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(plugins);
+            var parser = new ManifestParser(Logger, plugins);
             var initJs = new JsInitialization(parser);
             var initCss = new CssInitialization(parser);
             var jsResult = initJs.GetJavascriptInitializationArray(HttpContext, new JArray());

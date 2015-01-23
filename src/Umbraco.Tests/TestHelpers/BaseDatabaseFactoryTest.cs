@@ -15,6 +15,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -194,6 +195,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
         }
+        
 
         /// <summary>
         /// sets up resolvers before resolution is frozen
@@ -201,11 +203,12 @@ namespace Umbraco.Tests.TestHelpers
         protected override void FreezeResolution()
         {
             PropertyEditorResolver.Current = new PropertyEditorResolver(
-                 new ActivatorServiceProvider(), Logger,
-                 () => PluginManager.Current.ResolvePropertyEditors());
+                 Container, Logger,
+                 () => PluginManager.Current.ResolvePropertyEditors(),
+                 new ManifestBuilder(new ManifestParser(Logger, new DirectoryInfo(TestHelper.MapPathForTest("~/App_Plugins")))));
 
             MappingResolver.Current = new MappingResolver(
-                new ActivatorServiceProvider(), Logger,
+                Container, Logger,
                () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             if (PropertyValueConvertersResolver.HasCurrent == false)

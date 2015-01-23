@@ -1,10 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
@@ -43,6 +47,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
+            Container = new ServiceContainer();
+
             TestHelper.InitializeContentDirectories();
 
             SetupCacheHelper();
@@ -54,6 +60,15 @@ namespace Umbraco.Tests.TestHelpers
             SetupApplicationContext();
 
             InitializeMappers();
+
+            //register basic stuff that might need to be there for some container resolvers to work,  we can 
+            // add more to this in base classes in resolution freezing
+            Container.Register<ILogger>(factory => Logger);
+            Container.Register<CacheHelper>(factory => CacheHelper);
+            Container.Register<ProfilingLogger>(factory => ProfilingLogger);
+            Container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault(), new PerContainerLifetime());
+            Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
+            Container.Register<IServiceProvider, ActivatorServiceProvider>();
 
             FreezeResolution();
 
@@ -74,6 +89,8 @@ namespace Umbraco.Tests.TestHelpers
             ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
             ApplicationContext.Current = null;
             ResetPluginManager();
+
+            Container.Dispose();
 
         }
 
@@ -212,5 +229,9 @@ namespace Umbraco.Tests.TestHelpers
         }
         protected ProfilingLogger ProfilingLogger { get; private set; }
         protected CacheHelper CacheHelper { get; private set; }
+
+        //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests 
+        // and the number of these will hopefully start getting greatly reduced now that most things are mockable.
+        internal IServiceContainer Container { get; private set; }
     }
 }

@@ -16,16 +16,20 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class ManifestParser
     {
+        private readonly ILogger _logger;
+        
         private readonly DirectoryInfo _pluginsDir;
         
         //used to strip comments
         private static readonly Regex CommentsSurround = new Regex(@"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", RegexOptions.Compiled);
         private static readonly Regex CommentsLine = new Regex(@"//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
-        public ManifestParser(DirectoryInfo pluginsDir)
+        public ManifestParser(ILogger logger, DirectoryInfo pluginsDir)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (pluginsDir == null) throw new ArgumentNullException("pluginsDir");
             _pluginsDir = pluginsDir;
+            _logger = logger;
         }
 
         /// <summary>
@@ -33,11 +37,11 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         /// <param name="jsonEditors"></param>
         /// <returns></returns>
-        internal static IEnumerable<PropertyEditor> GetPropertyEditors(JArray jsonEditors)
+        internal IEnumerable<PropertyEditor> GetPropertyEditors(JArray jsonEditors)
         {
             return JsonConvert.DeserializeObject<IEnumerable<PropertyEditor>>(
-                jsonEditors.ToString(), 
-                new PropertyEditorConverter(),
+                jsonEditors.ToString(),
+                new PropertyEditorConverter(_logger),
                 new PreValueFieldConverter());
         }
 
@@ -46,7 +50,7 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         /// <param name="jsonEditors"></param>
         /// <returns></returns>
-        internal static IEnumerable<ParameterEditor> GetParameterEditors(JArray jsonEditors)
+        internal IEnumerable<ParameterEditor> GetParameterEditors(JArray jsonEditors)
         {
             return JsonConvert.DeserializeObject<IEnumerable<ParameterEditor>>(
                 jsonEditors.ToString(),
@@ -96,7 +100,7 @@ namespace Umbraco.Core.Manifest
         /// <param name="baseDir"></param>
         /// <param name="currDir"></param>
         /// <returns></returns>
-        internal static int FolderDepth(DirectoryInfo baseDir, DirectoryInfo currDir)
+        internal int FolderDepth(DirectoryInfo baseDir, DirectoryInfo currDir)
         {
             var removed = currDir.FullName.Remove(0, baseDir.FullName.Length).TrimStart('\\').TrimEnd('\\');
             return removed.Split(new char[] {'\\'}, StringSplitOptions.RemoveEmptyEntries).Length;
@@ -111,7 +115,7 @@ namespace Umbraco.Core.Manifest
         /// This ensures that comments are removed (but they have to be /* */ style comments
         /// and ensures that virtual paths are replaced with real ones
         /// </remarks>
-        internal static IEnumerable<PackageManifest> CreateManifests(params string[] manifestFileContents)
+        internal IEnumerable<PackageManifest> CreateManifests(params string[] manifestFileContents)
         {
             var result = new List<PackageManifest>();
             foreach (var m in manifestFileContents)
@@ -129,7 +133,7 @@ namespace Umbraco.Core.Manifest
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ManifestParser>("An error occurred parsing manifest with contents: " + m, ex);
+                    _logger.Error<ManifestParser>("An error occurred parsing manifest with contents: " + m, ex);
                     continue;
                 }
 
@@ -192,7 +196,7 @@ namespace Umbraco.Core.Manifest
         /// Replaces any virtual paths found in properties
         /// </summary>
         /// <param name="jarr"></param>
-        private static void ReplaceVirtualPaths(JArray jarr)
+        private void ReplaceVirtualPaths(JArray jarr)
         {
             foreach (var i in jarr)
             {
@@ -204,7 +208,7 @@ namespace Umbraco.Core.Manifest
         /// Replaces any virtual paths found in properties
         /// </summary>
         /// <param name="jToken"></param>
-        private static void ReplaceVirtualPaths(JToken jToken)
+        private void ReplaceVirtualPaths(JToken jToken)
         {
             if (jToken.Type == JTokenType.Object)
             {
@@ -232,7 +236,7 @@ namespace Umbraco.Core.Manifest
         /// Replaces any virtual paths found in properties
         /// </summary>
         /// <param name="jObj"></param>
-        private static void ReplaceVirtualPaths(JObject jObj)
+        private void ReplaceVirtualPaths(JObject jObj)
         {
             foreach (var p in jObj.Properties().Select(x => x.Value))
             {

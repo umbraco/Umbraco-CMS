@@ -1,4 +1,5 @@
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -14,6 +15,11 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.RadioButtonListAlias, "Radio button list", "radiobuttons", ValueType = "INT")]
     public class RadioButtonsPropertyEditor : DropDownWithKeysPropertyEditor
     {
-
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public RadioButtonsPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
     }
 }

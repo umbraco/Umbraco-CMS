@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
@@ -11,6 +12,12 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.NoEditAlias, "Label", "readonlyvalue")]
     public class LabelPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public LabelPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
 
         protected override PropertyValueEditor CreateValueEditor()
         {

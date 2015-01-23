@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -12,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DateAlias, "Date", "DATE", "datepicker")]
     public class DatePropertyEditor : PropertyEditor
     {
-        public DatePropertyEditor()
+        public DatePropertyEditor(ILogger logger): base(logger)
         {
             _defaultPreVals = new Dictionary<string, object>
                 {

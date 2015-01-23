@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -10,6 +11,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TinyMCEAlias, "Rich Text Editor", "rte", ValueType = "TEXT",  HideLabel = false)]
     public class RichTextPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public RichTextPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         /// <summary>
         /// Create a custom value editor
         /// </summary>

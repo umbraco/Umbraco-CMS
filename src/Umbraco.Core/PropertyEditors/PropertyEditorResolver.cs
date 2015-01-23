@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.ObjectResolution;
@@ -13,11 +14,14 @@ namespace Umbraco.Core.PropertyEditors
     /// <remarks>
     /// This resolver will contain any property editors defined in manifests as well!
     /// </remarks>
-    public class PropertyEditorResolver : LazyManyObjectsResolverBase<PropertyEditorResolver, PropertyEditor>
+    public class PropertyEditorResolver : ContainerLazyManyObjectsResolver<PropertyEditorResolver, PropertyEditor>
     {
-        public PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList)
-            : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
+        private readonly ManifestBuilder _builder;
+
+        internal PropertyEditorResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
+            : base(container, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
+            _builder = builder;
         }
 
         /// <summary>
@@ -25,7 +29,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public IEnumerable<PropertyEditor> PropertyEditors
         {
-            get { return Values.Union(ManifestBuilder.PropertyEditors); }
+            get { return Values.Union(_builder.PropertyEditors); }
         }
 
         /// <summary>

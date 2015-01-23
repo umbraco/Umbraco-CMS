@@ -1,4 +1,5 @@
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -14,6 +15,12 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DropdownlistPublishingKeysAlias, "Dropdown list, publishing keys", "dropdown", ValueType = "INT")]
     public class DropDownWithKeysPropertyEditor : PropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public DropDownWithKeysPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
 
         /// <summary>
         /// Return a custom pre-value editor

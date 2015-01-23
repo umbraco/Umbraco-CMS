@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
@@ -35,7 +36,12 @@ namespace Umbraco.Tests.Models.Mapping
         [PropertyEditor("Test.Test", "Test", "~/Test.html")]
         public class TestPropertyEditor : PropertyEditor
         {
-            
+            /// <summary>
+            /// The constructor will setup the property editor based on the attribute if one is found
+            /// </summary>
+            public TestPropertyEditor(ILogger logger) : base(logger)
+            {
+            }
         }
 
         //protected override void FreezeResolution()

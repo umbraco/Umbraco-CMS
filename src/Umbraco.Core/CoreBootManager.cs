@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,6 +9,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
@@ -126,10 +128,14 @@ namespace Umbraco.Core
         /// </summary>
         private void ConfigureCoreServices(ServiceContainer container)
         {
+            container.Register<IServiceContainer>(factory => container);
             container.Register<ILogger>(factory => _umbracoApplication.Logger, new PerContainerLifetime());
             container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
             container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
-            container.Register<IUmbracoSettingsSection>(factory => UmbracoConfig.For.UmbracoSettings());
+            var settings = UmbracoConfig.For.UmbracoSettings();
+            container.Register<IUmbracoSettingsSection>(factory => settings);
+            container.Register<IContentSection>(factory => settings.Content);
+            //TODO: Add the other config areas...
             container.Register<CacheHelper>(factory => _cacheHelper, new PerContainerLifetime());
             container.Register<IRuntimeCacheProvider>(factory => _cacheHelper.RuntimeCache, new PerContainerLifetime());
             container.Register<IServiceProvider, ActivatorServiceProvider>();
@@ -149,6 +155,7 @@ namespace Umbraco.Core
                 factory.GetInstance<CacheHelper>(),
                 factory.GetInstance<ILogger>()));
             container.Register<ApplicationContext>(new PerContainerLifetime());
+            container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
         }
 
         /// <summary>
@@ -157,7 +164,7 @@ namespace Umbraco.Core
         /// <param name="container"></param>
         internal virtual void ConfigureServices(ServiceContainer container)
         {
-            container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
+            
         }
 
         /// <summary>
@@ -299,8 +306,15 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual void InitializeResolvers()
         {
-            PropertyEditorResolver.Current = new PropertyEditorResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors());
-            ParameterEditorResolver.Current = new ParameterEditorResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors());
+            var manifestParser = new ManifestParser(ProfilingLogger.Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")));
+            var manifestBuilder = new ManifestBuilder(manifestParser);
+
+            PropertyEditorResolver.Current = new PropertyEditorResolver(
+                Container, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(),
+                manifestBuilder);
+            ParameterEditorResolver.Current = new ParameterEditorResolver(
+                ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors(),
+                manifestBuilder);
 
             //setup the validators resolver with our predefined validators
             ValidatorsResolver.Current = new ValidatorsResolver(
@@ -322,7 +336,7 @@ namespace Umbraco.Core
             ServerMessengerResolver.Current = new ServerMessengerResolver(Container, typeof (DefaultServerMessenger));
 
             MappingResolver.Current = new MappingResolver(
-                ServiceProvider, ProfilingLogger.Logger,
+                Container, ProfilingLogger.Logger,
                 () => PluginManager.ResolveAssignedMapperTypes());
 
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -14,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.TagsAlias, "Tags", "tags")]
     public class TagsPropertyEditor : PropertyEditor
     {
-        public TagsPropertyEditor()
+        public TagsPropertyEditor(ILogger logger) : base(logger)
         {
             _defaultPreVals = new Dictionary<string, object>
                 {

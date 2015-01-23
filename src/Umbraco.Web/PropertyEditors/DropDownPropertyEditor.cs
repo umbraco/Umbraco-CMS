@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using umbraco;
 using ClientDependency.Core;
@@ -19,6 +20,13 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DropDownListAlias, "Dropdown list", "dropdown", ValueType = "STRING")]
     public class DropDownPropertyEditor : DropDownWithKeysPropertyEditor
     {
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public DropDownPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
+
         /// <summary>
         /// We need to override the value editor so that we can ensure the string value is published in cache and not the integer ID value.
         /// </summary>
