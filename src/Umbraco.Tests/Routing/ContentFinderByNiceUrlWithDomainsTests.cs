@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Routing
 			// must lookup domain else lookup by url fails
 			pcr.Engine.FindDomain();
 
-			var lookup = new ContentFinderByNiceUrl();
+            var lookup = new ContentFinderByNiceUrl(Logger);
 			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Routing
 			pcr.Engine.FindDomain();
 			Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
-			var lookup = new ContentFinderByNiceUrl();
+            var lookup = new ContentFinderByNiceUrl(Logger);
 			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);

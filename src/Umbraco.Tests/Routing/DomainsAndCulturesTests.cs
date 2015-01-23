@@ -152,8 +152,8 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
-            SettingsForTests.HideTopLevelNodeFromPath = false; 
-            var finder = new ContentFinderByNiceUrl();
+            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var finder = new ContentFinderByNiceUrl(Logger);
             var result = finder.TryFindContent(pcr);
 
             Assert.IsTrue(result);
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Routing
 
             // find document
             SettingsForTests.HideTopLevelNodeFromPath = false;
-            var finder = new ContentFinderByNiceUrl();
+            var finder = new ContentFinderByNiceUrl(Logger);
             var result = finder.TryFindContent(pcr);
 
             // apply wildcard domain
