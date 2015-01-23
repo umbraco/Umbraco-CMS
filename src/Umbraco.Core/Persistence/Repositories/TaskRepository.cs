@@ -168,11 +168,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             if (ownerUser.HasValue)
             {
-                sql.Where<TaskDto>(dto => dto.UserId == ownerUser.Value);
+                sql.Where<TaskDto>(dto => dto.ParentUserId == ownerUser.Value);
             }
             if (assignedUser.HasValue)
             {
-                sql.Where<TaskDto>(dto => dto.ParentUserId == assignedUser.Value);
+                sql.Where<TaskDto>(dto => dto.UserId == assignedUser.Value);
             }
             return sql;
         }
