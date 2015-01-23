@@ -229,7 +229,7 @@ namespace Umbraco.Core
 
 					if (currentVersion != configStatus)
 					{
-                        ProfilingLogger.Logger.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                        ProfilingLogger.Logger.Debug<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
 					}
 						
 

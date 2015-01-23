@@ -23,6 +23,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     {
         public override void Up()
         {
+            //Don't exeucte if the stylesheet table is not there
+            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
+            if (tables.InvariantContains("cmsStylesheet") == false) return;
+
             //This is all rather nasty but it's how stylesheets used to work in the 2 various ugly ways so we just have to 
             // deal with that to get this migration done
 
