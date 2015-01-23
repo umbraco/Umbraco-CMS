@@ -629,21 +629,6 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        public IContent GetByLanguage(int id, string language)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.Where<ContentVersionDto>(x => x.Language == language);
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            return GetByVersion(dto.ContentVersionDto.VersionId);
-        }
-
         /// <summary>
         /// Assigns a single permission to the current content item for the specified user ids
         /// </summary>

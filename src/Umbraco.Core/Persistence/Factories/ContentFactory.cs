@@ -38,7 +38,6 @@ namespace Umbraco.Core.Persistence.Factories
                         : _id.ToGuid(),
                 Name = dto.Text,
                 NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text,
-                Language = dto.ContentVersionDto.Language,
                 Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
                 CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
                 WriterId = dto.WriterUserId,
@@ -107,7 +106,6 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 VersionDate = entity.UpdateDate,
                 VersionId = entity.Version,
-                Language = lang,
                 ContentDto = BuildContentDto(entity)
             };
             return contentVersionDto;
