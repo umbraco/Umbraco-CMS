@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.translation
 {
+    [Obsolete("This will be removed in future versions, the translation utility will not work perfectly in v7.x")]
     public class Translation
     {
         public static void MakeNew(CMSNode Node, User User, User Translator, Language Language, string Comment,
