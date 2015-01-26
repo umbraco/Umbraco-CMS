@@ -8,7 +8,10 @@ angular.module("umbraco")
             dialogService.macroPicker({
                 dialogData: {
                     richTextEditor: true,  
-                    macroData: $scope.control.value
+                    macroData: $scope.control.value || {
+                        macroAlias: $scope.control.editor.config && $scope.control.editor.config.macroAlias
+                          ? $scope.control.editor.config.macroAlias : ""
+                    }
                 },
                 callback: function (data) {
                     $scope.control.value = {
