@@ -68,23 +68,36 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             var documentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
 
             // Remove current one
-            documentTypes = documentTypes.Where(x => x.Id != _content.ContentType.Id);
+            documentTypes = documentTypes
+                .Where(x => x.Id != _content.ContentType.Id);
 
             // Remove any not valid for current location
             if (_content.ParentId == -1)
             {
                 // Root content, only include those that have been selected as allowed at root
-                documentTypes = documentTypes.Where(x => x.AllowedAsRoot);
+                documentTypes = documentTypes
+                    .Where(x => x.AllowedAsRoot);
             }
             else
             {
                 // Below root, so only include those allowed as sub-nodes for the parent
                 var parentNode = ApplicationContext.Current.Services.ContentService.GetById(_content.ParentId);
-                documentTypes = documentTypes.Where(x => parentNode.ContentType.AllowedContentTypes
-                    .Select(y => y.Id.Value)
-                    .Contains(x.Id));
+                documentTypes = documentTypes
+                    .Where(x => parentNode.ContentType.AllowedContentTypes
+                        .Select(y => y.Id.Value)
+                        .Contains(x.Id));
             }
 
+            // Remove any that existing children would not be valid for
+            var docTypeIdsOfChildren = _content.Children()
+                .Select(x => x.ContentType.Id)
+                .Distinct()
+                .ToList();
+            documentTypes = documentTypes
+                .Where(x => x.AllowedContentTypes
+                    .Select(y => y.Id.Value)
+                    .ContainsAll(docTypeIdsOfChildren));
+            
             // If we have at least one, bind to list and return true
             if (documentTypes.Any())
             {
