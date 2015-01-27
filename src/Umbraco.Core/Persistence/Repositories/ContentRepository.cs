@@ -305,6 +305,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
+        protected override void PersistDeletedItem(IContent entity)
+        {
+            //We need to clear out all access rules but we need to do this in a manual way
+            var subQuery = new Sql()
+                .Select("umbracoAccessRule.accessId")
+                .From<AccessRuleDto>(SqlSyntax)
+                .InnerJoin<AccessDto>(SqlSyntax)
+                .On<AccessRuleDto, AccessDto>(SqlSyntax, left => left.AccessId, right => right.Id)
+                .Where<AccessDto>(dto => dto.NodeId == entity.Key);
+            Database.Execute(SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
+            //Now delete everything from umbracoAccess, we are doing this manually because we have joined on GUIDs instead
+            // of integers since we'll be moving to GUID for v8 for everything
+            Database.Execute("DELETE FROM umbracoAccess WHERE nodeId = @Key", new {Key = entity.Key});
+
+            //now let the normal delete clauses take care of everything else
+            base.PersistDeletedItem(entity);
+        }
+
         protected override void PersistNewItem(IContent entity)
         {
             ((Content)entity).AddingEntity();

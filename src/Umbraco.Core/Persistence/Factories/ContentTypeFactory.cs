@@ -22,10 +22,7 @@ namespace Umbraco.Core.Persistence.Factories
             var contentType = new ContentType(dto.ContentTypeDto.NodeDto.ParentId)
                                   {
                                       Id = dto.ContentTypeDto.NodeDto.NodeId,
-                                      Key =
-                                          dto.ContentTypeDto.NodeDto.UniqueId.HasValue
-                                              ? dto.ContentTypeDto.NodeDto.UniqueId.Value
-                                              : dto.ContentTypeDto.NodeDto.NodeId.ToGuid(),
+                                      Key = dto.ContentTypeDto.NodeDto.UniqueId,
                                       Alias = dto.ContentTypeDto.Alias,
                                       Name = dto.ContentTypeDto.NodeDto.Text,
                                       Icon = dto.ContentTypeDto.Icon,

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 CreateDate = dto.CreateDate,
                 Id = dto.NodeId,
-                Key = dto.UniqueId.Value,
+                Key = dto.UniqueId,
                 Name = dto.Text                
             };
 

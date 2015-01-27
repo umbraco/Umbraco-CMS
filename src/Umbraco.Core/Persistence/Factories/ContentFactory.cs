@@ -32,10 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
             var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
             {
                 Id = _id,
-                Key =
-                    dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.HasValue
-                        ? dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.Value
-                        : _id.ToGuid(),
+                Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId,
                 Name = dto.Text,
                 NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text,
                 Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
