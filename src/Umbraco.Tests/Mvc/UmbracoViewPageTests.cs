@@ -423,7 +423,7 @@ namespace Umbraco.Tests.Mvc
                 logger, settings,
                 "/dang", 0);
 
-            var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[] { new DefaultUrlProvider(settings.RequestHandler) });
             var routingContext = new RoutingContext(
                 umbracoContext,
                 Enumerable.Empty<IContentFinder>(),

@@ -88,27 +88,27 @@ namespace Umbraco.Core.Services
             IDomainService domainService = null,
             ITaskService taskService = null)
         {
-            if (_auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
-            if (_localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
-            if (_tagService != null) _tagService = new Lazy<ITagService>(() => tagService);
-            if (_contentService != null) _contentService = new Lazy<IContentService>(() => contentService);
-            if (_mediaService != null) _mediaService = new Lazy<IMediaService>(() => mediaService);
-            if (_contentTypeService != null) _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
-            if (_dataTypeService != null) _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
-            if (_fileService != null) _fileService = new Lazy<IFileService>(() => fileService);
-            if (_localizationService != null) _localizationService = new Lazy<ILocalizationService>(() => localizationService);
-            if (_packagingService != null) _packagingService = new Lazy<IPackagingService>(() => packagingService);
-            if (_entityService != null) _entityService = new Lazy<IEntityService>(() => entityService);
-            if (_relationService != null) _relationService = new Lazy<IRelationService>(() => relationService);
-            if (_sectionService != null) _sectionService = new Lazy<ISectionService>(() => sectionService);
-            if (_memberGroupService != null) _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
-            if (_memberTypeService != null) _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
-            if (_treeService != null) _treeService = new Lazy<IApplicationTreeService>(() => treeService);
-            if (_memberService != null) _memberService = new Lazy<IMemberService>(() => memberService);
-            if (_userService != null) _userService = new Lazy<IUserService>(() => userService);
-            if (_notificationService != null) _notificationService = new Lazy<INotificationService>(() => notificationService);
-            if (_domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
-            if (_taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
+            if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
+            if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
+            if (tagService != null) _tagService = new Lazy<ITagService>(() => tagService);
+            if (contentService != null) _contentService = new Lazy<IContentService>(() => contentService);
+            if (mediaService != null) _mediaService = new Lazy<IMediaService>(() => mediaService);
+            if (contentTypeService != null) _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
+            if (dataTypeService != null) _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
+            if (fileService != null) _fileService = new Lazy<IFileService>(() => fileService);
+            if (localizationService != null) _localizationService = new Lazy<ILocalizationService>(() => localizationService);
+            if (packagingService != null) _packagingService = new Lazy<IPackagingService>(() => packagingService);
+            if (entityService != null) _entityService = new Lazy<IEntityService>(() => entityService);
+            if (relationService != null) _relationService = new Lazy<IRelationService>(() => relationService);
+            if (sectionService != null) _sectionService = new Lazy<ISectionService>(() => sectionService);
+            if (memberGroupService != null) _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
+            if (memberTypeService != null) _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
+            if (treeService != null) _treeService = new Lazy<IApplicationTreeService>(() => treeService);
+            if (memberService != null) _memberService = new Lazy<IMemberService>(() => memberService);
+            if (userService != null) _userService = new Lazy<IUserService>(() => userService);
+            if (notificationService != null) _notificationService = new Lazy<INotificationService>(() => notificationService);
+            if (domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
+            if (taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
         }
 
         internal ServiceContext(

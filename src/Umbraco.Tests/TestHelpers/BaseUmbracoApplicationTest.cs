@@ -188,7 +188,6 @@ namespace Umbraco.Tests.TestHelpers
                         Assembly.Load("umbraco.editorControls"),
                         Assembly.Load("umbraco.MacroEngines"),
                         Assembly.Load("umbraco.providers"),
-                        Assembly.Load("Umbraco.Web.UI"),
                     }
                 };
             }
