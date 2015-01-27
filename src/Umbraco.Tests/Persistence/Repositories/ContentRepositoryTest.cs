@@ -678,34 +678,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         }
 
-        [Test]
-        public void Can_Create_Different_Language_Version()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            ContentTypeRepository contentTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
-            {
-                var content = repository.Get(NodeDto.NodeIdSeed + 2);
-
-                // Act
-                content.Language = "da-DK";
-                content.Name = "Tekst Side 1";
-                repository.AddOrUpdate(content);
-                unitOfWork.Commit();
-
-                var latest = repository.Get(NodeDto.NodeIdSeed + 2);
-                var english = repository.GetByLanguage(NodeDto.NodeIdSeed + 2, "en-US");
-                var danish = repository.GetByLanguage(NodeDto.NodeIdSeed + 2, "da-DK");
-
-                // Assert
-                Assert.That(latest.Name, Is.EqualTo("Tekst Side 1"));
-                Assert.That(english.Name, Is.EqualTo("Text Page 1"));
-                Assert.That(danish.Name, Is.EqualTo("Tekst Side 1"));
-            }
-        }
-
         public void CreateTestData()
         {
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
