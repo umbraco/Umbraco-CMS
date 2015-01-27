@@ -11,6 +11,12 @@ namespace Umbraco.Core
 		/// </summary>
 		public static class Conventions
 		{
+		    public static class PublicAccess
+		    {
+		        public const string MemberIdClaimType = "MemberId";
+                public const string MemberGroupClaimType = "MemberGroup";
+		    }
+
 		    public static class Localization
 		    {
                 /// <summary>

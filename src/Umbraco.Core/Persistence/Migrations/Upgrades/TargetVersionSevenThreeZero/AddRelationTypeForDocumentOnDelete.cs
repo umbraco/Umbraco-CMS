@@ -9,14 +9,20 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     {
         public override void Up()
         {
-            Insert.IntoTable("umbracoRelationType").Row(new
+            var exists = Context.Database.FirstOrDefault<RelationTypeDto>("WHERE alias=@alias", new {alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias});
+            if (exists == null)
             {
-                dual = false,
-                parentObjectType = Guid.Parse(Constants.ObjectTypes.Document),
-                childObjectType = Guid.Parse(Constants.ObjectTypes.Document),
-                name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
-                alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias
-            });
+                Insert.IntoTable("umbracoRelationType").Row(new
+                {
+                    dual = false,
+                    parentObjectType = Guid.Parse(Constants.ObjectTypes.Document),
+                    childObjectType = Guid.Parse(Constants.ObjectTypes.Document),
+                    name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
+                    alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias
+                });
+            }
+
+            
 
         }
 
