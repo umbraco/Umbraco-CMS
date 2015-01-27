@@ -17,6 +17,7 @@ using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -36,10 +37,12 @@ namespace Umbraco.Core.Services
         private readonly ILocalizationService _localizationService;
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
 
+        //TODO: Perhaps this should just accept a ServiceContext instance? and not actually be part of the service context?
 
         public PackagingService(
             ILogger logger,
@@ -52,7 +55,8 @@ namespace Umbraco.Core.Services
             ILocalizationService localizationService,
             IUserService userService,
             RepositoryFactory repositoryFactory,
-            IDatabaseUnitOfWorkProvider uowProvider)
+            IDatabaseUnitOfWorkProvider uowProvider,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             _logger = logger;
             _contentService = contentService;
@@ -64,6 +68,7 @@ namespace Umbraco.Core.Services
             _localizationService = localizationService;
             _repositoryFactory = repositoryFactory;
             _uowProvider = uowProvider;
+            _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
@@ -88,7 +93,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_contentService, _dataTypeService, _userService, content, deep);
+            var xml = exporter.Serialize(_contentService, _dataTypeService, _userService, _urlSegmentProviders, content, deep);
 
             if (raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
@@ -1283,7 +1288,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_mediaService, _dataTypeService, _userService, media, deep);
+            var xml = exporter.Serialize(_mediaService, _dataTypeService, _userService, _urlSegmentProviders, media, deep);
 
             if (raiseEvents)
                 ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);

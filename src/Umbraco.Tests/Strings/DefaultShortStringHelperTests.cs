@@ -127,7 +127,6 @@ namespace Umbraco.Tests.Strings
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
 
@@ -413,9 +412,8 @@ namespace Umbraco.Tests.Strings
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault()).WithDefaultConfig();
+            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig();
 
             const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";
 

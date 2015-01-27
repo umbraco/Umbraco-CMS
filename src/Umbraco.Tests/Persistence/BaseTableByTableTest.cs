@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
@@ -59,7 +60,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger),                
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger, new[] { new DefaultUrlSegmentProvider() }), 
                 cacheHelper,
                 new ProfilingLogger(new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))), Mock.Of<IProfiler>()))
                 {

@@ -55,9 +55,8 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerManyObjectsResolver(IServiceContainer container, ILogger logger, IEnumerable<Type> types, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : base(logger, types, scope)
         {
+            if (container == null) throw new ArgumentNullException("container");
             _container = container;
-            
-
             Resolution.Frozen += Resolution_Frozen;
 
         }

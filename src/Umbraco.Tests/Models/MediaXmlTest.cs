@@ -21,10 +21,6 @@ namespace Umbraco.Tests.Models
 
         protected override void FreezeResolution()
         {
-            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
-                new ActivatorServiceProvider(),
-                Logger,
-                typeof(DefaultUrlSegmentProvider));
             base.FreezeResolution();
         }
 
@@ -45,7 +41,7 @@ namespace Umbraco.Tests.Models
             ServiceContext.MediaService.Save(media, 0);
 
             var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-            var urlName = media.GetUrlSegment();
+            var urlName = media.GetUrlSegment(new[] { new DefaultUrlSegmentProvider() });
 
             // Act
             XElement element = media.ToXml();

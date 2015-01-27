@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -32,49 +33,23 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
+        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
 
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService()
-            : this(new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory, new PublishingStrategy())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()), new PublishingStrategy())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, new PublishingStrategy())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
-            _dataTypeService = new DataTypeService(UowProvider, RepositoryFactory);
-            _userService = new UserService(UowProvider, RepositoryFactory);
-        }
-
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService, IUserService userService)
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService, IUserService userService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
             : base(provider, repositoryFactory, logger)
         {
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
             _publishingStrategy = publishingStrategy;
             _dataTypeService = dataTypeService;
             _userService = userService;
+            _urlSegmentProviders = urlSegmentProviders;
         }
 
         public int CountPublished(string contentTypeAlias = null)
@@ -270,7 +245,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
                 //Generate a new preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Commit();
             }
 
@@ -322,7 +297,7 @@ namespace Umbraco.Core.Services
                 content.WriterId = userId;
                 repository.AddOrUpdate(content);
                 //Generate a new preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Commit();
             }
 
@@ -945,7 +920,7 @@ namespace Umbraco.Core.Services
 
                             repository.AddOrUpdate(content);
                             //add or update preview
-                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         }
                     }
                     else
@@ -955,7 +930,7 @@ namespace Umbraco.Core.Services
                             content.WriterId = userId;
                             repository.AddOrUpdate(content);
                             //add or update preview
-                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                            repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         }
                     }
 
@@ -1293,7 +1268,7 @@ namespace Umbraco.Core.Services
 
                     repository.AddOrUpdate(copy);
                     //add or update a preview
-                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     uow.Commit();
 
 
@@ -1379,7 +1354,7 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(content);
                 //add or update a preview
-                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                 uow.Commit();
             }
 
@@ -1445,13 +1420,13 @@ namespace Umbraco.Core.Services
 
                         repository.AddOrUpdate(content);
                         //add or update a preview
-                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     }
 
                     foreach (var content in shouldBePublished)
                     {
                         //Create and Save ContentXml DTO
-                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     }
 
                     uow.Commit();
@@ -1482,7 +1457,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
             {
                 repository.RebuildXmlStructures(
-                    content => _entitySerializer.Serialize(this, _dataTypeService, _userService, content),
+                    content => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, content),
                     contentTypeIds: contentTypeIds.Length == 0 ? null : contentTypeIds);
 
                 uow.Commit();
@@ -1571,7 +1546,7 @@ namespace Umbraco.Core.Services
                     // change how this method calls "Save" as it needs to save using an internal method
                     using (var uow = UowProvider.GetUnitOfWork())
                     {
-                        var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, content);
+                        var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, content);
 
                         var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
                         var exists =
@@ -1670,9 +1645,9 @@ namespace Umbraco.Core.Services
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);
                         //add or update a preview
-                        repository.AddOrUpdatePreviewXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdatePreviewXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         //add or update the published xml
-                        repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                         updated.Add(item.Result.ContentItem);
                     }
 
@@ -1789,12 +1764,12 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                     if (published)
                     {
                         //Content Xml
-                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                        repository.AddOrUpdateContentXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
                     }
 
                     uow.Commit();
@@ -1856,7 +1831,7 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
 
                     //Generate a new preview
-                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+                    repository.AddOrUpdatePreviewXml(content, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, _urlSegmentProviders, c));
 
                     uow.Commit();
                 }

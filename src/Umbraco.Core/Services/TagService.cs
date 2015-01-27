@@ -17,29 +17,6 @@ namespace Umbraco.Core.Services
     public class TagService : RepositoryService, ITagService
     {
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public TagService()
-            : this(new RepositoryFactory())
-        {}
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public TagService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public TagService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public TagService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-        }
-
         public TagService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
             : base(provider, repositoryFactory, logger)
         {

@@ -12,6 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using UmbracoExamine;
 using UmbracoExamine.Config;
 using UmbracoExamine.DataServices;
@@ -104,6 +105,7 @@ namespace Umbraco.Tests.UmbracoExamine
                                               mediaService,
                                               dataTypeService,
                                               userService,
+                                              new[] { new DefaultUrlSegmentProvider() },
 		                                      analyzer,
 		                                      false);
 

@@ -153,7 +153,8 @@ namespace Umbraco.Core
                 factory.GetInstance<IUnitOfWorkProvider>(),
                 factory.GetInstance<BasePublishingStrategy>(),
                 factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>()));
+                factory.GetInstance<ILogger>(),
+                factory.GetAllInstances<IUrlSegmentProvider>()));
             container.Register<ApplicationContext>(new PerContainerLifetime());
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
         }

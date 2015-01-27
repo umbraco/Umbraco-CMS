@@ -31,17 +31,6 @@ namespace Umbraco.Core.Services
         private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public FileService()
-            : this(new RepositoryFactory())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public FileService(RepositoryFactory repositoryFactory)
-            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        {
-        }
-
         public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
         {
             if (fileProvider == null) throw new ArgumentNullException("fileProvider");

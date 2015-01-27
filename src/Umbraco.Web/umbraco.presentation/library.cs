@@ -19,6 +19,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Templates;
@@ -481,7 +482,8 @@ namespace umbraco
             var serialized = serializer.Serialize(
                 ApplicationContext.Current.Services.MediaService, 
                 ApplicationContext.Current.Services.DataTypeService,
-                ApplicationContext.Current.Services.UserService,                
+                ApplicationContext.Current.Services.UserService,      
+                UrlSegmentProviderResolver.Current.Providers,
                 media, 
                 deep);
             return serialized;

@@ -374,45 +374,9 @@ namespace Umbraco.Tests.Mvc
 
         #region Test helpers
 
-        ServiceContext GetServiceContext(IUmbracoSettingsSection umbracoSettings, ILogger logger)
+        ServiceContext GetServiceContext()
         {
-            var svcCtx = new ServiceContext(
-                new Mock<IContentService>().Object,
-                new Mock<IMediaService>().Object,
-                new Mock<IContentTypeService>().Object,
-                new Mock<IDataTypeService>().Object,
-                new Mock<IFileService>().Object,
-                new Mock<ILocalizationService>().Object,
-                new PackagingService(
-                    new Mock<ILogger>().Object,
-                    new Mock<IContentService>().Object,
-                    new Mock<IContentTypeService>().Object,
-                    new Mock<IMediaService>().Object,
-                    new Mock<IMacroService>().Object,
-                    new Mock<IDataTypeService>().Object,
-                    new Mock<IFileService>().Object,
-                    new Mock<ILocalizationService>().Object,
-                    new Mock<IUserService>().Object,
-                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object),
-                new Mock<IEntityService>().Object,
-                new RelationService(
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
-                    logger,
-                    new Mock<IEntityService>().Object),
-                new Mock<IMemberGroupService>().Object,
-                new Mock<IMemberTypeService>().Object,
-                new Mock<IMemberService>().Object,
-                new Mock<IUserService>().Object,
-            new Mock<ISectionService>().Object,
-                new Mock<IApplicationTreeService>().Object,
-                new Mock<ITagService>().Object,
-                new Mock<INotificationService>().Object,
-                Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IAuditService>(),
-                Mock.Of<IDomainService>());
-            return svcCtx;
+            return MockHelper.GetMockedServiceContext();
         }
 
         ViewContext GetViewContext()
@@ -423,7 +387,10 @@ namespace Umbraco.Tests.Mvc
                 logger, settings,
                 "/dang", 0);
 
-            var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler)
+            });
             var routingContext = new RoutingContext(
                 umbracoContext,
                 Enumerable.Empty<IContentFinder>(),
@@ -456,7 +423,7 @@ namespace Umbraco.Tests.Mvc
             //PublishedContentCache.UnitTesting = true;
 
             // ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
-            var svcCtx = GetServiceContext(umbracoSettings, logger);
+            var svcCtx = GetServiceContext();
 
             var appCtx = new ApplicationContext(
                 new DatabaseContext(Mock.Of<IDatabaseFactory>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),

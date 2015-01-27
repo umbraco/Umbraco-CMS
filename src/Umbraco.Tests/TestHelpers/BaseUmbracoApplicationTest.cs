@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using AutoMapper;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
@@ -20,6 +22,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
 using umbraco.BusinessLogic;
@@ -71,6 +74,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<IContentSection>(factory => settings.Content, new PerContainerLifetime());
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
+            Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
 
             FreezeResolution();
 
@@ -177,7 +181,7 @@ namespace Umbraco.Tests.TestHelpers
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
                     Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), CacheHelper, Logger),
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), CacheHelper, Logger, new[] { new DefaultUrlSegmentProvider() }),
                 CacheHelper,
                 ProfilingLogger)
             {
@@ -204,9 +208,6 @@ namespace Umbraco.Tests.TestHelpers
                         Assembly.Load("businesslogic"),
                         Assembly.Load("cms"),
                         Assembly.Load("controls"),
-                        Assembly.Load("umbraco.MacroEngines"),
-                        Assembly.Load("umbraco.providers"),
-                        Assembly.Load("Umbraco.Web.UI"),
                     }
                 };
             }

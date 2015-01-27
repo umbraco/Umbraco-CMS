@@ -305,6 +305,8 @@ namespace Umbraco.Web
             //register other services
             container.Register<IPublishedContentCache, PublishedContentCache>();
             container.Register<IPublishedMediaCache, PublishedMediaCache>();
+            //no need to declare as per request, currently we manage it's lifetime as the singleton
+            container.Register<UmbracoContext>(factory => UmbracoContext.Current);
         }
 
         /// <summary>

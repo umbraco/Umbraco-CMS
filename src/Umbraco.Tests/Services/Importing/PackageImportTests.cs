@@ -268,11 +268,7 @@ namespace Umbraco.Tests.Services.Importing
             AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
         }
 
-        [Test]
-        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Legacy_Property_Editor_Ids()
-        {
-            AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package_LegacyIds);
-        }
+    
 
         private void AssertCheckBoxListTests(string strXml)
         {

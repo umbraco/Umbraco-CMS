@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -52,7 +53,8 @@ namespace Umbraco.Tests.Services
                 new FileUnitOfWorkProvider(), 
                 new PublishingStrategy(), 
                 cacheHelper, 
-                Logger);
+                Logger,
+                new[] { new DefaultUrlSegmentProvider() });
 
 			CreateTestData();
 		}

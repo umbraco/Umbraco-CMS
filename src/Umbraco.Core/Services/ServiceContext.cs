@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using log4net;
 using Umbraco.Core.Logging;
 using System.IO;
@@ -6,6 +7,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Strings;
 using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
@@ -65,6 +67,7 @@ namespace Umbraco.Core.Services
         /// <param name="auditService"></param>
         /// <param name="domainService"></param>
         /// <param name="taskService"></param>
+        /// <param name="macroService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -86,29 +89,31 @@ namespace Umbraco.Core.Services
             ILocalizedTextService localizedTextService = null,
             IAuditService auditService = null,
             IDomainService domainService = null,
-            ITaskService taskService = null)
+            ITaskService taskService = null, 
+            IMacroService macroService = null)
         {
-            if (_auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
-            if (_localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
-            if (_tagService != null) _tagService = new Lazy<ITagService>(() => tagService);
-            if (_contentService != null) _contentService = new Lazy<IContentService>(() => contentService);
-            if (_mediaService != null) _mediaService = new Lazy<IMediaService>(() => mediaService);
-            if (_contentTypeService != null) _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
-            if (_dataTypeService != null) _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
-            if (_fileService != null) _fileService = new Lazy<IFileService>(() => fileService);
-            if (_localizationService != null) _localizationService = new Lazy<ILocalizationService>(() => localizationService);
-            if (_packagingService != null) _packagingService = new Lazy<IPackagingService>(() => packagingService);
-            if (_entityService != null) _entityService = new Lazy<IEntityService>(() => entityService);
-            if (_relationService != null) _relationService = new Lazy<IRelationService>(() => relationService);
-            if (_sectionService != null) _sectionService = new Lazy<ISectionService>(() => sectionService);
-            if (_memberGroupService != null) _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
-            if (_memberTypeService != null) _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
-            if (_treeService != null) _treeService = new Lazy<IApplicationTreeService>(() => treeService);
-            if (_memberService != null) _memberService = new Lazy<IMemberService>(() => memberService);
-            if (_userService != null) _userService = new Lazy<IUserService>(() => userService);
-            if (_notificationService != null) _notificationService = new Lazy<INotificationService>(() => notificationService);
-            if (_domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
-            if (_taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
+            if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
+            if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
+            if (tagService != null) _tagService = new Lazy<ITagService>(() => tagService);
+            if (contentService != null) _contentService = new Lazy<IContentService>(() => contentService);
+            if (mediaService != null) _mediaService = new Lazy<IMediaService>(() => mediaService);
+            if (contentTypeService != null) _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
+            if (dataTypeService != null) _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
+            if (fileService != null) _fileService = new Lazy<IFileService>(() => fileService);
+            if (localizationService != null) _localizationService = new Lazy<ILocalizationService>(() => localizationService);
+            if (packagingService != null) _packagingService = new Lazy<IPackagingService>(() => packagingService);
+            if (entityService != null) _entityService = new Lazy<IEntityService>(() => entityService);
+            if (relationService != null) _relationService = new Lazy<IRelationService>(() => relationService);
+            if (sectionService != null) _sectionService = new Lazy<ISectionService>(() => sectionService);
+            if (memberGroupService != null) _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
+            if (memberTypeService != null) _memberTypeService = new Lazy<IMemberTypeService>(() => memberTypeService);
+            if (treeService != null) _treeService = new Lazy<IApplicationTreeService>(() => treeService);
+            if (memberService != null) _memberService = new Lazy<IMemberService>(() => memberService);
+            if (userService != null) _userService = new Lazy<IUserService>(() => userService);
+            if (notificationService != null) _notificationService = new Lazy<INotificationService>(() => notificationService);
+            if (domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
+            if (taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
+            if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
         }
 
         internal ServiceContext(
@@ -117,11 +122,13 @@ namespace Umbraco.Core.Services
             IUnitOfWorkProvider fileUnitOfWorkProvider, 
             BasePublishingStrategy publishingStrategy, 
             CacheHelper cache, 
-            ILogger logger)
+            ILogger logger,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
                               repositoryFactory,
-                              logger);
+                              logger,
+                              urlSegmentProviders);
         }
 
         /// <summary>
@@ -133,7 +140,8 @@ namespace Umbraco.Core.Services
             BasePublishingStrategy publishingStrategy,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
-            ILogger logger)
+            ILogger logger,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
@@ -165,10 +173,10 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, publishingStrategy, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, publishingStrategy, _dataTypeService.Value, _userService.Value, urlSegmentProviders));
 
             if (_mediaService == null)
-                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, _dataTypeService.Value, _userService.Value));
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, _dataTypeService.Value, _userService.Value, urlSegmentProviders));
 
             if (_contentTypeService == null)
                 _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory, logger, _contentService.Value, _mediaService.Value));
@@ -183,7 +191,7 @@ namespace Umbraco.Core.Services
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger));
 
             if (_packagingService == null)
-                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _userService.Value, repositoryFactory, provider));
+                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _userService.Value, repositoryFactory, provider, urlSegmentProviders));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(

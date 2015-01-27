@@ -223,6 +223,8 @@ p{font-size:2em;}"));
         [TearDown]
         public override void TearDown()
         {
+            base.TearDown();
+
             //Delete all files
             var files = _fileSystem.GetFiles("", "*.css");
             foreach (var file in files)

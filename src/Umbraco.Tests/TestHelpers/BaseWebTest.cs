@@ -83,7 +83,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected override void FreezeResolution()
         {
-            Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            
 
             base.FreezeResolution();
         }

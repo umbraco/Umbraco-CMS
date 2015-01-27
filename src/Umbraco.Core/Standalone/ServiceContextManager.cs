@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Standalone
 {
@@ -68,7 +69,8 @@ namespace Umbraco.Core.Standalone
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(),
                         cacheHelper,
-                        new DebugDiagnosticsLogger());
+                        new DebugDiagnosticsLogger(),
+                        UrlSegmentProviderResolver.Current.Providers);
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

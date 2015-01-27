@@ -35,33 +35,6 @@ namespace Umbraco.Core.Persistence
             _settings = settings;
         }
 
-        [Obsolete("Use the ctor specifying all dependencies instead")]
-        public RepositoryFactory()
-            : this(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
-        {
-        }
-
-        [Obsolete("Use the ctor specifying all dependencies instead")]
-        public RepositoryFactory(CacheHelper cacheHelper)
-            : this(cacheHelper, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
-        {
-        }
-
-        [Obsolete("Use the ctor specifying all dependencies instead, NOTE: disableAllCache has zero effect")]        
-        public RepositoryFactory(bool disableAllCache, CacheHelper cacheHelper)
-            : this(cacheHelper, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
-        {
-            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _cacheHelper = cacheHelper;
-        }
-
-        [Obsolete("Use the ctor specifying all dependencies instead")]
-        public RepositoryFactory(bool disableAllCache)
-            : this(disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings())
-        {
-        }
-
-     
         #endregion
 
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
