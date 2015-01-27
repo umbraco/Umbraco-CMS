@@ -84,7 +84,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
         public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             if (raiseEvents)
             {
@@ -1279,7 +1279,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
         public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             if (raiseEvents)
             {

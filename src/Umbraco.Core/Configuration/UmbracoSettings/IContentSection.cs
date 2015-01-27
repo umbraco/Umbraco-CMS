@@ -38,8 +38,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         string PropertyContextHelpOption { get; }
 
-        bool UseLegacyXmlSchema { get; }
-
         bool ForceSafeAliases { get; }
 
         string PreviewBadge { get; }

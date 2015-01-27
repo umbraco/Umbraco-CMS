@@ -84,7 +84,7 @@ namespace umbraco.presentation.webservices
                     try
                     {
                         // Check if there's any documents yet
-                        string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "/root/node" : "/root/*";
+                        string xpath = "/root/*";
                         if (content.Instance.XmlContent.SelectNodes(xpath).Count > 0)
                         {
                             var macroXML = new XmlDocument();

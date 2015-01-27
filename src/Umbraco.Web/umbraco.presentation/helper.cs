@@ -154,7 +154,7 @@ namespace umbraco
                                         XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
                                         if (element == null)
                                             continue;
-                                        string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "{0}";
+                                        string xpath = "{0}";
                                         XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
                                             keyName));
                                         if (currentNode != null && currentNode.FirstChild != null &&

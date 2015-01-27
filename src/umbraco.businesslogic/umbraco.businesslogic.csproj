@@ -217,9 +217,6 @@
     <Compile Include="ui.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UmbracoSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="User.cs">
       <SubType>Code</SubType>
     </Compile>

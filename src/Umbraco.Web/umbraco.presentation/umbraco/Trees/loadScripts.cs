@@ -2,6 +2,7 @@
 using System.Text;
 using Umbraco.Core;
 using umbraco.businesslogic;
+using Umbraco.Core.Configuration;
 using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
@@ -45,7 +46,7 @@ namespace umbraco
         protected override string FileSearchPattern
         {
 
-            get { return UmbracoSettings.ScriptFileTypes; }
+            get { return string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes); }
         }
 
         protected override void OnRenderFolderNode(ref XmlTreeNode xNode)

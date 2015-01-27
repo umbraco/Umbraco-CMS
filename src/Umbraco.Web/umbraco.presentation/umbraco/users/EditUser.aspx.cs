@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Security;
@@ -146,7 +147,7 @@ namespace umbraco.cms.presentation.user
             contentPicker.TreeAlias = "content";
 
             if (u.StartNodeId > 0)
-                contentPicker.Value = u.StartNodeId.ToString();
+                contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
             else
                 contentPicker.Value = "-1";
 
@@ -155,7 +156,7 @@ namespace umbraco.cms.presentation.user
 
             // Add password changer
             var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
-            passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
+            passwordChanger.MembershipProviderName = UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider;
             
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator

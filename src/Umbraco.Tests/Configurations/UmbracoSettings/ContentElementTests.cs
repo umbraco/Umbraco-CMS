@@ -102,11 +102,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.EnsureUniqueNaming == true);
         }
         
-        [Test]
-        public void UseLegacyXmlSchema()
-        {
-            Assert.IsTrue(SettingsSection.Content.UseLegacyXmlSchema == false);
-        }
+   
         [Test]
         public void ForceSafeAliases()
         {

@@ -44,7 +44,7 @@ namespace Umbraco.Core.Services
             if (content == null) throw new ArgumentNullException("content");
             if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, content, content.GetUrlSegment(urlSegmentProviders), nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
             if (media == null) throw new ArgumentNullException("media");
             if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, media, media.GetUrlSegment(urlSegmentProviders), nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Services
         public XElement Serialize(IDataTypeService dataTypeService, IMember member)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = member.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, member, "", nodeName);
             xml.Add(new XAttribute("nodeType", member.ContentType.Id));
@@ -133,16 +133,10 @@ namespace Umbraco.Core.Services
         public XElement Serialize(IDataTypeService dataTypeService, Property property)
         {
             var propertyType = property.PropertyType;
-            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
+            var nodeName = property.Alias.ToSafeAlias();
 
             var xElement = new XElement(nodeName);
 
-            //Add the property alias to the legacy schema
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-            {
-                var a = new XAttribute("alias", property.Alias.ToSafeAlias());
-                xElement.Add(a);
-            }
 
             //Get the property editor for thsi property and let it convert it to the xml structure
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);

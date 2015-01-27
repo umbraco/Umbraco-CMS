@@ -151,7 +151,7 @@ namespace Umbraco.Tests
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var umbracoXML = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
 
-            string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
+            string xpath = "./{0}";
 			if (umbracoXML.GetElementById(nodeId.ToString()) != null)
 				if (
 					",id,parentID,level,writerID,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"

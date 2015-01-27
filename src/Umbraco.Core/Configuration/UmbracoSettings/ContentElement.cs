@@ -132,17 +132,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [ConfigurationProperty("UseLegacyXmlSchema")]
-        internal InnerTextConfigurationElement<bool> UseLegacyXmlSchema
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["UseLegacyXmlSchema"],
-                    //set the default
-                          false); 
-            }
-        }
         
         [ConfigurationProperty("ForceSafeAliases")]
         internal InnerTextConfigurationElement<bool> ForceSafeAliases
@@ -334,11 +323,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IContentSection.PropertyContextHelpOption
         {
             get { return PropertyContextHelpOption; }
-        }
-
-        bool IContentSection.UseLegacyXmlSchema
-        {
-            get { return UseLegacyXmlSchema; }
         }
 
         bool IContentSection.ForceSafeAliases

@@ -37,10 +37,8 @@ namespace umbraco.developer
 		    {
                 if (!existingGenProps.Contains("," + pt.Alias + ","))
                 {
-                    if(UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-                        preValuesSource.Add(string.Format("data [@alias = '{0}']", pt.Alias));
-                    else
-                        preValuesSource.Add(pt.Alias);
+                    preValuesSource.Add(pt.Alias);
+                        
 
                     existingGenProps += pt.Alias + ",";
                 }

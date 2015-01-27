@@ -56,7 +56,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            settings.Setup(x => x.Content.UseLegacyXmlSchema).Returns(false);
             settings.Setup(x => x.Content.ForceSafeAliases).Returns(true);
             settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
             settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());

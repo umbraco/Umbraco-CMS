@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
@@ -79,7 +80,7 @@ namespace umbraco.cms.businesslogic.workflow
                 pUser, documentObject.Content, action.Letter.ToString(CultureInfo.InvariantCulture), ui.Text(action.Alias), 
                 new HttpContextWrapper(HttpContext.Current),
                 (user, strings) => ui.Text("notifications", "mailSubject", strings, mailingUser),
-                (user, strings) => UmbracoSettings.NotificationDisableHtmlEmail
+                (user, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
                     ? ui.Text("notifications", "mailBody", strings, mailingUser)
                     : ui.Text("notifications", "mailBodyHtml", strings, mailingUser));
         }

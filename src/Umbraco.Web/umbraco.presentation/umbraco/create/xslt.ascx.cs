@@ -40,14 +40,7 @@ namespace umbraco.presentation.create
 
         private static string GetXsltTemplatePath()
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-            {
-                return "/xslt/templates";
-            }
-            else
-            {
-                return "/xslt/templates/schema2";
-            }
+            return "/xslt/templates/schema2";
         }
 
         protected void sbmt_Click(object sender, System.EventArgs e)
@@ -58,8 +51,8 @@ namespace umbraco.presentation.create
                 if (createMacro.Checked)
                     createMacroVal = 1;
 
-                var xsltName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? xsltTemplate.SelectedValue :
-                    Path.Combine("schema2", xsltTemplate.SelectedValue);
+                var xsltName = Path.Combine("schema2", xsltTemplate.SelectedValue);
+                    
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),

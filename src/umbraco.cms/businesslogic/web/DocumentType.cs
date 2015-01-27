@@ -91,38 +91,30 @@ namespace umbraco.cms.businesslogic.web
         public static string GenerateXmlDocumentType()
         {
             StringBuilder dtd = new StringBuilder();
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
+            // TEMPORARY: Added Try-Catch to this call since trying to generate a DTD against a corrupt db
+            // or a broken connection string is not handled yet
+            // (Alex N 20100212)
+            try
             {
-                dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
-            }
-            else
-            {
-                // TEMPORARY: Added Try-Catch to this call since trying to generate a DTD against a corrupt db
-                // or a broken connection string is not handled yet
-                // (Alex N 20100212)
-                try
-                {
-                    StringBuilder strictSchemaBuilder = new StringBuilder();
+                StringBuilder strictSchemaBuilder = new StringBuilder();
 
-                    List<DocumentType> dts = GetAllAsList();
-                    foreach (DocumentType dt in dts)
+                List<DocumentType> dts = GetAllAsList();
+                foreach (DocumentType dt in dts)
+                {
+                    string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
+                    if (safeAlias != null)
                     {
-                        string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
-                        if (safeAlias != null)
-                        {
-                            strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
-                            strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
-                        }
+                        strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
+                        strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
                     }
-
-                    // Only commit the strong schema to the container if we didn't generate an error building it
-                    dtd.Append(strictSchemaBuilder);
-                }
-                catch (Exception exception)
-                {
-                    LogHelper.Error<DocumentType>("Exception while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
                 }
 
+                // Only commit the strong schema to the container if we didn't generate an error building it
+                dtd.Append(strictSchemaBuilder);
+            }
+            catch (Exception exception)
+            {
+                LogHelper.Error<DocumentType>("Exception while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
             }
             return dtd.ToString();
 

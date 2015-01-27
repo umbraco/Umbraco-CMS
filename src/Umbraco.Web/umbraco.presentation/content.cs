@@ -319,7 +319,7 @@ namespace umbraco
         {
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
-            string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
+            string xpath = "./* [not(@id)]";
             foreach (XmlNode n in PublishedNode.SelectNodes(xpath))
                 PublishedNode.RemoveChild(n);
 
@@ -370,11 +370,11 @@ namespace umbraco
                 throw new ArgumentException("Values of parentId and docNode/@parentID are different.");
 
             // find the document in the cache
-            XmlNode currentNode = xmlContentCopy.GetElementById(id.ToString());
+            XmlNode currentNode = xmlContentCopy.GetElementById(id.ToString(CultureInfo.InvariantCulture));
 
 			// if the document is not there already then it's a new document
 			// we must make sure that its document type exists in the schema
-			if (currentNode == null && UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema == false)
+			if (currentNode == null)
 			{
                 // ValidateSchema looks for the doctype in the schema and if not found
                 // creates a new XML document with a schema containing the doctype. If
@@ -396,9 +396,7 @@ namespace umbraco
                 return xmlContentCopy;
 
             // define xpath for getting the children nodes (not properties) of a node
-            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                ? "./node"
-                : "./* [@id]";
+            var childNodesXPath = "./* [@id]";
 
             // insert/move the node under the parent
             if (currentNode == null)
@@ -485,9 +483,7 @@ namespace umbraco
         /// <param name="parentId">The parent node identifier.</param>
         public void SortNodes(int parentId)
         {
-            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                ? "./node"
-                : "./* [@id]";
+            var childNodesXPath = "./* [@id]";
 
             lock (XmlContentInternalSyncLock)
             {
@@ -1173,37 +1169,13 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             if (hierarchy.TryGetValue(parentId, out children))
             {
-                XmlNode childContainer = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ||
-                                         String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
-                                             ? parentNode
-                                             : parentNode.SelectSingleNode(
-                                                 UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
-
-                if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema &&
-                    !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
-                {
-                    if (childContainer == null)
-                    {
-                        childContainer = xmlHelper.addTextNode(parentNode.OwnerDocument,
-                                                               UmbracoSettings.
-                                                                   TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME, "");
-                        parentNode.AppendChild(childContainer);
-                    }
-                }
+                XmlNode childContainer = parentNode;
 
                 foreach (int childId in children)
                 {
                     XmlNode childNode = nodeIndex[childId];
 
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ||
-                        String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
-                    {
-                        parentNode.AppendChild(childNode);
-                    }
-                    else
-                    {
-                        childContainer.AppendChild(childNode);
-                    }
+                    parentNode.AppendChild(childNode);
 
                     // Recursively build the content tree under the current child
                     GenerateXmlDocument(hierarchy, nodeIndex, childId, childNode);
@@ -1293,7 +1265,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             else
             {
                 // Save copy of content
-                if (UmbracoSettings.CloneXmlCacheOnPublish)
+                if (UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent)
                 {
                     XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
                     PersistXmlToFile(xmlContentCopy);

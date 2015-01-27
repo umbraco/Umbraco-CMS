@@ -147,7 +147,7 @@ namespace Umbraco.Tests
             XmlNode n = parentNode.CloneNode(true);
 
             // remove all children from original node
-            string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./node" : "./* [@id]";
+            string xpath = "./* [@id]";
             foreach (XmlNode child in parentNode.SelectNodes(xpath))
                 parentNode.RemoveChild(child);
 

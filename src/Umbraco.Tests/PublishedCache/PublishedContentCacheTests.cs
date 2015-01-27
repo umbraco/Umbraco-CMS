@@ -80,8 +80,7 @@ namespace Umbraco.Tests.PublishedCache
             StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
 		    var settings = SettingsForTests.GenerateMockSettings();
-		    var contentMock = Mock.Get(settings.Content);
-            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(false);
+
 		    SettingsForTests.ConfigureSettings(settings);
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());
@@ -99,15 +98,6 @@ namespace Umbraco.Tests.PublishedCache
 		    _cache = _umbracoContext.ContentCache;
         }
 
-	    private void SetupForLegacy()
-		{
-            var settings = SettingsForTests.GenerateMockSettings();
-		    var contentMock = Mock.Get(settings.Content);
-            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
-            SettingsForTests.ConfigureSettings(settings);
-            _xml = new XmlDocument();
-            _xml.LoadXml(GetLegacyXml());
-		}
 
 	    protected override void FreezeResolution()
 	    {
@@ -115,12 +105,6 @@ namespace Umbraco.Tests.PublishedCache
 	        base.FreezeResolution();
 	    }
 		
-	    [Test]
-		public void Has_Content_LegacySchema()
-		{
-			SetupForLegacy();
-			Has_Content();
-		}
 
 		[Test]
 		public void Has_Content()
@@ -128,12 +112,6 @@ namespace Umbraco.Tests.PublishedCache
 			Assert.IsTrue(_cache.HasContent());
 		}
 
-		[Test]
-		public void Get_Root_Docs_LegacySchema()
-		{
-			SetupForLegacy();
-			Get_Root_Docs();
-		}
 
 		[Test]
 		public void Get_Root_Docs()
@@ -144,17 +122,6 @@ namespace Umbraco.Tests.PublishedCache
 			Assert.AreEqual(1172, result.ElementAt(1).Id);
 		}
 
-		[TestCase("/", 1046)]
-		[TestCase("/home", 1046)]
-		[TestCase("/Home", 1046)] //test different cases
-		[TestCase("/home/sub1", 1173)]
-		[TestCase("/Home/sub1", 1173)]
-		[TestCase("/home/Sub1", 1173)] //test different cases
-		public void Get_Node_By_Route_LegacySchema(string route, int nodeId)
-		{
-			SetupForLegacy();
-			Get_Node_By_Route(route, nodeId);
-		}
 
 		[TestCase("/", 1046)]
 		[TestCase("/home", 1046)]
@@ -170,14 +137,7 @@ namespace Umbraco.Tests.PublishedCache
 			Assert.AreEqual(nodeId, result.Id);
 		}
 
-		[TestCase("/", 1046)]
-		[TestCase("/sub1", 1173)]
-		[TestCase("/Sub1", 1173)]
-		public void Get_Node_By_Route_Hiding_Top_Level_Nodes_LegacySchema(string route, int nodeId)
-		{
-			SetupForLegacy();
-			Get_Node_By_Route_Hiding_Top_Level_Nodes(route, nodeId);
-		}
+	
 
 		[TestCase("/", 1046)]		
 		[TestCase("/sub1", 1173)]

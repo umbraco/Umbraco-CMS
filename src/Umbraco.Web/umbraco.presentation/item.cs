@@ -142,7 +142,7 @@ namespace umbraco
                     if (element == null)
                         continue;
 
-                    var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
+                    var xpath = "./{0}";
                     var currentNode = element.SelectSingleNode(string.Format(xpath, _fieldName));
 
                     //continue if all is null

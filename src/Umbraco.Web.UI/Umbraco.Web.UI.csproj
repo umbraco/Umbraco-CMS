@@ -842,7 +842,6 @@
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\Developer\Packages\StarterKits.aspx" />
-    <Content Include="Umbraco\helpRedirect.aspx" />
     <Content Include="Umbraco\Images\aboutNew.png" />
     <Content Include="Umbraco\Images\Editor\skin.gif" />
     <Content Include="Umbraco\Images\loginBg.png" />

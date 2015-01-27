@@ -270,10 +270,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			if (xpath == null) throw new ArgumentNullException("xpath");
 
 			var values = new Dictionary<string, string> {{"nodeName", xpath.GetAttribute("nodeName", "")}};
-			if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-			{
-			    values["nodeTypeAlias"] = xpath.Name;
-			}
+			values["nodeTypeAlias"] = xpath.Name;
 			
 			var result = xpath.SelectChildren(XPathNodeType.Element);
 			//add the attributes e.g. id, parentId etc

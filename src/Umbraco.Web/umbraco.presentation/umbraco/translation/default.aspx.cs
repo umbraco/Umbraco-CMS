@@ -187,7 +187,7 @@ namespace umbraco.presentation.translation
 
                 foreach (XmlNode taskXml in tasks)
                 {
-                    string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+                    string xpath = "* [@isDoc]";
                     XmlNode taskNode = taskXml.SelectSingleNode(xpath);
 
                     // validate file
