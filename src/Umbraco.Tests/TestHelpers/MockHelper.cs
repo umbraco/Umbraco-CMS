@@ -33,7 +33,9 @@ namespace Umbraco.Tests.TestHelpers
                 new Mock<INotificationService>().Object,
                 new Mock<ILocalizedTextService>().Object,
                 new Mock<IAuditService>().Object,
-                new Mock<IDomainService>().Object);
+                new Mock<IDomainService>().Object,
+                new Mock<ITaskService>().Object,
+                new Mock<IMacroService>().Object);
         }
     }
 }

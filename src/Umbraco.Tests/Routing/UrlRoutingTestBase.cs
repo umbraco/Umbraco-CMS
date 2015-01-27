@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
         protected ServiceContext GetServiceContext(IUmbracoSettingsSection umbracoSettings, ILogger logger)
         {
             //get the mocked service context to get the mocked domain service
-            var svcCtx = MockHelper.GetMockedServiceContext(umbracoSettings, logger);
+            var svcCtx = MockHelper.GetMockedServiceContext();
             var domainService = Mock.Get(svcCtx.DomainService);
             //setup mock domain service
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))

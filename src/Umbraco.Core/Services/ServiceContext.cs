@@ -65,6 +65,7 @@ namespace Umbraco.Core.Services
         /// <param name="auditService"></param>
         /// <param name="domainService"></param>
         /// <param name="taskService"></param>
+        /// <param name="macroService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -86,7 +87,8 @@ namespace Umbraco.Core.Services
             ILocalizedTextService localizedTextService = null,
             IAuditService auditService = null,
             IDomainService domainService = null,
-            ITaskService taskService = null)
+            ITaskService taskService = null,
+            IMacroService macroService = null)
         {
             if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
             if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
@@ -109,6 +111,7 @@ namespace Umbraco.Core.Services
             if (notificationService != null) _notificationService = new Lazy<INotificationService>(() => notificationService);
             if (domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
             if (taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
+            if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
         }
 
         internal ServiceContext(
