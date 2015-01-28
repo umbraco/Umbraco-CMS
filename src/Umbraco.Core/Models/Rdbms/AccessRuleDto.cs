@@ -17,8 +17,8 @@ namespace Umbraco.Core.Models.Rdbms
         [ForeignKey(typeof(AccessDto), Name = "FK_umbracoAccessRule_umbracoAccess_id")]
         public Guid AccessId { get; set; }
 
-        [Column("rule")]
-        [Index(IndexTypes.UniqueNonClustered, ForColumns = "rule,ruleType,accessId", Name = "IX_umbracoAccessRule")]
+        [Column("ruleValue")]
+        [Index(IndexTypes.UniqueNonClustered, ForColumns = "ruleValue,ruleType,accessId", Name = "IX_umbracoAccessRule")]
         public string RuleValue { get; set; }
 
         [Column("ruleType")]

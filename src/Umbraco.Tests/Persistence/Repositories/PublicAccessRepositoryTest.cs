@@ -72,9 +72,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var found = repo.GetAll().ToArray();
 
                 Assert.AreEqual(1, found.Count());
-                Assert.AreEqual(content[0].Key, found[0].ProtectedNodeId);
-                Assert.AreEqual(content[1].Key, found[0].LoginNodeId);
-                Assert.AreEqual(content[2].Key, found[0].NoAccessNodeId);
+                Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
+                Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
+                Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
                 Assert.IsTrue(found[0].HasIdentity);
                 Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
                 Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
         [Test]
-        public void Get_All_With_Node_Id()
+        public void Get_All_With_Id()
         {
             var content = CreateTestData(3).ToArray();
 
@@ -221,6 +221,42 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var found = repo.GetAll(entry1.Key).ToArray();
                 Assert.AreEqual(1, found.Count());
+            }
+        }
+
+        [Test]
+        public void Get_All_By_Content_Id()
+        {
+            var content = CreateTestData(3).ToArray();
+
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            {
+                var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
+                {
+                    new PublicAccessRule
+                    {
+                        RuleValue = "test",
+                        RuleType = "RoleName"
+                    },
+                });
+                repo.AddOrUpdate(entry1);
+
+                var entry2 = new PublicAccessEntry(content[1], content[0], content[2], new[]
+                {
+                    new PublicAccessRule
+                    {
+                        RuleValue = "test",
+                        RuleType = "RoleName"
+                    },
+                });
+                repo.AddOrUpdate(entry2);
+
+                unitOfWork.Commit();
+
+                var found = repo.GetEntriesForProtectedContent(content[0].Id, content[1].Id);
+                Assert.AreEqual(2, found.Count());
             }
         }
 

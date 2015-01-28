@@ -15,9 +15,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
             Create.Table("umbracoAccess")
                 .WithColumn("id").AsGuid().NotNullable().PrimaryKey("PK_umbracoAccess")
-                .WithColumn("nodeId").AsGuid().NotNullable().ForeignKey("FK_umbracoAccess_umbracoNode_id", "umbracoNode", "uniqueID")
-                .WithColumn("loginNodeId").AsGuid().NotNullable().ForeignKey("FK_umbracoAccess_umbracoNode_id1", "umbracoNode", "uniqueID")
-                .WithColumn("noAccessNodeId").AsGuid().NotNullable().ForeignKey("FK_umbracoAccess_umbracoNode_id2", "umbracoNode", "uniqueID")
+                .WithColumn("nodeId").AsInt32().NotNullable().ForeignKey("FK_umbracoAccess_umbracoNode_id", "umbracoNode", "id")
+                .WithColumn("loginNodeId").AsInt32().NotNullable().ForeignKey("FK_umbracoAccess_umbracoNode_id1", "umbracoNode", "id")
+                .WithColumn("noAccessNodeId").AsInt32().NotNullable().ForeignKey("FK_umbracoAccess_umbracoNode_id2", "umbracoNode", "id")
                 .WithColumn("createDate").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime)
                 .WithColumn("updateDate").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime);
 
@@ -27,16 +27,16 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             Create.Table("umbracoAccessRule")
                 .WithColumn("id").AsGuid().NotNullable().PrimaryKey("PK_umbracoAccessRule")
                 .WithColumn("accessId").AsGuid().NotNullable().ForeignKey("FK_umbracoAccessRule_umbracoAccess_id", "umbracoAccess", "id")
-                .WithColumn("claim").AsString().NotNullable()
-                .WithColumn("claimType").AsString().NotNullable()
+                .WithColumn("ruleValue").AsString().NotNullable()
+                .WithColumn("ruleType").AsString().NotNullable()
                 .WithColumn("createDate").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime)
                 .WithColumn("updateDate").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime);
 
-            //unique constraint on node + claim + claim type
+            //unique constraint on node + ruleValue + ruleType
             Create.Index("IX_umbracoAccessRule").OnTable("umbracoAccessRule")
                 .OnColumn("accessId").Ascending()
-                .OnColumn("claim").Ascending()
-                .OnColumn("claimType").Ascending()
+                .OnColumn("ruleValue").Ascending()
+                .OnColumn("ruleType").Ascending()
                 .WithOptions()
                 .Unique();
         }

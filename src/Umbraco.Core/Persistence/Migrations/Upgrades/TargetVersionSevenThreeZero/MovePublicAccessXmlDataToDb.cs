@@ -16,9 +16,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
         public override void Up()
         {
-            //don't run if data is already there.
-            var dataExists = Context.Database.Fetch<AccessDto>(new Sql().Select("*").From<AccessDto>(SqlSyntax));
-            if (dataExists.Any()) return;
+            //Don't lookup data if the table doesn't exist
+            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
+            if (tables.InvariantContains("umbracoAccess"))
+            {
+                //don't run if data is already there.
+                var dataExists = Context.Database.Fetch<AccessDto>(new Sql().Select("*").From<AccessDto>(SqlSyntax));
+                if (dataExists.Any()) return;
+            }
 
             var xmlFile = IOHelper.MapPath(SystemFiles.AccessXml);
             using (var fileStream = File.OpenRead(xmlFile))
@@ -47,9 +52,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                 Insert.IntoTable("umbracoAccess").Row(new
                                 {
                                     id = accessId,
-                                    nodeId = umbracoNode.UniqueId,
-                                    loginNodeId = loginNode.UniqueId,
-                                    noAccessNodeId = noRightsPage.UniqueId,
+                                    nodeId = umbracoNode.NodeId,
+                                    loginNodeId = loginNode.NodeId,
+                                    noAccessNodeId = noRightsPage.NodeId,
                                     createDate = DateTime.Now,
                                     updateDate = DateTime.Now
                                 });
@@ -62,8 +67,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                     {
                                         id = Guid.NewGuid(),
                                         accessId = accessId,
-                                        claim = memberId,
-                                        claimType = Constants.Conventions.PublicAccess.MemberIdRuleType,
+                                        ruleValue = memberId,
+                                        ruleType = Constants.Conventions.PublicAccess.MemberUsernameRuleType,
                                         createDate = DateTime.Now,
                                         updateDate = DateTime.Now
                                     });
@@ -81,8 +86,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                         {
                                             id = Guid.NewGuid(),
                                             accessId = accessId,
-                                            claim = memberGroup,
-                                            claimType = Constants.Conventions.PublicAccess.MemberRoleRuleType,
+                                            ruleValue = memberGroup,
+                                            ruleType = Constants.Conventions.PublicAccess.MemberRoleRuleType,
                                             createDate = DateTime.Now,
                                             updateDate = DateTime.Now
                                         });
