@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Web.Security;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
@@ -16,10 +18,8 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ctor_Throws_On_Null_PCR()
         {
-            Assert.Throws<ArgumentException>(() => new PublishedContentRequestEngine(
-                ServiceContext.DomainService,
-                ServiceContext.LocalizationService,
-                ProfilingLogger,
+            Assert.Throws<ArgumentException>(() => new PublishedContentRequestEngine(                
+                Mock.Of<IWebRoutingSection>(),
                 null));
         }
 
@@ -29,11 +29,12 @@ namespace Umbraco.Tests.PublishedContent
             var routeCtx = GetRoutingContext("/test");
 
             var pcre = new PublishedContentRequestEngine(
-                ServiceContext.DomainService,
-                ServiceContext.LocalizationService,
-                ProfilingLogger,
+                Mock.Of<IWebRoutingSection>(),
                 new PublishedContentRequest(
-                    routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx));
+                    routeCtx.UmbracoContext.CleanedUmbracoUrl, 
+                    routeCtx,
+                    Mock.Of<IWebRoutingSection>(),
+                    s => new string[] { }));
 
             var result = pcre.ConfigureRequest();
             Assert.IsFalse(result);
@@ -44,15 +45,13 @@ namespace Umbraco.Tests.PublishedContent
         {
             var routeCtx = GetRoutingContext("/test");
 
-            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx);
+            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx, Mock.Of<IWebRoutingSection>(), s => new string[] { });
             var pc = GetPublishedContentMock();            
             pcr.PublishedContent = pc.Object;
             pcr.Culture = new CultureInfo("en-AU");
             pcr.SetRedirect("/hello");
             var pcre = new PublishedContentRequestEngine(
-                ServiceContext.DomainService,
-                ServiceContext.LocalizationService,
-                ProfilingLogger,
+                Mock.Of<IWebRoutingSection>(),
                 pcr);
 
             var result = pcre.ConfigureRequest();
@@ -64,14 +63,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             var routeCtx = GetRoutingContext("/test");
 
-            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx);
+            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx, Mock.Of<IWebRoutingSection>(), s => new string[] { });
             var pc = GetPublishedContentMock();
             pcr.PublishedContent = pc.Object;
             pcr.Culture = new CultureInfo("en-AU");
             var pcre = new PublishedContentRequestEngine(
-                ServiceContext.DomainService,
-                ServiceContext.LocalizationService,
-                ProfilingLogger,
+                Mock.Of<IWebRoutingSection>(),
                 pcr);
 
             pcre.ConfigureRequest();
@@ -85,14 +82,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             var routeCtx = GetRoutingContext("/test");
 
-            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx);
+            var pcr = new PublishedContentRequest(routeCtx.UmbracoContext.CleanedUmbracoUrl, routeCtx, Mock.Of<IWebRoutingSection>(), s => new string[] { });
             var pc = GetPublishedContentMock();
             pcr.Culture = new CultureInfo("en-AU");
             pcr.PublishedContent = pc.Object;
             var pcre = new PublishedContentRequestEngine(
-                ServiceContext.DomainService,
-                ServiceContext.LocalizationService,
-                ProfilingLogger,
+                Mock.Of<IWebRoutingSection>(),
                 pcr);
 
             pcre.ConfigureRequest();

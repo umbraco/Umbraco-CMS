@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
@@ -32,14 +33,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        bool IsProtected(IContent content);
+        Attempt<PublicAccessEntry> IsProtected(IContent content);
 
         /// <summary>
         /// Returns true if the content has an entry based on a content path
         /// </summary>
         /// <param name="contentPath"></param>
         /// <returns></returns>
-        bool IsProtected(string contentPath);
+        Attempt<PublicAccessEntry> IsProtected(string contentPath);
 
         /// <summary>
         /// Adds/updates a rule, if an entry doesn't exist one will be created with the new rule

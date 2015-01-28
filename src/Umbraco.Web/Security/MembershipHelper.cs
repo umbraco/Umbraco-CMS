@@ -525,6 +525,14 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
+        /// Returns the currently logged in username
+        /// </summary>
+        public string CurrentUserName
+        {
+            get { return _httpContext.User.Identity.Name; }
+        }
+
+        /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
         /// </summary>
         /// <param name="allowAll"></param>

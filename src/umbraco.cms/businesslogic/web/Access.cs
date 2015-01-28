@@ -8,6 +8,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -390,34 +391,22 @@ namespace umbraco.cms.businesslogic.web
 
         public static bool HasAccess(int documentId, object memberId)
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetById(documentId);
-            if (content == null) return true;
-
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null) return true;
-
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            var member = provider.GetUser(memberId, false);
-            if (member == null) return false;
-
-            var roles = Roles.GetRolesForUser(member.UserName);
-            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
-                                        && roles.Contains(x.RuleValue));
-
+            return ApplicationContext.Current.Services.PublicAccessService.HasAccess(
+                documentId, 
+                memberId, 
+                ApplicationContext.Current.Services.ContentService,
+                MembershipProviderExtensions.GetMembersMembershipProvider(),
+                //TODO: This should really be targeting a specific provider by name!!
+                Roles.Provider);
         }
 
         public static bool HasAccess(int documentId, string path, MembershipUser member)
         {
-            //var hasAccess = false;
-
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
-            if (entry == null) return true;      
-
-            var roles = Roles.GetRolesForUser(member.UserName);
-            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
-                                        && roles.Contains(x.RuleValue));
-
-      
+            return ApplicationContext.Current.Services.PublicAccessService.HasAccess(
+                 path,
+                 member,
+                //TODO: This should really be targeting a specific provider by name!!
+                 Roles.Provider);
         }
 
         public static ProtectionType GetProtectionType(int DocumentId)

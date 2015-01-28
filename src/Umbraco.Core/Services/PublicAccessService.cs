@@ -87,9 +87,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public bool IsProtected(IContent content)
+        public Attempt<PublicAccessEntry> IsProtected(IContent content)
         {
-            return GetEntryForContent(content) != null;
+            var result = GetEntryForContent(content);
+            return Attempt.If(result != null, result);
         }
 
         /// <summary>
@@ -97,9 +98,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentPath"></param>
         /// <returns></returns>
-        public bool IsProtected(string contentPath)
+        public Attempt<PublicAccessEntry> IsProtected(string contentPath)
         {
-            return GetEntryForContent(contentPath) != null;
+            var result = GetEntryForContent(contentPath);
+            return Attempt.If(result != null, result);
         }
 
         /// <summary>
