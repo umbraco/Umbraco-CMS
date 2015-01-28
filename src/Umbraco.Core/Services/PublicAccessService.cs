@@ -44,6 +44,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentPath"></param>
         /// <returns>Returns null if no entry is found</returns>
+        /// <remarks>
+        /// NOTE: This method get's called *very* often! This will return the results from cache
+        /// </remarks>
         public PublicAccessEntry GetEntryForContent(string contentPath)
         {
             //Get all ids in the path for the content item and ensure they all
@@ -65,9 +68,10 @@ namespace Umbraco.Core.Services
             ids.Reverse();
 
             using (var repo = RepositoryFactory.CreatePublicAccessRepository(UowProvider.GetUnitOfWork()))
-            {
-                var entries = repo.GetEntriesForProtectedContent(ids.ToArray()).ToArray();
-                //return the entry with the deepest id in the path
+            {    
+                //This will retrieve from cache!                 
+                var entries = repo.GetAll().ToArray();
+
                 foreach (var id in ids)
                 {
                     var found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
@@ -110,7 +114,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
             {
-                var entry = repo.GetEntriesForProtectedContent(content.Id).FirstOrDefault();
+                var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return null;
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType);
@@ -143,7 +147,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreatePublicAccessRepository(uow))
             {
-                var entry = repo.GetEntriesForProtectedContent(content.Id).FirstOrDefault();
+                var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return;
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);

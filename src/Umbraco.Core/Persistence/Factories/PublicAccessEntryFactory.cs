@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public PublicAccessEntry BuildEntity(AccessDto dto)
         {
-            var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.AccessDeniedNodeId, 
+            var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId, 
                 dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
                 {
                     RuleValue = x.RuleValue,
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new AccessDto
             {
                 Id = entity.Key,
-                AccessDeniedNodeId = entity.NoAccessNodeId,
+                NoAccessNodeId = entity.NoAccessNodeId,
                 LoginNodeId = entity.LoginNodeId,
                 NodeId = entity.ProtectedNodeId,
                 CreateDate = entity.CreateDate,

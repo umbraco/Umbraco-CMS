@@ -7,6 +7,5 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IPublicAccessRepository : IRepositoryQueryable<Guid, PublicAccessEntry>
     {
-        IEnumerable<PublicAccessEntry> GetEntriesForProtectedContent(params int[] protectedContentIds);
     }
 }

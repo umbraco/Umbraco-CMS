@@ -224,41 +224,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
-        public void Get_All_By_Content_Id()
-        {
-            var content = CreateTestData(3).ToArray();
-
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
-            {
-                var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
-                {
-                    new PublicAccessRule
-                    {
-                        RuleValue = "test",
-                        RuleType = "RoleName"
-                    },
-                });
-                repo.AddOrUpdate(entry1);
-
-                var entry2 = new PublicAccessEntry(content[1], content[0], content[2], new[]
-                {
-                    new PublicAccessRule
-                    {
-                        RuleValue = "test",
-                        RuleType = "RoleName"
-                    },
-                });
-                repo.AddOrUpdate(entry2);
-
-                unitOfWork.Commit();
-
-                var found = repo.GetEntriesForProtectedContent(content[0].Id, content[1].Id);
-                Assert.AreEqual(2, found.Count());
-            }
-        }
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {

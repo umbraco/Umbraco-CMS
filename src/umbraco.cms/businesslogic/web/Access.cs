@@ -302,14 +302,8 @@ namespace umbraco.cms.businesslogic.web
 
         public static string[] GetAccessingMembershipRoles(int documentId, string path)
         {
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path);
-            if (entry == null)
-            {
-                var content = ApplicationContext.Current.Services.ContentService.GetById(documentId);
-                if (content == null) return new string[] { };
-                entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
-                if (entry == null) return new string[] { };
-            }
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
+            if (entry == null) return new string[] { };
 
             var memberGroupRoleRules = entry.Rules.Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType);
             return memberGroupRoleRules.Select(x => x.RuleValue).ToArray();
@@ -416,14 +410,8 @@ namespace umbraco.cms.businesslogic.web
         {
             //var hasAccess = false;
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path);
-            if (entry == null)
-            {
-                var content = ApplicationContext.Current.Services.ContentService.GetById(documentId);
-                if (content == null) return true;
-                entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
-                if (entry == null) return true;                
-            }
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
+            if (entry == null) return true;      
 
             var roles = Roles.GetRolesForUser(member.UserName);
             return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
@@ -449,15 +437,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static bool IsProtected(int DocumentId, string Path)
         {
-            var isProtected = ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path);
-            if (isProtected == false)
-            {
-                var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
-                if (content == null) return false;
-                isProtected = ApplicationContext.Current.Services.PublicAccessService.IsProtected(content);
-            }
-            return isProtected;
-
+            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));             
         }
 
         public static int GetErrorPage(string Path)

@@ -22,6 +22,7 @@ namespace Umbraco.Web.Cache
             dc.RefreshAll(new Guid(DistributedCache.PublicAccessCacheRefresherId));
         }
 
+
         #endregion
 
         #region Application tree cache

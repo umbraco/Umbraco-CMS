@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -89,6 +90,29 @@ namespace Umbraco.Core.Persistence.Repositories
             get { throw new NotImplementedException(); }
         }
 
+        /// <summary>
+        /// The threshold entity count for which the GetAll method will cache entities
+        /// </summary>
+        /// <remarks>
+        /// Set to 1000 just to ensure that all of them are cached, The GetAll on this repository gets called *A lot*, we want max performance
+        /// </remarks>
+        protected override int GetAllThresholdCacheLimit
+        {
+            get { return 1000; }
+        }
+
+        /// <summary>
+        /// Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to 
+        /// return the raw cache without validation. 
+        /// </summary>
+        /// <remarks>
+        /// The GetAll on this repository gets called *A lot*, we want max performance
+        /// </remarks>
+        protected override bool GetAllValidateCount
+        {
+            get { return false; }
+        }
+
         protected override void PersistNewItem(PublicAccessEntry entity)
         {
             entity.AddingEntity();
@@ -150,14 +174,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity.Key;
         }
 
-        public IEnumerable<PublicAccessEntry> GetEntriesForProtectedContent(params int[] protectedContentIds)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where("umbracoAccess.nodeId in (@nodeIds)", new {nodeIds = protectedContentIds});
-
-            var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
-            return dtos.Select(factory.BuildEntity);
-        }
+    
     }
 }

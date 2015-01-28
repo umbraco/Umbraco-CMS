@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var entities = ids.Select(x => RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
                 
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
-                    return entities.Select(x => (TEntity)x);
+                    return entities;
             }
             else
             {
@@ -168,12 +168,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 if (allEntities.Any())
                 {
-                    //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                    var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
-                    int totalCount = PerformCount(query);
 
-                    if (allEntities.Count() == totalCount)
-                        return allEntities.Select(x => (TEntity)x);
+                    if (GetAllValidateCount)
+                    {
+                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
+                        var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
+                        int totalCount = PerformCount(query);
+
+                        if (allEntities.Count() == totalCount)
+                            return allEntities;
+                    }
+                    else
+                    {
+                        return allEntities;
+                    }
                 }
             }
 
@@ -186,7 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // coming back here we don't want to chuck it all into memory, this added cache here
             // is more for convenience when paging stuff temporarily
 
-            if (entityCollection.Length > 100) return entityCollection;
+            if (entityCollection.Length > GetAllThresholdCacheLimit) return entityCollection;
 
             foreach (var entity in entityCollection)
             {
@@ -198,6 +206,28 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return entityCollection;
+        }
+
+        /// <summary>
+        /// True/false as to validate the total item count when all items are returned from cache, the default is true but this
+        /// means that a db lookup will occur - though that lookup will probably be significantly less expensive than the normal 
+        /// GetAll method. 
+        /// </summary>
+        /// <remarks>
+        /// Overriding this to return false will improve performance of GetAll cache with no params but should only be used
+        /// for specific circumstances
+        /// </remarks>
+        protected virtual bool GetAllValidateCount
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// The threshold entity count for which the GetAll method will cache entities
+        /// </summary>
+        protected virtual int GetAllThresholdCacheLimit
+        {
+            get { return 100; }
         }
 
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);

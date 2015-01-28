@@ -16,7 +16,6 @@ namespace Umbraco.Core.Models
         {
             AccessEntryId = accessEntryId;
             Key = id;
-            Id = Key.GetHashCode();
         }
 
         public PublicAccessRule()
@@ -32,7 +31,7 @@ namespace Umbraco.Core.Models
             set
             {
                 base.Key = value;
-                HasIdentity = true;
+                Id = value.GetHashCode();
             }
         }
 

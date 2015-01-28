@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("noAccessNodeId")]
         [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_id2")]
-        public int AccessDeniedNodeId { get; set; }
+        public int NoAccessNodeId { get; set; }
 
         [Column("createDate")]
         [Constraint(Default = "getdate()")]

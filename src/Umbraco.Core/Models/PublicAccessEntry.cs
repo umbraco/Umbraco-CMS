@@ -127,7 +127,7 @@ namespace Umbraco.Core.Models
             set
             {
                 base.Key = value;
-                HasIdentity = true;
+                Id = value.GetHashCode();
             }
         }
 
