@@ -20,12 +20,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         bool Published { get; }
 
-        /// <summary>
-        /// Language of the data contained within this Content object.
-        /// </summary>
-        /// <remarks>
-        /// Left internal until multilingual support is implemented.
-        /// </remarks>
+        [Obsolete("This will be removed in future versions")]
         string Language { get; set; }
 
         /// <summary>

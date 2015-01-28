@@ -180,30 +180,8 @@ namespace umbraco.cms.businesslogic.web
 
         public static bool RenameMemberShipRole(string oldRolename, string newRolename)
         {
-            var hasChange = false;
-            if (oldRolename == newRolename) return false;
-
-            var allEntries = ApplicationContext.Current.Services.PublicAccessService.GetAll();
-
-            foreach (var entry in allEntries)
-            {
-                //get rules that match
-                var roleRules = entry.Rules
-                    .Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                    .Where(x => x.RuleValue == oldRolename);
-                var save = false;
-                foreach (var roleRule in roleRules)
-                {
-                    //a rule is being updated so flag this entry to be saved
-                    roleRule.RuleValue = newRolename;
-                    save = true;
-                }
-                if (save)
-                {
-                    hasChange = true;
-                    ApplicationContext.Current.Services.PublicAccessService.Save(entry);    
-                }
-            }
+            var hasChange = ApplicationContext.Current.Services.PublicAccessService.RenameMemberGroupRoleRules(oldRolename, newRolename);
+            
             if (hasChange)
                 Save();
 

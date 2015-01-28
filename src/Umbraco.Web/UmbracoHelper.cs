@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -23,6 +25,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
 using Umbraco.Core.Cache;
+using AttributeCollection = System.Web.UI.AttributeCollection;
 
 namespace Umbraco.Web
 {
@@ -484,32 +487,44 @@ namespace Umbraco.Web
 
 		#region Membership
 
-		/// <summary>
-		/// Check if a document object is protected by the "Protect Pages" functionality in umbraco
-		/// </summary>
-		/// <param name="documentId">The identifier of the document object to check</param>
-		/// <param name="path">The full path of the document object to check</param>
-		/// <returns>True if the document object is protected</returns>
-		public bool IsProtected(int documentId, string path)
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Use the IsProtected method that only specifies path")]
+        public bool IsProtected(int documentId, string path)
 		{
-			return Access.IsProtected(documentId, path);
+            return IsProtected(path.EnsureEndsWith("," + documentId));
 		}
 
-		/// <summary>
-		/// Check if the current user has access to a document
-		/// </summary>
-		/// <param name="nodeId">The identifier of the document object to check</param>
-		/// <param name="path">The full path of the document object to check</param>
-		/// <returns>True if the current user has access or if the current document isn't protected</returns>
-		public bool MemberHasAccess(int nodeId, string path)
-		{
-			if (IsProtected(nodeId, path))
-			{
+        /// <summary>
+        /// Check if a document object is protected by the "Protect Pages" functionality in umbraco
+        /// </summary>
+        /// <param name="path">The full path of the document object to check</param>
+        /// <returns>True if the document object is protected</returns>
+        public bool IsProtected(string path)
+        {
+            return UmbracoContext.Application.Services.PublicAccessService.IsProtected(path);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the MemberHasAccess method that only specifies path")]
+        public bool MemberHasAccess(int nodeId, string path)
+        {
+            return MemberHasAccess(path.EnsureEndsWith("," + nodeId));
+        }
+
+        /// <summary>
+        /// Check if the current user has access to a document
+        /// </summary>
+        /// <param name="path">The full path of the document object to check</param>
+        /// <returns>True if the current user has access or if the current document isn't protected</returns>        
+        public bool MemberHasAccess(string path)
+        {
+            if (IsProtected(path))
+            {
                 return _membershipHelper.IsLoggedIn()
-                    && Access.HasAccess(nodeId, path, GetCurrentMember());
-			}
-			return true;
-		}
+                       && UmbracoContext.Application.Services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
+            }
+            return true;
+        }
 
         /// <summary>
         /// Gets (or adds) the current member from the current request cache
