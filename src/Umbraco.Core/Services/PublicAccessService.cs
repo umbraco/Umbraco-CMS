@@ -117,7 +117,7 @@ namespace Umbraco.Core.Services
                 var entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return null;
 
-                var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType);
+                var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
                 {
                     entry.AddRule(ruleValue, ruleType);

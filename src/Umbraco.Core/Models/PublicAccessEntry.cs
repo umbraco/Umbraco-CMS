@@ -32,6 +32,7 @@ namespace Umbraco.Core.Models
         public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
         {
             Key = id;
+            Id = Key.GetHashCode();
 
             LoginNodeId = loginNodeId;
             NoAccessNodeId = noAccessNodeId;
@@ -117,18 +118,6 @@ namespace Umbraco.Core.Models
                 Key = Guid.NewGuid();
             }
             base.AddingEntity();
-        }
-
-
-        [DataMember]
-        public sealed override Guid Key
-        {
-            get { return base.Key; }
-            set
-            {
-                base.Key = value;
-                Id = value.GetHashCode();
-            }
         }
 
         [DataMember]

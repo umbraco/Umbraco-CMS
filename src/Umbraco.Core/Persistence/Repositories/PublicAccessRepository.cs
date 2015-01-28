@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select("*")
                 .From<AccessDto>(SqlSyntax)
-                .InnerJoin<AccessRuleDto>(SqlSyntax)
+                .LeftJoin<AccessRuleDto>(SqlSyntax)
                 .On<AccessDto, AccessRuleDto>(SqlSyntax, left => left.Id, right => right.AccessId);
                 
             return sql;
@@ -122,6 +122,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = factory.BuildDto(entity);
 
             Database.Insert(dto);
+            //update the id so HasEntity is correct
+            entity.Id = entity.Key.GetHashCode();
 
             foreach (var rule in dto.Rules)
             {
@@ -147,18 +149,25 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (rule.HasIdentity)
                 {
-                    Database.Update(dto.Rules.Single(x => x.Id == rule.Key));
+                    var count = Database.Update(dto.Rules.Single(x => x.Id == rule.Key));
+                    if (count == 0)
+                    {
+                        throw new InvalidOperationException("No rows were updated for the access rule");
+                    }
                 }
                 else
                 {
                     Database.Insert(new AccessRuleDto
                     {
+                        Id = rule.Key,
                         AccessId = dto.Id,
                         RuleValue = rule.RuleValue,
                         RuleType = rule.RuleType,
                         CreateDate = rule.CreateDate,
                         UpdateDate = rule.UpdateDate
                     });
+                    //update the id so HasEntity is correct
+                    rule.Id = rule.Key.GetHashCode();
                 }
             }
             foreach (var removedRule in entity.RemovedRules)

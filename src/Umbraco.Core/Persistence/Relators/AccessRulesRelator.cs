@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Relators
@@ -19,7 +20,11 @@ namespace Umbraco.Core.Persistence.Relators
             if (Current != null && Current.Id == a.Id)
             {
                 // Yes, just add this AccessRuleDto to the current AccessDto's collection
-                Current.Rules.Add(p);
+                if (p.Id != default(Guid))
+                {
+                    Current.Rules.Add(p);    
+                }
+                
 
                 // Return null to indicate we're not done with this AccessDto yet
                 return null;
@@ -34,7 +39,10 @@ namespace Umbraco.Core.Persistence.Relators
             // Setup the new current AccessDto
             Current = a;
             Current.Rules = new List<AccessRuleDto>();
-            Current.Rules.Add(p);
+            if (p.Id != default(Guid))
+            {
+                Current.Rules.Add(p);    
+            }
 
             // Return the now populated previous AccessDto (or null if first time through)
             return prev;

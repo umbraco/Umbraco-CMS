@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models
         {
             AccessEntryId = accessEntryId;
             Key = id;
+            Id = Key.GetHashCode();
         }
 
         public PublicAccessRule()
@@ -24,17 +25,7 @@ namespace Umbraco.Core.Models
 
         private static readonly PropertyInfo RuleValueSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleValue);
         private static readonly PropertyInfo RuleTypeSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleType);
-
-        public sealed override Guid Key
-        {
-            get { return base.Key; }
-            set
-            {
-                base.Key = value;
-                Id = value.GetHashCode();
-            }
-        }
-
+       
         public Guid AccessEntryId { get; internal set; }
 
         /// <summary>
@@ -43,7 +34,7 @@ namespace Umbraco.Core.Models
         internal override void AddingEntity()
         {
             if (Key == default(Guid))
-            {
+            {                
                 Key = Guid.NewGuid();       
             }
             base.AddingEntity();

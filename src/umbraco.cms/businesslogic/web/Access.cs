@@ -444,7 +444,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(Path);
             if (entry == null) return -1;
-            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.ContentItem, false);
+            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document, false);
             return entity.Id;
 
         }
@@ -453,7 +453,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(Path);
             if (entry == null) return -1;
-            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.ContentItem, false);
+            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document, false);
             return entity.Id;
 
         } 
