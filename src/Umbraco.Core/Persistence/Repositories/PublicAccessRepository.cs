@@ -129,9 +129,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     Database.Insert(new AccessRuleDto
                     {
-                        AccessId = dto.NodeId,
-                        Claim = rule.Claim,
-                        ClaimType = rule.ClaimType,
+                        AccessId = dto.Id,
+                        RuleValue = rule.RuleValue,
+                        RuleType = rule.RuleType,
                         CreateDate = rule.CreateDate,
                         UpdateDate = rule.UpdateDate
                     });
@@ -148,6 +148,16 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Guid GetEntityId(PublicAccessEntry entity)
         {
             return entity.Key;
+        }
+
+        public IEnumerable<PublicAccessEntry> GetEntriesForProtectedContent(params int[] protectedContentIds)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("umbracoAccess.nodeId in (@nodeIds)", new {nodeIds = protectedContentIds});
+
+            var factory = new PublicAccessEntryFactory();
+            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            return dtos.Select(factory.BuildEntity);
         }
     }
 }

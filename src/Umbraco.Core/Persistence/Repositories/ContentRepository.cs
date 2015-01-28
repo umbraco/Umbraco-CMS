@@ -141,7 +141,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
+                               "DELETE FROM umbracoNode WHERE id = @Id",
+                               "DELETE FROM umbracoAccess WHERE nodeId = @Id"
                            };
             return list;
         }
@@ -307,17 +308,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(IContent entity)
         {
-            //We need to clear out all access rules but we need to do this in a manual way
+            //We need to clear out all access rules but we need to do this in a manual way since 
+            // nothing in that table is joined to a content id
             var subQuery = new Sql()
                 .Select("umbracoAccessRule.accessId")
                 .From<AccessRuleDto>(SqlSyntax)
                 .InnerJoin<AccessDto>(SqlSyntax)
                 .On<AccessRuleDto, AccessDto>(SqlSyntax, left => left.AccessId, right => right.Id)
-                .Where<AccessDto>(dto => dto.NodeId == entity.Key);
+                .Where<AccessDto>(dto => dto.NodeId == entity.Id);
             Database.Execute(SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
-            //Now delete everything from umbracoAccess, we are doing this manually because we have joined on GUIDs instead
-            // of integers since we'll be moving to GUID for v8 for everything
-            Database.Execute("DELETE FROM umbracoAccess WHERE nodeId = @Key", new {Key = entity.Key});
 
             //now let the normal delete clauses take care of everything else
             base.PersistDeletedItem(entity);

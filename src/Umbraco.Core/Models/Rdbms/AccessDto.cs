@@ -17,17 +17,17 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid Id { get; set; }
 
         [Column("nodeId")]
-        [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_uniqueID", Column = "uniqueID")]
+        [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_id")]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoAccess_nodeId")]
-        public Guid NodeId { get; set; }
+        public int NodeId { get; set; }
 
         [Column("loginNodeId")]
-        [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_uniqueID1", Column = "uniqueID")]
-        public Guid LoginNodeId { get; set; }
+        [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_id1")]
+        public int LoginNodeId { get; set; }
 
         [Column("noAccessNodeId")]
-        [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_uniqueID2", Column = "uniqueID")]
-        public Guid AccessDeniedNodeId { get; set; }
+        [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_id2")]
+        public int AccessDeniedNodeId { get; set; }
 
         [Column("createDate")]
         [Constraint(Default = "getdate()")]

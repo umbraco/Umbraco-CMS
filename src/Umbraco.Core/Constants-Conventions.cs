@@ -13,8 +13,13 @@ namespace Umbraco.Core
 		{
 		    public static class PublicAccess
 		    {
-		        public const string MemberIdClaimType = "MemberId";
-                public const string MemberGroupClaimType = "MemberGroup";
+                public const string MemberUsernameRuleType = "MemberUsername";               
+                public const string MemberRoleRuleType = "MemberRole";
+
+                [Obsolete("No longer supported, this is here for backwards compatibility only")]
+                public const string MemberIdRuleType = "MemberId";
+                [Obsolete("No longer supported, this is here for backwards compatibility only")]
+                public const string MemberGroupIdRuleType = "MemberGroupId";
 		    }
 
 		    public static class Localization

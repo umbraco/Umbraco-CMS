@@ -9,8 +9,8 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PublicAccessRule : Entity
     {
-        private string _claim;
-        private string _claimType;
+        private string _ruleValue;
+        private string _ruleType;
 
         public PublicAccessRule(Guid id, Guid accessEntryId)
         {
@@ -23,8 +23,8 @@ namespace Umbraco.Core.Models
         {
         }
 
-        private static readonly PropertyInfo ClaimSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.Claim);
-        private static readonly PropertyInfo ClaimTypeSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.ClaimType);
+        private static readonly PropertyInfo RuleValueSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleValue);
+        private static readonly PropertyInfo RuleTypeSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleType);
 
         public sealed override Guid Key
         {
@@ -50,29 +50,29 @@ namespace Umbraco.Core.Models
             base.AddingEntity();
         }
 
-        public string Claim
+        public string RuleValue
         {
-            get { return _claim; }
+            get { return _ruleValue; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _claim = value;
-                    return _claim;
-                }, _claim, ClaimSelector);
+                    _ruleValue = value;
+                    return _ruleValue;
+                }, _ruleValue, RuleValueSelector);
             }
         }
 
-        public string ClaimType
+        public string RuleType
         {
-            get { return _claimType; }
+            get { return _ruleType; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _claimType = value;
-                    return _claimType;
-                }, _claimType, ClaimTypeSelector);
+                    _ruleType = value;
+                    return _ruleType;
+                }, _ruleType, RuleTypeSelector);
             }
         }
 

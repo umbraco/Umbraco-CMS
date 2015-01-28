@@ -99,7 +99,7 @@ namespace umbraco.presentation.preview
                 //Inject preview xml
                 parentId = document.Level == 1 ? -1 : document.Parent.Id;
                 var previewXml = document.ToPreviewXml(XmlContent);
-                if (document.Content.Published == false 
+                if (document.ContentEntity.Published == false 
                     && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
                     previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
                 content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);

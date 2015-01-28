@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry);
@@ -62,8 +62,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry);
@@ -79,8 +79,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
                 Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
                 Assert.AreEqual(1, found[0].Rules.Count());
-                Assert.AreEqual("test", found[0].Rules.First().Claim);
-                Assert.AreEqual("RoleName", found[0].Rules.First().ClaimType);
+                Assert.AreEqual("test", found[0].Rules.First().RuleValue);
+                Assert.AreEqual("RoleName", found[0].Rules.First().RuleType);
                 Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
                 Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
                 Assert.IsTrue(found[0].Rules.First().HasIdentity);
@@ -100,8 +100,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry);
@@ -110,8 +110,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //re-get 
                 entry = repo.Get(entry.Key);
 
-                entry.Rules.First().Claim = "blah";
-                entry.Rules.First().ClaimType = "asdf";
+                entry.Rules.First().RuleValue = "blah";
+                entry.Rules.First().RuleType = "asdf";
                 repo.AddOrUpdate(entry);
 
                 unitOfWork.Commit();
@@ -119,8 +119,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //re-get 
                 entry = repo.Get(entry.Key);
 
-                Assert.AreEqual("blah", entry.Rules.First().Claim);
-                Assert.AreEqual("asdf", entry.Rules.First().ClaimType);
+                Assert.AreEqual("blah", entry.Rules.First().RuleValue);
+                Assert.AreEqual("asdf", entry.Rules.First().RuleType);
             }
         }
 
@@ -137,8 +137,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry);
@@ -164,8 +164,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry1);
@@ -174,8 +174,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry2);
@@ -201,8 +201,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry1);
@@ -211,8 +211,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     new PublicAccessRule
                     {
-                        Claim = "test",
-                        ClaimType = "RoleName"
+                        RuleValue = "test",
+                        RuleType = "RoleName"
                     },
                 });
                 repo.AddOrUpdate(entry2);

@@ -63,15 +63,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                         id = Guid.NewGuid(),
                                         accessId = accessId,
                                         claim = memberId,
-                                        claimType = Constants.Conventions.PublicAccess.MemberIdClaimType,
+                                        claimType = Constants.Conventions.PublicAccess.MemberIdRuleType,
                                         createDate = DateTime.Now,
                                         updateDate = DateTime.Now
                                     });
                                 }
 
-                                //now there should be a member group defined here
-                                var memberGroupElement = page.Element("group");
-                                if (memberGroupElement != null)
+                                //now there should be a member group(s) defined here
+                                var memberGroupElements = page.Elements("group");
+                                foreach (var memberGroupElement in memberGroupElements)
                                 {
                                     var memberGroup = (string)memberGroupElement.Attribute("id");
                                     if (memberGroup.IsNullOrWhiteSpace() == false)
@@ -82,11 +82,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                             id = Guid.NewGuid(),
                                             accessId = accessId,
                                             claim = memberGroup,
-                                            claimType = Constants.Conventions.PublicAccess.MemberGroupClaimType,
+                                            claimType = Constants.Conventions.PublicAccess.MemberRoleRuleType,
                                             createDate = DateTime.Now,
                                             updateDate = DateTime.Now
                                         });
-                                    }
+                                    }   
                                 }
 
                             }

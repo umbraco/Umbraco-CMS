@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.Factories
             var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.AccessDeniedNodeId, 
                 dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
                 {
-                    Claim = x.Claim,
-                    ClaimType = x.ClaimType,
+                    RuleValue = x.RuleValue,
+                    RuleType = x.RuleType,
                     CreateDate = x.CreateDate,
                     UpdateDate = x.UpdateDate
                 }))
@@ -42,8 +42,8 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     AccessId = x.AccessEntryId,
                     Id = x.Key,
-                    Claim = x.Claim,
-                    ClaimType = x.ClaimType,
+                    RuleValue = x.RuleValue,
+                    RuleType = x.RuleType,
                     CreateDate = x.CreateDate,
                     UpdateDate = x.UpdateDate
                 }).ToList()

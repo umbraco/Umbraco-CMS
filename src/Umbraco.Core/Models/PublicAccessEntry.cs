@@ -14,22 +14,22 @@ namespace Umbraco.Core.Models
     public class PublicAccessEntry : Entity, IAggregateRoot
     {
         private readonly ObservableCollection<PublicAccessRule> _ruleCollection;
-        private Guid _protectedNodeId;
-        private Guid _noAccessNodeId;
-        private Guid _loginNodeId;
+        private int _protectedNodeId;
+        private int _noAccessNodeId;
+        private int _loginNodeId;
         private readonly List<Guid> _removedRules = new List<Guid>();
 
         public PublicAccessEntry(IContent protectedNode, IContent loginNode, IContent noAccessNode, IEnumerable<PublicAccessRule> ruleCollection)
         {
-            LoginNodeId = loginNode.Key;
-            NoAccessNodeId = noAccessNode.Key;
-            _protectedNodeId = protectedNode.Key;
+            LoginNodeId = loginNode.Id;
+            NoAccessNodeId = noAccessNode.Id;
+            _protectedNodeId = protectedNode.Id;
 
             _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);            
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
         }
 
-        public PublicAccessEntry(Guid id, Guid protectedNodeId, Guid loginNodeId, Guid noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
+        public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
         {
             Key = id;
 
@@ -67,9 +67,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        private static readonly PropertyInfo ProtectedNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, Guid>(x => x.ProtectedNodeId);
-        private static readonly PropertyInfo LoginNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, Guid>(x => x.LoginNodeId);
-        private static readonly PropertyInfo NoAccessNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, Guid>(x => x.NoAccessNodeId);
+        private static readonly PropertyInfo ProtectedNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, int>(x => x.ProtectedNodeId);
+        private static readonly PropertyInfo LoginNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, int>(x => x.LoginNodeId);
+        private static readonly PropertyInfo NoAccessNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, int>(x => x.NoAccessNodeId);
         private static readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, IEnumerable<PublicAccessRule>>(x => x.Rules);
 
         internal IEnumerable<Guid> RemovedRules
@@ -82,13 +82,13 @@ namespace Umbraco.Core.Models
             get { return _ruleCollection; }
         }
 
-        public PublicAccessRule AddRule(string claim, string claimType)
+        public PublicAccessRule AddRule(string ruleValue, string ruleType)
         {
             var rule = new PublicAccessRule
             {
                 AccessEntryId = Key,
-                Claim = claim,
-                ClaimType = claimType
+                RuleValue = ruleValue,
+                RuleType = ruleType
             };
             _ruleCollection.Add(rule);
             return rule;
@@ -97,6 +97,14 @@ namespace Umbraco.Core.Models
         public void RemoveRule(PublicAccessRule rule)
         {
             _ruleCollection.Remove(rule);
+        }
+
+        public void ClearRules()
+        {
+            foreach (var rule in _ruleCollection)
+            {
+                RemoveRule(rule);
+            }
         }
 
         /// <summary>
@@ -111,6 +119,7 @@ namespace Umbraco.Core.Models
             base.AddingEntity();
         }
 
+
         [DataMember]
         public sealed override Guid Key
         {
@@ -123,7 +132,7 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        public Guid LoginNodeId
+        public int LoginNodeId
         {
             get { return _loginNodeId; }
             set
@@ -137,7 +146,7 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        public Guid NoAccessNodeId
+        public int NoAccessNodeId
         {
             get { return _noAccessNodeId; }
             set
@@ -151,7 +160,7 @@ namespace Umbraco.Core.Models
         }
        
         [DataMember]
-        public Guid ProtectedNodeId
+        public int ProtectedNodeId
         {
             get { return _protectedNodeId; }
             set

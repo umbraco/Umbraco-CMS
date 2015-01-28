@@ -464,7 +464,7 @@ namespace Umbraco.Web.Search
 		{
             if (TypeHelper.IsTypeAssignableFrom<Document>(node))
             {
-                return new XDocument(((Document) node).Content.ToXml());
+                return new XDocument(((Document) node).ContentEntity.ToXml());
             }
 
             if (TypeHelper.IsTypeAssignableFrom<global::umbraco.cms.businesslogic.media.Media>(node))
