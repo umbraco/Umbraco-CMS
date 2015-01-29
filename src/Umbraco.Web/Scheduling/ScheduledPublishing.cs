@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -74,6 +75,16 @@ namespace Umbraco.Web.Scheduling
                     _isPublishingRunning = false;
                 }
             }            
+        }
+
+        public Task RunAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsAsync
+        {
+            get { return false; }
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Caching;
 using umbraco.BusinessLogic;
@@ -48,6 +49,16 @@ namespace Umbraco.Web.Scheduling
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
             }           
+        }
+
+        public Task RunAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsAsync
+        {
+            get { return false; }
         }
     }
 }

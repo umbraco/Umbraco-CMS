@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -105,6 +106,16 @@ namespace Umbraco.Web.Scheduling
                     _isPublishingRunning = false;
                 }
             }
+        }
+
+        public Task RunAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsAsync
+        {
+            get { return false; }
         }
     }
 }

@@ -543,6 +543,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheFilePersister.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

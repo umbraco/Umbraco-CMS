@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -13,6 +16,31 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class XmlExtensions
 	{
+        /// <summary>
+        /// Saves the xml document async
+        /// </summary>
+        /// <param name="xdoc"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+	    public static async Task SaveAsync(this XmlDocument xdoc, string filename)
+	    {
+            if (xdoc.DocumentElement == null)
+                throw new XmlException("Cannot save xml document, there is no root element");
+
+            using (var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
+            using (var xmlWriter = XmlWriter.Create(fs, new XmlWriterSettings
+            {
+                Async = true,
+                Encoding = Encoding.UTF8,
+                Indent = true
+            }))
+            {
+                //NOTE: There are no nice methods to write it async, only flushing it async. We
+                // could implement this ourselves but it'd be a very manual process.
+                xdoc.WriteTo(xmlWriter);
+                await xmlWriter.FlushAsync();
+            }
+	    }
 
         public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
         {

@@ -265,6 +265,16 @@ namespace Umbraco.Tests.Scheduling
             public Guid UniqueId { get; protected set; }
 
             public abstract void Run();
+            public Task RunAsync()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool IsAsync
+            {
+                get { return false; }
+            }
+
             public abstract void Cancel();
 
             public DateTime Queued { get; set; }
