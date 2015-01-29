@@ -404,7 +404,8 @@ namespace Umbraco.Web.Routing
 			    if (_routingContext.PublishedContentFinders == null)
                     throw new InvalidOperationException("There is no finder collection.");
 
-			    _routingContext.PublishedContentFinders.ForEach(finder => finder.TryFindContent(_pcr));
+                //iterate but return on first one that finds it
+			    var found = _routingContext.PublishedContentFinders.Any(finder => finder.TryFindContent(_pcr));
 			}
 
 		    // indicate that the published content (if any) we have at the moment is the
