@@ -12,7 +12,7 @@ namespace Umbraco.Core
 	/// <remarks>
 	/// Taken from http://damieng.com/blog/2010/10/17/enums-better-syntax-improved-performance-and-tryparse-in-net-3-5
 	/// </remarks>
-	internal static class Enum<T> where T : struct
+	public static class Enum<T> where T : struct
 	{
 		private static readonly IEnumerable<T> All = Enum.GetValues(typeof(T)).Cast<T>();
 		private static readonly Dictionary<string, T> InsensitiveNames = All.ToDictionary(k => Enum.GetName(typeof(T), k).ToLowerInvariant());
