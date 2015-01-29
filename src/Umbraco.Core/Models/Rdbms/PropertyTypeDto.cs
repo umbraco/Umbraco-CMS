@@ -32,11 +32,6 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Name { get; set; }
 
-        [Column("helpText")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(1000)]
-        public string HelpText { get; set; }
-
         [Column("sortOrder")]
         [Constraint(Default = "0")]
         public int SortOrder { get; set; }

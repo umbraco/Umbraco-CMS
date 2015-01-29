@@ -453,7 +453,6 @@ AND umbracoNode.id <> @id",
                 propType.Description = dto.Description;
                 propType.Id = dto.Id;
                 propType.Name = dto.Name;
-                propType.HelpText = dto.HelpText;
                 propType.Mandatory = dto.Mandatory;
                 propType.SortOrder = dto.SortOrder;
                 propType.ValidationRegExp = dto.ValidationRegExp;
@@ -969,13 +968,13 @@ AND umbracoNode.id <> @id",
                 // NOTE: MySQL requires a SELECT * FROM the inner union in order to be able to sort . lame.
 
                 var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,
-                            PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptHelpText,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
+                            PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
                             PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
                             PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyTypeGroup as PG
                         LEFT JOIN
                         (
-                            SELECT PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, PT.helpText as ptHelpText,
+                            SELECT PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, 
                                     PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
                                     PT.propertyTypeGroupId as ptGroupId,
                                     DT.dbType as dtDbType, DT.nodeId as dtId, DT.propertyEditorAlias as dtPropEdAlias
@@ -989,7 +988,7 @@ AND umbracoNode.id <> @id",
                         UNION
 
                         SELECT  PT.contentTypeId as contentTypeId,
-                                PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, PT.helpText as ptHelpText,
+                                PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, 
                                 PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
                                 DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
                                 PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText

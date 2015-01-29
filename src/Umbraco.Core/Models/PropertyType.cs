@@ -236,7 +236,7 @@ namespace Umbraco.Core.Models
         /// Gets of Sets the Help text for the current PropertyType
         /// </summary>
         [DataMember]
-        [Obsolete("Not used anywhere in the UI")]
+        [Obsolete("Not used anywhere, will be removed in future versions")]
         public string HelpText
         {
             get { return _helpText; }
