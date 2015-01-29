@@ -18,7 +18,19 @@ namespace Umbraco.Core.Persistence.Repositories
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
+            _options = new RepositoryCacheOptions
+            {
+                //We want to ensure that a zero count gets cached, even if there is nothing in the db we don't want it to lookup nothing each time
+                GetAllCacheAllowZeroCount = true,
+                //Set to 1000 just to ensure that all of them are cached, The GetAll on this repository gets called *A lot*, we want max performance
+                GetAllCacheThresholdLimit = 1000,
+                //Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to 
+                // return the raw cache without validation. The GetAll on this repository gets called *A lot*, we want max performance
+                GetAllCacheValidateCount = false
+            };
         }
+
+        private readonly RepositoryCacheOptions _options;
 
         protected override PublicAccessEntry PerformGet(Guid id)
         {
@@ -91,27 +103,13 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// The threshold entity count for which the GetAll method will cache entities
+        /// Returns the repository cache options
         /// </summary>
-        /// <remarks>
-        /// Set to 1000 just to ensure that all of them are cached, The GetAll on this repository gets called *A lot*, we want max performance
-        /// </remarks>
-        protected override int GetAllThresholdCacheLimit
+        protected override RepositoryCacheOptions RepositoryCacheOptions
         {
-            get { return 1000; }
+            get { return _options; }
         }
 
-        /// <summary>
-        /// Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to 
-        /// return the raw cache without validation. 
-        /// </summary>
-        /// <remarks>
-        /// The GetAll on this repository gets called *A lot*, we want max performance
-        /// </remarks>
-        protected override bool GetAllValidateCount
-        {
-            get { return false; }
-        }
 
         protected override void PersistNewItem(PublicAccessEntry entity)
         {

@@ -80,6 +80,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
+        private readonly RepositoryCacheOptions _cacheOptions = new RepositoryCacheOptions();
+
         #region IRepository<TEntity> Members
 
         /// <summary>
@@ -158,18 +160,20 @@ namespace Umbraco.Core.Persistence.Repositories
             if (ids.Any())
             {
                 var entities = ids.Select(x => RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
-                
+
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
                     return entities;
             }
             else
             {
-                var allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>()).ToArray();
+                var allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>())
+                    .WhereNotNull()
+                    .ToArray();
 
                 if (allEntities.Any())
                 {
 
-                    if (GetAllValidateCount)
+                    if (RepositoryCacheOptions.GetAllCacheValidateCount)
                     {
                         //Get count of all entities of current type (TEntity) to ensure cached result is correct
                         var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
@@ -183,6 +187,17 @@ namespace Umbraco.Core.Persistence.Repositories
                         return allEntities;
                     }
                 }
+                else if (RepositoryCacheOptions.GetAllCacheAllowZeroCount)
+                {
+                    //if the repository allows caching a zero count, then check the zero count cache
+                    var zeroCount = RuntimeCache.GetCacheItem<TEntity[]>(GetCacheTypeKey<TEntity>());
+                    if (zeroCount != null && zeroCount.Any() == false)
+                    {
+                        //there is a zero count cache so return an empty list
+                        return Enumerable.Empty<TEntity>();
+                    }
+                }
+
             }
 
             var entityCollection = PerformGetAll(ids)
@@ -194,7 +209,15 @@ namespace Umbraco.Core.Persistence.Repositories
             // coming back here we don't want to chuck it all into memory, this added cache here
             // is more for convenience when paging stuff temporarily
 
-            if (entityCollection.Length > GetAllThresholdCacheLimit) return entityCollection;
+            if (entityCollection.Length > RepositoryCacheOptions.GetAllCacheThresholdLimit) 
+                return entityCollection;
+
+            if (entityCollection.Length == 0 && RepositoryCacheOptions.GetAllCacheAllowZeroCount)
+            {
+                //there was nothing returned but we want to cache a zero count result so add an TEntity[] to the cache
+                // to signify that there is a zero count cache
+                RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => new TEntity[] {});
+            }
 
             foreach (var entity in entityCollection)
             {
@@ -209,25 +232,11 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// True/false as to validate the total item count when all items are returned from cache, the default is true but this
-        /// means that a db lookup will occur - though that lookup will probably be significantly less expensive than the normal 
-        /// GetAll method. 
+        /// Returns the repository cache options
         /// </summary>
-        /// <remarks>
-        /// Overriding this to return false will improve performance of GetAll cache with no params but should only be used
-        /// for specific circumstances
-        /// </remarks>
-        protected virtual bool GetAllValidateCount
+        protected virtual RepositoryCacheOptions RepositoryCacheOptions
         {
-            get { return true; }
-        }
-
-        /// <summary>
-        /// The threshold entity count for which the GetAll method will cache entities
-        /// </summary>
-        protected virtual int GetAllThresholdCacheLimit
-        {
-            get { return 100; }
+            get { return _cacheOptions; }
         }
 
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
@@ -284,12 +293,16 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 PersistNewItem((TEntity)entity);
                 RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
                 RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
                 throw;
             }
 
@@ -305,13 +318,16 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 PersistUpdatedItem((TEntity)entity);
                 RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                //RepositoryCache.Delete(typeof(TEntity), entity);
                 RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
                 throw;
             }
 
@@ -325,6 +341,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             PersistDeletedItem((TEntity)entity);
             RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+            //If there's a GetAll zero count cache, ensure it is cleared
+            RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
         }
 
         #endregion

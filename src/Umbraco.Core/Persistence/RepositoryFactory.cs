@@ -80,7 +80,9 @@ namespace Umbraco.Core.Persistence
 
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
         {
-            return new AuditRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+            return new AuditRepository(uow,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _logger, _sqlSyntax);
         }
 
         public virtual ITagRepository CreateTagRepository(IDatabaseUnitOfWork uow)

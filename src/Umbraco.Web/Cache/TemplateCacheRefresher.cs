@@ -55,9 +55,6 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
                 string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, id));
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
-                string.Format("{0}{1}", CacheKeys.TemplateBusinessLogicCacheKey, id));
-
             //need to clear the runtime cache for template instances
             //NOTE: This is temp until we implement the correct ApplicationCache and then we can remove the RuntimeCache, etc...
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<ITemplate>();
