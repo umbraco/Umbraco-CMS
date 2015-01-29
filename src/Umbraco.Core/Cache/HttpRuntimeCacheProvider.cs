@@ -20,9 +20,15 @@ namespace Umbraco.Core.Cache
 
         private readonly System.Web.Caching.Cache _cache;
 
+        /// <summary>
+        /// Used for debugging
+        /// </summary>
+        internal Guid InstanceId { get; private set; }
+
         public HttpRuntimeCacheProvider(System.Web.Caching.Cache cache)
         {
             _cache = cache;
+            InstanceId = Guid.NewGuid();
         }
 
         protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()

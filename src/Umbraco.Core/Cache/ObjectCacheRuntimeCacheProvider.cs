@@ -16,15 +16,22 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
     {
+
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
 
         // an object that represent a value that has not been created yet
         protected readonly object ValueNotCreated = new object();
 
+        /// <summary>
+        /// Used for debugging
+        /// </summary>
+        internal Guid InstanceId { get; private set; }
+
         public ObjectCacheRuntimeCacheProvider()
         {
             MemoryCache = new MemoryCache("in-memory");
+            InstanceId = Guid.NewGuid();
         }
 
         protected object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
@@ -93,7 +100,16 @@ namespace Umbraco.Core.Cache
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
-                        return value == null || value.GetType() == typeOfT;
+
+                        //TODO: waiting on a response for this comment: https://github.com/umbraco/Umbraco-CMS/commit/c2db7b2b9b78847a828512818e79492ecc24ac7c#commitcomment-9492329
+                        // until then we will check if 'T' is an interface and if so we will use the 'is' clause, 
+                        // otherwise we do an exact match.
+
+                        return value == null ||
+                               (typeOfT.IsInterface
+                                   ? (value is T)
+                                   : value.GetType() == typeOfT);
+
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -114,8 +130,13 @@ namespace Umbraco.Core.Cache
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
-                        return value.GetType() == typeOfT
-                            && predicate(x.Key, (T) value);
+
+                        //TODO: waiting on a response for this comment: https://github.com/umbraco/Umbraco-CMS/commit/c2db7b2b9b78847a828512818e79492ecc24ac7c#commitcomment-9492329
+                        // until then we will check if 'T' is an interface and if so we will use the 'is' clause, 
+                        // otherwise we do an exact match.
+
+                        return ((typeOfT.IsInterface && value is T) || (value.GetType() == typeOfT))
+                               && predicate(x.Key, (T)value);
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
