@@ -144,6 +144,11 @@ namespace Umbraco.Web.Models.Mapping
             var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName) 
                 ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
 
+            if (dt == null)
+            {
+                throw new InvalidOperationException("No list view data type was found for this document type, ensure that the default list view data types exists and/or that your custom list view data type exists");
+            }
+
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
 
             var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
