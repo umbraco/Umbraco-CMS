@@ -146,7 +146,8 @@ namespace Umbraco.Web.Scheduling
                         T remainingTask;
                         while (_tasks.TryTake(out remainingTask))
                         {
-                            ConsumeTaskInternal(remainingTask);
+                            ConsumeTaskInternalAsync(remainingTask)
+                                .Wait(); //block until it completes
                         }
                     }
 
@@ -178,7 +179,7 @@ namespace Umbraco.Web.Scheduling
             var token = _tokenSource.Token;
 
             _consumer = Task.Factory.StartNew(() =>
-                StartThread(token),
+                StartThreadAsync(token),
                 token,
                 _dedicatedThread ? TaskCreationOptions.LongRunning : TaskCreationOptions.None,
                 TaskScheduler.Default);
@@ -197,7 +198,7 @@ namespace Umbraco.Web.Scheduling
         /// Invokes a new worker thread to consume tasks
         /// </summary>
         /// <param name="token"></param>
-        private void StartThread(CancellationToken token)
+        private async Task StartThreadAsync(CancellationToken token)
         {
             // Was cancellation already requested?  
             if (token.IsCancellationRequested)
@@ -206,14 +207,14 @@ namespace Umbraco.Web.Scheduling
                 token.ThrowIfCancellationRequested();
             }
 
-            TakeAndConsumeTask(token);
+            await TakeAndConsumeTaskAsync(token);
         }
 
         /// <summary>
         /// Trys to get a task from the queue, if there isn't one it will wait a second and try again
         /// </summary>
         /// <param name="token"></param>
-        private void TakeAndConsumeTask(CancellationToken token)
+        private async Task TakeAndConsumeTaskAsync(CancellationToken token)
         {
             if (token.IsCancellationRequested)
             {
@@ -235,25 +236,25 @@ namespace Umbraco.Web.Scheduling
                 // cancel when we shutdown
                 foreach (var t in _tasks.GetConsumingEnumerable(token))
                 {
-                    ConsumeTaskCancellable(t, token);
+                    await ConsumeTaskCancellableAsync(t, token);
                 }
 
                 //recurse and keep going
-                TakeAndConsumeTask(token);
+                await TakeAndConsumeTaskAsync(token);
             }
             else
             {
                 T repositoryTask;
                 while (_tasks.TryTake(out repositoryTask))
                 {
-                    ConsumeTaskCancellable(repositoryTask, token);
+                    await ConsumeTaskCancellableAsync(repositoryTask, token);
                 }
 
                 //the task will end here
             }
         }
 
-        internal void ConsumeTaskCancellable(T task, CancellationToken token)
+        internal async Task ConsumeTaskCancellableAsync(T task, CancellationToken token)
         {
             if (token.IsCancellationRequested)
             {
@@ -266,10 +267,10 @@ namespace Umbraco.Web.Scheduling
                 token.ThrowIfCancellationRequested();
             }
 
-            ConsumeTaskInternal(task);
+            await ConsumeTaskInternalAsync(task);
         }
 
-        private void ConsumeTaskInternal(T task)
+        private async Task ConsumeTaskInternalAsync(T task)
         {
             try
             {
@@ -279,7 +280,14 @@ namespace Umbraco.Web.Scheduling
                 {
                     using (task)
                     {
-                        task.Run();
+                        if (task.IsAsync)
+                        {
+                            await task.RunAsync();
+                        }
+                        else
+                        {
+                            task.Run();
+                        }
                     }
                 }
                 catch (Exception e)
