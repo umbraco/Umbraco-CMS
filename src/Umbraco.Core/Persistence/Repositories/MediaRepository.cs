@@ -259,18 +259,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
         {
-            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
-
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(contentExists, content, xml));
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
         }
 
         public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
         {
-            var previewExists =
-                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                    new { Id = content.Id, Version = content.Version }) != 0;
-
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(previewExists, content, xml));
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(content, xml));
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)

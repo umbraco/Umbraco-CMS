@@ -60,13 +60,20 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             throw new NotImplementedException();
         }
+
+        //NOTE: Not implemented because all ContentPreviewEntity will always return false for having an Identity
+        protected override void PersistUpdatedItem(ContentPreviewEntity<TContent> entity)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         protected override void PersistNewItem(ContentPreviewEntity<TContent> entity)
         {
             if (entity.Content.HasIdentity == false)
             {
-                throw new InvalidOperationException("Cannot insert a preview for a content item that has no identity");
+                throw new InvalidOperationException("Cannot insert or update a preview for a content item that has no identity");
             }
 
             var previewPoco = new PreviewXmlDto
@@ -77,33 +84,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 Xml = entity.Xml.ToString(SaveOptions.None)
             };
 
-            Database.Insert(previewPoco);
+            //We need to do a special InsertOrUpdate here because we know that the PreviewXmlDto table has a composite key and thus
+            // a unique constraint which can be violated if 2+ threads try to execute the same insert sql at the same time.
+            Database.InsertOrUpdate(previewPoco,
+                //Since the table has a composite key, we need to specify an explit update statement
+                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId=@NodeId AND versionId=@VersionId",
+                new {NodeId = previewPoco.NodeId, VersionId = previewPoco.VersionId, Xml = previewPoco.Xml, Timestamp = previewPoco.Timestamp});
         }
 
-        protected override void PersistUpdatedItem(ContentPreviewEntity<TContent> entity)
-        {
-            if (entity.Content.HasIdentity == false)
-            {
-                throw new InvalidOperationException("Cannot update a preview for a content item that has no identity");
-            }
-
-            var previewPoco = new PreviewXmlDto
-            {
-                NodeId = entity.Id,
-                Timestamp = DateTime.Now,
-                VersionId = entity.Version,
-                Xml = entity.Xml.ToString(SaveOptions.None)
-            };
-
-            Database.Update<PreviewXmlDto>(
-                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                new
-                {
-                    Xml = previewPoco.Xml,
-                    Timestamp = previewPoco.Timestamp,
-                    Id = previewPoco.NodeId,
-                    Version = previewPoco.VersionId
-                });
-        }
     }
 }

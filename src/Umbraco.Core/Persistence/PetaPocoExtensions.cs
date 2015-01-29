@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
@@ -17,6 +19,95 @@ namespace Umbraco.Core.Persistence
         internal delegate void CreateTableEventHandler(string tableName, Database db, TableCreationEventArgs e);
 
         internal static event CreateTableEventHandler NewTable;
+
+        /// <summary>
+        /// This will handle the issue of inserting data into a table when there can be a violation of a primary key or unique constraint which
+        /// can occur when two threads are trying to insert data at the exact same time when the data violates this constraint. 
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="poco"></param>       
+        /// <returns>
+        /// Returns the action that executed, either an insert or an update
+        /// 
+        /// NOTE: If an insert occurred and a PK value got generated, the poco object passed in will contain the updated value.
+        /// </returns>
+        /// <remarks>
+        /// In different databases, there are a few raw SQL options like MySql's ON DUPLICATE KEY UPDATE or MSSQL's MERGE WHEN MATCHED, but since we are 
+        /// also supporting SQLCE for which this doesn't exist we cannot simply rely on the underlying database to help us here. So we'll actually need to 
+        /// try to be as proficient as possible when we know this can occur and manually handle the issue. 
+        /// 
+        /// We do this by first trying to Update the record, this will return the number of rows affected. If it is zero then we insert, if it is one, then
+        /// we know the update was successful and the row was already inserted by another thread. If the rowcount is zero and we insert and get an exception, 
+        /// that's due to a race condition, in which case we need to retry and update.
+        /// </remarks>
+        internal static RecordPersistenceType InsertOrUpdate<T>(this Database db, T poco)
+            where T : class
+        {
+            return db.InsertOrUpdate(poco, null, null);
+        }
+
+        /// <summary>
+        /// This will handle the issue of inserting data into a table when there can be a violation of a primary key or unique constraint which
+        /// can occur when two threads are trying to insert data at the exact same time when the data violates this constraint. 
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="poco"></param>
+        /// <param name="updateArgs"></param>      
+        /// <param name="updateCommand">If the entity has a composite key they you need to specify the update command explicitly</param>
+        /// <returns>
+        /// Returns the action that executed, either an insert or an update
+        /// 
+        /// NOTE: If an insert occurred and a PK value got generated, the poco object passed in will contain the updated value.
+        /// </returns>
+        /// <remarks>
+        /// In different databases, there are a few raw SQL options like MySql's ON DUPLICATE KEY UPDATE or MSSQL's MERGE WHEN MATCHED, but since we are 
+        /// also supporting SQLCE for which this doesn't exist we cannot simply rely on the underlying database to help us here. So we'll actually need to 
+        /// try to be as proficient as possible when we know this can occur and manually handle the issue. 
+        /// 
+        /// We do this by first trying to Update the record, this will return the number of rows affected. If it is zero then we insert, if it is one, then
+        /// we know the update was successful and the row was already inserted by another thread. If the rowcount is zero and we insert and get an exception, 
+        /// that's due to a race condition, in which case we need to retry and update.
+        /// </remarks>
+        internal static RecordPersistenceType InsertOrUpdate<T>(this Database db,
+            T poco, 
+            string updateCommand, 
+            object updateArgs)
+            where T : class
+        {
+            if (poco == null) throw new ArgumentNullException("poco");
+
+            var rowCount = updateCommand.IsNullOrWhiteSpace()
+                    ? db.Update(poco)
+                    : db.Update<T>(updateCommand, updateArgs); 
+
+            if (rowCount > 0) return RecordPersistenceType.Update;
+
+            try
+            {
+                db.Insert(poco);
+                return RecordPersistenceType.Insert;
+            }
+            //TODO: Need to find out if this is the same exception that will occur for all databases... pretty sure it will be
+            catch (SqlException ex)
+            {
+                //This will occur if the constraint was violated and this record was already inserted by another thread, 
+                //at this exact same time, in this case we need to do an update
+
+                rowCount = updateCommand.IsNullOrWhiteSpace() 
+                    ? db.Update(poco) 
+                    : db.Update<T>(updateCommand, updateArgs);                
+
+                if (rowCount == 0)
+                {
+                    //this would be strange! in this case the only circumstance would be that at the exact same time, 3 threads executed, one
+                    // did the insert and the other somehow managed to do a delete precisely before this update was executed... now that would
+                    // be real crazy. In that case we need to throw an exception.
+                    throw new DataException("Record could not be inserted or updated");
+                }
+
+                return RecordPersistenceType.Update;
+            }
+        }
 
         /// <summary>
         /// This will escape single @ symbols for peta poco values so it doesn't think it's a parameter

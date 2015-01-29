@@ -675,18 +675,12 @@ namespace Umbraco.Core.Persistence.Repositories
         
         public void AddOrUpdateContentXml(IMember content, Func<IMember, XElement> xml)
         {
-            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
-
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(contentExists, content, xml));
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMember>(content, xml));
         }
 
         public void AddOrUpdatePreviewXml(IMember content, Func<IMember, XElement> xml)
         {
-            var previewExists =
-                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                    new { Id = content.Id, Version = content.Version }) != 0;
-
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(previewExists, content, xml));
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMember>(content, xml));
         }
 
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
