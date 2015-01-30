@@ -394,9 +394,12 @@ namespace umbraco.controls
                     var tabs = SaveTabs();
                     foreach (var tab in tabs)
                     {
-                        if (_contentType.ContentTypeItem.PropertyGroups.Contains(tab.Item2))
-                        {
-                            _contentType.ContentTypeItem.PropertyGroups[tab.Item2].SortOrder = tab.Item3;
+                        var propertyGroup = _contentType.ContentTypeItem.PropertyGroups
+                            .SingleOrDefault(x => x.Id == tab.Item1);
+                        if (propertyGroup != null)
+                        {                            
+                            propertyGroup.Name = tab.Item2;
+                            propertyGroup.SortOrder = tab.Item3;
                         }
                         else
                         {
