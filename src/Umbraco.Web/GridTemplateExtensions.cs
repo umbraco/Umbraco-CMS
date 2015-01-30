@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using System.Web.Mvc;
 using Umbraco.Web.Templates;
@@ -12,6 +13,7 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web
 {
+    [Obsolete("This should not be used, GetGridHtml extensions on HtmlHelper should be used instead")]
     public static class GridTemplateExtensions
     {
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
@@ -27,19 +29,29 @@ namespace Umbraco.Web
 
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias)
         {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+
             return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
         }
 
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
         {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+
             var view = "Grid/" + framework;
-            var model = contentItem.GetProperty(propertyAlias).Value;
+            var prop = contentItem.GetProperty(propertyAlias);
+            if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias);
+            var model = prop.Value;
+
+            var asString = model as string;
+            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
 
             return new MvcHtmlString(RenderPartialViewToString(view, model));
         }
 
         private static string RenderPartialViewToString(string viewName, object model)
         {
+
             using (var sw = new StringWriter())
             {
                 var cc = new ControllerContext
