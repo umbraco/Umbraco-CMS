@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Web.Mvc;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Tests.DynamicsAndReflection
@@ -27,8 +29,8 @@ namespace Umbraco.Tests.DynamicsAndReflection
         //
         // Eric Lippert, http://stackoverflow.com/questions/5311465/extension-method-and-dynamic-object-in-c-sharp
 
+        [Ignore("This is just testing the below GetMethodForArguments method - Stephen was working on this but it's not used in the core")]
         [Test]
-        [Ignore("fails")]
         public void TypesTests()
         {
             Assert.IsTrue(typeof(int[]).Inherits<int[]>());
@@ -84,7 +86,9 @@ namespace Umbraco.Tests.DynamicsAndReflection
             Assert.IsNotNull(m5A);
 
             // note - should we also handle "ref" and "out" parameters?
+            // SD: NO, lets not make this more complicated than it already is
             // note - should we pay attention to array types?
+            // SD: NO, lets not make this more complicated than it already is
         }
 
         public void TestMethod1(int value) {}
@@ -157,42 +161,122 @@ namespace Umbraco.Tests.DynamicsAndReflection
                 : method.MakeGenericMethod(genericArgumentTypes);
         }
 
-        public class Class1
+        public class TestClass
         {}
 
+        public class TestClass<T> : TestClass { }
+
         [Test]
-        [Ignore("fails")]
-        public void FinderTests()
+        public void Find_Non_Overloaded_Method()
         {
             MethodInfo method;
-            var class1 = new Class1();
+            var class1 = new TestClass();
 
-            method = ExtensionMethodFinder.FindExtensionMethod(typeof (Class1), new object[] {1}, "TestMethod1", false);
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { 1 }, "SimpleMethod", false);
             Assert.IsNotNull(method);
             method.Invoke(null, new object[] { class1, 1 });
 
-            method = ExtensionMethodFinder.FindExtensionMethod(typeof(Class1), new object[] { "x" }, "TestMethod1", false);
-            Assert.IsNull(method); // note - fails, return TestMethod1!
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { "x" }, "SimpleMethod", false);
+            Assert.IsNull(method);            
+        }
 
-            method = ExtensionMethodFinder.FindExtensionMethod(typeof(Class1), new object[] { 1 }, "TestMethod2", false);
+        [Test]
+        public void Find_Overloaded_Method()
+        {
+            MethodInfo method;
+            var class1 = new TestClass();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { 1 }, "SimpleOverloadMethod", false);
             Assert.IsNotNull(method);
-            method.Invoke(null, new object[] { class1, "1" });
+            method.Invoke(null, new object[] { class1, 1 });
 
-            method = ExtensionMethodFinder.FindExtensionMethod(typeof(Class1), new object[] { "x" }, "TestMethod2", false);
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { "x" }, "SimpleOverloadMethod", false);
             Assert.IsNotNull(method);
             method.Invoke(null, new object[] { class1, "x" });
+        }
+
+        [Test]
+        public void Find_Overloaded_Method_With_Args_Containing_This()
+        {
+            MethodInfo method;
+            var class1 = new TestClass();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { class1, 1 }, "SimpleOverloadMethod", true);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1, 1 });
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { class1, "x" }, "SimpleOverloadMethod", true);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1, "x" });
+        }
+
+        [Test]
+        public void Find_Non_Overloaded_Generic_Enumerable_Method()
+        {
+            MethodInfo method;
+            var class1 = Enumerable.Empty<TestClass>();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(IEnumerable<TestClass>), new object[] { 1 }, "SimpleEnumerableGenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1, 1 });
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(IEnumerable<TestClass>), new object[] { "x" }, "SimpleEnumerableGenericMethod", false);
+            Assert.IsNull(method);       
+        }
+
+        [Test]
+        public void Find_Overloaded_Generic_Enumerable_Method()
+        {
+            MethodInfo method;
+            var class1 = Enumerable.Empty<TestClass>();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(IEnumerable<TestClass>), new object[] { 1 }, "SimpleOverloadEnumerableGenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1, 1 });
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(IEnumerable<TestClass>), new object[] { "x" }, "SimpleOverloadEnumerableGenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1, "x" });
+        }
+
+        [Test]
+        public void Find_Method_With_Parameter_Match_With_Generic_Argument()
+        {
+            MethodInfo method;
+
+            var genericTestClass = new TestClass<TestClass>();
+            var nonGenericTestClass = new TestClass();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { genericTestClass }, "GenericParameterMethod", false);
+            Assert.IsNotNull(method);
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { nonGenericTestClass }, "GenericParameterMethod", false);
+            Assert.IsNotNull(method);    
         }
     }
 
     static class ExtensionMethodFinderTestsExtensions
     {
-        public static void TestMethod1(this ExtensionMethodFinderTests.Class1 source, int value)
+        public static void SimpleMethod(this ExtensionMethodFinderTests.TestClass source, int value)
         { }
 
-        public static void TestMethod2(this ExtensionMethodFinderTests.Class1 source, int value)
+        public static void SimpleOverloadMethod(this ExtensionMethodFinderTests.TestClass source, int value)
         { }
 
-        public static void TestMethod2(this ExtensionMethodFinderTests.Class1 source, string value)
+        public static void SimpleOverloadMethod(this ExtensionMethodFinderTests.TestClass source, string value)
         { }
+
+        public static void SimpleEnumerableGenericMethod(this IEnumerable<ExtensionMethodFinderTests.TestClass> source, int value)
+        { }
+
+        public static void SimpleOverloadEnumerableGenericMethod(this IEnumerable<ExtensionMethodFinderTests.TestClass> source, int value)
+        { }
+
+        public static void SimpleOverloadEnumerableGenericMethod(this IEnumerable<ExtensionMethodFinderTests.TestClass> source, string value)
+        { }
+
+        public static void GenericParameterMethod(this ExtensionMethodFinderTests.TestClass source, ExtensionMethodFinderTests.TestClass value)
+        { }
+
     }
 }

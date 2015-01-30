@@ -48,38 +48,30 @@ namespace Umbraco.Web
             var model = prop.Value;
 
             var asString = model as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             return html.Partial(view, model);
         }
 
-
-        [Obsolete("This should not be used, GetGridHtml extensions on HtmlHelper should be used instead")]
-        public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
+        public static MvcHtmlString GetGridHtml(this IPublishedProperty property, HtmlHelper html, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
             if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
-            
+
             var view = "Grid/" + framework;
-            return new MvcHtmlString(RenderPartialViewToString(view, property.Value));
+            return html.Partial(view, property.Value);
         }
-
-        [Obsolete("This should not be used, GetGridHtml extensions on HtmlHelper should be used instead")]
-        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem)
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html)
         {
-            return GetGridHtml(contentItem, "bodyText", "bootstrap3");
+            return GetGridHtml(contentItem, html, "bodyText", "bootstrap3");
         }
-
-        [Obsolete("This should not be used, GetGridHtml extensions on HtmlHelper should be used instead")]
-        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias)
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
-            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
+            return GetGridHtml(contentItem, html, propertyAlias, "bootstrap3");
         }
-
-        [Obsolete("This should not be used, GetGridHtml extensions on HtmlHelper should be used instead")]
-        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias, string framework)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
 
@@ -89,41 +81,68 @@ namespace Umbraco.Web
             var model = prop.Value;
 
             var asString = model as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
-            return new MvcHtmlString(RenderPartialViewToString(view, model));
+            return html.Partial(view, model);
         }
 
-        [Obsolete("This should not be used, GetGridHtml extensions on HtmlHelper should be used instead")]
-        private static string RenderPartialViewToString(string viewName, object model)
+
+        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
         {
+            var asString = property.Value as string;
+            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
 
-            using (var sw = new StringWriter())
+            var htmlHelper = CreateHtmlHelper(property.Value);
+            return htmlHelper.GetGridHtml(property, framework);
+        }
+
+        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem)
+        {
+            return GetGridHtml(contentItem, "bodyText", "bootstrap3");
+        }
+
+        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias)
+        {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+
+            return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
+        }
+
+        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
+        {
+            Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
+
+            var prop = contentItem.GetProperty(propertyAlias);
+            if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias);
+            var model = prop.Value;
+
+            var asString = model as string;
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
+
+            var htmlHelper = CreateHtmlHelper(model);
+            return htmlHelper.GetGridHtml(contentItem, propertyAlias, framework);
+        }
+
+        //[Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
+        private static HtmlHelper CreateHtmlHelper(object model)
+        {
+            var cc = new ControllerContext
             {
-                var cc = new ControllerContext
-                             {
-                                 RequestContext =
-                                     new RequestContext(
-                                     UmbracoContext.Current.HttpContext,
-                                     new RouteData() { Route = RouteTable.Routes["Umbraco_default"] })
-                             };
+                RequestContext = UmbracoContext.Current.HttpContext.Request.RequestContext
+            };
+            var viewContext = new ViewContext(cc, new FakeView(), new ViewDataDictionary(model), new TempDataDictionary(), new StringWriter());
+            var htmlHelper = new HtmlHelper(viewContext, new ViewPage());
+            return htmlHelper;
+        }
 
-                var routeHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory(), UmbracoContext.Current);
-                var routeDef = routeHandler.GetUmbracoRouteDefinition(cc.RequestContext, UmbracoContext.Current.PublishedContentRequest);
-                cc.RequestContext.RouteData.Values.Add("action", routeDef.ActionName);
-                cc.RequestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
-
-                var partialView = ViewEngines.Engines.FindPartialView(cc, viewName);
-                var viewData = new ViewDataDictionary();
-                var tempData = new TempDataDictionary();
-                
-                viewData.Model = model;
-
-                var viewContext = new ViewContext(cc, partialView.View, viewData, tempData, sw);
-                partialView.View.Render(viewContext, sw);
-                partialView.ViewEngine.ReleaseView(cc, partialView.View);
-                
-                return sw.GetStringBuilder().ToString();
+        private class FakeView : IView
+        {
+            public void Render(ViewContext viewContext, TextWriter writer)
+            {                
             }
         }
     }
