@@ -393,11 +393,15 @@ angular.module("umbraco")
         };
 
 
+        $scope.clearPrompt = function(scopedObject, e) {
+            scopedObject.deletePrompt = false;
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-
-
-
-
+        $scope.showPrompt = function (scopedObject) {
+            scopedObject.deletePrompt = true;
+        }
 
 
         // *********************************************
