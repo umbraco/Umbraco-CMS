@@ -102,6 +102,8 @@ namespace Umbraco.Web.Macros
 
         public string Execute(MacroModel macro, INode node)
         {
+            if (node == null) return string.Empty;
+
             var umbCtx = _getUmbracoContext();
             //NOTE: This is a bit of a nasty hack to check if the INode is actually already based on an IPublishedContent 
             // (will be the case when using LegacyConvertedNode )

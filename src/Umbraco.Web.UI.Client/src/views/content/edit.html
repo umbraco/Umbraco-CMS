@@ -4,42 +4,40 @@
     ng-submit="save()"
     val-form-manager>
     
-    <umb-panel ng-class="'editor-breadcrumb'">
+    <umb-panel ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
         <umb-header tabs="content.tabs">
 
             <div class="span7">
-                <umb-content-name
-                    placeholder="@placeholders_entername"
-                    ng-model="content.name"/>
+                <umb-content-name placeholder="@placeholders_entername"
+                                  ng-model="content.name" />
             </div>
 
-            <div class="span5">     
+            <div class="span5">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
                     </div>
-                    
+
                     <umb-options-menu ng-show="currentNode"
-                        current-node="currentNode" 
-                        current-section="{{currentSection}}">                        
+                                      current-node="currentNode"
+                                      current-section="{{currentSection}}">
                     </umb-options-menu>
 
-                 </div>
-             </div>
+                </div>
+            </div>
         </umb-header>
 
         <umb-tab-view>
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
                 <div class="umb-pane">
-                    <umb-property 
-                        property="property"
-                        ng-repeat="property in tab.properties">
+                    <umb-property property="property"
+                                  ng-repeat="property in tab.properties">
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
 
 
                     <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
-                        
+
                         <div class="btn-group" ng-show="listViewPath">
                             <a class="btn" href="#{{listViewPath}}">
                                 <localize key="buttons_returnToList">Return to list</localize>
@@ -52,20 +50,20 @@
                             </a>
                         </div>
 
-                        <div class="btn-group dropup" ng-if="defaultButton" >
+                        <div class="btn-group dropup" ng-if="defaultButton">
                             <!-- primary button -->
                             <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
-                                <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>                            
+                                <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>
                             </a>
-                            
+
                             <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
                                 <span class="caret"></span>
                             </a>
 
                             <a href="#">Return to list</a>
-                            
+
                             <!-- sub buttons -->
-                            <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel"  ng-if="subButtons.length > 0">
+                            <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel" ng-if="subButtons.length > 0">
                                 <li ng-repeat="btn in subButtons">
                                     <a href="#" ng-click="performAction(btn)" prevent-default>
                                         <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
@@ -73,14 +71,14 @@
                                 </li>
                             </ul>
 
-                         </div>
+                        </div>
                     </div>
                 </div>
             </umb-tab>
         </umb-tab-view>
 
 
-        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="content.parentId">
+        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="ancestors && ancestors.length > 0">
             <li ng-repeat="ancestor in ancestors">
                 <a href="#/content/content/edit/{{ancestor.id}}">{{ancestor.name}}</a>
             </li>

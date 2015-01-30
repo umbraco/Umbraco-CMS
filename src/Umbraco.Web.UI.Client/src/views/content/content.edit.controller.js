@@ -32,13 +32,14 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
         editorState.set($scope.content);
 
-        //We fetch all ancestors of the node to generate the footer breadcrump navigation
+        //We fetch all ancestors of the node to generate the footer breadcrumb navigation
         if (!$routeParams.create) {
-            entityResource.getAncestors(content.id, "document")
-                .then(function (anc) {
-                    anc.pop();
-                    $scope.ancestors = anc;
-                });
+            if (content.parentId && content.parentId != -1) {
+                entityResource.getAncestors(content.id, "document")
+               .then(function (anc) {
+                   $scope.ancestors = anc.reverse();
+               });
+            }
         }
     }
 
