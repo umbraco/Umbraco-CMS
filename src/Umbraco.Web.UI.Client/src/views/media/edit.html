@@ -3,14 +3,13 @@
       ng-show="loaded" 
       ng-submit="save()"
       val-form-manager>
-    <umb-panel ng-class="'editor-breadcrumb'">  
+    <umb-panel ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
         <umb-header tabs="content.tabs">
-            
+
             <div class="span7">
-                <umb-content-name
-                    placeholder="@placeholders_entername"
-                    ng-model="content.name"/>
-           </div>
+                <umb-content-name placeholder="@placeholders_entername"
+                                  ng-model="content.name" />
+            </div>
 
             <div class="span5">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
@@ -19,8 +18,8 @@
                     </div>
 
                     <umb-options-menu ng-show="currentNode"
-                        current-node="currentNode" 
-                        current-section="{{currentSection}}">                     
+                                      current-node="currentNode"
+                                      current-section="{{currentSection}}">
                     </umb-options-menu>
                 </div>
             </div>
@@ -30,21 +29,20 @@
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
                 <div class="umb-pane">
-                    <umb-property 
-                        property="property"
-                        ng-repeat="property in tab.properties">
-                        
+                    <umb-property property="property"
+                                  ng-repeat="property in tab.properties">
+
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
 
                     <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
-                        
+
                         <div class="btn-group" ng-show="listViewPath">
                             <a class="btn" href="#{{listViewPath}}">
                                 <localize key="buttons_returnToList">Return to list</localize>
                             </a>
                         </div>
-                        
+
                         <div class="btn-group">
                             <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
                                 <localize key="buttons_save">Save</localize>
@@ -56,7 +54,7 @@
             </umb-tab>
         </umb-tab-view>
 
-        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="content.parentId">
+        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="ancestors && ancestors.length > 0">
             <li ng-repeat="ancestor in ancestors">
                 <a href="#/media/media/edit/{{ancestor.id}}">{{ancestor.name}}</a>
             </li>
