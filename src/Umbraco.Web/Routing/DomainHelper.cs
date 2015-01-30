@@ -157,6 +157,16 @@ namespace Umbraco.Web.Routing
                 var currentWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
+
+                // try removing the port number from Uri and then try to match it.
+                // e.g. request: http://website.com:443/ maps to http://website.com/
+                if (domainAndUri == null)
+                {
+                    currentWithSlash = new Uri(currentWithSlash.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+                    domainAndUri = domainsAndUris
+                        .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
+                }
+
                 if (domainAndUri != null) return domainAndUri;
 
                 // if none matches, try again without the port
