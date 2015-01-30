@@ -72,7 +72,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            var type = Type.GetType(typeName);
+            var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             using (new WriteLock(_locker))
