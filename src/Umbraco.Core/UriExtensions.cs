@@ -303,5 +303,15 @@ namespace Umbraco.Core
 
             return query;
         }
+
+        /// <summary>
+        /// Removes the port from the uri.
+        /// </summary>
+        /// <param name="uri">The uri.</param>
+        /// <returns>The same uri, without its port.</returns>
+        public static Uri WithoutPort(this Uri uri)
+        {
+            return new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+        }
     }
 }

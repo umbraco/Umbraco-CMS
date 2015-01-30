@@ -181,5 +181,24 @@ namespace Umbraco.Tests
             var output = source.MakeAbsolute(absolute);
             Assert.AreEqual(expected, output.ToString());
         }
+
+        [TestCase("http://www.domain.com/path/to/page", "http://www.domain.com/path/to/page")]
+        [TestCase("http://www.domain.com/path/to/page/", "http://www.domain.com/path/to/page/")]
+        [TestCase("http://www.domain.com", "http://www.domain.com/")]
+        [TestCase("http://www.domain.com/", "http://www.domain.com/")]
+        [TestCase("http://www.domain.com/path/to?q=3#yop", "http://www.domain.com/path/to?q=3#yop")]
+        [TestCase("http://www.domain.com/path/to/?q=3#yop", "http://www.domain.com/path/to/?q=3#yop")]
+        [TestCase("http://www.domain.com:666/path/to/page", "http://www.domain.com/path/to/page")]
+        [TestCase("http://www.domain.com:666/path/to/page/", "http://www.domain.com/path/to/page/")]
+        [TestCase("http://www.domain.com:666", "http://www.domain.com/")]
+        [TestCase("http://www.domain.com:666/", "http://www.domain.com/")]
+        [TestCase("http://www.domain.com:666/path/to?q=3#yop", "http://www.domain.com/path/to?q=3#yop")]
+        [TestCase("http://www.domain.com:666/path/to/?q=3#yop", "http://www.domain.com/path/to/?q=3#yop")]
+        public void WithoutPort(string input, string expected)
+        {
+            var source = new Uri(input);
+            var output = source.WithoutPort();
+            Assert.AreEqual(expected, output.ToString());
+        }
     }
 }
