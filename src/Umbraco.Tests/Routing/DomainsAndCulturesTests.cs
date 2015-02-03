@@ -179,13 +179,16 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)] // domain takes over local wildcard at 10012
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)] // domain takes over local wildcard at 10012
 
-        [TestCase("/1003", "en-US", 1003)] // default culture (no domain)
+        [TestCase("/1003", null, 1003)] // default culture (no domain)
         [TestCase("/1003/1003-1", "nl-NL", 10031)] // wildcard on 10031 applies
         [TestCase("/1003/1003-1/1003-1-1", "nl-NL", 100311)] // wildcard on 10031 applies
         #endregion
         public void DomainAndCultureWithWildcards(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains2();
+
+            // defaults depend on test environment
+            expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
             var routingContext = GetRoutingContext(inputUrl);
             var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
