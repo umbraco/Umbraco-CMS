@@ -17,7 +17,7 @@ namespace Umbraco.Core.Dynamics
         /// <summary>
         /// The static cache for extension methods found that match the criteria that we are looking for
         /// </summary>
-        private static readonly ConcurrentDictionary<Tuple<Type, string, int>, MethodInfo[]> MethodCache = new ConcurrentDictionary<Tuple<Type, string, int>, MethodInfo[]>();
+        private static readonly ConcurrentDictionary<Tuple<Type, string, int>, ExtensionMethodSearchResult[]> MethodCache = new ConcurrentDictionary<Tuple<Type, string, int>, ExtensionMethodSearchResult[]>();
 
         /// <summary>
         /// Returns the enumerable of all extension method info's in the app domain = USE SPARINGLY!!!
@@ -65,16 +65,18 @@ namespace Umbraco.Core.Dynamics
 	    /// <param name="argumentCount">
 	    /// The arguments EXCLUDING the 'this' argument in an extension method
 	    /// </param>
-	    /// <returns></returns>
+	    /// <returns>
+	    /// Returns the MethodInfo that matched + the generic type
+	    /// </returns>
 	    /// <remarks>
 	    /// NOTE: This will be an intensive method to call! Results will be cached based on the key (args) of this method
 	    /// </remarks>
-	    internal static IEnumerable<MethodInfo> GetAllExtensionMethods(IRuntimeCacheProvider runtimeCache, Type thisType, string name, int argumentCount)
+        internal static IEnumerable<ExtensionMethodSearchResult> GetAllExtensionMethods(IRuntimeCacheProvider runtimeCache, Type thisType, string name, int argumentCount)
 		{
 		    var key = new Tuple<Type, string, int>(thisType, name, argumentCount);
 
-		    return MethodCache.GetOrAdd(key, tuple =>
-		    {
+            return MethodCache.GetOrAdd(key, tuple =>
+            {
                 var candidates = GetAllExtensionMethodsInAppDomain(runtimeCache);
 
 
@@ -84,28 +86,31 @@ namespace Umbraco.Core.Dynamics
                 //ensure we add + 1 to the arg count because the 'this' arg is not included in the count above!
                 var byParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
 
-		        var methodsWithFirstParamType = byParamCount.Select(m => new {m, t = FirstParameterType(m)})
+		        var methodsWithFirstParamType = byParamCount.Select(methodInfo => new {methodInfo = methodInfo, firstParamType = FirstParameterType(methodInfo)})
 		            .ToArray(); // get the array so we don't keep enumerating.
 
-                //Find the method with an assignable first parameter type
-		        var methodsWhereArgZeroIsTargetType = (from method in methodsWithFirstParamType
-		            where
-		                method.t != null && TypeHelper.IsTypeAssignableFrom(method.t, thisType)
-		            select method).ToArray();
+                //Find the method with an assignable first parameter type - this is an easy match
+                var methodsWhereArgZeroIsTargetType = methodsWithFirstParamType
+                    .Where(method => method.firstParamType != null && TypeHelper.IsTypeAssignableFrom(method.firstParamType, thisType))
+                    .ToArray();
                 
-                //found some so return this
-		        if (methodsWhereArgZeroIsTargetType.Any()) return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToArray();
+                //found some so return this before trying to look for generics
+	            if (methodsWhereArgZeroIsTargetType.Any())
+	                return methodsWhereArgZeroIsTargetType.Select(mt => new ExtensionMethodSearchResult(mt.methodInfo)).ToArray();
 
                 //this is where it gets tricky, none of the first parameters were assignable to our type which means that
                 // if they are assignable they are generic arguments
-
-		        methodsWhereArgZeroIsTargetType = (from method in methodsWithFirstParamType
-		            where
-		                method.t != null && TypeHelper.IsAssignableToGenericType(method.t, thisType)
-		            select method).ToArray();
-
-                return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToArray();
-		    });
+                return methodsWithFirstParamType
+                    .Where(method => method.firstParamType != null)
+                    .Select(x => new
+                    {
+                        methodInfo = x.methodInfo,
+                        genericMethodResult = TypeHelper.IsAssignableToGenericType(x.firstParamType, thisType)
+                    })
+                    .Where(x => x.genericMethodResult.Success)
+                    .Select(x => new ExtensionMethodSearchResult(x.methodInfo, x.genericMethodResult.Result))
+                    .ToArray();
+            });
 		    
         }
     
@@ -119,7 +124,7 @@ namespace Umbraco.Core.Dynamics
             return null;
         }
 
-        private static MethodInfo DetermineMethodFromParams(IEnumerable<MethodInfo> methods, Type thisType, IEnumerable<object> args)
+        private static MethodInfo DetermineMethodFromParams(IEnumerable<ExtensionMethodSearchResult> methods, Type thisType, IEnumerable<object> args)
 		{
 			MethodInfo methodToExecute = null;
 
@@ -132,9 +137,9 @@ namespace Umbraco.Core.Dynamics
 
             var methodsWithArgTypes = methods.Select(method => new
             {
-                method,
+                method = method,
                 //skip the first arg because that is the extension method type ('this') that we are looking for
-                types = method.GetParameters().Select(pi => pi.ParameterType).Skip(1)
+                types = method.MethodInfo.GetParameters().Select(pi => pi.ParameterType).Skip(1)
             });
 
             //This type comparer will check 
@@ -152,20 +157,15 @@ namespace Umbraco.Core.Dynamics
 
             if (firstMatchingOverload != null)
             {
-                methodToExecute = firstMatchingOverload.method;
+                methodToExecute = firstMatchingOverload.method.MethodInfo;
 
-                var extensionParam = methodToExecute.GetParameters()[0].ParameterType;
-
-                //We've already done this check before in the GetAllExtensionMethods method, but need to do it here
-                // again because in order to use this found generic method we need to create a real generic method
-                // with the generic type parameters
-                var baseCompareTypeAttempt = TypeHelper.IsAssignableToGenericType(extensionParam, thisType);
-                //This should never throw
-                if (baseCompareTypeAttempt.Success == false) throw new InvalidOperationException("No base compare type could be resolved");
-
-                if (methodToExecute.IsGenericMethodDefinition && baseCompareTypeAttempt.Result.IsGenericType)
+                //if this is null then we can't need to create the generic method
+                if (methodToExecute.IsGenericMethodDefinition && firstMatchingOverload.method.BaseGenericTypeMatch.IsGenericType)
                 {
-                    methodToExecute = methodToExecute.MakeGenericMethod(baseCompareTypeAttempt.Result.GetGenericArguments());
+                    //This should never be null in this case
+                    if (firstMatchingOverload.method.BaseGenericTypeMatch == null) throw new InvalidOperationException("No base generic type could be resolved");
+
+                    methodToExecute = methodToExecute.MakeGenericMethod(firstMatchingOverload.method.BaseGenericTypeMatch.GetGenericArguments());
                 }
             }
 
@@ -184,5 +184,31 @@ namespace Umbraco.Core.Dynamics
 
             return DetermineMethodFromParams(methods, thisType, args);
         }
+
+        internal class ExtensionMethodSearchResult
+	    {
+	        /// <summary>
+	        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+	        /// </summary>
+	        public ExtensionMethodSearchResult(MethodInfo methodInfo)
+	        {
+	            MethodInfo = methodInfo;
+	            IsGeneric = false;
+	        }
+
+	        /// <summary>
+	        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+	        /// </summary>
+	        public ExtensionMethodSearchResult(MethodInfo methodInfo, Type baseGenericTypeMatch)
+	        {
+	            MethodInfo = methodInfo;
+	            IsGeneric = true;
+	            BaseGenericTypeMatch = baseGenericTypeMatch;
+	        }
+
+	        public MethodInfo MethodInfo { get; private set; }
+            public bool IsGeneric { get; private set; }
+            public Type BaseGenericTypeMatch { get; private set; }
+	    }
     }
 }

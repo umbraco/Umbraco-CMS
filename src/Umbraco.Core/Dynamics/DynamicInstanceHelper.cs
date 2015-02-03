@@ -174,6 +174,13 @@ namespace Umbraco.Core.Dynamics
 			if (toExecute != null)
 			{
 				var genericArgs = (new[] { (object)thisObject }).Concat(args);
+
+                // else we'd get an exception w/ message "Late bound operations cannot
+                // be performed on types or methods for which ContainsGenericParameters is true."
+                // because MakeGenericMethod must be used to obtain an actual method that can run
+                if (toExecute.ContainsGenericParameters)
+                    throw new InvalidOperationException("Method contains generic parameters, something's wrong.");
+                
 				result = toExecute.Invoke(null, genericArgs.ToArray());	
 			}
 			else
