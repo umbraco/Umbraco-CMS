@@ -99,6 +99,7 @@ namespace Umbraco.Tests.Services
 
             foreach (var dictionaryItem in item)
             {
+                Assert.AreEqual(_parentItemGuidId, dictionaryItem.ParentId);
                 Assert.IsFalse(string.IsNullOrEmpty(dictionaryItem.ItemKey));
             }
         }
