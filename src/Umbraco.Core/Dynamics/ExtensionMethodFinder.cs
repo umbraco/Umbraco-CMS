@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
+using System.Web.Services.Description;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Dynamics
@@ -77,87 +78,31 @@ namespace Umbraco.Core.Dynamics
 		    {
                 var candidates = GetAllExtensionMethodsInAppDomain(runtimeCache);
 
+                // filter by name	
+                var filtr1 = candidates.Where(m => m.Name == name);
 
-                //filter by name	
-                var methodsByName = candidates.Where(m => m.Name == name);
+                // filter by args count
+                // ensure we add + 1 to the arg count because the 'this' arg is not included in the count above!
+                var filtr2 = filtr1.Where(m => m.GetParameters().Length == argumentCount + 1);
 
-                //ensure we add + 1 to the arg count because the 'this' arg is not included in the count above!
-                var isGenericAndRightParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
+                // filter by first parameter type (target of the extension method)
+                // ie find the right overload that can take genericParameterType
+                // (which will be either DynamicNodeList or List<DynamicNode> which is IEnumerable)
+                var filtr3 = filtr2.Select(x =>
+                {
+                    var t = x.GetParameters()[0].ParameterType; // exists because of +1 above
+                    var bindings = new Dictionary<string, List<Type>>();
+                    if (thisType.MatchType(t, bindings) == false) return null;
 
-                //find the right overload that can take genericParameterType
-                //which will be either DynamicNodeList or List<DynamicNode> which is IEnumerable`
+                    // create the generic method if necessary
+                    if (x.ContainsGenericParameters == false) return x;
+                    var targs = t.GetGenericArguments().Select(y => bindings[y.Name].First()).ToArray();
+                    return x.MakeGenericMethod(targs);
+                }).Where(x => x != null);
 
-                var withGenericParameterType = isGenericAndRightParamCount.Select(m => new { m, t = FirstParameterType(m) });
-
-                var methodsWhereArgZeroIsTargetType = (from method in withGenericParameterType
-                                                       where
-                                                       method.t != null && MethodArgZeroHasCorrectTargetType(method.m, method.t, thisType)
-                                                       select method);
-
-		        return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToArray();
+		        return filtr3.ToArray();
 		    });
 		    
-        }
-        
-		private static bool MethodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            //This is done with seperate method calls because you can't debug/watch lamdas - if you're trying to figure
-            //out why the wrong method is returned, it helps to be able to see each boolean result
-
-            return
-
-            // is it defined on me?
-            MethodArgZeroHasCorrectTargetTypeTypeMatchesExactly(method, firstArgumentType, thisType) ||
-
-            // or on any of my interfaces?
-           MethodArgZeroHasCorrectTargetTypeAnInterfaceMatches(method, firstArgumentType, thisType) ||
-
-            // or on any of my base types?
-            MethodArgZeroHasCorrectTargetTypeIsASubclassOf(method, firstArgumentType, thisType) ||
-
-           //share a common interface (e.g. IEnumerable)
-            MethodArgZeroHasCorrectTargetTypeShareACommonInterface(method, firstArgumentType, thisType);
-
-
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeShareACommonInterface(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var interfaces = firstArgumentType.GetInterfaces();
-            if (interfaces.Length == 0)
-            {
-                return false;
-            }
-            var result = interfaces.All(i => thisType.GetInterfaces().Contains(i));
-            return result;
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeIsASubclassOf(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var result = thisType.IsSubclassOf(firstArgumentType);
-            return result;
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeAnInterfaceMatches(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var result = thisType.GetInterfaces().Contains(firstArgumentType);
-            return result;
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeTypeMatchesExactly(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var result = (thisType == firstArgumentType);
-            return result;
-        }
-        
-		private static Type FirstParameterType(MethodInfo m)
-        {
-            var p = m.GetParameters();
-            if (p.Any())
-            {
-                return p.First().ParameterType;
-            }
-            return null;
         }
 
         private static MethodInfo DetermineMethodFromParams(IEnumerable<MethodInfo> methods, Type genericType, IEnumerable<object> args)

@@ -101,7 +101,7 @@
     <key alias="contentRepublished">The content has been re-published.</key>
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>
+    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
     <key alias="docTypeChanged">Document Type Changed</key>
     <key alias="mapProperties">Map Properties</key>
     <key alias="mapToProperty">Map to Property</key>

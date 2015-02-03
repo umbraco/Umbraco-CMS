@@ -28,7 +28,7 @@
       <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
       <dependency id="MySql.Data" version="[6.6.5]" />
       <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
-      <dependency id="ClientDependency" version="[1.8.1, 2.0.0)" />
+      <dependency id="ClientDependency" version="[1.8.2, 2.0.0)" />
       <dependency id="ClientDependency-Mvc" version="[1.8.0, 2.0.0)" />
       <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
       <dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
