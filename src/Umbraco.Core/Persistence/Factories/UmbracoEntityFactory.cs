@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         internal void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
         {
-            var entityProps = TypeHelper.GetPublicProperties(typeof(IUmbracoEntity)).Select(x => x.Name).ToArray();
+            var entityProps = typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray();
             
             //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
             foreach (var k in originalEntityProperties.Keys

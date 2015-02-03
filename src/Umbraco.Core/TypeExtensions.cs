@@ -131,20 +131,7 @@ namespace Umbraco.Core
 
             return true;
         }
-
-        // that method is broken (will return duplicates) and useless (GetInterfaces already does the job)
-        //public static IEnumerable<Type> AllInterfaces(this Type target)
-        //{
-        //    foreach (var IF in target.GetInterfaces())
-        //    {
-        //        yield return IF;
-        //        foreach (var childIF in IF.AllInterfaces())
-        //        {
-        //            yield return childIF;
-        //        }
-        //    }
-        //}
-
+        
         public static IEnumerable<Type> GetBaseTypes(this Type type, bool andSelf)
         {
             if (andSelf)
@@ -309,6 +296,53 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Returns all public properties including inherited properties even for interfaces
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// taken from http://stackoverflow.com/questions/358835/getproperties-to-return-all-properties-for-an-interface-inheritance-hierarchy
+        /// </remarks>
+        public static PropertyInfo[] GetPublicProperties(this Type type)
+        {
+            if (type.IsInterface)
+            {
+                var propertyInfos = new List<PropertyInfo>();
+
+                var considered = new List<Type>();
+                var queue = new Queue<Type>();
+                considered.Add(type);
+                queue.Enqueue(type);
+                while (queue.Count > 0)
+                {
+                    var subType = queue.Dequeue();
+                    foreach (var subInterface in subType.GetInterfaces())
+                    {
+                        if (considered.Contains(subInterface)) continue;
+
+                        considered.Add(subInterface);
+                        queue.Enqueue(subInterface);
+                    }
+
+                    var typeProperties = subType.GetProperties(
+                        BindingFlags.FlattenHierarchy
+                        | BindingFlags.Public
+                        | BindingFlags.Instance);
+
+                    var newPropertyInfos = typeProperties
+                        .Where(x => !propertyInfos.Contains(x));
+
+                    propertyInfos.InsertRange(0, newPropertyInfos);
+                }
+
+                return propertyInfos.ToArray();
+            }
+
+            return type.GetProperties(BindingFlags.FlattenHierarchy
+                | BindingFlags.Public | BindingFlags.Instance);
+        }
+
+        /// <summary>
 		/// Determines whether the specified actual type is type.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -389,100 +423,6 @@ namespace Umbraco.Core
 		}
 
 
-        #region Match Type
 
-        private static void ReduceGenericParameterCandidateTypes(ICollection<Type> allStuff, Type type)
-        {
-            var at1 = new List<Type>();
-            var t = type;
-            while (t != null)
-            {
-                at1.Add(t);
-                t = t.BaseType;
-            }
-            var r = allStuff.Where(x => x.IsClass && at1.Contains(x) == false).ToArray();
-            foreach (var x in r) allStuff.Remove(x);
-            var ai1 = type.GetInterfaces();
-            if (type.IsInterface) ai1 = ai1.Union(new[] { type }).ToArray();
-            r = allStuff.Where(x => x.IsInterface && ai1.Contains(x) == false).ToArray();
-            foreach (var x in r) allStuff.Remove(x);
-        }
-
-        private static bool MatchGeneric(Type inst, Type type, IDictionary<string, List<Type>> bindings)
-        {
-            if (inst.IsGenericType == false) return false;
-
-            var instd = inst.GetGenericTypeDefinition();
-            var typed = type.GetGenericTypeDefinition();
-
-            if (instd != typed) return false;
-
-            var insta = inst.GetGenericArguments();
-            var typea = type.GetGenericArguments();
-
-            if (insta.Length != typea.Length) return false;
-
-            // but... there is no ZipWhile, and we have arrays anyway
-            //var x = insta.Zip<Type, Type, bool>(typea, (instax, typeax) => { ... });
-
-            for (var i = 0; i < insta.Length; i++)
-                if (MatchType(insta[i], typea[i], bindings) == false)
-                    return false;
-
-            return true;
-        }
-
-        private static IEnumerable<Type> GetGenericParameterCandidateTypes(Type type)
-        {
-            yield return type;
-            var t = type.BaseType;
-            while (t != null)
-            {
-                yield return t;
-                t = t.BaseType;
-            }
-            foreach (var i in type.GetInterfaces())
-                yield return i;
-        }
-
-	    public static bool MatchType(this Type inst, Type type)
-	    {
-	        return MatchType(inst, type, new Dictionary<string, List<Type>>());
-	    }
-
-        internal static bool MatchType(this Type inst, Type type, IDictionary<string, List<Type>> bindings)
-        {
-            if (type.IsGenericType)
-            {
-                if (MatchGeneric(inst, type, bindings)) return true;
-                var t = inst.BaseType;
-                while (t != null)
-                {
-                    if (MatchGeneric(t, type, bindings)) return true;
-                    t = t.BaseType;
-                }
-                return inst.GetInterfaces().Any(i => MatchGeneric(i, type, bindings));
-            }
-
-            if (type.IsGenericParameter)
-            {
-                if (bindings.ContainsKey(type.Name))
-                {
-                    ReduceGenericParameterCandidateTypes(bindings[type.Name], inst);
-                    return bindings[type.Name].Count > 0;
-                }
-
-                bindings[type.Name] = new List<Type>(GetGenericParameterCandidateTypes(inst));
-                return true;
-            }
-
-            if (inst == type) return true;
-            if (type.IsClass && inst.IsClass && inst.IsSubclassOf(type)) return true;
-            if (type.IsInterface && inst.GetInterfaces().Contains(type)) return true;
-
-            return false;
-        }
-
-        #endregion
     }
 }

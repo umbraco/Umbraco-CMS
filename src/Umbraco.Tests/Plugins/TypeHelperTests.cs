@@ -10,6 +10,7 @@ using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.DynamicsAndReflection;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Models;
 using Umbraco.Web.Scheduling;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Plugins
             //Will always fail which is correct, you cannot 'assign' IEnumerable<IPublishedContent> simply to IEnumerable<>
             //Assert.IsTrue(TypeHelper.IsTypeAssignableFrom(type5, type2));
 
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(type5, type2));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(type5, type2));
         }
 
         [Test]
@@ -49,20 +50,20 @@ namespace Umbraco.Tests.Plugins
             //modified from: https://gist.github.com/klmr/4174727
             //using a version modified from: http://stackoverflow.com/a/1075059/1968
 
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(Base<>), typeof(Derived<int>)));
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(IEnumerable<>), typeof(List<int>)));
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(Derived<>), typeof(Derived<int>)));
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(Base<>), typeof(Derived2<int>)));
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(IBase<>), typeof(DerivedI<int>)));
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(IBase<>), typeof(Derived2<int>)));
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(typeof(Nullable<>), typeof(int?)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(Base<>), typeof(Derived<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(IEnumerable<>), typeof(List<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(Derived<>), typeof(Derived<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(Base<>), typeof(Derived2<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(IBase<>), typeof(DerivedI<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(IBase<>), typeof(Derived2<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(typeof(Nullable<>), typeof(int?)));
 
-            Assert.IsFalse(TypeHelper.IsAssignableToGenericType(typeof(Object), typeof(Derived<int>)));
-            Assert.IsFalse(TypeHelper.IsAssignableToGenericType(typeof(List<>), typeof(Derived<int>)));
-            Assert.IsFalse(TypeHelper.IsAssignableToGenericType(typeof(IEnumerable<>), typeof(Derived<int>)));
-            Assert.IsFalse(TypeHelper.IsAssignableToGenericType(typeof(Base<int>), typeof(Derived<int>)));
-            Assert.IsFalse(TypeHelper.IsAssignableToGenericType(typeof(IEnumerable<int>), typeof(List<int>)));
-            Assert.IsFalse(TypeHelper.IsAssignableToGenericType(typeof(Nullable<>), typeof(int)));
+            Assert.IsFalse(TypeHelper.IsAssignableFromGeneric(typeof(Object), typeof(Derived<int>)));
+            Assert.IsFalse(TypeHelper.IsAssignableFromGeneric(typeof(List<>), typeof(Derived<int>)));
+            Assert.IsFalse(TypeHelper.IsAssignableFromGeneric(typeof(IEnumerable<>), typeof(Derived<int>)));
+            Assert.IsFalse(TypeHelper.IsAssignableFromGeneric(typeof(Base<int>), typeof(Derived<int>)));
+            Assert.IsFalse(TypeHelper.IsAssignableFromGeneric(typeof(IEnumerable<int>), typeof(List<int>)));
+            Assert.IsFalse(TypeHelper.IsAssignableFromGeneric(typeof(Nullable<>), typeof(int)));
 
             //This get's the "Type" from the Count extension method on IEnumerable<T>, however the type IEnumerable<T> isn't
             // IEnumerable<> and it is not a generic definition, this attempts to explain that:
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Plugins
                 .Single()
                 .ParameterType;
 
-            Assert.IsTrue(TypeHelper.IsAssignableToGenericType(genericEnumerableNonGenericDefinition, typeof(List<int>)));
+            Assert.IsTrue(TypeHelper.IsAssignableFromGeneric(genericEnumerableNonGenericDefinition, typeof(List<int>)));
            
         }
 
@@ -138,6 +139,51 @@ namespace Umbraco.Tests.Plugins
             Assert.IsTrue(t6.Success);
             Assert.AreEqual(typeof(IApplicationEventHandler), t6.Result);
 
+        }
+
+        [Test]
+        public void MatchTypesTest()
+        {
+            var bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(int), typeof(int), bindings));
+            Assert.AreEqual(0, bindings.Count);
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsFalse(TypeHelper.MatchType(typeof(int), typeof(string), bindings));
+            Assert.AreEqual(0, bindings.Count);
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(System.Collections.IEnumerable), bindings));
+            Assert.AreEqual(0, bindings.Count);
+
+            var m = typeof(ExtensionMethodFinderTests).GetMethod("TestMethod7");
+            var t1 = m.GetParameters()[0].ParameterType; // List<T>
+            var t2 = m.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // <T>
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(int), t2, bindings));
+            Assert.AreEqual(1, bindings.Count);
+            Assert.AreEqual(typeof(int), bindings["T"].FirstOrDefault());
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(IList<int>), t1, bindings));
+            Assert.AreEqual(1, bindings.Count);
+            Assert.AreEqual(typeof(int), bindings["T"].FirstOrDefault());
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), typeof(IList<int>), bindings));
+            Assert.AreEqual(0, bindings.Count);
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), t1, bindings));
+            Assert.AreEqual(1, bindings.Count);
+            Assert.AreEqual(typeof(int), bindings["T"].FirstOrDefault());
+
+            bindings = new Dictionary<string, List<Type>>();
+            Assert.IsTrue(TypeHelper.MatchType(typeof(Dictionary<int, string>), typeof(IDictionary<,>), bindings));
+            Assert.AreEqual(2, bindings.Count);
+            Assert.AreEqual(typeof(int), bindings["TKey"].FirstOrDefault());
+            Assert.AreEqual(typeof(string), bindings["TValue"].FirstOrDefault());
         }
 
     }

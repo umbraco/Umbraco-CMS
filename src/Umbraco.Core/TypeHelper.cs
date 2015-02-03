@@ -134,80 +134,84 @@ namespace Umbraco.Core
         /// <summary>
         /// Checks if the generic type passed in can be assigned from the given type
         /// </summary>
-        /// <param name="genericType"></param>
-        /// <param name="givenType"></param>
+        /// <param name="contract"></param>
+        /// <param name="implementation"></param>
         /// <returns>
         /// Returns an Attempt{Type} which if true will include the actual type that matched the genericType
         /// being compared.
         /// </returns>
         /// <remarks>
-        /// First we need to check a special case, if the generic type is a generic definition but has not FullName, then
+        /// First we need to check a special case, if the generic type is a generic definition but has no FullName, then
         /// we cannot compare it with traditional means because the types will never match. 
         /// Generic types will not have a FullName in these cases: http://blogs.msdn.com/b/haibo_luo/archive/2006/02/17/534480.aspx
-        /// or apparently when you retrieve a generic method parameter using reflection.
+        /// or when you retrieve a generic method parameter using reflection, for example, typeof(IEnumerable{}) is not IEnumerable{T} since
+        /// when reflected 'T' is actually something.
         ///  
         /// This is using a version modified from: http://stackoverflow.com/a/1075059/1968
         /// </remarks>
-        public static Attempt<Type> IsAssignableToGenericType(Type genericType, Type givenType)
+        public static Attempt<Type> IsAssignableFromGeneric(Type contract, Type implementation)
         {
-            if (genericType.IsGenericTypeDefinition == false && genericType.FullName.IsNullOrWhiteSpace())
+            if (contract.IsGenericTypeDefinition == false && contract.FullName.IsNullOrWhiteSpace())
             {
-                return IsAssignableToReflectedGenericType(genericType, givenType);
+                return IsTypeAssignableFromReflectedGeneric(contract, implementation);
             }
 
-            var genericTypeDef = givenType.IsGenericType ? givenType.GetGenericTypeDefinition() : null;
+            var genericTypeDef = implementation.IsGenericType ? implementation.GetGenericTypeDefinition() : null;
 
-            if (genericTypeDef != null && genericTypeDef == genericType)
-                return Attempt<Type>.Succeed(givenType);
+            if (genericTypeDef != null && genericTypeDef == contract)
+                return Attempt<Type>.Succeed(implementation);
 
-            var its = givenType.GetInterfaces();
+            var its = implementation.GetInterfaces();
 
             foreach (var it in its)
             {
                 genericTypeDef = it.IsGenericType ? it.GetGenericTypeDefinition() : null;
 
-                if (genericTypeDef != null && genericTypeDef == genericType)
+                if (genericTypeDef != null && genericTypeDef == contract)
                     return Attempt<Type>.Succeed(it);
             }
 
-            var baseType = givenType.BaseType;
+            var baseType = implementation.BaseType;
             return baseType != null
-                ? IsAssignableToGenericType(genericType, baseType)
+                ? IsAssignableFromGeneric(contract, baseType)
                 : Attempt<Type>.Fail();
         }
 
         /// <summary>
         /// This is used in IsAssignableToGenericType
         /// </summary>
-        /// <param name="genericType"></param>
-        /// <param name="givenType"></param>
+        /// <param name="contract">The generic type contract</param>
+        /// <param name="implementation"></param>
         /// <returns>
         /// Returns an Attempt{Type} which if true will include the actual type that matched the genericType
         /// being compared.
         /// </returns>
-        private static Attempt<Type> IsAssignableToReflectedGenericType(Type genericType, Type givenType)
+        /// <remarks>
+        /// See remarks in method IsAssignableFromGeneric
+        /// </remarks>
+        private static Attempt<Type> IsTypeAssignableFromReflectedGeneric(Type contract, Type implementation)
         {
-            if (givenType.IsGenericType && givenType.GetGenericTypeDefinition().Name == genericType.Name && givenType.GenericTypeArguments.Length == genericType.GenericTypeArguments.Length)
-                return Attempt<Type>.Succeed(givenType);
+            if (implementation.IsGenericType && implementation.GetGenericTypeDefinition().Name == contract.Name && implementation.GenericTypeArguments.Length == contract.GenericTypeArguments.Length)
+                return Attempt<Type>.Succeed(implementation);
 
-            var its = givenType.GetInterfaces();
+            var its = implementation.GetInterfaces();
 
             foreach (var it in its)
             {
-                if (it.IsGenericType && it.GetGenericTypeDefinition().Name == genericType.Name && givenType.GenericTypeArguments.Length == genericType.GenericTypeArguments.Length)
+                if (it.IsGenericType && it.GetGenericTypeDefinition().Name == contract.Name && implementation.GenericTypeArguments.Length == contract.GenericTypeArguments.Length)
                 {
                     return Attempt<Type>.Succeed(it);
                 }
             }
 
-            var baseType = givenType.BaseType;
+            var baseType = implementation.BaseType;
             return baseType != null 
-                ? IsAssignableToReflectedGenericType(genericType, baseType) 
+                ? IsTypeAssignableFromReflectedGeneric(contract, baseType) 
                 : Attempt<Type>.Fail();
         }
 
         /// <summary>
-		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
+		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation,
 		/// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
 		/// </summary>
 		/// <param name="contract">The type of the contract.</param>
@@ -231,8 +235,20 @@ namespace Umbraco.Core
 			return IsTypeAssignableFrom(typeof(TContract), implementation);
 		}
 
+        /// <summary>
+        /// Determines whether the object instance <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
+        /// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
+        /// </summary>
+        /// <typeparam name="TContract">The type of the contract.</typeparam>
+        /// <param name="implementation">The implementation.</param>
+        public static bool IsTypeAssignableFrom<TContract>(object implementation)
+        {
+            if (implementation == null) throw new ArgumentNullException("implementation");
+            return IsTypeAssignableFrom<TContract>(implementation.GetType());
+        }
+
 		/// <summary>
-		/// A cached method to determine whether <paramref name="implementation"/> represents a value type.
+		/// A method to determine whether <paramref name="implementation"/> represents a value type.
 		/// </summary>
 		/// <param name="implementation">The implementation.</param>
 		public static bool IsValueType(Type implementation)
@@ -241,7 +257,7 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
-		/// A cached method to determine whether <paramref name="implementation"/> is an implied value type (<see cref="Type.IsValueType"/>, <see cref="Type.IsEnum"/> or a string).
+		/// A method to determine whether <paramref name="implementation"/> is an implied value type (<see cref="Type.IsValueType"/>, <see cref="Type.IsEnum"/> or a string).
 		/// </summary>
 		/// <param name="implementation">The implementation.</param>
 		public static bool IsImplicitValueType(Type implementation)
@@ -249,14 +265,8 @@ namespace Umbraco.Core
 		    return IsValueType(implementation) || implementation.IsEnum || implementation == typeof (string);
 		}
 
-		public static bool IsTypeAssignableFrom<TContract>(object implementation)
-		{
-			if (implementation == null) throw new ArgumentNullException("implementation");
-			return IsTypeAssignableFrom<TContract>(implementation.GetType());
-		}
-
 		/// <summary>
-		/// Returns a PropertyInfo from a type
+		/// Returns (and caches) a PropertyInfo from a type
 		/// </summary>
 		/// <param name="type"></param>
 		/// <param name="name"></param>
@@ -278,54 +288,7 @@ namespace Umbraco.Core
 							return x.Name == name;
 						return x.Name.InvariantEquals(name);
 					});
-		}
-
-        /// <summary>
-        /// Returns all public properties including inherited properties even for interfaces
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// taken from http://stackoverflow.com/questions/358835/getproperties-to-return-all-properties-for-an-interface-inheritance-hierarchy
-        /// </remarks>
-        public static PropertyInfo[] GetPublicProperties(Type type)
-        {
-            if (type.IsInterface)
-            {
-                var propertyInfos = new List<PropertyInfo>();
-
-                var considered = new List<Type>();
-                var queue = new Queue<Type>();
-                considered.Add(type);
-                queue.Enqueue(type);
-                while (queue.Count > 0)
-                {
-                    var subType = queue.Dequeue();
-                    foreach (var subInterface in subType.GetInterfaces())
-                    {
-                        if (considered.Contains(subInterface)) continue;
-
-                        considered.Add(subInterface);
-                        queue.Enqueue(subInterface);
-                    }
-
-                    var typeProperties = subType.GetProperties(
-                        BindingFlags.FlattenHierarchy
-                        | BindingFlags.Public
-                        | BindingFlags.Instance);
-
-                    var newPropertyInfos = typeProperties
-                        .Where(x => !propertyInfos.Contains(x));
-
-                    propertyInfos.InsertRange(0, newPropertyInfos);
-                }
-
-                return propertyInfos.ToArray();
-            }
-
-            return type.GetProperties(BindingFlags.FlattenHierarchy
-                | BindingFlags.Public | BindingFlags.Instance);
-        }
+		}        
 
 		/// <summary>
 		/// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
@@ -361,5 +324,104 @@ namespace Umbraco.Core
 				     	            && (includeIndexed || !y.GetIndexParameters().Any()))
 				     	.ToArray());
 		}
+
+
+        #region Match Type
+
+        //TODO: Need to determine if these methods should replace/combine/merge etc with IsTypeAssignableFrom, IsAssignableFromGeneric
+
+        private static void ReduceGenericParameterCandidateTypes(ICollection<Type> allStuff, Type type)
+        {
+            var at1 = new List<Type>();
+            var t = type;
+            while (t != null)
+            {
+                at1.Add(t);
+                t = t.BaseType;
+            }
+            var r = allStuff.Where(x => x.IsClass && at1.Contains(x) == false).ToArray();
+            foreach (var x in r) allStuff.Remove(x);
+            var ai1 = type.GetInterfaces();
+            if (type.IsInterface) ai1 = ai1.Union(new[] { type }).ToArray();
+            r = allStuff.Where(x => x.IsInterface && ai1.Contains(x) == false).ToArray();
+            foreach (var x in r) allStuff.Remove(x);
+        }
+
+        private static bool MatchGeneric(Type inst, Type type, IDictionary<string, List<Type>> bindings)
+        {
+            if (inst.IsGenericType == false) return false;
+
+            var instd = inst.GetGenericTypeDefinition();
+            var typed = type.GetGenericTypeDefinition();
+
+            if (instd != typed) return false;
+
+            var insta = inst.GetGenericArguments();
+            var typea = type.GetGenericArguments();
+
+            if (insta.Length != typea.Length) return false;
+
+            // but... there is no ZipWhile, and we have arrays anyway
+            //var x = insta.Zip<Type, Type, bool>(typea, (instax, typeax) => { ... });
+
+            for (var i = 0; i < insta.Length; i++)
+                if (MatchType(insta[i], typea[i], bindings) == false)
+                    return false;
+
+            return true;
+        }
+
+        private static IEnumerable<Type> GetGenericParameterCandidateTypes(Type type)
+        {
+            yield return type;
+            var t = type.BaseType;
+            while (t != null)
+            {
+                yield return t;
+                t = t.BaseType;
+            }
+            foreach (var i in type.GetInterfaces())
+                yield return i;
+        }
+
+        public static bool MatchType(Type inst, Type type)
+        {
+            return MatchType(inst, type, new Dictionary<string, List<Type>>());
+        }
+
+        internal static bool MatchType(Type inst, Type type, IDictionary<string, List<Type>> bindings)
+        {
+            if (type.IsGenericType)
+            {
+                if (MatchGeneric(inst, type, bindings)) return true;
+                var t = inst.BaseType;
+                while (t != null)
+                {
+                    if (MatchGeneric(t, type, bindings)) return true;
+                    t = t.BaseType;
+                }
+                return inst.GetInterfaces().Any(i => MatchGeneric(i, type, bindings));
+            }
+
+            if (type.IsGenericParameter)
+            {
+                if (bindings.ContainsKey(type.Name))
+                {
+                    ReduceGenericParameterCandidateTypes(bindings[type.Name], inst);
+                    return bindings[type.Name].Count > 0;
+                }
+
+                bindings[type.Name] = new List<Type>(GetGenericParameterCandidateTypes(inst));
+                return true;
+            }
+
+            if (inst == type) return true;
+            if (type.IsClass && inst.IsClass && inst.IsSubclassOf(type)) return true;
+            if (type.IsInterface && inst.GetInterfaces().Contains(type)) return true;
+
+            return false;
+        }
+
+        #endregion
 	}
 }

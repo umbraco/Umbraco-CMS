@@ -105,7 +105,7 @@ namespace Umbraco.Core.Dynamics
                     .Select(x => new
                     {
                         methodInfo = x.methodInfo,
-                        genericMethodResult = TypeHelper.IsAssignableToGenericType(x.firstParamType, thisType)
+                        genericMethodResult = TypeHelper.IsAssignableFromGeneric(x.firstParamType, thisType)
                     })
                     .Where(x => x.genericMethodResult.Success)
                     .Select(x => new ExtensionMethodSearchResult(x.methodInfo, x.genericMethodResult.Result))
