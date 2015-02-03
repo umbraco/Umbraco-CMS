@@ -131,7 +131,82 @@ namespace Umbraco.Core
 	        return Attempt<Type>.Fail();
 	    }
 
-		/// <summary>
+        /// <summary>
+        /// Checks if the generic type passed in can be assigned from the given type
+        /// </summary>
+        /// <param name="genericType"></param>
+        /// <param name="givenType"></param>
+        /// <returns>
+        /// Returns an Attempt{Type} which if true will include the actual type that matched the genericType
+        /// being compared.
+        /// </returns>
+        /// <remarks>
+        /// First we need to check a special case, if the generic type is a generic definition but has not FullName, then
+        /// we cannot compare it with traditional means because the types will never match. 
+        /// Generic types will not have a FullName in these cases: http://blogs.msdn.com/b/haibo_luo/archive/2006/02/17/534480.aspx
+        /// or apparently when you retrieve a generic method parameter using reflection.
+        ///  
+        /// This is using a version modified from: http://stackoverflow.com/a/1075059/1968
+        /// </remarks>
+        public static Attempt<Type> IsAssignableToGenericType(Type genericType, Type givenType)
+        {
+            if (genericType.IsGenericTypeDefinition == false && genericType.FullName.IsNullOrWhiteSpace())
+            {
+                return IsAssignableToReflectedGenericType(genericType, givenType);
+            }
+
+            var genericTypeDef = givenType.IsGenericType ? givenType.GetGenericTypeDefinition() : null;
+
+            if (genericTypeDef != null && genericTypeDef == genericType)
+                return Attempt<Type>.Succeed(givenType);
+
+            var its = givenType.GetInterfaces();
+
+            foreach (var it in its)
+            {
+                genericTypeDef = it.IsGenericType ? it.GetGenericTypeDefinition() : null;
+
+                if (genericTypeDef != null && genericTypeDef == genericType)
+                    return Attempt<Type>.Succeed(it);
+            }
+
+            var baseType = givenType.BaseType;
+            return baseType != null
+                ? IsAssignableToGenericType(genericType, baseType)
+                : Attempt<Type>.Fail();
+        }
+
+        /// <summary>
+        /// This is used in IsAssignableToGenericType
+        /// </summary>
+        /// <param name="genericType"></param>
+        /// <param name="givenType"></param>
+        /// <returns>
+        /// Returns an Attempt{Type} which if true will include the actual type that matched the genericType
+        /// being compared.
+        /// </returns>
+        private static Attempt<Type> IsAssignableToReflectedGenericType(Type genericType, Type givenType)
+        {
+            if (givenType.IsGenericType && givenType.GetGenericTypeDefinition().Name == genericType.Name && givenType.GenericTypeArguments.Length == genericType.GenericTypeArguments.Length)
+                return Attempt<Type>.Succeed(givenType);
+
+            var its = givenType.GetInterfaces();
+
+            foreach (var it in its)
+            {
+                if (it.IsGenericType && it.GetGenericTypeDefinition().Name == genericType.Name && givenType.GenericTypeArguments.Length == genericType.GenericTypeArguments.Length)
+                {
+                    return Attempt<Type>.Succeed(it);
+                }
+            }
+
+            var baseType = givenType.BaseType;
+            return baseType != null 
+                ? IsAssignableToReflectedGenericType(genericType, baseType) 
+                : Attempt<Type>.Fail();
+        }
+
+        /// <summary>
 		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
 		/// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
 		/// </summary>

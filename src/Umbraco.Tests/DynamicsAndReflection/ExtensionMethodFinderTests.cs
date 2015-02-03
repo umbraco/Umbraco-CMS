@@ -166,6 +166,11 @@ namespace Umbraco.Tests.DynamicsAndReflection
 
         public class TestClass<T> : TestClass { }
 
+        public class TestClassCollection : List<TestClass>
+        {
+            
+        }
+
         [Test]
         public void Find_Non_Overloaded_Method()
         {
@@ -253,10 +258,30 @@ namespace Umbraco.Tests.DynamicsAndReflection
             method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClass), new object[] { nonGenericTestClass }, "GenericParameterMethod", false);
             Assert.IsNotNull(method);    
         }
+
+        [Test]
+        public void Find_Generic_Enumerable_Method()
+        {
+            MethodInfo method;
+            var class1 = Enumerable.Empty<TestClass>();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(IEnumerable<TestClass>), new object[] {}, "GenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1 });
+
+            var class2 = new TestClassCollection();
+
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClassCollection), new object[] { }, "GenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class2 });
+        }
     }
 
     static class ExtensionMethodFinderTestsExtensions
     {
+        public static void GenericMethod<T>(this IEnumerable<T> source)
+        { }
+
         public static void SimpleMethod(this ExtensionMethodFinderTests.TestClass source, int value)
         { }
 

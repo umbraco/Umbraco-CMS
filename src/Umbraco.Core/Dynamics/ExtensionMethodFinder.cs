@@ -82,75 +82,34 @@ namespace Umbraco.Core.Dynamics
                 var methodsByName = candidates.Where(m => m.Name == name);
 
                 //ensure we add + 1 to the arg count because the 'this' arg is not included in the count above!
-                var isGenericAndRightParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
+                var byParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
 
-                //find the right overload that can take genericParameterType
-                //which will be either DynamicNodeList or List<DynamicNode> which is IEnumerable`
+		        var methodsWithFirstParamType = byParamCount.Select(m => new {m, t = FirstParameterType(m)})
+		            .ToArray(); // get the array so we don't keep enumerating.
 
-                var withGenericParameterType = isGenericAndRightParamCount.Select(m => new { m, t = FirstParameterType(m) });
+                //Find the method with an assignable first parameter type
+		        var methodsWhereArgZeroIsTargetType = (from method in methodsWithFirstParamType
+		            where
+		                method.t != null && TypeHelper.IsTypeAssignableFrom(method.t, thisType)
+		            select method).ToArray();
+                
+                //found some so return this
+		        if (methodsWhereArgZeroIsTargetType.Any()) return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToArray();
 
-                var methodsWhereArgZeroIsTargetType = (from method in withGenericParameterType
-                                                       where
-                                                       method.t != null && MethodArgZeroHasCorrectTargetType(method.m, method.t, thisType)
-                                                       select method);
+                //this is where it gets tricky, none of the first parameters were assignable to our type which means that
+                // if they are assignable they are generic arguments
 
-		        return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToArray();
+		        methodsWhereArgZeroIsTargetType = (from method in methodsWithFirstParamType
+		            where
+		                method.t != null && TypeHelper.IsAssignableToGenericType(method.t, thisType)
+		            select method).ToArray();
+
+                return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToArray();
 		    });
 		    
         }
-        
-		private static bool MethodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            //This is done with seperate method calls because you can't debug/watch lamdas - if you're trying to figure
-            //out why the wrong method is returned, it helps to be able to see each boolean result
-
-            return
-
-            // is it defined on me?
-            MethodArgZeroHasCorrectTargetTypeTypeMatchesExactly(method, firstArgumentType, thisType) ||
-
-            // or on any of my interfaces?
-           MethodArgZeroHasCorrectTargetTypeAnInterfaceMatches(method, firstArgumentType, thisType) ||
-
-            // or on any of my base types?
-            MethodArgZeroHasCorrectTargetTypeIsASubclassOf(method, firstArgumentType, thisType) ||
-
-           //share a common interface (e.g. IEnumerable)
-            MethodArgZeroHasCorrectTargetTypeShareACommonInterface(method, firstArgumentType, thisType);
-
-
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeShareACommonInterface(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var interfaces = firstArgumentType.GetInterfaces();
-            if (interfaces.Length == 0)
-            {
-                return false;
-            }
-            var result = interfaces.All(i => thisType.GetInterfaces().Contains(i));
-            return result;
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeIsASubclassOf(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var result = thisType.IsSubclassOf(firstArgumentType);
-            return result;
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeAnInterfaceMatches(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var result = thisType.GetInterfaces().Contains(firstArgumentType);
-            return result;
-        }
-
-        private static bool MethodArgZeroHasCorrectTargetTypeTypeMatchesExactly(MethodInfo method, Type firstArgumentType, Type thisType)
-        {
-            var result = (thisType == firstArgumentType);
-            return result;
-        }
-        
-		private static Type FirstParameterType(MethodInfo m)
+    
+        private static Type FirstParameterType(MethodInfo m)
         {
             var p = m.GetParameters();
             if (p.Any())
@@ -160,7 +119,7 @@ namespace Umbraco.Core.Dynamics
             return null;
         }
 
-        private static MethodInfo DetermineMethodFromParams(IEnumerable<MethodInfo> methods, Type genericType, IEnumerable<object> args)
+        private static MethodInfo DetermineMethodFromParams(IEnumerable<MethodInfo> methods, Type thisType, IEnumerable<object> args)
 		{
 			MethodInfo methodToExecute = null;
 
@@ -194,19 +153,27 @@ namespace Umbraco.Core.Dynamics
             if (firstMatchingOverload != null)
             {
                 methodToExecute = firstMatchingOverload.method;
+
+                var extensionParam = methodToExecute.GetParameters()[0].ParameterType;
+
+                //We've already done this check before in the GetAllExtensionMethods method, but need to do it here
+                // again because in order to use this found generic method we need to create a real generic method
+                // with the generic type parameters
+                var baseCompareTypeAttempt = TypeHelper.IsAssignableToGenericType(extensionParam, thisType);
+                //This should never throw
+                if (baseCompareTypeAttempt.Success == false) throw new InvalidOperationException("No base compare type could be resolved");
+
+                if (methodToExecute.IsGenericMethodDefinition && baseCompareTypeAttempt.Result.IsGenericType)
+                {
+                    methodToExecute = methodToExecute.MakeGenericMethod(baseCompareTypeAttempt.Result.GetGenericArguments());
+                }
             }
 
-			return methodToExecute;
+            return methodToExecute;
 		}
 
         public static MethodInfo FindExtensionMethod(IRuntimeCacheProvider runtimeCache, Type thisType, object[] args, string name, bool argsContainsThis)
         {
-            Type genericType = null;
-            if (thisType.IsGenericType)
-            {
-                genericType = thisType.GetGenericArguments()[0];
-            }
-
             args = args
                 //if the args contains 'this', remove the first one since that is 'this' and we don't want to use
                 //that in the method searching
@@ -214,8 +181,8 @@ namespace Umbraco.Core.Dynamics
                 .ToArray();
 
             var methods = GetAllExtensionMethods(runtimeCache, thisType, name, args.Length).ToArray();
-            
-            return DetermineMethodFromParams(methods, genericType, args);
+
+            return DetermineMethodFromParams(methods, thisType, args);
         }
     }
 }
