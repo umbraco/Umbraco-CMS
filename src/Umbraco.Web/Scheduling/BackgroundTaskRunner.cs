@@ -8,26 +8,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
-
-    internal class BackgroundTaskRunnerOptions
-    {
-        public BackgroundTaskRunnerOptions()
-        {
-            DedicatedThread = false;
-            PersistentThread = false;
-            OnlyProcessLastItem = false;
-        }
-
-        public bool DedicatedThread { get; set; }
-        public bool PersistentThread { get; set; }
-
-        /// <summary>
-        /// If this is true, the task runner will skip over all items and only process the last/final 
-        /// item registered
-        /// </summary>
-        public bool OnlyProcessLastItem { get; set; }
-    }
-
     /// <summary>
     /// This is used to create a background task runner which will stay alive in the background of and complete
     /// any tasks that are queued. It is web aware and will ensure that it is shutdown correctly when the app domain
@@ -174,7 +154,8 @@ namespace Umbraco.Web.Scheduling
                             //skip if this is not the last
                             if (_options.OnlyProcessLastItem && _tasks.Count > 0)
                             {
-                                //NOTE: don't raise canceled event, we're shutting down
+                                //NOTE: don't raise canceled event, we're shutting down, just dispose
+                                remainingTask.Dispose();
                                 continue;
                             }
 
@@ -372,6 +353,9 @@ namespace Umbraco.Web.Scheduling
         {
             var handler = TaskCancelled;
             if (handler != null) handler(this, e);
+
+            //dispose it
+            e.Task.Dispose();
         }
 
 

@@ -273,22 +273,25 @@ namespace Umbraco.Tests.Scheduling
             {
             }
 
-            public override void Run()
+            public override void PerformRun()
             {
                 Thread.Sleep(500);
             }
 
-            public override void Cancel()
-            {
-
-            }
         }
 
         public abstract class BaseTask : IBackgroundTask
         {
+            public bool WasCancelled { get; set; }
+
             public Guid UniqueId { get; protected set; }
 
-            public abstract void Run();
+            public abstract void PerformRun();
+            public void Run()
+            {
+                PerformRun();
+                Ended = DateTime.Now;
+            }
             public Task RunAsync()
             {
                 throw new NotImplementedException();
@@ -299,7 +302,10 @@ namespace Umbraco.Tests.Scheduling
                 get { return false; }
             }
 
-            public abstract void Cancel();
+            public virtual void Cancel()
+            {
+                WasCancelled = true;
+            }
 
             public DateTime Queued { get; set; }
             public DateTime Started { get; set; }
@@ -307,7 +313,7 @@ namespace Umbraco.Tests.Scheduling
 
             public virtual void Dispose()
             {
-                Ended = DateTime.Now;
+                
             }
         }
 
