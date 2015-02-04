@@ -29,7 +29,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
-        public UmbracoHelper Umbraco
+        public virtual UmbracoHelper Umbraco
         {
             get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
         }
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns a ProfilingLogger
         /// </summary>
-        public ProfilingLogger ProfilingLogger
+        public virtual ProfilingLogger ProfilingLogger
         {
             get { return UmbracoContext.Application.ProfilingLogger; }
         }
@@ -53,12 +53,12 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        public UmbracoContext UmbracoContext { get; private set; }
+        public virtual UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Returns the current ApplicationContext
         /// </summary>
-        public ApplicationContext ApplicationContext
+        public virtual ApplicationContext ApplicationContext
         {
             get { return UmbracoContext.Application; }
         }
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the WebSecurity instance
         /// </summary>
-        public WebSecurity Security
+        public virtual WebSecurity Security
         {
             get { return UmbracoContext.Security; }
         }

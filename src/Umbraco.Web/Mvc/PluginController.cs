@@ -18,8 +18,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
-        private UmbracoHelper _umbracoHelper;
-        private readonly UmbracoContext _umbracoContext;
+        private UmbracoHelper _umbracoHelper;        
 
         /// <summary>
         /// Default constructor
@@ -28,7 +27,7 @@ namespace Umbraco.Web.Mvc
         protected PluginController(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            _umbracoContext = umbracoContext;
+            UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
         }
 
@@ -64,10 +63,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        public virtual UmbracoContext UmbracoContext
-        {
-            get { return _umbracoContext; }
-        }
+        public virtual UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Returns the current ApplicationContext
