@@ -29,6 +29,7 @@ namespace Umbraco.Tests.DynamicsAndReflection
         public void TestMethod6(int value) { }
         public void TestMethod6(string value) { }
         public void TestMethod7<T>(IList<T> value) { }
+        public void TestMethod8<T>(IDictionary<T, T> value) { }
 
         public interface ITestDict<T> : IDictionary<T, T> { }
 
