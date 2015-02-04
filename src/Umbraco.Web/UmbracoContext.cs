@@ -84,139 +84,138 @@ namespace Umbraco.Web
             bool replaceContext,
             bool? preview)
         {
-            return EnsureContext(httpContext, applicationContext, webSecurity, UmbracoConfig.For.UmbracoSettings(), replaceContext, preview);
+            return EnsureContext(httpContext, applicationContext, webSecurity, UmbracoConfig.For.UmbracoSettings(), UrlProviderResolver.Current.Providers, replaceContext, preview);
         } 
         #endregion
 
-        /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
-        /// context is created and assigned.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
-        /// <param name="webSecurity"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <returns>
-        /// The Singleton context object
-        /// </returns>
-        /// <remarks>
-        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
-        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
-        /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// </remarks>
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            WebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings)
-        {
-            return EnsureContext(httpContext, applicationContext, webSecurity, umbracoSettings, false);
-        }
+        ///// <summary>
+        ///// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        ///// context is created and assigned.
+        ///// </summary>
+        ///// <param name="httpContext"></param>
+        ///// <param name="applicationContext"></param>
+        ///// <param name="webSecurity"></param>
+        ///// <param name="umbracoSettings"></param>
+        ///// <returns>
+        ///// The Singleton context object
+        ///// </returns>
+        ///// <remarks>
+        ///// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        ///// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        ///// during the startup process as well.
+        ///// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        ///// </remarks>
+        //public static UmbracoContext EnsureContext(
+        //    HttpContextBase httpContext,
+        //    ApplicationContext applicationContext,
+        //    WebSecurity webSecurity,
+        //    IUmbracoSettingsSection umbracoSettings)
+        //{
+        //    return EnsureContext(httpContext, applicationContext, webSecurity, umbracoSettings, false);
+        //}
 
         
 
-        /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
-        /// context is created and assigned.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <returns>
-        /// The Singleton context object
-        /// </returns>
-        /// <remarks>
-        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
-        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
-        /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// </remarks>
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            IUmbracoSettingsSection umbracoSettings)
-        {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, false);
-        }
+        ///// <summary>
+        ///// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        ///// context is created and assigned.
+        ///// </summary>
+        ///// <param name="httpContext"></param>
+        ///// <param name="applicationContext"></param>
+        ///// <param name="umbracoSettings"></param>
+        ///// <returns>
+        ///// The Singleton context object
+        ///// </returns>
+        ///// <remarks>
+        ///// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        ///// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        ///// during the startup process as well.
+        ///// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        ///// </remarks>
+        //public static UmbracoContext EnsureContext(
+        //    HttpContextBase httpContext,
+        //    ApplicationContext applicationContext,
+        //    IUmbracoSettingsSection umbracoSettings)
+        //{
+        //    return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, false);
+        //}
 
        
 
-        /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
-        /// context is created and assigned.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <param name="replaceContext">
-        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
-        /// during application startup the base url domain will not be available so after app startup we'll replace the current
-        /// context with a new one in which we can access the httpcontext.Request object.
-        /// </param>
-        /// <returns>
-        /// The Singleton context object
-        /// </returns>
-        /// <remarks>
-        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
-        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
-        /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// </remarks>
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            IUmbracoSettingsSection umbracoSettings,
-            bool replaceContext)
-        {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, replaceContext);
-        }
+        ///// <summary>
+        ///// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        ///// context is created and assigned.
+        ///// </summary>
+        ///// <param name="httpContext"></param>
+        ///// <param name="applicationContext"></param>
+        ///// <param name="umbracoSettings"></param>
+        ///// <param name="replaceContext">
+        ///// if set to true will replace the current singleton with a new one, this is generally only ever used because
+        ///// during application startup the base url domain will not be available so after app startup we'll replace the current
+        ///// context with a new one in which we can access the httpcontext.Request object.
+        ///// </param>
+        ///// <returns>
+        ///// The Singleton context object
+        ///// </returns>
+        ///// <remarks>
+        ///// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        ///// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        ///// during the startup process as well.
+        ///// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        ///// </remarks>
+        //public static UmbracoContext EnsureContext(
+        //    HttpContextBase httpContext,
+        //    ApplicationContext applicationContext,
+        //    IUmbracoSettingsSection umbracoSettings,
+        //    bool replaceContext)
+        //{
+        //    return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, replaceContext);
+        //}
 
         
         
 
+        ///// <summary>
+        ///// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        ///// context is created and assigned.
+        ///// </summary>
+        ///// <param name="httpContext"></param>
+        ///// <param name="applicationContext"></param>
+        ///// <param name="webSecurity"></param>
+        ///// <param name="umbracoSettings"></param>
+        ///// <param name="replaceContext">
+        ///// if set to true will replace the current singleton with a new one, this is generally only ever used because
+        ///// during application startup the base url domain will not be available so after app startup we'll replace the current
+        ///// context with a new one in which we can access the httpcontext.Request object.
+        ///// </param>
+        ///// <returns>
+        ///// The Singleton context object
+        ///// </returns>
+        ///// <remarks>
+        ///// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        ///// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        ///// during the startup process as well.
+        ///// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        ///// </remarks>
+        //public static UmbracoContext EnsureContext(
+        //    HttpContextBase httpContext,
+        //    ApplicationContext applicationContext,
+        //    WebSecurity webSecurity,
+        //    IUmbracoSettingsSection umbracoSettings,
+        //    bool replaceContext)
+        //{
+        //    return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, UrlProviderResolver.Current.Providers, replaceContext, null);
+        //}
+
+
         /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
-        /// context is created and assigned.
+        /// This is a helper method which is called to ensure that the singleton context is created
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
         /// <param name="webSecurity"></param>
         /// <param name="umbracoSettings"></param>
-        /// <param name="replaceContext">
-        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
-        /// during application startup the base url domain will not be available so after app startup we'll replace the current
-        /// context with a new one in which we can access the httpcontext.Request object.
-        /// </param>
-        /// <returns>
-        /// The Singleton context object
-        /// </returns>
-        /// <remarks>
-        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
-        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
-        /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// </remarks>
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            WebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            bool replaceContext)
-        {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), umbracoSettings, replaceContext, null);
-        }
-
-        
-
-        /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
-        /// context is created and assigned.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
-        /// <param name="webSecurity"></param>
-        /// <param name="umbracoSettings"></param>
+        /// <param name="urlProviders"></param>
         /// <param name="replaceContext">
         /// if set to true will replace the current singleton with a new one, this is generally only ever used because
         /// during application startup the base url domain will not be available so after app startup we'll replace the current
@@ -237,9 +236,16 @@ namespace Umbraco.Web
             ApplicationContext applicationContext,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
+            IEnumerable<IUrlProvider> urlProviders,
             bool replaceContext,
-            bool? preview)
+            bool? preview = null)
         {
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            if (webSecurity == null) throw new ArgumentNullException("webSecurity");
+            if (umbracoSettings == null) throw new ArgumentNullException("umbracoSettings");
+            if (urlProviders == null) throw new ArgumentNullException("urlProviders");
+
             if (UmbracoContext.Current != null)
             {
                 if (replaceContext == false)
@@ -257,15 +263,18 @@ namespace Umbraco.Web
             // create the RoutingContext, and assign
             var routingContext = new RoutingContext(
                 umbracoContext,
+                
+                //TODO: Until the new cache is done we can't really expose these to override/mock
                 new Lazy<IEnumerable<IContentFinder>>(() => ContentFinderResolver.Current.Finders),
                 new Lazy<IContentFinder>(() => ContentLastChanceFinderResolver.Current.Finder),
+                
                 // create the nice urls provider
                 // there's one per request because there are some behavior parameters that can be changed
                 new Lazy<UrlProvider>(
                     () => new UrlProvider(                        
                         umbracoContext,
                         umbracoSettings.WebRouting,
-                        UrlProviderResolver.Current.Providers),
+                        urlProviders),
                     false));
 
             //assign the routing context back

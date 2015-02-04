@@ -23,10 +23,7 @@ namespace Umbraco.Web
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public string ReplaceLineBreaksForHtml(string text)
         {
-            if (bool.Parse(Umbraco.Core.Configuration.GlobalSettings.EditXhtmlMode))
-                return text.Replace("\n", "<br/>\n");
-            else
-                return text.Replace("\n", "<br />\n");
+            return text.Replace("\n", "<br/>\n");
         }
 
         public HtmlString StripHtmlTags(string html, params string[] tags)

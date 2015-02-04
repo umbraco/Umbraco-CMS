@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Security;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -18,6 +19,7 @@ using Moq;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests
 {
@@ -84,7 +86,9 @@ namespace Umbraco.Tests
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
             
             Assert.AreEqual(umbCtx, UmbracoContext.Current);
@@ -95,10 +99,14 @@ namespace Umbraco.Tests
         {
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
             ApplicationContext.EnsureContext(appCtx, true);
-            
+            var httpContext = Mock.Of<HttpContextBase>();
+
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
 
             var helper = new UmbracoHelper(umbCtx,
@@ -108,7 +116,8 @@ namespace Umbraco.Tests
                 Mock.Of<ITagQuery>(),
                 Mock.Of<IDataTypeService>(),
                 new UrlProvider(umbCtx, new[] {Mock.Of<IUrlProvider>()}, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
-                Mock.Of<IUmbracoComponentRenderer>());
+                Mock.Of<IUmbracoComponentRenderer>(),
+                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()));
 
             Assert.Pass();
         }
@@ -122,6 +131,9 @@ namespace Umbraco.Tests
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
 
             var urlHelper = new Mock<IUrlProvider>();
@@ -138,7 +150,8 @@ namespace Umbraco.Tests
                 {
                     urlHelper.Object
                 }, UrlProviderMode.Auto), Mock.Of<ICultureDictionary>(),
-                Mock.Of<IUmbracoComponentRenderer>());
+                Mock.Of<IUmbracoComponentRenderer>(),
+                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()));
 
             Assert.AreEqual("/hello/world/1234", helper.Url(1234));
         }

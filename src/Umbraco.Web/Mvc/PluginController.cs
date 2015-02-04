@@ -18,6 +18,9 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
+        private UmbracoHelper _umbracoHelper;
+        private readonly UmbracoContext _umbracoContext;
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -25,9 +28,8 @@ namespace Umbraco.Web.Mvc
         protected PluginController(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            UmbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
-            Umbraco = new UmbracoHelper(umbracoContext);
         }
 
         /// <summary>
@@ -38,7 +40,10 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
-        public UmbracoHelper Umbraco { get; private set; }
+        public virtual UmbracoHelper Umbraco
+        {
+            get { return _umbracoHelper ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext)); }
+        }
 
         /// <summary>
         /// Returns an ILogger
@@ -51,7 +56,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns a ProfilingLogger
         /// </summary>
-        public ProfilingLogger ProfilingLogger
+        public virtual ProfilingLogger ProfilingLogger
         {
             get { return UmbracoContext.Application.ProfilingLogger; }
         }
@@ -59,12 +64,15 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        public UmbracoContext UmbracoContext { get; private set; }
+        public virtual UmbracoContext UmbracoContext
+        {
+            get { return _umbracoContext; }
+        }
 
         /// <summary>
         /// Returns the current ApplicationContext
         /// </summary>
-        public ApplicationContext ApplicationContext
+        public virtual ApplicationContext ApplicationContext
         {
             get { return UmbracoContext.Application; }
         }

@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Security;
-using System.Web.UI;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using HtmlAgilityPack;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
@@ -20,13 +13,8 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Web.Templates;
-using umbraco;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.web;
-using umbraco.presentation.templateControls;
 using Umbraco.Core.Cache;
-using AttributeCollection = System.Web.UI.AttributeCollection;
 
 namespace Umbraco.Web
 {
@@ -39,13 +27,15 @@ namespace Umbraco.Web
 		private readonly IPublishedContent _currentPage;
         private readonly ITypedPublishedContentQuery _typedQuery;
         private readonly IDynamicPublishedContentQuery _dynamicQuery;
-        private readonly IUmbracoComponentRenderer _componentRenderer;
-        private PublishedContentQuery _query;
-        private readonly MembershipHelper _membershipHelper;
+        
         private readonly HtmlStringUtilities _stringUtilities = new HtmlStringUtilities();
+
+        private IUmbracoComponentRenderer _componentRenderer;        
+        private PublishedContentQuery _query;
+        private MembershipHelper _membershipHelper;
         private ITagQuery _tag;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly UrlProvider _urlProvider;
+        private IDataTypeService _dataTypeService;
+        private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
 
         /// <summary>
@@ -57,7 +47,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Lazy instantiates the query context
+        /// Lazy instantiates the query context if not specified in the constructor
         /// </summary>
         public PublishedContentQuery ContentQuery
         {
@@ -75,7 +65,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Helper method to ensure an umbraco context is set when it is needed
         /// </summary>
-        private UmbracoContext UmbracoContext
+        public UmbracoContext UmbracoContext
         {
             get
             {
@@ -88,10 +78,43 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Lazy instantiates the membership helper if not specified in the constructor
+        /// </summary>
+        public MembershipHelper MembershipHelper
+        {
+            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
+        }
+
+        /// <summary>
+        /// Lazy instantiates the UrlProvider if not specified in the constructor
+        /// </summary>
+        public UrlProvider UrlProvider
+        {
+            get { return _urlProvider ?? (_urlProvider = UmbracoContext.UrlProvider); }
+        }
+
+        /// <summary>
+        /// Lazy instantiates the IDataTypeService if not specified in the constructor
+        /// </summary>
+        public IDataTypeService DataTypeService
+        {
+            get { return _dataTypeService ?? (_dataTypeService = UmbracoContext.Application.Services.DataTypeService); }
+        }
+
+        /// <summary>
+        /// Lazy instantiates the IUmbracoComponentRenderer if not specified in the constructor
+        /// </summary>
+        public IUmbracoComponentRenderer UmbracoComponentRenderer
+        {
+            get { return _componentRenderer ?? (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext)); }
+        }
+
+        #region Constructors
+        /// <summary>
         /// Empty constructor to create an umbraco helper for access to methods that don't have dependencies
         /// </summary>
         public UmbracoHelper()
-        {            
+        {
         }
 
         /// <summary>
@@ -106,17 +129,19 @@ namespace Umbraco.Web
         /// <param name="urlProvider"></param>
         /// <param name="cultureDictionary"></param>
         /// <param name="componentRenderer"></param>
+        /// <param name="membershipHelper"></param>
         /// <remarks>
         /// This constructor can be used to create a testable UmbracoHelper
         /// </remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content, 
-            ITypedPublishedContentQuery typedQuery, 
+        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
+            ITypedPublishedContentQuery typedQuery,
             IDynamicPublishedContentQuery dynamicQuery,
             ITagQuery tagQuery,
             IDataTypeService dataTypeService,
             UrlProvider urlProvider,
             ICultureDictionary cultureDictionary,
-            IUmbracoComponentRenderer componentRenderer)
+            IUmbracoComponentRenderer componentRenderer,
+            MembershipHelper membershipHelper)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             if (content == null) throw new ArgumentNullException("content");
@@ -127,6 +152,7 @@ namespace Umbraco.Web
             if (urlProvider == null) throw new ArgumentNullException("urlProvider");
             if (cultureDictionary == null) throw new ArgumentNullException("cultureDictionary");
             if (componentRenderer == null) throw new ArgumentNullException("componentRenderer");
+            if (membershipHelper == null) throw new ArgumentNullException("membershipHelper");
 
             _umbracoContext = umbracoContext;
             _tag = tagQuery;
@@ -134,64 +160,60 @@ namespace Umbraco.Web
             _urlProvider = urlProvider;
             _cultureDictionary = cultureDictionary;
             _componentRenderer = componentRenderer;
-            _membershipHelper = new MembershipHelper(_umbracoContext);
+            _membershipHelper = membershipHelper;
             _currentPage = content;
             _typedQuery = typedQuery;
             _dynamicQuery = dynamicQuery;
         }
 
         [Obsolete("Use the constructor specifying all dependencies")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content, PublishedContentQuery query)
             : this(umbracoContext)
         {
             if (content == null) throw new ArgumentNullException("content");
             if (query == null) throw new ArgumentNullException("query");
-            _membershipHelper = new MembershipHelper(_umbracoContext);
             _currentPage = content;
             _query = query;
         }
-        
-		/// <summary>
-		/// Custom constructor setting the current page to the parameter passed in
-		/// </summary>
-		/// <param name="umbracoContext"></param>
-		/// <param name="content"></param>
-		public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content)
-			: this(umbracoContext)
-		{			
-			if (content == null) throw new ArgumentNullException("content");
-			_currentPage = content;
-		    _membershipHelper = new MembershipHelper(_umbracoContext);
-		}
 
-		/// <summary>
-		/// Standard constructor setting the current page to the page that has been routed to
-		/// </summary>
-		/// <param name="umbracoContext"></param>
-		public UmbracoHelper(UmbracoContext umbracoContext)
-		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-			if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
+        /// <summary>
+        /// Custom constructor setting the current page to the parameter passed in
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="content"></param>
+        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content)
+            : this(umbracoContext)
+        {
+            if (content == null) throw new ArgumentNullException("content");
+            _currentPage = content;
+        }
 
-		    _componentRenderer = new UmbracoComponentRenderer(umbracoContext);
-            _urlProvider = umbracoContext.UrlProvider;
-            _dataTypeService = umbracoContext.Application.Services.DataTypeService;
+        /// <summary>
+        /// Standard constructor setting the current page to the page that has been routed to
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public UmbracoHelper(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
+
             _umbracoContext = umbracoContext;
-            _membershipHelper = new MembershipHelper(_umbracoContext);
-			if (_umbracoContext.IsFrontEndUmbracoRequest)
-			{
-				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
-			}
-		}
+            if (_umbracoContext.IsFrontEndUmbracoRequest)
+            {
+                _currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
+            }
+        }
 
         [Obsolete("Use the constructor specifying all dependencies")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoHelper(UmbracoContext umbracoContext, PublishedContentQuery query)
             : this(umbracoContext)
         {
             if (query == null) throw new ArgumentNullException("query");
             _query = query;
-            _membershipHelper = new MembershipHelper(_umbracoContext);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Returns the current IPublishedContent item assigned to the UmbracoHelper
@@ -385,7 +407,7 @@ namespace Umbraco.Web
         {
             if (IsProtected(path))
             {
-                return _membershipHelper.IsLoggedIn()
+                return MembershipHelper.IsLoggedIn()
                        && UmbracoContext.Application.Services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
             }
             return true;
@@ -410,7 +432,7 @@ namespace Umbraco.Web
 		/// <returns>True is the current user is logged in</returns>
 		public bool MemberIsLoggedOn()
 		{
-		    return _membershipHelper.IsLoggedIn();
+            return MembershipHelper.IsLoggedIn();
 		} 
 
 		#endregion
@@ -436,7 +458,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(int contentId)
         {
-            return _urlProvider.GetUrl(contentId);
+            return UrlProvider.GetUrl(contentId);
         }
 
         /// <summary>
@@ -447,7 +469,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
 	    public string Url(int contentId, UrlProviderMode mode)
 	    {
-            return _urlProvider.GetUrl(contentId, mode);
+            return UrlProvider.GetUrl(contentId, mode);
 	    }
 
 		/// <summary>
@@ -467,7 +489,7 @@ namespace Umbraco.Web
         /// <returns>The absolute url for the content.</returns>
         public string UrlAbsolute(int contentId)
         {
-            return _urlProvider.GetUrl(contentId, true);
+            return UrlProvider.GetUrl(contentId, true);
         }
 
 		#endregion
@@ -477,39 +499,39 @@ namespace Umbraco.Web
         public IPublishedContent TypedMember(object id)
         {
             var asInt = id.TryConvertTo<int>();
-            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
         }
 
         public IPublishedContent TypedMember(int id)
         {
-            return _membershipHelper.GetById(id);
+            return MembershipHelper.GetById(id);
         }
 
         public IPublishedContent TypedMember(string id)
         {
             var asInt = id.TryConvertTo<int>();
-            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
         }
 
         public dynamic Member(object id)
         {
             var asInt = id.TryConvertTo<int>();
             return asInt
-                ? _membershipHelper.GetById(asInt.Result).AsDynamic()
-                : _membershipHelper.GetByProviderKey(id).AsDynamic();
+                ? MembershipHelper.GetById(asInt.Result).AsDynamic()
+                : MembershipHelper.GetByProviderKey(id).AsDynamic();
         }
 
         public dynamic Member(int id)
         {
-            return _membershipHelper.GetById(id).AsDynamic();
+            return MembershipHelper.GetById(id).AsDynamic();
         }
 
         public dynamic Member(string id)
         {
             var asInt = id.TryConvertTo<int>();
             return asInt
-                ? _membershipHelper.GetById(asInt.Result).AsDynamic()
-                : _membershipHelper.GetByProviderKey(id).AsDynamic();
+                ? MembershipHelper.GetById(asInt.Result).AsDynamic()
+                : MembershipHelper.GetByProviderKey(id).AsDynamic();
         }
 
         #endregion
@@ -984,7 +1006,7 @@ namespace Umbraco.Web
 
         public string GetPreValueAsString(int id)
         {
-            return _dataTypeService.GetPreValueAsString(id);
+            return DataTypeService.GetPreValueAsString(id);
         }
 
         #endregion
