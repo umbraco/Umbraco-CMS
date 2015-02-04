@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
-using System.Web.Services.Description;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Dynamics
@@ -18,7 +17,7 @@ namespace Umbraco.Core.Dynamics
         /// <summary>
         /// The static cache for extension methods found that match the criteria that we are looking for
         /// </summary>
-        private static readonly ConcurrentDictionary<Tuple<Type, string, int>, MethodInfo[]> MethodCache = new ConcurrentDictionary<Tuple<Type, string, int>, MethodInfo[]>();
+        private static readonly ConcurrentDictionary<Tuple<Type, string, int>, ExtensionMethodSearchResult[]> MethodCache = new ConcurrentDictionary<Tuple<Type, string, int>, ExtensionMethodSearchResult[]>();
 
         /// <summary>
         /// Returns the enumerable of all extension method info's in the app domain = USE SPARINGLY!!!
@@ -66,46 +65,66 @@ namespace Umbraco.Core.Dynamics
 	    /// <param name="argumentCount">
 	    /// The arguments EXCLUDING the 'this' argument in an extension method
 	    /// </param>
-	    /// <returns></returns>
+	    /// <returns>
+	    /// Returns the MethodInfo that matched + the generic type
+	    /// </returns>
 	    /// <remarks>
 	    /// NOTE: This will be an intensive method to call! Results will be cached based on the key (args) of this method
 	    /// </remarks>
-	    internal static IEnumerable<MethodInfo> GetAllExtensionMethods(IRuntimeCacheProvider runtimeCache, Type thisType, string name, int argumentCount)
+        internal static IEnumerable<ExtensionMethodSearchResult> GetAllExtensionMethods(IRuntimeCacheProvider runtimeCache, Type thisType, string name, int argumentCount)
 		{
 		    var key = new Tuple<Type, string, int>(thisType, name, argumentCount);
 
-		    return MethodCache.GetOrAdd(key, tuple =>
-		    {
+            return MethodCache.GetOrAdd(key, tuple =>
+            {
                 var candidates = GetAllExtensionMethodsInAppDomain(runtimeCache);
 
-                // filter by name	
-                var filtr1 = candidates.Where(m => m.Name == name);
 
-                // filter by args count
-                // ensure we add + 1 to the arg count because the 'this' arg is not included in the count above!
-                var filtr2 = filtr1.Where(m => m.GetParameters().Length == argumentCount + 1);
+                //filter by name	
+                var methodsByName = candidates.Where(m => m.Name == name);
 
-                // filter by first parameter type (target of the extension method)
-                // ie find the right overload that can take genericParameterType
-                // (which will be either DynamicNodeList or List<DynamicNode> which is IEnumerable)
-                var filtr3 = filtr2.Select(x =>
-                {
-                    var t = x.GetParameters()[0].ParameterType; // exists because of +1 above
-                    var bindings = new Dictionary<string, List<Type>>();
-                    if (thisType.MatchType(t, bindings) == false) return null;
+                //ensure we add + 1 to the arg count because the 'this' arg is not included in the count above!
+                var byParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
 
-                    // create the generic method if necessary
-                    if (x.ContainsGenericParameters == false) return x;
-                    var targs = t.GetGenericArguments().Select(y => bindings[y.Name].First()).ToArray();
-                    return x.MakeGenericMethod(targs);
-                }).Where(x => x != null);
+		        var methodsWithFirstParamType = byParamCount.Select(methodInfo => new {methodInfo = methodInfo, firstParamType = FirstParameterType(methodInfo)})
+		            .ToArray(); // get the array so we don't keep enumerating.
 
-		        return filtr3.ToArray();
-		    });
+                //Find the method with an assignable first parameter type - this is an easy match
+                var methodsWhereArgZeroIsTargetType = methodsWithFirstParamType
+                    .Where(method => method.firstParamType != null && TypeHelper.IsTypeAssignableFrom(method.firstParamType, thisType))
+                    .ToArray();
+                
+                //found some so return this before trying to look for generics
+	            if (methodsWhereArgZeroIsTargetType.Any())
+	                return methodsWhereArgZeroIsTargetType.Select(mt => new ExtensionMethodSearchResult(mt.methodInfo)).ToArray();
+
+                //this is where it gets tricky, none of the first parameters were assignable to our type which means that
+                // if they are assignable they are generic arguments
+                return methodsWithFirstParamType
+                    .Where(method => method.firstParamType != null)
+                    .Select(x => new
+                    {
+                        methodInfo = x.methodInfo,
+                        genericMethodResult = TypeHelper.IsAssignableFromGeneric(x.firstParamType, thisType)
+                    })
+                    .Where(x => x.genericMethodResult.Success)
+                    .Select(x => new ExtensionMethodSearchResult(x.methodInfo, x.genericMethodResult.Result))
+                    .ToArray();
+            });
 		    
         }
+    
+        private static Type FirstParameterType(MethodInfo m)
+        {
+            var p = m.GetParameters();
+            if (p.Any())
+            {
+                return p.First().ParameterType;
+            }
+            return null;
+        }
 
-        private static MethodInfo DetermineMethodFromParams(IEnumerable<MethodInfo> methods, Type genericType, IEnumerable<object> args)
+        private static MethodInfo DetermineMethodFromParams(IEnumerable<ExtensionMethodSearchResult> methods, Type thisType, IEnumerable<object> args)
 		{
 			MethodInfo methodToExecute = null;
 
@@ -118,9 +137,9 @@ namespace Umbraco.Core.Dynamics
 
             var methodsWithArgTypes = methods.Select(method => new
             {
-                method,
+                method = method,
                 //skip the first arg because that is the extension method type ('this') that we are looking for
-                types = method.GetParameters().Select(pi => pi.ParameterType).Skip(1)
+                types = method.MethodInfo.GetParameters().Select(pi => pi.ParameterType).Skip(1)
             });
 
             //This type comparer will check 
@@ -138,20 +157,23 @@ namespace Umbraco.Core.Dynamics
 
             if (firstMatchingOverload != null)
             {
-                methodToExecute = firstMatchingOverload.method;
+                methodToExecute = firstMatchingOverload.method.MethodInfo;
+
+                //if this is null then we can't need to create the generic method
+                if (methodToExecute.IsGenericMethodDefinition && firstMatchingOverload.method.BaseGenericTypeMatch.IsGenericType)
+                {
+                    //This should never be null in this case
+                    if (firstMatchingOverload.method.BaseGenericTypeMatch == null) throw new InvalidOperationException("No base generic type could be resolved");
+
+                    methodToExecute = methodToExecute.MakeGenericMethod(firstMatchingOverload.method.BaseGenericTypeMatch.GetGenericArguments());
+                }
             }
 
-			return methodToExecute;
+            return methodToExecute;
 		}
 
         public static MethodInfo FindExtensionMethod(IRuntimeCacheProvider runtimeCache, Type thisType, object[] args, string name, bool argsContainsThis)
         {
-            Type genericType = null;
-            if (thisType.IsGenericType)
-            {
-                genericType = thisType.GetGenericArguments()[0];
-            }
-
             args = args
                 //if the args contains 'this', remove the first one since that is 'this' and we don't want to use
                 //that in the method searching
@@ -159,8 +181,34 @@ namespace Umbraco.Core.Dynamics
                 .ToArray();
 
             var methods = GetAllExtensionMethods(runtimeCache, thisType, name, args.Length).ToArray();
-            
-            return DetermineMethodFromParams(methods, genericType, args);
+
+            return DetermineMethodFromParams(methods, thisType, args);
         }
+
+        internal class ExtensionMethodSearchResult
+	    {
+	        /// <summary>
+	        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+	        /// </summary>
+	        public ExtensionMethodSearchResult(MethodInfo methodInfo)
+	        {
+	            MethodInfo = methodInfo;
+	            IsGeneric = false;
+	        }
+
+	        /// <summary>
+	        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+	        /// </summary>
+	        public ExtensionMethodSearchResult(MethodInfo methodInfo, Type baseGenericTypeMatch)
+	        {
+	            MethodInfo = methodInfo;
+	            IsGeneric = true;
+	            BaseGenericTypeMatch = baseGenericTypeMatch;
+	        }
+
+	        public MethodInfo MethodInfo { get; private set; }
+            public bool IsGeneric { get; private set; }
+            public Type BaseGenericTypeMatch { get; private set; }
+	    }
     }
 }

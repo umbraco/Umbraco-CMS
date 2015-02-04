@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Web;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dynamics;
@@ -16,8 +15,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using System.Reflection;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web.Models
 {

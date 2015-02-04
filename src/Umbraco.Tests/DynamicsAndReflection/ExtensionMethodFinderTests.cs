@@ -202,50 +202,24 @@ namespace Umbraco.Tests.DynamicsAndReflection
             Assert.AreEqual("T", t3.GetGenericArguments()[0].Name);
         }
 
+        
+
         [Test]
-        public void MatchTypesTest()
+        public void Find_Generic_Enumerable_Method()
         {
-            var bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(int).MatchType(typeof(int), bindings));
-            Assert.AreEqual(0, bindings.Count);
+            MethodInfo method;
+            var class1 = Enumerable.Empty<TestClass>();
 
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsFalse(typeof(int).MatchType(typeof(string), bindings));
-            Assert.AreEqual(0, bindings.Count);
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(IEnumerable<TestClass>), new object[] { }, "GenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class1 });
 
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(List<int>).MatchType(typeof(System.Collections.IEnumerable), bindings));
-            Assert.AreEqual(0, bindings.Count);
+            var class2 = new TestClassCollection();
 
-            var m = typeof(ExtensionMethodFinderTests).GetMethod("TestMethod7");
-            var t1 = m.GetParameters()[0].ParameterType; // List<T>
-            var t2 = m.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // <T>
-
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(int).MatchType(t2, bindings));
-            Assert.AreEqual(1, bindings.Count);
-            Assert.AreEqual(typeof(int), bindings["T"].FirstOrDefault());
-
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(IList<int>).MatchType(t1, bindings));
-            Assert.AreEqual(1, bindings.Count);
-            Assert.AreEqual(typeof(int), bindings["T"].FirstOrDefault());
-
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(List<int>).MatchType(typeof(IList<int>), bindings));
-            Assert.AreEqual(0, bindings.Count);
-
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(List<int>).MatchType(t1, bindings));
-            Assert.AreEqual(1, bindings.Count);
-            Assert.AreEqual(typeof(int), bindings["T"].FirstOrDefault());
-
-            bindings = new Dictionary<string, List<Type>>();
-            Assert.IsTrue(typeof(Dictionary<int, string>).MatchType(typeof(IDictionary<,>), bindings));
-            Assert.AreEqual(2, bindings.Count);
-            Assert.AreEqual(typeof(int), bindings["TKey"].FirstOrDefault());
-            Assert.AreEqual(typeof(string), bindings["TValue"].FirstOrDefault());
-        }
+            method = ExtensionMethodFinder.FindExtensionMethod(new NullCacheProvider(), typeof(TestClassCollection), new object[] { }, "GenericMethod", false);
+            Assert.IsNotNull(method);
+            method.Invoke(null, new object[] { class2 });
+        }      
 
         [Ignore("This is just testing the below GetMethodForArguments method - Stephen was working on this but it's not used in the core")]
         [Test]
@@ -374,12 +348,22 @@ namespace Umbraco.Tests.DynamicsAndReflection
         }
 
         #endregion
+
+        public class TestClassCollection : List<TestClass>
+        {
+            
+        }
+
     }
 
     #region Tests Elements
 
+        
     static class ExtensionMethodFinderTestsExtensions
     {
+        public static void GenericMethod<T>(this IEnumerable<T> source)
+        { }
+
         public static void SimpleMethod(this ExtensionMethodFinderTests.TestClass source, int value)
         { }
 
