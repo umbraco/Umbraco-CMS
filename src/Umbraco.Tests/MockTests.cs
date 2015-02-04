@@ -81,7 +81,6 @@ namespace Umbraco.Tests
         public void Can_Get_Umbraco_Context()
         {
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
-            ApplicationContext.EnsureContext(appCtx, true);
             
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
@@ -98,8 +97,6 @@ namespace Umbraco.Tests
         public void Can_Mock_Umbraco_Helper()
         {
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
-            ApplicationContext.EnsureContext(appCtx, true);
-            var httpContext = Mock.Of<HttpContextBase>();
 
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
@@ -126,8 +123,7 @@ namespace Umbraco.Tests
         public void Can_Mock_Umbraco_Helper_Get_Url()
         {
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
-            ApplicationContext.EnsureContext(appCtx, true);
-
+            
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
                 appCtx,
