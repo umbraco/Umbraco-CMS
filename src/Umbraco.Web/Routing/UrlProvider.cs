@@ -21,7 +21,7 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="routingSettings"></param>
         /// <param name="urlProviders">The list of url providers.</param>
-        internal UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
+        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
         {
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;
