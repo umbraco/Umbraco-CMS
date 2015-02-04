@@ -84,6 +84,30 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
+        public async void Many_Tasks_Added_Only_Last_Task_Executes_With_Option()
+        {
+            var tasks = new Dictionary<BaseTask, ManualResetEvent>();
+            for (var i = 0; i < 10; i++)
+            {
+                tasks.Add(new MyTask(), new ManualResetEvent(false));
+            }
+
+            BackgroundTaskRunner<BaseTask> tManager;
+            using (tManager = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions{OnlyProcessLastItem = true}))
+            {
+               
+                tasks.ForEach(t => tManager.Add(t.Key));
+
+                //wait till the thread is done
+                await tManager;
+
+                var countExecuted = tasks.Count(x => x.Key.Ended != default(DateTime));
+
+                Assert.AreEqual(1, countExecuted);
+            }
+        }
+
+        [Test]
         public void Tasks_Can_Keep_Being_Added_And_Will_Execute()
         {
             Func<Dictionary<BaseTask, ManualResetEvent>> getTasks = () =>

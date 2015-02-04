@@ -32,7 +32,8 @@ namespace umbraco
     /// </summary>
     public class content
     {
-        private static readonly BackgroundTaskRunner<XmlCacheFilePersister> FilePersister = new BackgroundTaskRunner<XmlCacheFilePersister>(dedicatedThread: true);
+        private static readonly BackgroundTaskRunner<XmlCacheFilePersister> FilePersister
+            = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions {DedicatedThread = true, OnlyProcessLastItem = true});
 
         #region Declarations
 
