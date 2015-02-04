@@ -8,6 +8,26 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
+
+    internal class BackgroundTaskRunnerOptions
+    {
+        public BackgroundTaskRunnerOptions()
+        {
+            DedicatedThread = false;
+            PersistentThread = false;
+            OnlyProcessLastItem = false;
+        }
+
+        public bool DedicatedThread { get; set; }
+        public bool PersistentThread { get; set; }
+
+        /// <summary>
+        /// If this is true, the task runner will skip over all items and only process the last/final 
+        /// item registered
+        /// </summary>
+        public bool OnlyProcessLastItem { get; set; }
+    }
+
     /// <summary>
     /// This is used to create a background task runner which will stay alive in the background of and complete
     /// any tasks that are queued. It is web aware and will ensure that it is shutdown correctly when the app domain
@@ -17,8 +37,7 @@ namespace Umbraco.Web.Scheduling
     internal class BackgroundTaskRunner<T> : IDisposable, IRegisteredObject
         where T : IBackgroundTask
     {
-        private readonly bool _dedicatedThread;
-        private readonly bool _persistentThread;
+        private readonly BackgroundTaskRunnerOptions _options;
         private readonly BlockingCollection<T> _tasks = new BlockingCollection<T>();
         private Task _consumer;
 
@@ -31,9 +50,15 @@ namespace Umbraco.Web.Scheduling
         internal event EventHandler<TaskEventArgs<T>> TaskCancelled;
 
         public BackgroundTaskRunner(bool dedicatedThread = false, bool persistentThread = false)
+            : this(new BackgroundTaskRunnerOptions{DedicatedThread = dedicatedThread, PersistentThread = persistentThread})
+        {            
+        }
+
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options)
         {
-            _dedicatedThread = dedicatedThread;
-            _persistentThread = persistentThread;
+            if (options == null) throw new ArgumentNullException("options");
+            _options = options;
+
             HostingEnvironment.RegisterObject(this);
         }
 
@@ -146,6 +171,13 @@ namespace Umbraco.Web.Scheduling
                         T remainingTask;
                         while (_tasks.TryTake(out remainingTask))
                         {
+                            //skip if this is not the last
+                            if (_options.OnlyProcessLastItem && _tasks.Count > 0)
+                            {
+                                //NOTE: don't raise canceled event, we're shutting down
+                                continue;
+                            }
+
                             ConsumeTaskInternalAsync(remainingTask)
                                 .Wait(); //block until it completes
                         }
@@ -181,13 +213,13 @@ namespace Umbraco.Web.Scheduling
             _consumer = Task.Factory.StartNew(() =>
                 StartThreadAsync(token),
                 token,
-                _dedicatedThread ? TaskCreationOptions.LongRunning : TaskCreationOptions.None,
+                _options.DedicatedThread ? TaskCreationOptions.LongRunning : TaskCreationOptions.None,
                 TaskScheduler.Default);
 
             //if this is not a persistent thread, wait till it's done and shut ourselves down
             // thus ending the thread or giving back to the thread pool. If another task is added
             // another thread will spawn or be taken from the pool to process.
-            if (!_persistentThread)
+            if (!_options.PersistentThread)
             {
                 _consumer.ContinueWith(task => ShutDown());
             }
@@ -228,7 +260,7 @@ namespace Umbraco.Web.Scheduling
             //When this is false, the thread will process what is currently in the queue and once that is 
             // done, the thread will end and we will shutdown the process
 
-            if (_persistentThread)
+            if (_options.PersistentThread)
             {
                 //This will iterate over the collection, if there is nothing to take
                 // the thread will block until there is something available.
@@ -236,6 +268,13 @@ namespace Umbraco.Web.Scheduling
                 // cancel when we shutdown
                 foreach (var t in _tasks.GetConsumingEnumerable(token))
                 {
+                    //skip if this is not the last
+                    if (_options.OnlyProcessLastItem && _tasks.Count > 0)
+                    {
+                        OnTaskCancelled(new TaskEventArgs<T>(t));
+                        continue;
+                    }
+
                     await ConsumeTaskCancellableAsync(t, token);
                 }
 
@@ -244,10 +283,17 @@ namespace Umbraco.Web.Scheduling
             }
             else
             {
-                T repositoryTask;
-                while (_tasks.TryTake(out repositoryTask))
+                T t;
+                while (_tasks.TryTake(out t))
                 {
-                    await ConsumeTaskCancellableAsync(repositoryTask, token);
+                    //skip if this is not the last
+                    if (_options.OnlyProcessLastItem && _tasks.Count > 0)
+                    {
+                        OnTaskCancelled(new TaskEventArgs<T>(t));
+                        continue;
+                    }
+
+                    await ConsumeTaskCancellableAsync(t, token);
                 }
 
                 //the task will end here
