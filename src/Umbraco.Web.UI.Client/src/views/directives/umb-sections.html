@@ -16,7 +16,7 @@
                 </a>
             </li>
             
-            <li class="expand" ng-show="needTray">
+            <li class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
                 <a href ng-click="trayClick()">
                     <i class="icon icon-arrow-right"></i>
                 </a>

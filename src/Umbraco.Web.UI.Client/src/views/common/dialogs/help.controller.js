@@ -35,7 +35,11 @@ angular.module("umbraco")
     	    });
 
     	    helpService.findVideos(rq).then(function(videos){
-    	    	$scope.videos = videos;
+    	        $scope.videos = videos;
+
+    	        angular.forEach($scope.videos, function (obj) {
+    	            obj.thumbnail = obj.thumbnail.replace(/(\.[\w\d_-]+)$/i, '_thumb$1');
+    	        });
     	    });
 
         });
