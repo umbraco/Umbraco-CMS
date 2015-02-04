@@ -330,94 +330,99 @@ namespace Umbraco.Core
 
         //TODO: Need to determine if these methods should replace/combine/merge etc with IsTypeAssignableFrom, IsAssignableFromGeneric
 
-        private static void ReduceGenericParameterCandidateTypes(ICollection<Type> allStuff, Type type)
+        // readings:
+        // http://stackoverflow.com/questions/2033912/c-sharp-variance-problem-assigning-listderived-as-listbase
+        // http://stackoverflow.com/questions/2208043/generic-variance-in-c-sharp-4-0
+        // http://stackoverflow.com/questions/8401738/c-sharp-casting-generics-covariance-and-contravariance
+        // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+        // http://stackoverflow.com/questions/74616/how-to-detect-if-type-is-another-generic-type/1075059#1075059
+
+        private static bool MatchGeneric(Type implementation, Type contract, IDictionary<string, Type> bindings)
         {
-            var at1 = new List<Type>();
-            var t = type;
-            while (t != null)
+            // trying to match eg List<int> with List<T>
+            // or List<List<List<int>>> with List<ListList<T>>>
+            // classes are NOT invariant so List<string> does not match List<object>
+
+            if (implementation.IsGenericType == false) return false;
+
+            // must have the same generic type definition
+            var implDef = implementation.GetGenericTypeDefinition();
+            var contDef = contract.GetGenericTypeDefinition();
+            if (implDef != contDef) return false;
+
+            // must have the same number of generic arguments
+            var implArgs = implementation.GetGenericArguments();
+            var contArgs = contract.GetGenericArguments();
+            if (implArgs.Length != contArgs.Length) return false;
+
+            // generic arguments must match
+            // in insta we should have actual types (eg int, string...)
+            // in typea we can have generic parameters (eg <T>)
+            for (var i = 0; i < implArgs.Length; i++)
             {
-                at1.Add(t);
-                t = t.BaseType;
-            }
-            var r = allStuff.Where(x => x.IsClass && at1.Contains(x) == false).ToArray();
-            foreach (var x in r) allStuff.Remove(x);
-            var ai1 = type.GetInterfaces();
-            if (type.IsInterface) ai1 = ai1.Union(new[] { type }).ToArray();
-            r = allStuff.Where(x => x.IsInterface && ai1.Contains(x) == false).ToArray();
-            foreach (var x in r) allStuff.Remove(x);
-        }
-
-        private static bool MatchGeneric(Type inst, Type type, IDictionary<string, List<Type>> bindings)
-        {
-            if (inst.IsGenericType == false) return false;
-
-            var instd = inst.GetGenericTypeDefinition();
-            var typed = type.GetGenericTypeDefinition();
-
-            if (instd != typed) return false;
-
-            var insta = inst.GetGenericArguments();
-            var typea = type.GetGenericArguments();
-
-            if (insta.Length != typea.Length) return false;
-
-            // but... there is no ZipWhile, and we have arrays anyway
-            //var x = insta.Zip<Type, Type, bool>(typea, (instax, typeax) => { ... });
-
-            for (var i = 0; i < insta.Length; i++)
-                if (MatchType(insta[i], typea[i], bindings) == false)
+                const bool variance = false; // classes are NOT invariant
+                if (MatchType(implArgs[i], contArgs[i], bindings, variance) == false)
                     return false;
+            }
 
             return true;
         }
 
-        private static IEnumerable<Type> GetGenericParameterCandidateTypes(Type type)
+        public static bool MatchType(Type implementation, Type contract)
         {
-            yield return type;
-            var t = type.BaseType;
-            while (t != null)
-            {
-                yield return t;
-                t = t.BaseType;
-            }
-            foreach (var i in type.GetInterfaces())
-                yield return i;
+            return MatchType(implementation, contract, new Dictionary<string, Type>());
         }
 
-        public static bool MatchType(Type inst, Type type)
+        internal static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
         {
-            return MatchType(inst, type, new Dictionary<string, List<Type>>());
-        }
-
-        internal static bool MatchType(Type inst, Type type, IDictionary<string, List<Type>> bindings)
-        {
-            if (type.IsGenericType)
+            if (contract.IsGenericType)
             {
-                if (MatchGeneric(inst, type, bindings)) return true;
-                var t = inst.BaseType;
+                // eg type is List<int> or List<T>
+                // if we have variance then List<int> can match IList<T>
+                // if we don't have variance it can't - must have exact type
+
+                // try to match implementation against contract
+                if (MatchGeneric(implementation, contract, bindings)) return true;
+
+                // if no variance, fail
+                if (variance == false) return false;
+
+                // try to match an ancestor of implementation against contract
+                var t = implementation.BaseType;
                 while (t != null)
                 {
-                    if (MatchGeneric(t, type, bindings)) return true;
+                    if (MatchGeneric(t, contract, bindings)) return true;
                     t = t.BaseType;
                 }
-                return inst.GetInterfaces().Any(i => MatchGeneric(i, type, bindings));
+
+                // try to match an interface of implementation against contract
+                return implementation.GetInterfaces().Any(i => MatchGeneric(i, contract, bindings));
             }
 
-            if (type.IsGenericParameter)
+            if (contract.IsGenericParameter)
             {
-                if (bindings.ContainsKey(type.Name))
+                // eg <T>
+
+                if (bindings.ContainsKey(contract.Name))
                 {
-                    ReduceGenericParameterCandidateTypes(bindings[type.Name], inst);
-                    return bindings[type.Name].Count > 0;
+                    // already bound: ensure it's compatible
+                    return bindings[contract.Name] == implementation;
                 }
 
-                bindings[type.Name] = new List<Type>(GetGenericParameterCandidateTypes(inst));
+                // not already bound: bind
+                bindings[contract.Name] = implementation;
                 return true;
             }
 
-            if (inst == type) return true;
-            if (type.IsClass && inst.IsClass && inst.IsSubclassOf(type)) return true;
-            if (type.IsInterface && inst.GetInterfaces().Contains(type)) return true;
+            // not a generic type, not a generic parameter
+            // so normal class or interface
+            // fixme structs? enums? array types?
+            // about primitive types, value types, etc:
+            // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+
+            if (implementation == contract) return true;
+            if (contract.IsClass && implementation.IsClass && implementation.IsSubclassOf(contract)) return true;
+            if (contract.IsInterface && implementation.GetInterfaces().Contains(contract)) return true;
 
             return false;
         }
