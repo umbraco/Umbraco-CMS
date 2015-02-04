@@ -80,7 +80,7 @@ namespace Umbraco.Web.Security
         /// <returns>
         /// The updated MembershipUser object
         /// </returns>
-        public Attempt<MembershipUser> UpdateMemberProfile(ProfileModel model)
+        public virtual Attempt<MembershipUser> UpdateMemberProfile(ProfileModel model)
         {
             if (IsLoggedIn() == false)
             {
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Security
         /// true to log the member in upon successful registration
         /// </param>
         /// <returns></returns>
-        public MembershipUser RegisterMember(RegisterModel model, out MembershipCreateStatus status, bool logMemberIn = true)
+        public virtual MembershipUser RegisterMember(RegisterModel model, out MembershipCreateStatus status, bool logMemberIn = true)
         {
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
@@ -210,7 +210,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public bool Login(string username, string password)
+        public virtual bool Login(string username, string password)
         {
             var provider = _membershipProvider;
             //Validate credentials
@@ -234,14 +234,14 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Logs out the current member
         /// </summary>
-        public void Logout()
+        public virtual void Logout()
         {
             FormsAuthentication.SignOut();
         }
 
         #region Querying for front-end
 
-        public IPublishedContent GetByProviderKey(object key)
+        public virtual IPublishedContent GetByProviderKey(object key)
         {
             return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByProviderKey", key), () =>
@@ -257,7 +257,7 @@ namespace Umbraco.Web.Security
                 });
         }
 
-        public IPublishedContent GetById(int memberId)
+        public virtual IPublishedContent GetById(int memberId)
         {
             return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetById", memberId), () =>
@@ -273,7 +273,7 @@ namespace Umbraco.Web.Security
                 });
         }
 
-        public IPublishedContent GetByUsername(string username)
+        public virtual IPublishedContent GetByUsername(string username)
         {
             return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByUsername", username), () =>
@@ -289,7 +289,7 @@ namespace Umbraco.Web.Security
                 });
         }
 
-        public IPublishedContent GetByEmail(string email)
+        public virtual IPublishedContent GetByEmail(string email)
         {
             return _applicationContext.ApplicationCache.RequestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByEmail", email), () =>
@@ -309,7 +309,7 @@ namespace Umbraco.Web.Security
         /// Returns the currently logged in member as IPublishedContent
         /// </summary>
         /// <returns></returns>
-        public IPublishedContent GetCurrentMember()
+        public virtual IPublishedContent GetCurrentMember()
         {
             if (IsLoggedIn() == false)
             {
@@ -341,7 +341,7 @@ namespace Umbraco.Web.Security
         /// profile properties
         /// </summary>
         /// <returns></returns>
-        public ProfileModel GetCurrentMemberProfileModel()
+        public virtual ProfileModel GetCurrentMemberProfileModel()
         {
             if (IsLoggedIn() == false)
             {
@@ -400,7 +400,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="memberTypeAlias"></param>
         /// <returns></returns>
-        public RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
+        public virtual RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
         {
             var provider = _membershipProvider;
             if (provider.IsUmbracoMembershipProvider())
@@ -486,7 +486,7 @@ namespace Umbraco.Web.Security
         /// Returns the login status model of the currently logged in member, if no member is logged in it returns null;
         /// </summary>
         /// <returns></returns>
-        public LoginStatusModel GetCurrentLoginStatus()
+        public virtual LoginStatusModel GetCurrentLoginStatus()
         {
             var model = LoginStatusModel.CreateModel();
 
@@ -560,7 +560,7 @@ namespace Umbraco.Web.Security
         /// <param name="allowGroups"></param>
         /// <param name="allowMembers"></param>
         /// <returns></returns>
-        public bool IsMemberAuthorized(
+        public virtual bool IsMemberAuthorized(
             bool allowAll = false,
             IEnumerable<string> allowTypes = null,
             IEnumerable<string> allowGroups = null,
@@ -636,7 +636,7 @@ namespace Umbraco.Web.Security
         /// <param name="passwordModel"></param>
         /// <param name="membershipProviderName"></param>
         /// <returns></returns>
-        public Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, string membershipProviderName)
+        public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, string membershipProviderName)
         {
             var provider = Membership.Providers[membershipProviderName];
             if (provider == null)
@@ -653,7 +653,7 @@ namespace Umbraco.Web.Security
         /// <param name="passwordModel"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>        
-        public Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
+        public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!        
 
