@@ -38,7 +38,12 @@
             $scope.cancelEdit = function(idx) {
                 $scope.model.value[idx].edit = false;
             };
-            
+
+            $scope.saveEdit = function (idx) {
+                $scope.model.value[idx].title = $scope.model.value[idx].caption;
+                $scope.model.value[idx].edit = false;
+            };
+
             $scope.delete = function (idx) {               
                 $scope.model.value.splice(idx, 1);               
             };
