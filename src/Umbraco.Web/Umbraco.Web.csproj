@@ -499,6 +499,11 @@
     <Compile Include="Routing\CustomRouteUrlProvider.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerOptions.cs" />
+    <Compile Include="Scheduling\DelayedRecurringTaskBase.cs" />
+    <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
+    <Compile Include="Scheduling\IDelayedBackgroundTask.cs" />
+    <Compile Include="Scheduling\RecurringTaskBase.cs" />
+    <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
