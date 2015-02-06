@@ -19,12 +19,10 @@ namespace Umbraco.Web.Scheduling
     internal sealed class Scheduler : ApplicationEventHandler
     {
         private static Timer _pingTimer;
-        private static Timer _schedulingTimer;
-        private static BackgroundTaskRunner<ScheduledPublishing> _publishingRunner;
-        private static BackgroundTaskRunner<ScheduledTasks> _tasksRunner;
-        private static BackgroundTaskRunner<LogScrubber> _scrubberRunner;
-        private static Timer _logScrubberTimer;
-        private static volatile bool _started = false;
+        private static BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
+        private static BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
+        private static BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
+        private static volatile bool _started;
         private static readonly object Locker = new object();
 
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
@@ -49,97 +47,37 @@ namespace Umbraco.Web.Scheduling
                                 _started = true;
                                 LogHelper.Debug<Scheduler>(() => "Initializing the scheduler");
 
-                                // time to setup the tasks
+                                // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
+                                _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>();
+                                _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>();
+                                _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>();
 
-                                //We have 3 background runners that are web aware, if the app domain dies, these tasks will wind down correctly
-                                _publishingRunner = new BackgroundTaskRunner<ScheduledPublishing>();
-                                _tasksRunner = new BackgroundTaskRunner<ScheduledTasks>();
-                                _scrubberRunner = new BackgroundTaskRunner<LogScrubber>();
+                                var settings = UmbracoConfig.For.UmbracoSettings();
 
-                                //NOTE: It is important to note that we need to use the ctor for a timer without the 'state' object specified, this is in order 
-                                // to ensure that the timer itself is not GC'd since internally .net will pass itself in as the state object and that will keep it alive.
-                                // There's references to this here: http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
-                                // we also make these timers static to ensure further GC safety.
+                                // note
+                                // must use the single-parameter constructor on Timer to avoid it from being GC'd
+                                // also make the timer static to ensure further GC safety
+                                // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
 
-                                // ping/keepalive - NOTE: we don't use a background runner for this because it does not need to be web aware, if the app domain dies, no problem
+                                // ping/keepalive - no need for a background runner - does not need to be web aware, ok if the app domain dies
                                 _pingTimer = new Timer(state => KeepAlive.Start(applicationContext, UmbracoConfig.For.UmbracoSettings()));
                                 _pingTimer.Change(60000, 300000);
 
                                 // scheduled publishing/unpublishing
-                                _schedulingTimer = new Timer(state => PerformScheduling(applicationContext, UmbracoConfig.For.UmbracoSettings()));
-                                _schedulingTimer.Change(60000, 60000);
+                                // install on all, will only run on non-slaves servers
+                                // both are delayed recurring tasks
+                                _publishingRunner.Add(new ScheduledPublishing(_publishingRunner, 60000, 60000, applicationContext, settings));
+                                _tasksRunner.Add(new ScheduledTasks(_tasksRunner, 60000, 60000, applicationContext, settings));
 
-                                //log scrubbing
-                                _logScrubberTimer = new Timer(state => PerformLogScrub(applicationContext, UmbracoConfig.For.UmbracoSettings()));
-                                _logScrubberTimer.Change(60000, GetLogScrubbingInterval(UmbracoConfig.For.UmbracoSettings()));
+                                // log scrubbing
+                                // install & run on all servers
+                                // LogScrubber is a delayed recurring task
+                                _scrubberRunner.Add(new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings), applicationContext, settings));
                             }
                         }
                     }
                 };
             };
         }
-
-
-        private int GetLogScrubbingInterval(IUmbracoSettingsSection settings)
-        {
-            int interval = 24 * 60 * 60; //24 hours
-            try
-            {
-                if (settings.Logging.CleaningMiliseconds > -1)
-                    interval = settings.Logging.CleaningMiliseconds;
-            }
-            catch (Exception e)
-            {
-                LogHelper.Error<Scheduler>("Unable to locate a log scrubbing interval.  Defaulting to 24 horus", e);
-            }
-            return interval;
-        }
-
-        private static void PerformLogScrub(ApplicationContext appContext, IUmbracoSettingsSection settings)
-        {
-            _scrubberRunner.Add(new LogScrubber(appContext, settings));
-        }
-
-        /// <summary>
-        /// This performs all of the scheduling on the one timer
-        /// </summary>
-        /// <param name="appContext"></param>
-        /// <param name="settings"></param>
-        /// <remarks>
-        /// No processing will be done if this server is a slave
-        /// </remarks>
-        private static void PerformScheduling(ApplicationContext appContext, IUmbracoSettingsSection settings)
-        {
-            using (DisposableTimer.DebugDuration<Scheduler>(() => "Scheduling interval executing", () => "Scheduling interval complete"))
-            {
-                //get the current server status to see if this server should execute the scheduled publishing
-                var serverStatus = ServerEnvironmentHelper.GetStatus(settings);
-
-                switch (serverStatus)
-                {
-                    case CurrentServerEnvironmentStatus.Single:
-                    case CurrentServerEnvironmentStatus.Master:
-                    case CurrentServerEnvironmentStatus.Unknown:
-                        //if it's a single server install, a master or it cannot be determined 
-                        // then we will process the scheduling
-                    
-                        //do the scheduled publishing
-                        _publishingRunner.Add(new ScheduledPublishing(appContext, settings));
-     
-                        //do the scheduled tasks
-                        _tasksRunner.Add(new ScheduledTasks(appContext, settings));
-                        
-                        break;
-                    case CurrentServerEnvironmentStatus.Slave:                
-                        //do not process
-                        
-                        LogHelper.Debug<Scheduler>(
-                            () => string.Format("Current server ({0}) detected as a slave, no scheduled processes will execute on this server", NetworkHelper.MachineName));
-
-                        break;
-                }            
-            }            
-        }
-        
     }
 }
