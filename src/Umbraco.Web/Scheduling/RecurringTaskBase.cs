@@ -67,12 +67,17 @@ namespace Umbraco.Web.Scheduling
             var recur = GetRecurring();
             if (recur == null) return; // done
 
+            // note
+            // must use the single-parameter constructor on Timer to avoid it from being GC'd
+            // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
+
             _timer = new Timer(_ =>
             {
                 _timer.Dispose();
                 _timer = null;
                 _runner.TryAdd(recur);
-            }, null, _periodMilliseconds, 0);
+            });
+            _timer.Change(_periodMilliseconds, 0);
         }
 
         /// <summary>
