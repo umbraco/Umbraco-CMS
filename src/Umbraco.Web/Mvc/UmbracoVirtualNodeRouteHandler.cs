@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Models;
@@ -32,8 +34,25 @@ namespace Umbraco.Web.Mvc
             requestContext.RouteData.DataTokens.Add("umbraco", renderModel);
             requestContext.RouteData.DataTokens.Add("umbraco-doc-request", umbracoContext.PublishedContentRequest);
             requestContext.RouteData.DataTokens.Add("umbraco-context", umbracoContext);
+            //this is used just for a flag that this is an umbraco custom route
+            requestContext.RouteData.DataTokens.Add("umbraco-custom-route", true);
 
-            umbracoContext.PublishedContentRequest.ConfigureRequest();
+            //Here we need to detect if a SurfaceController has posted
+            var formInfo = RenderRouteHandler.GetFormInfo(requestContext);
+            if (formInfo != null)
+            {
+                var def = new RouteDefinition
+                {
+                    ActionName = requestContext.RouteData.GetRequiredString("action"),
+                    ControllerName = requestContext.RouteData.GetRequiredString("controller"),
+                    PublishedContentRequest = umbracoContext.PublishedContentRequest
+                };
+
+                //set the special data token to the current route definition
+                requestContext.RouteData.DataTokens["umbraco-route-def"] = def;
+
+                return RenderRouteHandler.HandlePostedValues(requestContext, formInfo);
+            }
 
             return new MvcHandler(requestContext);
         }
@@ -42,6 +61,7 @@ namespace Umbraco.Web.Mvc
 
         protected virtual void PreparePublishedContentRequest(PublishedContentRequest publishedContentRequest)
         {
+            publishedContentRequest.Prepare();
         }
     }
 }

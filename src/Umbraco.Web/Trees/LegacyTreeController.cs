@@ -19,7 +19,7 @@ namespace Umbraco.Web.Trees
     /// This is used to output JSON from legacy trees
     /// </summary>
     [PluginController("UmbracoTrees")]
-    //public class LegacyTreeController : UmbracoAuthorizedApiController
+    [LegacyTreeAuthorizeAttribute]
     public class LegacyTreeController : TreeControllerBase
     {
         private readonly XmlTreeNode _xmlTreeNode;

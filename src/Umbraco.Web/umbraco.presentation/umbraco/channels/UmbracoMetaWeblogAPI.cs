@@ -15,6 +15,7 @@ using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 using umbraco.presentation.channels.businesslogic;
 using Post = CookComputing.MetaWeblog.Post;
@@ -74,15 +75,15 @@ namespace umbraco.presentation.channels
 
                 // Excerpt
                 if (userChannel.FieldExcerptAlias != null && userChannel.FieldExcerptAlias != "")
-                    doc.getProperty(userChannel.FieldExcerptAlias).Value = removeLeftUrl(post.mt_excerpt);
+                    doc.getProperty(userChannel.FieldExcerptAlias).Value = RemoveLeftUrl(post.mt_excerpt);
 
                 
                 if (UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent)
-                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
+                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(RemoveLeftUrl(post.description), false);
                 else
-                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = removeLeftUrl(post.description);
+                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = RemoveLeftUrl(post.description);
 
-                updateCategories(doc, post, userChannel);
+                UpdateCategories(doc, post, userChannel);
 
 
                 if (publish)
@@ -97,7 +98,7 @@ namespace umbraco.presentation.channels
             }
         }
 
-        private void updateCategories(Document doc, Post post, Channel userChannel)
+        private static void UpdateCategories(Document doc, Post post, Channel userChannel)
         {
             if (userChannel.FieldCategoriesAlias != null && userChannel.FieldCategoriesAlias != "")
             {
@@ -384,17 +385,17 @@ namespace umbraco.presentation.channels
 
                 // Excerpt
                 if (userChannel.FieldExcerptAlias != null && userChannel.FieldExcerptAlias != "")
-                    doc.getProperty(userChannel.FieldExcerptAlias).Value = removeLeftUrl(post.mt_excerpt);
+                    doc.getProperty(userChannel.FieldExcerptAlias).Value = RemoveLeftUrl(post.mt_excerpt);
 
 
                 // Description
                 if (UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent)
-                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
+                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(RemoveLeftUrl(post.description), false);
                 else
-                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = removeLeftUrl(post.description);
+                    doc.getProperty(userChannel.FieldDescriptionAlias).Value = RemoveLeftUrl(post.description);
 
                 // Categories
-                updateCategories(doc, post, userChannel);
+                UpdateCategories(doc, post, userChannel);
 
                 // check release date
                 if (post.dateCreated.Year > 0001)
@@ -486,24 +487,29 @@ namespace umbraco.presentation.channels
                             int fileWidth;
                             int fileHeight;
 
-                            var stream = _fs.OpenFile(relativeFilePath);
+                            using (var stream = _fs.OpenFile(relativeFilePath))
+                            {
+                                Image image = Image.FromStream(stream);
+                                fileWidth = image.Width;
+                                fileHeight = image.Height;
+                                stream.Close();
+                                try
+                                {
+                                    m.getProperty(Constants.Conventions.Media.Width).Value = fileWidth.ToString();
+                                    m.getProperty(Constants.Conventions.Media.Height).Value = fileHeight.ToString();
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogHelper.Error<UmbracoMetaWeblogAPI>("An error occurred reading the media stream", ex);
+                                }    
+                            }
 
-                            Image image = Image.FromStream(stream);
-                            fileWidth = image.Width;
-                            fileHeight = image.Height;
-                            stream.Close();
-                            try
-                            {
-                                m.getProperty(Constants.Conventions.Media.Width).Value = fileWidth.ToString();
-                                m.getProperty(Constants.Conventions.Media.Height).Value = fileHeight.ToString();
-                            }
-                            catch
-                            {
-                            }
+                            
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        LogHelper.Error<UmbracoMetaWeblogAPI>("An error occurred in newMediaObjectLogic", ex);
                     }
 
                     return fileUrl;
@@ -553,7 +559,7 @@ namespace umbraco.presentation.channels
             throw new ArgumentException(string.Format("No data found for user with username: '{0}'", username));
         }
 
-        private string removeLeftUrl(string text)
+        private static string RemoveLeftUrl(string text)
         {
             return
                 text.Replace(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority), "");

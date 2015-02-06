@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="ja" intName="Japanese" localName="日本語" lcid="17" culture="ja-JP">
   <creator>
-    <name>umbraco</name>
-    <link>http://umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">ドメインの割り当て</key>
@@ -348,10 +348,10 @@
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% をデータベースにコピーします。<strong>次へ</strong>を押して続行してください。]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>データベースを見つけられません！"web.config"ファイルの中の"接続文字列"を確認してください。</p>
-              <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"umbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
+              <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"UmbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
               <p>
               <strong>再施行</strong>ボタンをクリックして
-              続けます。<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              続けます。<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
         必要ならISPに連絡するなどしてみてください。
@@ -380,7 +380,7 @@
         </p>
       ]]></key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
-    <key alias="licenseText">次へボタンをクリック(またはweb.configのumbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
+    <key alias="licenseText">次へボタンをクリック(またはweb.configのUmbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
     <key alias="None">まだインストールは完了していません。</key>
     <key alias="permissionsAffectedFolders">影響するファイルとフォルダ</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Umbracoに必要なアクセス権の設定についての詳細はこちらをどうぞ</key>
@@ -408,7 +408,7 @@
     <key alias="runwayFromScratch">スクラッチから始めたい</key>
     <key alias="runwayFromScratchText"><![CDATA[
         ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。 
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
         後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
       ]]></key>
     <key alias="runwayHeader">Umbracoプラットフォームのクリーンセットアップが完了しました。この後はどうしますか？</key>
@@ -444,7 +444,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 我々の認めるコミュニティから手助けを得られるでしょう。どうしたら簡単なサイトを構築できるか、どうしたらパッケージを使えるかについてのビデオや文書、またUmbracoの用語のクイックガイドも見る事ができます。]]></key>
     <key alias="theEndHeader">Umbraco %0% のインストールは完了、準備が整いました</key>
     <key alias="theEndInstallFailed"><![CDATA[インストールを終えた後、もし必要ならば
-        <strong>/web.config file</strong>を手作業で編集し、<strong>'%0%'</strong>の下にある<strong>umbracoConfigurationStatus</strong>キーを設定してください。]]></key>
+        <strong>/web.config file</strong>を手作業で編集し、<strong>'%0%'</strong>の下にある<strong>UmbracoConfigurationStatus</strong>キーを設定してください。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA["Umbracoを始める"ボタンをクリックして<strong>今すぐ開始</strong>できます。<br />もし<strong>Umbracoの初心者</strong>なら、
 私たちの初心者向けのたくさんの情報を参考にしてください。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbracoの開始</h3>
@@ -453,7 +453,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
     <key alias="watch">見る</key>
-    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
+    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>Umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
                                 <br /><br />
                                 <strong>"次へ"</strong>を押してウィザードを開始します。]]></key>
   </area>
@@ -466,7 +466,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="renewSession">作業を保存して今すぐ更新</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="topText">Umbraco にようこそ。ユーザー名とパスワードを入力してください:</key>
   </area>
   <area alias="main">
@@ -729,9 +729,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="insertContentAreaPlaceHolder">コンテンツ領域プレースホルダーの挿入</key>
     <key alias="insertDictionaryItem">dictionary item の挿入</key>
     <key alias="insertMacro">マクロの挿入</key>
-    <key alias="insertPageField">umbraco ページフィールドの挿入</key>
+    <key alias="insertPageField">Umbraco ページフィールドの挿入</key>
     <key alias="mastertemplate">マスターテンプレート</key>
-    <key alias="quickGuide">umbraco テンプレートタグのクイックガイド</key>
+    <key alias="quickGuide">Umbraco テンプレートタグのクイックガイド</key>
     <key alias="template">テンプレート</key>
   </area>
   <area alias="templateEditor">

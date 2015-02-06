@@ -16,17 +16,37 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
     {
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
+
+        // an object that represent a value that has not been created yet
+        protected readonly object ValueNotCreated = new object();
 
         public ObjectCacheRuntimeCacheProvider()
         {
             MemoryCache = new MemoryCache("in-memory");
         }
 
+        protected object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
+        {
+            try
+            {
+                // if onlyIfValueIsCreated, do not trigger value creation
+                // must return something, though, to differenciate from null values
+                if (onlyIfValueIsCreated && lazy.IsValueCreated == false) return ValueNotCreated;
+                return lazy.Value;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #region Clear
+
         public virtual void ClearAllCache()
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 MemoryCache.DisposeIfDisposable();
                 MemoryCache = new MemoryCache("in-memory");
@@ -35,7 +55,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheItem(string key)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 if (MemoryCache[key] == null) return;
                 MemoryCache.Remove(key);
@@ -44,130 +64,178 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
-                var keysToRemove = MemoryCache
-                    .Where(c => c.Value != null && c.Value.GetType().ToString().InvariantEquals(typeName))
-                    .Select(c => c.Key)
-                    .ToArray();
-                foreach (var k in keysToRemove)
-                    MemoryCache.Remove(k);
+                foreach (var key in MemoryCache
+                    .Where(x =>
+                    {
+                        // x.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
+                        // get non-created as NonCreatedValue & exceptions as null
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        return value == null || value.GetType().ToString().InvariantEquals(typeName);
+                    })
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }
         }
 
         public virtual void ClearCacheObjectTypes<T>()
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var typeOfT = typeof (T);
-                var keysToRemove = MemoryCache
-                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT)
-                    .Select(c => c.Key)
-                    .ToArray();
-                foreach (var k in keysToRemove)
-                    MemoryCache.Remove(k);
+                foreach (var key in MemoryCache
+                    .Where(x =>
+                    {
+                        // x.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
+                        // get non-created as NonCreatedValue & exceptions as null
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        return value == null || value.GetType() == typeOfT;
+                    })
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }
         }
 
         public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
                 var typeOfT = typeof(T);
-                var keysToRemove = MemoryCache
-                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT && predicate(c.Key, (T)c.Value))
-                    .Select(c => c.Key)
-                    .ToArray();
-                foreach (var k in keysToRemove)
-                    MemoryCache.Remove(k);
+                foreach (var key in MemoryCache
+                    .Where(x =>
+                    {
+                        // x.Value is Lazy<object> and not null, its value may be null
+                        // remove null values as well, does not hurt
+                        // get non-created as NonCreatedValue & exceptions as null
+                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        if (value == null) return true;
+                        return value.GetType() == typeOfT
+                            && predicate(x.Key, (T) value);
+                    })
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }
         }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
-                var keysToRemove = (from c in MemoryCache where c.Key.InvariantStartsWith(keyStartsWith) select c.Key).ToList();
-                foreach (var k in keysToRemove)
-                {
-                    MemoryCache.Remove(k);
-                }
+                foreach (var key in MemoryCache
+                    .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }            
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            using (new WriteLock(Locker))
+            using (new WriteLock(_locker))
             {
-                var keysToRemove = (from c in MemoryCache where Regex.IsMatch(c.Key, regexString) select c.Key).ToList();
-                foreach (var k in keysToRemove)
-                {
-                    MemoryCache.Remove(k);
-                }
+                foreach (var key in MemoryCache
+                    .Where(x => Regex.IsMatch(x.Key, regexString))
+                    .Select(x => x.Key)
+                    .ToArray()) // ToArray required to remove
+                    MemoryCache.Remove(key);
             }     
         }
 
-        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        #endregion
+
+        #region Get
+
+        public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
-            return (from c in MemoryCache
-                    where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value).ToList();
+            KeyValuePair<string, object>[] entries;
+            using (new ReadLock(_locker))
+            {
+                entries = MemoryCache
+                    .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
+                    .ToArray(); // evaluate while locked
+            }
+            return entries
+                .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Where(x => x != null) // backward compat, don't store null values in the cache
+                .ToList();
         }
 
         public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
         {
-            return (from c in MemoryCache
-                    where Regex.IsMatch(c.Key, regexString)
-                    select c.Value).ToList();
+            KeyValuePair<string, object>[] entries;
+            using (new ReadLock(_locker))
+            {
+                entries = MemoryCache
+                    .Where(x => Regex.IsMatch(x.Key, regexString))
+                    .ToArray(); // evaluate while locked
+            }
+            return entries
+                .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Where(x => x != null) // backward compat, don't store null values in the cache
+                .ToList();
         }
 
-        public virtual object GetCacheItem(string cacheKey)
+        public object GetCacheItem(string cacheKey)
         {
-            var result = MemoryCache.Get(cacheKey);
-            return result;
+            Lazy<object> result;
+            using (new ReadLock(_locker))
+            {
+                result = MemoryCache.Get(cacheKey) as Lazy<object>; // null if key not found
+            }
+            return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
         }
 
-        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return GetCacheItem(cacheKey, getCacheItem, null);
         }
 
-        public object GetCacheItem(
-            string cacheKey, 
-            Func<object> getCacheItem, 
-            TimeSpan? timeout, 
-            bool isSliding = false, 
-            CacheItemPriority priority = CacheItemPriority.Normal,
-            CacheItemRemovedCallback removedCallback = null, 
-            string[] dependentFiles = null)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal,CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            using (var lck = new UpgradeableReadLock(Locker))
-            {
-                var result = MemoryCache.Get(cacheKey);
-                if (result == null)
-                {
-                    lck.UpgradeToWriteLock();
+            // see notes in HttpRuntimeCacheProvider
 
-                    result = getCacheItem();
-                    if (result != null)
-                    {
-                        var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
-                        MemoryCache.Set(cacheKey, result, policy);
-                    }
+            Lazy<object> result;
+
+            using (var lck = new UpgradeableReadLock(_locker))
+            {
+                result = MemoryCache.Get(cacheKey) as Lazy<object>;
+                if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                {
+                    result = new Lazy<object>(getCacheItem);
+                    var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+
+                    lck.UpgradeToWriteLock();
+                    MemoryCache.Set(cacheKey, result, policy);
                 }
-                return result;
             }
+
+            return result.Value;
         }
+
+        #endregion
+
+        #region Insert
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            object result = getCacheItem();
-            if (result != null)
-            {
-                var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
-                MemoryCache.Set(cacheKey, result, policy);
-            }
+            // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
+            // and make sure we don't store a null value.
+
+            var result = new Lazy<object>(getCacheItem);
+            var value = result.Value; // force evaluation now
+            if (value == null) return; // do not store null values (backward compat)
+
+            var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            MemoryCache.Set(cacheKey, result, policy);
         }
+
+        #endregion
 
         private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {

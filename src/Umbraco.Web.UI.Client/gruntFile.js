@@ -3,19 +3,24 @@ module.exports = function (grunt) {
 
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
-  grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
+    grunt.registerTask('dev', ['jshint:dev', 'build-dev', 'webserver', 'open:dev', 'watch']);
+    grunt.registerTask('docserve', ['docs:api', 'connect:docserver', 'open:docs', 'watch:docs']);
+    grunt.registerTask('vs', ['jshint:dev', 'build-dev', 'watch']);
 
+    //TODO: Too much watching, this brings windows to it's knees when in dev mode
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:tuning','copy:vs','karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:tuning','copy:tuning', 'copy:assets', 'copy:vs']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:canvasdesigner','copy:vs', 'karma:unit']);
+  grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner','copy:canvasdesigner', 'copy:assets', 'copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
-  grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
-  grunt.registerTask('watch-tuning', ['copy:tuning', 'concat:tuningJs', 'copy:vs']);
+  grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:tuning', 'bower', 'copy']);
+  grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
+  
+  //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
+  grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'copy']);
 
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -27,9 +32,9 @@ module.exports = function (grunt) {
     grunt.log.subhead(Date());
   });
 
-    // Custom task to run the bower dependency installer
-    // tried, a few other things but this seems to work the best.
-    // https://coderwall.com/p/xnkdqw
+  // Custom task to run the bower dependency installer
+  // tried, a few other things but this seems to work the best.
+  // https://coderwall.com/p/xnkdqw
   grunt.registerTask('bower', 'Get js packages listed in bower.json',
       function () {
           var bower = require('bower');
@@ -71,12 +76,31 @@ module.exports = function (grunt) {
                  }
                }
              },
-             testserver: {}
+             testserver: {},
+             docserver: {
+               options: {
+                 port: 8880,
+                 hostname: '0.0.0.0',
+                 base: './docs/api',
+                 middleware: function(connect, options){
+                   return [
+                     //uncomment to enable CSP
+                     // util.csp(),
+                     //util.rewrite(),
+                     connect.static(options.base),
+                     connect.directory(options.base)
+                   ];
+                 }
+               }
+             },
            },
 
     open : {
       dev : {
           path: 'http://localhost:9990/belle/'
+      },
+      docs : {
+          path: 'http://localhost:8880/index.html'
       }
     },
 
@@ -85,7 +109,7 @@ module.exports = function (grunt) {
     vsdir: '../Umbraco.Web.UI/umbraco',
     pkg: grunt.file.readJSON('package.json'),
     banner:
-    '/*! <%= pkg.title || pkg.name %> - v<%= buildVersion %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+    '/*! <%= pkg.title || pkg.name %>\n' +
     '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
     ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
     ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
@@ -114,41 +138,37 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'src/assets/' }]
       },
 
+      config: {
+        files: [{ dest: '<%= distdir %>/../config', src : '**', expand: true, cwd: 'src/config/' }]
+      },
 
       // Copies over the files downloaded by bower
       bower: {
         files: [
                 {
-                  dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js', 
-                  src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js' 
+                  dest: '<%= distdir %>/lib/typeahead/typeahead.bundle.min.js',
+                  src: 'bower_components/typeahead.js/dist/typeahead.bundle.min.js'
                 },
                 {
-                  dest: '<%= distdir %>/lib/lazyload/lazyload.min.js', 
+                  dest: '<%= distdir %>/lib/lazyload/lazyload.min.js',
                   src: 'bower_components/rgrove-lazyload/lazyload.js'
-                },
-                {
-                  dest: '<%= distdir %>/lib/ace/',
-                  src: '**',
-                  expand: true,
-                  cwd: 'bower_components/ace-builds/src-min-noconflict/'
                 }
               ]
       },
-      
+
 
       installer: {
         files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
 
-      tuning: {
+      canvasdesigner: {
           files: [
-              { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/css', src: 'tuning.defaultStyle.css', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/less', src: 'tuning.defaultStyle.less', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/assets/less', src: 'tuning.gridRowStyle.less', expand: true, cwd: 'src/tuning' },
-              { dest: '<%= distdir %>/js', src: 'tuning.config.js', expand: true, cwd: 'src/tuning/config' },
-              { dest: '<%= distdir %>/js', src: 'tuning.palettes.js', expand: true, cwd: 'src/tuning/config' },
-              { dest: '<%= distdir %>/js', src: 'tuning.front.js', expand: true, cwd: 'src/tuning' }
+              { dest: '<%= distdir %>/preview', src: '**/*.html', expand: true, cwd: 'src/canvasdesigner' },
+              { dest: '<%= distdir %>/preview/editors', src: '**/*.html', expand: true, cwd: 'src/canvasdesigner/editors' },
+              { dest: '<%= distdir %>/assets/less', src: '**/*.less', expand: true, cwd: 'src/canvasdesigner/editors' },
+              { dest: '<%= distdir %>/js', src: 'canvasdesigner.config.js', expand: true, cwd: 'src/canvasdesigner/config' },
+              { dest: '<%= distdir %>/js', src: 'canvasdesigner.palettes.js', expand: true, cwd: 'src/canvasdesigner/config' },
+              { dest: '<%= distdir %>/js', src: 'canvasdesigner.front.js', expand: true, cwd: 'src/canvasdesigner' }
           ]
       },
 
@@ -176,10 +196,6 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
               { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' }
           ]
-      },
-
-      packages: {
-        files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
     },
 
@@ -213,9 +229,9 @@ module.exports = function (grunt) {
               footer: "\n\n})();"
           }
         },
-        tuningJs: {
-            src: ['src/tuning/tuning.global.js', 'src/tuning/tuning.controller.js', 'src/tuning/lib/slider.directive.js', 'src/tuning/lib/spectrum.directive.js'],
-            dest: '<%= distdir %>/js/tuning.panel.js'
+        canvasdesignerJs: {
+            src: ['src/canvasdesigner/canvasdesigner.global.js', 'src/canvasdesigner/canvasdesigner.controller.js', 'src/canvasdesigner/editors/*.js', 'src/canvasdesigner/lib/*.js'],
+            dest: '<%= distdir %>/js/canvasdesigner.panel.js'
         },
         controllers: {
           src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
@@ -303,10 +319,10 @@ module.exports = function (grunt) {
           compile: true
         }
       },
-      tuning: {
+      canvasdesigner: {
           files: {
-              '<%= distdir %>/assets/css/tuning.panelStyles.css':
-              ['src/less/tuning.panelStyles.less', 'src/less/helveticons.less']
+              '<%= distdir %>/assets/css/canvasdesigner.css':
+              ['src/less/canvasdesigner.less', 'src/less/helveticons.less']
           },
           options: {
               compile: true
@@ -326,7 +342,7 @@ module.exports = function (grunt) {
 
     watch:{
       css: {
-          files: '**/*.less',
+          files: 'src/**/*.less',
           tasks: ['watch-less', 'timestamp'],
           options: {
             livereload: true,
@@ -344,18 +360,13 @@ module.exports = function (grunt) {
           files: ['src/installer/**/*.*'],
           tasks: ['watch-installer', 'timestamp'],
       },
-      tuning: {
-          files: ['src/tuning/**/*.*'],
-          tasks: ['watch-tuning', 'timestamp'],
+      canvasdesigner: {
+          files: ['src/canvasdesigner/**/*.*'],
+          tasks: ['watch-canvasdesigner', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
         tasks:['watch-html','timestamp']
-      },
-
-      packages: {
-          files: 'src/packages/**/*.*',
-          tasks: ['watch-packages', 'timestamp'],
       }
     },
 

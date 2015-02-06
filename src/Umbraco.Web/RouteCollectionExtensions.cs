@@ -4,11 +4,30 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Http;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web
 {
-    internal static class RouteCollectionExtensions
+    public static class RouteCollectionExtensions
 	{
+        /// <summary>
+        /// Maps an Umbraco route with an UmbracoVirtualNodeRouteHandler
+        /// </summary>
+        /// <param name="routes"></param>
+        /// <param name="name"></param>
+        /// <param name="url"></param>
+        /// <param name="defaults"></param>
+        /// <param name="virtualNodeHandler"></param>
+        /// <param name="constraints"></param>
+        /// <param name="namespaces"></param>
+        /// <returns></returns>
+        public static Route MapUmbracoRoute(this RouteCollection routes, string name, string url, object defaults, UmbracoVirtualNodeRouteHandler virtualNodeHandler, object constraints = null, string[] namespaces = null)
+        {
+            var route = routes.MapRoute(name, url, defaults, constraints, namespaces);
+            route.RouteHandler = virtualNodeHandler;
+            return route;
+        }
+
         /// <summary>
         /// Routes a webapi controller with namespaces
         /// </summary>

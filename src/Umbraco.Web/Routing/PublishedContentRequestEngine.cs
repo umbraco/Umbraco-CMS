@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using System.IO;
-
+using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -74,11 +74,17 @@ namespace Umbraco.Web.Routing
 		    // set the culture on the thread - once, so it's set when running document lookups
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
-			// find the document & template
-			FindPublishedContentAndTemplate();
+            //find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
+            // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
+            // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
+		    if (_pcr.PublishedContent == null)
+		    {
+                // find the document & template
+                FindPublishedContentAndTemplate();
 
-			// set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+                // set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
+                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+		    }
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
@@ -517,6 +523,11 @@ namespace Umbraco.Web.Routing
 			if (Access.IsProtected(_pcr.PublishedContent.Id, path))
 			{
 				LogHelper.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
+
+                //TODO: We coud speed this up, the only reason we are looking up the members is for it's
+                // ProviderUserKey (id). We could store this id in the FormsAuth cookie custom data when 
+                // a member logs in. Then we can check if the value exists and just use that, otherwise lookup 
+                // the member like we are currently doing.
 
 				System.Web.Security.MembershipUser user = null;
 				try

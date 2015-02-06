@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Models.EntityBase
 {
-    public interface IUmbracoEntity : IAggregateRoot
+    public interface IUmbracoEntity : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Profile of the user who created this Entity

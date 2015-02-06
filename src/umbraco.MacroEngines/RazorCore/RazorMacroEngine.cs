@@ -175,6 +175,19 @@ namespace umbraco.MacroEngines
         }
 
         public string Execute(MacroModel macro, INode currentPage) {
+            
+            //if this is executing, we need to ensure the folder exists and that the correct web.config exists on that folder too
+            var absolutePath = IOHelper.MapPath(SystemDirectories.MacroScripts);
+            if (!Directory.Exists(absolutePath))
+                Directory.CreateDirectory(absolutePath);
+            if (!File.Exists(Path.Combine(absolutePath, "web.config")))
+            {
+                using (var writer = File.CreateText(Path.Combine(absolutePath, "web.config")))
+                {
+                    writer.Write(Strings.WebConfig);
+                }
+            }
+            
             try
             {
                 Success = true;

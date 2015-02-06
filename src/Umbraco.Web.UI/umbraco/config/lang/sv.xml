@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
-    <name>Kalle Ekstrand, Toxic Interactive Solutions AB</name>
-    <link>http://www.toxic.se</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
-  <area alias="actions">    
+  <area alias="actions">
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
     <key alias="browse">Surfa på sidan</key>
@@ -15,7 +15,7 @@
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
-    <key alias="emptyTrashcan">Töm papperskorgen</key>    
+    <key alias="emptyTrashcan">Töm papperskorgen</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
     <key alias="importDocumentType">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
@@ -55,10 +55,8 @@
     <key alias="remove">Ta bort</key>
     <key alias="setDomains">Domäner</key>
     <key alias="setLanguage">Kultur</key>
-    <key alias="setLanguageHelp">
-      <![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
-     på befintlig nod.]]>
-    </key>
+    <key alias="setLanguageHelp"><![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
+     på befintlig nod.]]></key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
@@ -81,6 +79,7 @@
     <key alias="macroInsert">Infoga macro</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="relations">Ändra relation</key>
+    <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
     <key alias="saveAndPublish">Spara och publicera</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
@@ -121,6 +120,7 @@
     <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
+    <key alias="altTextOptional">Alternativ text (optionell)</key>
     <key alias="childItems">Underliggande noder</key>
     <key alias="clickToEdit">Klicka för att redigera detta objekt</key>
     <key alias="createBy">Skapad av</key>
@@ -130,9 +130,11 @@
     <key alias="documentType">Dokumenttyp</key>
     <key alias="editing">Redigering</key>
     <key alias="expireDate">Ta bort</key>
+    <key alias="isPublished">Är publicerad</key>
     <key alias="itemChanged">Detta objekt har ändrats efter publicering</key>
     <key alias="itemNotPublished">Detta objekt är inte publicerat</key>
     <key alias="lastPublished">Senast publicerat</key>
+    <key alias="listViewNoItems">Det finns inget att visa i listan</key>
     <key alias="mediaLinks">Länk till medieobjekt</key>
     <key alias="mediatype">Mediatyp</key>
     <key alias="membergroup">Medlemsgrupp</key>
@@ -230,12 +232,20 @@
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot">Tillåt i roten</key>
+    <key alias="allowAtRootDesc">Endast innehållstyper med denna markerad kan skapas i roten av innehåll samt media</key>
     <key alias="allowedchildnodetypes">Tillåtna typer för underliggande noder</key>
+    <key alias="contenttypecompositions">Dokumenttypssammansättning</key>
     <key alias="create">Skapa</key>
+    <key alias="createListView">Skapa en anpassad listvy</key>
+    <key alias="currentListView">Aktuell listvy</key>
+    <key alias="currentListViewDesc">Datatyp för markerad listvy</key>
     <key alias="deletetab">Ta bort flik</key>
     <key alias="description">Beskrivning</key>
     <key alias="hasListView">Aktivera listvy</key>
+    <key alias="hasListViewDesc">Konfigurerar innehållet till att visa en sorterbar &amp; sökbar lista av nodens barn, barnen kommer ej att visas i trädet.</key>
     <key alias="newtab">Ny flik</key>
+    <key alias="removeListView">Radera anpassad listvy</key>
     <key alias="tab">Flik</key>
     <key alias="thumbnail">Miniatyrbild</key>
   </area>
@@ -400,38 +410,36 @@
     <key alias="databaseHeader">Databaskonfiguration</key>
     <key alias="databaseInstall"><![CDATA[För att installera Umbraco {0} databasen, tryck på knappen <strong>installera</strong>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco {0} kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="http://umbraco.org/redir/installWebConfig" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco {0}</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen {0}.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Din nuvarande databas behöver inte uppgraderas! Klicka <strong>Nästa</strong> för att fortsätta med konfigurationsguiden]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Lösenordet på standardanvändaren måste bytas!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Standardanvändaren har avaktiverats eller har inte åtkomst till umbraco!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <b>Next</b> för att fortsätta.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Standardanvändaren har avaktiverats eller har inte åtkomst till Umbraco!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <b>Next</b> för att fortsätta.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Standardanvändarens lösenord har ändrats sedan installationen!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="defaultUserPasswordChanged">Lösenordet är ändrat!</key>
-    <key alias="defaultUserText"><![CDATA[<p> umbraco skapar en standardanvändare med login <strong>('admin')</strong> och lösenordet <strong>('default')</strong>. Det är <strong>viktigt</strong> att lösenordet ändras till något unikt. </p> <p> Det här steget kommer kontrollera standardanvändarens lösenord och låta dig vet om det behöver ändras. </p>]]></key>
+    <key alias="defaultUserText"><![CDATA[<p> Umbraco skapar en standardanvändare med login <strong>('admin')</strong> och lösenordet <strong>('default')</strong>. Det är <strong>viktigt</strong> att lösenordet ändras till något unikt. </p> <p> Det här steget kommer kontrollera standardanvändarens lösenord och låta dig vet om det behöver ändras. </p>]]></key>
     <key alias="greatStart">Få en flygande start, kolla på våra introduktionsvideor</key>
-    <key alias="licenseText">Genom att klicka på Nästa knappen (eller redigera umbracoConfigurationStatus i web.config), accepterar du licensavtalet för den här mjukvaran som det är skrivet i rutan nedan. Observera att den här umbracodistributionen består av två olika licensavtal, "the open source MIT license" för ramverket och "the umbraco freeware license" som täcker användargränssnittet.</key>
+    <key alias="licenseText">Genom att klicka på Nästa knappen (eller redigera UmbracoConfigurationStatus i web.config), accepterar du licensavtalet för den här mjukvaran som det är skrivet i rutan nedan. Observera att den här Umbracodistributionen består av två olika licensavtal, "the open source MIT license" för ramverket och "the Umbraco freeware license" som täcker användargränssnittet.</key>
     <key alias="None">Inte installerad än.</key>
     <key alias="permissionsAffectedFolders">Berörda filer och mappar</key>
-    <key alias="permissionsAffectedFoldersMoreInfo">Här hittar du mer information om att sätta rättigheter för umbraco</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Här hittar du mer information om att sätta rättigheter för Umbraco</key>
     <key alias="permissionsAffectedFoldersText">Du måste ge ASP.NET ändra rättigheter till följande filer/mappar</key>
-    <key alias="permissionsAlmostPerfect">
-      <![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
-    <br /><br /> Du kan köra umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja umbraco fullt ut.]]>
-    </key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
+    <br /><br /> Du kan köra Umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja Umbraco fullt ut.]]></key>
     <key alias="permissionsHowtoResolve">Hur skall man lösa</key>
     <key alias="permissionsHowtoResolveLink">Klicka här för att läsa text-versionen</key>
-    <key alias="permissionsHowtoResolveText"><![CDATA[Titta på vår <strong>video-självstudiekurs</strong> om hur du konfigurerar mapp-rättigheter för umbraco eller läs text-versionen.]]></key>
-    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Dina rättighetsinställningar kan vara ett problem!</strong><br /><br /> Du kan köra umbraco utan problem, men du kommer inte att kunna skapa mappar eller installera paket vilket är rekommenderat för att kunna utnyttja umbraco fullt ut.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Dina rättighetsinställningar är inte reda för umbraco!</strong> <br /><br /> För att kunna köra umbraco måste du ändra dina rättighetsinställningar.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Dina rättighetsinställningar är perfekta!</strong><br /><br />Du är redo att köra umbraco och installera paket!]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Titta på vår <strong>video-självstudiekurs</strong> om hur du konfigurerar mapp-rättigheter för Umbraco eller läs text-versionen.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Dina rättighetsinställningar kan vara ett problem!</strong><br /><br /> Du kan köra Umbraco utan problem, men du kommer inte att kunna skapa mappar eller installera paket vilket är rekommenderat för att kunna utnyttja Umbraco fullt ut.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Dina rättighetsinställningar är inte reda för Umbraco!</strong> <br /><br /> För att kunna köra Umbraco måste du ändra dina rättighetsinställningar.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Dina rättighetsinställningar är perfekta!</strong><br /><br />Du är redo att köra Umbraco och installera paket!]]></key>
     <key alias="permissionsResolveFolderIssues">Lösa mapp problem</key>
     <key alias="permissionsResolveFolderIssuesLink">Följ den här länken för mer information om problem med ASP.NET och att skapa mappar</key>
     <key alias="permissionsSettingUpPermissions">Konfigurerar mapprättigheter</key>
-    <key alias="permissionsText">umbraco behöver skriv/ändra rättigheter till vissa mappar för att spara filer som bilder och PDFer. Umbraco sparar också temporär data (så kallad cache) för att öka prestandan på din webbplats.</key>
+    <key alias="permissionsText">Umbraco behöver skriv/ändra rättigheter till vissa mappar för att spara filer som bilder och PDFer. Umbraco sparar också temporär data (så kallad cache) för att öka prestandan på din webbplats.</key>
     <key alias="runwayFromScratch">Jag vill börja från början</key>
-    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
     <key alias="runwayHeader">Du har just installerat en ren Umbraco platform. Vad vill du göra härnäst?</key>
     <key alias="runwayInstalled">Runway är installerat</key>
     <key alias="runwayInstalledText"><![CDATA[Du har nu grunden på plats. Välj vilka moduler du vill installera ovanpå den.<br /> Det här är vår lista över rekommenderade moduler, markera de moduler du vill installera, eller visa den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fullständiga listan</a>]]></key>
@@ -444,16 +452,16 @@
     <key alias="step3">Steg 3/5: Bekräftar filrättigheter</key>
     <key alias="step4">Steg 4/5: Umbraco säkerhetskontroll</key>
     <key alias="step5">Steg 5/5: Umbraco är redo att ge dig en flygande start</key>
-    <key alias="thankYou">Tack för att du valde umbraco</key>
+    <key alias="thankYou">Tack för att du valde Umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Besök din nya webbplats</h3> Du installerade Runway, så varför inte se hur din nya webbplats ser ut.]]></key>
-    <key alias="theEndFurtherHelp"><![CDATA[<h3>Ytterligare hjälp och information</h3> Få hjälp från våra prisbelönta community, bläddra i dokumentationen eller titta på några gratis videor om hur man bygger en enkel webbplats, hur du använder paket eller en snabbguide till umbracos terminologi]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Ytterligare hjälp och information</h3> Få hjälp från våra prisbelönta community, bläddra i dokumentationen eller titta på några gratis videor om hur man bygger en enkel webbplats, hur du använder paket eller en snabbguide till Umbracos terminologi]]></key>
     <key alias="theEndHeader">Umbraco {0} är installerat och klart för användning</key>
-    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>{0}</strong>]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>UmbracoConfigurationStatus</strong> på slutet till <strong>{0}</strong>]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny Umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
     <key alias="watch">Se</key>
-    <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>umbraco {0}</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
+    <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>Umbraco {0}</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
   </area>
@@ -466,7 +474,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - {0} <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - {0} <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>
@@ -528,7 +536,7 @@
     <key alias="packageUpgradeDownload">Hämta uppdatering från paketvalvet</key>
     <key alias="packageUpgradeHeader">Uppdatera paket</key>
     <key alias="packageUpgradeInstructions">Uppdateringsinstruktioner</key>
-    <key alias="packageUpgradeText">Det finns an uppdaterad version av paketet. Du kan hämta den direkt från umbracos paketvalv.</key>
+    <key alias="packageUpgradeText">Det finns an uppdaterad version av paketet. Du kan hämta den direkt från Umbracos paketvalv.</key>
     <key alias="packageVersion">Paketversion</key>
     <key alias="packageVersionHistory">Versionshistorik för paket</key>
     <key alias="viewPackageWebsite">Besök paketets webbplats</key>
@@ -549,7 +557,7 @@
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
-    <key alias="paAdvancedHelp"><![CDATA[Välj detta alternativ om du vill skydda sidan med hjälp av rollbaserat lösenordsskydd.<br /> Då används umbracos medlemsgrupper.]]></key>
+    <key alias="paAdvancedHelp"><![CDATA[Välj detta alternativ om du vill skydda sidan med hjälp av rollbaserat lösenordsskydd.<br /> Då används Umbracos medlemsgrupper.]]></key>
     <key alias="paAdvancedNoGroups"><![CDATA[Du måste skapa en medlemsgrupp innan du kan använda <br />rollbaserat lösenordsskydd.]]></key>
     <key alias="paErrorPage">Sida med felmeddelande</key>
     <key alias="paErrorPageHelp">Används när en användare är inloggad, men saknar rättigheter att se sidan</key>
@@ -603,13 +611,14 @@
     <key alias="editscript">Redigera script</key>
   </area>
   <area alias="sections">
+    <key alias="analytics">Analytics</key>
     <key alias="concierge">Concierge</key>
     <key alias="content">Innehåll</key>
-    <key alias="contour">Contour</key>
     <key alias="courier">Courier</key>
     <key alias="developer">Utvecklare</key>
+    <key alias="forms">Formulär</key>
     <key alias="help">Hjälp</key>
-    <key alias="installer">Umbraco Configuration Wizard</key>
+    <key alias="installer">Umbraco konfigurationsguide</key>
     <key alias="media">Media</key>
     <key alias="member">Medlemmar</key>
     <key alias="newsletters">Nyhetsbrev</key>
@@ -712,7 +721,7 @@
     <key alias="insertMacro">Lägg in makro</key>
     <key alias="insertPageField">Lägg in sidfält</key>
     <key alias="mastertemplate">Huvudmall</key>
-    <key alias="quickGuide">Snabbguide för taggar i umbracos sidmallar</key>
+    <key alias="quickGuide">Snabbguide för taggar i Umbracos sidmallar</key>
     <key alias="template">Sidmall</key>
   </area>
   <area alias="templateEditor">
@@ -755,7 +764,7 @@
     <key alias="DownloadXmlDTD">Ladda hem DTD för XML</key>
     <key alias="fields">Fält</key>
     <key alias="includeSubpages">Inkludera undersidor</key>
-    <key alias="mailBody">Hej {0}. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1' till '{5}' skickad av {2}. För att redigere, besök http://{3}/translation/details.aspx?id={4}. För att få en översikt över dina översättningsuppgigter loggar du in i umbraco på: http://{3}</key>
+    <key alias="mailBody">Hej {0}. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1' till '{5}' skickad av {2}. För att redigere, besök http://{3}/translation/details.aspx?id={4}. För att få en översikt över dina översättningsuppgigter loggar du in i Umbraco på: http://{3}</key>
     <key alias="mailSubject">[{0}] Översättningsuppgit för {1}</key>
     <key alias="noTranslators">Hittade inga användare som är översättare. Vänligen skapa en användare som är översättare innan du börjar skicka innehåll för översättning</key>
     <key alias="ownedTasks">Arbetsuppgifter som du har skapat</key>
@@ -774,6 +783,7 @@
     <key alias="uploadTranslationXml">Ladda upp översättning i XML-format</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="analytics">Analytics</key>
     <key alias="cacheBrowser">Cacha webbläsare</key>
     <key alias="contentRecycleBin">Papperskorg</key>
     <key alias="createdPackages">Skapade paket</key>

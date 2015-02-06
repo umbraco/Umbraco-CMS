@@ -15,18 +15,19 @@ namespace UmbracoExamine.DataServices
     /// <summary>
     /// Data service used to query for media
     /// </summary>
+    [Obsolete("This should no longer be used, latest content will be indexed by using the IMediaService directly")]
 	public class UmbracoMediaService : IMediaService
 	{
 		private readonly ServiceContext _services;
 
-        [SecuritySafeCritical]
+        
 		public UmbracoMediaService()
 			: this(ApplicationContext.Current.Services)
 		{
 
 		}
 
-        [SecuritySafeCritical]
+        
 		public UmbracoMediaService(ServiceContext services)
 		{
 			_services = services;
@@ -39,13 +40,13 @@ namespace UmbracoExamine.DataServices
 		/// </summary>
 		/// <param name="xpath"></param>
 		/// <returns></returns>
-		[SecuritySafeCritical]
+        [Obsolete("This should no longer be used, latest content will be indexed by using the IMediaService directly")]
 		public XDocument GetLatestMediaByXpath(string xpath)
 		{
 			var xmlMedia = XDocument.Parse("<media></media>");
 			foreach (var m in _services.MediaService.GetRootMedia())
 			{
-				xmlMedia.Root.Add(m.ToDeepXml());
+                xmlMedia.Root.Add(m.ToDeepXml(_services.PackagingService));
 			}
 			var result = ((IEnumerable)xmlMedia.XPathEvaluate(xpath)).Cast<XElement>();
 			return result.ToXDocument();

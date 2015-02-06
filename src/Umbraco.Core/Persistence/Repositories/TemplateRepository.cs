@@ -53,68 +53,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override ITemplate PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            string csViewName = string.Concat(dto.Alias, ".cshtml");
-            string vbViewName = string.Concat(dto.Alias, ".vbhtml");
-            string masterpageName = string.Concat(dto.Alias, ".master");
-
-            var factory = new TemplateFactory();
-            var template = factory.BuildEntity(dto);
-
-            if (dto.Master.HasValue)
-            {
-                var masterTemplate = Get(dto.Master.Value);
-                template.MasterTemplateAlias = masterTemplate.Alias;
-                template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
-            }
-
-            if (_viewsFileSystem.FileExists(csViewName))
-            {
-                PopulateViewTemplate(template, csViewName);
-            }
-            else if (_viewsFileSystem.FileExists(vbViewName))
-            {
-                PopulateViewTemplate(template, vbViewName);
-            }
-            else
-            {
-                if (_masterpagesFileSystem.FileExists(masterpageName))
-                {
-                    PopulateMasterpageTemplate(template, masterpageName);
-                }
-            }
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            template.ResetDirtyProperties(false);
-
-            return template;
+            return GetAll(new[] {id}).FirstOrDefault();
         }
 
         protected override IEnumerable<ITemplate> PerformGetAll(params int[] ids)
         {
+            var sql = GetBaseQuery(false);
+
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                sql.Where("umbracoNode.id in (@ids)", new {ids = ids});
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
+            
+            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
+
+            return dtos.Select(MapFromDto);
         }
 
         protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)
@@ -125,10 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
 
-            foreach (var dto in dtos.DistinctBy(x => x.NodeId))
-            {
-                yield return Get(dto.NodeId);
-            }
+            return dtos.Select(MapFromDto);
         }
 
         #endregion
@@ -245,7 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((Template)entity).ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -268,7 +222,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(dto.NodeDto);
             Database.Update(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -323,6 +277,50 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        private ITemplate MapFromDto(TemplateDto dto)
+        {
+            string csViewName = string.Concat(dto.Alias, ".cshtml");
+            string vbViewName = string.Concat(dto.Alias, ".vbhtml");
+            string masterpageName = string.Concat(dto.Alias, ".master");
+
+            var factory = new TemplateFactory();
+            var template = factory.BuildEntity(dto);
+
+            if (dto.Master.HasValue)
+            {
+                //TODO: Fix this n+1 query!
+                var masterTemplate = Get(dto.Master.Value);
+                if (masterTemplate != null)
+                {
+                    template.MasterTemplateAlias = masterTemplate.Alias;
+                    template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);    
+                }
+            }
+
+            if (_viewsFileSystem.FileExists(csViewName))
+            {
+                PopulateViewTemplate(template, csViewName);
+            }
+            else if (_viewsFileSystem.FileExists(vbViewName))
+            {
+                PopulateViewTemplate(template, vbViewName);
+            }
+            else
+            {
+                if (_masterpagesFileSystem.FileExists(masterpageName))
+                {
+                    PopulateMasterpageTemplate(template, masterpageName);
+                }
+            }
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            template.ResetDirtyProperties(false);
+
+            return template;
+        }
+
 
         private void PersistDeletedTemplate(TemplateDto dto)
         {

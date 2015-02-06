@@ -2,7 +2,9 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -92,15 +94,20 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberTypeService.Save(memberType);
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
+            //need to test with '@' symbol in the lookup
+            IMember member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
+            ServiceContext.MemberService.Save(member2);
 
             ServiceContext.MemberService.AddRole("MyTestRole1");
             ServiceContext.MemberService.AddRole("MyTestRole2");
             ServiceContext.MemberService.AddRole("MyTestRole3");
-            ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+            ServiceContext.MemberService.AssignRoles(new[] { member.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
             var memberRoles = ServiceContext.MemberService.GetAllRoles("test");
-
             Assert.AreEqual(2, memberRoles.Count());
+
+            var memberRoles2 = ServiceContext.MemberService.GetAllRoles("test2@test.com");
+            Assert.AreEqual(2, memberRoles2.Count());
         }
 
         [Test]
@@ -323,9 +330,12 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberTypeService.Save(memberType);
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
+            IMember member2 = MockedMember.CreateSimpleMember(memberType, "test", "test2@test.com", "pass", "test2@test.com");
+            ServiceContext.MemberService.Save(member2);
 
             Assert.IsTrue(ServiceContext.MemberService.Exists("test"));
             Assert.IsFalse(ServiceContext.MemberService.Exists("notFound"));
+            Assert.IsTrue(ServiceContext.MemberService.Exists("test2@test.com"));
         }
 
         [Test]
@@ -341,6 +351,29 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Tracks_Dirty_Changes()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            var resolved = ServiceContext.MemberService.GetByEmail(member.Email);
+
+            //NOTE: This will not trigger a property isDirty because this is not based on a 'Property', it is
+            // just a c# property of the Member object
+            resolved.Email = "changed@test.com";
+            //NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
+            // the underlying 'Property'
+            resolved.FailedPasswordAttempts = 1234;
+
+            var dirtyMember = (ICanBeDirty)resolved;
+            var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
+            Assert.IsTrue(dirtyMember.IsDirty());
+            Assert.AreEqual(1, dirtyProperties.Count());
+        }
+
+        [Test]
         public void Get_By_Email()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
@@ -350,6 +383,34 @@ namespace Umbraco.Tests.Services
 
             Assert.IsNotNull(ServiceContext.MemberService.GetByEmail(member.Email));
             Assert.IsNull(ServiceContext.MemberService.GetByEmail("do@not.find"));
+        }
+
+        [Test]
+        public void Get_Member_Name()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "Test Real Name", "test@test.com", "pass", "testUsername");
+            ServiceContext.MemberService.Save(member);
+
+
+            Assert.AreEqual("Test Real Name", member.Name);
+        }
+
+        [Test]
+        public void Get_Member_Name_In_Created_Event()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+
+            TypedEventHandler<IMemberService, NewEventArgs<IMember>> callback = (sender, args) =>
+            {
+                Assert.AreEqual("Test Real Name", args.Entity.Name);
+            };
+
+            MemberService.Created += callback;
+            var member = ServiceContext.MemberService.CreateMember("testUsername", "test@test.com", "Test Real Name", memberType);
+            MemberService.Created -= callback;
         }
 
         [Test]
@@ -391,6 +452,23 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(10, totalRecs);
             Assert.AreEqual("test0", found.First().Username);
             Assert.AreEqual("test1", found.Last().Username);
+        }
+
+        [Test]
+        public void Find_By_Name_Starts_With()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+            
+            var customMember = MockedMember.CreateSimpleMember(memberType, "Bob", "hello@test.com", "hello", "hello");
+            ServiceContext.MemberService.Save(customMember);
+
+            int totalRecs;
+            var found = ServiceContext.MemberService.FindMembersByDisplayName("B", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+
+            Assert.AreEqual(1, found.Count());
         }
 
         [Test]

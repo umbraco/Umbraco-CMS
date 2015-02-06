@@ -191,25 +191,23 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Assigns permissions to an entity for multiple users/permission entries
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="userPermissions">
-        /// A key/value pair list containing a userId and a permission to assign
+        /// <param name="permissionSet">
         /// </param>
         /// <remarks>
         /// This will first clear the permissions for this entity then re-create them
         /// </remarks>
-        public void ReplaceEntityPermissions(TEntity entity, IEnumerable<Tuple<int, string>> userPermissions)
+        public void ReplaceEntityPermissions(EntityPermissionSet permissionSet)
         {
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())
             {
-                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId", new { nodeId = entity.Id });
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId", new { nodeId = permissionSet.EntityId });
 
-                var actions = userPermissions.Select(p => new User2NodePermissionDto
+                var actions = permissionSet.UserPermissionsSet.Select(p => new User2NodePermissionDto
                 {
-                    NodeId = entity.Id,
-                    Permission = p.Item2,
-                    UserId = p.Item1
+                    NodeId = permissionSet.EntityId,
+                    Permission = p.Permission,
+                    UserId = p.UserId
                 }).ToArray();
 
                 _unitOfWork.Database.BulkInsertRecords(actions, trans);

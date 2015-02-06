@@ -17,7 +17,7 @@ function avatarDirective() {
 
             scope.$watch("hash", function (val) {
                 //set the gravatar url
-                scope.gravatar = "http://www.gravatar.com/avatar/" + val + "?s=40";
+                scope.gravatar = "//www.gravatar.com/avatar/" + val + "?s=40";
             });
             
         }

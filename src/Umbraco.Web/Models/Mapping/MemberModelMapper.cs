@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
@@ -11,6 +14,7 @@ using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using System.Linq;
 using Umbraco.Core.Security;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -79,12 +83,16 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Published, expression => expression.Ignore())
-                .ForMember(display => display.Updator, expression => expression.Ignore())
+                .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
+                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.Trashed, expression => expression.Ignore())
+                .ForMember(display => display.IsContainer, expression => expression.Ignore())
+                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
 
-            //FROM IMember TO ContentItemBasic<ContentPropertyBasic, IMember>
-            config.CreateMap<IMember, ContentItemBasic<ContentPropertyBasic, IMember>>()
+            //FROM IMember TO MemberBasic
+            config.CreateMap<IMember, MemberBasic>()
                 .ForMember(
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IMember>>())
@@ -94,9 +102,47 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.ContentTypeAlias,
                     expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(
+                    dto => dto.Email,
+                    expression => expression.MapFrom(content => content.Email))
+                .ForMember(
+                    dto => dto.Username,
+                    expression => expression.MapFrom(content => content.Username))
+                .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore());
+
+            //FROM MembershipUser TO MemberBasic
+            config.CreateMap<MembershipUser, MemberBasic>()
+                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
+                .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
+                .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
+                .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
+                .ForMember(
+                    dto => dto.Owner,
+                    expression => expression.UseValue(new UserBasic {Name = "Admin", UserId = 0}))
+                .ForMember(
+                    dto => dto.Icon,
+                    expression => expression.UseValue("icon-user"))
+                .ForMember(member => member.Name, expression => expression.MapFrom(user => user.UserName))
+                .ForMember(
+                    dto => dto.Email,
+                    expression => expression.MapFrom(content => content.Email))
+                .ForMember(
+                    dto => dto.Username,
+                    expression => expression.MapFrom(content => content.UserName))
+                .ForMember(member => member.Properties, expression => expression.Ignore())
+                .ForMember(member => member.ParentId, expression => expression.Ignore())
+                .ForMember(member => member.Path, expression => expression.Ignore())
+                .ForMember(member => member.SortOrder, expression => expression.Ignore())
+                .ForMember(member => member.AdditionalData, expression => expression.Ignore())
+                .ForMember(x => x.Published, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.ContentTypeAlias, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
@@ -104,7 +150,7 @@ namespace Umbraco.Web.Models.Mapping
                     dto => dto.Owner,
                     expression => expression.ResolveUsing<OwnerResolver<IMember>>())
                 .ForMember(x => x.Published, expression => expression.Ignore())
-                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Updater, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
@@ -124,6 +170,14 @@ namespace Umbraco.Web.Models.Mapping
         {
             var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
+            //map the tree node url
+            if (HttpContext.Current != null)
+            {
+                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
+                display.TreeNodeUrl = url;
+            }
+
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
                 GetLoginProperty(memberService, member, display),
@@ -133,7 +187,7 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("general", "email"),
                         Value = display.Email,
                         View = "email",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
+                        Validation = { Mandatory = true }        
                     },
                 new ContentPropertyDisplay
                     {
@@ -205,7 +259,7 @@ namespace Umbraco.Web.Models.Mapping
             if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
             {
                 prop.View = "textbox";
-                prop.Config = new Dictionary<string, object> {{"IsRequired", true}};
+                prop.Validation.Mandatory = true;
             }
             else
             {

@@ -126,7 +126,7 @@ namespace Umbraco.Web.Editors
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
-            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == "umbContainerView");
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
             mapped.Tabs = mapped.Tabs.Except(new[] {containerTab});
             return mapped;
         }
@@ -157,47 +157,26 @@ namespace Umbraco.Web.Editors
             Direction orderDirection = Direction.Ascending, 
             string filter = "")
         {
-            //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
-            // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
-
-            //PP: could we in 7.0.1+ migrate this to the internal examine index instead of using the content service?
-
-            var children = Services.ContentService.GetChildren(id).ToArray();
-            var totalChildren = children.Length;
-
-            if (totalChildren == 0)
-                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
-
-            var result = children
-                .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>)
-                .AsQueryable();
-
-            //TODO: This is a rudimentry filter - should use the logic found in the EntityService filter (dynamic linq) instead
-            if (!string.IsNullOrEmpty(filter))
-            {
-                filter = filter.ToLower();
-                result = result.Where(x => x.Name.InvariantContains(filter));
-            }
-
-            var orderedResult = orderDirection == Direction.Ascending 
-                ? result.OrderBy(orderBy) 
-                : result.OrderByDescending(orderBy);
-
-            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(
-               totalChildren,
-               pageNumber,
-               pageSize);
-
+            int totalChildren;
+            IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                pagedResult.Items = orderedResult
-                    .Skip(pagedResult.SkipSize)
-                    .Take(pageSize);
+                children = Services.ContentService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
             }
             else
             {
-                pagedResult.Items = orderedResult;
+                children = Services.ContentService.GetChildren(id).ToArray();
+                totalChildren = children.Length;
             }
+
+            if (totalChildren == 0)
+            {
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
+            }
+
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
+            pagedResult.Items = children
+                .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
 
             return pagedResult;
         }

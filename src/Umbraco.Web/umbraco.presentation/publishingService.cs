@@ -5,15 +5,15 @@ using System.Net;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Publishing;
 
 namespace umbraco.presentation
 {
-	/// <summary>
-	/// Summary description for publishingService.
-	/// </summary>
+    [Obsolete("This is no longer used and will be removed in future versions")]
 	public class publishingService
 	{
 		private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
@@ -27,37 +27,10 @@ namespace umbraco.presentation
 			_isPublishingRunning = true;
 			try
 			{
-				// DO not run publishing if content is re-loading
-				if(!content.Instance.isInitializing)
-				{
-                   
-                    foreach (var d in Document.GetDocumentsForRelease())
-					{
-						try
-						{
-                            d.ReleaseDate = DateTime.MinValue; //new DateTime(1, 1, 1); // Causes release date to be null
-                            d.SaveAndPublish(d.User);
-						}
-						catch(Exception ee)
-						{
-						    LogHelper.Error<publishingService>(string.Format("Error publishing node {0}", d.Id), ee);
-						}
-					}
-					foreach(Document d in Document.GetDocumentsForExpiration())
-					{
-                        try
-                        {
-                            d.ExpireDate = DateTime.MinValue;
+                //run the scheduled publishing - we need to determine if this server 
 
-                            d.UnPublish();
-                        }
-                        catch (Exception ee)
-                        {
-                            LogHelper.Error<publishingService>(string.Format("Error unpublishing node {0}", d.Id), ee);
-                        }
-                       
-					}
-				}
+                var publisher = new ScheduledPublisher(ApplicationContext.Current.Services.ContentService);
+                publisher.CheckPendingAndProcess();
 
 				// run scheduled url tasks
 				try

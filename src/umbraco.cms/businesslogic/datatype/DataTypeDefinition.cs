@@ -31,7 +31,8 @@ namespace umbraco.cms.businesslogic.datatype
     public class DataTypeDefinition : CMSNode
     {
         #region Private fields
-        private string _propertyEditorAlias;
+
+        internal string PropertyEditorAlias { get; private set; }
 
         private static readonly Guid ObjectType = new Guid(Constants.ObjectTypes.DataType);
         private string _text1;
@@ -69,7 +70,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                if (_propertyEditorAlias.IsNullOrWhiteSpace()) 
+                if (PropertyEditorAlias.IsNullOrWhiteSpace()) 
                     return null;
 
                 //Attempt to resolve a legacy control id from the alias. If one is not found we'll generate one - 
@@ -78,7 +79,7 @@ namespace umbraco.cms.businesslogic.datatype
                 //So, we'll generate an id for it based on the alias which will remain consistent, but then we'll try to resolve a legacy
                 // IDataType which of course will not exist. In this case we'll have to create a new one on the fly for backwards compatibility but 
                 // this instance will have limited capabilities and will really only work for saving data so the legacy APIs continue to work.
-                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId);
+                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId);
 
                 var dt = DataTypesResolver.Current.GetById(controlId.Value);
                 
@@ -90,7 +91,7 @@ namespace umbraco.cms.businesslogic.datatype
                 {
                     //Ok so it was not found, we can only assume that this is because this is a new property editor that does not have a legacy predecessor.
                     //we'll have to attempt to generate one at runtime.
-                    dt = BackwardsCompatibleDataType.Create(_propertyEditorAlias, controlId.Value, Id);
+                    dt = BackwardsCompatibleDataType.Create(PropertyEditorAlias, controlId.Value, Id);
                 }
                     
 
@@ -110,7 +111,7 @@ namespace umbraco.cms.businesslogic.datatype
 
                 
 
-                _propertyEditorAlias = alias;
+                PropertyEditorAlias = alias;
             }
         }
 
@@ -375,7 +376,7 @@ WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("te
             {
                 if (dr.Read())
                 {
-                    _propertyEditorAlias = dr.GetString("propertyEditorAlias");
+                    PropertyEditorAlias = dr.GetString("propertyEditorAlias");
                     DbType = dr.GetString("dbType");
                 }
                 else

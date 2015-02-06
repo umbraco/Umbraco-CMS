@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Web.UI.WebControls;
-using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.relation;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
 	/// <summary>
 	/// Add a new Relation Type
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.RelationTypes)]
 	public partial class NewRelationType : UmbracoEnsuredPage
 	{
-	    public NewRelationType()
-	    {
-	        CurrentApp = DefaultApps.developer.ToString();
-	    }
-
 		/// <summary>
 		/// On Load event
 		/// </summary>
@@ -40,7 +37,8 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// <param name="args">to set validation respose</param>
 		protected void AliasCustomValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			args.IsValid = RelationType.GetByAlias(this.aliasTextBox.Text.Trim()) == null;
+		    var relationService = Services.RelationService;
+			args.IsValid = relationService.GetRelationTypeByAlias(this.aliasTextBox.Text.Trim()) == null;
 		}
 
 		/// <summary>
@@ -54,19 +52,18 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			{
                 var newRelationTypeAlias = this.aliasTextBox.Text.Trim();
 
-                uQuery.SqlHelper.ExecuteNonQuery(
-                    string.Format("INSERT INTO umbracoRelationType ([dual], parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
-                        this.dualRadioButtonList.SelectedValue,
-                        uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid().ToString(),
-                        uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid().ToString(),
-                        this.descriptionTextBox.Text,
-                        newRelationTypeAlias));
+			    var relationService = Services.RelationService;
+			    var relationType = new RelationType(new Guid(this.childDropDownList.SelectedValue),
+			        new Guid(this.parentDropDownList.SelectedValue), newRelationTypeAlias, this.descriptionTextBox.Text)
+			                       {
+			                           IsBidirectional = this.dualRadioButtonList.SelectedValue == "1"
+			                       };
 
-                var newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
+                relationService.Save(relationType);
 
-				// base.speechBubble(BasePage.speechBubbleIcon.success, "New Relation Type", "relation type created");
+			    var newRelationTypeId = relationService.GetRelationTypeByAlias(newRelationTypeAlias).Id;
 
-				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId.ToString()).CloseModalWindow().ChildNodeCreated();
+				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId).CloseModalWindow().ChildNodeCreated();
 			}
 		}
 
@@ -74,23 +71,20 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// Adds the Umbraco Object types to a drop down list
 		/// </summary>
 		/// <param name="dropDownList">control for which to add the Umbraco object types</param>
-		private void AppendUmbracoObjectTypes(DropDownList dropDownList)
+		private void AppendUmbracoObjectTypes(ListControl dropDownList)
 		{
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Document.GetFriendlyName(), uQuery.UmbracoObjectType.Document.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Media.GetFriendlyName(), uQuery.UmbracoObjectType.Media.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Member.GetFriendlyName(), uQuery.UmbracoObjectType.Member.GetName()));
-			//////dropDownList.Items.Add(new ListItem("---", "---"));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.MemberGroup.GetFriendlyName(), uQuery.UmbracoObjectType.MemberGroup.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.MemberType.GetFriendlyName(), uQuery.UmbracoObjectType.MemberType.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.DocumentType.GetFriendlyName(), uQuery.UmbracoObjectType.DocumentType.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.MediaType.GetFriendlyName(), uQuery.UmbracoObjectType.MediaType.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.ContentItem.GetFriendlyName(), uQuery.UmbracoObjectType.ContentItem.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.ContentItemType.GetFriendlyName(), uQuery.UmbracoObjectType.ContentItemType.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.DataType.GetFriendlyName(), uQuery.UmbracoObjectType.DataType.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.RecycleBin.GetFriendlyName(), uQuery.UmbracoObjectType.RecycleBin.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.ROOT.GetFriendlyName(), uQuery.UmbracoObjectType.ROOT.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Stylesheet.GetFriendlyName(), uQuery.UmbracoObjectType.Stylesheet.GetName()));
-			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Template.GetFriendlyName(), uQuery.UmbracoObjectType.Template.GetName()));
+            dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Document.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Document));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Media.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Media));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Member.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Member));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MediaType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.MediaType));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.DocumentType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.DocumentType));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MemberType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.MemberType));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.DataType.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.DataType));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.MemberGroup.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.MemberGroup));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Stylesheet.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Stylesheet));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.Template.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.Template));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.ROOT.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.SystemRoot));
+		    dropDownList.Items.Add(new ListItem(UmbracoObjectTypes.RecycleBin.GetFriendlyName(), Umbraco.Core.Constants.ObjectTypes.ContentRecycleBin));
 		}
 	}
 }

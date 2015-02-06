@@ -16,6 +16,9 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         if (!$scope.model.value.toolbar) {
             $scope.model.value.toolbar = [];
         }
+        if (!$scope.model.value.maxImageSize && $scope.model.value.maxImageSize != 0) {
+            $scope.model.value.maxImageSize = cfg.maxImageSize;
+        }
 
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;

@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using umbraco.cms.presentation;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -19,11 +21,14 @@ using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models;
 using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
+using Umbraco.Web;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Node = umbraco.NodeFactory.Node;
 using Umbraco.Core;
+using File = System.IO.File;
 
 namespace umbraco
 {
@@ -97,13 +102,13 @@ namespace umbraco
         {
             get
             {
-                if (HttpContext.Current == null)
+                if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
                     return XmlContentInternal;
-                var content = HttpContext.Current.Items[XmlContextContentItemKey] as XmlDocument;
+                var content = UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] as XmlDocument;
                 if (content == null)
                 {
                     content = XmlContentInternal;
-                    HttpContext.Current.Items[XmlContextContentItemKey] = content;
+                    UmbracoContext.Current.HttpContext.Items[XmlContextContentItemKey] = content;
                 }
                 return content;
             }
@@ -207,7 +212,6 @@ namespace umbraco
                         FireAfterRefreshContent(new RefreshContentEventArgs());
 
                         // Only save new XML cache to disk if we just repopulated it
-                        // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
                         if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && !IsValidDiskCachePresent())
                         {
                             QueueXmlForPersistence();
@@ -216,7 +220,9 @@ namespace umbraco
                     }
                 }
             }
-            Trace.WriteLine("Content initialized (was already in context)");
+
+            LogHelper.Debug<content>(() => "Content initialized (was already in context)");
+
             return false;
         }
 
@@ -289,36 +295,38 @@ namespace umbraco
 
         #endregion
 
-        /// <summary>
-        /// Load content from database in a background thread
-        /// Replaces active content when done.
-        /// </summary>
+        [Obsolete("This is no longer used and will be removed in future versions, if you use this method it will not refresh 'async' it will perform the refresh on the current thread which is how it should be doing it")]
         public virtual void RefreshContentFromDatabaseAsync()
+        {
+            RefreshContentFromDatabase();
+        }
+
+        /// <summary>
+        /// Load content from database and replaces active content when done.
+        /// </summary>
+        public virtual void RefreshContentFromDatabase()
         {
             var e = new RefreshContentEventArgs();
             FireBeforeRefreshContent(e);
 
             if (!e.Cancel)
             {
-                ThreadPool.QueueUserWorkItem(
-                    delegate
-                    {
-                        XmlDocument xmlDoc = LoadContentFromDatabase();
-                        XmlContentInternal = xmlDoc;
+                XmlDocument xmlDoc = LoadContentFromDatabase();
+                XmlContentInternal = xmlDoc;
 
-                        // It is correct to manually call PersistXmlToFile here event though the setter of XmlContentInternal
-                        // queues this up, because this delegate is executing on a different thread and may complete
-                        // after the request which invoked it (which would normally persist the file on completion)
-                        // So we are responsible for ensuring the content is persisted in this case.
-                        if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
-                            PersistXmlToFile(xmlDoc);
-                    });
-
-                FireAfterRefreshContent(e);
+                // It is correct to manually call PersistXmlToFile here event though the setter of XmlContentInternal
+                // queues this up, because it is possible that this method gets called outside of a web context and in that
+                // case the queue is not going to be executed by the UmbracoModule. So we'll process inline on this thread
+                // and clear the queue in case is this a web request, we don't want it reprocessing.
+                if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
+                {
+                    RemoveXmlFilePersistenceQueue();
+                    PersistXmlToFile(xmlDoc);
+                }
             }
         }
 
-        public static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
+        private static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
         {
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
@@ -349,8 +357,12 @@ namespace umbraco
             if (d.Published)
             {
                 var parentId = d.Level == 1 ? -1 : d.Parent.Id;
-                xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId,
-                                                   GetPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
+
+                // fix sortOrder - see note in UpdateSortOrder
+                var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
+                var attr = ((XmlElement)node).GetAttributeNode("sortOrder");
+                attr.Value = d.sortOrder.ToString();
+                xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, node, xmlContentCopy);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -378,79 +390,113 @@ namespace umbraco
 			return xmlContentCopy;
 		}
 
-        public static XmlDocument AppendDocumentXml(int id, int level, int parentId, XmlNode docNode, XmlDocument xmlContentCopy)
+        // appends a node (docNode) into a cache (xmlContentCopy)
+        // and returns a cache (not necessarily the original one)
+        //
+        internal static XmlDocument AppendDocumentXml(int id, int level, int parentId, XmlNode docNode, XmlDocument xmlContentCopy)
         {
-            // Find the document in the xml cache
+            // sanity checks
+            if (id != docNode.AttributeValue<int>("id"))
+                throw new ArgumentException("Values of id and docNode/@id are different.");
+            if (parentId != docNode.AttributeValue<int>("parentID"))
+                throw new ArgumentException("Values of parentId and docNode/@parentID are different.");
+
+            // find the document in the cache
             XmlNode currentNode = xmlContentCopy.GetElementById(id.ToString());
 
 			// if the document is not there already then it's a new document
 			// we must make sure that its document type exists in the schema
-            var xmlContentCopy2 = xmlContentCopy;
 			if (currentNode == null && UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema == false)
 			{
-				xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
+                // ValidateSchema looks for the doctype in the schema and if not found
+                // creates a new XML document with a schema containing the doctype. If
+                // a new cache copy is returned, must import the new node into the new
+                // copy.
+                var xmlContentCopy2 = xmlContentCopy;
+                xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
 				if (xmlContentCopy != xmlContentCopy2)
 					docNode = xmlContentCopy.ImportNode(docNode, true);
 			}
 
-            // Find the parent (used for sortering and maybe creation of new node)
+            // find the parent
             XmlNode parentNode = level == 1
-                                     ? xmlContentCopy.DocumentElement
-                                     : xmlContentCopy.GetElementById(parentId.ToString());
+                ? xmlContentCopy.DocumentElement
+                : xmlContentCopy.GetElementById(parentId.ToString());
 
-            if (parentNode != null)
+            // no parent = cannot do anything
+            if (parentNode == null)
+                return xmlContentCopy;
+
+            // define xpath for getting the children nodes (not properties) of a node
+            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                ? "./node"
+                : "./* [@id]";
+
+            // insert/move the node under the parent
+            if (currentNode == null)
             {
-                if (currentNode == null)
+                // document not there, new node, append
+                currentNode = docNode;
+                parentNode.AppendChild(currentNode);
+            }
+            else
+            {
+                // document found... we could just copy the currentNode children nodes over under
+                // docNode, then remove currentNode and insert docNode... the code below tries to
+                // be clever and faster, though only benchmarking could tell whether it's worth the
+                // pain...
+                
+                // first copy current parent ID - so we can compare with target parent
+                var moving = currentNode.AttributeValue<int>("parentID") != parentId;
+
+                if (docNode.Name == currentNode.Name)
                 {
-                    currentNode = docNode;
-                    parentNode.AppendChild(currentNode);
+                    // name has not changed, safe to just update the current node
+                    // by transfering values eg copying the attributes, and importing the data elements
+                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
+
+                    // if moving, move the node to the new parent
+                    // else it's already under the right parent
+                    // (but maybe the sort order has been updated)
+                    if (moving)
+                        parentNode.AppendChild(currentNode); // remove then append to parentNode
                 }
                 else
                 {
-                    //check the current parent id
-                    var currParentId = currentNode.AttributeValue<int>("parentID");
+                    // name has changed, must use docNode (with new name)
+                    // move children nodes from currentNode to docNode (already has properties)
+                    foreach (XmlNode child in currentNode.SelectNodes(childNodesXPath))
+                        docNode.AppendChild(child); // remove then append to docNode
 
-                    //update the node with it's new values
-                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
-
-                    //If the node is being moved we also need to ensure that it exists under the new parent!
-                    // http://issues.umbraco.org/issue/U4-2312
-                    // we were never checking this before and instead simply changing the parentId value but not 
-                    // changing the actual parent.
-
-                    //check the new parent
-                    if (currParentId != currentNode.AttributeValue<int>("parentID"))
+                    // and put docNode in the right place - if parent has not changed, then
+                    // just replace, else remove currentNode and insert docNode under the right parent
+                    // (but maybe not at the right position due to sort order)
+                    if (moving)
                     {
-                        //ok, we've actually got to move the node
-                        parentNode.AppendChild(currentNode);
+                        currentNode.ParentNode.RemoveChild(currentNode);
+                        parentNode.AppendChild(docNode);
                     }
-                    
-                }
-
-                // TODO: Update with new schema!
-                var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                                ? "./node"
-                                : "./* [@id]";
-
-                var childNodes = parentNode.SelectNodes(xpath);
-
-                // Sort the nodes if the added node has a lower sortorder than the last
-                if (childNodes != null && childNodes.Count > 0)
-                {
-                    //get the biggest sort order for all children including the one added
-                    var largestSortOrder = childNodes.Cast<XmlNode>().Max(x => x.AttributeValue<int>("sortOrder"));
-                    var currentSortOrder = currentNode.AttributeValue<int>("sortOrder");
-                    //if the current item's sort order is less than the largest sort order in the list then
-                    //we need to resort the xml structure since this item belongs somewhere in the middle.
-                    //http://issues.umbraco.org/issue/U4-509
-                    if (childNodes.Count > 1 && currentSortOrder < largestSortOrder)
+                    else
                     {
-                        SortNodes(ref parentNode);
+                        // replacing might screw the sort order
+                        parentNode.ReplaceChild(docNode, currentNode);
                     }
+
+                    currentNode = docNode;
                 }
             }
 
-			return xmlContentCopy;
+            // if the nodes are not ordered, must sort
+            // (see U4-509 + has to work with ReplaceChild too)
+            //XmlHelper.SortNodesIfNeeded(parentNode, childNodesXPath, x => x.AttributeValue<int>("sortOrder"));
+            
+            // but...
+            // if we assume that nodes are always correctly sorted
+            // then we just need to ensure that currentNode is at the right position.
+            // should be faster that moving all the nodes around.
+            XmlHelper.SortNode(parentNode, childNodesXPath, currentNode, x => x.AttributeValue<int>("sortOrder"));
+
+            return xmlContentCopy;
         }
 
         private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
@@ -468,18 +514,36 @@ namespace umbraco
         /// <summary>
         /// Sorts the documents.
         /// </summary>
-        /// <param name="parentNode">The parent node.</param>
-        public static void SortNodes(ref XmlNode parentNode)
+        /// <param name="parentId">The parent node identifier.</param>
+        public void SortNodes(int parentId)
         {
-            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                            ? "./node"
-                            : "./* [@id]";
+            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                ? "./node"
+                : "./* [@id]";
 
-            XmlHelper.SortNodes(
-                parentNode,
-                xpath,
-                element => element.Attribute("id") != null,
-                element => element.AttributeValue<int>("sortOrder"));            
+            lock (XmlContentInternalSyncLock)
+            {
+                // modify a clone of the cache because even though we're into the write-lock
+                // we may have threads reading at the same time. why is this an option?
+                var wip = UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent
+                    ? CloneXmlDoc(XmlContentInternal)
+                    : XmlContentInternal;
+
+                var parentNode = parentId == -1
+                    ? XmlContent.DocumentElement
+                    : XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture));
+
+                if (parentNode == null) return;
+
+                var sorted = XmlHelper.SortNodesIfNeeded(
+                    parentNode,
+                    childNodesXPath,
+                    x => x.AttributeValue<int>("sortOrder"));
+
+                if (sorted == false) return;
+                
+                XmlContentInternal = wip;
+            }
         }
 
 
@@ -527,6 +591,53 @@ namespace umbraco
             }
         }
 
+        internal virtual void UpdateSortOrder(int contentId)
+        {
+            var content = ApplicationContext.Current.Services.ContentService.GetById(contentId);
+            if (content == null) return;
+            UpdateSortOrder(content);
+        }
+
+        internal virtual void UpdateSortOrder(IContent c)
+        {
+            if (c == null) throw new ArgumentNullException("c");
+
+            // the XML in database is updated only when content is published, and then
+            // it contains the sortOrder value at the time the XML was generated. when
+            // a document with unpublished changes is sorted, then it is simply saved
+            // (see ContentService) and so the sortOrder has changed but the XML has
+            // not been updated accordingly.
+
+            // this updates the published cache to take care of the situation
+            // without ContentService having to ... what exactly?
+
+            // no need to do it if the content is published without unpublished changes,
+            // though, because in that case the XML will get re-generated with the
+            // correct sort order.
+            if (c.Published)
+                return;
+
+            lock (XmlContentInternalSyncLock)
+            {
+                var wip = UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent
+                    ? CloneXmlDoc(XmlContentInternal)
+                    : XmlContentInternal;
+
+                var node = wip.GetElementById(c.Id.ToString(CultureInfo.InvariantCulture));
+                if (node == null) return;
+                var attr = node.GetAttributeNode("sortOrder");
+                if (attr == null) return;
+                var sortOrder = c.SortOrder.ToString(CultureInfo.InvariantCulture);
+                if (attr.Value == sortOrder) return;
+
+                // only if node was actually modified
+                attr.Value = sortOrder;
+                XmlContentInternal = wip;
+
+                // no need to clear any cache
+            }
+        }
+
         /// <summary>
         /// Updates the document cache for multiple documents
         /// </summary>
@@ -552,33 +663,15 @@ namespace umbraco
             }
         }
         
-        /// <summary>
-        /// Updates the document cache async.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
         [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
         public virtual void UpdateDocumentCacheAsync(int documentId)
         {
-            //SD: WE've obsoleted this but then didn't make it call the method it should! So we've just 
-            // left a bug behind...???? ARGH. 
-            //.... changed now.
-            //ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
-
             UpdateDocumentCache(documentId);
         }
-
-        /// <summary>
-        /// Clears the document cache async.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
+        
         [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         public virtual void ClearDocumentCacheAsync(int documentId)
         {
-            //SD: WE've obsoleted this but then didn't make it call the method it should! So we've just 
-            // left a bug behind...???? ARGH.
-            //.... changed now.
-            //ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
-
             ClearDocumentCache(documentId);
         }
 
@@ -652,69 +745,6 @@ namespace umbraco
         {
             ClearDocumentCache(documentId);
         }
-
-        ///// <summary>
-        ///// Uns the publish node async.
-        ///// </summary>
-        ///// <param name="documentId">The document id.</param>
-        //[Obsolete("Please use: umbraco.content.ClearDocumentCacheAsync", true)]
-        //public virtual void UnPublishNodeAsync(int documentId)
-        //{
-
-        //    ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
-        //}
-
-
-        ///// <summary>
-        ///// Legacy method - you should use the overloaded publishnode(document d) method whenever possible
-        ///// </summary>
-        ///// <param name="documentId"></param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        //public virtual void PublishNode(int documentId)
-        //{
-
-        //    // Get the document
-        //    var d = new Document(documentId);
-        //    PublishNode(d);
-        //}
-
-
-        ///// <summary>
-        ///// Publishes the node async.
-        ///// </summary>
-        ///// <param name="documentId">The document id.</param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCacheAsync", true)]
-        //public virtual void PublishNodeAsync(int documentId)
-        //{
-
-        //    UpdateDocumentCacheAsync(documentId);
-        //}
-
-
-        ///// <summary>
-        ///// Publishes the node.
-        ///// </summary>
-        ///// <param name="Documents">The documents.</param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        //public virtual void PublishNode(List<Document> Documents)
-        //{
-
-        //    UpdateDocumentCache(Documents);
-        //}
-
-
-
-        ///// <summary>
-        ///// Publishes the node.
-        ///// </summary>
-        ///// <param name="d">The document.</param>
-        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        //public virtual void PublishNode(Document d)
-        //{
-
-        //    UpdateDocumentCache(d);
-        //}
-
 
         /// <summary>
         /// Occurs when [before document cache update].
@@ -906,24 +936,27 @@ namespace umbraco
 		/// </summary>
 		internal void RemoveXmlFilePersistenceQueue()
 		{
-			HttpContext.Current.Application.Lock();
-			HttpContext.Current.Application[PersistenceFlagContextKey] = null;
-			HttpContext.Current.Application.UnLock();
+		    if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
+		    {
+                UmbracoContext.Current.HttpContext.Application.Lock();
+                UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] = null;
+                UmbracoContext.Current.HttpContext.Application.UnLock();   
+		    }			
 		}
 
         internal bool IsXmlQueuedForPersistenceToFile
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
                 {
-                    bool val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
+                    bool val = UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] != null;
                     if (val)
                     {
                         DateTime persistenceTime = DateTime.MinValue;
                         try
                         {
-                            persistenceTime = (DateTime)HttpContext.Current.Application[PersistenceFlagContextKey];
+                            persistenceTime = (DateTime)UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey];
                             if (persistenceTime > GetCacheFileUpdateTime())
                             {
                                 return true;
@@ -933,9 +966,10 @@ namespace umbraco
                                 RemoveXmlFilePersistenceQueue();
                             }
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             // Nothing to catch here - we'll just persist
+                            LogHelper.Error<content>("An error occurred checking if xml file is queued for persistence", ex);
                         }
                     }
                 }
@@ -971,8 +1005,8 @@ namespace umbraco
         private void ClearContextCache()
         {
             // If running in a context very important to reset context cache orelse new nodes are missing
-            if (HttpContext.Current != null && HttpContext.Current.Items.Contains(XmlContextContentItemKey))
-                HttpContext.Current.Items.Remove(XmlContextContentItemKey);
+            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null && UmbracoContext.Current.HttpContext.Items.Contains(XmlContextContentItemKey))
+                UmbracoContext.Current.HttpContext.Items.Remove(XmlContextContentItemKey);
         }
 
         /// <summary>
@@ -1037,22 +1071,8 @@ namespace umbraco
         /// </summary>
         private XmlDocument LoadContentFromDatabase()
         {
-            // Alex N - 2010 06 - Very generic try-catch simply because at the moment, unfortunately, this method gets called inside a ThreadPool thread
-            // and we need to guarantee it won't tear down the app pool by throwing an unhandled exception
             try
             {
-                // Moved User to a local variable - why are we causing user 0 to load from the DB though?
-                // Alex N 20100212
-                User staticUser = null;
-                try
-                {
-                    staticUser = User.GetCurrent(); //User.GetUser(0);
-                }
-                catch
-                {
-                    /* We don't care later if the staticUser is null */
-                }
-
                 // Try to log to the DB
                 LogHelper.Info<content>("Loading content from database...");
 
@@ -1096,6 +1116,13 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                                 int currentId = dr.GetInt("id");
                                 int parentId = dr.GetInt("parentId");
                                 string xml = dr.GetString("xml");
+
+                                // fix sortOrder - see notes in UpdateSortOrder
+                                var tmp = new XmlDocument();
+                                tmp.LoadXml(xml);
+                                var attr = tmp.DocumentElement.GetAttributeNode("sortOrder");
+                                attr.Value = dr.GetInt("sortOrder").ToString();
+                                xml = tmp.InnerXml;
 
                                 // Call the eventhandler to allow modification of the string
                                 var e1 = new ContentCacheLoadNodeEventArgs();
@@ -1236,19 +1263,10 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             {
                 if (xmlDoc != null)
                 {
-                    Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})",
-                                              Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread));
-
-                    // Moved the user into a variable and avoided it throwing an error if one can't be loaded (e.g. empty / corrupt db on initial install)
-                    User staticUser = null;
-                    try
-                    {
-                        staticUser = User.GetCurrent();
-                    }
-                    catch
-                    {
-                    }
-
+                    LogHelper.Debug<content>("Saving content to disk on thread '{0}' (Threadpool? {1})",
+                        () => Thread.CurrentThread.Name,
+                        () => Thread.CurrentThread.IsThreadPoolThread);
+                    
                     try
                     {
                         Stopwatch stopWatch = Stopwatch.StartNew();
@@ -1264,23 +1282,20 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         }
 
                         xmlDoc.Save(UmbracoXmlDiskCacheFileName);
-
-                        Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})",
-                                                  Thread.CurrentThread.Name, stopWatch.Elapsed,
-                                                  Thread.CurrentThread.IsThreadPoolThread));
-
-						LogHelper.Debug<content>(string.Format("Xml saved in {0}", stopWatch.Elapsed));
+                        
+                        LogHelper.Debug<content>("Saved content on thread '{0}' in {1} (Threadpool? {2})",
+                            () => Thread.CurrentThread.Name,
+                            () => stopWatch.Elapsed,
+                            () => Thread.CurrentThread.IsThreadPoolThread);
                     }
                     catch (Exception ee)
                     {
                         // If for whatever reason something goes wrong here, invalidate disk cache
                         DeleteXmlCache();
-
-                        Trace.Write(string.Format(
+                        
+                        LogHelper.Error<content>(string.Format(
                             "Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})",
-                            Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread));
-
-                        LogHelper.Error<content>("Xml wasn't saved", ee);
+                            Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread), ee);
                     }
                 }
             }
@@ -1289,36 +1304,42 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// <summary>
         /// Marks a flag in the HttpContext so that, upon page execution completion, the Xml cache will
         /// get persisted to disk. Ensure this method is only called from a thread executing a page request
-        /// since umbraco.presentation.requestModule is the only monitor of this flag and is responsible
+        /// since UmbracoModule is the only monitor of this flag and is responsible
         /// for enacting the persistence at the PostRequestHandlerExecute stage of the page lifecycle.
         /// </summary>
         private void QueueXmlForPersistence()
         {
-            /* Alex Norcliffe 2010 06 03 - removing all launching of ThreadPool threads, instead we just 
-             * flag on the context that the Xml should be saved and an event in the requestModule
-             * will check for this and call PersistXmlToFile() if necessary */
-            if (HttpContext.Current != null)
+            //if this is called outside a web request we cannot queue it it will run in the current thread.
+            
+            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
             {
-                HttpContext.Current.Application.Lock();
-                if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
-                    HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
-                HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
-                HttpContext.Current.Application.UnLock();
-            }
+                UmbracoContext.Current.HttpContext.Application.Lock();
+                try
+                {
+                    if (UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] != null)
+                    {
+                        UmbracoContext.Current.HttpContext.Application.Add(PersistenceFlagContextKey, null);
+                    }
+                    UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
+                }
+                finally
+                {
+                    UmbracoContext.Current.HttpContext.Application.UnLock();    
+                }
+            }          
             else
             {
-                //// Save copy of content
-                if (UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent)
+                // Save copy of content
+                if (UmbracoSettings.CloneXmlCacheOnPublish)
                 {
                     XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
-
-                    ThreadPool.QueueUserWorkItem(
-                        delegate { PersistXmlToFile(xmlContentCopy); });
+                    PersistXmlToFile(xmlContentCopy);
                 }
                 else
-                    ThreadPool.QueueUserWorkItem(
-                        delegate { PersistXmlToFile(); });
-            }
+                {
+                    PersistXmlToFile();
+                }
+            }    
         }
 
         internal DateTime GetCacheFileUpdateTime()

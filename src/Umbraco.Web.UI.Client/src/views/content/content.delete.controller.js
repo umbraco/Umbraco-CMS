@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, contentResource, treeService, navigationService) {
+function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location) {
 
     $scope.performDelete = function() {
 
@@ -19,12 +19,20 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
             //get the root node before we remove it
             var rootNode = treeService.getTreeRoot($scope.currentNode);
 
-            //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
 
-            //ensure the recycle bin has child nodes now            
-            var recycleBin = treeService.getDescendantNode(rootNode, -20);
-            recycleBin.hasChildren = true;
+            if (rootNode) {
+                //ensure the recycle bin has child nodes now            
+                var recycleBin = treeService.getDescendantNode(rootNode, -20);
+                if (recycleBin) {
+                    recycleBin.hasChildren = true;
+                }
+            }
+            
+            //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
+            if (editorState.current && editorState.current.id == $scope.currentNode.id) {
+                $location.path("/content/content/edit/" + $scope.currentNode.parentId);
+            }
 
             navigationService.hideMenu();
         });

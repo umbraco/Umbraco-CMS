@@ -365,7 +365,7 @@ namespace umbraco.cms.presentation.user
                 Application[] uapps = u.Applications;
                 foreach (Application app in BusinessLogic.Application.getAll())
                 {
-                    if (CurrentUser.IsRoot() || currentUserApps.Contains(";" + app.alias + ";"))
+                    if (CurrentUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
                     {
                         ListItem li = new ListItem(ui.Text("sections", app.alias), app.alias);
                         if (!IsPostBack) foreach (Application tmp in uapps) if (app.alias == tmp.alias) li.Selected = true;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
 using System.Linq;
 using umbraco.BusinessLogic;
 
@@ -102,7 +101,7 @@ namespace umbraco.cms.businesslogic.media
 
         internal static MediaType MakeNew(User u, string text, int parentId)
         {
-            var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
+            var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
             var mt = new MediaType(mediaType.Id);
 
@@ -124,15 +123,6 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                if (MasterContentType != 0)
-                    MediaTypeItem.ParentId = MasterContentType;
-
-                foreach (var masterContentType in MasterContentTypes)
-                {
-                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(masterContentType);
-                    MediaTypeItem.AddContentType(contentType);
-                }
-
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(MediaTypeItem, userId);

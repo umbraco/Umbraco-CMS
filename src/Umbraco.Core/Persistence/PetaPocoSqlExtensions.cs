@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core.Persistence.Querying;
@@ -23,9 +25,15 @@ namespace Umbraco.Core.Persistence
         public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate)
         {
             var expresionist = new PocoToSqlExpressionHelper<T>();
-            string whereExpression = expresionist.Visit(predicate);
+            var whereExpression = expresionist.Visit(predicate);
+            return sql.Where(whereExpression, expresionist.GetSqlParameters());
+        }
 
-            return sql.Where(whereExpression);
+        public static Sql WhereIn<T>(this Sql sql, Expression<Func<T, object>> fieldSelector, IEnumerable values)
+        {
+            var expresionist = new PocoToSqlExpressionHelper<T>();
+            var fieldExpression = expresionist.Visit(fieldSelector);
+            return sql.Where(fieldExpression + " IN (@values)", new {@values = values});
         }
 
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
@@ -124,6 +132,11 @@ namespace Umbraco.Core.Persistence
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(rightTableName),
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(rightColumnName));
             return sql.On(onClause);
+        }
+
+        public static Sql OrderByDescending(this Sql sql, params object[] columns)
+        {
+            return sql.Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x + " DESC").ToArray())));
         }
     }
 }

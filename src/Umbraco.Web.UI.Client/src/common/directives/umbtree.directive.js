@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout) {
+function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService) {
 
     return {
         restrict: 'E',
@@ -19,7 +19,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             isdialog: '@',
             //Custom query string arguments to pass in to the tree as a string, example: "startnodeid=123&something=value"
             customtreeparams: '@',
-            eventhandler: '='
+            eventhandler: '=',
+            enablecheckboxes: '@',
+            enablelistviewsearch: '@'
         },
 
         compile: function(element, attrs) {
@@ -28,11 +30,13 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             var hideoptions = (attrs.hideoptions === 'true') ? "hide-options" : "";
             var template = '<ul class="umb-tree ' + hideoptions + '"><li class="root">';
             template += '<div ng-hide="hideheader">' +
-                '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)" on-right-click="altSelect(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
-                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
+                '<h5>' +
+                '<i ng-if="enablecheckboxes == \'true\'" ng-class="selectEnabledNodeClass(tree.root)"></i>' +
+                '<a href="#/{{section}}" ng-click="select(tree.root, $event)" on-right-click="altSelect(tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
+                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
             template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
@@ -132,9 +136,33 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             //reset current node selection
                             //scope.currentNode = null;
 
-                            //filter the path for root node ids
+                            //Filter the path for root node ids (we don't want to pass in -1 or 'init')
+
                             args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
-                            loadPath(args.path, args.forceReload, args.activate);
+
+                            //Once those are filtered we need to check if the current user has a special start node id, 
+                            // if they do, then we're going to trim the start of the array for anything found from that start node
+                            // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
+                            // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
+
+                            userService.getCurrentUser().then(function(userData) {
+
+                                var startNodes = [userData.startContentId, userData.startMediaId];
+                                _.each(startNodes, function (i) {
+                                    var found = _.find(args.path, function (p) {
+                                        return String(p) === String(i);
+                                    });
+                                    if (found) {
+                                        args.path = args.path.splice(_.indexOf(args.path, found));
+                                    }
+                                });
+
+
+                                loadPath(args.path, args.forceReload, args.activate);
+
+                            });
+
+                            
 
                             return deferred.promise;
                         };
@@ -270,6 +298,14 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                 }
 
+                scope.selectEnabledNodeClass = function (node) {
+                    return node ?
+                        node.selected ?
+                        'icon umb-tree-icon sprTree icon-check blue temporary' :
+                        '' :
+                        '';
+                };
+
                 /** method to set the current animation for the node. 
                  *  This changes dynamically based on if we are changing sections or just loading normal tree data. 
                  *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
@@ -324,8 +360,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   The tree doesnt know about this, so it raises an event to tell the parent controller
                   about it.
                 */
-                scope.options = function(e, n, ev) {
-                    emitEvent("treeOptionsClick", { element: e, node: n, event: ev });
+                scope.options = function(n, ev) {
+                    emitEvent("treeOptionsClick", { element: elem, node: n, event: ev });
                 };
 
                 /**
@@ -334,17 +370,17 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   and emits it as a treeNodeSelect element if there is a callback object
                   defined on the tree
                 */
-                scope.select = function (e, n, ev) {
+                scope.select = function (n, ev) {
                     //on tree select we need to remove the current node - 
                     // whoever handles this will need to make sure the correct node is selected
                     //reset current node selection
                     scope.currentNode = null;
 
-                    emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
+                    emitEvent("treeNodeSelect", { element: elem, node: n, event: ev });
                 };
 
-                scope.altSelect = function(e, n, ev) {
-                    emitEvent("treeNodeAltSelect", { element: e, tree: scope.tree, node: n, event: ev });
+                scope.altSelect = function(n, ev) {
+                    emitEvent("treeNodeAltSelect", { element: elem, tree: scope.tree, node: n, event: ev });
                 };
                 
                 //watch for section changes

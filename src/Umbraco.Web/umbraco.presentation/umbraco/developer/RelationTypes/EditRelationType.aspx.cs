@@ -4,42 +4,39 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.relation;
-using umbraco.DataLayer;
-using umbraco.uicontrols;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using RelationType = umbraco.cms.businesslogic.relation.RelationType;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
 	/// <summary>
 	/// Edit an existing RelationType
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.RelationTypes)]
 	public partial class EditRelationType : UmbracoEnsuredPage
 	{
-	    public EditRelationType()
-	    {
-	        CurrentApp = DefaultApps.developer.ToString();
-	    }
 
 		/// <summary>
 		/// Class scope reference to the current RelationType being edited
 		/// </summary>
-		private RelationType _relationType = null;
+		private IRelationType _relationType;
 
 		/// <summary>
 		/// Class scope reference to the relations associated with the current RelationType
 		/// </summary>
-		private List<ReadOnlyRelation> _relations = null;
+		private List<ReadOnlyRelation> _relations;
 
 		/// <summary>
 		/// Umbraco ObjectType used to represent all parent items in this relation type
 		/// </summary>
 		/// 
-		private uQuery.UmbracoObjectType _parentObjectType = uQuery.UmbracoObjectType.Unknown;
+		private UmbracoObjectTypes _parentObjectType;
 
 		/// <summary>
 		/// Umbraco ObjectType used to represent all child items in this relation type
 		/// </summary>
-		private uQuery.UmbracoObjectType _childObjectType = uQuery.UmbracoObjectType.Unknown;
+		private UmbracoObjectTypes _childObjectType;
 
 		/// <summary>
 		/// Gets the name of the parent object type for all relations in this relation type 
@@ -70,7 +67,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		{
 			get
 			{
-				return this._relationType.Dual == true ? "bidirectional" : "parentToChild";
+				return this._relationType.IsBidirectional ? "bidirectional" : "parentToChild";
 			}
 		}
 
@@ -131,48 +128,47 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			int id;
 			if (int.TryParse(Request.QueryString["id"], out id))
 			{
-				this._relationType = new RelationType(id);
+                var relationService = Services.RelationService;
+
+			    this._relationType = relationService.GetRelationTypeById(id);
 				if (this._relationType != null)
 				{
-					// API doens't allow us to pull the object Type, so sql needed
-					// this.parentObjectType = UmbracoHelper.GetUmbracoObjectType(uQuery.SqlHelper.ExecuteScalar<Guid>("SELECT parentObjectType FROM umbracoRelationType WHERE id = " + this.relationType.Id.ToString()));
-					// this.childObjectType = UmbracoHelper.GetUmbracoObjectType(uQuery.SqlHelper.ExecuteScalar<Guid>("SELECT childObjectType FROM umbracoRelationType WHERE id = " + this.relationType.Id.ToString()));
-
-					// uQuery has the above in a helper method, so no sql needed now
-					this._parentObjectType = this._relationType.GetParentUmbracoObjectType();
-					this._childObjectType = this._relationType.GetChildUmbracoObjectType();
+				    this._parentObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(this._relationType.ParentObjectType);
+				    this._childObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(this._relationType.ChildObjectType);
 
 					// -----------
 
-					if (!this.IsPostBack)
-					{
-						this.EnsureChildControls();
+				    if (!this.IsPostBack)
+				    {
+				        this.EnsureChildControls();
 
-						this.idLiteral.Text = this._relationType.Id.ToString();
-						this.nameTextBox.Text = this._relationType.Name;
-						this.aliasTextBox.Text = this._relationType.Alias;
+				        this.idLiteral.Text = this._relationType.Id.ToString();
+				        this.nameTextBox.Text = this._relationType.Name;
+				        this.aliasTextBox.Text = this._relationType.Alias;
 
-						if (this._relationType.Dual)
-						{
-							this.dualRadioButtonList.Items.FindByValue("1").Selected = true;
-						}
-						else
-						{
-							this.dualRadioButtonList.Items.FindByValue("0").Selected = true;
-						}
+				        if (this._relationType.IsBidirectional)
+				        {
+				            this.dualRadioButtonList.Items.FindByValue("1").Selected = true;
+				        }
+				        else
+				        {
+				            this.dualRadioButtonList.Items.FindByValue("0").Selected = true;
+				        }
 
-						this.parentLiteral.Text = this._parentObjectType.GetFriendlyName(); // UmbracoHelper.GetFriendlyName(this.parentObjectType);
-						this.childLiteral.Text = this._childObjectType.GetFriendlyName(); // UmbracoHelper.GetFriendlyName(this.childObjectType);
+				        this.parentLiteral.Text = this._parentObjectType.GetFriendlyName();
+				            // UmbracoHelper.GetFriendlyName(this.parentObjectType);
+				        this.childLiteral.Text = this._childObjectType.GetFriendlyName();
+				            // UmbracoHelper.GetFriendlyName(this.childObjectType);
 
-						this.relationsCountLiteral.Text = this.Relations.Count.ToString();
+				        this.relationsCountLiteral.Text = this.Relations.Count.ToString();
 
-						this.relationsRepeater.DataSource = this.Relations;
-						this.relationsRepeater.DataBind();
-					}
+				        this.relationsRepeater.DataSource = this.Relations;
+				        this.relationsRepeater.DataBind();
+				    }
 				}
 				else
 				{
-					throw new Exception("Unable to get RelationType where ID = " + id.ToString());
+					throw new Exception("Unable to get RelationType where ID = " + id);
 				}
 			}
 			else
@@ -244,7 +240,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			{
 				var nameChanged = this._relationType.Name != this.nameTextBox.Text.Trim();
 				var aliasChanged = this._relationType.Alias != this.aliasTextBox.Text.Trim();
-				var directionChanged = this._relationType.Dual != (this.dualRadioButtonList.SelectedValue == "1");
+				var directionChanged = this._relationType.IsBidirectional != (this.dualRadioButtonList.SelectedValue == "1");
 
 				if (nameChanged || aliasChanged || directionChanged)
 				{
@@ -263,7 +259,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 					if (directionChanged)
 					{
 						bubbleBody += "Direction, ";
-						this._relationType.Dual = this.dualRadioButtonList.SelectedValue == "1";
+						this._relationType.IsBidirectional = this.dualRadioButtonList.SelectedValue == "1";
 					}
 
 					if (aliasChanged)
@@ -275,6 +271,9 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 					bubbleBody = bubbleBody.Remove(bubbleBody.LastIndexOf(','), 1);
 					bubbleBody = bubbleBody + "Changed";
 
+				    var relationService = Services.RelationService;
+                    relationService.Save(this._relationType);
+                    
 					ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Relation Type Updated", bubbleBody);
 				}
 			}

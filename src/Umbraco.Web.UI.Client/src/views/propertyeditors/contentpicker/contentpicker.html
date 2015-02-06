@@ -15,11 +15,13 @@
                     <i class="{{node.icon}} hover-hide"></i> 
                     {{node.name}}
                 </a>
-                <br/><small><a href ng-click="edit(node)">Edit</a></small>
+                <div ng-if="!dialogEditor && model.config.showEditButton">
+                    <small><a href umb-launch-mini-editor="node">Edit</a></small>
+                </div>
             </li>
         </ul>
 
-        <ul class="unstyled list-icons" ng-show="cfg.multiPicker === true || renderModel.length === 0">	
+        <ul class="unstyled list-icons" ng-show="model.config.multiPicker === true || renderModel.length === 0">
             <li>
                 <i class="icon icon-add blue"></i>
                 <a href="#" ng-click="openContentPicker()" prevent-default>
@@ -33,7 +35,7 @@
         <input type="hidden" name="maxCount" ng-model="renderModel" />
 
         <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
-            You need to add at least {{model.config.minNumber-renderModel.length}} items
+            You need to add at least {{model.config.minNumber}} items
         </div>
         
         <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">

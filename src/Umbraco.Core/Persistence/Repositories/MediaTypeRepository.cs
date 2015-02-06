@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMediaType"/>
     /// </summary>
-    internal class MediaTypeRepository : ContentTypeBaseRepository<int, IMediaType>, IMediaTypeRepository
+    internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
     {
 		public MediaTypeRepository(IDatabaseUnitOfWork work)
             : base(work)
@@ -63,18 +63,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, this);
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var allIds = Database.Fetch<int>(sql).ToArray();
+                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, this);
             }
         }
 
@@ -82,14 +77,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMediaType>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                .OrderBy<NodeDto>(x => x.Text);
 
-            var documentTypeDtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
-
-            foreach (var dto in documentTypeDtos)
-            {
-                yield return Get(dto.NodeId);
-            }
+            var dtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
+            return dtos.Any()
+                ? GetAll(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
+                : Enumerable.Empty<IMediaType>();
         }
 
         #endregion
@@ -158,7 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             PersistNewBaseContentType(dto, entity);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMediaType entity)
@@ -169,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ((MediaType)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -186,7 +180,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             PersistUpdatedBaseContentType(dto, entity);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         #endregion

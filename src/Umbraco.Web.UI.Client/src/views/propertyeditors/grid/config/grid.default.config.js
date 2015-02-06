@@ -1,29 +1,67 @@
 var uSkyGridConfig = [
 {
-    columns: [
+
+    style:[
+        {
+            label: "Set a background image",
+            description: "Set a row background",
+            key: "background-image",
+            view: "imagepicker",
+            modifier: "url({0})"
+        },
+
+        {
+            label: "Set a font color",
+            description: "Pick a color",
+            key: "color",
+            view: "colorpicker"
+        }
+    ],
+
+    config:[
+        {
+            label: "Preview",
+            description: "Display a live preview",
+            key: "preview",
+            view: "boolean"
+        },
+
+        {
+            label: "Class",
+            description: "Set a css class",
+            key: "class",
+            view: "textstring"
+        }
+    ],
+
+    layouts: [
     {
         grid: 12,
         percentage: 100,
 
-        cellModels: [
+
+        rows: [
         {
             name: "Single column",
-            models: [{
-                grid: 12,
-                percentage: 100
-            }]
-        }, {
-            name: "Article",
-            models: [{
-                grid: 4,
-                percentage: 33.3,
-                allowed: ["media","quote"]
-            }, {
-                grid: 8,
-                percentage: 66.6,
-                allowed: ["rte"]
-            }]
+                columns: [{
+                    grid: 12,
+                    percentage: 100
+                }]
         },
+
+        {
+            name: "Article",
+                models: [{
+                    grid: 4,
+                    percentage: 33.3,
+                    allowed: ["media","quote"]
+                }, {
+                    grid: 8,
+                    percentage: 66.6,
+                    allowed: ["rte"]
+                }]
+        },
+
         {
          name: "Article, reverse",
          models: [
@@ -92,6 +130,7 @@ var uSkyGridConfig = [
     {
         grid: 9,
         percentage: 70,
+
         cellModels: [
         {
             models: [{

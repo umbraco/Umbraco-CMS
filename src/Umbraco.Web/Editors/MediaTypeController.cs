@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using AutoMapper;
+using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -19,8 +20,8 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with media types
     /// </summary>
-    [PluginController("UmbracoApi")]    
-    public class MediaTypeController : UmbracoAuthorizedJsonController
+    [PluginController("UmbracoApi")]
+    public class MediaTypeController : ContentTypeControllerBase
     {
         /// <summary>
         /// Constructor
@@ -61,11 +62,11 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+            if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-            return contentItem.ContentType.AllowedContentTypes
-                              .Select(x => Services.ContentTypeService.GetMediaType((int) x.Id.Value))
-                              .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
-
+            return Services.ContentTypeService.GetAllMediaTypes(ids)
+                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
     }
 }

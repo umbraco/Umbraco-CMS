@@ -70,7 +70,9 @@ namespace umbraco
         protected override void CreateRootNodeActions(ref List<IAction> actions)
         {
             actions.Clear();
-            actions.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
+
+            // U4-4422 : There is no variable nodes on this so no need to reload nodes
+            //actions.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
         }
 
         /// <summary>
@@ -119,6 +121,9 @@ namespace umbraco
                         {
                             xNode.Text = "";
                         }
+
+                        xNode.Action = "javascript:void(0);";
+
                         break;
 
 
@@ -161,6 +166,7 @@ namespace umbraco
                         xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
                         xNode.Text = ui.Text("treeHeaders", "createdPackages");
                         xNode.HasChildren = true;
+                        xNode.Action = "javascript:void(0);";
                         
                         break;
 

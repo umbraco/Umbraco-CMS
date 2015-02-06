@@ -15,6 +15,7 @@ using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -450,14 +451,23 @@ namespace Umbraco.Core
                 var allTypes = GetTypesWithFormattedException(a)
                     .ToArray();
 
-                //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes but have
-                //the specified attribute
-                var attributedTypes = allTypes
-                    .Where(t => (TypeHelper.IsNonStaticClass(t)
-                                 && (onlyConcreteClasses == false || t.IsAbstract == false))
-                                 //the type must have this attribute
-                                 && t.GetCustomAttributes(attributeType, false).Any())
-                    .ToArray();
+                var attributedTypes = new Type[] {};
+                try
+                {
+                    //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes but have
+                    //the specified attribute
+                    attributedTypes = allTypes
+                        .Where(t => (TypeHelper.IsNonStaticClass(t)
+                                     && (onlyConcreteClasses == false || t.IsAbstract == false))
+                            //the type must have this attribute
+                                     && t.GetCustomAttributes(attributeType, false).Any())
+                        .ToArray();
+                }
+                catch (TypeLoadException ex)
+                {
+                    LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
+                    continue;
+                }
 
                 //add the types to our list to return
                 foreach (var t in attributedTypes)
@@ -583,16 +593,25 @@ namespace Umbraco.Core
                     .Where(assignTypeFrom.IsAssignableFrom)
                     .ToArray();
 
-                //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes
-                var filteredTypes = allSubTypes
-                    .Where(t => (TypeHelper.IsNonStaticClass(t)                                 
-                                //Do not include nested private classes - since we are in full trust now this will find those too!
-                                 && t.IsNestedPrivate == false   
-                                 && (onlyConcreteClasses == false || t.IsAbstract == false)
-                                 //Do not include classes that are flagged to hide from the type finder
-                                 && t.GetCustomAttribute<HideFromTypeFinderAttribute>() == null
-                                 && additionalFilter(t)))
-                    .ToArray();
+                var filteredTypes = new Type[] { };
+                try
+                {
+                    //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes
+                    filteredTypes = allSubTypes
+                        .Where(t => (TypeHelper.IsNonStaticClass(t)
+                            //Do not include nested private classes - since we are in full trust now this will find those too!
+                                     && t.IsNestedPrivate == false
+                                     && (onlyConcreteClasses == false || t.IsAbstract == false)
+                            //Do not include classes that are flagged to hide from the type finder
+                                     && t.GetCustomAttribute<HideFromTypeFinderAttribute>() == null
+                                     && additionalFilter(t)))
+                        .ToArray();
+                }
+                catch (TypeLoadException ex)
+                {
+                    LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
+                    continue; 
+                }
 
                 //add the types to our list to return
                 foreach (var t in filteredTypes)

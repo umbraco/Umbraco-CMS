@@ -339,10 +339,10 @@ namespace Umbraco.Tests.Services
 
             var parentContentType1 = MockedContentTypes.CreateSimpleContentType("parent1", "Parent1");
             service.Save(parentContentType1);
-            var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2");
+            var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2", null, true);
             service.Save(parentContentType2);
 
-            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1);
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1, true);
             service.Save(simpleContentType);
 
             // Act
@@ -371,8 +371,8 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(clonedContentType.Key, originalContentType.Key);
             Assert.AreNotEqual(clonedContentType.Path, originalContentType.Path);
 
-            Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id, originalContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
-            Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
+            Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id, originalContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id);
+            Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id);
         }
 
         [Test]
@@ -432,10 +432,10 @@ namespace Umbraco.Tests.Services
 
             var parentContentType1 = MockedContentTypes.CreateSimpleContentType("parent1", "Parent1");
             service.Save(parentContentType1);
-            var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2");
+            var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2", null, true);
             service.Save(parentContentType2);
 
-            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1);
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1, true);
             service.Save(simpleContentType);
 
             // Act
@@ -460,8 +460,8 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(clonedContentType.Key, originalContentType.Key);
             Assert.AreNotEqual(clonedContentType.Path, originalContentType.Path);
 
-            Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id, originalContentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
-            Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
+            Assert.AreNotEqual(clonedContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id, originalContentType.PropertyTypes.First(x => x.Alias.StartsWith("title")).Id);
+            Assert.AreNotEqual(clonedContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id, originalContentType.PropertyGroups.First(x => x.Name.StartsWith("Content")).Id);
         }
 
         private ContentType CreateComponent()
@@ -571,7 +571,7 @@ namespace Umbraco.Tests.Services
             {
                 var contentType = MockedContentTypes.CreateSimpleContentType("childType" + i, "ChildType" + i,
                     //make the last entry in the list, this one's parent
-                    list.Last());
+                    list.Last(), true);
 
                 list.Add(contentType);
             }

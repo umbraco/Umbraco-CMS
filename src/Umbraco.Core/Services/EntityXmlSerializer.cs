@@ -23,18 +23,19 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IContent content, bool deep = false)
+        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
-            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
-            xml.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
+            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService).Name));
+            xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService).Name));
             xml.Add(new XAttribute("writerID", content.WriterId));
             xml.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString(CultureInfo.InvariantCulture)));
             xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Services
             {
                 var descendants = contentService.GetDescendants(content).ToArray();
                 var currentChildren = descendants.Where(x => x.ParentId == content.Id);
-                AddChildXml(contentService, dataTypeService, descendants, currentChildren, xml);
+                AddChildXml(contentService, dataTypeService, userService, descendants, currentChildren, xml);
             }
 
             return xml;
@@ -54,17 +55,18 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="media">Media to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        public XElement Serialize(IMediaService mediaService, IDataTypeService dataTypeService, IMedia media, bool deep = false)
+        public XElement Serialize(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, IMedia media, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Serialize(dataTypeService, media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
-            xml.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            xml.Add(new XAttribute("writerName", media.GetCreatorProfile(userService).Name));
             xml.Add(new XAttribute("writerID", media.CreatorId));
             xml.Add(new XAttribute("version", media.Version));
             xml.Add(new XAttribute("template", 0));
@@ -74,14 +76,14 @@ namespace Umbraco.Core.Services
             {
                 var descendants = mediaService.GetDescendants(media).ToArray();
                 var currentChildren = descendants.Where(x => x.ParentId == media.Id);
-                AddChildXml(mediaService, dataTypeService, descendants, currentChildren, xml);
+                AddChildXml(mediaService, dataTypeService, userService, descendants, currentChildren, xml);
             }
 
             return xml;
         }
 
         /// <summary>
-        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// Exports an <see cref="IMember"/> item to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="dataTypeService"></param>
         /// <param name="member">Member to export</param>
@@ -128,26 +130,277 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Exports an <see cref="IDataTypeDefinition"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="dataTypeDefinition">IDataTypeDefinition type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IDataTypeDefinition dataTypeDefinition)
+        {
+            var prevalues = new XElement("PreValues");
+            var prevalueList = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
+                .FormatAsDictionary();
+
+            var sort = 0;
+            foreach (var pv in prevalueList)
+            {
+                var prevalue = new XElement("PreValue");
+                prevalue.Add(new XAttribute("Id", pv.Value.Id));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value ?? ""));
+                prevalue.Add(new XAttribute("Alias", pv.Key));
+                prevalue.Add(new XAttribute("SortOrder", sort));
+                prevalues.Add(prevalue);
+                sort++;
+            }
+
+            var xml = new XElement("DataType", prevalues);
+            xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
+            //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
+            xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
+            xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
+            xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
+
+            return xml;
+        }
+
+        public XElement Serialize(IDictionaryItem dictionaryItem)
+        {
+            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
+            foreach (var translation in dictionaryItem.Translations)
+            {
+                xml.Add(new XElement("Value",
+                    new XAttribute("LanguageId", translation.Language.Id),
+                    new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
+                    new XCData(translation.Value)));
+            }
+
+            return xml;
+        }
+
+        public XElement Serialize(ILanguage language)
+        {
+            var xml = new XElement("Language",
+                new XAttribute("Id", language.Id),
+                new XAttribute("CultureAlias", language.IsoCode),
+                new XAttribute("FriendlyName", language.CultureName));
+
+            return xml;
+        }
+
+        public XElement Serialize(ITemplate template)
+        {
+            var xml = new XElement("Template");
+            xml.Add(new XElement("Name", template.Name));
+            xml.Add(new XElement("Alias", template.Alias));
+            xml.Add(new XElement("Design", new XCData(template.Content)));
+
+            var concreteTemplate = template as Template;
+            if (concreteTemplate != null && concreteTemplate.MasterTemplateId != null)
+            {
+                if (concreteTemplate.MasterTemplateId.IsValueCreated &&
+                    concreteTemplate.MasterTemplateId.Value != default(int))
+                {
+                    xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
+                    xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
+                }
+            }
+
+            return xml;
+        }
+
+        public XElement Serialize(IDataTypeService dataTypeService, IMediaType mediaType)
+        {
+            var info = new XElement("Info",
+                                    new XElement("Name", mediaType.Name),
+                                    new XElement("Alias", mediaType.Alias),
+                                    new XElement("Icon", mediaType.Icon),
+                                    new XElement("Thumbnail", mediaType.Thumbnail),
+                                    new XElement("Description", mediaType.Description),
+                                    new XElement("AllowAtRoot", mediaType.AllowedAsRoot.ToString()));
+
+            var masterContentType = mediaType.CompositionAliases().FirstOrDefault();
+            if (masterContentType != null)
+                info.Add(new XElement("Master", masterContentType));
+
+            var structure = new XElement("Structure");
+            foreach (var allowedType in mediaType.AllowedContentTypes)
+            {
+                structure.Add(new XElement("MediaType", allowedType.Alias));
+            }
+
+            var genericProperties = new XElement("GenericProperties");
+            foreach (var propertyType in mediaType.PropertyTypes)
+            {
+                var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
+                var propertyGroup = mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                var genericProperty = new XElement("GenericProperty",
+                                                   new XElement("Name", propertyType.Name),
+                                                   new XElement("Alias", propertyType.Alias),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
+                                                   new XElement("Definition", definition.Key),
+                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("Description", new XCData(propertyType.Description)));
+                genericProperties.Add(genericProperty);
+            }
+
+            var tabs = new XElement("Tabs");
+            foreach (var propertyGroup in mediaType.PropertyGroups)
+            {
+                var tab = new XElement("Tab",
+                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
+                                       new XElement("Caption", propertyGroup.Name),
+                                       new XElement("SortOrder", propertyGroup.SortOrder));
+
+                tabs.Add(tab);
+            }
+
+            var xml = new XElement("MediaType",
+                                   info,
+                                   structure,
+                                   genericProperties,
+                                   tabs);
+
+            return xml;
+        }
+
+        public XElement Serialize(IMacro macro)
+        {
+            var xml = new XElement("macro");
+            xml.Add(new XElement("name", macro.Name));
+            xml.Add(new XElement("alias", macro.Alias));
+            xml.Add(new XElement("scriptType", macro.ControlType));
+            xml.Add(new XElement("scriptAssembly", macro.ControlAssembly));
+            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
+            xml.Add(new XElement("xslt", macro.XsltPath));
+            xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
+            xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
+            xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
+            xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));
+            xml.Add(new XElement("cacheByPage", macro.CacheByPage.ToString()));
+
+            var properties = new XElement("properties");
+            foreach (var property in macro.Properties)
+            {
+                properties.Add(new XElement("property",
+                    new XAttribute("name", property.Name),
+                    new XAttribute("alias", property.Alias),
+                    new XAttribute("sortOrder", property.SortOrder),
+                    new XAttribute("propertyType", property.EditorAlias)));
+            }
+            xml.Add(properties);
+
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports an <see cref="IContentType"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="contentType">Content type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType)
+        {
+            var info = new XElement("Info",
+                                    new XElement("Name", contentType.Name),
+                                    new XElement("Alias", contentType.Alias),
+                                    new XElement("Icon", contentType.Icon),
+                                    new XElement("Thumbnail", contentType.Thumbnail),
+                                    new XElement("Description", contentType.Description),
+                                    new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
+                                    new XElement("IsListView", contentType.IsContainer.ToString()));
+
+            var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
+            if(masterContentType != null)
+                info.Add(new XElement("Master", masterContentType.Alias));
+
+            var compositionsElement = new XElement("Compositions");
+            var compositions = contentType.ContentTypeComposition;
+            foreach (var composition in compositions)
+            {
+                compositionsElement.Add(new XElement("Composition", composition.Alias));
+            }
+            info.Add(compositionsElement);
+
+            var allowedTemplates = new XElement("AllowedTemplates");
+            foreach (var template in contentType.AllowedTemplates)
+            {
+                allowedTemplates.Add(new XElement("Template", template.Alias));
+            }
+            info.Add(allowedTemplates);
+
+            if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+                info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
+            else
+                info.Add(new XElement("DefaultTemplate", ""));
+
+            var structure = new XElement("Structure");
+            foreach (var allowedType in contentType.AllowedContentTypes)
+            {
+                structure.Add(new XElement("DocumentType", allowedType.Alias));
+            }
+
+            var genericProperties = new XElement("GenericProperties");
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
+
+                var propertyGroup = propertyType.PropertyGroupId == null
+                                                ? null
+                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
+                var genericProperty = new XElement("GenericProperty",
+                                                   new XElement("Name", propertyType.Name),
+                                                   new XElement("Alias", propertyType.Alias),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
+                                                   new XElement("Definition", definition.Key),
+                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("Description", new XCData(propertyType.Description)));
+                genericProperties.Add(genericProperty);
+            }
+
+            var tabs = new XElement("Tabs");
+            foreach (var propertyGroup in contentType.PropertyGroups)
+            {
+                var tab = new XElement("Tab",
+                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
+                                       new XElement("Caption", propertyGroup.Name),
+                                       new XElement("SortOrder", propertyGroup.SortOrder));
+                tabs.Add(tab);
+            }
+
+            return new XElement("DocumentType",
+                                   info,
+                                   structure,
+                                   genericProperties,
+                                   tabs);
+        }
+
+        /// <summary>
         /// Used by Media Export to recursively add children
         /// </summary>
         /// <param name="mediaService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="originalDescendants"></param>
         /// <param name="currentChildren"></param>
         /// <param name="currentXml"></param>
-        private void AddChildXml(IMediaService mediaService, IDataTypeService dataTypeService, IMedia[] originalDescendants, IEnumerable<IMedia> currentChildren, XElement currentXml)
+        private void AddChildXml(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, IMedia[] originalDescendants, IEnumerable<IMedia> currentChildren, XElement currentXml)
         {
             foreach (var child in currentChildren)
             {
                 //add the child's xml
-                var childXml = Serialize(mediaService, dataTypeService, child);
+                var childXml = Serialize(mediaService, dataTypeService, userService, child);
                 currentXml.Add(childXml);
                 //copy local (out of closure)
                 var c = child;
                 //get this item's children                
                 var children = originalDescendants.Where(x => x.ParentId == c.Id);
                 //recurse and add it's children to the child xml element
-                AddChildXml(mediaService, dataTypeService, originalDescendants, children, childXml);
+                AddChildXml(mediaService, dataTypeService, userService, originalDescendants, children, childXml);
             }
         }
 
@@ -189,22 +442,23 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentService"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
         /// <param name="originalDescendants"></param>
         /// <param name="currentChildren"></param>
         /// <param name="currentXml"></param>
-        private void AddChildXml(IContentService contentService, IDataTypeService dataTypeService, IContent[] originalDescendants, IEnumerable<IContent> currentChildren, XElement currentXml)
+        private void AddChildXml(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent[] originalDescendants, IEnumerable<IContent> currentChildren, XElement currentXml)
         {
             foreach (var child in currentChildren)
             {
                 //add the child's xml
-                var childXml = Serialize(contentService, dataTypeService, child);
+                var childXml = Serialize(contentService, dataTypeService, userService, child);
                 currentXml.Add(childXml);
                 //copy local (out of closure)
                 var c = child;
                 //get this item's children                
                 var children = originalDescendants.Where(x => x.ParentId == c.Id);
                 //recurse and add it's children to the child xml element
-                AddChildXml(contentService, dataTypeService, originalDescendants, children, childXml);
+                AddChildXml(contentService, dataTypeService, userService, originalDescendants, children, childXml);
             }
         }
     }

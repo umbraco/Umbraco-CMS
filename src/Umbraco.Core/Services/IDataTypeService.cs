@@ -6,10 +6,17 @@ using umbraco.interfaces;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataType"/> and <see cref="IDataTypeDefinition"/>
+    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/> 
     /// </summary>
     public interface IDataTypeService : IService
     {
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its Name
+        /// </summary>
+        /// <param name="name">Name of the <see cref="IDataTypeDefinition"/></param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        IDataTypeDefinition GetDataTypeDefinitionByName(string name);
+
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Id
         /// </summary>
@@ -44,6 +51,14 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
         void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0);
+
+        /// <summary>
+        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
+        void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents);
 
         /// <summary>
         /// Deletes an <see cref="IDataTypeDefinition"/>

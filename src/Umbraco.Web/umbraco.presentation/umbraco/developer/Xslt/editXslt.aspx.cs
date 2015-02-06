@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.uicontrols;
@@ -19,12 +20,9 @@ namespace umbraco.cms.presentation.developer
 	/// <summary>
 	/// Summary description for editXslt.
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
 	public partial class editXslt : UmbracoEnsuredPage
 	{
-		public editXslt()
-		{
-			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
-		}
 
 		protected PlaceHolder buttons;
 

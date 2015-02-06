@@ -15,7 +15,7 @@ using umbraco.interfaces;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataType"/> and <see cref="IDataTypeDefinition"/>
+    /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/>
     /// </summary>
     public class DataTypeService : IDataTypeService
     {
@@ -41,6 +41,19 @@ namespace Umbraco.Core.Services
         {
 			_repositoryFactory = repositoryFactory;
             _uowProvider = provider;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its Name
+        /// </summary>
+        /// <param name="name">Name of the <see cref="IDataTypeDefinition"/></param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        public IDataTypeDefinition GetDataTypeDefinitionByName(string name)
+        {
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetByQuery(new Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
+            }
         }
 
         /// <summary>
@@ -187,8 +200,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the user issueing the save</param>
         public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this))
-                return;
+            Save(dataTypeDefinitions, userId, true);
+        }
+
+        /// <summary>
+        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
+        public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents)
+        {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this))
+                    return;
+            }
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
@@ -200,7 +227,8 @@ namespace Umbraco.Core.Services
                 }
                 uow.Commit();
 
-                Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
             }
 
             Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
@@ -216,30 +244,27 @@ namespace Umbraco.Core.Services
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
-            using (new WriteLock(Locker))
+            using (var uow = _uowProvider.GetUnitOfWork())
             {
-                using (var uow = _uowProvider.GetUnitOfWork())
+                using (var transaction = uow.Database.GetTransaction())
                 {
-                    using (var transaction = uow.Database.GetTransaction())
+                    var sortOrderObj =
+                    uow.Database.ExecuteScalar<object>(
+                        "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
+                    int sortOrder;
+                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
                     {
-                        var sortOrderObj =
-                        uow.Database.ExecuteScalar<object>(
-                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
-                        int sortOrder;
-                        if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
-                        {
-                            sortOrder = 1;
-                        }
-
-                        foreach (var value in values)
-                        {
-                            var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
-                            uow.Database.Insert(dto);
-                            sortOrder++;
-                        }
-
-                        transaction.Complete();
+                        sortOrder = 1;
                     }
+
+                    foreach (var value in values)
+                    {
+                        var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
+                        uow.Database.Insert(dto);
+                        sortOrder++;
+                    }
+
+                    transaction.Complete();
                 }
             }
         }

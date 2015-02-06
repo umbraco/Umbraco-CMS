@@ -5,15 +5,47 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Packaging
 {
+    // Note
+    // That class uses ReflectionOnlyLoad which does NOT handle policies (bindingRedirect) and
+    // therefore raised warnings when installing a package, if an exact dependency could not be
+    // found, though it would be found via policies. So we have to explicitely apply policies
+    // where appropriate.
+
     internal class PackageBinaryInspector : MarshalByRefObject
     {
+        /// <summary>
+        /// Entry point to call from your code
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="assemblys"></param>
+        /// <param name="errorReport"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Will perform the assembly scan in a separate app domain
+        /// </remarks>
+        public static IEnumerable<string> ScanAssembliesForTypeReference<T>(IEnumerable<byte[]> assemblys, out string[] errorReport)
+        {
+            var appDomain = GetTempAppDomain();
+            var type = typeof(PackageBinaryInspector);
+            try
+            {
+                var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
+                       type.Assembly.FullName,
+                       type.FullName);
+                // do NOT turn PerformScan into static (even if ReSharper says so)!
+                var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
+                return result;
+            }
+            finally
+            {
+                AppDomain.Unload(appDomain);
+            }
+        }
+
         /// <summary>
         /// Entry point to call from your code
         /// </summary>
@@ -33,6 +65,7 @@ namespace Umbraco.Core.Packaging
                 var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
                        type.Assembly.FullName,
                        type.FullName);
+                // do NOT turn PerformScan into static (even if ReSharper says so)!
                 var result = value.PerformScan<T>(dllPath, out errorReport);
                 return result;
             }
@@ -46,39 +79,77 @@ namespace Umbraco.Core.Packaging
         /// Performs the assembly scanning
         /// </summary>
         /// <typeparam name="T"></typeparam>        
+        /// <param name="assemblies"></param>
+        /// <param name="errorReport"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This method is executed in a separate app domain
+        /// </remarks>
+        private IEnumerable<string> PerformScan<T>(IEnumerable<byte[]> assemblies, out string[] errorReport)
+        {
+            //we need this handler to resolve assembly dependencies when loading below
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (s, e) =>
+            {
+                var name = AppDomain.CurrentDomain.ApplyPolicy(e.Name);
+                var a = Assembly.ReflectionOnlyLoad(name);
+                if (a == null) throw new TypeLoadException("Could not load assembly " + e.Name);
+                return a;
+            };
+
+            //First load each dll file into the context
+            // do NOT apply policy here: we want to scan the dlls that are in the binaries
+            var loaded = assemblies.Select(Assembly.ReflectionOnlyLoad).ToList();
+
+            //scan
+            return PerformScan<T>(loaded, out errorReport);
+        }
+
+        /// <summary>
+        /// Performs the assembly scanning
+        /// </summary>
+        /// <typeparam name="T"></typeparam>        
         /// <param name="dllPath"></param>
         /// <param name="errorReport"></param>
         /// <returns></returns>
         /// <remarks>
         /// This method is executed in a separate app domain
         /// </remarks>
-        internal IEnumerable<string> PerformScan<T>(string dllPath, out string[] errorReport)
+        private IEnumerable<string> PerformScan<T>(string dllPath, out string[] errorReport)
         {
             if (Directory.Exists(dllPath) == false)
             {
                 throw new DirectoryNotFoundException("Could not find directory " + dllPath);
             }
 
+            //we need this handler to resolve assembly dependencies when loading below
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (s, e) =>
+            {
+                var name = AppDomain.CurrentDomain.ApplyPolicy(e.Name);
+                var a = Assembly.ReflectionOnlyLoad(name);
+                if (a == null) throw new TypeLoadException("Could not load assembly " + e.Name);
+                return a;
+            };
+
+            //First load each dll file into the context
+            // do NOT apply policy here: we want to scan the dlls that are in the path
             var files = Directory.GetFiles(dllPath, "*.dll");
+            var loaded = files.Select(Assembly.ReflectionOnlyLoadFrom).ToList();
+
+            //scan
+            return PerformScan<T>(loaded, out errorReport);
+        }
+
+        private static IEnumerable<string> PerformScan<T>(IList<Assembly> loaded, out string[] errorReport)
+        {
             var dllsWithReference = new List<string>();
             var errors = new List<string>();
             var assembliesWithErrors = new List<Assembly>();
 
-            //we need this handler to resolve assembly dependencies below
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (s, e) =>
-                {
-                    var a = Assembly.ReflectionOnlyLoad(e.Name);                                        
-                    if (a == null) throw new TypeLoadException("Could not load assembly " + e.Name);
-                    return a;
-                };
-
-            //First load each dll file into the context
-            var loaded = files.Select(Assembly.ReflectionOnlyLoadFrom).ToList();
-            
             //load each of the LoadFrom assemblies into the Load context too
             foreach (var a in loaded)
             {
-                Assembly.ReflectionOnlyLoad(a.FullName);
+                var name = AppDomain.CurrentDomain.ApplyPolicy(a.FullName);
+                Assembly.ReflectionOnlyLoad(name);
             }
 
             //get the list of assembly names to compare below
@@ -94,7 +165,8 @@ namespace Umbraco.Core.Packaging
                 {
                     try
                     {
-                        Assembly.ReflectionOnlyLoad(assemblyName.FullName);
+                        var name = AppDomain.CurrentDomain.ApplyPolicy(assemblyName.FullName);
+                        Assembly.ReflectionOnlyLoad(name);
                     }
                     catch (FileNotFoundException)
                     {
@@ -167,7 +239,6 @@ namespace Umbraco.Core.Packaging
             return dllsWithReference;
         }
 
-
         /// <summary>
         /// In order to compare types, the types must be in the same context, this method will return the type that
         /// we are checking against but from the Load context.
@@ -176,7 +247,8 @@ namespace Umbraco.Core.Packaging
         /// <returns></returns>
         private static Type GetLoadFromContractType<T>()
         {
-            var contractAssemblyLoadFrom =Assembly.ReflectionOnlyLoad(typeof (T).Assembly.FullName);
+            var name = AppDomain.CurrentDomain.ApplyPolicy(typeof(T).Assembly.FullName);
+            var contractAssemblyLoadFrom = Assembly.ReflectionOnlyLoad(name);
 
             var contractType = contractAssemblyLoadFrom.GetExportedTypes()
                 .FirstOrDefault(x => x.FullName == typeof(T).FullName && x.Assembly.FullName == typeof(T).Assembly.FullName);
@@ -216,13 +288,5 @@ namespace Umbraco.Core.Packaging
                 domainSetup,
                 new PermissionSet(PermissionState.Unrestricted));
         }
-
-        private static string GetAssemblyPath(Assembly a)
-        {
-            var codeBase = a.CodeBase;
-            var uri = new Uri(codeBase);
-            return uri.LocalPath;
-        }
-
     }
 }

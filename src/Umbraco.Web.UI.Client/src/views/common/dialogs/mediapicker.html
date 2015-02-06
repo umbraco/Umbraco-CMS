@@ -5,9 +5,24 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
  	<div class="umb-panel-body no-header with-footer compact">
  			<umb-pane>
  				<umb-control-group ng-if="target.url">
-	 				<div class="thumbnail span6 clearfix">
-	 					<img ng-src="{{target.url}}" />
+	 				
+	 				<div class="clearfix">
+	 					<umb-image-gravity 
+	 						src="target.url"
+	 						center="target.focalPoint" />
 	 				</div>
+
+	 				<div ng-if="cropSize">
+	 					<h5>Preview</h5>
+	 					<umb-image-thumbnail
+	 						center="target.focalPoint"
+	 						src="target.url"
+	 						height="{{cropSize.height}}"
+	 						width="{{cropSize.width}}"
+	 						max-size="400"/>
+	 				</div>
+
+
  				</umb-control-group>
 
  				<umb-control-group label="@general_url">
@@ -19,14 +34,10 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
  						ng-disabled="target.id"/>	
  				</umb-control-group>
 
- 				<umb-control-group label="@content_titleOptional">
- 					
+ 				<umb-control-group label="@content_altTextOptional">
  					<input type="text"
- 						localize="placeholder" 
- 						placeholder="@placeholders_entername" 
  						class="umb-editor umb-textstring" 
- 						ng-model="target.name" />
-
+ 						ng-model="target.altText" />
  				</umb-control-group>
  			</umb-pane>
  		</div>
@@ -98,8 +109,11 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 	</div>
 
 	<div class="umb-panel-body with-footer">
-        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
-        	ng-hide="active() == 0"></div>
+		
+        <div class="umb-loader-wrapper" ng-hide="active() == 0">
+            <div class="umb-loader"></div>
+        </div>
+
         <umb-photo-folder 
         	min-height="105" 
         	min-width="150"

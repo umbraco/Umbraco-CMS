@@ -18,14 +18,9 @@ namespace umbraco.developer
 	/// <summary>
 	/// Summary description for xsltInsertValueOf.
 	/// </summary>
+    [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
 	public partial class xsltInsertValueOf : BasePages.UmbracoEnsuredPage
 	{
-
-	    public xsltInsertValueOf()
-	    {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
-
-	    }
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 		    ArrayList preValuesSource = new ArrayList();

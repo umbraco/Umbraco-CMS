@@ -19,8 +19,7 @@ namespace umbraco.presentation
             EnsurePathExists("~/App_Code");
             EnsurePathExists("~/App_Data");
             EnsurePathExists(SystemDirectories.AppPlugins);
-            EnsurePathExists(SystemDirectories.Css);
-            EnsurePathExists(SystemDirectories.MacroScripts);
+            EnsurePathExists(SystemDirectories.Css);            
             EnsurePathExists(SystemDirectories.Masterpages);
             EnsurePathExists(SystemDirectories.Media);
             EnsurePathExists(SystemDirectories.Scripts);

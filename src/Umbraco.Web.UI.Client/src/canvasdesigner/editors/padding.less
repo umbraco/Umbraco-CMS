@@ -1,0 +1,45 @@
+﻿
+/************************************************************************/
+/* padding -ALIAS- */
+/************************************************************************/
+
+/***start-lessParam--ALIAS-***/
+@paddingvalue-ALIAS-:'';
+@leftpaddingvalue-ALIAS-:'';
+@rightpaddingvalue-ALIAS-:'';
+@toppaddingvalue-ALIAS-:'';
+@bottompaddingvalue-ALIAS-:'';
+/***end-lessParam--ALIAS-***/
+
+/***start-lessStyle--ALIAS-***/
+
+.all-ALIAS- () when  (isnumber(@paddingvalue-ALIAS-)) {
+    padding: @paddingvalue-ALIAS- + 0px;
+}
+
+.left-ALIAS- () when  (isnumber(@leftpaddingvalue-ALIAS-)) {
+    padding-left: @leftpaddingvalue-ALIAS- + 0px;
+}
+
+.right-ALIAS- () when (isnumber(@rightpaddingvalue-ALIAS-)) {
+    padding-right: @rightpaddingvalue-ALIAS- + 0px;
+}
+
+.top-ALIAS- () when (isnumber(@toppaddingvalue-ALIAS-)) {
+    padding-top: @toppaddingvalue-ALIAS- + 0px;
+}
+
+.bottom-ALIAS- () when (isnumber(@bottompaddingvalue-ALIAS-)) {
+    padding-bottom: @bottompaddingvalue-ALIAS- + 0px;
+}
+
+-SCHEMA- {
+    .all-ALIAS-;
+    .left-ALIAS-;
+    .right-ALIAS-;
+    .top-ALIAS-;
+    .bottom-ALIAS-;
+}
+/***end-lessStyle--ALIAS-***/ 
+
+

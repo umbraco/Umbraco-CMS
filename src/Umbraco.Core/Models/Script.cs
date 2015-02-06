@@ -28,7 +28,7 @@ namespace Umbraco.Core.Models
             _contentConfig = contentConfig;
             base.Path = path;
         }
-
+        
         /// <summary>
         /// Boolean indicating whether the file could be validated
         /// </summary>
@@ -37,6 +37,8 @@ namespace Umbraco.Core.Models
         /// but has been moved to the script file so the validation is central.
         /// </remarks>
         /// <returns>True if file is valid, otherwise false</returns>
+        //TODO: This makes no sense to be here, any validation methods should be at the service level,
+        // when we move Scripts to truly use IFileSystem, then this validation logic doesn't work anymore
         public override bool IsValid()
         {
             //NOTE Since a script file can be both JS, Razor Views, Razor Macros and Xslt

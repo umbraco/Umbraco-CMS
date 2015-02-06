@@ -42,6 +42,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
             }
 
+            //TODO: We need to fix this for SQL Azure since it does not let you drop any clustered indexes
+            // Issue: http://issues.umbraco.org/issue/U4-5673
+            // Some work around notes:
+            // http://stackoverflow.com/questions/15872347/alter-clustered-index-column    
+            // https://social.msdn.microsoft.com/Forums/azure/en-US/5cc4b302-fa42-4c62-956a-bbf79dbbd040/changing-clustered-index-in-azure?forum=ssdsgetstarted
+
             //we want to drop the umbracoUserLogins_Index index since it is named incorrectly and then re-create it so 
             // it follows the standard naming convention
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))

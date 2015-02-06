@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <language alias="de" intName="German" localName="Deutsch" lcid="7" culture="de-DE">
   <creator>
-    <name>The German Umbraco Community</name>
-    <link>http://umbraco.org</link>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Hostnamen verwalten</key>
@@ -370,8 +370,8 @@
     <key alias="databaseInstall">Klicken Sie auf &lt;strong&gt;Installieren&lt;/strong&gt;, um die Datenbank für Umbraco %0% einzurichten.</key>
     <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
     <key alias="databaseNotFound">&lt;p&gt;Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.&lt;/p&gt;
-&lt;p&gt;Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "umbracoDbDSN" hinzu und speichern Sie die Datei.&lt;/p&gt;
-&lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="http://our.umbraco.org/wiki" target="_blank"&gt;The umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.&lt;/p&gt;
+&lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="http://our.Umbraco.org/wiki" target="_blank"&gt;The Umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
 </key>
     <key alias="databaseText">Um diesen Schritt abzuschließen, müssen Sie die notwendigen Informationen zur Datenbankverbindung angeben.&lt;br /&gt;Bitte kontaktieren Sie Ihren Provider bzw. Server-Administrator für weitere Informationen.</key>
     <key alias="databaseUpgrade">
@@ -403,7 +403,7 @@
     <key alias="permissionsAlmostPerfect">&lt;strong&gt;Die Dateiberechtigungen sind fast perfekt eingestellt!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt;Damit können Sie Umbraco ohne Probleme verwenden, werden aber viele Erweiterungspakete können nicht installiert werden.</key>
     <key alias="permissionsHowtoResolve">Problemlösung</key>
     <key alias="permissionsHowtoResolveLink">Klicken Sie hier, um den technischen Artikel zu lesen</key>
-    <key alias="permissionsHowtoResolveText">Schauen Sie sich die &lt;strong&gt;Video-Lehrgänge&lt;/strong&gt; zum Thema Verzeichnisberechtigungen für umbraco an oder lesen Sie den technischen Artikel.</key>
+    <key alias="permissionsHowtoResolveText">Schauen Sie sich die &lt;strong&gt;Video-Lehrgänge&lt;/strong&gt; zum Thema Verzeichnisberechtigungen für Umbraco an oder lesen Sie den technischen Artikel.</key>
     <key alias="permissionsMaybeAnIssue">&lt;strong&gt;Die Dateiberechtigungen sind möglicherweise fehlerhaft!&lt;/strong&gt;Sie können Umbraco vermutlich ohne Probleme verwenden, werden aber viele Erweiterungspakete können nicht installiert werden.</key>
     <key alias="permissionsNotReady">&lt;strong&gt;Die Dateiberechtigungen sind nicht geeignet!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt;Die Dateiberechtigungen müssen angepasst werden.</key>
     <key alias="permissionsPerfect">&lt;strong&gt;Die Dateiberechtigungen sind perfekt eingestellt!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt; Damit ist Umbraco komplett eingerichtet und es können problemlos Erweiterungspakete installiert werden.</key>
@@ -414,7 +414,7 @@
     <key alias="runwayFromScratch">Ich möchte mit einem leeren System ohne Inhalte und Vorgaben starten</key>
     <key alias="runwayFromScratchText">
 	Die Website ist zur Zeit komplett leer und ohne Inhalte und Vorgaben zu Erstellung eigener Dokumenttypen und Vorlagen bereit. 
-	(&lt;a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
+	(&lt;a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
 	Sie können "Runway" auch jederzeit später installieren. Verwenden Sie hierzu den Punkt "Pakete" im Entwickler-Bereich.
   </key>
     <key alias="runwayHeader">Die Einrichtung von Umbraco ist abgeschlossen und das Content-Management-System steht bereit. Wie soll es weitergehen?</key>
@@ -428,8 +428,8 @@ Dies sind unsere empfohlenen Module. Schauen Sie sich die an, die Sie installier
     <key alias="runwaySimpleSiteText">
 &lt;p&gt;
 "Runway" ist eine einfache Website mit einfachen Dokumententypen und Vorlagen. Der Installer kann Runway automatisch einrichten, 
-aber es kann einfach verändert, erweitert oder entfernt werden. Es ist nicht zwingend notwendig und umbraco kann auch ohne Runway verwendet werden. 
-Runway bietet eine einfache Basis zum schnellen Start mit umbraco.
+aber es kann einfach verändert, erweitert oder entfernt werden. Es ist nicht zwingend notwendig und Umbraco kann auch ohne Runway verwendet werden. 
+Runway bietet eine einfache Basis zum schnellen Start mit Umbraco.
 Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die "Runway Modules" und Ihre Runway-Seite erweitern.
 &lt;/p&gt;
 &lt;small&gt;
@@ -447,7 +447,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="theEndBrowseSite">&lt;h3&gt;Zur neuen Seite&lt;/h3&gt;Sie haben Runway installiert, schauen Sie sich doch mal auf Ihrer Website um.</key>
     <key alias="theEndFurtherHelp">&lt;h3&gt;Weitere Hilfe und Informationen&lt;/h3&gt;Hilfe von unserer preisgekrönten Community, Dokumentation und kostenfreie Videos, wie Sie eine einfache Website erstellen, ein Packages nutzen und eine schnelle Einführung in alle Umbraco-Begriffe</key>
     <key alias="theEndHeader">Umbraco %0% wurde installiert und kann verwendet werden</key>
-    <key alias="theEndInstallFailed">Um die Installation abzuschließen, müssen Sie die &lt;strong&gt;"web.config"-Datei&lt;/strong&gt; von Hand anpassen und den AppSetting-Schlüssel &lt;strong&gt;umbracoConfigurationStatus&lt;/strong&gt; auf den Wert &lt;strong&gt;'%0%'&lt;/strong&gt; ändern.</key>
+    <key alias="theEndInstallFailed">Um die Installation abzuschließen, müssen Sie die &lt;strong&gt;"web.config"-Datei&lt;/strong&gt; von Hand anpassen und den AppSetting-Schlüssel &lt;strong&gt;UmbracoConfigurationStatus&lt;/strong&gt; auf den Wert &lt;strong&gt;'%0%'&lt;/strong&gt; ändern.</key>
     <key alias="theEndInstallSuccess">Sie können &lt;strong&gt;sofort starten&lt;/strong&gt;, in dem Sie auf "Umbraco starten" klicken.</key>
     <key alias="theEndOpenUmbraco">&lt;h3&gt;Umbraco starten&lt;/h3&gt;Um Ihre Website zu verwalten, öffnen Sie einfach den Administrationsbereich und beginnen Sie damit, Inhalte hinzuzufügen sowie Vorlagen und Stylesheets zu bearbeiten oder neue Funktionen einzurichten</key>
     <key alias="Unavailable">Verbindung zur Datenbank fehlgeschlagen.</key>
@@ -465,7 +465,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
-    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.org" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
     <key alias="greeting1">Einen wunderbaren Sonntag</key>
     <key alias="greeting6">Frohen freundlichen Freitag</key>
     <key alias="greeting5">Donnerwetter Donnerstag</key>
@@ -512,9 +512,9 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
 &lt;p&gt;die Aufgabe &lt;strong&gt;'%1%'&lt;/strong&gt; (von Benutzer '%3%') an der Seite &lt;a href="http://%4%/actions/preview.aspx?id=%5%"&gt;&lt;strong&gt;'%2%'&lt;/strong&gt;&lt;/a&gt; wurde ausgeführt.&lt;/p&gt;
 &lt;div style="margin: 8px 0; padding: 8px; display: block;"&gt;
 	&lt;br /&gt;
-	&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;VERÖFFENTLICHEN&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
-	&lt;a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;BEARBEITEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
-	&lt;a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/umbraco/actions/delete.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;LÖSCHEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt;
+	&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/Umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;VERÖFFENTLICHEN&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
+	&lt;a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/Umbraco/actions/editContent.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;BEARBEITEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
+	&lt;a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/Umbraco/actions/delete.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;LÖSCHEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt;
 	&lt;br /&gt;
 &lt;/div&gt;
 &lt;p&gt;
@@ -525,9 +525,9 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
  &lt;/p&gt;
 &lt;div style="margin: 8px 0; padding: 8px; display: block;"&gt;
 	&lt;br /&gt;
-	&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;VERÖFFENTLICHEN&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
-	&lt;a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;BEARBEITEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
-	&lt;a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/umbraco/actions/delete.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;LÖSCHEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt;
+	&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/Umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;VERÖFFENTLICHEN&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
+	&lt;a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/Umbraco/actions/editContent.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;BEARBEITEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
+	&lt;a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/Umbraco/actions/delete.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;LÖSCHEN&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt;
 	&lt;br /&gt;
 &lt;/div&gt;
 &lt;p&gt;Einen schönen Tag wünscht&lt;br /&gt;Ihr freundlicher Umbraco-Robot&lt;/p&gt;
@@ -779,9 +779,9 @@ Hallo %0%,
 
 das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
 
-Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/umbraco/translation/details.aspx?id=%4%.
+Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/Umbraco/translation/details.aspx?id=%4%.
 
-Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/umbraco/umbraco.aspx
+Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/Umbraco/Umbraco.aspx
 
 Einen schönen Tag wünscht
 Ihr freundlicher Umbraco-Robot

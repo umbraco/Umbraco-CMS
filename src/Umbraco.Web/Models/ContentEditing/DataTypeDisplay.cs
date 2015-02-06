@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents a data type that is being edited
     /// </summary>
     [DataContract(Name = "dataType", Namespace = "")]
-    public class DataTypeDisplay : EntityBasic, INotificationModel
+    public class DataTypeDisplay : DataTypeBasic, INotificationModel
     {
         public DataTypeDisplay()
         {
@@ -34,5 +34,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
+       
     }
 }

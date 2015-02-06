@@ -1,109 +1,163 @@
-<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController">
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController" class="usky-grid usky-grid-configuration">
+    <div style="width: 600px">
+        <div class="control-group uSky-templates">
 
-    <p><strong>Config file path:</strong></p>
-    <table cellpadding="20" style="margin-bottom:20px">
-        <tr>
-            <td>
-                <input ng-model="model.value.gridConfigPath" type="text" style="width:500px;">
-            </td>
-        </tr>
-    </table>
+            <h4><localize key="grid_gridLayouts"/></h4>
+            <p><localize key="grid_gridLayoutsDetail" /></p>
 
-   
-    <!--<p><strong>Allowed row settings:</strong></p>
-    <table cellpadding="20" style="margin-bottom:20px">
-        <tr>
-            <td>
-                <p><i class="icon icon-paint-roller"></i>&nbsp;Enable/Disable row background</p>
-                <input ng-model="model.value.enableBackground" type="checkbox">
-                <label for="">Enable</label>
-            </td>
-            <td>
-                <p><i class="icon icon-navigation-top"></i>&nbsp;Enable/Disable top margin</p>
-                <input ng-model="model.value.enableSkipTopMargin" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultSkipTopMargin" type="checkbox">
-                <label for="">Default value</label>
-            </td>
-            <td>
-                <p><i class="icon icon-navigation-bottom"></i>&nbsp;Enable/Disable bottom margin</p>
-                <input ng-model="model.value.enableSkipBottomMargin" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultSkipBottomMargin" type="checkbox">
-                <label for="">Default value</label>
+            <ul class="unstyled"
+                ui-sortable
+                ng-model="model.value.templates">
 
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p><i class="icon icon-navigation-first"></i>&nbsp;Enable/Disable left margin</p>
-                <input ng-model="model.value.enableSkipLeftMargin" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultSkipLeftMargin" type="checkbox">
-                <label for="">Default value</label>
-            </td>
-            <td>
-                <p><i class="icon icon-navigation-last"></i>&nbsp;Enable/Disable right margin</p>
-                <input ng-model="model.value.enableSkipRightMargin" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultSkipRightMargin" type="checkbox">
-                <label for="">Default value</label>
-            </td>
-            <td>
-                <p><i class="icon icon-fullscreen"></i>&nbsp;Enable/Disable control margin</p>
-                <input ng-model="model.value.enableSkipControlMargin" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultSkipControlMargin" type="checkbox">
-                <label for="">Default value</label>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p><i class="icon icon-width"></i>&nbsp;Enable/Disable full screen</p>
-                <input ng-model="model.value.enableFullScreen" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultFullScreen" type="checkbox">
-                <label for="">Default value</label>
-            </td>
-            <td>
-                <p><i class="icon icon-frame"></i>&nbsp;Enable/Disable boxed</p>
-                <input ng-model="model.value.enableBoxed" type="checkbox">
-                <label for="">Enable</label>
-                <br />
-                <input ng-model="model.value.defaultBoxed" type="checkbox">
-                <label for="">Default value</label>
-            </td>
-        </tr>
-    </table>-->
+                <li ng-repeat="template in model.value.templates">
 
-    <!--<p><strong>Allowed editors:</strong></p>
-    <table cellpadding="20" style="margin-bottom:20px">
-        <tr>
-            <td>
-                <p ng-repeat="editor in editors">
-                    <input type="checkbox" 
-                        checklist-model="model.value.enabledEditors" 
-                        checklist-value="editor.alias">
-                        &nbsp;<i class="icon {{editor.icon}}"></i>&nbsp; {{editor.name}}
-                </p>
-            </td>
-        </tr>
-    </table>-->
+                    <div ng-click="configureTemplate(template)"
+                        class="preview-rows layout" style="margin-top: 5px; margin-bottom: 20px; float:left">
 
-    <p><strong>Others settings:</strong></p>
-    <table cellpadding="20" style="margin-bottom:20px">
-        <tr>
-            <td>
-                <p><input ng-model="model.value.enableMultiCells" type="checkbox">&nbsp;<i class="icon icon-edit"></i>&nbsp;Multiple controls in cell</p>
-                <!--<p>Approved background stylesheet path:&nbsp;<input ng-model="model.value.approvedBackgroundCss" type="text" style="width:300px;"></p>-->
-            </td>
-        </tr>
-    </table>
+                        <div class="preview-row">
+                            <div class="preview-col"
+                                ng-class="{last:$last}"
+                                ng-repeat="section in template.sections | filter:zeroWidthFilter"
+                                ng-style="{width: percentage(section.grid) + '%', height: '60px'}">
+                                <div class="preview-cell"></div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div>
+                        {{template.name}} <br/>
+                        <i class="icon-delete red"></i>
+                        <a class="btn btn-small btn-link"
+                           href
+                           ng-click="deleteTemplate($index)"><localize key="general_delete" /></a>
+                    </div>
+
+                    <br style="clear: both"
+                </li>
+            </ul>
+
+            <button class="btn btn-small"
+                    prevent-default
+                    ng-click="configureTemplate()">
+                    <i class="icon-add"></i> <localize key="grid_addGridLayout" />
+            </button>
+        </div>
+    </div>
+    <div style="max-width: 600px">
+
+        <div class="control-group uSky-templates">
+
+            <h4><localize key="grid_rowConfigurations" /></h4>
+            <p><localize key="grid_rowConfigurationsDetail" /></p>
+
+            <div class="control-group uSky-templates-rows">
+                <ul class="unstyled"
+                    ui-sortable
+                    ng-model="model.value.layouts">
+
+                    <li ng-repeat="layout in model.value.layouts">
+
+                        <div ng-click="configureLayout(layout)"
+                            class="preview-rows columns" style="margin-top: 5px; margin-bottom: 25px; float:left">
+
+                            <div class="preview-row">
+                                <div class="preview-col"
+                                    ng-class="{last:$last}"
+                                    ng-repeat="area in layout.areas | filter:zeroWidthFilter"
+                                    ng-style="{width: percentage(area.grid) + '%'}">
+
+                                    <div class="preview-cell"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            {{layout.name}}<br />
+                            <i class="icon-delete red"></i>
+                            <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)">
+                                <localize key="general_delete" />
+                            </a>
+                        </div>
+
+                        <br style="clear: both" />
+                    </li>
+                </ul>
+
+                <button class="btn btn-small" prevent-default ng-click="configureLayout()">
+                        <i class="icon-add"></i> <localize key="grid_addRowConfiguration" />
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <div style="max-width: 600px">
+
+        <umb-control-group
+            label="@grid_columns"
+            description="@grid_columnsDetails">
+                <input type="text" class="" ng-model="model.value.columns" />
+        </umb-control-group>
+
+        <umb-control-group
+            label="@grid_settings"
+            description="@grid_settingsDetails">
+
+            <ul class="unstyled list-icons umb-contentpicker"
+                ui-sortable
+                ng-model="model.config">
+
+                <li ng-repeat="configValue in model.value.config">
+                    <i class="icon icon-navigation handle"></i>
+
+                    <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
+                        <i class="icon icon-delete red hover-show"></i>
+                        <i class="icon-settings-alt-2 hover-hide"></i>
+                        {{configValue.label}}
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="unstyled list-icons">
+                <li>
+                    <i class="icon icon-add blue"></i>
+
+                    <a href="#" ng-click="editConfig()" prevent-default>
+                        <localize key="general_edit" />
+                    </a>
+                </li>
+            </ul>
+        </umb-control-group>
+
+
+
+        <umb-control-group label="@grid_styles"  description="@grid_stylesDetails">
+            <ul class="unstyled list-icons  umb-contentpicker"
+                ui-sortable
+                ng-model="model.value.styles">
+
+                <li ng-repeat="style in model.value.styles">
+                    <i class="icon icon-navigation handle"></i>
+
+                    <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
+                        <i class="icon icon-delete red hover-show"></i>
+                        <i class="icon-brush hover-hide"></i>
+                        {{style.label}}
+                    </a>
+
+                </li>
+            </ul>
+
+            <ul class="unstyled list-icons">
+                <li>
+                    <i class="icon icon-add blue"></i>
+                    <a href="#" ng-click="editStyles()" prevent-default>
+                        <localize key="general_edit" />
+                    </a>
+                </li>
+            </ul>
+        </umb-control-group>
+    </div>
 </div>

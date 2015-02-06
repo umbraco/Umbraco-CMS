@@ -171,6 +171,7 @@ input[type="button"] {
 .btn-primary {
   .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
 }
+
 // Warning appears are orange
 .btn-warning {
   .buttonBackground(@btnWarningBackground, @btnWarningBackgroundHighlight);
@@ -207,6 +208,20 @@ input[type="button"] {
     .opacity(65);
   }
 
+}
+
+.btn-install {
+    margin: 40px auto;
+    display: block;
+    padding: 15px 50px;
+    font-size: 16px;
+    border: none;
+    background: @blue;
+    color: white;
+
+        &:hover {
+            background: #2b8ee3;
+		}
 }
 
 // Cross-browser Jank

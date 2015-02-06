@@ -1,38 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public class TaggedEntity
-    {
-        public TaggedEntity(int entityId, IEnumerable<TaggedProperty> taggedProperties)
-        {
-            EntityId = entityId;
-            TaggedProperties = taggedProperties;
-        }
-
-        public int EntityId { get; private set; }
-        public IEnumerable<TaggedProperty> TaggedProperties { get; private set; }
-    }
-
-    public class TaggedProperty
-    {
-        public TaggedProperty(int propertyTypeId, string propertyTypeAlias, IEnumerable<Tag> tags)
-        {
-            PropertyTypeId = propertyTypeId;
-            PropertyTypeAlias = propertyTypeAlias;
-            Tags = tags;
-        }
-
-        public int PropertyTypeId { get; private set; }
-        public string PropertyTypeAlias { get; private set; }
-        public IEnumerable<Tag> Tags { get; private set; }
-    }
-
     [Serializable]
     [DataContract(IsReference = true)]
     public class Tag : Entity, ITag
@@ -43,9 +16,15 @@ namespace Umbraco.Core.Models
 
         public Tag(int id, string text, string @group)
         {
+            Id = id;
             Text = text;
             Group = @group;
-            Id = id;
+        }
+
+        public Tag(int id, string text, string @group, int nodeCount)
+            : this(id, text, @group)
+        {
+            NodeCount = nodeCount;            
         }
 
         private static readonly PropertyInfo TextSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
@@ -78,6 +57,8 @@ namespace Umbraco.Core.Models
                 }, _group, GroupSelector);
             }
         }
+
+        public int NodeCount { get; internal set; }
 
         //TODO: enable this at some stage
         //public int ParentId { get; set; }

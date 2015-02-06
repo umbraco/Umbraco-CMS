@@ -1,0 +1,35 @@
+<form name="gridConfigEditor">
+    <div class="umb-panel" ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController.Dialogs.EditConfig">
+
+        <div class="umb-panel-body no-header with-footer compact">
+
+            <umb-pane>
+                <h4>{{renderModel.name}}</h4>
+                <p>Settings will only save if the entered json configuration is valid</p>
+                <textarea name="configSource"
+                    validate-on="'blur'"
+                    rows="20" class="umb-editor umb-textarea"
+                    umb-raw-model="renderModel.config"></textarea>
+
+                <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
+                    This configuration is not valid json, and will not be saved.
+                </div>
+            </umb-pane>
+        </div>
+
+
+        <div class="umb-panel-footer">
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="btn-toolbar umb-btn-toolbar pull-right">
+                    <a href ng-click="close()" class="btn btn-link">
+                         <localize key="general_cancel">Cancel</localize>
+                    </a>
+
+                    <a href ng-click="saveAndClose(gridConfigEditor.$valid)" class="btn btn-primary">
+                        <localize key="buttons_save">Save</localize>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

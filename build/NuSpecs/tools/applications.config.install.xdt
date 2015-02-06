@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<applications xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <add alias="content" icon="traycontent" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon)" />
+  <add alias="media" icon="traymedia" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon)" />
+  <add alias="settings" icon="traysettings" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon)" />
+  <add alias="developer" icon="traydeveloper" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon)" />
+  <add alias="users" icon="trayusers" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon)" />
+  <add alias="member" icon="traymember" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon)" />
+  <add alias="forms" name="Forms" icon="icon-umb-contour" sortOrder="6" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing" />
+  <add alias="translation" icon="traytranslation" sortOrder="7" xdt:Locator="Match(alias)" xdt:Transform="SetAttributes(icon,sortOrder)" />
+</applications>

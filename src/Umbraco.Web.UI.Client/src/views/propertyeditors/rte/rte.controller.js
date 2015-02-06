@@ -4,6 +4,29 @@ angular.module("umbraco")
 
         $scope.isLoading = true;
 
+        //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
+        // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
+        // we have this mini content editor panel that can be launched with MNTP.
+        var d = new Date();
+        var n = d.getTime();
+        $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
+
+        var alreadyDirty = false;
+        function syncContent(editor){
+            editor.save();
+            angularHelper.safeApply($scope, function () {
+                $scope.model.value = editor.getContent();
+            });
+
+            if (!alreadyDirty) {
+                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+                // the angular bits because tinymce replaces the textarea.
+                var currForm = angularHelper.getCurrentForm($scope);
+                currForm.$setDirty();
+                alreadyDirty = true;
+            }
+        }
+
         tinyMceService.configuration().then(function (tinyMceConfig) {
 
             //config value from general tinymce.config file
@@ -30,6 +53,9 @@ angular.module("umbraco")
             var stylesheets = [];
             var styleFormats = [];
             var await = [];
+            if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
+                editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
+            }
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
@@ -80,6 +106,7 @@ angular.module("umbraco")
                     statusbar: false,
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
+                    maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets.join(','),
                     relative_urls: false,
@@ -92,7 +119,7 @@ angular.module("umbraco")
                 }
 
                 //set all the things that user configs should not be able to override
-                baseLineConfigObj.elements = $scope.model.alias + "_rte";
+                baseLineConfigObj.elements = $scope.textAreaHtmlId; //this is the exact textarea id to replace!
                 baseLineConfigObj.setup = function (editor) {
 
                     //set the reference
@@ -143,27 +170,18 @@ angular.module("umbraco")
 
                     //when buttons modify content
                     editor.on('ExecCommand', function (e) {
-                        editor.save();
-                        angularHelper.safeApply($scope, function () {
-                            $scope.model.value = editor.getContent();
-                        });
+                        syncContent(editor);
                     });
 
                     // Update model on keypress
                     editor.on('KeyUp', function (e) {
-                        editor.save();
-                        angularHelper.safeApply($scope, function () {
-                            $scope.model.value = editor.getContent();
-                        });
+                        syncContent(editor);
                     });
 
                     // Update model on change, i.e. copy/pasted text, plugins altering content
                     editor.on('SetContent', function (e) {
                         if (!e.initial) {
-                            editor.save();
-                            angularHelper.safeApply($scope, function () {
-                                $scope.model.value = editor.getContent();
-                            });
+                            syncContent(editor);
                         }
                     });
 
@@ -173,6 +191,8 @@ angular.module("umbraco")
                         var srcAttr = $(e.target).attr("src");
                         var path = srcAttr.split("?")[0];
                         $(e.target).attr("data-mce-src", path + qs);
+
+                        syncContent(editor);
                     });
 
 

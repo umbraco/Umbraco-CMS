@@ -146,6 +146,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DictionaryItem)entity).AddingEntity();
 
+            foreach (var translation in entity.Translations)
+                translation.Value = translation.Value.ToValidXmlString();
+
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);
 
@@ -160,12 +163,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 translation.Key = entity.Key;
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IDictionaryItem entity)
         {
             ((Entity)entity).UpdatingEntity();
+
+            foreach (var translation in entity.Translations)
+                translation.Value = translation.Value.ToValidXmlString();
 
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);
@@ -187,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)

@@ -2,7 +2,7 @@
 <language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://umbraco.org/documentation/language-files</link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">호스트명 관리</key>
@@ -119,7 +119,7 @@
   <area alias="dashboard">
     <key alias="browser">브라우저에서 보기</key>
     <key alias="dontShowAgain">TRANSLATE ME: '- Hide'</key>
-    <key alias="nothinghappens">umbraco 가 열리지 않으면, 이 사이트의 팝업을 허용하여야 합니다</key>
+    <key alias="nothinghappens">Umbraco 가 열리지 않으면, 이 사이트의 팝업을 허용하여야 합니다</key>
     <key alias="openinnew">새로운 창으로 열렸습니다</key>
     <key alias="restart">재시작</key>
     <key alias="visit">방문</key>
@@ -342,9 +342,9 @@
     <key alias="databaseInstall"><![CDATA[<strong>설치</strong> 버튼을 누르면 Umbraco %0% 데이터베이스가 설치됩니다.]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% 가 데이터베이스에 복사되었습니다. 계속하시려면 <strong>다음</strong>을 누르세요.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>데이터베이스를 찾을 수 없습니다. “web.config”파일의 "connection string"이 바르게 설정되었는지 확인하세요.</p>
-            <p>"web.config" 파일에 맨아래에 ,키네임을 "umbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
+            <p>"web.config" 파일에 맨아래에 ,키네임을 "UmbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
             <p>
-            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 		               web.config의 더많은 정보는 여기에 있습니다.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[이과정을 위해선, 당신의 DB서버 정보에 대해서 알고 계셔야합니다.("connection string").<br />
       필요하시다면 사용하시는 ISP쪽에 문의하시기 바랍니다..
@@ -358,17 +358,17 @@
     <key alias="defaultUserPasswordChanged">비밀번호가 변경되었습니다!</key>
     <key alias="defaultUserText"><![CDATA[
       <p>
-        umbraco 는 로긴을 위한 기본 <strong>('admin')</strong> 사용자를 만들고 암호를 <strong>('default')</strong>로 설정합니다. 암호를 <strong>꼭</strong>변경하셔야 합니다.
+        Umbraco 는 로긴을 위한 기본 <strong>('admin')</strong> 사용자를 만들고 암호를 <strong>('default')</strong>로 설정합니다. 암호를 <strong>꼭</strong>변경하셔야 합니다.
       </p>
       <p>
         이 과정은 기본 사용자의 암호를 체크하고 변경이 필요한 부분을 제안합니다.
       </p>
     ]]></key>
     <key alias="greatStart">편리한 시작을 위해, 소개 Video를 시청하세요</key>
-    <key alias="licenseText">다음버튼을 누르시면 (또는Web.config에 umbracoConfigurationStatus를 수정하시면), 여러분은 아래에 명시된 소프트웨어 라이센스를 수락합니다. Umbraco 배포는 2가지 다른 라이센스로 구성되어 있습니다. 프레임워크에는 오픈소스 MIT라이센스가 UI에는 Umbraco 프리웨어 라이센스가 적용됩니다.</key>
+    <key alias="licenseText">다음버튼을 누르시면 (또는Web.config에 UmbracoConfigurationStatus를 수정하시면), 여러분은 아래에 명시된 소프트웨어 라이센스를 수락합니다. Umbraco 배포는 2가지 다른 라이센스로 구성되어 있습니다. 프레임워크에는 오픈소스 MIT라이센스가 UI에는 Umbraco 프리웨어 라이센스가 적용됩니다.</key>
     <key alias="None">아직 설치되지 않았습니다.</key>
     <key alias="permissionsAffectedFolders">영향받는 파일과 폴더</key>
-    <key alias="permissionsAffectedFoldersMoreInfo">umbraco권한관리을 위해 더정보가 필요하시면 여기를 누르세요</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Umbraco권한관리을 위해 더정보가 필요하시면 여기를 누르세요</key>
     <key alias="permissionsAffectedFoldersText">다음 파일/폴더에 ASP.NET 수정권한이 필요합니다.</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>권한 설정이 대부분 완벽합니다!</strong><br /><br />
       여러분은 문제없이 Umbraco사용이 가능하지만 일부 추천 패키지가 설치되지 않을 수 있습니다.]]></key>
@@ -390,7 +390,7 @@
     <key alias="runwayFromScratch">scratch를 시작하기 원합니다.</key>
     <key alias="runwayFromScratchText"><![CDATA[
       사이트가 완전히 비어있는 상태입니다. 스크래치를 시작하시거나 문서유형, 템플릿을 만드시기에 완벽한 상태입니다. 
-      (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+      (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
       Runway설치를 나중에 실행하실 수 있습니다. 개발도구 부분에서 패키지를 선택하세요.
     ]]></key>
     <key alias="runwayHeader">여러분은 Umbraco 플랫폼 설치를 완료하였습니다. 다음엔 어떤 작업을 원하십니까?</key>
@@ -425,7 +425,7 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>고급 도움말과 정보</h3>
      우수 커뮤니티에서 도음을 받으세요. 간단한 사이트제작이나 패키지 사용법, Umbraco기술의 퀵가이드를 제공하는 문서를 보시거나 무료 비디오를 시청하세요.]]></key>
     <key alias="theEndHeader">Umbraco %0% 가 설치되어 사용준비가 되었습니다.</key>
-    <key alias="theEndInstallFailed"><![CDATA[설치를 마치기 위해, <strong>/web.config file</strong>을 수동으로 편집해야 합니다. AppSetting 키의 <strong>umbracoConfigurationStatus</strong> 를 <strong>'%0%'</strong>의 값으로 설정하세요.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[설치를 마치기 위해, <strong>/web.config file</strong>을 수동으로 편집해야 합니다. AppSetting 키의 <strong>UmbracoConfigurationStatus</strong> 를 <strong>'%0%'</strong>의 값으로 설정하세요.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[<strong>Umbraco 와 첫만남</strong>이시면 <br />아래의 "Umbraco 접속하기" 버튼을 클릭하여 <strong>즉시 시작</strong>하실 수 있습니다. 
     시작페이지에서 풍부한 리소소를 제공받을 수 있습니다.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbraco 실행</h3>
@@ -447,8 +447,8 @@
     <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="topText">umbraco 에 오신것을 환영합니다. 사용자명과 비밀번호를 입력하십시오:</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="topText">Umbraco 에 오신것을 환영합니다. 사용자명과 비밀번호를 입력하십시오:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">대시보드</key>
@@ -512,7 +512,7 @@
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[
     사용하시는 PC에서 패키지를 선택하세요<br />
-       umbraco 패키지는 보통 ".umb" 나 ".zip" 확장자를 가집니다.
+       Umbraco 패키지는 보통 ".umb" 나 ".zip" 확장자를 가집니다.
     ]]></key>
     <key alias="packageAuthor">저자</key>
     <key alias="packageDemonstration">데모</key>

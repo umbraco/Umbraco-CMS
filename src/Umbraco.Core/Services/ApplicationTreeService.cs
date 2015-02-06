@@ -8,6 +8,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Cache;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Services
@@ -15,15 +16,18 @@ namespace Umbraco.Core.Services
     internal class ApplicationTreeService : IApplicationTreeService
     {
         private readonly CacheHelper _cache;
+        private IEnumerable<ApplicationTree> _allAvailableTrees;
+        private volatile bool _isInitialized = false;
+        internal const string TreeConfigFileName = "trees.config";
+        private static string _treeConfig;
+        private static readonly object Locker = new object();
 
         public ApplicationTreeService(CacheHelper cache)
         {
             _cache = cache;
         }
 
-        internal const string TreeConfigFileName = "trees.config";
-        private static string _treeConfig;
-        private static readonly object Locker = new object();
+        
 
         /// <summary>
         /// gets/sets the trees.config file path
@@ -45,74 +49,101 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// The cache storage for all application trees
+        /// The main entry point to get application trees
         /// </summary>
+        /// <remarks>
+        /// This lazily on first access will scan for plugin trees and ensure the trees.config is up-to-date with the plugins. If plugins
+        /// haven't changed on disk then the file will not be saved. The trees are all then loaded from this config file into cache and returned.
+        /// </remarks>
         private List<ApplicationTree> GetAppTrees()
         {
-            return _cache.GetCacheItem(
+            return _cache.RuntimeCache.GetCacheItem<List<ApplicationTree>>(
                 CacheKeys.ApplicationTreeCacheKey,
                 () =>
+                {
+                    var list = ReadFromXmlAndSort();
+
+                    //On first access we need to do some initialization
+                    if (_isInitialized == false)
                     {
-                        var list = new List<ApplicationTree>();
-
-                        LoadXml(doc =>
+                        lock (Locker)
+                        {
+                            if (_isInitialized == false)
                             {
-                                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                                    {
-                                        var sortOrderAttr = x.Attribute("sortOrder");
-                                        return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                                    }))
+                                //now we can check the non-volatile flag
+                                if (_allAvailableTrees != null)
                                 {
-                                    var applicationAlias = (string) addElement.Attribute("application");
-                                    var type = (string) addElement.Attribute("type");
-                                    var assembly = (string) addElement.Attribute("assembly");
+                                    var hasChanges = false;
 
-                                    var clrType = Type.GetType(type);
-                                    if (clrType == null)
+                                    LoadXml(doc =>
                                     {
-                                        LogHelper.Warn<ApplicationTreeService>("The tree definition: " + addElement.ToString() + " could not be resolved to a .Net object type");
-                                        continue;
-                                    }
+                                        //Now, load in the xml structure and update it with anything that is not declared there and save the file.
 
-                                    //check if the tree definition (applicationAlias + type + assembly) is already in the list
+                                        //NOTE: On the first iteration here, it will lazily scan all trees, etc... this is because this ienumerable is lazy
+                                        // based on the ApplicationTreeRegistrar - and as noted there this is not an ideal way to do things but were stuck like this
+                                        // currently because of the legacy assemblies and types not in the Core.
 
-                                    if (list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias) && tree.GetRuntimeType() == clrType) == false)
+                                        //Get all the trees not registered in the config
+                                        var unregistered = _allAvailableTrees
+                                            .Where(x => list.Any(l => l.Alias == x.Alias) == false)
+                                            .ToArray();
+
+                                        hasChanges = unregistered.Any();
+
+                                        if (hasChanges == false) return false;
+
+                                        //add the unregistered ones to the list and re-save the file if any changes were found
+                                        var count = 0;
+                                        foreach (var tree in unregistered)
+                                        {
+                                            doc.Root.Add(new XElement("add",
+                                                new XAttribute("initialize", tree.Initialize),
+                                                new XAttribute("sortOrder", tree.SortOrder),
+                                                new XAttribute("alias", tree.Alias),
+                                                new XAttribute("application", tree.ApplicationAlias),
+                                                new XAttribute("title", tree.Title),
+                                                new XAttribute("iconClosed", tree.IconClosed),
+                                                new XAttribute("iconOpen", tree.IconOpened),
+                                                new XAttribute("type", tree.Type)));
+                                            count++;
+                                        }
+
+                                        //don't save if there's no changes
+                                        return count > 0;
+                                    }, true);
+
+                                    if (hasChanges)
                                     {
-                                        list.Add(new ApplicationTree(
-                                                     addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),
-                                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte) 0,
-                                                     addElement.Attribute("application").Value,
-                                                     addElement.Attribute("alias").Value,
-                                                     addElement.Attribute("title").Value,
-                                                     addElement.Attribute("iconClosed").Value,
-                                                     addElement.Attribute("iconOpen").Value,
-                                                     addElement.Attribute("type").Value));
+                                        //If there were changes, we need to re-read the structures from the XML
+                                        list = ReadFromXmlAndSort();
                                     }
                                 }
-                            }, false);
 
-                        return list;
-                    });
+                                _isInitialized = true;
+                            }
+                        }
+                    }
+
+
+                    return list;
+
+
+                });
         }
 
-        public void Intitialize(IEnumerable<ApplicationTree> existingTrees)
+        /// <summary>
+        /// Initializes the service with any trees found in plugins
+        /// </summary>
+        /// <param name="allAvailableTrees">
+        /// A collection of all available tree found in assemblies in the application
+        /// </param>
+        /// <remarks>
+        /// This will update the trees.config with the found tree plugins that are not currently listed in the file when the first
+        /// access is made to resolve the tree collection
+        /// </remarks>
+        public void Intitialize(IEnumerable<ApplicationTree> allAvailableTrees)
         {
-            LoadXml(doc =>
-            {
-                foreach (var tree in existingTrees)
-                {
-                    doc.Root.Add(new XElement("add",
-                                              new XAttribute("initialize", tree.Initialize),
-                                              new XAttribute("sortOrder", tree.SortOrder),
-                                              new XAttribute("alias", tree.Alias),
-                                              new XAttribute("application", tree.ApplicationAlias),
-                                              new XAttribute("title", tree.Title),
-                                              new XAttribute("iconClosed", tree.IconClosed),
-                                              new XAttribute("iconOpen", tree.IconOpened),
-                                              new XAttribute("type", tree.Type)));
-                }
-
-            }, true);
+            _allAvailableTrees = allAvailableTrees;
         }
 
         /// <summary>
@@ -134,16 +165,19 @@ namespace Umbraco.Core.Services
 
                 if (el == null)
                 {
-                doc.Root.Add(new XElement("add",
-                    new XAttribute("initialize", initialize),
-                    new XAttribute("sortOrder", sortOrder),
-                    new XAttribute("alias", alias),
-                    new XAttribute("application", applicationAlias),
-                    new XAttribute("title", title),
-                    new XAttribute("iconClosed", iconClosed),
-                    new XAttribute("iconOpen", iconOpened),
-                    new XAttribute("type", type)));
+                    doc.Root.Add(new XElement("add",
+                        new XAttribute("initialize", initialize),
+                        new XAttribute("sortOrder", sortOrder),
+                        new XAttribute("alias", alias),
+                        new XAttribute("application", applicationAlias),
+                        new XAttribute("title", title),
+                        new XAttribute("iconClosed", iconClosed),
+                        new XAttribute("iconOpen", iconOpened),
+                        new XAttribute("type", type)));
                 }
+
+                return true;
+
             }, true);
 
             OnNew(new ApplicationTree(initialize, sortOrder, applicationAlias, alias, title, iconClosed, iconOpened, type), new EventArgs());
@@ -161,7 +195,7 @@ namespace Umbraco.Core.Services
                 if (el != null)
                 {
                     el.RemoveAttributes();
-                    
+
                     el.Add(new XAttribute("initialize", tree.Initialize));
                     el.Add(new XAttribute("sortOrder", tree.SortOrder));
                     el.Add(new XAttribute("alias", tree.Alias));
@@ -172,6 +206,8 @@ namespace Umbraco.Core.Services
                     el.Add(new XAttribute("type", tree.Type));
                 }
 
+                return true;
+
             }, true);
 
             OnUpdated(tree, new EventArgs());
@@ -181,11 +217,16 @@ namespace Umbraco.Core.Services
         /// Deletes this instance.
         /// </summary>
         public void DeleteTree(ApplicationTree tree)
-        {            
+        {
             LoadXml(doc =>
             {
-                doc.Root.Elements("add").Where(x => x.Attribute("application") != null && x.Attribute("application").Value == tree.ApplicationAlias &&
-                x.Attribute("alias") != null && x.Attribute("alias").Value == tree.Alias).Remove();
+                doc.Root.Elements("add")
+                    .Where(x => x.Attribute("application") != null
+                                && x.Attribute("application").Value == tree.ApplicationAlias
+                                && x.Attribute("alias") != null && x.Attribute("alias").Value == tree.Alias).Remove();
+
+                return true;
+
             }, true);
 
             OnDeleted(tree, new EventArgs());
@@ -231,31 +272,44 @@ namespace Umbraco.Core.Services
         {
             var list = GetAppTrees().FindAll(
                 t =>
-                    {
-                        if (onlyInitialized)
-                            return (t.ApplicationAlias == applicationAlias && t.Initialize);
-                        return (t.ApplicationAlias == applicationAlias);
-                    }
+                {
+                    if (onlyInitialized)
+                        return (t.ApplicationAlias == applicationAlias && t.Initialize);
+                    return (t.ApplicationAlias == applicationAlias);
+                }
                 );
 
             return list.OrderBy(x => x.SortOrder).ToArray();
         }
 
-        internal void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
+        /// <summary>
+        /// Loads in the xml structure from disk if one is found, otherwise loads in an empty xml structure, calls the 
+        /// callback with the xml document and saves the structure back to disk if saveAfterCallback is true.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="saveAfterCallbackIfChanges"></param>
+        internal void LoadXml(Func<XDocument, bool> callback, bool saveAfterCallbackIfChanges)
         {
             lock (Locker)
             {
                 var doc = File.Exists(TreeConfigFilePath)
                     ? XDocument.Load(TreeConfigFilePath)
                     : XDocument.Parse("<?xml version=\"1.0\"?><trees />");
+
                 if (doc.Root != null)
                 {
-                    callback.Invoke(doc);
+                    var hasChanges = callback.Invoke(doc);
 
-                    if (saveAfterCallback)
+                    if (saveAfterCallbackIfChanges && hasChanges
+                        //Don't save it if it is empty, in some very rare cases if the app domain get's killed in the middle of this process 
+                        // in some insane way the file saved will be empty. I'm pretty sure it's not actually anything to do with the xml doc and
+                        // more about the IO trying to save the XML doc, but it doesn't hurt to check.
+                        && doc.Root != null && doc.Root.Elements().Any())
                     {
+                        //ensures the folder exists
                         Directory.CreateDirectory(Path.GetDirectoryName(TreeConfigFilePath));
 
+                        //saves it
                         doc.Save(TreeConfigFilePath);
 
                         //remove the cache now that it has changed  SD: I'm leaving this here even though it
@@ -265,6 +319,54 @@ namespace Umbraco.Core.Services
                 }
             }
         }
+
+        private List<ApplicationTree> ReadFromXmlAndSort()
+        {
+            var list = new List<ApplicationTree>();
+
+            //read in the xml file containing trees and convert them all to ApplicationTree instances
+            LoadXml(doc =>
+            {
+                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                {
+                    var sortOrderAttr = x.Attribute("sortOrder");
+                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                }))
+                {
+                    var applicationAlias = (string)addElement.Attribute("application");
+                    var type = (string)addElement.Attribute("type");
+                    var assembly = (string)addElement.Attribute("assembly");
+
+                    var clrType = Type.GetType(type);
+                    if (clrType == null)
+                    {
+                        LogHelper.Warn<ApplicationTreeService>("The tree definition: " + addElement.ToString() + " could not be resolved to a .Net object type");
+                        continue;
+                    }
+
+                    //check if the tree definition (applicationAlias + type + assembly) is already in the list
+
+                    if (list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias) && tree.GetRuntimeType() == clrType) == false)
+                    {
+                        list.Add(new ApplicationTree(
+                                     addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),
+                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
+                                     addElement.Attribute("application").Value,
+                                     addElement.Attribute("alias").Value,
+                                     addElement.Attribute("title").Value,
+                                     addElement.Attribute("iconClosed").Value,
+                                     addElement.Attribute("iconOpen").Value,
+                                     addElement.Attribute("type").Value));
+                    }
+                }
+
+                return false;
+
+            }, false);
+
+            return list;
+        }
+
 
         internal static event TypedEventHandler<ApplicationTree, EventArgs> Deleted;
         private static void OnDeleted(ApplicationTree app, EventArgs args)

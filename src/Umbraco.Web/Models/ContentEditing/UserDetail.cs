@@ -31,6 +31,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "remainingAuthSeconds")]
         public double SecondsUntilTimeout { get; set; }
 
+        [DataMember(Name = "startContentId")]
+        public int StartContentId { get; set; }
+
+        [DataMember(Name = "startMediaId")]
+        public int StartMediaId { get; set; }
+
         /// <summary>
         /// A list of sections the user is allowed to view.
         /// </summary>

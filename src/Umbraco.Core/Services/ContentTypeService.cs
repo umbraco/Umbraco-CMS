@@ -47,6 +47,18 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets all property type aliases.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllPropertyTypeAliases()
+        {
+            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAllPropertyTypeAliases();
+            }
+        }
+
+        /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
         /// </summary>
         /// <param name="original">

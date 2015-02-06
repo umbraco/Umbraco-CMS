@@ -14,6 +14,12 @@ namespace Umbraco.Core.Models.EntityBase
     [DataContract(IsReference = true)]
     public abstract class TracksChangesEntityBase : IRememberBeingDirty
     {
+        //TODO: This needs to go on to ICanBeDirty http://issues.umbraco.org/issue/U4-5662
+        public virtual IEnumerable<string> GetDirtyProperties()
+        {
+            return _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
+        } 
+
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
@@ -139,11 +145,12 @@ namespace Umbraco.Core.Models.EntityBase
         /// save a document type, nearly all properties are flagged as dirty just because we've 'reset' them, but they are all set 
         /// to the same value, so it's really not dirty.
         /// </remarks>
-        internal bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector)
+        internal virtual bool SetPropertyValueAndDetectChanges<T>(Func<T, T> setValue, T value, PropertyInfo propertySelector)
         {
             var initVal = value;
             var newVal = setValue(value);
-            if (!Equals(initVal, newVal))
+
+            if (Equals(initVal, newVal) == false)
             {
                 OnPropertyChanged(propertySelector);
                 return true;

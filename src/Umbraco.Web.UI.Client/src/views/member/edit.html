@@ -11,6 +11,9 @@
                placeholder="@placeholders_entername"
                ng-model="content.name"/>
             </div>
+            <div class="umb-headline-editor-wrapper span7" ng-if="content.membershipScenario != 0">
+                <h1>{{content.name}}</h1>
+            </div>
 
             <div class="span5">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
@@ -38,6 +41,13 @@
                     </umb-property>
 
                     <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
+                        
+                        <div class="btn-group" ng-if="listViewPath">
+                            <a class="btn" href="#{{listViewPath}}">
+                                <localize key="buttons_returnToList">Return to list</localize>
+                            </a>
+                        </div>
+                        
                         <div class="btn-group">
                             <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
                                 <localize key="buttons_save">Save</localize>

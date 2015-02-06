@@ -1,86 +1,77 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco')
-.controller("Umbraco.PropertyEditors.MemberGroupPickerController",
-	
-	function($scope, dialogService){
-		$scope.renderModel = [];
-		$scope.ids = [];
+function memberGroupPicker($scope, dialogService){
 
-		
+    function trim(str, chr) {
+        var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
+        return str.replace(rgxtrim, '');
+    }
+
+    $scope.renderModel = [];
+    
+    if ($scope.model.value) {
+        var modelIds = $scope.model.value.split(',');
+        _.each(modelIds, function (item, i) {
+            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
+        });
+    }
 	    
-	    if ($scope.model.value) {
-	        $scope.ids = $scope.model.value.split(',');
+    var dialogOptions = {
+        multiPicker: true,
+        entityType: "MemberGroup",
+        section: "membergroup",
+        treeAlias: "memberGroup",
+        filter: "",
+        filterCssClass: "not-allowed",
+        callback: function (data) {
+            if (angular.isArray(data)) {
+                _.each(data, function (item, i) {
+                    $scope.add(item);
+                });
+            } else {
+                $scope.clear();
+                $scope.add(data);
 
-	        $($scope.ids).each(function (i, item) {
-	           
-	            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
-	        });
-	    }
-	    
-	    $scope.cfg = {multiPicker: true, entityType: "MemberGroup", type: "membergroup", treeAlias: "memberGroup", filter: ""};
-		if($scope.model.config){
-			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
-		}
+            }
+        }
+    };
 
-		
+    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
+    // pre-value config on to the dialog options
+    if($scope.model.config){
+        angular.extend(dialogOptions, $scope.model.config);
+    }
 
-		$scope.openMemberGroupPicker =function(){
-				var d = dialogService.memberGroupPicker(
-							{
-								multiPicker: $scope.cfg.multiPicker,
-								filter: $scope.cfg.filter,
-								filterCssClass: "not-allowed", 
-								callback: populate}
-								);
-		};
-
-
-		$scope.remove =function(index){
-			$scope.renderModel.splice(index, 1);
-			$scope.ids.splice(index, 1);
-			$scope.model.value = trim($scope.ids.join(), ",");
-		};
-
-		$scope.add =function(item){
-			if($scope.ids.indexOf(item) < 0){
-				//item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-
-				$scope.ids.push(item);
-				$scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
-				$scope.model.value = trim($scope.ids.join(), ",");
-			}	
-		};
-
-	    $scope.clear = function() {
-	        $scope.model.value = "";
-	        $scope.renderModel = [];
-	        $scope.ids = [];
-	    };
-	   
+    $scope.openMemberGroupPicker =function() {
+        var d = dialogService.memberGroupPicker(dialogOptions);
+    };
 
 
-	    $scope.$on("formSubmitting", function (ev, args) {
-			$scope.model.value = trim($scope.ids.join(), ",");
-	    });
+    $scope.remove =function(index){
+        $scope.renderModel.splice(index, 1);
+    };
 
+    $scope.add = function (item) {
+        var currIds = _.map($scope.renderModel, function (i) {
+            return i.id;
+        });
 
+        if (currIds.indexOf(item) < 0) {
+            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
+        }	
+    };
 
-		function trim(str, chr) {
-			var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+chr+'+|'+chr+'+$', 'g');
-			return str.replace(rgxtrim, '');
-		}
+    $scope.clear = function() {
+        $scope.renderModel = [];
+    };
 
+    $scope.$on("formSubmitting", function (ev, args) {
+        var currIds = _.map($scope.renderModel, function (i) {
+            return i.id;
+        });
+        $scope.model.value = trim(currIds.join(), ",");
+    });
 
-		function populate(data){
-			if(angular.isArray(data)){
-			    _.each(data, function (item, i) {
-					$scope.add(item);
-				});
-			}else{
-			    $scope.clear();
-				$scope.add(data);
-			   
-			}
-		}
-});
+}
+
+angular.module('umbraco').controller("Umbraco.PropertyEditors.MemberGroupPickerController", memberGroupPicker);

@@ -5,9 +5,58 @@
 </head>
 <body>
 
-<script type="text/javascript">
-  top.right.document.location = window.location.search.substring(1);
-</script>
+    <script type="text/javascript">
+        
+        //This is a stupid way of parsing a uri
+        //https://gist.github.com/jlong/2428561
+
+        try {
+		
+            var parser = document.createElement('a');
+            parser.href = window.location.search.substring(1);
+
+            // => "http:"
+            if (parser.protocol && (parser.protocol.toLowerCase() != "http:" && parser.protocol.toLowerCase() != "https:")) {
+                throw "invalid protocol";
+            };
+
+            // => "example.com"
+            if (!parser.hostname || parser.hostname == "") {
+                throw "invalid hostname";
+            }
+            
+            //parser.port;     // => "3000"
+
+            // => "/pathname/"
+            if (!parser.pathname || ((parser.pathname.length - parser.pathname.toLowerCase().indexOf("/developer/packages/installer.aspx")) != "/developer/packages/installer.aspx".length))
+            {
+                throw "invalid pathname";
+            }
+            
+            // => "?search=test"
+            if (!parser.search || parser.search.toLowerCase().indexOf("?repoguid") != 0) {
+                throw "invalid search";
+            }
+            
+            // => "#hash"
+            if (parser.hash && parser.hash != "") {
+                throw "invalid hash";
+            }   
+
+            //parser.host;     // => "example.com:3000"
+
+            if (!top.right) {
+                throw "invalid document";
+            }
+
+            top.right.document.location = window.location.search.substring(1);
+
+        } catch (e) {
+            alert(e);
+        }
+
+        
+    </script>
 
 </body>
 </html>

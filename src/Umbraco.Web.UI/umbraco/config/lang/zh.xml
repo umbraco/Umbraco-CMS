@@ -2,7 +2,7 @@
 <language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
   <creator>
     <name>孙柱梁</name>
-    <link></link>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">管理主机名</key>
@@ -160,7 +160,7 @@
   <area alias="dashboard">
     <key alias="browser">浏览您的网站</key>
     <key alias="dontShowAgain">- 隐藏</key>
-    <key alias="nothinghappens">如果umbraco没有打开，您可能需要允许弹出式窗口。</key>
+    <key alias="nothinghappens">如果Umbraco没有打开，您可能需要允许弹出式窗口。</key>
     <key alias="openinnew">已经在新窗口中打开</key>
     <key alias="restart">重启</key>
     <key alias="visit">访问</key>
@@ -382,9 +382,9 @@
     <key alias="databaseInstall"><![CDATA[点击<strong>安装</strong>进行 %0% 数据库配置]]></key>
     <key alias="databaseInstallDone"><![CDATA[%0%数据库安装完成。点击<strong>下一步</strong>继续。]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
-              <p>您可以自行编辑“web.config”文件，键名为 “umbracoDbDSN”</p>
+              <p>您可以自行编辑“web.config”文件，键名为 “UmbracoDbDSN”</p>
               <p>
-             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">。
+             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">。
                                     如何编辑web.config</a></p>
     ]]></key>
     <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />
@@ -413,7 +413,7 @@
         </p>
     ]]></key>
     <key alias="greatStart">作为入门者，从视频教程开始吧！</key>
-    <key alias="licenseText">点击下一步 (或在Web.config中自行修改umbracoConfigurationStatus)，意味着您接受上述许可协议。</key>
+    <key alias="licenseText">点击下一步 (或在Web.config中自行修改UmbracoConfigurationStatus)，意味着您接受上述许可协议。</key>
     <key alias="None">安装失败。</key>
     <key alias="permissionsAffectedFolders">受影响的文件和文件夹</key>
     <key alias="permissionsAffectedFoldersMoreInfo">此处查看更多信息</key>
@@ -444,7 +444,7 @@
     <key alias="runwayFromScratch">我要从头开始</key>
     <key alias="runwayFromScratchText"><![CDATA[
        此时您的网站是全空的,您应该首先建立您的文档类型和模板
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
        您也可以安装晚一些安装“Runway”。
     ]]></key>
     <key alias="runwayHeader">您刚刚安装了一个干净的系统，要继续吗？</key>
@@ -478,7 +478,7 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>更多的帮助信息</h3>
 从社区获取帮助]]></key>
     <key alias="theEndHeader">系统 %0% 安装完毕</key>
-    <key alias="theEndInstallFailed"><![CDATA[完成安装，您需要手工编辑<strong>/web.config file</strong> 的 AppSetting 键 <strong>umbracoConfigurationStatus</strong>为 <strong>'%0%'</strong>。]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[完成安装，您需要手工编辑<strong>/web.config file</strong> 的 AppSetting 键 <strong>UmbracoConfigurationStatus</strong>为 <strong>'%0%'</strong>。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[您想要<strong>立即开始</strong>请点“运行系统”<br />如果您是<strong>新手</strong>, 您可以得到相当丰富的学习资源。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>运行系统</h3>
 管理您的网站, 运行后台添加内容，也可以添加模板和功能。
@@ -501,7 +501,7 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0%</p> ]]></key>
-    <key alias="topText">欢迎使用umbraco，在下方输入用户名和密码</key>
+    <key alias="topText">欢迎使用Umbraco，在下方输入用户名和密码</key>
   </area>
   <area alias="main">
     <key alias="dashboard">仪表板</key>
@@ -596,7 +596,7 @@
   </area>
   <area alias="paste">
     <key alias="doNothing">带格式粘贴（不推荐）</key>
-    <key alias="errorMessage">您所粘贴的文本含有特殊字符或格式，umbraco将清除以适应网页。</key>
+    <key alias="errorMessage">您所粘贴的文本含有特殊字符或格式，Umbraco将清除以适应网页。</key>
     <key alias="removeAll">无格式粘贴</key>
     <key alias="removeSpecialFormattering">粘贴并移除格式（推荐）</key>
   </area>

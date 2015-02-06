@@ -8,7 +8,7 @@
 
         assetsService.load([
             //"lib/spectrum/tinycolor.js",
-            "lib/spectrum/spectrum.js"			
+            "lib/spectrum/spectrum.js"          
         ]).then(function () {
             var elem = $element.find("input");
             elem.spectrum({
@@ -68,7 +68,10 @@
                 });
                 if (!exists) {
                     $scope.model.value.push({ value: $scope.newColor });
-                    $scope.newColor = defaultColor;
+                    //$scope.newColor = defaultColor;
+                    // set colorpicker to default color
+                    //var elem = $element.find("input");
+                    //elem.spectrum("set", $scope.newColor);
                     $scope.hasError = false;
                     return;
                 }

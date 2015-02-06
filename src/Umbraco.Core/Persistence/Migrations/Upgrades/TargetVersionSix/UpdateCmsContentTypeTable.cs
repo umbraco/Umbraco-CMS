@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Configuration;
+﻿using System.Linq;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
@@ -9,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
             Alter.Table("cmsContentType").AddColumn("isContainer").AsBoolean().NotNullable().WithDefaultValue(0);
 
-            Alter.Table("cmsContentType").AddColumn("allowAtRoot").AsBoolean().NotNullable().WithDefaultValue(0);
+            Alter.Table("cmsContentType").AddColumn("allowAtRoot").AsBoolean().NotNullable().WithDefaultValue(0);            
         }
 
         public override void Down()

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Serialization;
@@ -87,6 +88,58 @@ namespace Umbraco.Tests.Models
             foreach (var propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
             {
                 Assert.IsFalse(propertyType.HasIdentity);
+            }
+        }
+
+        [Ignore]
+        [Test]
+        public void Can_Deep_Clone_Content_Type_Perf_Test()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.Id = 99;
+
+            var i = 200;
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                propertyType.Id = ++i;
+            }
+            foreach (var group in contentType.PropertyGroups)
+            {
+                group.Id = ++i;
+            }
+            contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
+            contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
+            contentType.Id = 10;
+            contentType.CreateDate = DateTime.Now;
+            contentType.CreatorId = 22;
+            contentType.SetDefaultTemplate(new Template("-1,2,3,4", "Test Template", "testTemplate")
+            {
+                Id = 88
+            });
+            contentType.Description = "test";
+            contentType.Icon = "icon";
+            contentType.IsContainer = true;
+            contentType.Thumbnail = "thumb";
+            contentType.Key = Guid.NewGuid();
+            contentType.Level = 3;
+            contentType.Path = "-1,4,10";
+            contentType.SortOrder = 5;
+            contentType.Trashed = false;
+            contentType.UpdateDate = DateTime.Now;
+
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
+
+            using (DisposableTimer.DebugDuration<ContentTypeTests>("STARTING PERF TEST"))
+            {
+                for (int j = 0; j < 1000; j++)
+                {
+                    using (DisposableTimer.DebugDuration<ContentTypeTests>("Cloning content type"))
+                    {
+                        var clone = (ContentType)contentType.DeepClone();
+                    }                    
+                }
             }
         }
 

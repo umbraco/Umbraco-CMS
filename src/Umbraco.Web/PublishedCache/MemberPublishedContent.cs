@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -15,21 +19,20 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Exposes a member object as IPublishedContent
     /// </summary>
-    internal class MemberPublishedContent : PublishedContentBase
+    public sealed class MemberPublishedContent : PublishedContentBase
     {
 
         private readonly IMember _member;
-        private readonly MembershipUser _membershipUser;
+        private readonly IMembershipUser _membershipUser;
         private readonly IPublishedProperty[] _properties;
         private readonly PublishedContentType _publishedMemberType;
 
-        public MemberPublishedContent(IMember member, MembershipUser membershipUser)
+        public MemberPublishedContent(IMember member)
         {
-            if (member == null) throw new ArgumentNullException("member");
-            if (membershipUser == null) throw new ArgumentNullException("membershipUser");
+            if (member == null) throw new ArgumentNullException("member");            
 
             _member = member;
-            _membershipUser = membershipUser;
+            _membershipUser = member;
             _publishedMemberType = PublishedContentType.Get(PublishedItemType.Member, _member.ContentTypeAlias);
             if (_publishedMemberType == null)
             {
@@ -49,7 +52,7 @@ namespace Umbraco.Web.PublishedCache
         }
         public string UserName
         {
-            get { return _membershipUser.UserName; }
+            get { return _membershipUser.Username; }
         }
         public string PasswordQuestion
         {
@@ -57,7 +60,7 @@ namespace Umbraco.Web.PublishedCache
         }
         public string Comments
         {
-            get { return _membershipUser.Comment; }
+            get { return _membershipUser.Comments; }
         }
         public bool IsApproved
         {
@@ -73,7 +76,7 @@ namespace Umbraco.Web.PublishedCache
         }
         public DateTime CreationDate
         {
-            get { return _membershipUser.CreationDate; }
+            get { return _membershipUser.CreateDate; }
         }
         public DateTime LastLoginDate
         {
@@ -81,11 +84,11 @@ namespace Umbraco.Web.PublishedCache
         }
         public DateTime LastActivityDate
         {
-            get { return _membershipUser.LastActivityDate; }
+            get { return _membershipUser.LastLoginDate; }
         }
         public DateTime LastPasswordChangedDate
         {
-            get { return _membershipUser.LastPasswordChangedDate; }
+            get { return _membershipUser.LastPasswordChangeDate; }
         } 
         #endregion
 
@@ -126,6 +129,14 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedProperty GetProperty(string alias)
         {
+            switch (alias)
+            {
+                case "Email":
+                    return new PropertyResult("Email", Email, PropertyResultType.CustomProperty);
+                case "UserName":
+                    return new PropertyResult("UserName", UserName, PropertyResultType.CustomProperty);
+            }
+
             return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
         }
 

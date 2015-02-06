@@ -6,18 +6,19 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
     
     //setup scope vars
-    $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
 
+    $scope.listViewPath = ($routeParams.page && $routeParams.listName)
+        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
+        : null;
+
     //build a path to sync the tree with
     function buildTreePath(data) {
-        //TODO: Will this work for the 'other' list ?
-        var path = data.name[0].toLowerCase() + "," + data.key;
-        return path;
+        return $routeParams.listName ? "-1," + $routeParams.listName : "-1";
     }
 
     if ($routeParams.create) {
@@ -68,9 +69,16 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     
                     var path = buildTreePath(data);
 
-                    navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    //sync the tree (only for ui purposes)
+                    navigationService.syncTree({ tree: "member", path: path.split(",") });
+
+                    //it's the initial load of the editor, we need to get the tree node 
+                    // from the server so that we can load in the actions menu.
+                    umbRequestHelper.resourcePromise(
+                        $http.get(data.treeNodeUrl),
+                        'Failed to retrieve data for child node ' + data.key).then(function (node) {
+                            $scope.currentNode = node;
+                        });
 
                     //in one particular special case, after we've created a new item we redirect back to the edit
                     // route but there might be server validation errors in the collection which we need to display
@@ -106,11 +114,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     
                     var path = buildTreePath(data);
 
-                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    //sync the tree (only for ui purposes)
+                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true });
 
-                }, function (err) {
+            }, function (err) {
                     
                     contentEditingHelper.handleSaveError({
                         redirectOnFailure: false,

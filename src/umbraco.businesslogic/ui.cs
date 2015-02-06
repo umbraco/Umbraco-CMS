@@ -136,7 +136,7 @@ namespace umbraco
             return GetText(Area, Key, null, GetLanguage(u));
         }
 
-        internal static string Text(string area, string key, IUser u)
+        public static string Text(string area, string key, IUser u)
         {
             return GetText(area, key, null, GetLanguage(u));
         }

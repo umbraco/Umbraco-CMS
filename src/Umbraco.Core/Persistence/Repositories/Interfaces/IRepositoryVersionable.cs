@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -12,6 +13,26 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IRepositoryVersionable<TId, TEntity> : IRepositoryQueryable<TId, TEntity>
         where TEntity : IAggregateRoot
     {
+        /// <summary>
+        /// Rebuilds the xml structures for all TEntity if no content type ids are specified, otherwise rebuilds the xml structures
+        /// for only the content types specified
+        /// </summary>
+        /// <param name="serializer">The serializer to convert TEntity to Xml</param>
+        /// <param name="groupSize">Structures will be rebuilt in chunks of this size</param>
+        /// <param name="contentTypeIds"></param>
+        void RebuildXmlStructures(Func<TEntity, XElement> serializer, int groupSize = 5000, IEnumerable<int> contentTypeIds = null);
+
+        /// <summary>
+        /// Get the total count of entities
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <returns></returns>
+        int Count(string contentTypeAlias = null);
+
+        int CountChildren(int parentId, string contentTypeAlias = null);
+
+        int CountDescendants(int parentId, string contentTypeAlias = null);
+
         /// <summary>
         /// Gets a list of all versions for an <see cref="TEntity"/>.
         /// </summary>

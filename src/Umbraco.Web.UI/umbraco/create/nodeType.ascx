@@ -2,14 +2,16 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <cc1:Pane runat="server">
-    <cc1:PropertyPanel runat="server" text="Master Document Type">
-        <asp:ListBox id="masterType" Runat="server" cssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single"></asp:ListBox>
-        <asp:Literal ID="masterTypePreDefined" runat="server" Visible="false"></asp:Literal>
-    </cc1:PropertyPanel>
+    
     
     <cc1:PropertyPanel runat="server" id="pp_name" text="Name">
         <asp:TextBox id="rename" Runat="server" CssClass="bigInput input-large-type input-block-level"></asp:TextBox>
         <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
+    </cc1:PropertyPanel>
+    
+    <cc1:PropertyPanel runat="server" text="Master Document Type" ID="pp_MasterDocumentType">
+        <asp:ListBox id="masterType" Runat="server" cssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single"></asp:ListBox>
+        <asp:Literal ID="masterTypePreDefined" runat="server" Visible="false"></asp:Literal>
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server">

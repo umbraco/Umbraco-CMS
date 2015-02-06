@@ -55,11 +55,91 @@ angular.module('umbraco.mocks').
                     allowedActions: ["U", "H", "A"],
                     tabs: [
                     {
-                        label: "Child documents",
+                        label: "Grid",
                         id: 1, 
                         active: true,
                         properties: [                            
-                            { alias: "list", label: "List", view: "listview", value: "", hideLabel: true, config:{entityType: "content"} },
+                            { alias: "grid", 
+                            label: "Grid", 
+                            view: "grid", 
+                            value: "", 
+                            hideLabel: true, 
+                            config: {
+                                items:{
+
+                                    styles:[
+                                        {
+                                            label: "Set a background image",
+                                            description: "Set a row background",
+                                            key: "background-image",
+                                            view: "imagepicker",
+                                            modifier: "url({0})"
+                                        }
+                                    ],
+                                    config:[
+                                        {
+                                            label: "Class",
+                                            description: "Set a css class",
+                                            key: "class",
+                                            view: "textstring"
+                                        }
+                                    ],
+                                    columns: 12,
+                                    templates:[
+                                        {
+                                            name: "1 column layout",
+                                            sections: [
+                                                {
+                                                    grid: 12,
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            name: "2 column layout",
+                                            sections: [
+                                                {
+                                                    grid: 4,
+                                                },
+                                                {
+                                                    grid: 8
+                                                }
+                                            ]
+                                        }
+                                    ],
+
+
+                                    layouts:[
+                                        {
+                                            name: "Headline",
+                                            areas: [
+                                                {
+                                                    grid: 12,
+                                                    editors: ["headline"]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            name: "Article",
+                                            areas: [
+                                                {
+                                                    grid: 12
+                                                },
+                                                {
+                                                    grid: 4
+                                                },
+                                                {
+                                                    grid: 8
+                                                },
+                                                {
+                                                    grid: 12
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                    }
+
+                                }
+                            },
                         ]
                     },
                     {
@@ -111,22 +191,6 @@ angular.module('umbraco.mocks').
                         ]
                     },
                     {
-                        label: "Tab # 7",
-                        id: 7,
-                        properties: [
-                            { alias: "valTest7", label: "Validation test", view: "validationtest", value: "asdfasdf" },
-                            { alias: "bodyText7", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
-                            { alias: "textarea7", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "content7", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
-                        ]
-                    },
-                    {
-                        label: "Grid",
-                        id: 8,
-                        properties: [
-                        { alias: "grid", label: "Grid", view: "grid", value: "test", hideLabel: true }
-                        ]
-                    }, {
                         label: "Generic Properties",
                         id: 0,
                         properties: [

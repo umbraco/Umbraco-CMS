@@ -39,8 +39,14 @@
 
 
                     <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
+                        
+                        <div class="btn-group" ng-show="listViewPath">
+                            <a class="btn" href="#{{listViewPath}}">
+                                <localize key="buttons_returnToList">Return to list</localize>
+                            </a>
+                        </div>
 
-                        <div class="btn-group" ng-show="content.template">
+                        <div class="btn-group" ng-show="content.template && !isNew">
                             <a class="btn" ng-click="preview(content)">
                                 <localize key="buttons_showPage">Preview page</localize>
                             </a>
@@ -55,8 +61,9 @@
                             <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
                                 <span class="caret"></span>
                             </a>
-                            
 
+                            <a href="#">Return to list</a>
+                            
                             <!-- sub buttons -->
                             <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel"  ng-if="subButtons.length > 0">
                                 <li ng-repeat="btn in subButtons">

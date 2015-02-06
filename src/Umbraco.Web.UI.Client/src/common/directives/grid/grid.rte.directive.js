@@ -1,4 +1,4 @@
-angular.module("umbraco")
+angular.module("umbraco.directives")
     .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout) {
         return {
             scope: {
@@ -9,7 +9,7 @@ angular.module("umbraco")
                 onBlur: '&',
                 configuration:"="
             },
-            template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" id=\"{{uniqueId}}\"></textarea>",
+            template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
             link: function (scope, element, attrs) {
 
@@ -18,12 +18,12 @@ angular.module("umbraco")
                     //we always fetch the default one, and then override parts with our own
                     tinyMceService.configuration().then(function (tinyMceConfig) {
 
-                        
+
 
                         //config value from general tinymce.config file
                         var validElements = tinyMceConfig.validElements;
                         var fallbackStyles = [{title: "Page header", block: "h2"}, {title: "Section header", block: "h3"}, {title: "Paragraph header", block: "h4"}, {title: "Normal", block: "p"}, {title: "Quote", block: "blockquote"}, {title: "Code", block: "code"}];
-                        
+
                         //These are absolutely required in order for the macros to render inline
                         //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
                         var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align]";
@@ -38,9 +38,9 @@ angular.module("umbraco")
                         //config value on the data type
                         var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"].join(" | ");
                         var stylesheets = [];
-                        
+
                         var styleFormats = [];
-                        var await = []; 
+                        var await = [];
 
                         //queue file loading
                         if (typeof (tinymce) === "undefined") {
@@ -55,7 +55,7 @@ angular.module("umbraco")
 
                         if(scope.configuration && scope.configuration.stylesheets){
                             angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
-                                    
+
                                     stylesheets.push("/css/" + stylesheet + ".css");
                                     await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
                                         angular.forEach(rules, function (rule) {
@@ -96,7 +96,6 @@ angular.module("umbraco")
                                 menubar: false,
                                 statusbar: false,
                                 relative_urls: false,
-                                autoresize_min_height: 30,
                                 toolbar: toolbar,
                                 content_css: stylesheets.join(','),
                                 style_formats: styleFormats
@@ -113,10 +112,11 @@ angular.module("umbraco")
 
                                 //set the reference
                                 tinyMceEditor = editor;
-                                
+
 
                                 //enable browser based spell checking
                                 editor.on('init', function (e) {
+
                                     editor.getBody().setAttribute('spellcheck', true);
 
                                     //hide toolbar by default
@@ -124,12 +124,15 @@ angular.module("umbraco")
                                         .find(".mce-toolbar")
                                         .css("visibility", "hidden");
 
+                                    //force overflow to hidden to prevent no needed scroll
+                                    editor.getBody().style.overflow = "hidden";
+
                                     $timeout(function(){
                                         if(scope.value === null){
                                             editor.focus();
                                         }
-                                    }, 500);
-                                    
+                                    }, 400);
+
                                 });
 
                                 //when we leave the editor (maybe)
@@ -144,7 +147,7 @@ angular.module("umbraco")
                                         if(scope.onBlur){
                                             scope.onBlur();
                                         }
-                                        
+
                                         _toolbar.css("visibility", "hidden");
                                     });
                                 });
@@ -152,7 +155,7 @@ angular.module("umbraco")
                                 // Focus on editor
                                 editor.on('focus', function (e) {
                                     angularHelper.safeApply(scope, function () {
-                                        
+
                                         var _toolbar = $(editor.editorContainer)
                                              .find(".mce-toolbar");
 
@@ -170,7 +173,7 @@ angular.module("umbraco")
                                 // Click on editor
                                 editor.on('click', function (e) {
                                     angularHelper.safeApply(scope, function () {
-                                        
+
                                         var _toolbar = $(editor.editorContainer)
                                              .find(".mce-toolbar");
 
@@ -264,7 +267,7 @@ angular.module("umbraco")
                             });
 
                             //when the element is disposed we need to unsubscribe!
-                            // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom 
+                            // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                             // element might still be there even after the modal has been hidden.
                             scope.$on('$destroy', function () {
                                 unsubscribe();

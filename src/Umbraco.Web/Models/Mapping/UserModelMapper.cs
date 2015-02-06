@@ -15,6 +15,8 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserDetail>()
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
+                .ForMember(detail => detail.StartContentId, opt => opt.MapFrom(user => user.StartContentId))
+                .ForMember(detail => detail.StartMediaId, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => ui.Culture(user)))
                 .ForMember(
                     detail => detail.EmailHash,

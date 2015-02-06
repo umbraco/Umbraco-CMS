@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     internal class FileUnitOfWork : IUnitOfWork
     {
         private Guid _key;
-        private readonly List<Operation> _operations = new List<Operation>();
+        private readonly Queue<Operation> _operations = new Queue<Operation>();
 
         public FileUnitOfWork()
         {
@@ -28,11 +28,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
         public void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository)
         {
-            _operations.Add(
+            _operations.Enqueue(
                 new Operation
                 {
                     Entity = entity,
-                    ProcessDate = DateTime.Now,
                     Repository = repository,
                     Type = TransactionType.Insert
                 });
@@ -45,11 +44,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
         public void RegisterChanged(IEntity entity, IUnitOfWorkRepository repository)
         {
-            _operations.Add(
+            _operations.Enqueue(
                 new Operation
                 {
                     Entity = entity,
-                    ProcessDate = DateTime.Now,
                     Repository = repository,
                     Type = TransactionType.Update
                 });
@@ -62,11 +60,10 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// <param name="repository">The <see cref="IUnitOfWorkRepository" /> participating in the transaction</param>
         public void RegisterRemoved(IEntity entity, IUnitOfWorkRepository repository)
         {
-            _operations.Add(
+            _operations.Enqueue(
                 new Operation
                 {
                     Entity = entity,
-                    ProcessDate = DateTime.Now,
                     Repository = repository,
                     Type = TransactionType.Delete
                 });
@@ -74,25 +71,31 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         public void Commit()
         {
-            using(var scope = new TransactionScope())
+            //NOTE: I'm leaving this in here for reference, but this is useless, transaction scope + Files doesn't do anything,
+            // the closest you can get is transactional NTFS, but that requires distributed transaction coordinator and some other libs/wrappers,
+            // plus MS has not deprecated it anyways. To do transactional IO we'd have to write this ourselves using temporary files and then 
+            // on committing move them to their correct place.
+            //using(var scope = new TransactionScope())
+            //{
+            //    // Commit the transaction
+            //    scope.Complete();
+            //}
+
+            while (_operations.Count > 0)
             {
-                foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
+                var operation = _operations.Dequeue();
+                switch (operation.Type)
                 {
-                    switch (operation.Type)
-                    {
-                        case TransactionType.Insert:
-                            operation.Repository.PersistNewItem(operation.Entity);
-                            break;
-                        case TransactionType.Delete:
-                            operation.Repository.PersistDeletedItem(operation.Entity);
-                            break;
-                        case TransactionType.Update:
-                            operation.Repository.PersistUpdatedItem(operation.Entity);
-                            break;
-                    }
+                    case TransactionType.Insert:
+                        operation.Repository.PersistNewItem(operation.Entity);
+                        break;
+                    case TransactionType.Delete:
+                        operation.Repository.PersistDeletedItem(operation.Entity);
+                        break;
+                    case TransactionType.Update:
+                        operation.Repository.PersistUpdatedItem(operation.Entity);
+                        break;
                 }
-                // Commit the transaction
-                scope.Complete();
             }
 
             // Clear everything
@@ -119,12 +122,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             /// </summary>
             /// <value>The entity.</value>
             public IEntity Entity { get; set; }
-
-            /// <summary>
-            /// Gets or sets the process date.
-            /// </summary>
-            /// <value>The process date.</value>
-            public DateTime ProcessDate { get; set; }
 
             /// <summary>
             /// Gets or sets the repository.

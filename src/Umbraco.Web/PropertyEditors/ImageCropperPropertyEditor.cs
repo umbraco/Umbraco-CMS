@@ -30,8 +30,16 @@ namespace Umbraco.Web.PropertyEditors
         {
             MediaService.Saving += MediaServiceSaving;
             MediaService.Created += MediaServiceCreated;
-
             ContentService.Copied += ContentServiceCopied;
+
+            MediaService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            MediaService.EmptiedRecycleBin += (sender, args) =>
+                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+            ContentService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            ContentService.EmptiedRecycleBin += (sender, args) =>
+                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
         }
 
         /// <summary>
@@ -57,6 +65,71 @@ namespace Umbraco.Web.PropertyEditors
                     {"focalPoint", "{left: 0.5, top: 0.5}"},
                     {"src", ""}
                 };
+        }
+
+        /// <summary>
+        /// Ensures any files associated are removed
+        /// </summary>
+        /// <param name="allPropertyData"></param>
+        static IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
+        {
+            var list = new List<string>();
+            //Get all values for any image croppers found
+            foreach (var cropperVal in allPropertyData
+                .SelectMany(x => x.Value)
+                .Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias)  
+                .Select(x => x.Value)
+                .WhereNotNull())
+            {
+                JObject json;
+                try
+                {
+                    json = JsonConvert.DeserializeObject<JObject>(cropperVal.ToString());
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + cropperVal, ex);
+                    continue;
+                }
+
+                if (json["src"] != null && json["src"].ToString().IsNullOrWhiteSpace() == false)
+                {
+                    list.Add(json["src"].ToString());
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Ensures any files associated are removed
+        /// </summary>
+        /// <param name="deletedEntities"></param>
+        static IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
+        {
+            var list = new List<string>();
+            foreach (var property in deletedEntities.SelectMany(deletedEntity => deletedEntity
+                .Properties
+                .Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias
+                            && x.Value != null
+                            && string.IsNullOrEmpty(x.Value.ToString()) == false)))
+            {
+                JObject json;
+                try
+                {
+                    json = JsonConvert.DeserializeObject<JObject>(property.Value.ToString());
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<ImageCropperPropertyEditor>("An error occurred parsing the value stored in the image cropper value: " + property.Value, ex);
+                    continue;
+                }
+
+                if (json["src"] != null && json["src"].ToString().IsNullOrWhiteSpace() == false)
+                {
+                    list.Add(json["src"].ToString());
+                }
+            }
+            return list;
         }
 
         /// <summary>
@@ -89,7 +162,7 @@ namespace Umbraco.Web.PropertyEditors
 
                     if (json["src"] != null && json["src"].ToString().IsNullOrWhiteSpace() == false)
                     {
-                        if (fs.FileExists(IOHelper.MapPath(json["src"].ToString())))
+                        if (fs.FileExists(fs.GetRelativePath(json["src"].ToString())))
                         {
                             var currentPath = fs.GetRelativePath(json["src"].ToString());
                             var propertyId = e.Copy.Properties.First(x => x.Alias == property.Alias).Id;
@@ -150,9 +223,13 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             json = JObject.Parse((string)p.Value);
                         }
-                        catch (JsonException ex)
+                        catch (JsonException)
                         {
-                            LogHelper.Error<ImageCropperPropertyEditor>("Could not parse the value into a JSON structure! Value: " + p.Value, ex);
+                            //note: we are swallowing this exception because in some cases a normal string/non json value will be passed in which will just be the 
+                            // file path like /media/23454/hello.jpg
+                            // This will happen everytime an image is uploaded via the folder browser and we don't really want to pollute the log since it's not actually
+                            // a problem and we take care of this below.
+                            // see: http://issues.umbraco.org/issue/U4-4756
                         }
                         if (json != null && json["src"] != null)
                         {

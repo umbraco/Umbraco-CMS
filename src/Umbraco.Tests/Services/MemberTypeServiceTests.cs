@@ -162,8 +162,8 @@ namespace Umbraco.Tests.Services
             contentType1.RemovePropertyType(alias);
             ServiceContext.MemberTypeService.Save(contentType1);
 
-            var reQueried = ServiceContext.ContentTypeService.GetContentType(contentType1.Id);
-            var reContent = ServiceContext.ContentService.GetById(contentItems1.First().Id);
+            var reQueried = ServiceContext.MemberTypeService.Get(contentType1.Id);
+            var reContent = ServiceContext.MemberService.GetById(contentItems1.First().Id);
 
             foreach (var c in contentItems1)
             {

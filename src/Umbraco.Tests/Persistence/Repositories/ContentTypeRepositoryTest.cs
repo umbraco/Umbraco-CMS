@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
             var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
@@ -63,6 +63,42 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Assert
             Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test]
+        public void Maps_Templates_Correctly()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var templateRepo = new TemplateRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var templates = new[]
+                {
+                    new Template("test1.cshtml", "test1", "test1"),
+                    new Template("test2.cshtml", "test2", "test2"),
+                    new Template("test3.cshtml", "test3", "test3")
+                };
+                foreach (var template in templates)
+                {
+                    templateRepo.AddOrUpdate(template);
+                }
+                unitOfWork.Commit();
+                
+                var contentType = MockedContentTypes.CreateSimpleContentType();
+                contentType.AllowedTemplates = new[] {templates[0], templates[1]};
+                contentType.SetDefaultTemplate(templates[0]);
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                //re-get
+                var result = repository.Get(contentType.Id);
+
+                Assert.AreEqual(2, result.AllowedTemplates.Count());
+                Assert.AreEqual(templates[0].Id, result.DefaultTemplate.Id);
+            }
+
         }
 
         [Test]
@@ -157,8 +193,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {                
                 var ctMain = MockedContentTypes.CreateSimpleContentType();
-                var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain);
-                var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1);
+                var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
+                var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true);
                 
                 repository.AddOrUpdate(ctMain);
                 repository.AddOrUpdate(ctChild1);
@@ -246,14 +282,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Act                
-                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("metaDescription");
+                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("description");
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
                 var result = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Assert
-                Assert.That(result.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
+                Assert.That(result.PropertyTypes.Any(x => x.Alias == "description"), Is.False);
                 Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(result.PropertyGroups.Count));
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(result.PropertyTypes.Count()));
             }
@@ -398,7 +434,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
-                Assert.That(subpage.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+                Assert.That(subpage.Properties.First(x => x.Alias == "description").Value, Is.EqualTo("This is the meta description for a textpage"));
             }
         }
 
@@ -498,7 +534,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Assert
                 var updated = contentRepository.Get(subpage.Id);
                 Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
-                Assert.That(updated.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+                Assert.That(updated.Properties.First(x => x.Alias == "description").Value, Is.EqualTo("This is the meta description for a textpage"));
 
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);

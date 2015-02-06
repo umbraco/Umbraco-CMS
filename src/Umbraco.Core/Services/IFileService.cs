@@ -31,9 +31,9 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
-        /// <param name="name">Name incl. extension of the Stylesheet to delete</param>
+        /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
-        void DeleteStylesheet(string name, int userId = 0);
+        void DeleteStylesheet(string path, int userId = 0);
 
         /// <summary>
         /// Validates a <see cref="Stylesheet"/>
@@ -65,9 +65,9 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
-        /// <param name="name">Name incl. extension of the Script to delete</param>
+        /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId">Optional id of the user deleting the script</param>
-        void DeleteScript(string name, int userId = 0);
+        void DeleteScript(string path, int userId = 0);
 
         /// <summary>
         /// Validates a <see cref="Script"/>

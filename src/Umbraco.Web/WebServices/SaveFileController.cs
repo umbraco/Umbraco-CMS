@@ -2,8 +2,11 @@
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
@@ -16,91 +19,160 @@ using Template = umbraco.cms.businesslogic.template.Template;
 namespace Umbraco.Web.WebServices
 {
     /// <summary>
-	/// A REST controller used to save files such as templates, partial views, macro files, etc...
-	/// </summary>
-	/// <remarks>
-	/// This isn't fully implemented yet but we should migrate all of the logic in the umbraco.presentation.webservices.codeEditorSave
-	/// over to this controller.
-	/// </remarks>
-	public class SaveFileController : UmbracoAuthorizedController
-	{
+    /// A REST controller used to save files such as templates, partial views, macro files, etc...
+    /// </summary>
+    /// <remarks>
+    /// This isn't fully implemented yet but we should migrate all of the logic in the umbraco.presentation.webservices.codeEditorSave
+    /// over to this controller.
+    /// </remarks>
+    public class SaveFileController : UmbracoAuthorizedController
+    {
+        /// <summary>
+        /// Saves a partial view macro
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="oldName"></param>
+        /// <param name="contents"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult SavePartialViewMacro(string filename, string oldName, string contents)
+        {
+            //NOTE: This is a bit of a hack because we're sharing the View editor with templates/partial views/partial view macros, so the path starts with
+            // 'Partials' which we need to remove because the path that we construct the partial view with is a relative path to the root path of 
+            // Views/Partials
+            if (filename.InvariantStartsWith("MacroPartials/"))
+            {
+                filename = filename.TrimStart("MacroPartials/");
+            }
+            if (oldName.IsNullOrWhiteSpace() == false)
+            {
+                if (oldName.InvariantStartsWith("MacroPartials/"))
+                {
+                    oldName = oldName.TrimStart("MacroPartials/");
+                }
+            }
 
-		/// <summary>
-		/// Saves a partial view for a partial view macr
-		/// </summary>
-		/// <param name="filename"></param>
-		/// <param name="oldName"></param>
-		/// <param name="contents"></param>
-		/// <returns></returns>
-		[HttpPost]
-		public JsonResult SavePartialView(string filename, string oldName, string contents)
-		{
-			var folderPath = SystemDirectories.MvcViews.EnsureEndsWith('/');// +"/Partials/";
+            var fileService = (FileService)Services.FileService;
 
-			// validate file
-			IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);
-			// validate extension
-			IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] { "cshtml" }.ToList());
-			
-			//TODO: Validate using the macro engine
-			var engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-			//engine.Validate(...)
+            //try to get the file by the old name first if they are different and delete that file
+            if (filename.Trim().InvariantEquals(oldName.Trim()) == false)
+            {
+                var existing = fileService.GetPartialViewMacro(oldName);
+                if (existing != null)
+                {
+                    var success = fileService.DeletePartialViewMacro(existing.Path, Security.GetUserId());
+                    if (success == false)
+                    {
+                        return Failed(
+                            ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                            //pass in a new exception ... this will also append the the message
+                            new Exception("Could not delete old file: " + oldName));
+                    }
+                }
+            }
 
-			var val = contents;
-			var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
-			var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);
+            var partialView = new PartialView(filename)
+            {
+                Content = contents
+            };
 
-			//Directory check.. only allow files in script dir and below to be edited
-			if (!savePath.StartsWith(IOHelper.MapPath(folderPath)))
-			{
-				return Failed(
-					ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-					//pass in a new exception ... this will also append the the message
-					new ArgumentException("Illegal path: " + savePath));
-			}
+            var attempt = fileService.SavePartialViewMacro(partialView);
 
-			//deletes the old file
-			if (savePath != saveOldPath)
-			{
-				if (System.IO.File.Exists(saveOldPath))
-					System.IO.File.Delete(saveOldPath);
-			}
+            if (attempt.Success == false)
+            {
+                return Failed(
+                    ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                    //pass in a new exception ... this will also append the the message
+                    attempt.Exception);
+            }
 
-            //NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
-            // BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
-            // http://issues.umbraco.org/issue/U4-2118
-            //using (var sw = System.IO.File.CreateText(savePath))
-            //{
-            //    sw.Write(val);
-            //}
+            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
+        }
 
-            System.IO.File.WriteAllText(savePath, val, Encoding.UTF8);
+        /// <summary>
+        /// Saves a partial view
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="oldName"></param>
+        /// <param name="contents"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult SavePartialView(string filename, string oldName, string contents)
+        {
+            //NOTE: This is a bit of a hack because we're sharing the View editor with templates/partial views/partial view macros, so the path starts with
+            // 'Partials' which we need to remove because the path that we construct the partial view with is a relative path to the root path of 
+            // Views/Partials
+            if (filename.InvariantStartsWith("Partials/"))
+            {
+                filename = filename.TrimStart("Partials/");
+            }
+            if (oldName.IsNullOrWhiteSpace() == false)
+            {
+                if (oldName.InvariantStartsWith("Partials/"))
+                {
+                    oldName = oldName.TrimStart("Partials/");
+                }    
+            }
 
-			return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
-		}
+            var fileService = (FileService)Services.FileService;
+            
+            //try to get the file by the old name first if they are different and delete that file
+            if (filename.Trim().InvariantEquals(oldName.Trim()) == false)
+            {
+                var existing = fileService.GetPartialView(oldName);
+                if (existing != null)
+                {
+                    var success = fileService.DeletePartialView(existing.Path, Security.GetUserId());
+                    if (success == false)
+                    {
+                        return Failed(
+                            ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                            //pass in a new exception ... this will also append the the message
+                            new Exception("Could not delete old file: " + oldName));
+                    }
+                }
+            }
+            
+            var partialView = new PartialView(filename)
+            {
+                Content = contents
+            };
+            
+            var attempt = fileService.SavePartialView(partialView);
 
-		/// <summary>
-		/// Saves a template
-		/// </summary>
-		/// <param name="templateName"></param>
-		/// <param name="templateAlias"></param>
-		/// <param name="templateContents"></param>
-		/// <param name="templateId"></param>
-		/// <param name="masterTemplateId"></param>
-		/// <returns></returns>
-		[HttpPost]
-		public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
-		{
-			Template t;
-		    bool pathChanged = false;
-			try
-			{
-				t = new Template(templateId)
-						{
-							Text = templateName,
-							Alias = templateAlias,							
-							Design = templateContents
-						};
+            if (attempt.Success == false)
+            {
+                return Failed(
+                    ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                    //pass in a new exception ... this will also append the the message
+                    attempt.Exception);
+            }
+
+            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
+        }
+
+        /// <summary>
+        /// Saves a template
+        /// </summary>
+        /// <param name="templateName"></param>
+        /// <param name="templateAlias"></param>
+        /// <param name="templateContents"></param>
+        /// <param name="templateId"></param>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
+        {
+            Template t;
+            bool pathChanged = false;
+            try
+            {
+                t = new Template(templateId)
+                {
+                    Text = templateName,
+                    Alias = templateAlias,
+                    Design = templateContents
+                };
 
                 //check if the master page has changed
                 if (t.MasterTemplate != masterTemplateId)
@@ -108,16 +180,16 @@ namespace Umbraco.Web.WebServices
                     pathChanged = true;
                     t.MasterTemplate = masterTemplateId;
                 }
-			}
-			catch (ArgumentException ex)
-			{
-				//the template does not exist
-				return Failed("Template does not exist", ui.Text("speechBubbles", "templateErrorHeader"), ex);
-			}
+            }
+            catch (ArgumentException ex)
+            {
+                //the template does not exist
+                return Failed("Template does not exist", ui.Text("speechBubbles", "templateErrorHeader"), ex);
+            }
 
-			try
-			{
-				t.Save();
+            try
+            {
+                t.Save();
 
                 //ensure the correct path is synced as the parent might have been changed
                 // http://issues.umbraco.org/issue/U4-2300                
@@ -128,14 +200,14 @@ namespace Umbraco.Web.WebServices
                 }
                 var syncPath = "-1,init," + t.Path.Replace("-1,", "");
 
-			    return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"), 
-                    new {path = syncPath});
-			}
-			catch (Exception ex)
-			{
-				return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"), ex);
-			}
-		}
+                return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"),
+                    new { path = syncPath });
+            }
+            catch (Exception ex)
+            {
+                return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"), ex);
+            }
+        }
 
         /// <summary>
         /// Returns a successful message
@@ -151,27 +223,26 @@ namespace Umbraco.Web.WebServices
             d["message"] = message;
             d["header"] = header;
 
-			return Json(d);
-		}
+            return Json(d);
+        }
 
-		/// <summary>
-		/// Returns a failed message
-		/// </summary>
-		/// <param name="message">The message to display in the speach bubble</param>
-		/// <param name="header">The header to display in the speach bubble</param>
-		/// <param name="exception">The exception if there was one</param>
-		/// <returns></returns>
-		private JsonResult Failed(string message, string header, Exception exception = null)
-		{
-			if (exception != null)
-				LogHelper.Error<SaveFileController>("An error occurred saving a file. " + message, exception);
-			return Json(new
-				{
-					success = false,
-					header = header,
-					message = message + (exception == null ? "" : (exception.Message + ". Check log for details."))
-				});
-		}
-
-	}
+        /// <summary>
+        /// Returns a failed message
+        /// </summary>
+        /// <param name="message">The message to display in the speach bubble</param>
+        /// <param name="header">The header to display in the speach bubble</param>
+        /// <param name="exception">The exception if there was one</param>
+        /// <returns></returns>
+        private JsonResult Failed(string message, string header, Exception exception = null)
+        {
+            if (exception != null)
+                LogHelper.Error<SaveFileController>("An error occurred saving a file. " + message, exception);
+            return Json(new
+            {
+                success = false,
+                header = header,
+                message = message + (exception == null ? "" : (exception.Message + ". Check log for details."))
+            });
+        }
+    }
 }

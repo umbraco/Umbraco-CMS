@@ -12,8 +12,12 @@ using Examine;
 using Examine.Config;
 using Examine.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Umbraco.Core;
 using umbraco.cms.businesslogic;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Services;
 using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
@@ -21,6 +25,9 @@ using UmbracoExamine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using umbraco.BasePages;
+using IContentService = Umbraco.Core.Services.IContentService;
+using UmbracoExamine.LocalStorage;
+using IMediaService = Umbraco.Core.Services.IMediaService;
 
 
 namespace UmbracoExamine
@@ -30,13 +37,24 @@ namespace UmbracoExamine
     /// </summary>
     public class UmbracoContentIndexer : BaseUmbracoIndexer
     {
+        private readonly IContentService _contentService;
+        private readonly IMediaService _mediaService;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly IUserService _userService;
+
         #region Constructors
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public UmbracoContentIndexer()
-            : base() { }
+            : base()
+        {
+            _contentService = ApplicationContext.Current.Services.ContentService;
+            _mediaService = ApplicationContext.Current.Services.MediaService;
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _userService = ApplicationContext.Current.Services.UserService;
+        }
 
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
@@ -45,31 +63,73 @@ namespace UmbracoExamine
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
         /// <param name="analyzer"></param>
-		[SecuritySafeCritical]
-		public UmbracoContentIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-            : base(indexerData, indexPath, dataService, analyzer, async) { }
+        /// <param name="async"></param>
+        [Obsolete("Use the overload that specifies the Umbraco services")]
+        public UmbracoContentIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
+            : base(indexerData, indexPath, dataService, analyzer, async)
+        {
+            _contentService = ApplicationContext.Current.Services.ContentService;
+            _mediaService = ApplicationContext.Current.Services.MediaService;
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _userService = ApplicationContext.Current.Services.UserService;
+        }
 
-		/// <summary>
-		/// Constructor to allow for creating an indexer at runtime
-		/// </summary>
-		/// <param name="indexerData"></param>
-		/// <param name="luceneDirectory"></param>
-		/// <param name="dataService"></param>
-		/// <param name="analyzer"></param>
-		/// <param name="async"></param>
-		[SecuritySafeCritical]
-		public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
-			: base(indexerData, luceneDirectory, dataService, analyzer, async) { }
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="dataService"></param>
+        /// <param name="analyzer"></param>
+        /// <param name="async"></param>
+        [Obsolete("Use the overload that specifies the Umbraco services")]
+        public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
+            : base(indexerData, luceneDirectory, dataService, analyzer, async)
+        {
+            _contentService = ApplicationContext.Current.Services.ContentService;
+            _mediaService = ApplicationContext.Current.Services.MediaService;
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _userService = ApplicationContext.Current.Services.UserService;
+        }
+
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexerData"></param>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="dataService"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="analyzer"></param>
+        /// <param name="async"></param>
+        public UmbracoContentIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, 
+            IContentService contentService, 
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IUserService userService,
+            Analyzer analyzer, bool async)
+            : base(indexerData, luceneDirectory, dataService, analyzer, async)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _dataTypeService = dataTypeService;
+            _userService = userService;
+        }
 
         #endregion
 
         #region Constants & Fields
+
+        private readonly LocalTempStorageIndexer _localTempStorageHelper = new LocalTempStorageIndexer();
 
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
         public const string IndexPathFieldName = "__Path";
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
+        public const string IconFieldName = "__Icon";
 
         /// <summary>
         /// The prefix added to a field when it is duplicated in order to store the original raw value.
@@ -124,10 +184,10 @@ namespace UmbracoExamine
         /// <exception cref="T:System.InvalidOperationException">
         /// An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
         /// </exception>
-        [SecuritySafeCritical]
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        
+        public override void Initialize(string name, NameValueCollection config)
         {
-           
+
             //check if there's a flag specifying to support unpublished content,
             //if not, set to false;
             bool supportUnpublished;
@@ -147,6 +207,22 @@ namespace UmbracoExamine
 
 
             base.Initialize(name, config);
+
+            if (config != null && config["useTempStorage"] != null)
+            {
+                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
+                // for websites that are running from a remove file server and file IO latency becomes an issue
+                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<bool>();
+                if (attemptUseTempStorage)
+                {
+                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
+                    var configuredPath = indexSet.IndexPath;
+
+                    _localTempStorageHelper.Initialize(config, configuredPath, base.GetLuceneDirectory(), IndexingAnalyzer);
+                }
+            }
+
+            
         }
 
         #endregion
@@ -181,26 +257,26 @@ namespace UmbracoExamine
         /// This ensures that the special __Raw_ fields are indexed
         /// </summary>
         /// <param name="docArgs"></param>
-        [SecuritySafeCritical]
+
         protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
         {
             var d = docArgs.Document;
             foreach (var f in docArgs.Fields.Where(x => x.Key.StartsWith(RawFieldPrefix)))
-            {                
+            {
                 d.Add(new Field(
                    f.Key,
                    f.Value,
                    Field.Store.YES,
                    Field.Index.NO, //don't index this field, we never want to search by it 
-                   Field.TermVector.NO));   
-            }            
+                   Field.TermVector.NO));
+            }
 
             base.OnDocumentWriting(docArgs);
         }
 
         protected override void OnNodeIndexed(IndexedNodeEventArgs e)
         {
-            DataService.LogService.AddVerboseLog(e.NodeId, string.Format("Index created for node"));
+            DataService.LogService.AddVerboseLog(e.NodeId, string.Format("Index created for node {0}", e.NodeId));
             base.OnNodeIndexed(e);
         }
 
@@ -220,7 +296,34 @@ namespace UmbracoExamine
 
         #region Public methods
 
-       
+        public override Lucene.Net.Store.Directory GetLuceneDirectory()
+        {
+            //if temp local storage is configured use that, otherwise return the default
+            if (_localTempStorageHelper.LuceneDirectory != null)
+            {
+                return _localTempStorageHelper.LuceneDirectory;
+            }
+
+            return base.GetLuceneDirectory();
+
+        }
+
+        public override IndexWriter GetIndexWriter()
+        {
+            //if temp local storage is configured use that, otherwise return the default
+            if (_localTempStorageHelper.LuceneDirectory != null)
+            {
+                return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
+                    //create the writer with the snapshotter, though that won't make too much a difference because we are not keeping the writer open unless using nrt
+                    // which we are not currently.
+                    _localTempStorageHelper.Snapshotter,
+                    IndexWriter.MaxFieldLength.UNLIMITED);
+            }
+
+            return base.GetIndexWriter();
+        }
+
+
         /// <summary>
         /// Overridden for logging
         /// </summary>
@@ -233,14 +336,14 @@ namespace UmbracoExamine
 
             if (node.Attribute("id") != null)
             {
-                DataService.LogService.AddVerboseLog((int) node.Attribute("id"), string.Format("ReIndexNode with type: {0}", type));
+                DataService.LogService.AddVerboseLog((int)node.Attribute("id"), string.Format("ReIndexNode with type: {0}", type));
                 base.ReIndexNode(node, type);
             }
             else
             {
                 DataService.LogService.AddErrorLog(-1, string.Format("ReIndexNode cannot proceed, the format of the XElement is invalid, the xml has no 'id' attribute. {0}", node));
             }
-            
+
         }
 
         /// <summary>
@@ -279,7 +382,123 @@ namespace UmbracoExamine
 
         #region Protected
 
+        protected override void PerformIndexAll(string type)
+        {
+            
+            const int pageSize = 5000;
+            var pageIndex = 0;
 
+            switch (type)
+            {
+                case IndexTypes.Content:
+                    if (this.SupportUnpublishedContent == false)
+                    {
+                        //use the base implementation which will use the published XML cache to perform the lookups
+                        base.PerformIndexAll(type);
+                    }
+                    else
+                    {
+                        var contentParentId = -1;
+                        if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                        {
+                            contentParentId = IndexerData.ParentNodeId.Value;
+                        }
+                        IContent[] content;
+
+                        do
+                        {
+                            int total;
+                            var descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+
+                            //if specific types are declared we need to post filter them
+                            //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                            if (IndexerData.IncludeNodeTypes.Any())
+                            {
+                                content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                            }
+                            else
+                            {
+                                content = descendants.ToArray();
+                            }
+
+                            AddNodesToIndex(GetSerializedContent(content), type);
+                            pageIndex++;
+                        } while (content.Length == pageSize);
+
+                    }
+                    break;
+                case IndexTypes.Media:
+
+                    var mediaParentId = -1;
+                    if (IndexerData.ParentNodeId.HasValue && IndexerData.ParentNodeId.Value > 0)
+                    {
+                        mediaParentId = IndexerData.ParentNodeId.Value;
+                    }
+                    IMedia[] media;
+                    
+                    do
+                    {
+                        int total;
+                        var descendants = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
+
+                        //if specific types are declared we need to post filter them
+                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
+                        if (IndexerData.IncludeNodeTypes.Any())
+                        {
+                            media = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                        }
+                        else
+                        {
+                            media = descendants.ToArray();
+                        }
+                        
+                        AddNodesToIndex(GetSerializedMedia(media), type);
+                        pageIndex++;
+                    } while (media.Length == pageSize);
+
+                    break;
+            }
+        }
+
+        private IEnumerable<XElement> GetSerializedMedia(IEnumerable<IMedia> media)
+        {
+            var serializer = new EntityXmlSerializer();
+            foreach (var m in media)
+            {
+                var xml = serializer.Serialize(
+                    _mediaService,
+                    _dataTypeService,
+                    _userService,
+                    m);
+
+                //add a custom 'icon' attribute
+                if (m.ContentType.Icon.IsNullOrWhiteSpace() == false)
+                {
+                    xml.Add(new XAttribute("icon", m.ContentType.Icon));    
+                }
+                
+
+                yield return xml;
+            }
+        }
+
+        private IEnumerable<XElement> GetSerializedContent(IEnumerable<IContent> content)
+        {
+            var serializer = new EntityXmlSerializer();
+            foreach (var c in content)
+            {
+                var xml = serializer.Serialize(
+                    _contentService,
+                    _dataTypeService,
+                    _userService,
+                    c);
+
+                //add a custom 'icon' attribute
+                xml.Add(new XAttribute("icon", c.ContentType.Icon));
+
+                yield return xml;
+            }
+        }
 
         /// <summary>
         /// Overridden for logging.
@@ -316,9 +535,10 @@ namespace UmbracoExamine
         /// ensure our special Path field is added to the collection
         /// </summary>
         /// <param name="e"></param>
-        [SecuritySafeCritical]
+
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
+
             //strip html of all users fields if we detect it has HTML in it. 
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
@@ -333,22 +553,28 @@ namespace UmbracoExamine
                         //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
                         e.Fields[RawFieldPrefix + field.Name] = e.Fields[field.Name];
                         //now replace the original value with the stripped html
-                        e.Fields[field.Name] = DataService.ContentService.StripHtml(e.Fields[field.Name]);    
+                        e.Fields[field.Name] = DataService.ContentService.StripHtml(e.Fields[field.Name]);
                     }
                 }
             }
 
             base.OnGatheringNodeData(e);
 
-            //ensure the special path and node type alis fields is added to the dictionary to be saved to file
+            //ensure the special path and node type alias fields is added to the dictionary to be saved to file
             var path = e.Node.Attribute("path").Value;
             if (!e.Fields.ContainsKey(IndexPathFieldName))
                 e.Fields.Add(IndexPathFieldName, path);
 
-            //this needs to support both schemas so get the nodeTypeAlias if it exists, otherwise the name
+            //this needs to support both schema's so get the nodeTypeAlias if it exists, otherwise the name
             var nodeTypeAlias = e.Node.Attribute("nodeTypeAlias") == null ? e.Node.Name.LocalName : e.Node.Attribute("nodeTypeAlias").Value;
             if (!e.Fields.ContainsKey(NodeTypeAliasFieldName))
                 e.Fields.Add(NodeTypeAliasFieldName, nodeTypeAlias);
+
+            //add icon 
+            var icon = (string)e.Node.Attribute("icon");
+            if (!e.Fields.ContainsKey(IconFieldName))
+                e.Fields.Add(IconFieldName, icon);  
+            
         }
 
         /// <summary>
@@ -379,6 +605,12 @@ namespace UmbracoExamine
             //adds the special node type alias property to the index
             fields.Add(NodeTypeAliasFieldName, allValuesForIndexing[NodeTypeAliasFieldName]);
 
+            //icon
+            if (allValuesForIndexing[IconFieldName].IsNullOrWhiteSpace() == false)
+            {
+                fields.Add(IconFieldName, allValuesForIndexing[IconFieldName]);    
+            }
+
             return fields;
 
         }
@@ -401,7 +633,7 @@ namespace UmbracoExamine
             {
                 return base.GetIndexerData(indexSet);
             }
-            
+
         }
 
         /// <summary>

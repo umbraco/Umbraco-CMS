@@ -8,9 +8,9 @@ namespace Umbraco.Core.Packaging
 
     internal class PackageBuilding : IPackageBuilding
     {
-        private readonly PackagingService _packagingService;
+        private readonly IPackagingService _packagingService;
 
-        public PackageBuilding(PackagingService packagingService)
+        public PackageBuilding(IPackagingService packagingService)
         {
             _packagingService = packagingService;
         }

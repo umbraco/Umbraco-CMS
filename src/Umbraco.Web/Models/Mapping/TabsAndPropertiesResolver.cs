@@ -4,8 +4,10 @@ using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 
@@ -40,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
         /// </param>
         /// <remarks>
         /// The generic properties tab is mapped during AfterMap and is responsible for 
-        /// setting up the properties such as Created date, udpated date, template selected, etc...
+        /// setting up the properties such as Created date, updated date, template selected, etc...
         /// </remarks>
         public static void MapGenericProperties<TPersisted>(
             TPersisted content,
@@ -116,14 +118,49 @@ namespace Umbraco.Web.Models.Mapping
         /// <typeparam name="TPersisted"></typeparam>
         /// <param name="display"></param>
         /// <param name="entityType">This must be either 'content' or 'media'</param>
-        internal static void AddContainerView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType)
+        /// <param name="dataTypeService"></param>
+        internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType, IDataTypeService dataTypeService)
              where TPersisted : IContentBase
         {
+            int dtdId;
+            var customDtdName = Constants.Conventions.DataTypes.ListViewPrefix + display.ContentTypeAlias;
+            switch (entityType)
+            {
+                case "content":
+                    dtdId = Constants.System.DefaultContentListViewDataTypeId;
+                    
+                    break;
+                case "media":
+                    dtdId = Constants.System.DefaultMediaListViewDataTypeId;
+                    break;
+                case "member":
+                    dtdId = Constants.System.DefaultMembersListViewDataTypeId;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("entityType does not match a required value");
+            }
+
+            //first try to get the custom one if there is one
+            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName) 
+                ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
+
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
+
+            var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
+            if (editor == null)
+            {
+                throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
+            }
+
             var listViewTab = new Tab<ContentPropertyDisplay>();
-            listViewTab.Alias = "umbContainerView";
+            listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
             listViewTab.Label = ui.Text("content", "childItems");
             listViewTab.Id = 25;
             listViewTab.IsActive = true;
+
+            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
+            //add the entity type to the config
+            listViewConfig["entityType"] = entityType;
 
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
@@ -131,12 +168,9 @@ namespace Umbraco.Web.Models.Mapping
                 Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                 Label = "",
                 Value = null,
-                View = "listview",
+                View = editor.ValueEditor.View,
                 HideLabel = true,
-                Config = new Dictionary<string, object>
-                    {
-                        {"entityType", entityType}
-                    }
+                Config = listViewConfig
             });
             listViewTab.Properties = listViewProperties;
 
@@ -145,6 +179,7 @@ namespace Umbraco.Web.Models.Mapping
             tabs.Add(listViewTab);
             tabs.AddRange(display.Tabs);
             display.Tabs = tabs;
+
         }
 
         protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
@@ -167,16 +202,14 @@ namespace Umbraco.Web.Models.Mapping
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
                             propsForGroup));
                 }
-
-                // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
-                foreach (var prop in aggregateProperties)
-                {
-                    prop.Label = TranslateItem(prop.Label);
-                    prop.Description = TranslateItem(prop.Description);
-                }
                 
+                if (aggregateProperties.Count == 0)
+                    continue;
+
+                    TranslateProperties(aggregateProperties);
+
                 //then we'll just use the root group's data to make the composite tab
-                var rootGroup = propertyGroups.Single(x => x.ParentId == null);
+                var rootGroup = propertyGroups.First(x => x.ParentId == null);
                 aggregateTabs.Add(new Tab<ContentPropertyDisplay>
                     {
                         Id = rootGroup.Id,
@@ -192,19 +225,31 @@ namespace Umbraco.Web.Models.Mapping
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
 
             //now add the generic properties tab
+            var genericproperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties).ToList();
+            TranslateProperties(genericproperties);
+
             aggregateTabs.Add(new Tab<ContentPropertyDisplay>
                 {
                     Id = 0,
                     Label = ui.Text("general", "properties"),
                     Alias = "Generic properties",
-                    Properties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties)
+                    Properties = genericproperties
                 });
-
 
             //set the first tab to active
             aggregateTabs.First().IsActive = true;
 
             return aggregateTabs;
+        }
+
+        private void TranslateProperties(IEnumerable<ContentPropertyDisplay> properties)
+        {
+            // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
+            foreach (var prop in properties)
+            {
+                prop.Label = TranslateItem(prop.Label);
+                prop.Description = TranslateItem(prop.Description);
+            }
         }
 
         // TODO: This should really be centralized and used anywhere globalization applies.

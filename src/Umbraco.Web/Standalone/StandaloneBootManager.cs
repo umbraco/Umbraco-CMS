@@ -57,7 +57,7 @@ namespace Umbraco.Web.Standalone
 
             var caches = new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
-                new PublishedCache.XmlPublishedCache.PublishedMediaCache());
+                new PublishedCache.XmlPublishedCache.PublishedMediaCache(ApplicationContext.Current));
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(caches);
 

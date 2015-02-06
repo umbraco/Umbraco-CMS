@@ -6,12 +6,11 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using Umbraco.Core;
-using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -146,7 +145,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static DocumentType MakeNew(User u, string Text)
         {
-            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
+            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType);
 
@@ -475,87 +474,12 @@ namespace umbraco.cms.businesslogic.web
 
         public XmlElement ToXml(XmlDocument xd)
         {
-            XmlElement doc = xd.CreateElement("DocumentType");
+            var exporter = new EntityXmlSerializer();
+            var xml = exporter.Serialize(ApplicationContext.Current.Services.DataTypeService, ContentType);
 
-            // info section
-            XmlElement info = xd.CreateElement("Info");
-            doc.AppendChild(info);
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Name", GetRawText()));
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Alias", Alias));
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Icon", IconUrl));
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Thumbnail", Thumbnail));
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Description", GetRawDescription()));
-            info.AppendChild(XmlHelper.AddTextNode(xd, "AllowAtRoot", AllowAtRoot.ToString()));
-
-            //TODO: Add support for mixins!
-            if (this.MasterContentType > 0)
-            {
-                DocumentType dt = new DocumentType(this.MasterContentType);
-
-                if (dt != null)
-                    info.AppendChild(XmlHelper.AddTextNode(xd, "Master", dt.Alias));
-            }
-
-
-            // templates
-            XmlElement allowed = xd.CreateElement("AllowedTemplates");
-            foreach (template.Template t in allowedTemplates)
-                allowed.AppendChild(XmlHelper.AddTextNode(xd, "Template", t.Alias));
-            info.AppendChild(allowed);
-            if (DefaultTemplate != 0)
-                info.AppendChild(
-                    XmlHelper.AddTextNode(xd, "DefaultTemplate", new template.Template(DefaultTemplate).Alias));
-            else
-                info.AppendChild(XmlHelper.AddTextNode(xd, "DefaultTemplate", ""));
-
-            // structure
-            XmlElement structure = xd.CreateElement("Structure");
-            doc.AppendChild(structure);
-
-            foreach (int cc in AllowedChildContentTypeIDs.ToList())
-                structure.AppendChild(XmlHelper.AddTextNode(xd, "DocumentType", new DocumentType(cc).Alias));
-
-            // generic properties
-            XmlElement pts = xd.CreateElement("GenericProperties");
-            foreach (PropertyType pt in PropertyTypes)
-            {
-                //only add properties that aren't from master doctype
-                if (pt.ContentTypeId == this.Id)
-                {
-                    XmlElement ptx = xd.CreateElement("GenericProperty");
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Name", pt.GetRawName()));
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Alias", pt.Alias));
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
-
-                    //Datatype definition guid was added in v4 to enable datatype imports
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
-
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Tab", Tab.GetRawCaptionById(pt.TabId)));
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Validation", pt.ValidationRegExp));
-                    ptx.AppendChild(XmlHelper.AddCDataNode(xd, "Description", pt.GetRawDescription()));
-                    pts.AppendChild(ptx);
-                }
-            }
-            doc.AppendChild(pts);
-
-            // tabs
-            var tabs = xd.CreateElement("Tabs");
-
-            foreach (var propertyTypeGroup in PropertyTypeGroups)
-            {
-                //only add tabs that aren't from a master doctype
-                if (propertyTypeGroup.ContentTypeId == this.Id)
-                {
-                    var tabx = xd.CreateElement("Tab");
-                    tabx.AppendChild(XmlHelper.AddTextNode(xd, "Id", propertyTypeGroup.Id.ToString()));
-                    tabx.AppendChild(XmlHelper.AddTextNode(xd, "Caption", propertyTypeGroup.Name));
-                    tabx.AppendChild(XmlHelper.AddTextNode(xd, "SortOrder", propertyTypeGroup.SortOrder.ToString()));
-                    tabs.AppendChild(tabx);
-                }
-            }
-
-            doc.AppendChild(tabs);
+            //convert the Linq to Xml structure to the old .net xml structure
+            var xNode = xml.GetXmlNode();
+            var doc = (XmlElement)xd.ImportNode(xNode, true);
             return doc;
         }
 
@@ -582,15 +506,6 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                if (MasterContentType != 0)
-                    ContentType.ParentId = MasterContentType;
-
-                /*foreach (var masterContentType in MasterContentTypes)
-                {
-                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(masterContentType);
-                    ContentType.AddContentType(contentType);
-                }*/
-
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(ContentType, userId);

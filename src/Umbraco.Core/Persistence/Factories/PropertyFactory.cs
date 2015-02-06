@@ -6,37 +6,35 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PropertyFactory : IEntityFactory<IEnumerable<Property>, IEnumerable<PropertyDataDto>>
+    internal class PropertyFactory
     {
-        private readonly IContentTypeComposition _contentType;
+        private readonly PropertyType[] _compositionTypeProperties;
         private readonly Guid _version;
         private readonly int _id;
         private readonly DateTime _createDate;
         private readonly DateTime _updateDate;
 
-        public PropertyFactory(IContentTypeComposition contentType, Guid version, int id)
+        public PropertyFactory(PropertyType[] compositionTypeProperties, Guid version, int id)
         {
-            _contentType = contentType;
+            _compositionTypeProperties = compositionTypeProperties;
             _version = version;
             _id = id;
         }
 
-        public PropertyFactory(IContentTypeComposition contentType, Guid version, int id, DateTime createDate, DateTime updateDate)
+        public PropertyFactory(PropertyType[] compositionTypeProperties, Guid version, int id, DateTime createDate, DateTime updateDate)
         {
-            _contentType = contentType;
+            _compositionTypeProperties = compositionTypeProperties;
             _version = version;
             _id = id;
             _createDate = createDate;
             _updateDate = updateDate;
         }
 
-        #region Implementation of IEntityFactory<IContent,PropertyDataDto>
-
-        public IEnumerable<Property> BuildEntity(IEnumerable<PropertyDataDto> dtos)
+        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
         {
             var properties = new List<Property>();
 
-            foreach (var propertyType in _contentType.CompositionPropertyTypes)
+            foreach (var propertyType in _compositionTypeProperties)
             {
                 var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
                 var property = propertyDataDto == null
@@ -104,6 +102,5 @@ namespace Umbraco.Core.Persistence.Factories
             return propertyDataDtos;
         }
 
-        #endregion
     }
 }

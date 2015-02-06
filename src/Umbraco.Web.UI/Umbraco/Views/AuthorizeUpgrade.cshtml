@@ -55,7 +55,7 @@
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/lazyload/lazyload.min.js"></script>
-    <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
+    <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
 </body>
 </html>

@@ -1,0 +1,27 @@
+﻿<form novalidate name="contentForm"
+      ng-controller="Umbraco.Editors.Member.ListController"
+      ng-show="loaded">
+    <umb-panel>
+        <umb-header tabs="content.tabs">
+            
+            <div class="umb-headline-editor-wrapper span12">
+                <h1>{{content.name}}</h1>
+            </div>
+
+        </umb-header>
+
+        <umb-tab-view>
+            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+                <div class="umb-pane">
+                    <umb-property property="property"
+                                  ng-repeat="property in tab.properties">
+
+                        <umb-editor model="property"></umb-editor>
+                    </umb-property>
+
+                </div>
+            </umb-tab>
+
+        </umb-tab-view>
+    </umb-panel>
+</form>

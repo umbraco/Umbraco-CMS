@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using umbraco.cms.businesslogic.Files;
 using Umbraco.Core;
@@ -32,11 +34,17 @@ namespace Umbraco.Web.PropertyEditors
         {
             MediaService.Saving += MediaServiceSaving;
             MediaService.Created += MediaServiceCreating;
-
             ContentService.Copied += ContentServiceCopied;
+            
+            MediaService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            MediaService.EmptiedRecycleBin += (sender, args) =>
+                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
+            ContentService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            ContentService.EmptiedRecycleBin += (sender, args) =>
+                args.Files.AddRange(ServiceEmptiedRecycleBin(args.AllPropertyData));
         }
-
-        
 
         /// <summary>
         /// Creates our custom value editor
@@ -52,6 +60,49 @@ namespace Umbraco.Web.PropertyEditors
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new FileUploadPreValueEditor();
+        }
+
+        /// <summary>
+        /// Ensures any files associated are removed
+        /// </summary>
+        /// <param name="allPropertyData"></param>
+        static IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
+        {
+            var list = new List<string>();
+            //Get all values for any image croppers found
+            foreach (var uploadVal in allPropertyData
+                .SelectMany(x => x.Value)
+                .Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
+                .Select(x => x.Value)
+                .WhereNotNull())
+            {
+                if (uploadVal.ToString().IsNullOrWhiteSpace() == false)
+                {
+                    list.Add(uploadVal.ToString());
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Ensures any files associated are removed
+        /// </summary>
+        /// <param name="deletedEntities"></param>
+        static IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
+        {
+            var list = new List<string>();
+            foreach (var property in deletedEntities.SelectMany(deletedEntity => deletedEntity
+                .Properties
+                .Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
+                            && x.Value != null
+                            && string.IsNullOrEmpty(x.Value.ToString()) == false)))
+            {
+                if (property.Value != null && property.Value.ToString().IsNullOrWhiteSpace() == false)
+                {
+                    list.Add(property.Value.ToString());
+                }
+            }
+            return list;
         }
 
         /// <summary>
@@ -71,7 +122,7 @@ namespace Umbraco.Web.PropertyEditors
                     && x.Value != null                                                   
                     && string.IsNullOrEmpty(x.Value.ToString()) == false))
                 {
-                    if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                    if (fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
                     {
                         var currentPath = fs.GetRelativePath(property.Value.ToString());
                         var propertyId = e.Copy.Properties.First(x => x.Alias == property.Alias).Id;
@@ -149,24 +200,28 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
             {
-                var result = new Dictionary<string, object>();
+                var result = new List<PreValue>();
 
                 //the pre-values just take up one field with a semi-colon delimiter so we'll just parse
                 var dictionary = persistedPreVals.FormatAsDictionary();
                 if (dictionary.Any())
                 {
                     //there should only be one val
-                    var delimited = dictionary.First().Value.Value.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+                    var delimited = dictionary.First().Value.Value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     for (var index = 0; index < delimited.Length; index++)
                     {
-                        result.Add(index.ToInvariantString(), delimited[index]);
+                        result.Add(new PreValue(index, delimited[index]));
                     }
                 }
 
                 //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-                return new Dictionary<string, object> { { "items", result } };
+                return new Dictionary<string, object> { { "items", result.ToDictionary(x => x.Id, x => PreValueAsDictionary(x)) } };
             }
 
+            private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)
+            {
+                return new Dictionary<string, object> { { "value", preValue.Value }, { "sortOrder", preValue.SortOrder } };
+            }
             /// <summary>
             /// Take the posted values and convert them to a semi-colon separated list so that its backwards compatible
             /// </summary>

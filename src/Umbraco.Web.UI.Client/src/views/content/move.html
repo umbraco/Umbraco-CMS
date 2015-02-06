@@ -1,38 +1,67 @@
 <div ng-controller="Umbraco.Editors.Content.MoveController">
-<div class="umb-dialog-body">
-	<div class="umb-pane">
+    <div class="umb-dialog-body">
+        <div class="umb-pane">
 
-		<p class="abstract" ng-hide="success">
-			Choose where to move <strong>{{currentNode.name}}</strong> to in the tree structure below
-		</p>
+            <p class="abstract" ng-hide="success">
+                Choose where to move <strong>{{currentNode.name}}</strong> to in the tree structure below
+            </p>
+            
+            <div class="umb-loader-wrapper" ng-show="busy">
+                <div class="umb-loader"></div>
+            </div>
 
-		<div class="alert alert-error" ng-show="error">
-			<h4>{{error.errorMsg}}</h4>
-			<p>{{error.data.Message}}</p>
-		</div>
+            <div class="alert alert-error" ng-show="error">
+                <h4>{{error.errorMsg}}</h4>
+                <p>{{error.data.Message}}</p>
+            </div>
 
-		<div class="alert alert-success" ng-show="success">
-			<p><strong>{{currentNode.name}}</strong> was moved underneath 
-			<strong>{{target.name}}</strong></p>
+            <div class="alert alert-success" ng-show="success">
+                <p>
+                    <strong>{{currentNode.name}}</strong> was moved underneath
+                    <strong>{{target.name}}</strong>
+                </p>
 
-			<button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
-		</div>
+                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+            </div>
 
-		<div ng-hide="success">
-			<umb-tree
-				section="content" 
-				hideheader="false" 
-				hideoptions="true"
-                isdialog="true"
-				eventhandler="dialogTreeEventHandler">
-			</umb-tree>
-		</div>
-	</div>
-</div>
+            <div ng-hide="success">
+
+                <umb-tree-search-box hide-search-callback="hideSearch"
+                                     search-callback="onSearchResults"
+                                     search-from-id="{{searchInfo.searchFromId}}"
+                                     search-from-name="{{searchInfo.searchFromName}}"
+                                     show-search="{{searchInfo.showSearch}}"
+                                     section="{{section}}">
+                </umb-tree-search-box>
+
+                <br />
+
+                <umb-tree-search-results ng-if="searchInfo.showSearch"
+                                         results="searchInfo.results"
+                                         select-result-callback="selectResult">
+                </umb-tree-search-results>
+
+                <div ng-hide="searchInfo.showSearch">
+                    <umb-tree section="content"
+                              hideheader="false"
+                              hideoptions="true"
+                              isdialog="true"
+                              eventhandler="dialogTreeEventHandler"
+                              enablecheckboxes="true">
+                    </umb-tree>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
-<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-	<a class="btn btn-link" ng-click="nav.hideDialog()">Cancel</a>
-	<button class="btn btn-primary" ng-click="move()">Move</button>
-</div>
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-if="!busy">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+        <button class="btn btn-primary" ng-click="move()" ng-disabled="busy">
+            <localize key="actions_move">Move</localize>
+        </button>
+    </div>
 </div>

@@ -49,7 +49,7 @@ namespace Umbraco.Tests.PublishedContent
                         });    
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
-                new PublishedContentCache(), new PublishedMediaCache()));
+                new PublishedContentCache(), new PublishedMediaCache(ApplicationContext)));
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

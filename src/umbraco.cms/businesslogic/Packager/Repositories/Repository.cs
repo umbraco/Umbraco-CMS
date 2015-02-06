@@ -5,13 +5,14 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Net;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.repositories
 {
-    public class Repository
+    public class Repository : DisposableObject
     {        
         public string Guid { get; private set; }
 
@@ -211,25 +212,26 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
 
                 // Check for package directory
-                if (!System.IO.Directory.Exists(IOHelper.MapPath(packager.Settings.PackagerRoot)))
-                    System.IO.Directory.CreateDirectory(IOHelper.MapPath(packager.Settings.PackagerRoot));
+                if (Directory.Exists(IOHelper.MapPath(Settings.PackagerRoot)) == false)
+                    Directory.CreateDirectory(IOHelper.MapPath(Settings.PackagerRoot));
 
-
-                System.IO.FileStream fs1 = null;
-                fs1 = new FileStream(IOHelper.MapPath(packager.Settings.PackagerRoot + System.IO.Path.DirectorySeparatorChar.ToString() + packageGuid + ".umb"), FileMode.Create);
-                fs1.Write(fileByteArray, 0, fileByteArray.Length);
-                fs1.Close();
-                fs1 = null;
-
-                return "packages\\" + packageGuid + ".umb";
-
+                using (var fs1 = new FileStream(IOHelper.MapPath(Settings.PackagerRoot + Path.DirectorySeparatorChar + packageGuid + ".umb"), FileMode.Create))
+                {
+                    fs1.Write(fileByteArray, 0, fileByteArray.Length);
+                    fs1.Close();
+                    return "packages\\" + packageGuid + ".umb";
+                }
             }
-            else
-            {
 
-                return "";
-            }
+            return "";
         }
-        
+
+        /// <summary>
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
+        /// </summary>
+        protected override void DisposeResources()
+        {
+            Webservice.Dispose();
+        }
     }
 }

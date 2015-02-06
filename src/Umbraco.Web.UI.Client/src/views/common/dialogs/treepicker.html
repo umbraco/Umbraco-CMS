@@ -1,48 +1,38 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.TreePickerController">
-    <div class="umb-panel-header" ng-hide="startNodeId > -1">
+    <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
-            <div class="form-search">
-                <i class="icon-search"></i>
-                <input type="text"
-                    ng-model="term"
-                    class="umb-search-field search-query"
-                    placeholder="Search..."
-                    on-keyup="performSearch()">
-            </div>
-        </div>
+            
+            <umb-tree-search-box hide-search-callback="hideSearch"
+                                 search-callback="onSearchResults"
+                                 search-from-id="{{searchInfo.searchFromId}}"
+                                 search-from-name="{{searchInfo.searchFromName}}"
+                                 show-search="{{searchInfo.showSearch}}"
+                                 section="{{section}}">
+            </umb-tree-search-box>
+
+        </div>        
     </div>
-    <div class="umb-panel-body with-footer" ng-class="{'no-header':startNodeId > -1}">
+    <div class="umb-panel-body with-footer">
+        
         <div class="tab-content umb-control-group">
+            
+            <umb-tree-search-results 
+                ng-if="searchInfo.showSearch"                                     
+                results="searchInfo.results"
+                select-result-callback="selectResult">
+            </umb-tree-search-results>
 
-            <!-- Search results -->
-            <div ng-show="showSearch">
-                <ul class="umb-tree">
-                    <li class="root">
-                        <ul class="umb-search-group">
-                            <li ng-repeat="result in results">
-                                <div style="padding-left: 20px">
-                                    <a ng-class="{first:$first}" ng-click="selectResult(result)">
-                                        <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
-                                        {{result.name}}
-			                            <small class="search-subtitle" ng-show="result.subTitle">{{result.subTitle}}</small>
-                                    </a>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-
-            <div ng-hide="showSearch">
-                <umb-tree
-                    section="{{section}}"
-                    treealias="{{treeAlias}}"
-                    hideheader="{{hideHeader}}"
-                    hideoptions="true"
-                    isdialog="true"
-                    customtreeparams="{{customTreeParams}}"
-                    eventhandler="dialogTreeEventHandler">
-				</umb-tree>
+            <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+                <umb-tree section="{{section}}"
+                          treealias="{{treeAlias}}"
+                          hideheader="{{hideHeader}}"
+                          hideoptions="true"
+                          isdialog="true"
+                          customtreeparams="{{customTreeParams}}"
+                          eventhandler="dialogTreeEventHandler"
+                          enablelistviewsearch="true"
+                          enablecheckboxes="{{multiPicker}}">
+                </umb-tree>
             </div>
         </div>
     </div>
@@ -57,7 +47,7 @@
 
                 <button
                     class="btn btn-primary"
-                    ng-show="dialogOptions.multiPicker"
+                    ng-if="dialogOptions.multiPicker"
                     ng-click="multiSubmit(dialogData.selection)">
                     <localize key="buttons_select">Select</localize>
                     ({{dialogData.selection.length}})

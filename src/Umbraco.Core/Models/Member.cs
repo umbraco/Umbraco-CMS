@@ -543,7 +543,10 @@ namespace Umbraco.Core.Models
             base.AddingEntity();
 
             if (Key == Guid.Empty)
+            {
                 Key = Guid.NewGuid();
+                ProviderUserKey = Key;
+            }
         }
 
         /// <summary>
@@ -568,7 +571,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         internal string ShortStringPropertyValue { get; set; }
         [IgnoreDataMember]
-        internal int IntegerropertyValue { get; set; }
+        internal int IntegerPropertyValue { get; set; }
         [IgnoreDataMember]
         internal bool BoolPropertyValue { get; set; }
         [IgnoreDataMember]

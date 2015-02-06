@@ -47,7 +47,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual void AddOrUpdate(TEntity entity)
         {
-            _work.RegisterAdded(entity, this);
+            if (FileSystem.FileExists(entity.Path) == false)
+            {
+                _work.RegisterAdded(entity, this);
+            }
+            else
+            {
+                _work.RegisterChanged(entity, this);
+            }
         }
 
         public virtual void Delete(TEntity entity)
@@ -127,7 +134,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
             {
-                FileSystem.AddFile(entity.Path, stream, true);                
+                FileSystem.AddFile(entity.Path, stream, true);
+                entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
+                entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
+                //the id can be the hash
+                entity.Id = entity.Path.GetHashCode();
+                entity.Key = entity.Path.EncodeAsGuid();
             }
         }
 
@@ -135,17 +147,18 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
             {
-                FileSystem.AddFile(entity.Path, stream, true);    
+                FileSystem.AddFile(entity.Path, stream, true);
+                entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
+                entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
+                //the id can be the hash
+                entity.Id = entity.Path.GetHashCode();
+                entity.Key = entity.Path.EncodeAsGuid();
             }
         }
 
         protected virtual void PersistDeletedItem(TEntity entity)
         {
-            if (_fileSystem.FileExists(entity.Name))
-            {
-                _fileSystem.DeleteFile(entity.Name);
-            }
-            else if (_fileSystem.FileExists(entity.Path))
+            if (_fileSystem.FileExists(entity.Path))
             {
                 _fileSystem.DeleteFile(entity.Path);
             }

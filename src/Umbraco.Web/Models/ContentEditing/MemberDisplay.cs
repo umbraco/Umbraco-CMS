@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a member to be displayed in the back office
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class MemberDisplay : ContentItemDisplayBase<ContentPropertyDisplay, IMember>
+    public class MemberDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IMember>
     {
         public MemberDisplay()
         {

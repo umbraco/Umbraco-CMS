@@ -5,8 +5,11 @@ using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -14,7 +17,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTests
+    public class ContentTests : BaseUmbracoConfigurationTest
     {
         [SetUp]
         public void Init()
@@ -179,6 +182,62 @@ namespace Umbraco.Tests.Models
             Assert.That(clone.HasIdentity, Is.False);
 
             Assert.AreNotSame(content.Properties, clone.Properties);
+        }
+
+        [Ignore]
+        [Test]
+        public void Can_Deep_Clone_Perf_Test()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.Id = 99;
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+            var i = 200;
+            foreach (var property in content.Properties)
+            {
+                property.Id = ++i;
+            }
+            content.Id = 10;
+            content.CreateDate = DateTime.Now;
+            content.CreatorId = 22;
+            content.ExpireDate = DateTime.Now;
+            content.Key = Guid.NewGuid();
+            content.Language = "en";
+            content.Level = 3;
+            content.Path = "-1,4,10";
+            content.ReleaseDate = DateTime.Now;
+            content.ChangePublishedState(PublishedState.Published);
+            content.SortOrder = 5;
+            content.Template = new Template("-1,2,3,4", "Test Template", "testTemplate")
+            {
+                Id = 88
+            };
+            content.Trashed = false;
+            content.UpdateDate = DateTime.Now;
+            content.Version = Guid.NewGuid();
+            content.WriterId = 23;
+
+            ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
+
+            var runtimeCache = new RuntimeCacheProvider();
+            runtimeCache.Save(typeof(IContent), content);
+
+            using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
+            {
+                for (int j = 0; j < 1000; j++)
+                {
+                    var clone = runtimeCache.GetById(typeof(IContent), content.Id.ToGuid());
+                }
+            }
+
+            using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITHOUT RUNTIME CACHE"))
+            {
+                for (int j = 0; j < 1000; j++)
+                {
+                    var clone = (ContentType)contentType.DeepClone();
+                }
+            }
         }
 
         [Test]
@@ -360,7 +419,7 @@ namespace Umbraco.Tests.Models
             Assert.That(content.Properties["title"], Is.Not.Null);
             Assert.That(content.Properties["title"].Alias, Is.EqualTo("title"));
             Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
-            Assert.That(content.Properties["metaDescription"].Value, Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(content.Properties["description"].Value, Is.EqualTo("This is the meta description for a textpage"));
         }
 
         [Test]
@@ -554,9 +613,9 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Contains("author"), Is.True);
             Assert.That(content.Properties.Contains("keywords"), Is.True);
-            Assert.That(content.Properties.Contains("metaDescription"), Is.True);
+            Assert.That(content.Properties.Contains("description"), Is.True);
             Assert.That(content.Properties["keywords"].Value, Is.EqualTo("text,page,meta"));
-            Assert.That(content.Properties["metaDescription"].Value, Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(content.Properties["description"].Value, Is.EqualTo("This is the meta description for a textpage"));
         }
 
         [Test]
@@ -573,7 +632,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Contains("author"), Is.True);
             Assert.That(content.Properties.Contains("keywords"), Is.False);
-            Assert.That(content.Properties.Contains("metaDescription"), Is.False);
+            Assert.That(content.Properties.Contains("description"), Is.False);
         }
 
         [Test]
@@ -770,7 +829,7 @@ namespace Umbraco.Tests.Models
         public void Can_Avoid_Circular_Dependencies_In_Composition()
         {
             var textPage = MockedContentTypes.CreateTextpageContentType();
-            var parent = MockedContentTypes.CreateSimpleContentType("parent", "Parent");
+            var parent = MockedContentTypes.CreateSimpleContentType("parent", "Parent", null, true);
             var meta = MockedContentTypes.CreateMetaContentType();
             var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(
                                                                                     new List<PropertyType>
@@ -805,7 +864,9 @@ namespace Umbraco.Tests.Models
             var addedMetaMixin2 = mixin2.AddContentType(meta);
             var addedMixin2 = mixin1.AddContentType(mixin2);
             var addedMeta = parent.AddContentType(meta);
+
             var addedMixin1 = parent.AddContentType(mixin1);
+
             var addedMixin1Textpage = textPage.AddContentType(mixin1);
             var addedTextpageParent = parent.AddContentType(textPage);
 

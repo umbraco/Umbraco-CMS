@@ -41,7 +41,7 @@ namespace Umbraco.Core.Dynamics
             foreach (string prop in props)
             {
                 // use reflection (not ComponentModel) to mirror LINQ
-                PropertyInfo pi = type.GetProperty(prop);
+                PropertyInfo pi = type.GetProperty(prop, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 expr = Expression.Property(expr, pi);
                 type = pi.PropertyType;
             }

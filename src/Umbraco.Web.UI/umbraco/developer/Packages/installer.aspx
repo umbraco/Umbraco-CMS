@@ -74,9 +74,11 @@
             <cc1:PropertyPanel runat="server" Text="&nbsp;">
                 <asp:Button ID="ButtonLoadPackage" runat="server" Enabled="false" Text="Load Package"
                     OnClick="uploadFile"></asp:Button>
-                <span id="loadingbar" style="display: none;">
-                    <cc1:ProgressBar ID="progbar1" runat="server" Title="Please wait..." />
-                </span>
+                <div id="loadingbar" style="display: none;">
+                    <div class="umb-loader-wrapper">
+                        <cc1:ProgressBar ID="progbar1" runat="server" Title="Please wait..." />
+                    </div>
+                </div>
             </cc1:PropertyPanel>
         </cc1:Pane>
         <cc1:Pane ID="pane_authenticate" runat="server" Visible="false" Text="Repository authentication">
@@ -98,16 +100,17 @@
         </cc1:Pane>
 
         <asp:Panel ID="pane_acceptLicense" runat="server" Visible="false">
-            <br />
-            <div class="alert alert-warning">
-                <p>
-                    <strong>Please note:</strong> Installing a package containing several items and
-                    files can take some time. Do not refresh the page or navigate away before, the installer
-                    notifies you the install is completed.
-                </p>
-            </div>
-
+            
             <cc1:Pane ID="pane_acceptLicenseInner" runat="server">
+                
+                <div class="alert alert-warning">
+                    <p>
+                        <strong>Please note:</strong> Installing a package containing several items and
+                        files can take some time. Do not refresh the page or navigate away before, the installer
+                        notifies you the install is completed.
+                    </p>
+                </div>
+
                 <cc1:PropertyPanel ID="PropertyPanel3" runat="server" Text="Name">
                     <asp:Label ID="LabelName" runat="server" /></cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="PropertyPanel5" runat="server" Text="Author">
@@ -251,10 +254,12 @@
 
                 <cc1:PropertyPanel runat="server" Text=" ">
                     <br />
-                    <div style="display: none;" id="installingMessage">
-                        <cc1:ProgressBar runat="server" ID="_progbar1" />
+                    <div id="installingMessage" style="display: none;">
+                        <div class="umb-loader-wrapper">
+                            <cc1:ProgressBar runat="server" ID="_progbar1" />
+                        </div>
                         <br />
-                        <em>&nbsp; &nbsp;Installing package, please wait...</em><br />
+                        <em>Installing package, please wait...</em><br /><br />
                     </div>
                     <asp:Button ID="ButtonInstall" runat="server" Text="Install Package" CssClass="btn btn-primary" Enabled="False"
                         OnClick="startInstall"></asp:Button>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,10 +20,9 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
-using Member = umbraco.cms.businesslogic.member.Member;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
 {
@@ -506,11 +504,24 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, provider.GetCurrentUser());
+                return _membershipHelper.IsLoggedIn()
+                    && Access.HasAccess(nodeId, path, GetCurrentMember());
 			}
 			return true;
 		}
+
+        /// <summary>
+        /// Gets (or adds) the current member from the current request cache
+        /// </summary>
+        private MembershipUser GetCurrentMember()
+        {
+            return UmbracoContext.Application.ApplicationCache.RequestCache
+                .GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
+                {
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    return provider.GetCurrentUser();
+                });
+        }
 
 		/// <summary>
 		/// Whether or not the current member is logged in (based on the membership provider)
@@ -1301,43 +1312,50 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region tuning
+        #region canvasdesigner
+        
+        public HtmlString EnableCanvasDesigner()
+        {
+            return EnableCanvasDesigner(string.Empty, string.Empty);
+        }
 
-        public HtmlString EnableTuning()
+        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
+        {
+            return EnableCanvasDesigner(canvasdesignerConfigPath, string.Empty);
+        }
+
+        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
         {
 
-            string previewLink = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"" />" +
-                                 @"<link href=""{0}"" rel=""stylesheet/less"" type=""text/css"" />" +
-                                 @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
-                                 @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>" +
-                                 @"<script src=""/Umbraco/lib/Less/less-1.7.0.min.js"" type=""text/javascript""></script>" +
-                                 @"<script type=""text/javascript"">var tuningParameterUrl='{0}';</script>" +
-                                 @"<script src=""/umbraco/js/tuning.front.js"" type=""text/javascript""></script>";
+            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""{0}"" type=""text/javascript""></script>" +
+                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
+                                 @"<script type=""text/javascript"">var pageId = '{2}'</script>" +
+                                 @"<script src=""/umbraco/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
 
-            string noPreviewLinks = @"<link href=""/Umbraco/lib/bootstrap/css/bootstrap.min.3.0.1.css"" type=""text/css"" rel=""stylesheet"">" +
-                                    @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" />" +
-                                    @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
-                                    @"<script src=""/Umbraco/lib/bootstrap/js/bootstrap.3.0.1.min.js"" type=""text/javascript""></script>";
+            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
 
             // Get page value
             int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
             string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
             string result = string.Empty;
+            string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
 
             if (UmbracoContext.Current.InPreviewMode)
             {
-                // Create or update current less file
-                string lessPath = TuningUtility.CreateOrUpdateLessFile(path, pageId);
-                result = string.Format(previewLink, lessPath);
+                canvasdesignerConfigPath = !string.IsNullOrEmpty(canvasdesignerConfigPath) ? canvasdesignerConfigPath : "/umbraco/js/canvasdesigner.config.js";
+                canvasdesignerPalettesPath = !string.IsNullOrEmpty(canvasdesignerPalettesPath) ? canvasdesignerPalettesPath : "/umbraco/js/canvasdesigner.palettes.js";
+                
+                if (!string.IsNullOrEmpty(cssPath))
+                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+
+                result = result + string.Format(previewLink, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
             }
             else
             {
                 // Get css path for current page
-                string cssPath = TuningUtility.GetStylesheetPath(path, false);
                 if (!string.IsNullOrEmpty(cssPath))
                     result = string.Format(noPreviewLinks, cssPath);
-                else
-                    result = string.Format(noPreviewLinks, "/Umbraco/assets/css/tuning.defaultStyle.css");
             }
 
             return new HtmlString(result);

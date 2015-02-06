@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="GenericProperty.ascx.cs" Inherits="umbraco.controls.GenericProperties.GenericProperty" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
+<%@ Control Language="c#" AutoEventWireup="True" Inherits="umbraco.controls.GenericProperties.GenericProperty" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <li id="<%=this.FullId%>" onmousedown="activeDragId = this.id;">
@@ -39,7 +39,6 @@
 
         <cc1:PropertyPanel ID="PropertyPanel2" runat="server" Text="Alias">
                     <asp:TextBox ID="tbAlias" runat="server" CssClass="propertyFormInput prop-alias"></asp:TextBox>
-            <asp:Label ID="lblAlias" runat="server" ></asp:Label>
                 </cc1:PropertyPanel>
 
         <cc1:PropertyPanel ID="PropertyPanel3" runat="server" Text="Type">

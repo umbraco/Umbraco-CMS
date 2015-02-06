@@ -18,8 +18,6 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using UmbracoExamine;
 using umbraco;
-using umbraco.cms.businesslogic;
-using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -31,21 +29,30 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	/// </remarks>
     internal class PublishedMediaCache : IPublishedMediaCache
 	{
-		public PublishedMediaCache()
-		{			
-		}
+        public PublishedMediaCache(ApplicationContext applicationContext)
+        {
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            _applicationContext = applicationContext;
+        }
 
 	    /// <summary>
 	    /// Generally used for unit testing to use an explicit examine searcher
 	    /// </summary>
+        /// <param name="applicationContext"></param>
 	    /// <param name="searchProvider"></param>
 	    /// <param name="indexProvider"></param>
-	    internal PublishedMediaCache(BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
+        internal PublishedMediaCache(ApplicationContext applicationContext, BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
 	    {
-		    _searchProvider = searchProvider;
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+	        if (searchProvider == null) throw new ArgumentNullException("searchProvider");
+	        if (indexProvider == null) throw new ArgumentNullException("indexProvider");
+
+            _applicationContext = applicationContext;
+	        _searchProvider = searchProvider;
 		    _indexProvider = indexProvider;
 		}
 
+        private readonly ApplicationContext _applicationContext;
 	    private readonly BaseSearchProvider _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
 
@@ -56,17 +63,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 		public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
 		{
-			var rootMedia = global::umbraco.cms.businesslogic.media.Media.GetRootMedias();
-			var result = new List<IPublishedContent>();
-			//TODO: need to get a ConvertFromMedia method but we'll just use this for now.
-			foreach (var media in rootMedia
-				.Select(m => global::umbraco.library.GetMedia(m.Id, true))
-				.Where(media => media != null && media.Current != null))
-			{
-				media.MoveNext();
-				result.Add(ConvertFromXPathNavigator(media.Current));
-			}
-			return result;
+            //TODO: We should be able to look these ids first in Examine!
+
+		    var rootMedia = _applicationContext.Services.MediaService.GetRootMedia();
+		    return rootMedia.Select(m => GetUmbracoMedia(m.Id));
 		}
 
         public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars)
@@ -96,7 +96,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public bool XPathNavigatorIsNavigable { get { return false; } }
 
-        public virtual bool HasContent(UmbracoContext context, bool preview) { throw new NotImplementedException(); }
+        public virtual bool HasContent(UmbracoContext context, bool preview) { throw new NotImplementedException(); }	    
 
         private ExamineManager GetExamineManagerSafe()
 		{
@@ -192,29 +192,30 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}	
 			}
 
-			var media = global::umbraco.library.GetMedia(id, true);
-			if (media != null && media.Current != null)
-			{
-				media.MoveNext();
-				var moved = media.Current.MoveToFirstChild();
-				//first check if we have an error
-				if (moved)
-				{
-					if (media.Current.Name.InvariantEquals("error"))
-					{
-						return null;
-					}	
-				}
-				if (moved)
-				{
-					//move back to the parent and return
-					media.Current.MoveToParent();	
-				}
-				return ConvertFromXPathNavigator(media.Current);
-			}
+            LogHelper.Debug<PublishedMediaCache>(
+                "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
+                () => id);
 
-			return null;
+			var media = global::umbraco.library.GetMedia(id, true);
+
+		    return ConvertFromXPathNodeIterator(media, id);
 		}
+
+        internal IPublishedContent ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
+	    {
+            if (media != null && media.Current != null)
+            {
+                return media.Current.Name.InvariantEquals("error") 
+                    ? null 
+                    : ConvertFromXPathNavigator(media.Current);
+            }
+
+            LogHelper.Debug<PublishedMediaCache>(
+                "Could not retrieve media {0} from Examine index or from legacy library.GetMedia method",
+                () => id);
+
+            return null;
+	    }
 
 		internal IPublishedContent ConvertFromSearchResult(SearchResult searchResult)
 		{
@@ -417,7 +418,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
-				    media.MoveNext();
 					xpath = media.Current;
 				}
 				else

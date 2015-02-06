@@ -29,5 +29,11 @@ namespace Umbraco.Core.Persistence.Migrations
         {
             return this.ToString();
         }
+
+        /// <summary>
+        /// This might be useful in the future if we add it to the interface, but for now it's used to hack the DeleteAppTables & DeleteForeignKeyExpression
+        /// to ensure they are not executed twice.
+        /// </summary>
+        internal string Name { get; set; }
     }
 }

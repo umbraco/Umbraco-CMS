@@ -7,38 +7,17 @@ function contentTypeResource($q, $http, umbRequestHelper) {
 
     return {
 
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.contentTypeResource#getContentType
-         * @methodOf umbraco.resources.contentTypeResource
-         *
-         * @description
-         * Returns a content type with a given ID
-         *
-         * ##usage
-         * <pre>
-         * contentTypeResource.getContentType(1234)
-         *    .then(function(type) {
-         *        $scope.type = type;
-         *    });
-         * </pre> 
-         * @param {Int} id id of the content type to retrieve
-         * @returns {Promise} resourcePromise object.
-         *
-         */
-        getContentType: function (id) {
+        getAssignedListViewDataType: function (contentTypeId) {
 
-            var deferred = $q.defer();
-            var data = {
-                name: "News Article",
-                alias: "newsArticle",
-                id: id,
-                tabs: []
-            };
-            
-            deferred.resolve(data);
-            return deferred.promise;
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetAssignedListViewDataType",
+                       [{ contentTypeId: contentTypeId }])),
+               'Failed to retrieve data for content id ' + contentTypeId);
         },
+
         
         /**
          * @ngdoc method
@@ -68,6 +47,27 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                        "GetAllowedChildren",
                        [{ contentId: contentId }])),
                'Failed to retrieve data for content id ' + contentId);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#getAllPropertyTypeAliases
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Returns a list of defined property type aliases
+         *        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getAllPropertyTypeAliases: function () {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetAllPropertyTypeAliases")),
+               'Failed to retrieve property type aliases');
         }
 
     };

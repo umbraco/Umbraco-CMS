@@ -12,5 +12,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="query"></param>
         /// <returns>An enumerable list of <see cref="IContentType"/> objects</returns>
         IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query);
+
+        /// <summary>
+        /// Gets all property type aliases.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetAllPropertyTypeAliases();
     }
 }

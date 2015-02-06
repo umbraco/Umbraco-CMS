@@ -28,8 +28,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "owner")]
         public UserBasic Owner { get; set; }
 
-        [DataMember(Name = "updator")]
-        public UserBasic Updator { get; set; }
+        [DataMember(Name = "updater")]
+        public UserBasic Updater { get; set; }
 
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]

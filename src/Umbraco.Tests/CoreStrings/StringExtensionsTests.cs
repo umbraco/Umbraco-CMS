@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Security;
-using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
@@ -25,6 +22,16 @@ namespace Umbraco.Tests.CoreStrings
         public void TearDown()
         {
             ShortStringHelperResolver.Reset();
+        }
+
+        [TestCase("hello.txt", "hello")]
+        [TestCase("this.is.a.Txt", "this.is.a")]
+        [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]
+        [TestCase("not a file","not a file")]
+        public void Strip_File_Extension(string input, string result)
+        {
+            var stripped = input.StripFileExtension();
+            Assert.AreEqual(stripped, result);
         }
 
 	    [TestCase("This is a string to encrypt")]
@@ -52,7 +59,7 @@ namespace Umbraco.Tests.CoreStrings
 				for (int j = 0; j < chars.Length; j++)
 					valueToTest += chars[j].ToString();
 
-			var encrypted = valueToTest.ToString().EncryptWithMachineKey();
+			var encrypted = valueToTest.EncryptWithMachineKey();
 			var decrypted = encrypted.DecryptWithMachineKey();
 			Assert.AreNotEqual(valueToTest, encrypted);
 			Assert.AreEqual(valueToTest, decrypted);
@@ -122,14 +129,14 @@ namespace Umbraco.Tests.CoreStrings
         [Test]
         public void ToUrlAlias()
         {
-            var output = "JUST-ANYTHING".ToUrlAlias(null, false, false, false);
+            var output = "JUST-ANYTHING".ToUrlSegment();
             Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
         }
 
         [Test]
         public void FormatUrl()
         {
-            var output = "JUST-ANYTHING".FormatUrl();
+            var output = "JUST-ANYTHING".ToUrlSegment();
             Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
         }
 
@@ -185,7 +192,7 @@ namespace Umbraco.Tests.CoreStrings
         [Test]
         public void ConvertCase()
         {
-            var output = "JUST-ANYTHING".ConvertCase(StringAliasCaseType.Unchanged);
+            var output = "JUST-ANYTHING".ToCleanString(CleanStringType.Unchanged);
             Assert.AreEqual("CLEAN-STRING-A::JUST-ANYTHING", output);
         }
 

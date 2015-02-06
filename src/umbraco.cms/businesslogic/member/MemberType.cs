@@ -226,7 +226,7 @@ namespace umbraco.cms.businesslogic.member
             {
                 Level = 1,
                 Name = Text,
-                Icon = "member.gif",
+                Icon = "icon-user",
                 Alias = alias
             };
             ApplicationContext.Current.Services.MemberTypeService.Save(mt);

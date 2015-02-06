@@ -17,12 +17,19 @@ namespace Umbraco.Core.Services
     internal class SectionService : ISectionService
     {
         private readonly IUserService _userService;
+        private IEnumerable<Section> _allAvailableSections;
         private readonly IApplicationTreeService _applicationTreeService;
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly CacheHelper _cache;
+        internal const string AppConfigFileName = "applications.config";
+        private static string _appConfig;
+        private volatile bool _isInitialized = false;
+        private static readonly object Locker = new object();
 
         public SectionService(
             IUserService userService,
-            IApplicationTreeService applicationTreeService, 
+            IApplicationTreeService applicationTreeService,
+            IDatabaseUnitOfWorkProvider uowProvider,
             CacheHelper cache)
         {
             if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");
@@ -30,12 +37,11 @@ namespace Umbraco.Core.Services
 
             _userService = userService;
             _applicationTreeService = applicationTreeService;
+            _uowProvider = uowProvider;
             _cache = cache;
         }
 
-        internal const string AppConfigFileName = "applications.config";
-        private static string _appConfig;
-        private static readonly object Locker = new object();
+        
 
         /// <summary>
         /// gets/sets the application.config file path
@@ -57,22 +63,17 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Ensures all available sections exist in the storage medium
+        /// Initializes the service with all available application plugins
         /// </summary>
-        /// <param name="existingSections"></param>
-        public void Initialize(IEnumerable<Section> existingSections)
+        /// <param name="allAvailableSections">
+        /// All application plugins found in assemblies
+        /// </param>
+        /// <remarks>
+        /// This is used to populate the app.config file with any applications declared in plugins that don't exist in the file
+        /// </remarks>
+        public void Initialize(IEnumerable<Section> allAvailableSections)
         {
-            LoadXml(doc =>
-            {
-                foreach (var attr in existingSections)
-                {
-                    doc.Root.Add(new XElement("add",
-                                              new XAttribute("alias", attr.Alias),
-                                              new XAttribute("name", attr.Name),
-                                              new XAttribute("icon", attr.Icon),
-                                              new XAttribute("sortOrder", attr.SortOrder)));
-                }
-            }, true);
+            _allAvailableSections = allAvailableSections;            
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IEnumerable<Section> GetSections()
         {
-            return _cache.GetCacheItem(
+            return _cache.RuntimeCache.GetCacheItem<IEnumerable<Section>>(
                 CacheKeys.ApplicationsCacheKey,
                 () =>
                     {
@@ -88,28 +89,66 @@ namespace Umbraco.Core.Services
                         //if (_testApps != null)
                         //    return _testApps;
 
-                        var tmp = new List<Section>();
+                        var list = ReadFromXmlAndSort();
 
-                        LoadXml(doc =>
+                        //On first access we need to do some initialization
+                        if (_isInitialized == false)
+                        {
+                            lock (Locker)
                             {
-                                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                                    {
-                                        var sortOrderAttr = x.Attribute("sortOrder");
-                                        return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                                    }))
+                                if (_isInitialized == false)
                                 {
-                                    var sortOrderAttr = addElement.Attribute("sortOrder");
-                                    tmp.Add(new Section(addElement.Attribute("name").Value,
-                                                        addElement.Attribute("alias").Value,
-                                                        addElement.Attribute("icon").Value,
-                                                        sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
+                                    //now we can check the non-volatile flag
+                                    if (_allAvailableSections != null)
+                                    {
+                                        var hasChanges = false;
+
+                                        LoadXml(doc =>
+                                        {
+                                            //Now, load in the xml structure and update it with anything that is not declared there and save the file.
+
+                                            //NOTE: On the first iteration here, it will lazily scan all apps, etc... this is because this ienumerable is lazy
+                                            // based on the ApplicationRegistrar - and as noted there this is not an ideal way to do things but were stuck like this
+                                            // currently because of the legacy assemblies and types not in the Core.
+
+                                            //Get all the trees not registered in the config
+                                            var unregistered = _allAvailableSections
+                                                .Where(x => list.Any(l => l.Alias == x.Alias) == false)
+                                                .ToArray();
+
+                                            hasChanges = unregistered.Any();
+
+                                            var count = 0;
+                                            foreach (var attr in unregistered)
+                                            {
+                                                doc.Root.Add(new XElement("add",
+                                                    new XAttribute("alias", attr.Alias),
+                                                    new XAttribute("name", attr.Name),
+                                                    new XAttribute("icon", attr.Icon),
+                                                    new XAttribute("sortOrder", attr.SortOrder)));
+                                                count++;
+                                            }
+
+                                            //don't save if there's no changes
+                                            return count > 0;
+                                        }, true);
+
+                                        if (hasChanges)
+                                        {
+                                            //If there were changes, we need to re-read the structures from the XML
+                                            list = ReadFromXmlAndSort();
+                                        }
+                                    }
                                 }
-                            }, false);
-                        return tmp;
+                            }
+                        }
+
+                        return list;
+
                     });
         }
 
-        internal void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
+        internal void LoadXml(Func<XDocument, bool> callback, bool saveAfterCallbackIfChanged)
         {
             lock (Locker)
             {
@@ -119,9 +158,9 @@ namespace Umbraco.Core.Services
 
                 if (doc.Root != null)
                 {
-                    callback.Invoke(doc);
+                    var changed = callback.Invoke(doc);
 
-                    if (saveAfterCallback)
+                    if (saveAfterCallbackIfChanged && changed)
                     {
                         //ensure the folder is created!
                         Directory.CreateDirectory(Path.GetDirectoryName(AppConfigFilePath));
@@ -194,6 +233,7 @@ namespace Umbraco.Core.Services
                         new XAttribute("name", name),
                         new XAttribute("icon", icon),
                         new XAttribute("sortOrder", sortOrder)));
+                    return true;
                 }, true);
 
                 //raise event
@@ -209,7 +249,7 @@ namespace Umbraco.Core.Services
             lock (Locker)
             {
                 //delete the assigned applications
-                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                _uowProvider.GetUnitOfWork().Database.Execute(
                     "delete from umbracoUser2App where app = @appAlias",
                     new { appAlias = section.Alias });
 
@@ -222,13 +262,40 @@ namespace Umbraco.Core.Services
 
                 LoadXml(doc =>
                 {
-                    doc.Root.Elements("add").Where(x => x.Attribute("alias") != null && x.Attribute("alias").Value == section.Alias).Remove();
+                    doc.Root.Elements("add").Where(x => x.Attribute("alias") != null && x.Attribute("alias").Value == section.Alias)
+                        .Remove();
+
+                    return true;
                 }, true);
 
                 //raise event
                 OnDeleted(section, new EventArgs());   
             }            
         }
+
+        private List<Section> ReadFromXmlAndSort()
+        {
+            var tmp = new List<Section>();
+
+            LoadXml(doc =>
+            {
+                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                {
+                    var sortOrderAttr = x.Attribute("sortOrder");
+                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                }))
+                {
+                    var sortOrderAttr = addElement.Attribute("sortOrder");
+                    tmp.Add(new Section(addElement.Attribute("name").Value,
+                                        addElement.Attribute("alias").Value,
+                                        addElement.Attribute("icon").Value,
+                                        sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
+                }
+                return false;
+            }, false);
+
+            return tmp;
+        } 
 
         internal static event TypedEventHandler<Section, EventArgs> Deleted;
         private static void OnDeleted(Section app, EventArgs args)

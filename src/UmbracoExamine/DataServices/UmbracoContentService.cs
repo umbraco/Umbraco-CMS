@@ -29,14 +29,12 @@ namespace UmbracoExamine.DataServices
 
         private readonly ApplicationContext _applicationContext;
 
-        [SecuritySafeCritical]
 		public UmbracoContentService()
 			: this(ApplicationContext.Current)
 		{
 
 		}
 
-        [SecuritySafeCritical]
         public UmbracoContentService(ApplicationContext applicationContext)
 		{
             _applicationContext = applicationContext;
@@ -47,7 +45,6 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-		[SecuritySafeCritical]
 		public string StripHtml(string value)
         {
 			return value.StripHtml();
@@ -58,7 +55,6 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="xpath"></param>
         /// <returns></returns>
-		[SecuritySafeCritical]
 		public XDocument GetPublishedContentByXPath(string xpath)
         {
 			//TODO: Remove the need for this, the best way would be to remove all requirements of examine based on Xml but that
@@ -74,13 +70,13 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="xpath"></param>
         /// <returns></returns>
-		[SecuritySafeCritical]
+        [Obsolete("This should no longer be used, latest content will be indexed by using the IContentService directly")]
 		public XDocument GetLatestContentByXPath(string xpath)
         {
             var xmlContent = XDocument.Parse("<content></content>");
             foreach (var c in _applicationContext.Services.ContentService.GetRootContent())
             {
-				xmlContent.Root.Add(c.ToDeepXml());				
+                xmlContent.Root.Add(c.ToDeepXml(_applicationContext.Services.PackagingService));				
             }
             var result = ((IEnumerable)xmlContent.XPathEvaluate(xpath)).Cast<XElement>();
             return result.ToXDocument();
@@ -93,7 +89,7 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <param name="documentId"></param>
         /// <returns></returns>
-		[SecuritySafeCritical]
+		
 		private static XmlNode GetPage(int documentId)
         {
             var xDoc = Access.GetXmlDocumentCopy();
@@ -118,13 +114,13 @@ namespace UmbracoExamine.DataServices
         /// Returns a list of all of the user defined property names in Umbraco
         /// </summary>
         /// <returns></returns>
-		[SecuritySafeCritical]
+		
 		public IEnumerable<string> GetAllUserPropertyNames()
 	    {
             try
             {
-                var result = _applicationContext.DatabaseContext.Database.Fetch<PropertyAliasDto>("select distinct alias from cmsPropertyType order by alias");
-                return result.Select(r => r.Alias).ToList();
+                var result = _applicationContext.DatabaseContext.Database.Fetch<string>("select distinct alias from cmsPropertyType order by alias");
+                return result;
             }
             catch (Exception ex)
             {

@@ -10,7 +10,7 @@ using Umbraco.Core.IO;
 namespace Umbraco.Tests.IO
 {
     [TestFixture, RequiresSTA]
-    internal class PhysicalFileSystemTests : AbstractFileSystemTests
+    public class PhysicalFileSystemTests : AbstractFileSystemTests
     {
         public PhysicalFileSystemTests()
             : base(new PhysicalFileSystem(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),

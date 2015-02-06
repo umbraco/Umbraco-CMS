@@ -48,17 +48,22 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-		protected ContentTypeBase(IContentTypeBase parent)
+		protected ContentTypeBase(IContentTypeBase parent) : this(parent, null)
 		{
-			Mandate.ParameterNotNull(parent, "parent");
+		}
 
-			_parentId = new Lazy<int>(() => parent.Id);
-			_allowedContentTypes = new List<ContentTypeSort>();
-			_propertyGroups = new PropertyGroupCollection();
+        protected ContentTypeBase(IContentTypeBase parent, string alias)
+        {
+            Mandate.ParameterNotNull(parent, "parent");
+
+            _alias = alias;
+            _parentId = new Lazy<int>(() => parent.Id);
+            _allowedContentTypes = new List<ContentTypeSort>();
+            _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
-		}
+        }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);
@@ -370,6 +375,9 @@ namespace Umbraco.Core.Models
         /// This list aggregates PropertyTypes across the PropertyGroups.
         /// </summary>
         /// <remarks>
+        /// 
+        /// The setter is used purely to set the property types that DO NOT belong to a group!
+        /// 
         /// Marked as DoNotClone because the result of this property is not the natural result of the data, it is 
         /// a union of data so when auto-cloning if the setter is used it will be setting the unnatural result of the 
         /// data. We manually clone this instead. 

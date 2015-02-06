@@ -51,54 +51,38 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IDataTypeDefinition PerformGet(int id)
         {
-            var dataTypeSql = GetBaseQuery(false);
-            dataTypeSql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dataTypeDto = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql).FirstOrDefault();
-
-            if (dataTypeDto == null)
-                return null;
-
-            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
-            var definition = factory.BuildEntity(dataTypeDto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)definition).ResetDirtyProperties(false);
-            return definition;
+            return GetAll(new[] {id}).FirstOrDefault();
         }
 
         protected override IEnumerable<IDataTypeDefinition> PerformGetAll(params int[] ids)
         {
+            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+            var dataTypeSql = GetBaseQuery(false);
+
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                dataTypeSql.Where("umbracoNode.id in (@ids)", new { ids = ids });
             }
             else
             {
-                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-                foreach (var nodeDto in nodeDtos)
-                {
-                    yield return Get(nodeDto.NodeId);
-                }
+                dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
+
+            var dtos = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql);
+            return dtos.Select(factory.BuildEntity).ToArray();
         }
 
         protected override IEnumerable<IDataTypeDefinition> PerformGetByQuery(IQuery<IDataTypeDefinition> query)
         {
+            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dataTypeDtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
 
-            foreach (var dataTypeDto in dataTypeDtos)
-            {
-                yield return Get(dataTypeDto.DataTypeId);
-            }
+            return dtos.Select(factory.BuildEntity).ToArray();
         }
 
         /// <summary>
@@ -109,6 +93,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
             var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == entity.Id);
+
+            //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
 
             //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
@@ -209,7 +195,7 @@ WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("te
             dto.DataTypeId = nodeDto.NodeId;
             Database.Insert(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
@@ -230,7 +216,7 @@ AND umbracoNode.id <> @id",
             ((DataTypeDefinition)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (entity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -253,7 +239,7 @@ AND umbracoNode.id <> @id",
             Database.Update(nodeDto);
             Database.Update(dto);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IDataTypeDefinition entity)
@@ -389,16 +375,15 @@ AND umbracoNode.id <> @id",
                 var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
                 if (existing != null)
                 {
-                    existing.Value = pre.Value.Value;
-                    existing.SortOrder = sortOrder;
                     _preValRepository.AddOrUpdate(new PreValueEntity
                     {
                         //setting an id will update it
                         Id = existing.Id,
-                        Alias = existing.Alias,                        
-                        SortOrder = existing.SortOrder,
-                        Value = existing.Value,
                         DataType = dataType,
+                        //These are the new values to update
+                        Alias = pre.Key,
+                        SortOrder = sortOrder,
+                        Value = pre.Value.Value
                     });
                 }
                 else
@@ -426,7 +411,7 @@ AND umbracoNode.id <> @id",
         {
             //go get the data
             var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
-            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
+            var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
             var collection = PreValueConverter.ConvertToPreValuesCollection(list);
 
             //now create the cache key, this needs to include all pre-value ids so that we can use this cached item in the GetPreValuesAsString method

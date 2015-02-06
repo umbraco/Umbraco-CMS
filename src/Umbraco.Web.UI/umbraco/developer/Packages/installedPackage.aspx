@@ -139,12 +139,12 @@
                 </cc2:PropertyPanel>
 
                 <cc2:PropertyPanel ID="pp_confirm" runat="server" Text="&nbsp;">
-                    <p>
                         <asp:Button ID="bt_confirmUninstall" OnClick="confirmUnInstall" OnClientClick="$('#loadingbar').show()" Text="Confirm uninstall" CssClass="btn btn-primary" runat="server" />
-                        <div style="display: none" id="loadingbar">
-                            <cc2:ProgressBar ID="progbar" runat="server" Title="Please wait..." />    
+                        <div id="loadingbar" style="display: none">
+                            <div class="umb-loader-wrapper">
+                                <cc2:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
+                            </div>
                         </div>
-                    </p>
                 </cc2:PropertyPanel>
             </cc2:Pane>
 
@@ -153,6 +153,5 @@
                     <p><%= umbraco.ui.Text("packager", "packageUninstalledText") %></p>
                 </div>
              </cc2:Pane>
-            </cc2:Pane>
     </cc2:Tabview>
 </asp:Content>

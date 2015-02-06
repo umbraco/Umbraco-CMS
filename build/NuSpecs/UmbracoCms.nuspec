@@ -16,12 +16,12 @@
         <tags>umbraco</tags>
         <dependencies>
             <dependency id="UmbracoCms.Core" version="[$version$]" />
+            <dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
         </dependencies>
     </metadata>
   <files>
 	<file src="..\_BuildOutput\Configs\**" target="Content\config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
 	<file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
-	<file src="..\_BuildOutput\WebApp\macroScripts\**" target="Content\macroScripts" exclude="..\_BuildOutput\WebApp\macroScripts\Web.config" />
 	<file src="..\_BuildOutput\WebApp\masterpages\**" target="Content\masterpages" />
 	<file src="..\_BuildOutput\WebApp\media\**" target="Content\media" />
 	<file src="..\_BuildOutput\WebApp\scripts\**" target="Content\scripts" />
@@ -29,8 +29,8 @@
 	<file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" exclude="..\_BuildOutput\WebApp\Views\Web.config" />
 	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
 	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
-	<file src="..\_BuildOutput\WebApp\Web.config" target="Content\Web.config" />
 	<file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
+	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
 	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
 	<file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />	
 	<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
@@ -38,9 +38,14 @@
 	<file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\config\splashes" />
 	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
 	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
-	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
+    <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
+    <file src="tools\applications.config.install.xdt" target="Content\config\applications.config.install.xdt" />
+    <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
+    <file src="tools\Dashboard.config.install.xdt" target="Content\config\Dashboard.config.install.xdt" />
+    <file src="tools\trees.config.install.xdt" target="Content\config\trees.config.install.xdt" />
+    <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
     <file src="build\**" target="build" />
   </files>
 </package>

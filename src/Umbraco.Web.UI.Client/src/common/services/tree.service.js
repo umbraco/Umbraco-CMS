@@ -255,7 +255,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     eventsService.emit("treeService.treeNodeLoadError", {error: reason } );
 
                     //stop show the loading indicator  
-                    node.loading = false;
+                    args.node.loading = false;
 
                     //tell notications about the error
                     notificationsService.error(reason);
@@ -276,6 +276,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {object} treeNode the node to remove
          */
         removeNode: function(treeNode) {
+            if (!angular.isFunction(treeNode.parent)) {
+                return;
+            }
+
             if (treeNode.parent() == null) {
                 throw "Cannot remove a node that doesn't have a parent";
             }
@@ -315,7 +319,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 return null;
             }
             var found = _.find(treeNode.children, function (child) {
-                return String(child.id) === String(id);
+                return String(child.id).toLowerCase() === String(id).toLowerCase();
             });
             return found === undefined ? null : found;
         },
@@ -670,7 +674,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "Path must be an array";
             }
             if (args.path.length < 1) {
-                throw "args.path must contain at least one id";
+                //if there is no path, make -1 the path, and that should sync the tree root
+                args.path.push("-1");
             }
 
             var deferred = $q.defer();
@@ -685,7 +690,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //of the path is the root node, otherwise we'll search it's children.
             var currPathIndex = 0;
             //if the first id is the root node and there's only one... then consider it synced
-            if (String(args.path[currPathIndex]) === String(args.node.id)) {
+            if (String(args.path[currPathIndex]).toLowerCase() === String(args.node.id).toLowerCase()) {
                 if (args.path.length === 1) {
                     //return the root
                     deferred.resolve(root);

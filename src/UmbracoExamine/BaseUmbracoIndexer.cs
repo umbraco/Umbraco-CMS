@@ -42,14 +42,12 @@ namespace UmbracoExamine
         /// <param name="indexPath"></param>
         /// <param name="dataService"></param>
         /// <param name="analyzer"></param>
-        [SecuritySafeCritical]
         protected BaseUmbracoIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
             : base(indexerData, indexPath, analyzer, async)
         {
             DataService = dataService;
         }
 
-		[SecuritySafeCritical]
 		protected BaseUmbracoIndexer(IIndexCriteria indexerData, Lucene.Net.Store.Directory luceneDirectory, IDataService dataService, Analyzer analyzer, bool async)
 			: base(indexerData, luceneDirectory, analyzer, async)
 		{
@@ -96,7 +94,6 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="name"></param>
         /// <param name="config"></param>
-        [SecuritySafeCritical]
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {           
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
@@ -217,7 +214,6 @@ namespace UmbracoExamine
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
         /// <returns></returns>
-        [SecuritySafeCritical]
         protected bool CanInitialize()
         {
             //check the DisableInitializationCheck and ensure that it is not set to true
@@ -268,6 +264,9 @@ namespace UmbracoExamine
         /// <param name="type"></param>
         protected override void PerformIndexAll(string type)
         {
+            //NOTE: the logic below is ONLY used for published content, for media and members and non-published content, this method is overridden
+            // and we query directly against the umbraco service layer.
+
             if (!SupportedTypes.Contains(type))
                 return;
 
@@ -276,7 +275,7 @@ namespace UmbracoExamine
             var sb = new StringBuilder();
 
             //create the xpath statement to match node type aliases if specified
-            if (IndexerData.IncludeNodeTypes.Count() > 0)
+            if (IndexerData.IncludeNodeTypes.Any())
             {
                 sb.Append("(");
                 foreach (var field in IndexerData.IncludeNodeTypes)
@@ -329,6 +328,9 @@ namespace UmbracoExamine
         /// <returns>Either the Content or Media xml. If the type is not of those specified null is returned</returns>
         protected virtual XDocument GetXDocument(string xPath, string type)
         {
+            //TODO: We need to get rid of this! it will now only ever be called for published content - but we're keeping the other
+            // logic here for backwards compatibility in case inheritors are calling this for some reason.
+
             if (type == IndexTypes.Content)
             {
                 if (this.SupportUnpublishedContent)
@@ -360,11 +362,9 @@ namespace UmbracoExamine
             XDocument xDoc = GetXDocument(xPath, type);
             if (xDoc != null)
             {
-                XElement rootNode = xDoc.Root;
+                var rootNode = xDoc.Root;
 
-                IEnumerable<XElement> children = rootNode.Elements();
-
-                AddNodesToIndex(children, type);
+                AddNodesToIndex(rootNode.Elements(), type);
             }
 
         }

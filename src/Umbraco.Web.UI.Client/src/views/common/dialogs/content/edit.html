@@ -8,20 +8,19 @@
 		<div class="umb-panel-header">
 			<umb-content-name
 			    placeholder="@placeholders_entername"
-			    ng-model="model.entity.name"/>
+			    ng-model="content.name"/>
 		</div>
 
 		<div class="umb-panel-body with-footer">
-			<div id="tab{{tab.id}}" ng-repeat="tab in model.entity.tabs">
-			    <div class="umb-pane" ng-if="!tab.hide">
-			    	<h5>{{tab.label}} - {{tab.alias}}</h5>
-			        <umb-property 
-			            property="property"
-			            ng-repeat="property in tab.properties">
-			            <umb-editor model="property"></umb-editor>
-			        </umb-property>				
-			    </div>
-			 </div>    
+            <div id="tab{{tab.id}}" ng-repeat="tab in content.tabs">
+                <div class="umb-pane" ng-if="!tab.hide">
+                    <h5>{{tab.label}}</h5>
+                    <umb-property property="property"
+                                  ng-repeat="property in tab.properties">
+                        <umb-editor model="property"></umb-editor>
+                    </umb-property>
+                </div>
+            </div>    
 		</div>
 
 
@@ -33,24 +32,25 @@
 					</a>
 		        
 
-			        <div class="btn-group dropup">
-		                <!-- primary button -->
-		                <a class="btn btn-success" href="#" ng-click="saveAndPublish()" prevent-default>
-		                	Publish                         
-		                </a>
-		                
-		                <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
-		                    <span class="caret"></span>
-		                </a>
-		                
-		                <!-- sub buttons -->
-		                <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel">
-		                        <a href ng-click="save()" prevent-default>
-		                            Save
-		                        </a>
-		                    </li>
-		                </ul>
-			        </div>
+                    <div class="btn-group dropup" ng-if="defaultButton">
+                        <!-- primary button -->
+                        <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
+                            <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>
+                        </a>
+
+                        <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
+                            <span class="caret"></span>
+                        </a>
+
+                        <!-- sub buttons -->
+                        <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel" ng-if="subButtons.length > 0">
+                            <li ng-repeat="btn in subButtons">
+                                <a href="#" ng-click="performAction(btn)" prevent-default>
+                                    <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 			        
 		        </div>
 

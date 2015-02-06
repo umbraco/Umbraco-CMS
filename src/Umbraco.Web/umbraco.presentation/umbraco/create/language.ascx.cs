@@ -5,9 +5,6 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Web.UI;
-using umbraco.presentation.create;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.helpers;
 using umbraco.BasePages;
 namespace umbraco.cms.presentation.create.controls
 {
@@ -23,19 +20,18 @@ namespace umbraco.cms.presentation.create.controls
             pp1.Text = ui.Text("choose") + " " + ui.Text("language");
             sbmt.Text = ui.Text("create");
 
-            SortedList sortedCultures = new SortedList();
+            var sortedCultures = new SortedList();
             Cultures.Items.Clear();
             Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-            foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
-            {
-                sortedCultures.Add(ci.DisplayName + "|||" + Guid.NewGuid().ToString(), ci.Name);
-            }
+            foreach (var cultureInfo in CultureInfo.GetCultures(CultureTypes.AllCultures))
+                sortedCultures.Add(cultureInfo.DisplayName + "|||" + Guid.NewGuid(), cultureInfo.Name);
 
-            IDictionaryEnumerator ide = sortedCultures.GetEnumerator();
-            while (ide.MoveNext())
+            var dictionaryEnumerator = sortedCultures.GetEnumerator();
+            while (dictionaryEnumerator.MoveNext())
             {
-                ListItem li = new ListItem(ide.Key.ToString().Substring(0, ide.Key.ToString().IndexOf("|||")), ide.Value.ToString());
-                Cultures.Items.Add(li);
+                var language = dictionaryEnumerator.Key.ToString().Substring(0, dictionaryEnumerator.Key.ToString().IndexOf("|||", StringComparison.Ordinal));
+                var listItem = new ListItem(string.Format("{0} [{1}]", language, dictionaryEnumerator.Value), dictionaryEnumerator.Value.ToString());
+                Cultures.Items.Add(listItem);
             }
         }
 
@@ -51,7 +47,6 @@ namespace umbraco.cms.presentation.create.controls
             BasePage.Current.ClientTools
                 .ChildNodeCreated()
                 .CloseModalWindow();
-
         }
 
         /// <summary>

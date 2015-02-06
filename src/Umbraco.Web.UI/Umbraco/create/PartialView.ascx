@@ -3,15 +3,20 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <cc1:Pane runat="server">
-    <cc1:PropertyPanel runat="server" Text="Filename (without .cshtml)">
+    <cc1:PropertyPanel runat="server" Text="Filename (without .cshtml, use / to make folders)">
         <asp:TextBox ID="FileName" runat="server" CssClass="bigInput input-large-type input-block-level"></asp:TextBox>
-        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="FileName" runat="server">*</asp:RequiredFieldValidator>
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" 
+            CssClass="text-error" Display="Dynamic"
+            ErrorMessage="*" ControlToValidate="FileName" runat="server">*</asp:RequiredFieldValidator>
+        <asp:RegularExpressionValidator runat="server" ID="EndsWithValidator" 
+            CssClass="text-error" Display="Dynamic"
+            ErrorMessage="Cannot end with '/'" ControlToValidate="FileName" ValidationExpression=".*[^/\.]$">
+            Cannot end with '/' or '.'
+        </asp:RegularExpressionValidator>
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server" Text="Choose a snippet:">
-        <asp:ListBox ID="PartialViewTemplate" runat="server" Width="350" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single">
-            <asp:ListItem Value="clean.xslt">Clean</asp:ListItem>
-        </asp:ListBox>
+        <asp:ListBox ID="PartialViewTemplate" runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single"/>
     </cc1:PropertyPanel>
 </cc1:Pane>
 

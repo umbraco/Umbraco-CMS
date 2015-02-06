@@ -47,7 +47,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// OVerridable method to execute when All resolvers have been initialized but resolution is not frozen so they can be modified in this method
+        /// Overridable method to execute when All resolvers have been initialized but resolution is not frozen so they can be modified in this method
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="applicationContext"></param>
@@ -74,7 +74,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         private bool ShouldExecute(ApplicationContext applicationContext)
         {
-            if (applicationContext.IsConfigured && applicationContext.DatabaseContext.IsDatabaseConfigured)
+            if (applicationContext.IsConfigured && applicationContext.DatabaseContext.CanConnect)
             {
                 return true;
             }
@@ -84,7 +84,7 @@ namespace Umbraco.Core
                 return true;
             }
 
-            if (!applicationContext.DatabaseContext.IsDatabaseConfigured && ExecuteWhenDatabaseNotConfigured)
+            if (!applicationContext.DatabaseContext.CanConnect && ExecuteWhenDatabaseNotConfigured)
             {
                 return true;
             }

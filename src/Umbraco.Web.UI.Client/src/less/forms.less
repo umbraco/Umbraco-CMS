@@ -17,7 +17,7 @@ label small, .guiDialogTiny {
 }
 
 label.control-label {
-  padding-top: 8px !important;
+  padding: 8px 10px 0 0 !important;
 }
 
 .umb-status-label{
@@ -25,7 +25,7 @@ label.control-label {
   }
 
 
-.controls-row label{padding: 0px 10px 0px 10px; vertical-align: center}
+.controls-row label{padding: 0 10px 0 10px; vertical-align: center}
 
 
 
@@ -48,7 +48,20 @@ label.control-label {
   position: relative;
   padding: 0;
 }
-.form-search .icon-search {
+.form-search a{
+    text-decoration:none;
+    cursor:pointer;
+}
+.form-search a:hover{
+    color: @gray;
+}
+.form-search h4 {
+    color: @gray;
+}
+.form-search small {
+    color: @grayLight;
+}
+.form-search .icon, .form-search .icon-search {
   position: absolute;
   top: 6px;
   left: 4px;
@@ -58,7 +71,6 @@ label.control-label {
   width: 90%;
   font-size: @fontSizeLarge;
   font-weight: 400;
-  color: @gray;
   border: 1px solid @grayLight;
   padding: 4px 0px 4px 16px;
   padding-left: 25px !Important;

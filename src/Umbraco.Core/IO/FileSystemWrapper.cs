@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
 {

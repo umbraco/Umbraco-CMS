@@ -45,8 +45,11 @@ namespace Umbraco.Core.Media
             var result = new List<ResizedImage>();
 
             var allSizesDictionary = new Dictionary<int,string> {{100,"thumb"}, {500,"big-thumb"}};
-            var allSizes = allSizesDictionary.Select(kv => kv.Key).ToList();
-            allSizes.AddRange(additionalThumbSizes.Where(x => x > 0).Distinct());
+            
+            //combine the static dictionary with the additional sizes with only unique values
+            var allSizes = allSizesDictionary.Select(kv => kv.Key)
+                .Union(additionalThumbSizes.Where(x => x > 0).Distinct());
+
             var sizesDictionary = allSizes.ToDictionary(s => s, s => allSizesDictionary.ContainsKey(s) ? allSizesDictionary[s]: "");
 
             foreach (var s in sizesDictionary)
@@ -165,6 +168,16 @@ namespace Umbraco.Core.Media
                     ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
                     // Save the new image using the dimensions of the image
+                    var predictableThumbnailName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToString(CultureInfo.InvariantCulture));
+                    using (var ms = new MemoryStream())
+                    {
+                        bp.Save(ms, codec, ep);
+                        ms.Seek(0, 0);
+
+                        fs.AddFile(predictableThumbnailName, ms);
+                    }
+
+                    // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
                     var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh));
                     using (var ms = new MemoryStream())
                     {

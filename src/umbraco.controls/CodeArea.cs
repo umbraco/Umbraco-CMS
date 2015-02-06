@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -132,13 +133,13 @@ namespace umbraco.uicontrols
         {
             EnsureChildControls();
 
-            var jsEventCode = "";
+            var jsEventCode = new StringBuilder();
 
 
             if (CodeMirrorEnabled == false)
             {
                 CodeTextBox.RenderControl(writer);
-                jsEventCode = RenderBasicEditor();
+                jsEventCode.Append(RenderBasicEditor());
             }
             else
             {
@@ -148,13 +149,25 @@ namespace umbraco.uicontrols
                 this.ControlStyle.AddAttributesToRender(writer);
                 writer.Write(HtmlTextWriter.TagRightChar);
                 Menu.RenderControl(writer);
+
+                writer.WriteBeginTag("div");
+                writer.WriteAttribute("class", "code-container");
+                this.ControlStyle.AddAttributesToRender(writer);
+                writer.Write(HtmlTextWriter.TagRightChar);
                 CodeTextBox.RenderControl(writer);
                 writer.WriteEndTag("div");
+                writer.WriteEndTag("div");
 
-                jsEventCode = RenderCodeEditor();
+                jsEventCode.Append(RenderCodeEditor());
             }
 
-
+            jsEventCode.Append(@"   
+					//TODO: for now this is a global var, need to refactor all this so that is using proper js standards
+					//with correct objects, and proper accessors to these objects.
+					var UmbEditor;                 
+                    $(document).ready(function () {
+                        //create the editor
+                       UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (CodeMirrorEnabled == false).ToString().ToLower() + @", '" + ClientID + @"');");
 
             if (this.AutoResize)
             {
@@ -165,27 +178,22 @@ namespace umbraco.uicontrols
                     OffSetY += 50;
                 }
 
-                jsEventCode += @"   
-					//TODO: for now this is a global var, need to refactor all this so that is using proper js standards
-					//with correct objects, and proper accessors to these objects.
-					var UmbEditor;                 
-                    $(document).ready(function () {
-                        //create the editor
-                       UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (CodeMirrorEnabled == false).ToString().ToLower() + @", '" + this.ClientID + @"');
-                       var m_textEditor = jQuery('#" + this.ClientID + @"');
+                //add the resize code
+                jsEventCode.Append(@"
+                        var m_textEditor = jQuery('#" + ClientID + @"');
                    
                        //with codemirror adding divs for line numbers, we need to target a different element
                        m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
                    
-                       jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
-            	       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
-                    });";
-  
+                       jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX + "," + OffSetY + @"); });
+            	       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX + "," + OffSetY + @"); });");
+
             }
 
-            jsEventCode = string.Format(@"<script type=""text/javascript"">{0}</script>", jsEventCode);
-            writer.WriteLine(jsEventCode);
+            jsEventCode.Append(@"                       
+                    });");
 
+            writer.WriteLine(@"<script type=""text/javascript"">{0}</script>", jsEventCode);
 
         }
 
@@ -212,8 +220,6 @@ namespace umbraco.uicontrols
             var jsEventCode = @"
                                 var textarea = document.getElementById('" + CodeTextBox.ClientID + @"');
                                 var codeEditor = CodeMirror.fromTextArea(textarea, {
-                                                width: ""100%"",
-                                                height: ""100%"",
                                                 tabMode: ""shift"",
                                                 matchBrackets: true,
                                                 indentUnit: 4,

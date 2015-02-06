@@ -44,7 +44,8 @@
   position: absolute;
   top: 8px;
   left:5px;
-  color: @gray
+  color: @gray;
+  cursor:pointer;
 }
 
 .umb-listview table input[type="text"] {
@@ -55,7 +56,7 @@
   transition: all .5s;
   width: 60px;
   padding: 4px 0 4px 20px;
-  border: 1px solid @grayLighter
+  border: 1px solid @grayLight;
 }
 
 .umb-listview table input::-webkit-input-placeholder {
@@ -82,11 +83,25 @@
   color: @black
 }
 
+.umb-listview table thead a {
+    cursor: default;
+}
+.umb-listview table thead a:hover {
+    text-decoration: none;
+}
+
+.umb-listview table thead a.sortable {
+    cursor: pointer;
+}
+.umb-listview table thead a.sortable span:hover {
+    text-decoration: underline;
+}
+
 .umb-listview .icon-star {
   color: @grayLight
 }
 
-.umb-listview .selected i.icon, .umb-listview tr:hover i.icon{display: none}
+.umb-listview .selected i.icon, .umb-listview tbody tr:hover i.icon{display: none}
 .umb-listview .selected input[type="checkbox"], 
 .umb-listview tr:hover input[type="checkbox"]{display: inline-block !important;}
 .umb-listview .inactive{color: @grayLight;}
@@ -164,6 +179,10 @@
 
 .umb-listview .pagination ul > li.active > a, .umb-listview .pagination ul > li > a:hover {
   color: @black;
+}
+
+.umb-listview .pagination ul > li.disabled > a, .umb-listview .pagination ul > li.disabled > a:hover {
+  color: @grayLight;
 }
 
 /* TEMP */

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -15,6 +16,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -39,10 +41,122 @@ namespace Umbraco.Tests.Persistence.Repositories
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);            
             var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+
+                var contentType1 = MockedContentTypes.CreateSimpleContentType("Textpage1", "Textpage1");
+                contentTypeRepository.AddOrUpdate(contentType1);
+                var allCreated = new List<IContent>();
+
+                for (var i = 0; i < 100; i++)
+                {
+                    //These will be non-published so shouldn't show up
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 100; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                unitOfWork.Commit();
+
+                //now create some versions of this content - this shouldn't affect the xml structures saved
+                for (int i = 0; i < allCreated.Count; i++)
+                {
+                    allCreated[i].Name = "blah" + i;
+                    repository.AddOrUpdate(allCreated[i]);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10);
+
+                Assert.AreEqual(100, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Rebuild_All_Xml_Structures_For_Content_Type()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var contentType1 = MockedContentTypes.CreateSimpleContentType("Textpage1", "Textpage1");
+                var contentType2 = MockedContentTypes.CreateSimpleContentType("Textpage2", "Textpage2");
+                var contentType3 = MockedContentTypes.CreateSimpleContentType("Textpage3", "Textpage3");
+                contentTypeRepository.AddOrUpdate(contentType1);
+                contentTypeRepository.AddOrUpdate(contentType2);
+                contentTypeRepository.AddOrUpdate(contentType3);
+
+                var allCreated = new List<IContent>();
+
+                for (var i = 0; i < 30; i++)
+                {
+                    //These will be non-published so shouldn't show up
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);                 
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType1);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType2);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                for (var i = 0; i < 30; i++)
+                {
+                    var c1 = MockedContent.CreateSimpleContent(contentType3);
+                    c1.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(c1);
+                    allCreated.Add(c1);
+                }
+                unitOfWork.Commit();
+
+                //now create some versions of this content - this shouldn't affect the xml structures saved
+                for (int i = 0; i < allCreated.Count; i++)
+                {
+                    allCreated[i].Name = "blah" + i;
+                    repository.AddOrUpdate(allCreated[i]);
+                }
+                unitOfWork.Commit();
+
+                //delete all xml                 
+                unitOfWork.Database.Execute("DELETE FROM cmsContentXml");
+                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+
+                repository.RebuildXmlStructures(media => new XElement("test"), 10, contentTypeIds: new[] { contentType1.Id, contentType2.Id });
+
+                Assert.AreEqual(60, unitOfWork.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsContentXml"));
+            }
         }
 
         [Test]
@@ -328,6 +442,163 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Get_All_With_Many_Version()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {                
+                var result = repository.GetAll().ToArray();
+                foreach (var content in result)
+                {
+                    content.ChangePublishedState(PublishedState.Saved);
+                    repository.AddOrUpdate(content);
+                }
+                unitOfWork.Commit();
+                foreach (var content in result)
+                {
+                    content.ChangePublishedState(PublishedState.Published);
+                    repository.AddOrUpdate(content);
+                }
+                unitOfWork.Commit();
+
+                //re-get
+
+                var result2 = repository.GetAll().ToArray();
+
+                Assert.AreEqual(result.Count(), result2.Count());
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_ForFirstPage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_ForSecondPage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithSinglePage_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(2));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithDescendingOrder_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending);
+
+                // Assert
+                Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingSome_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page 2");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(1));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 2"));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetPagedResultsByQuery_WithFilterMatchingAll_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                int totalRecords;
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page");
+
+                // Assert
+                Assert.That(totalRecords, Is.EqualTo(2));
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Name, Is.EqualTo("Text Page 1"));
             }
         }
 

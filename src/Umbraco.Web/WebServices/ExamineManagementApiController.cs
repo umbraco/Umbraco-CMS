@@ -10,6 +10,7 @@ using Examine.LuceneEngine.Providers;
 using Examine.Providers;
 using Lucene.Net.Search;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
 
@@ -17,6 +18,54 @@ namespace Umbraco.Web.WebServices
 {
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
+        /// <summary>
+        /// Checks if the member internal index is consistent with the data stored in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool CheckMembersInternalIndex()
+        {
+            var total = Services.MemberService.Count();
+
+            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"]
+                .CreateSearchCriteria().RawQuery("__IndexType:member");
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"].Search(criteria);
+
+            return total == totalIndexed.TotalItemCount;
+        }
+
+        /// <summary>
+        /// Checks if the media internal index is consistent with the data stored in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool CheckMediaInternalIndex()
+        {
+            var total = Services.MediaService.Count();
+
+            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
+                .CreateSearchCriteria().RawQuery("__IndexType:media");
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
+
+            return total == totalIndexed.TotalItemCount;
+        }
+
+        /// <summary>
+        /// Checks if the content internal index is consistent with the data stored in the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public bool CheckContentInternalIndex()
+        {
+            var total = Services.ContentService.Count();
+
+            var criteria = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"]
+                .CreateSearchCriteria().RawQuery("__IndexType:content");
+            var totalIndexed = ExamineManager.Instance.SearchProviderCollection["InternalSearcher"].Search(criteria);
+
+            return total == totalIndexed.TotalItemCount;
+        }
+
         /// <summary>
         /// Get the details for indexers
         /// </summary>
@@ -41,7 +90,7 @@ namespace Umbraco.Web.WebServices
                     };
                     var props = TypeHelper.CachedDiscoverableProperties(searcher.GetType(), mustWrite: false)
                         //ignore these properties
-                                          .Where(x => !new[] { "Description" }.InvariantContains(x.Name))
+                                          .Where(x => new[] {"Description"}.InvariantContains(x.Name) == false)
                                           .OrderBy(x => x.Name);
                     foreach (var p in props)
                     {
@@ -121,6 +170,7 @@ namespace Umbraco.Web.WebServices
                 }
                 catch (Exception ex)
                 {
+                    LogHelper.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
                     var response = Request.CreateResponse(HttpStatusCode.Conflict);
                     response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
                     response.ReasonPhrase = "Could Not Rebuild";
@@ -136,7 +186,7 @@ namespace Umbraco.Web.WebServices
         /// <param name="indexerName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is kind of rudementary since there's no way we can know that the index has rebuilt, we'll just check
+        /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we'll just check
         /// if the index is locked based on Lucene apis
         /// </remarks>
         public ExamineIndexerModel PostCheckRebuildIndex(string indexerName)
@@ -181,7 +231,7 @@ namespace Umbraco.Web.WebServices
             };
             var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                 //ignore these properties
-                                  .Where(x => !new[] { "IndexerData", "Description", "WorkingFolder" }.InvariantContains(x.Name))
+                                  .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                                   .OrderBy(x => x.Name);
             foreach (var p in props)
             {
@@ -193,7 +243,7 @@ namespace Umbraco.Web.WebServices
             {                
                 indexerModel.IsLuceneIndex = true;
                 indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
-                indexerModel.FieldCount = luceneIndexer.GetIndexDocumentCount();
+                indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
                 indexerModel.IsOptimized = luceneIndexer.IsIndexOptimized();
                 indexerModel.DeletionCount = luceneIndexer.GetDeletedDocumentsCount();                
             }

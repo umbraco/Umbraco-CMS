@@ -139,6 +139,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<ContentVersionDto>();
 
@@ -153,6 +154,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<ContentXmlDto>();
 
@@ -232,6 +234,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<TemplateDto>();
                 Database.CreateTable<DocumentDto>();
@@ -311,6 +314,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<MemberDto>();
 
@@ -325,6 +329,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<MemberDto>();
                 Database.CreateTable<Member2MemberGroupDto>();
@@ -354,6 +359,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<ContentVersionDto>();
                 Database.CreateTable<PreviewXmlDto>();
@@ -480,6 +486,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<ContentDto>();
                 Database.CreateTable<ContentTypeDto>();
                 Database.CreateTable<DataTypeDto>();

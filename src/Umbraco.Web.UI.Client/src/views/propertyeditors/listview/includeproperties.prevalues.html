@@ -1,0 +1,55 @@
+﻿<div class="umb-editor" ng-controller="Umbraco.PrevalueEditors.IncludePropertiesListViewController">
+    <div class="control-group">
+
+        <select ng-model="selectedField">
+            <option ng-repeat="field in systemFields" value="_system_{{field.value}}">{{field.name}}</option>
+            <option class="select-dash" disabled="disabled">----</option>
+            <option ng-repeat="alias in propertyAliases" value="{{alias}}">{{alias}}</option>
+        </select>
+        <button type="button" class="btn" ng-click="addField()">
+            <localize key="general_add">Add</localize>
+        </button>
+    </div>
+    <div class="control-group">
+        <table ng-show="model.value.length > 0" class="table">
+            <thead>
+                <tr>
+                    <td style="width:20px;"></td>
+                    <th style="width:220px;">Alias</th>
+                    <th>Header</th>
+                    <td style="width:100px;"></td>
+                </tr>
+            </thead>
+            <tbody ui-sortable="sortableOptions">
+                <tr ng-repeat="val in model.value">
+                    <td>
+                        <i class="icon icon-navigation handle"></i>
+                    </td>
+                    <td>
+                        <span class="alias-value" ng-if="!val.isSystem">{{val.alias}}</span>
+                        <span class="alias-value" ng-if="val.isSystem == 1">
+                            {{val.alias}}
+                        </span>
+                        <em ng-show="val.isSystem == 1"><small>(system field)</small></em>
+                    </td>
+                    <td>
+                        <ng-form name="headerForm" ng-if="!val.isSystem">
+                            <input type="text" name="header" ng-model="val.header" required />
+                            <span class="help-inline" val-msg-for="header" val-toggle-msg="required">Required</span>
+                        </ng-form>
+                        
+                        <span ng-if="val.isSystem">
+                            <localize key="{{getLocalizedKey(val.alias)}}">{{val.alias}}</localize>
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" ng-click="removeField(val)">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+
+</div>

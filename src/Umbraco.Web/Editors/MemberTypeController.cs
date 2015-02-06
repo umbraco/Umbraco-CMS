@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -25,6 +27,7 @@ namespace Umbraco.Web.Editors
         public MemberTypeController()
             : this(UmbracoContext.Current)
         {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
         }
 
         /// <summary>
@@ -34,15 +37,23 @@ namespace Umbraco.Web.Editors
         public MemberTypeController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
         }
+
+        private readonly MembershipProvider _provider;
 
         /// <summary>
         /// Returns all member types
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAllTypes()
         {
-            return Services.MemberTypeService.GetAll()
-                           .Select(Mapper.Map<IMemberType, ContentTypeBasic>);
+            if (_provider.IsUmbracoMembershipProvider())
+            {
+                return Services.MemberTypeService.GetAll()
+                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);    
+            }
+            return Enumerable.Empty<ContentTypeBasic>();
+
         }
     }
 }

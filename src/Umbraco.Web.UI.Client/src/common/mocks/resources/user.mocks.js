@@ -10,7 +10,8 @@ angular.module('umbraco.mocks').
               emailHash: "f9879d71855b5ff21e4963273a886bfc",
               id: 0,
               locale: 'da-DK',
-              remainingAuthSeconds: 600
+              remainingAuthSeconds: 600,
+			  allowedSections: ["content", "media"]
           };
       }
 

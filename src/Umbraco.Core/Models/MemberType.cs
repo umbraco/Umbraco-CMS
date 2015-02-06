@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -21,7 +20,12 @@ namespace Umbraco.Core.Models
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        public MemberType(IContentTypeComposition parent) : base(parent)
+        public MemberType(IContentTypeComposition parent) : this(parent, null)
+        {
+        }
+
+        public MemberType(IContentTypeComposition parent, string alias)
+            : base(parent, alias)
         {
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
@@ -41,6 +45,10 @@ namespace Umbraco.Core.Models
                 // "_umbracoSystemDefaultProtectType" which is used internally, currently there is an issue with the safe alias as it strips
                 // leading underscores which we don't want in this case.
                 // see : http://issues.umbraco.org/issue/U4-3968
+
+                //TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
+                // .ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase)
+                // Need to ask Stephen
 
                 SetPropertyValueAndDetectChanges(o =>
                 {

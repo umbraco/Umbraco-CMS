@@ -153,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.Properties[propDto.Alias].Id = propId;
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMacro entity)
@@ -188,10 +188,22 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                     else
                     {
-                        //only update if it's dirty
-                        if (macro.Properties[propDto.Alias].IsDirty())
+                        //This will only work if the Alias hasn't been changed
+                        if (macro.Properties.ContainsKey(propDto.Alias))
                         {
-                            Database.Update(propDto);    
+                            //only update if it's dirty
+                            if (macro.Properties[propDto.Alias].IsDirty())
+                            {
+                                Database.Update(propDto);
+                            }
+                        }
+                        else
+                        {
+                            var property = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
+                            if (property != null && property.IsDirty())
+                            {
+                                Database.Update(propDto);
+                            }
                         }
                     }
                 }
@@ -199,7 +211,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 
             }
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            entity.ResetDirtyProperties();
         }
 
         //public IEnumerable<IMacro> GetAll(params string[] aliases)

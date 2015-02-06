@@ -39,6 +39,18 @@
         }
 
         /// <summary>
+        /// Sets the node style to show that it is currently locked / non-deletable
+        /// </summary>
+        /// <param name="treeNode"></param>
+        public static void SetLockedStyle(this TreeNode treeNode)
+        {
+            if (treeNode.CssClasses.Contains("locked") == false)
+            {
+                treeNode.CssClasses.Add("locked");
+            }
+        }
+
+        /// <summary>
         /// Sets the node style to show that it is has unpublished versions (but is currently published)
         /// </summary>
         /// <param name="treeNode"></param>
@@ -61,5 +73,6 @@
                 treeNode.CssClasses.Add("not-published");
             }
         }
+
     }
 }

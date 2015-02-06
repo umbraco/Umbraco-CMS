@@ -30,9 +30,15 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the developer application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
+        public DataTypeDisplay GetByName(string name)
+        {
+            var dataType = Services.DataTypeService.GetDataTypeDefinitionByName(name);
+            return dataType == null ? null : Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
+        }
+
         /// <summary>
         /// Gets the content json for the content id
         /// </summary>

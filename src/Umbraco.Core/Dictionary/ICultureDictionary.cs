@@ -6,7 +6,7 @@ namespace Umbraco.Core.Dictionary
 	/// <summary>
 	/// Represents a dictionary based on a specific culture
 	/// </summary>
-	internal interface ICultureDictionary
+	public interface ICultureDictionary
 	{
 		/// <summary>
 		/// Returns the dictionary value based on the key supplied

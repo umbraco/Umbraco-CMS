@@ -9,7 +9,7 @@ using umbraco.cms.businesslogic.language;
 namespace Umbraco.Web.Dictionary
 {
 
-	internal class DefaultCultureDictionary : Umbraco.Core.Dictionary.ICultureDictionary
+	public class DefaultCultureDictionary : Umbraco.Core.Dictionary.ICultureDictionary
 	{
 		/// <summary>
 		/// Returns the dictionary value based on the key supplied
