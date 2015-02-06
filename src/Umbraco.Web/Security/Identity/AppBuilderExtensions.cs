@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
+using Microsoft.Owin.Security.Cookies;
 using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -51,47 +53,28 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
 
-            app.Use(typeof (UmbracoBackOfficeAuthenticationMiddleware),
-                //ctor params
-                app, 
-                new UmbracoBackOfficeCookieAuthenticationOptions(
+
+            app.UseCookieAuthentication(new UmbracoBackOfficeCookieAuthenticationOptions(
                     UmbracoConfig.For.UmbracoSettings().Security,
                     GlobalSettings.TimeOutInMinutes,
-                    GlobalSettings.UseSSL),
-                LoggerResolver.Current.Logger);
+                    GlobalSettings.UseSSL,
+                    GlobalSettings.Path)
+            {
+                //Provider = new CookieAuthenticationProvider
+                //{
+                //    // Enables the application to validate the security stamp when the user 
+                //    // logs in. This is a security feature which is used when you 
+                //    // change a password or add an external login to your account.  
+                //    OnValidateIdentity = SecurityStampValidator
+                //        .OnValidateIdentity<UmbracoMembersUserManager<UmbracoApplicationUser>, UmbracoApplicationUser, int>(
+                //            TimeSpan.FromMinutes(30),
+                //            (manager, user) => user.GenerateUserIdentityAsync(manager),
+                //            identity => identity.GetUserId<int>())
+                //}
+            });
 
-            app.UseStageMarker(PipelineStage.Authenticate);
             return app;
         }
 
-        //This is a fix for OWIN mem leak! 
-        //http://stackoverflow.com/questions/24378856/memory-leak-in-owin-appbuilderextensions/24819543#24819543
-        private class OwinContextDisposal<T1, T2> : IDisposable
-            where T1 : IDisposable
-            where T2 : IDisposable
-        {
-            private readonly List<IDisposable> _disposables = new List<IDisposable>();
-            private bool _disposed = false;
-
-            public OwinContextDisposal(IOwinContext owinContext)
-            {
-                if (HttpContext.Current == null) return;
-
-                _disposables.Add(owinContext.Get<T1>());
-                _disposables.Add(owinContext.Get<T2>());
-
-                HttpContext.Current.DisposeOnPipelineCompleted(this);
-            }
-
-            public void Dispose()
-            {
-                if (_disposed) return;
-                foreach (var disposable in _disposables)
-                {
-                    disposable.Dispose();
-                }
-                _disposed = true;
-            }
-        }
     }
 }

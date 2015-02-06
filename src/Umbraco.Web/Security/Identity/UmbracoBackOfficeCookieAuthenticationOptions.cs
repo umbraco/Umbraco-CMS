@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
@@ -13,22 +14,32 @@ namespace Umbraco.Web.Security.Identity
     public sealed class UmbracoBackOfficeCookieAuthenticationOptions : CookieAuthenticationOptions
     {
         public UmbracoBackOfficeCookieAuthenticationOptions()
-            : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
+            : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL, GlobalSettings.Path)
         {            
         }
 
-        public UmbracoBackOfficeCookieAuthenticationOptions(ISecuritySection securitySection, int loginTimeoutMinutes, bool forceSsl)
+        public UmbracoBackOfficeCookieAuthenticationOptions(            
+            ISecuritySection securitySection, 
+            int loginTimeoutMinutes, 
+            bool forceSsl, 
+            string umbracoPath,
+            bool useLegacyFormsAuthDataFormat = true)
         {
             AuthenticationType = "UmbracoBackOffice";
 
-            TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);
+            if (useLegacyFormsAuthDataFormat)
+            {
+                //If this is not explicitly set it will fall back to the default automatically
+                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);    
+            }
 
             CookieDomain = securitySection.AuthCookieDomain;
             CookieName = securitySection.AuthCookieName;
             CookieHttpOnly = true;
             CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
-            CookiePath = "/";
-            LoginPath = new PathString("/umbraco/login"); //TODO: ??
+
+            //Ensure the cookie path is set so that it isn't transmitted for anything apart from requests to the back office
+            CookiePath = umbracoPath.EnsureStartsWith('/');
 
         }       
     }

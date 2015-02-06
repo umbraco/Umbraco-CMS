@@ -543,8 +543,6 @@
     <Compile Include="Security\Identity\AppBuilderExtensions.cs" />
     <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
     <Compile Include="Security\Identity\OwinExtensions.cs" />
-    <Compile Include="Security\Identity\UmbracoBackOfficeAuthenticationHandler.cs" />
-    <Compile Include="Security\Identity\UmbracoBackOfficeAuthenticationMiddleware.cs" />
     <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthenticationOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
