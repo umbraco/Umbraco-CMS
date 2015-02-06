@@ -7,6 +7,7 @@ using Microsoft.Owin.Extensions;
 using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -52,7 +53,12 @@ namespace Umbraco.Web.Security.Identity
 
             app.Use(typeof (UmbracoBackOfficeAuthenticationMiddleware),
                 //ctor params
-                app, new UmbracoBackOfficeAuthenticationOptions(), UmbracoConfig.For.UmbracoSettings().Security);
+                app, 
+                new UmbracoBackOfficeCookieAuthenticationOptions(
+                    UmbracoConfig.For.UmbracoSettings().Security,
+                    GlobalSettings.TimeOutInMinutes,
+                    GlobalSettings.UseSSL),
+                LoggerResolver.Current.Logger);
 
             app.UseStageMarker(PipelineStage.Authenticate);
             return app;

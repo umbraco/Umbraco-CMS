@@ -9,6 +9,9 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Security;
 using AutoMapper;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
@@ -108,6 +111,14 @@ namespace Umbraco.Web.Editors
 
                 //TODO: Clean up the int cast!
                 var ticket = UmbracoContext.Security.PerformLogin(user);
+
+                //TODO: Normally we'd do something like this for identity, but we're mixing and matching legacy and new here
+                // so we'll keep the legacy way and move forward with this in our custom handler for now, eventually replacing 
+                // the above legacy logic with the new stuff.
+
+                //OwinContext.Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
+                //OwinContext.Authentication.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent },
+                //    await user.GenerateUserIdentityAsync(UserManager));
 
                 var http = this.TryGetHttpContext();
                 if (http.Success == false)

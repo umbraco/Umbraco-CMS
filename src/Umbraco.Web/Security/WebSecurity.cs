@@ -91,7 +91,7 @@ namespace Umbraco.Web.Security
         /// Logs the user in
         /// </summary>
         /// <param name="user"></param>
-        /// <returns>returns the number of seconds until their session times out</returns>
+        /// <returns>returns the Forms Auth ticket created which is used to log them in</returns>
         public virtual FormsAuthenticationTicket PerformLogin(IUser user)
         {
             var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))

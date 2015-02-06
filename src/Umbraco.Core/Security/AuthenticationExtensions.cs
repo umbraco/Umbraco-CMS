@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Security;
+using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 
@@ -268,6 +273,23 @@ namespace Umbraco.Core.Security
             return new HttpContextWrapper(http).GetUmbracoAuthTicket();
         }
 
+        internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
+        {
+            if (ctx == null) throw new ArgumentNullException("ctx");
+            //get the ticket
+            try
+            {
+                return GetAuthTicket(ctx.Request.Cookies.ToDictionary(x => x.Key, x => x.Value), UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            }
+            catch (Exception)
+            {
+                //TODO: Do we need to do more here?? need to make sure that the forms cookie is gone, but is that
+                // taken care of in our custom middleware somehow?
+                ctx.Authentication.SignOut();
+                return null;
+            }
+        }
+
         /// <summary>
         /// This clears the forms authentication cookie
         /// </summary>
@@ -301,16 +323,18 @@ namespace Umbraco.Core.Security
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
         {
-            if (http == null) throw new ArgumentNullException("http");
-            var formsCookie = http.Request.Cookies[cookieName];
-            if (formsCookie == null)
+            var allKeys = new List<string>();
+            for (var i = 0; i < http.Request.Cookies.Keys.Count; i++)
             {
-                return null;
+                allKeys.Add(http.Request.Cookies.Keys.Get(i));
             }
+            var asDictionary = allKeys.ToDictionary(key => key, key => http.Request.Cookies[key].Value);
+
             //get the ticket
             try
             {
-                return FormsAuthentication.Decrypt(formsCookie.Value);
+
+                return GetAuthTicket(asDictionary, cookieName);
             }
             catch (Exception)
             {
@@ -318,6 +342,21 @@ namespace Umbraco.Core.Security
                 http.Logout(cookieName);
                 return null;
             }
+        }
+
+        private static FormsAuthenticationTicket GetAuthTicket(IDictionary<string, string> cookies, string cookieName)
+        {
+            if (cookies == null) throw new ArgumentNullException("cookies");
+
+            if (cookies.ContainsKey(cookieName) == false) return null;
+
+            var formsCookie = cookies[cookieName];
+            if (formsCookie == null)
+            {
+                return null;
+            }
+            //get the ticket
+            return FormsAuthentication.Decrypt(formsCookie);
         }
 
         /// <summary>

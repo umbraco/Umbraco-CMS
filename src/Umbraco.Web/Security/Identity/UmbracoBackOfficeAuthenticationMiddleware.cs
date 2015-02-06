@@ -2,25 +2,30 @@
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Security.Identity
 {
     /// <summary>
     /// Used to enable the normal Umbraco back office authentication to operate
     /// </summary>
-    public class UmbracoBackOfficeAuthenticationMiddleware : AuthenticationMiddleware<UmbracoBackOfficeAuthenticationOptions>
+    public class UmbracoBackOfficeAuthenticationMiddleware : AuthenticationMiddleware<UmbracoBackOfficeCookieAuthenticationOptions>
     {
-        private readonly ISecuritySection _securitySection;
+        private readonly ILogger _logger;
 
-        public UmbracoBackOfficeAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, UmbracoBackOfficeAuthenticationOptions options, ISecuritySection securitySection)
+        public UmbracoBackOfficeAuthenticationMiddleware(
+            OwinMiddleware next, 
+            IAppBuilder app, 
+            UmbracoBackOfficeCookieAuthenticationOptions options,
+            ILogger logger)
             : base(next, options)
         {
-            _securitySection = securitySection;
+            _logger = logger;
         }
 
-        protected override AuthenticationHandler<UmbracoBackOfficeAuthenticationOptions> CreateHandler()
+        protected override AuthenticationHandler<UmbracoBackOfficeCookieAuthenticationOptions> CreateHandler()
         {
-            return new UmbracoBackOfficeAuthenticationHandler(_securitySection);
+            return new UmbracoBackOfficeAuthenticationHandler(_logger);
         }
     }
 }
