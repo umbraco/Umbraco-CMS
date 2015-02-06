@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -49,7 +51,7 @@ namespace Umbraco.Web.Security.Identity
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static IAppBuilder UseUmbracoBackAuthentication(this IAppBuilder app)
+        public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app)
         {
             if (app == null) throw new ArgumentNullException("app");
 
@@ -60,18 +62,27 @@ namespace Umbraco.Web.Security.Identity
                     GlobalSettings.UseSSL,
                     GlobalSettings.Path)
             {
-                //Provider = new CookieAuthenticationProvider
-                //{
-                //    // Enables the application to validate the security stamp when the user 
-                //    // logs in. This is a security feature which is used when you 
-                //    // change a password or add an external login to your account.  
-                //    OnValidateIdentity = SecurityStampValidator
-                //        .OnValidateIdentity<UmbracoMembersUserManager<UmbracoApplicationUser>, UmbracoApplicationUser, int>(
-                //            TimeSpan.FromMinutes(30),
-                //            (manager, user) => user.GenerateUserIdentityAsync(manager),
-                //            identity => identity.GetUserId<int>())
-                //}
+                Provider = new CookieAuthenticationProvider
+                {                
+                    //// Enables the application to validate the security stamp when the user 
+                    //// logs in. This is a security feature which is used when you 
+                    //// change a password or add an external login to your account.  
+                    //OnValidateIdentity = SecurityStampValidator
+                    //    .OnValidateIdentity<UmbracoMembersUserManager<UmbracoApplicationUser>, UmbracoApplicationUser, int>(
+                    //        TimeSpan.FromMinutes(30),
+                    //        (manager, user) => user.GenerateUserIdentityAsync(manager),
+                    //        identity => identity.GetUserId<int>())
+                }
             });
+
+            return app;
+        }
+
+        public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app)
+        {
+            if (app == null) throw new ArgumentNullException("app");
+
+            app.UseExternalSignInCookie("UmbracoExternalCookie");
 
             return app;
         }

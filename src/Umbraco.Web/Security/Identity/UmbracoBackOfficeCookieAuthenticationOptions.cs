@@ -22,7 +22,7 @@ namespace Umbraco.Web.Security.Identity
             ISecuritySection securitySection, 
             int loginTimeoutMinutes, 
             bool forceSsl, 
-            string umbracoPath,
+            string cookiePath,
             bool useLegacyFormsAuthDataFormat = true)
         {
             AuthenticationType = "UmbracoBackOffice";
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Security.Identity
             if (useLegacyFormsAuthDataFormat)
             {
                 //If this is not explicitly set it will fall back to the default automatically
-                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);    
+                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes, cookiePath);    
             }
 
             CookieDomain = securitySection.AuthCookieDomain;
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Security.Identity
             CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
 
             //Ensure the cookie path is set so that it isn't transmitted for anything apart from requests to the back office
-            CookiePath = umbracoPath.EnsureStartsWith('/');
+            CookiePath = cookiePath.EnsureStartsWith('/');
 
         }       
     }

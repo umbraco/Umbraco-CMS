@@ -54,8 +54,24 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.1.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.1.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin">
       <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.2.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.2.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -326,6 +342,10 @@
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="Models\Identity\IdentityUser.cs" />
+    <Compile Include="Models\Identity\IdentityUserClaim.cs" />
+    <Compile Include="Models\Identity\IdentityUserLogin.cs" />
+    <Compile Include="Models\Identity\IdentityUserRole.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
@@ -343,6 +363,7 @@
     <Compile Include="Media\Exif\ExifTagFactory.cs" />
     <Compile Include="Models\Rdbms\AccessRuleDto.cs" />
     <Compile Include="Models\Rdbms\DocumentPublishedReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\ExternalLoginDto.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />
@@ -387,6 +408,7 @@
     <Compile Include="Persistence\Repositories\RepositoryCacheOptions.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />

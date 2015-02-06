@@ -50,9 +50,11 @@ namespace Umbraco.Web.UI
 
             //Ensure owin is configured for Umbraco back office authentication - this must
             // be configured AFTER the standard UseCookieConfiguration above.
-            app.UseUmbracoBackAuthentication();
+            app
+                .UseUmbracoBackOfficeCookieAuthentication()
+                .UseUmbracoBackOfficeExternalCookieAuthentication();
 
-            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
+            //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
         }
 

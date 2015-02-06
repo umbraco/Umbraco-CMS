@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Web.Security;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
@@ -12,16 +13,18 @@ namespace Umbraco.Web.Security.Identity
     internal class FormsAuthenticationSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
     {
         private readonly int _loginTimeoutMinutes;
+        private readonly string _cookiePath;
 
-        public FormsAuthenticationSecureDataFormat(int loginTimeoutMinutes)
+        public FormsAuthenticationSecureDataFormat(int loginTimeoutMinutes, string cookiePath)
         {
             _loginTimeoutMinutes = loginTimeoutMinutes;
+            _cookiePath = cookiePath;
         }
 
         public string Protect(AuthenticationTicket data)
         {
-            //TODO: Where to get the user data?
-            //var userDataString = JsonConvert.SerializeObject(userdata);
+            var backofficeIdentity = (UmbracoBackOfficeIdentity)data.Identity;
+            var userDataString = JsonConvert.SerializeObject(backofficeIdentity.UserData);
 
             var ticket = new FormsAuthenticationTicket(
                 5,
@@ -29,8 +32,8 @@ namespace Umbraco.Web.Security.Identity
                 data.Properties.IssuedUtc.HasValue ? data.Properties.IssuedUtc.Value.LocalDateTime : DateTime.Now,
                 data.Properties.ExpiresUtc.HasValue ? data.Properties.ExpiresUtc.Value.LocalDateTime : DateTime.Now.AddMinutes(_loginTimeoutMinutes),
                 data.Properties.IsPersistent,
-                "", //User data here!! This will come from the identity
-                "/"
+                userDataString,
+                _cookiePath
                 );
 
             return FormsAuthentication.Encrypt(ticket);
@@ -51,12 +54,14 @@ namespace Umbraco.Web.Security.Identity
 
             var identity = new UmbracoBackOfficeIdentity(decrypt);
 
-            return new AuthenticationTicket(identity, new AuthenticationProperties
+            var ticket = new AuthenticationTicket(identity, new AuthenticationProperties
             {
                 ExpiresUtc = decrypt.Expiration.ToUniversalTime(),
                 IssuedUtc = decrypt.IssueDate.ToUniversalTime(),
                 IsPersistent = decrypt.IsPersistent
             });
+
+            return ticket;
         }
     }
 }
