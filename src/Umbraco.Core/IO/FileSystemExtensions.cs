@@ -1,10 +1,42 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace Umbraco.Core.IO
 {
     public static class FileSystemExtensions
     {
+
+        /// <summary>
+        /// Attempts to open the file at <code>filePath</code> up to <code>maxRetries</code> times,
+        /// with a thread sleep time of <code>sleepPerRetryInMilliseconds</code> between retries.
+        /// </summary>
+        public static FileStream OpenReadWithRetry(this FileInfo file, int maxRetries = 5, int sleepPerRetryInMilliseconds = 50)
+        {
+            var retries = maxRetries;
+
+            while (retries > 0)
+            {
+                try
+                {
+                    return File.OpenRead(file.FullName);
+                }
+                catch(IOException)
+                {
+                    retries--;
+
+                    if (retries == 0)
+                    {
+                        throw;
+                    }
+
+                    Thread.Sleep(sleepPerRetryInMilliseconds);
+                }
+            }
+
+            throw new ArgumentException("Retries must be greater than zero");
+        }
+
         public static long GetSize(this IFileSystem fs, string path)
         {
             using (var file = fs.OpenFile(path))
