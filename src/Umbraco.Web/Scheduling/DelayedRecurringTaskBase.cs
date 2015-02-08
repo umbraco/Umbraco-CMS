@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -7,52 +8,67 @@ namespace Umbraco.Web.Scheduling
     /// Provides a base class for recurring background tasks.
     /// </summary>
     /// <typeparam name="T">The type of the managed tasks.</typeparam>
-    internal abstract class DelayedRecurringTaskBase<T> : RecurringTaskBase<T>, IDelayedBackgroundTask
+    internal abstract class DelayedRecurringTaskBase<T> : RecurringTaskBase<T>, ILatchedBackgroundTask
         where T : class, IBackgroundTask
     {
-        private readonly int _delayMilliseconds;
-        private ManualResetEvent _gate;
+        private readonly ManualResetEventSlim _latch;
         private Timer _timer;
 
         protected DelayedRecurringTaskBase(IBackgroundTaskRunner<T> runner, int delayMilliseconds, int periodMilliseconds)
             : base(runner, periodMilliseconds)
         {
-            _delayMilliseconds = delayMilliseconds;
+            if (delayMilliseconds > 0)
+            {
+                _latch = new ManualResetEventSlim(false);
+                _timer = new Timer(_ =>
+                {
+                    _timer.Dispose();
+                    _timer = null;
+                    _latch.Set();
+                });
+                _timer.Change(delayMilliseconds, 0);
+            }
         }
 
         protected DelayedRecurringTaskBase(DelayedRecurringTaskBase<T> source)
             : base(source)
         {
-            _delayMilliseconds = 0;
+            // no latch on recurring instances
+            _latch = null;
         }
 
-        public WaitHandle DelayWaitHandle
+        public override void Run()
+        {
+            if (_latch != null)
+                _latch.Dispose();
+            base.Run();
+        }
+
+        public override async Task RunAsync()
+        {
+            if (_latch != null)
+                _latch.Dispose();
+            await base.RunAsync();
+        }
+
+        public WaitHandle Latch
         {
             get
             {
-                if (_delayMilliseconds == 0) return new ManualResetEvent(true);
-
-                if (_gate != null) return _gate;
-                _gate = new ManualResetEvent(false);
-
-                // note
-                // must use the single-parameter constructor on Timer to avoid it from being GC'd
-                // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
-
-                _timer = new Timer(_ =>
-                {
-                    _timer.Dispose();
-                    _timer = null;
-                    _gate.Set();
-                });
-                _timer.Change(_delayMilliseconds, 0);
-                return _gate;
+                if (_latch == null)
+                    throw new InvalidOperationException("The task is not latched.");
+                return _latch.WaitHandle;
             }
         }
 
-        public bool IsDelayed
+        public bool IsLatched
         {
-            get { return _delayMilliseconds > 0; }
+            get { return _latch != null; }
+        }
+
+        public virtual bool RunsOnShutdown
+        {
+            get { return true; }
         }
     }
 }

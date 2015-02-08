@@ -564,7 +564,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        private class MyDelayedTask : IDelayedBackgroundTask
+        private class MyDelayedTask : ILatchedBackgroundTask
         {
             private readonly int _runMilliseconds;
             private readonly ManualResetEvent _gate;
@@ -577,12 +577,17 @@ namespace Umbraco.Tests.Scheduling
                 _gate = new ManualResetEvent(false);
             }
 
-            public WaitHandle DelayWaitHandle
+            public WaitHandle Latch
             {
                 get { return _gate; }
             }
 
-            public bool IsDelayed
+            public bool IsLatched
+            {
+                get { return true; }
+            }
+
+            public bool RunsOnShutdown
             {
                 get { return true; }
             }

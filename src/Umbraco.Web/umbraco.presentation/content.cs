@@ -35,6 +35,15 @@ namespace umbraco
         private static readonly BackgroundTaskRunner<XmlCacheFilePersister> FilePersister
             = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions { LongRunning = true });
 
+        private XmlCacheFilePersister _persisterTask;
+
+        private content()
+        {
+            _persisterTask = new XmlCacheFilePersister(FilePersister, this, UmbracoXmlDiskCacheFileName,
+                new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler));
+            FilePersister.Add(_persisterTask);
+        }
+
         #region Declarations
 
         // Sync access to disk file
@@ -131,7 +140,7 @@ namespace umbraco
         /// <remarks>
         /// Before returning we always check to ensure that the xml is loaded
         /// </remarks>
-        protected virtual XmlDocument XmlContentInternal
+        protected internal virtual XmlDocument XmlContentInternal
         {
             get
             {
@@ -317,8 +326,7 @@ namespace umbraco
                 // and clear the queue in case is this a web request, we don't want it reprocessing.
                 if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
                 {
-                    FilePersister.Add(new XmlCacheFilePersister(xmlDoc, UmbracoXmlDiskCacheFileName ,
-                        new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler)));
+                    QueueXmlForPersistence();
                 }
             }
         }
@@ -1230,8 +1238,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// </summary>
         private void QueueXmlForPersistence()
         {
-            FilePersister.Add(new XmlCacheFilePersister(_xmlContent, UmbracoXmlDiskCacheFileName,
-                new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler)));
+            _persisterTask = _persisterTask.Touch();
         }
 
         internal DateTime GetCacheFileUpdateTime()
