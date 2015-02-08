@@ -97,5 +97,10 @@ namespace Umbraco.Web.Scheduling
         {
             get { return false; }
         }
+    
+        public override bool RunsOnShutdown
+        {
+            get { return false; }
+        }
     }
 }

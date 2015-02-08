@@ -13,6 +13,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IBackgroundTaskRunner<T> _runner;
         private readonly int _periodMilliseconds;
         private Timer _timer;
+        private T _recurrent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringTaskBase{T}"/> class with a tasks runner and a period.
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Scheduling
         protected RecurringTaskBase(RecurringTaskBase<T> source)
         {
             _runner = source._runner;
+            _timer = source._timer;
             _periodMilliseconds = source._periodMilliseconds;
         }
 
@@ -41,7 +43,7 @@ namespace Umbraco.Web.Scheduling
         /// Implements IBackgroundTask.Run().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public void Run()
+        public virtual void Run()
         {
             PerformRun();
             Repeat();
@@ -51,7 +53,7 @@ namespace Umbraco.Web.Scheduling
         /// Implements IBackgroundTask.RunAsync().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public async Task RunAsync()
+        public virtual async Task RunAsync()
         {
             await PerformRunAsync();
             Repeat();
@@ -64,19 +66,19 @@ namespace Umbraco.Web.Scheduling
 
             if (_periodMilliseconds == 0) return;
 
-            var recur = GetRecurring();
-            if (recur == null) return; // done
+            _recurrent = GetRecurring();
+            if (_recurrent == null)
+            {
+                _timer.Dispose();
+                _timer = null;
+                return; // done
+            }
 
             // note
             // must use the single-parameter constructor on Timer to avoid it from being GC'd
             // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
 
-            _timer = new Timer(_ =>
-            {
-                _timer.Dispose();
-                _timer = null;
-                _runner.TryAdd(recur);
-            });
+            _timer = _timer ?? new Timer(_ => _runner.TryAdd(_recurrent));
             _timer.Change(_periodMilliseconds, 0);
         }
 

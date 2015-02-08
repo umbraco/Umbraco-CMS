@@ -21,7 +21,7 @@ namespace Umbraco.Web.Scheduling
         private readonly BackgroundTaskRunnerOptions _options;
         private readonly BlockingCollection<T> _tasks = new BlockingCollection<T>();
         private readonly object _locker = new object();
-        private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
+        private readonly ManualResetEventSlim _completedEvent = new ManualResetEventSlim(false);
 
         private volatile bool _isRunning; // is running
         private volatile bool _isCompleted; // does not accept tasks anymore, may still be running
@@ -304,13 +304,19 @@ namespace Umbraco.Web.Scheduling
                     return;
                 }
 
-                // wait for delayed task, supporting cancellation
-                var dbgTask = bgTask as IDelayedBackgroundTask;
-                if (dbgTask != null && dbgTask.IsDelayed)
+                // wait for latched task, supporting cancellation
+                var dbgTask = bgTask as ILatchedBackgroundTask;
+                if (dbgTask != null && dbgTask.IsLatched)
                 {
-                    WaitHandle.WaitAny(new[] { dbgTask.DelayWaitHandle, token.WaitHandle, _completedEvent });
+                    WaitHandle.WaitAny(new[] { dbgTask.Latch, token.WaitHandle, _completedEvent.WaitHandle });
                     if (TaskSourceCanceled(taskSource, token)) return;
-                    // else run now, either because delay is ok or runner is completed
+                    // else run now, either because latch ok or runner is completed
+                    // still latched & not running on shutdown = stop here
+                    if (dbgTask.IsLatched && dbgTask.RunsOnShutdown == false)
+                    {
+                        TaskSourceCompleted(taskSource, token);
+                        return;
+                    }
                 }
 
                 // run the task as first task, or a continuation
@@ -378,7 +384,7 @@ namespace Umbraco.Web.Scheduling
                     OnTaskError(new TaskEventArgs<T>(bgTask, e));
                     throw;
                 }
-                Console.WriteLine("!1");
+
                 OnTaskCompleted(new TaskEventArgs<T>(bgTask));
             }
             catch (Exception ex)
