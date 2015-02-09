@@ -323,12 +323,12 @@ namespace Umbraco.Core.Security
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
         {
-            var allKeys = new List<string>();
+            var asDictionary = new Dictionary<string, string>();
             for (var i = 0; i < http.Request.Cookies.Keys.Count; i++)
             {
-                allKeys.Add(http.Request.Cookies.Keys.Get(i));
+                var key = http.Request.Cookies.Keys.Get(i);
+                asDictionary[key] = http.Request.Cookies[key].Value;
             }
-            var asDictionary = allKeys.ToDictionary(key => key, key => http.Request.Cookies[key].Value);
 
             //get the ticket
             try

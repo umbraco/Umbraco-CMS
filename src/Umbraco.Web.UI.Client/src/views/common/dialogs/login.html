@@ -1,4 +1,4 @@
-﻿<form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
+﻿<div ng-controller="Umbraco.Dialogs.LoginController">
     <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
 
         <div class="form">
@@ -8,19 +8,37 @@
                 <localize key="login_instruction">Log in below</localize>
             </p>
 
-            <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
-            </div>
+            <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
+                <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
+                    <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
+                </div>
 
-            <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password"  />
-            </div>
+                <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
+                    <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" />
+                </div>
 
-            <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
+                <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
+
+                <div class="control-group" ng-show="loginForm.$invalid">
+                    <div class="alert alert-error">{{errorMsg}}</div>
+                </div>
+            </form>
             
-            <div class="control-group" ng-show="loginForm.$invalid">
-                <div class="alert alert-error">{{errorMsg}}</div>
-            </div>
+            <br/><br/>
+
+            <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
+
+                <div class="alert alert-success" ng-repeat="login in externalLogins">
+
+                    <button type="submit" class="btn btn-default" id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                            title="Log in using your {{login.caption}} account">
+                        {{login.authType}}
+                    </button>
+
+                </div>
+            </form>
+           
+            
         </div>
     </div>
-</form>
+</div>

@@ -5,9 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.UI;
 using dotless.Core.Parser.Tree;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
@@ -27,6 +31,9 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
 using Umbraco.Web.WebApi.Filters;
+using System.Web;
+using AutoMapper;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -37,12 +44,18 @@ namespace Umbraco.Web.Editors
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
+        protected IOwinContext OwinContext
+        {
+            get { return Request.GetOwinContext(); }
+        }
+
         /// <summary>
         /// Render the default view
         /// </summary>
         /// <returns></returns>
         public ActionResult Default()
         {
+            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
             return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
         }
 
@@ -359,6 +372,62 @@ namespace Umbraco.Web.Editors
             return JavaScript(ServerVariablesParser.Parse(result));
         }
         
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            if (returnUrl.IsNullOrWhiteSpace())
+            {
+                returnUrl = GlobalSettings.Path;
+            }
+
+            // Request a redirect to the external login provider
+            return new ChallengeResult(provider,
+                Url.Action("ExternalLoginCallback", "BackOffice", new
+                {
+                    area = GlobalSettings.UmbracoMvcArea,
+                    ReturnUrl = returnUrl
+                }));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
+        {
+            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync();
+            if (loginInfo == null)
+            {
+                //go home, invalid callback
+                return RedirectToLocal(returnUrl);
+            }
+
+            //// Sign in the user with this external login provider if the user already has a login
+            //var user = await UserManager<>.FindAsync(loginInfo.Login);
+            //if (user != null)
+            //{
+            //    await SignInAsync(user, isPersistent: false);
+            //    return RedirectToLocal(returnUrl);
+            //}
+            //else
+            //{
+            //    // If the user does not have an account, then prompt the user to create an account
+            //    ViewBag.ReturnUrl = returnUrl;
+            //    ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
+
+            //    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+            //}
+
+            //TODO: until we make a user thingy and make this correctly , we'll just see if this works
+
+            var user = Security.GetBackOfficeUser(loginInfo.DefaultUserName);
+
+            var ticket = UmbracoContext.Security.PerformLogin(user);
+            HttpContext.AuthenticateCurrentRequest(ticket, false);
+            
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+        }
+        
+        
         /// <summary>
         /// Returns the server variables regarding the application state
         /// </summary>
@@ -505,5 +574,43 @@ namespace Umbraco.Web.Editors
             JsUrl
         }
 
+        private ActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return Redirect("/");
+        }
+
+        // Used for XSRF protection when adding external logins
+        private const string XsrfKey = "XsrfId";
+
+        private class ChallengeResult : HttpUnauthorizedResult
+        {
+            public ChallengeResult(string provider, string redirectUri, string userId = null)
+            {
+                LoginProvider = provider;
+                RedirectUri = redirectUri;
+                UserId = userId;
+            }
+
+            private string LoginProvider { get; set; }
+            private string RedirectUri { get; set; }
+            private string UserId { get; set; }
+
+            public override void ExecuteResult(ControllerContext context)
+            {
+                //Ensure the forms auth module doesn't do a redirect!
+                context.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
+
+                var properties = new AuthenticationProperties() { RedirectUri = RedirectUri };
+                if (UserId != null)
+                {
+                    properties.Dictionary[XsrfKey] = UserId;
+                }
+                context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
+            }
+        }
     }
 }

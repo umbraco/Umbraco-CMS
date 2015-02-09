@@ -16,7 +16,11 @@
     }); // weekday[d.getDay()];
     
     $scope.errorMsg = "";
-    
+
+    $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
+
+    $scope.externalLogins = Umbraco.Sys.ServerVariables.externalLogins;
+
     $scope.loginSubmit = function (login, password) {
         
         //if the login and password are not empty we need to automatically 
