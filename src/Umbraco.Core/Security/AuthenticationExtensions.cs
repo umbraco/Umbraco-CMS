@@ -216,7 +216,6 @@ namespace Umbraco.Core.Security
                 GlobalSettings.TimeOutInMinutes, 
                 //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
                 1440, 
-                "/umbraco",
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
         }
@@ -420,7 +419,6 @@ namespace Umbraco.Core.Security
                                             string userData,
                                             int loginTimeoutMins,
                                             int minutesPersisted,
-                                            string cookiePath,
                                             string cookieName,
                                             string cookieDomain)
         {
@@ -433,7 +431,7 @@ namespace Umbraco.Core.Security
                 DateTime.Now.AddMinutes(loginTimeoutMins),
                 true,
                 userData,
-                cookiePath
+                "/"
                 );
 	
             // Encrypt the cookie using the machine key for secure transport
@@ -444,7 +442,7 @@ namespace Umbraco.Core.Security
                 {
                     Expires = DateTime.Now.AddMinutes(minutesPersisted),
                     Domain = cookieDomain,
-                    Path = cookiePath
+                    Path = "/"
                 };
 
 			if (GlobalSettings.UseSSL)

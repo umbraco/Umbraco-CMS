@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -14,7 +13,7 @@ namespace Umbraco.Web.Security.Identity
     public sealed class UmbracoBackOfficeCookieAuthenticationOptions : CookieAuthenticationOptions
     {
         public UmbracoBackOfficeCookieAuthenticationOptions()
-            : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL, GlobalSettings.Path)
+            : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
         {            
         }
 
@@ -22,15 +21,14 @@ namespace Umbraco.Web.Security.Identity
             ISecuritySection securitySection, 
             int loginTimeoutMinutes, 
             bool forceSsl, 
-            string cookiePath,
             bool useLegacyFormsAuthDataFormat = true)
         {
-            AuthenticationType = "UmbracoBackOffice";
+            AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
 
             if (useLegacyFormsAuthDataFormat)
             {
                 //If this is not explicitly set it will fall back to the default automatically
-                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes, cookiePath);    
+                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);    
             }
 
             CookieDomain = securitySection.AuthCookieDomain;
@@ -38,9 +36,10 @@ namespace Umbraco.Web.Security.Identity
             CookieHttpOnly = true;
             CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
 
-            //Ensure the cookie path is set so that it isn't transmitted for anything apart from requests to the back office
-            CookiePath = cookiePath.EnsureStartsWith('/');
+            CookiePath = "/";
 
+            //Custom cookie manager so we can filter requests
+            CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor());
         }       
     }
 }

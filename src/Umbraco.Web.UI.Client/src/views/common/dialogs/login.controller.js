@@ -17,9 +17,8 @@
     
     $scope.errorMsg = "";
 
-    $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
-
-    $scope.externalLogins = Umbraco.Sys.ServerVariables.externalLogins;
+    $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;    
+    $scope.externalLoginProviders = Umbraco.Sys.ServerVariables.externalLogins.providers;
 
     $scope.loginSubmit = function (login, password) {
         

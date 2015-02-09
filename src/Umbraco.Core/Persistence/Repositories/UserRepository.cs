@@ -122,7 +122,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
                                "DELETE FROM umbracoUserLogins WHERE userID = @Id",
                                "DELETE FROM umbracoUser2app WHERE " + SqlSyntax.GetQuotedColumnName("user") + "=@Id",
-                               "DELETE FROM umbracoUser WHERE id = @Id"
+                               "DELETE FROM umbracoUser WHERE id = @Id",
+                               "DELETE FROM umbracoExternalLogin WHERE id = @Id"
                            };
             return list;
         }

@@ -27,8 +27,28 @@ namespace Umbraco.Core.Security
             //This just creates a temp/fake ticket
             : base(new FormsAuthenticationTicket(userdata.Username, true, 10))
         {
+            if (userdata == null) throw new ArgumentNullException("userdata");
             UserData = userdata;
-            AddClaims();
+            AddUserDataClaims();
+        }
+
+        /// <summary>
+        /// Create a back office identity based on an existing claims identity
+        /// </summary>
+        /// <param name="claimsIdentity"></param>
+        /// <param name="userdata"></param>
+        public UmbracoBackOfficeIdentity(ClaimsIdentity claimsIdentity, UserData userdata)
+            //This just creates a temp/fake ticket
+            : base(new FormsAuthenticationTicket(userdata.Username, true, 10))
+        {
+            if (claimsIdentity == null) throw new ArgumentNullException("claimsIdentity");
+            if (userdata == null) throw new ArgumentNullException("userdata");
+
+            _currentIssuer = claimsIdentity.AuthenticationType;
+            UserData = userdata;
+            AddClaims(claimsIdentity);
+            Actor = claimsIdentity;
+            AddUserDataClaims();
         }
 
         /// <summary>
@@ -39,7 +59,7 @@ namespace Umbraco.Core.Security
             : base(ticket)
         {
             UserData = JsonConvert.DeserializeObject<UserData>(ticket.UserData);
-            AddClaims();
+            AddUserDataClaims();
         }
 
         /// <summary>
@@ -49,24 +69,49 @@ namespace Umbraco.Core.Security
         private UmbracoBackOfficeIdentity(UmbracoBackOfficeIdentity identity)
             : base(identity)
         {
+            if (identity.Actor != null)
+            {
+                _currentIssuer = identity.AuthenticationType;
+                AddClaims(identity);
+                Actor = identity.Clone();
+            }
+
             UserData = identity.UserData;
-            AddClaims();
+            AddUserDataClaims();
         }
 
-        public static string Issuer = "UmbracoBackOffice";
+        public const string Issuer = "UmbracoBackOffice";
+        private readonly string _currentIssuer = Issuer;
 
-        //TODO: Another option is to create a ClaimsIdentityFactory when everything is wired up... optional though i think
-        private void AddClaims()
+        private void AddClaims(ClaimsIdentity claimsIdentity)
+        {
+            foreach (var claim in claimsIdentity.Claims)
+            {
+                AddClaim(claim);
+            }
+        }
+
+        /// <summary>
+        /// Adds claims based on the UserData data
+        /// </summary>
+        private void AddUserDataClaims()
         {
             AddClaims(new[]
             {
                 new Claim(Constants.Security.StartContentNodeIdClaimType, StartContentNode.ToInvariantString(), null, Issuer, Issuer, this),
                 new Claim(Constants.Security.StartMediaNodeIdClaimType, StartMediaNode.ToInvariantString(), null, Issuer, Issuer, this),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, string.Join(",", AllowedApplications), null, Issuer, Issuer, this),
+                
+                //TODO: Similar one created by the ClaimsIdentityFactory<TUser, TKey> not sure we need this
                 new Claim(Constants.Security.UserIdClaimType, Id.ToString(), null, Issuer, Issuer, this),
                 new Claim(Constants.Security.CultureClaimType, Culture, null, Issuer, Issuer, this),
                 new Claim(Constants.Security.SessionIdClaimType, SessionId, null, Issuer, Issuer, this),
-                new Claim(ClaimTypes.Role, string.Join(",", Roles), null, Issuer, Issuer, this)
+
+                //TODO: Role claims are added by the default ClaimsIdentityFactory<TUser, TKey> based on the result from 
+                // the user manager manager.GetRolesAsync method so not sure if we can do that there or needs to be done here
+                // and each role should be a different claim, not a single string 
+
+                //new Claim(ClaimTypes.Role, string.Join(",", Roles), null, Issuer, Issuer, this)
             });
         }
 
@@ -80,7 +125,7 @@ namespace Umbraco.Core.Security
         /// </returns>
         public override string AuthenticationType
         {
-            get { return Issuer; }
+            get { return _currentIssuer; }
         }
 
         public int StartContentNode

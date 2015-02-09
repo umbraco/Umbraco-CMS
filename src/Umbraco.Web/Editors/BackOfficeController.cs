@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.ServiceModel.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -33,7 +35,10 @@ using Umbraco.Web.WebServices;
 using Umbraco.Web.WebApi.Filters;
 using System.Web;
 using AutoMapper;
+using Microsoft.AspNet.Identity.Owin;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,19 +49,48 @@ namespace Umbraco.Web.Editors
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
+        private BackOfficeUserManager _userManager;
+
         protected IOwinContext OwinContext
         {
             get { return Request.GetOwinContext(); }
+        }
+
+        protected BackOfficeUserManager UserManager
+        {
+            get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
         }
 
         /// <summary>
         /// Render the default view
         /// </summary>
         /// <returns></returns>
-        public ActionResult Default()
+        public async Task<ActionResult> Default()
         {
             ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+
+            //First check if there's external login info, if there's not proceed as normal
+            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync();
+            if (loginInfo == null)
+            {
+                return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+            }
+
+            // Sign in the user with this external login provider if the user already has a login
+            var user = await UserManager.FindAsync(loginInfo.Login);
+            if (user != null)
+            {
+                await SignInAsync(user, isPersistent: false);
+                //all signed in so just render the view as per normal
+                return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+            }
+
+            //The user hasn't used this login provider so need to display an error, they must link the provider in the user section
+            // TODO: Or wherever we decide to put that.
+
+            // TODO: Return a real error in one way or another, maybe a different view?
+
+            throw new SecurityNegotiationException("The requested provider " + loginInfo.Login.LoginProvider + " has not been linked to to an account");
         }
 
         /// <summary>
@@ -374,57 +408,33 @@ namespace Umbraco.Web.Editors
         
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult ExternalLogin(string provider, string returnUrl = null)
+        public ActionResult ExternalLogin(string provider)
         {
-            if (returnUrl.IsNullOrWhiteSpace())
-            {
-                returnUrl = GlobalSettings.Path;
-            }
-
             // Request a redirect to the external login provider
             return new ChallengeResult(provider,
-                Url.Action("ExternalLoginCallback", "BackOffice", new
+                Url.Action("Default", "BackOffice", new
                 {
-                    area = GlobalSettings.UmbracoMvcArea,
-                    ReturnUrl = returnUrl
+                    area = GlobalSettings.UmbracoMvcArea
                 }));
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
+        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
         {
-            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync();
-            if (loginInfo == null)
-            {
-                //go home, invalid callback
-                return RedirectToLocal(returnUrl);
-            }
-
-            //// Sign in the user with this external login provider if the user already has a login
-            //var user = await UserManager<>.FindAsync(loginInfo.Login);
-            //if (user != null)
-            //{
-            //    await SignInAsync(user, isPersistent: false);
-            //    return RedirectToLocal(returnUrl);
-            //}
-            //else
-            //{
-            //    // If the user does not have an account, then prompt the user to create an account
-            //    ViewBag.ReturnUrl = returnUrl;
-            //    ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-
-            //    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
-            //}
-
-            //TODO: until we make a user thingy and make this correctly , we'll just see if this works
-
-            var user = Security.GetBackOfficeUser(loginInfo.DefaultUserName);
-
-            var ticket = UmbracoContext.Security.PerformLogin(user);
-            HttpContext.AuthenticateCurrentRequest(ticket, false);
+            //TODO: I don't think we want to reference the 'default' external cookie since people might be using this on the front-end
+            // we'll need to create a secondary custom handler for the external cookie for the back office
+            OwinContext.Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+            OwinContext.Authentication.SignIn(
+                new AuthenticationProperties() {IsPersistent = isPersistent}, 
+                await GenerateUserIdentityAsync(user));
+        }
+
+        private async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeIdentityUser user)
+        {
+            // NOTE the authenticationType must match the umbraco one
+            // defined in CookieAuthenticationOptions.AuthenticationType
+            var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
+            return userIdentity;
         }
         
         

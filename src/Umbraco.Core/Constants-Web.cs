@@ -22,6 +22,8 @@
 	    public static class Security
 	    {
 
+            public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
+
 	        public const string StartContentNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startcontentnode";
             public const string StartMediaNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapps";

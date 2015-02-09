@@ -23,12 +23,12 @@
                     <div class="alert alert-error">{{errorMsg}}</div>
                 </div>
             </form>
-            
+
             <br/><br/>
 
             <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
 
-                <div class="alert alert-success" ng-repeat="login in externalLogins">
+                <div class="alert alert-success" ng-repeat="login in externalLoginProviders">
 
                     <button type="submit" class="btn btn-default" id="{{login.authType}}" name="provider" value="{{login.authType}}"
                             title="Log in using your {{login.caption}} account">

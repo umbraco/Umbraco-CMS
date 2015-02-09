@@ -12,39 +12,35 @@ using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security.Identity
 {
     public static class AppBuilderExtensions
     {
-        ///// <summary>
-        ///// Configure Identity User Manager for Umbraco
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="app"></param>
-        ///// <param name="appContext"></param>
-        //public static void ConfigureUserManagerForUmbraco<T>(this IAppBuilder app, ApplicationContext appContext)
-        //    where T : UmbracoIdentityUser, new()
-        //{
+        /// <summary>
+        /// Configure Identity User Manager for Umbraco
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="userMembershipProvider"></param>
+        public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app, ApplicationContext appContext, MembershipProviderBase userMembershipProvider)
+        {
+            //Don't proceed if the app is not ready
+            if (appContext.IsConfigured == false
+                || appContext.DatabaseContext == null
+                || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
 
-        //    //Don't proceed if the app is not ready
-        //    if (appContext.IsConfigured == false
-        //        || appContext.DatabaseContext == null
-        //        || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
-
-        //    //Configure Umbraco user manager to be created per request
-        //    app.CreatePerOwinContext<UmbracoMembersUserManager<T>>(
-        //        (o, c) => UmbracoMembersUserManager<T>.Create(
-        //            o, c, ApplicationContext.Current.Services.MemberService));
-
-        //    //Configure Umbraco member event handler to be created per request - this will ensure that the
-        //    // external logins are kept in sync if members are deleted from Umbraco
-        //    app.CreatePerOwinContext<MembersEventHandler<T>>((options, context) => new MembersEventHandler<T>(context));
-
-        //    //TODO: This is just for the mem leak fix
-        //    app.CreatePerOwinContext<OwinContextDisposal<MembersEventHandler<T>, UmbracoMembersUserManager<T>>>(
-        //        (o, c) => new OwinContextDisposal<MembersEventHandler<T>, UmbracoMembersUserManager<T>>(c));
-        //}
+            //Configure Umbraco user manager to be created per request
+            app.CreatePerOwinContext<BackOfficeUserManager>(
+                (options, owinContext) => BackOfficeUserManager.Create(
+                    options, 
+                    owinContext, 
+                    appContext.Services.UserService,
+                    appContext.Services.ExternalLoginService,
+                    userMembershipProvider));
+        }
 
         /// <summary>
         /// Ensures that the UmbracoBackOfficeAuthenticationMiddleware is assigned to the pipeline
@@ -59,8 +55,7 @@ namespace Umbraco.Web.Security.Identity
             app.UseCookieAuthentication(new UmbracoBackOfficeCookieAuthenticationOptions(
                     UmbracoConfig.For.UmbracoSettings().Security,
                     GlobalSettings.TimeOutInMinutes,
-                    GlobalSettings.UseSSL,
-                    GlobalSettings.Path)
+                    GlobalSettings.UseSSL)
             {
                 Provider = new CookieAuthenticationProvider
                 {                
@@ -82,7 +77,9 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
 
-            app.UseExternalSignInCookie("UmbracoExternalCookie");
+            //app.UseExternalSignInCookie("UmbracoExternalCookie");
+
+            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
             return app;
         }

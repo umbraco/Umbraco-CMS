@@ -63,19 +63,21 @@
         we will load the rest of the server vars after the user is authenticated.
     *@
     <script type="text/javascript">
-        var Umbraco = {};
-        Umbraco.Sys = {};
-        Umbraco.Sys.ServerVariables = {
-            "umbracoUrls": {
-                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-                "serverVarsJs": "@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")",
-                "externalLoginsUrl": "@(Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))"
-            },
-            "externalLogins": @Html.Raw(JsonConvert.SerializeObject(loginProviders)),
-            "application": {
-                "applicationPath" : "@Context.Request.ApplicationPath"
-            }
-        };       
+    var Umbraco = {};
+    Umbraco.Sys = {};
+    Umbraco.Sys.ServerVariables = {
+        "umbracoUrls": {
+            "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
+            "serverVarsJs": "@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")",
+            "externalLoginsUrl": "@(Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))"
+        },
+        "externalLogins": {
+            "providers": @Html.Raw(JsonConvert.SerializeObject(loginProviders))
+        },
+        "application": {
+            "applicationPath" : "@Context.Request.ApplicationPath"
+        }
+    };       
     </script>
 
     @*And finally we can load in our angular app*@

@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-
+using Microsoft.Owin.Security.Google;
+using Umbraco.Web.Security.Identity;
 using Owin;
+using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.UI;
 
@@ -24,8 +28,10 @@ namespace Umbraco.Web.UI
 
         public void Configuration(IAppBuilder app)
         {
-            ////Single method to configure the Identity user manager for use with Umbraco
-            //app.ConfigureUserManagerForUmbraco<UmbracoApplicationUser>();
+            //Single method to configure the Identity user manager for use with Umbraco
+            app.ConfigureUserManagerForUmbracoBackOffice(
+                ApplicationContext.Current,
+                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
 
             //// Enable the application to use a cookie to store information for the 
             //// signed in user and to use a cookie to temporarily store information 
@@ -56,6 +62,9 @@ namespace Umbraco.Web.UI
 
             //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
+
+
+         
         }
 
 
