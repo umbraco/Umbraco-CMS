@@ -314,6 +314,11 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="Media\Exif\ExifIds.cs" />
+    <Compile Include="Media\Exif\ExifIO.cs" />
+    <Compile Include="Media\Exif\ExifReader.cs" />
+    <Compile Include="Media\Exif\ExifTag.cs" />
+    <Compile Include="Media\Exif\JpegInfo.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
