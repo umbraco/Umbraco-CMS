@@ -643,6 +643,7 @@ namespace Umbraco.Core.Services
         /// <returns>The published version, if any; otherwise, null.</returns>
         public IContent GetPublishedVersion(IContent content)
         {
+            if (content.Published) return content;
             return content.HasPublishedVersion
                 ? GetByVersion(content.PublishedVersionGuid)
                 : null;
