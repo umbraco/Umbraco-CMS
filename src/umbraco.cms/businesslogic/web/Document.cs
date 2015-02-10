@@ -1039,7 +1039,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
         {
-            return ContentEntity.HasPublishedVersion();
+            return ContentEntity.HasPublishedVersion;
         }
 
         /// <summary>

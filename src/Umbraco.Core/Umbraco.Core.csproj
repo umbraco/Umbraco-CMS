@@ -324,6 +324,7 @@
     <Compile Include="Models\PublicAccessRule.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="Models\Rdbms\AccessRuleDto.cs" />
+    <Compile Include="Models\Rdbms\DocumentPublishedReadOnlyDto.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\DoNotCloneAttribute.cs" />
     <Compile Include="Models\IDomain.cs" />

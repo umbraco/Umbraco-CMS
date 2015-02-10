@@ -637,6 +637,18 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets the published version of a <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <returns>The published version, if any; otherwise, null.</returns>
+        public IContent GetPublishedVersion(IContent content)
+        {
+            return content.HasPublishedVersion
+                ? GetByVersion(content.PublishedVersionGuid)
+                : null;
+        }
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>

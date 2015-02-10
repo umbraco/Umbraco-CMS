@@ -73,5 +73,15 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
+
+        /// <summary>
+        /// Gets a value indicating whether the content has a published version.
+        /// </summary>
+        bool HasPublishedVersion { get; }
+
+        /// <summary>
+        /// Gets the unique identifier of the published version, if any.
+        /// </summary>
+        Guid PublishedVersionGuid { get; }
     }
 }

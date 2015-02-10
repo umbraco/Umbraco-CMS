@@ -1407,6 +1407,100 @@ namespace Umbraco.Tests.Services
             }
         }
 
+        [Test]
+        public void Created_HasPublishedVersion_Not()
+        {
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            contentService.Save(content);
+
+            Assert.IsTrue(content.HasIdentity);
+            Assert.IsFalse(content.HasPublishedVersion);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsFalse(content.HasPublishedVersion);
+        }
+
+        [Test]
+        public void Published_HasPublishedVersion_Self()
+        {
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            contentService.SaveAndPublishWithStatus(content);
+
+            Assert.IsTrue(content.HasIdentity);
+            Assert.IsTrue(content.HasPublishedVersion);
+            Assert.AreEqual(content.PublishedVersionGuid, content.Version);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsTrue(content.HasPublishedVersion);
+            Assert.AreEqual(content.PublishedVersionGuid, content.Version);
+        }
+
+        [Test]
+        public void PublishedWithChanges_HasPublishedVersion_Other()
+        {
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            contentService.SaveAndPublishWithStatus(content);
+            content.SetValue("author", "James Dean");
+            contentService.Save(content);
+
+            Assert.IsTrue(content.HasIdentity);
+            Assert.IsTrue(content.HasPublishedVersion);
+            Assert.AreNotEqual(content.PublishedVersionGuid, content.Version);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.HasPublishedVersion);
+            Assert.AreNotEqual(content.PublishedVersionGuid, content.Version);
+
+            var published = contentService.GetPublishedVersion(content);
+            Assert.IsTrue(published.Published);
+            Assert.IsTrue(published.HasPublishedVersion);
+            Assert.AreEqual(published.PublishedVersionGuid, published.Version);
+        }
+
+        [Test]
+        public void Unpublished_HasPublishedVersion_Not()
+        {
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            contentService.SaveAndPublishWithStatus(content);
+            contentService.UnPublish(content);
+
+            Assert.IsTrue(content.HasIdentity);
+            Assert.IsFalse(content.HasPublishedVersion);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsFalse(content.HasPublishedVersion);
+        }
+
+        [Test]
+        public void HasPublishedVersion_Method()
+        {
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            content.SetValue("author", "Barack Obama");
+
+            contentService.Save(content);
+            Assert.IsTrue(content.HasIdentity);
+            Assert.IsFalse(content.HasPublishedVersion);
+            Assert.IsFalse(content.HasPublishedVersion());
+
+            contentService.SaveAndPublishWithStatus(content);
+            Assert.IsTrue(content.HasPublishedVersion);
+            Assert.IsTrue(content.HasPublishedVersion());
+        }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");

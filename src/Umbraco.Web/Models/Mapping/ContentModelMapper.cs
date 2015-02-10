@@ -189,7 +189,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 return content.UpdateDate;
             }
-            if (content.HasPublishedVersion())
+            if (content.HasPublishedVersion)
             {
                 var published = applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
                 return published.UpdateDate;
