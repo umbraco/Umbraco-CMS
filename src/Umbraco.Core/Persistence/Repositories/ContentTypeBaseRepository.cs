@@ -873,7 +873,7 @@ AND umbracoNode.id <> @id",
                     var defaultTemplates = result
                         .Where(x => x.ctId == currentCtId)
                         //use a tuple so that distinct checks both values
-                        .Select(x => new Tuple<bool?, int?>(x.dtIsDefault, x.dtTemplateId))
+                        .Select(x => new Tuple<bool?, int?>(Convert.ToBoolean(x.dtIsDefault), x.dtTemplateId))
                         .Where(x => x.Item1.HasValue && x.Item2.HasValue)
                         .Distinct()
                         .OrderByDescending(x => x.Item1.Value)
