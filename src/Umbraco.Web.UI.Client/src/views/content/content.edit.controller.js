@@ -68,6 +68,8 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
+        var deferred = $q.defer();
+
         contentEditingHelper.contentEditorPerformSave({
             statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
@@ -77,12 +79,17 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             //success            
             init($scope.content);
             syncTreeNode($scope.content, data.path);
+
+            deferred.resolve(data);
         }, function (err) {
             //error
             if (err) {
                 editorState.set($scope.content);
             }
+            deferred.reject(err);
         });
+
+        return deferred.promise;
     }
 
     function resetLastListPageNumber(content) {
