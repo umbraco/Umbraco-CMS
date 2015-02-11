@@ -429,6 +429,25 @@ namespace Umbraco.Web.Editors
                 });
             }
 
+            //Different response if this is a 'blueimp' request
+            if (Request.GetQueryNameValuePairs().Any(x => x.Key == "origin"))
+            {
+                var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
+                if (origin.Value == "blueimp")
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK,
+                        tempFiles.UploadedFiles.Select(x => new
+                        {
+                            name = x.FileName,
+                            size = "",
+                            url = "",
+                            thumbnailUrl = ""
+                        }), 
+                        //Don't output the angular xsrf stuff, blue imp doesn't like that
+                        new JsonMediaTypeFormatter());
+                }
+            }
+
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
         }
 
