@@ -808,7 +808,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IContent> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
 
             //nothing found
             if (dtos.Any() == false) return Enumerable.Empty<IContent>();
