@@ -48,15 +48,7 @@ namespace Umbraco.Web.Security.Providers
         {
             get { return "MembersMembershipProvider"; }
         }
-
-        /// <summary>
-        /// For backwards compatibility, this provider supports this option
-        /// </summary>
-        public override bool AllowManuallyChangingPassword
-        {
-            get { return true; }
-        }
-
+        
         protected override MembershipUser ConvertToMembershipUser(IMember entity)
         {
             return entity.AsConcreteMembershipUser(Name, _providerKeyAsGuid);
