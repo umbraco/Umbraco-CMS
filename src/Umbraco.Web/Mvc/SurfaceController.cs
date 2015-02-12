@@ -24,7 +24,6 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-            _membershipHelper = new MembershipHelper(umbracoContext);
         }
 
         /// <summary>
@@ -33,17 +32,16 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController()
             : base(UmbracoContext.Current)
         {
-            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
         }
 
-        private readonly MembershipHelper _membershipHelper;
+        private MembershipHelper _membershipHelper;
 
         /// <summary>
         /// Returns the MemberHelper instance
         /// </summary>
-        public MembershipHelper Members
+        public virtual MembershipHelper Members
         {
-            get { return _membershipHelper; }
+            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
         }
 
         /// <summary>
@@ -101,7 +99,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the current page.
         /// </summary>
-        protected IPublishedContent CurrentPage
+        protected virtual IPublishedContent CurrentPage
         {
             get
             {

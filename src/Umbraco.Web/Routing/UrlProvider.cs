@@ -21,8 +21,10 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="routingSettings"></param>
         /// <param name="urlProviders">The list of url providers.</param>
-        internal UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
+        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
         {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;
 
@@ -32,7 +34,23 @@ namespace Umbraco.Web.Routing
             if (Enum<UrlProviderMode>.TryParse(routingSettings.UrlProviderMode, out provider))
             {
                 Mode = provider;
-            }            
+            }    
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
+        /// </summary>
+        /// <param name="umbracoContext">The Umbraco context.</param>
+        /// <param name="urlProviders">The list of url providers.</param>
+        /// <param name="provider"></param>
+        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, UrlProviderMode provider = UrlProviderMode.Auto)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+
+            _umbracoContext = umbracoContext;
+            _urlProviders = urlProviders;
+
+            Mode = provider;
         }
 
         private readonly UmbracoContext _umbracoContext;

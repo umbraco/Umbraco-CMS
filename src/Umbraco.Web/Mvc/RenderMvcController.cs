@@ -36,7 +36,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        protected new UmbracoContext UmbracoContext
+        protected virtual new UmbracoContext UmbracoContext
         {
             get { return PublishedContentRequest.RoutingContext.UmbracoContext; }
         }
@@ -49,11 +49,10 @@ namespace Umbraco.Web.Mvc
 	        get { return PublishedContentRequest.PublishedContent; }
 	    }
 
-		//TODO: make this protected once we make PublishedContentRequest not internal after we figure out what it should actually contain
 		/// <summary>
 		/// Returns the current PublishedContentRequest
 		/// </summary>
-		internal PublishedContentRequest PublishedContentRequest
+        protected internal virtual PublishedContentRequest PublishedContentRequest
 		{
 			get
 			{

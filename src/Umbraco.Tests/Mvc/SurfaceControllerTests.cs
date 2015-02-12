@@ -1,16 +1,26 @@
 using System.CodeDom;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Mvc
 {
@@ -21,11 +31,13 @@ namespace Umbraco.Tests.Mvc
         public void Can_Construct_And_Get_Result()
         {
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
-            ApplicationContext.EnsureContext(appCtx, true);
 
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,               
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
 
             var ctrl = new TestSurfaceController(umbCtx);
@@ -44,6 +56,9 @@ namespace Umbraco.Tests.Mvc
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
 
             var ctrl = new TestSurfaceController(umbCtx);
@@ -54,12 +69,18 @@ namespace Umbraco.Tests.Mvc
         [Test]
         public void Umbraco_Helper_Not_Null()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
-            ApplicationContext.EnsureContext(appCtx, true);
-
+            var appCtx = new ApplicationContext(
+                new DatabaseContext(new Mock<IDatabaseFactory>().Object, Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                MockHelper.GetMockedServiceContext(),
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,
+                Mock.Of<IUmbracoSettingsSection>(),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
 
             var ctrl = new TestSurfaceController(umbCtx);
@@ -70,56 +91,58 @@ namespace Umbraco.Tests.Mvc
         [Test]
         public void Can_Lookup_Content()
         {
-            //init app context
-            
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
-
-            //TODO: Need to either make this public or make all methods on the UmbracoHelper or 
-            // in v7 the PublishedContentQuery object virtual so we can just mock the methods
-
-            var contentCaches = new Mock<IPublishedCaches>();
-            
-            //init content resolver
-            //TODO: This is not public so people cannot actually do this!
-            
-            PublishedCachesResolver.Current = new PublishedCachesResolver(contentCaches.Object);
-
-            //init umb context
 
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
                 appCtx,
+                new Mock<WebSecurity>(null, null).Object,
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
+                Enumerable.Empty<IUrlProvider>(),
                 true);
 
-            //setup the mock
-
-            contentCaches.Setup(caches => caches.CreateContextualContentCache(It.IsAny<UmbracoContext>()))
-                .Returns(new ContextualPublishedContentCache(
-                    Mock.Of<IPublishedContentCache>(cache =>
-                        cache.GetById(It.IsAny<UmbracoContext>(), false, It.IsAny<int>()) ==
-                            //return mock of IPublishedContent for any call to GetById
-                            Mock.Of<IPublishedContent>(content => content.Id == 2)),
-                    umbCtx));
-
+            var helper = new UmbracoHelper(
+                umbCtx,
+                Mock.Of<IPublishedContent>(),
+                Mock.Of<ITypedPublishedContentQuery>(query => query.TypedContent(It.IsAny<int>()) == 
+                    //return mock of IPublishedContent for any call to GetById
+                    Mock.Of<IPublishedContent>(content => content.Id == 2)),
+                Mock.Of<IDynamicPublishedContentQuery>(),
+                Mock.Of<ITagQuery>(),
+                Mock.Of<IDataTypeService>(),
+                new UrlProvider(umbCtx, Enumerable.Empty<IUrlProvider>()),
+                Mock.Of<ICultureDictionary>(),
+                Mock.Of<IUmbracoComponentRenderer>(),
+                new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()));
             
+            var ctrl = new TestSurfaceController(umbCtx, helper);
+            var result = ctrl.GetContent(2) as PublishedContentResult;
 
-            
-            
-            using (var uTest = new DisposableUmbracoTest(appCtx))
-            {
-                var ctrl = new TestSurfaceController(uTest.UmbracoContext);
-                var result = ctrl.GetContent(2) as PublishedContentResult;
-
-                Assert.IsNotNull(result);
-                Assert.AreEqual(2, result.Content.Id);    
-            }
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Content.Id);    
         }
 
         public class TestSurfaceController : SurfaceController
         {
+            private readonly UmbracoHelper _umbracoHelper;
+
             public TestSurfaceController(UmbracoContext umbracoContext)
                 : base(umbracoContext)
             {
+            }
+
+            public TestSurfaceController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+                : base(umbracoContext)
+            {
+                _umbracoHelper = umbracoHelper;
+            }
+
+            /// <summary>
+            /// Returns an UmbracoHelper object
+            /// </summary>
+            public override UmbracoHelper Umbraco
+            {
+                get { return _umbracoHelper ?? base.Umbraco; }
             }
 
             public ActionResult Index()
