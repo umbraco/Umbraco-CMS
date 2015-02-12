@@ -19,6 +19,7 @@ angular.module("umbraco")
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile") + "?origin=blueimp",
                 autoUpload: true,
                 dropZone: $element.find(".umb-dialogs-mediapicker.browser"),
+                fileInput: $element.find("input.uploader"),
                 formData: {
                     currentFolder: -1
                 }

@@ -6,7 +6,7 @@
         <div class="fileinput-button umb-upload-button-big" ng-hide="dropping || uploading">
             <i class="icon icon-page-up"></i>
             <p><localize key="media_clickToUpload">Click to upload</localize></p>
-            <input type="file" name="files[]" multiple ng-disabled="disabled">
+            <input type="file" name="files[]" multiple ng-disabled="disabled" class="uploader">
         </div>
 
         <umb-upload-dropzone ng-show="dropping && !uploading"></umb-upload-dropzone>

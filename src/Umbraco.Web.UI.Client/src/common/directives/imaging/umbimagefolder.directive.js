@@ -38,6 +38,7 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                 previewMaxHeight: 150,
                 previewCrop: true,
                 dropZone: element.find(".drop-zone"),
+                fileInput: element.find("input.uploader"),
                 formData: {
                     currentFolder: scope.nodeId
                 }
@@ -52,7 +53,7 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                         scope.images = data.items;
                     });
             }
-
+            
             //when one is finished
             scope.$on('fileuploaddone', function(e, data) {
                 scope.$apply(function() {
