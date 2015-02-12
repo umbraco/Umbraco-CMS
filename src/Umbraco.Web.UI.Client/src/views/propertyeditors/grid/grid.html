@@ -123,7 +123,7 @@
                                                     <div class="cell-tools"
                                                          ng-class="{'with-prompt': control.deletePrompt}"
                                                          ng-animate="'fade'"
-                                                         ng-show="control && (currentControl == control)">
+                                                         ng-if="control && (currentControl == control)">
 
                                                         <!-- delete control -->
                                                         <div class="cell-tools-remove">
@@ -132,13 +132,13 @@
                                                                  ng-mouseover="setWarnhighlightControl(control)"
                                                                  ng-mouseleave="disableWarnhighlightControl(control)">
 
-                                                                <span class="prompt" ng-show="control.deletePrompt">
+                                                                <span class="prompt" ng-if="control.deletePrompt">
                                                                     <localize key="general_areyousure" />
                                                                     <a href ng-click="removeControl(area, $index)"><localize key="general_yes" /></a>
                                                                     <a href ng-click="clearPrompt(control, $event)"><localize key="general_no" /></a>
                                                                 </span>
 
-                                                                <i ng-show="!control.deletePrompt" class="icon icon-trash"></i>
+                                                                <i ng-if="!control.deletePrompt" class="icon icon-trash"></i>
                                                             </div>
                                                         </div>
 
