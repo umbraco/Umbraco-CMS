@@ -9,12 +9,12 @@ function umbImageUploadProgress($rootScope, assetsService, $timeout, $log, umbRe
         require: '^umbImageUpload',
         restrict: 'E',
         replace: true,
-        template: '<div class="progress progress-striped active"><div class="bar" ng-style="{width: uploadProgress + \'%\'}"></div></div>',
+        template: '<div class="progress progress-striped active"><div class="bar" ng-style="{width: progress + \'%\'}"></div></div>',
         
         link: function (scope, element, attrs, umbImgUploadCtrl) {
 
             umbImgUploadCtrl.bindEvent('fileuploadprogressall', function (e, data) {
-                scope.uploadProgress = parseInt(data.loaded / data.total * 100, 10);              
+                scope.progress = parseInt(data.loaded / data.total * 100, 10);
             });
         }
     };

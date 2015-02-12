@@ -59,11 +59,8 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                     //remove the amount of files complete
                     //NOTE: function is here instead of in the loop otherwise jshint blows up
                     function findFile(file) { return file === data.files[i]; }
-
                     for (var i = 0; i < data.files.length; i++) {
-
                         var found = _.find(scope.files, findFile);
-
                         found.completed = true;
                     }
 
