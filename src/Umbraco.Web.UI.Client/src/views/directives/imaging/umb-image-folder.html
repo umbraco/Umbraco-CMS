@@ -1,8 +1,5 @@
-<form ng-controller="Umbraco.PropertyEditors.FolderBrowserController" id="fileupload"
-      style="width: 100%"
-      method="POST" enctype="multipart/form-data"
-      class="umb-editor umb-folderbrowser"
-      file-upload="blueimpOptions">
+<form style="width: 100%" method="POST" enctype="multipart/form-data" class="umb-editor umb-folderbrowser"
+      umb-image-upload="blueimpOptions">
 
     <div class="drop-zone">
 
@@ -15,9 +12,8 @@
         <umb-upload-dropzone ng-show="dropping && !uploading"></umb-upload-dropzone>
 
         <div ng-if="uploading">
-            <div class="progress progress-striped active">
-                <div class="bar" ng-style="{width: progress + '%'}"></div>
-            </div>
+
+            <umb-image-upload-progress></umb-image-upload-progress>
 
             <div class="umb-photo-preview"
                  ng-repeat="file in files"
@@ -34,6 +30,5 @@
                       min-width="220"
                       on-click="clickHandler"
                       ng-model="images" />
-
 
 </form>
