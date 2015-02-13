@@ -419,7 +419,10 @@ namespace Umbraco.Core
 		/// </example>
 		public static string GetFullNameWithAssembly(this Type type)
 		{
-			return string.Concat(type.FullName, ", ", type.Assembly.GetName().Name);
+		    var assemblyName = type.Assembly.GetName();
+
+			return string.Concat(type.FullName, ", ",
+                assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
 		}
 
 
