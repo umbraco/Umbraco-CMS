@@ -44,6 +44,9 @@ CALL InstallGit.cmd
 ECHO Performing MSBuild and producing Umbraco binaries zip files
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
 
+ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
+attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
+
 ECHO Adding dummy files to include in the NuGet package so that empty folders actually get created
 SET dummytext=This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete.
 ECHO %dummytext% > .\_BuildOutput\WebApp\App_Code\dummy.txt
