@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Linq;
+using System.Runtime.Serialization;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Models.Trees
@@ -17,11 +18,16 @@ namespace Umbraco.Web.Models.Trees
     {
         public static SectionRootNode CreateMultiTreeSectionRoot(string nodeId, TreeNodeCollection children)
         {
-           return new SectionRootNode(nodeId, "", "")
+           var sectionRoot = new SectionRootNode(nodeId, "", "")
                 {
                     IsContainer = true,
                     Children = children
                 };
+
+            //some metadata as to whether or not this section contains any trees
+            sectionRoot.AdditionalData["containsTrees"] = children.Any();
+
+            return sectionRoot;
         }
 
         public static SectionRootNode CreateSingleTreeSectionRoot(string nodeId, string getChildNodesUrl, string menuUrl, string title, TreeNodeCollection children)
