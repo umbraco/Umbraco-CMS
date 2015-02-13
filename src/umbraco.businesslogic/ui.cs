@@ -400,7 +400,7 @@ namespace umbraco
             }
             catch (Exception x)
             {
-                LogHelper.Error<ui>( "Error loading langauage file: " + file + x.Message ,x);
+                LogHelper.Error<ui>( "Error loading language file: " + file + x.Message ,x);
             }
         }
     }
