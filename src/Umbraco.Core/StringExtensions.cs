@@ -101,6 +101,17 @@ namespace Umbraco.Core
             }
         }
 
+        internal static string ReplaceNonAlphanumericChars(this string input, string replacement)
+        {
+            //any character that is not alphanumeric, convert to a hyphen
+            var mName = input;
+            foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
+            {
+                mName = mName.Replace(c.ToString(CultureInfo.InvariantCulture), replacement);
+            }
+            return mName;
+        }
+
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
         {
             //any character that is not alphanumeric, convert to a hyphen

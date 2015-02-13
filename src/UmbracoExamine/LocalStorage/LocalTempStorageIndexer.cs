@@ -16,10 +16,12 @@ namespace UmbracoExamine.LocalStorage
 {
     internal class LocalTempStorageIndexer
     {
-        private string _tempPath;
         public Lucene.Net.Store.Directory LuceneDirectory { get; private set; }
         private readonly object _locker = new object();
         public SnapshotDeletionPolicy Snapshotter { get; private set; }
+
+        public string TempPath { get; private set; }
+
 
         public LocalTempStorageIndexer()
         {
@@ -31,7 +33,7 @@ namespace UmbracoExamine.LocalStorage
         {
             var codegenPath = HttpRuntime.CodegenDir;
 
-            _tempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
+            TempPath = Path.Combine(codegenPath, configuredPath.TrimStart('~', '/').Replace("/", "\\"));
 
             switch (localStorageType)
             {
@@ -40,18 +42,18 @@ namespace UmbracoExamine.LocalStorage
 
                     //create the custom lucene directory which will keep the main and temp FS's in sync
                     LuceneDirectory = LocalTempStorageDirectoryTracker.Current.GetDirectory(
-                        new DirectoryInfo(_tempPath),
+                        new DirectoryInfo(TempPath),
                         baseLuceneDirectory,
                         //flag to disable the mirrored folder if not successful
                         success == false);
                     break;
                 case LocalStorageType.LocalOnly:
-                    if (Directory.Exists(_tempPath) == false)
+                    if (Directory.Exists(TempPath) == false)
                     {
-                        Directory.CreateDirectory(_tempPath);
+                        Directory.CreateDirectory(TempPath);
                     }
 
-                    LuceneDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(_tempPath));
+                    LuceneDirectory = DirectoryTracker.Current.GetDirectory(new DirectoryInfo(TempPath));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("localStorageType");
@@ -63,9 +65,9 @@ namespace UmbracoExamine.LocalStorage
         {
             lock (_locker)
             {
-                if (Directory.Exists(_tempPath) == false)
+                if (Directory.Exists(TempPath) == false)
                 {
-                    Directory.CreateDirectory(_tempPath);
+                    Directory.CreateDirectory(TempPath);
                 }
 
                 //copy index if it exists, don't do anything if it's not there
@@ -93,7 +95,7 @@ namespace UmbracoExamine.LocalStorage
                             .Distinct()
                             .ToArray();
 
-                        var tempDir = new DirectoryInfo(_tempPath);
+                        var tempDir = new DirectoryInfo(TempPath);
 
                         //Get all files in the temp storage that don't exist in the snapshot collection, we want to remove these
                         var toRemove = tempDir.GetFiles()
@@ -111,7 +113,7 @@ namespace UmbracoExamine.LocalStorage
                         {
                             try
                             {
-                                File.Delete(Path.Combine(_tempPath, file));
+                                File.Delete(Path.Combine(TempPath, file));
                             }
                             catch (IOException ex)
                             {
@@ -132,7 +134,7 @@ namespace UmbracoExamine.LocalStorage
 
                         foreach (var fileName in allSnapshotFiles.Where(f => f.IsNullOrWhiteSpace() == false))
                         {
-                            var destination = Path.Combine(_tempPath, Path.GetFileName(fileName));
+                            var destination = Path.Combine(TempPath, Path.GetFileName(fileName));
 
                             //don't copy if it's already there, lucene is 'write once' so this file is meant to be there already
                             if (File.Exists(destination)) continue;

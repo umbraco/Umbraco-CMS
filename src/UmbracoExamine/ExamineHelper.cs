@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Examine;
 using Examine.LuceneEngine.Config;
 using Umbraco.Core;
@@ -22,7 +23,10 @@ namespace UmbracoExamine
         {
             var indexSet = GetConfiguredIndexSet(name, config, matchingVerb, alreadyConfiguredCheck);
             if (indexSet == null) return;
-            indexSet.IndexPath = indexSet.IndexPath.Replace("{machinename}", NetworkHelper.FileSafeMachineName).EnsureEndsWith('/');
+            indexSet.IndexPath = indexSet.IndexPath
+                .Replace("{machinename}", NetworkHelper.FileSafeMachineName)
+                .Replace("{appdomainappid}", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(""))
+                .EnsureEndsWith('/');
         }
 
         public static IndexSet GetConfiguredIndexSet(string name, System.Collections.Specialized.NameValueCollection config, string matchingVerb, Func<bool> alreadyConfiguredCheck)
