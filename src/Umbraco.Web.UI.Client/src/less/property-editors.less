@@ -82,32 +82,52 @@ ul.color-picker li {
   margin: 3px;
   border: 2px solid transparent;
   width: 60px;
-}
-ul.color-picker li.active {
-  border: 2px dashed #d9d9d9;
-}
-ul.color-picker li a  {
-  height: 50px;
-  display:block;
-  cursor:pointer;
-}
-
-.control-group.color-picker-preval .thumbnail {
-  width:30px;
-  border:none;
+  overflow: hidden;
+  position: relative;
+  &.active {
+    border: 2px dashed #d9d9d9;
+  }
+  &:hover {
+    overflow: visible;
+    z-index: 1;
+    .color-label {
+      background-color: @white;
+    }
+  }
+  a {
+    height: 50px;
+    display:block;
+    cursor:pointer;
+  }
 }
 
 /* pre-value editor */
 
-.control-group.color-picker-preval pre {
-    display: inline; 
-    margin-right: 20px; 
-    margin-left: 10px;
-}
-
-.control-group.color-picker-preval label {
-    border:solid white 1px;
-    padding:6px;
+.control-group.color-picker-preval {
+    .thumbnail {
+        width:30px;
+        border:none;
+    }
+    pre {
+        display: inline;
+        margin-left: 10px;
+        &.color-label {
+            margin-right: 20px;
+        }
+    }
+    label {
+        border:solid white 1px;
+        padding:6px;
+    }
+    input[type=checkbox] + label {
+        padding: 0;
+        border: none;
+    }
+    input.color-label {
+        min-width: 10px;
+        max-width: 100px;
+        margin-right: 20px;
+    }
 }
 
 

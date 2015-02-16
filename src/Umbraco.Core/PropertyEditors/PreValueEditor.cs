@@ -1,8 +1,8 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
@@ -177,7 +177,7 @@ namespace Umbraco.Core.PropertyEditors
             return result;
         }
 
-        private void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
+        protected void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
         {
             //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
             // so they can be consumed as real json in angular!
@@ -199,6 +199,40 @@ namespace Umbraco.Core.PropertyEditors
                         {
                             //swallow this exception, we thought it was json but it really isn't so continue returning a string
                         }
+                    }
+                }
+                else if (result[keys[i]] is Dictionary<int, string>)
+                {
+                    var nestedDic = result[keys[i]] as Dictionary<int, string>;
+                    var nestedKeys = nestedDic.Keys.ToArray();
+                    var newValues = new Dictionary<int, object>();
+                    var allJson = true;
+                    for (var j = 0; j < nestedKeys.Length; j++)
+                    {
+                        var asString = nestedDic[nestedKeys[j]];
+                        if (asString.DetectIsJson())
+                        {
+                            try
+                            {
+                                var json = JsonConvert.DeserializeObject(asString);
+                                newValues[nestedKeys[j]] = json;
+                            }
+                            catch
+                            {
+                                //swallow this exception, we thought it was json but it really isn't so continue returning a string
+                                allJson = false;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            allJson = false;
+                            break;
+                        }
+                    }
+                    if (allJson && nestedKeys.Length > 0)
+                    {
+                        result[keys[i]] = newValues;
                     }
                 }
             }
