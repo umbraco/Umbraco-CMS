@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ namespace Umbraco.Web.Scheduling
     /// </summary>
     /// <typeparam name="T">The type of the managed tasks.</typeparam>
     /// <remarks>The task runner is web-aware and will ensure that it shuts down correctly when the AppDomain
-    /// shuts down (ie is unloaded). FIXME WHAT DOES THAT MEAN?</remarks>
+    /// shuts down (ie is unloaded).</remarks>
     internal class BackgroundTaskRunner<T> : IBackgroundTaskRunner<T>
         where T : class, IBackgroundTask
     {
@@ -373,7 +372,7 @@ namespace Umbraco.Web.Scheduling
                     using (bgTask) // ensure it's disposed
                     {
                         if (bgTask.IsAsync)
-                            await bgTask.RunAsync(); // fixme should pass the token along?!
+                            await bgTask.RunAsync(token);
                         else
                             bgTask.Run();
                     }

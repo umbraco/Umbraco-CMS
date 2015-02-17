@@ -53,7 +53,7 @@ namespace Umbraco.Web.Scheduling
         /// Implements IBackgroundTask.RunAsync().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public virtual async Task RunAsync()
+        public virtual async Task RunAsync(CancellationToken token)
         {
             await PerformRunAsync();
             Repeat();

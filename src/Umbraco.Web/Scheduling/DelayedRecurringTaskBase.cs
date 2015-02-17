@@ -44,11 +44,11 @@ namespace Umbraco.Web.Scheduling
             base.Run();
         }
 
-        public override async Task RunAsync()
+        public override async Task RunAsync(CancellationToken token)
         {
             if (_latch != null)
                 _latch.Dispose();
-            await base.RunAsync();
+            await base.RunAsync(token);
         }
 
         public WaitHandle Latch
