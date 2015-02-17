@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using Microsoft.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
@@ -13,7 +12,7 @@ namespace Umbraco.Web.Mvc
 	/// A view engine to look into the template location specified in the config for the front-end/Rendering part of the cms,
 	/// this includes paths to render partial macros and media item templates.
 	/// </summary>
-	public class RenderViewEngine : FixedRazorViewEngine
+	public class RenderViewEngine : RazorViewEngine
 	{
 
 		private readonly IEnumerable<string> _supplementedViewLocations = new[] { "/{0}.cshtml" };
