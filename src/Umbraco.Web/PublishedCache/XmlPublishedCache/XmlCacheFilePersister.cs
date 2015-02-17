@@ -128,8 +128,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             get { return true; }
         }
-       
-        public async Task RunAsync()
+
+        public async Task RunAsync(CancellationToken token)
         {
             LogHelper.Debug<XmlCacheFilePersister>("Run now.");
             var doc = _content.XmlContentInternal;

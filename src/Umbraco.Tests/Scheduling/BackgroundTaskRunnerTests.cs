@@ -514,7 +514,7 @@ namespace Umbraco.Tests.Scheduling
                 throw new Exception("Task has thrown.");
             }
 
-            public async Task RunAsync()
+            public async Task RunAsync(CancellationToken token)
             {
                 await Task.Delay(1000);
                 throw new Exception("Task has thrown.");
@@ -603,7 +603,7 @@ namespace Umbraco.Tests.Scheduling
                 _gate.Set();
             }
 
-            public Task RunAsync()
+            public Task RunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
             }
@@ -690,10 +690,10 @@ namespace Umbraco.Tests.Scheduling
                 Ended = DateTime.Now;
             }
 
-            public Task RunAsync()
+            public Task RunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
-                //return Task.Delay(500); // fixme
+                //return Task.Delay(500); 
             }
 
             public bool IsAsync

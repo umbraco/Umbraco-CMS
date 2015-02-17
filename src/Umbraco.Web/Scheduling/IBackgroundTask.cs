@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Umbraco.Web.Scheduling
@@ -16,9 +17,10 @@ namespace Umbraco.Web.Scheduling
         /// <summary>
         /// Runs the task asynchronously.
         /// </summary>
+        /// <param name="token">A cancellation token.</param>
         /// <returns>A <see cref="Task"/> instance representing the execution of the background task.</returns>
         /// <exception cref="NotImplementedException">The background task cannot run asynchronously.</exception>
-        Task RunAsync();
+        Task RunAsync(CancellationToken token);
 
         /// <summary>
         /// Indicates whether the background task can run asynchronously.
