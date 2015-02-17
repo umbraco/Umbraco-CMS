@@ -231,12 +231,11 @@ namespace Umbraco.Web.Scheduling
                 // truncate running queues
                 _tokenSource.Cancel(false); // false is the default
             }
-            else
-            {
-                // tasks in the queue will be executed...
-                if (wait == false) return;
-                _runningTask.Wait(); // wait for whatever is running to end...
-            }
+
+            // tasks in the queue will be executed...
+            if (wait == false) return;
+            _runningTask.Wait(); // wait for whatever is running to end...
+
         }
 
         /// <summary>
