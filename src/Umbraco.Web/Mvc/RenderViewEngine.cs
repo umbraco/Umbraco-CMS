@@ -13,7 +13,7 @@ namespace Umbraco.Web.Mvc
 	/// A view engine to look into the template location specified in the config for the front-end/Rendering part of the cms,
 	/// this includes paths to render partial macros and media item templates.
 	/// </summary>
-	public class RenderViewEngine : FixedRazorViewEngine
+    public class RenderViewEngine : ReflectedFixedRazorViewEngine
 	{
 
 		private readonly IEnumerable<string> _supplementedViewLocations = new[] { "/{0}.cshtml" };
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Mvc
 			var replacePartialWithUmbracoFolder = _supplementedPartialViewLocations.ForEach(location => templateFolder + location);
 
 			//The Render view engine doesn't support Area's so make those blank
-			ViewLocationFormats = replaceWithUmbracoFolder.ToArray();
+            ViewLocationFormats = replaceWithUmbracoFolder.ToArray();
 			PartialViewLocationFormats = replacePartialWithUmbracoFolder.ToArray();
 
 			AreaPartialViewLocationFormats = new string[] { };
