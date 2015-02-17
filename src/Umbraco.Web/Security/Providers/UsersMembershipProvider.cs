@@ -36,14 +36,6 @@ namespace Umbraco.Web.Security.Providers
             get { return UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider; }
         }
 
-        /// <summary>
-        /// For backwards compatibility, this provider supports this option
-        /// </summary>
-        public override bool AllowManuallyChangingPassword
-        {
-            get { return true; }
-        }
-
         protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {
             //the provider user key is always the int id

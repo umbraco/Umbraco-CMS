@@ -1,26 +1,5 @@
-<form ng-controller="Umbraco.Dashboard.MediaFolderBrowserDashboardController" id="fileupload" 
-style="width: 100%" 
-method="POST" enctype="multipart/form-data"
-class="umb-editor umb-folderbrowser" 
-data-file-upload="options" 
-data-file-upload-progress="" 
-data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
-        
+<div ng-controller="Umbraco.Dashboard.MediaFolderBrowserDashboardController">
+    <umb-image-folder node-id="{{nodeId}}"
+                      on-upload-complete="onUploadComplete"></umb-image-folder>
+</div>
 
-        <span class="fileinput-button umb-upload-button-big" 
-            ng-class="{disabled: disabled}">
-            <i class="icon icon-page-up"></i>
-            <p><localize key="media_clickToUpload">Click to upload</localize></p>
-            <input type="file" name="files[]" multiple ng-disabled="disabled">
-        </span>
-
-        <umb-upload-dropzone dropping="dropping" files="filesUploading">
-        </umb-upload-dropzone>
-        
-        <umb-photo-folder 
-            min-height="220" 
-            min-width="220"
-            on-click="clickHandler"
-            ng-model="images"
-        />
-</form>

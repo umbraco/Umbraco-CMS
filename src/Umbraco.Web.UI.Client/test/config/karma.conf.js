@@ -7,7 +7,7 @@ module.exports = function(karma) {
 
     // list of files / patterns to load in the browser
     files: [
-        'lib/jquery/jquery-2.0.3.min.js',
+        'lib/../build/belle/lib/jquery/jquery.min.js',
         'lib/angular/1.1.5/angular.js',
         'lib/angular/1.1.5/angular-cookies.min.js',
         'lib/angular/1.1.5/angular-mocks.js',

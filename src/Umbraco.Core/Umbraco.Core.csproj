@@ -323,6 +323,11 @@
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
+    <Compile Include="Media\Exif\ExifIds.cs" />
+    <Compile Include="Media\Exif\ExifIO.cs" />
+    <Compile Include="Media\Exif\ExifReader.cs" />
+    <Compile Include="Media\Exif\ExifTag.cs" />
+    <Compile Include="Media\Exif\JpegInfo.cs" />
     <Compile Include="Models\Rdbms\AccessRuleDto.cs" />
     <Compile Include="Models\Rdbms\DocumentPublishedReadOnlyDto.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
