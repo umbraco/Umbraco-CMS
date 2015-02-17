@@ -33,7 +33,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private DateTime _initialTouch;
 
         private const int WaitMilliseconds = 4000; // save the cache 4s after the last change (ie every 4s min)
-        private const int MaxWaitMilliseconds = 10000; // save the cache after some time (ie no more than 10s of changes)
+        private const int MaxWaitMilliseconds = 30000; // save the cache after some time (ie no more than 30s of changes)
 
         // save the cache when the app goes down
         public bool RunsOnShutdown { get { return true; } }
