@@ -106,7 +106,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=@published)",
+            var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
                 SqlSyntax.GetQuotedTableName("cmsDocument"),
                 SqlSyntax.GetQuotedTableName("cmsDocument2"),
                 SqlSyntax.GetQuotedColumnName("nodeId"),
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //.LeftOuterJoin<DocumentPublishedReadOnlyDto>()
                 //.On<DocumentDto, DocumentPublishedReadOnlyDto>(left => left.NodeId, right => right.NodeId)
                 // so have to rely on writing our own SQL
-                .Append(sqlx, new { @published = true })
+                .Append(sqlx/*, new { @published = true }*/)
 
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
