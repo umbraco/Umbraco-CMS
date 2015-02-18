@@ -275,7 +275,12 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
+    <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Models\ContentEditing\RelationType.cs" />
+    <Compile Include="IDynamicPublishedContentQuery.cs" />
+    <Compile Include="ITagQuery.cs" />
+    <Compile Include="ITypedPublishedContentQuery.cs" />
+    <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Models\LegacyConvertedNode.cs" />
     <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
     <Compile Include="Models\Mapping\RelationModelMapper.cs" />
@@ -562,6 +567,7 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheFilePersister.cs" />
+    <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

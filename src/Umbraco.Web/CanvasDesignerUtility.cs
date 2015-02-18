@@ -20,6 +20,11 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Web
 {
+    //TODO: This class needs to be overhauled:
+    //  No statics that have dependencies!
+    //  Make into a real class that accept the dependencies required.
+    //  Remove all usages of singletons: HttpContext.Current, ApplicationContext.Current, UmbracoContext.Current, etc...
+
     internal static class CanvasDesignerUtility
     {
 
