@@ -1,258 +1,290 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Umbraco.Core.Media.Exif
 {
     /// <summary>
-    /// As per: http://www.media.mit.edu/pia/Research/deepview/exif.html
+    /// Represents the tags associated with exif fields.
     /// </summary>
-    internal enum ExifTagFormat
+    internal enum ExifTag : int
     {
-        BYTE = 1,
-        STRING = 2,
-        USHORT = 3,
-        ULONG = 4,
-        URATIONAL = 5,
-        SBYTE = 6,
-        UNDEFINED = 7,
-        SSHORT = 8,
-        SLONG = 9,
-        SRATIONAL = 10,
-        SINGLE = 11,
-        DOUBLE = 12,
-
-        NUM_FORMATS = 12
-    }
-
-    internal class ExifTag
-    {
-        public int Tag { get; private set; }
-        public ExifTagFormat Format { get; private set; }
-        public int Components { get; private set; }
-        public byte[] Data { get; private set; }
-        public bool LittleEndian { get; private set; }
-
-        private static int[] BytesPerFormat = new int[] { 0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8 };
-
-        public ExifTag(byte[] section, int sectionOffset, int offsetBase, int length, bool littleEndian)
-        {
-            this.IsValid = false;
-            this.Tag = ExifIO.ReadUShort(section, sectionOffset, littleEndian);
-            int format = ExifIO.ReadUShort(section, sectionOffset + 2, littleEndian);
-            if (format < 1 || format > 12)
-                return;
-            this.Format = (ExifTagFormat)format;
-            this.Components = ExifIO.ReadInt(section, sectionOffset + 4, littleEndian);
-            if (this.Components > 0x10000)
-                return;
-            this.LittleEndian = littleEndian;
-
-            int byteCount = this.Components * BytesPerFormat[format];
-            int valueOffset = 0;
-
-            if (byteCount > 4)
-            {
-                int offsetVal = ExifIO.ReadInt(section, sectionOffset + 8, littleEndian);
-                if (offsetVal + byteCount > length)
-                {
-                    // bad offset...
-                    return;
-                }
-                valueOffset = offsetBase + offsetVal;
-            }
-            else
-            {
-                valueOffset = sectionOffset + 8;
-            }
-            this.Data = new byte[byteCount];
-            Array.Copy(section, valueOffset, this.Data, 0, byteCount);
-            this.IsValid = true;
-        }
-
-        public bool IsValid { get; private set; }
-
-        private short ReadShort(int offset)
-        {
-            return ExifIO.ReadShort(Data, offset, LittleEndian);
-        }
-
-        private ushort ReadUShort(int offset)
-        {
-            return ExifIO.ReadUShort(Data, offset, LittleEndian);
-        }
-
-        private int ReadInt(int offset)
-        {
-            return ExifIO.ReadInt(Data, offset, LittleEndian);
-        }
-
-        private uint ReadUInt(int offset)
-        {
-            return ExifIO.ReadUInt(Data, offset, LittleEndian);
-        }
-
-        private float ReadSingle(int offset)
-        {
-            return ExifIO.ReadSingle(Data, offset, LittleEndian);
-        }
-
-        private double ReadDouble(int offset)
-        {
-            return ExifIO.ReadDouble(Data, offset, LittleEndian);
-        }
-
-        public bool IsNumeric
-        {
-            get
-            {
-                switch (Format)
-                {
-                    case ExifTagFormat.STRING:
-                    case ExifTagFormat.UNDEFINED:
-                        return false;
-                    default:
-                        return true;
-                }
-            }
-        }
-
-        public int GetInt(int componentIndex)
-        {
-            return (int)GetNumericValue(componentIndex);
-        }
-
-        public double GetNumericValue(int componentIndex)
-        {
-            switch (Format)
-            {
-                case ExifTagFormat.BYTE: return (double)this.Data[componentIndex];
-                case ExifTagFormat.USHORT: return (double)ReadUShort(componentIndex * 2);
-                case ExifTagFormat.ULONG: return (double)ReadUInt(componentIndex * 4);
-                case ExifTagFormat.URATIONAL: return (double)ReadUInt(componentIndex * 8) / (double)ReadUInt((componentIndex * 8) + 4);
-                case ExifTagFormat.SBYTE:
-                    {
-                        unchecked
-                        {
-                            return (double)(sbyte)this.Data[componentIndex];
-                        }
-                    }
-                case ExifTagFormat.SSHORT: return (double)ReadShort(componentIndex * 2);
-                case ExifTagFormat.SLONG: return (double)ReadInt(componentIndex * 4);
-                case ExifTagFormat.SRATIONAL: return (double)ReadInt(componentIndex * 8) / (double)ReadInt((componentIndex * 8) + 4);
-                case ExifTagFormat.SINGLE: return (double)ReadSingle(componentIndex * 4);
-                case ExifTagFormat.DOUBLE: return ReadDouble(componentIndex * 8);
-                default: return 0.0;
-            }
-        }
-
-        public string GetStringValue()
-        {
-            return GetStringValue(0);
-        }
-
-        public string GetStringValue(int componentIndex)
-        {
-            switch (Format)
-            {
-                case ExifTagFormat.STRING:
-                case ExifTagFormat.UNDEFINED:
-                    return Encoding.UTF8.GetString(this.Data, 0, this.Data.Length).Trim(' ', '\t', '\r', '\n', '\0');
-                case ExifTagFormat.URATIONAL:
-                    return ReadUInt(componentIndex * 8).ToString() + "/" + ReadUInt((componentIndex * 8) + 4).ToString();
-                case ExifTagFormat.SRATIONAL:
-                    return ReadInt(componentIndex * 8).ToString() + "/" + ReadInt((componentIndex * 8) + 4).ToString();
-                default:
-                    return GetNumericValue(componentIndex).ToString();
-            }
-        }
-
-        public virtual void Populate(JpegInfo info, ExifIFD ifd)
-        {
-            if (ifd == ExifIFD.Exif)
-            {
-                switch ((ExifId)this.Tag)
-                {
-                    case ExifId.ImageWidth: info.Width = GetInt(0); break;
-                    case ExifId.ImageHeight: info.Height = GetInt(0); break;
-                    case ExifId.Orientation: info.Orientation = (ExifOrientation)GetInt(0); break;
-                    case ExifId.XResolution: info.XResolution = GetNumericValue(0); break;
-                    case ExifId.YResolution: info.YResolution = GetNumericValue(0); break;
-                    case ExifId.ResolutionUnit: info.ResolutionUnit = (ExifUnit)GetInt(0); break;
-                    case ExifId.DateTime: info.DateTime = GetStringValue(); break;
-                    case ExifId.DateTimeOriginal: info.DateTimeOriginal = GetStringValue(); break;
-                    case ExifId.Description: info.Description = GetStringValue(); break;
-                    case ExifId.Make: info.Make = GetStringValue(); break;
-                    case ExifId.Model: info.Model = GetStringValue(); break;
-                    case ExifId.Software: info.Software = GetStringValue(); break;
-                    case ExifId.Artist: info.Artist = GetStringValue(); break;
-                    case ExifId.ThumbnailOffset: info.ThumbnailOffset = GetInt(0); break;
-                    case ExifId.ThumbnailLength: info.ThumbnailSize = GetInt(0); break;
-                    case ExifId.Copyright: info.Copyright = GetStringValue(); break;
-                    case ExifId.UserComment: info.UserComment = GetStringValue(); break;
-                    case ExifId.ExposureTime: info.ExposureTime = GetNumericValue(0); break;
-                    case ExifId.FNumber: info.FNumber = GetNumericValue(0); break;
-                    case ExifId.FlashUsed: info.Flash = (ExifFlash)GetInt(0); break;
-                    default: break;
-                }
-            }
-            else if (ifd == ExifIFD.Gps)
-            {
-                switch ((ExifGps)this.Tag)
-                {
-                    case ExifGps.LatitudeRef:
-                        {
-                            if (GetStringValue() == "N") info.GpsLatitudeRef = ExifGpsLatitudeRef.North;
-                            else if (GetStringValue() == "S") info.GpsLatitudeRef = ExifGpsLatitudeRef.South;
-                        } break;
-                    case ExifGps.LongitudeRef:
-                        {
-                            if (GetStringValue() == "E") info.GpsLongitudeRef = ExifGpsLongitudeRef.East;
-                            else if (GetStringValue() == "W") info.GpsLongitudeRef = ExifGpsLongitudeRef.West;
-                        } break;
-                    case ExifGps.Latitude:
-                        {
-                            if (Components == 3)
-                            {
-                                info.GpsLatitude[0] = GetNumericValue(0);
-                                info.GpsLatitude[1] = GetNumericValue(1);
-                                info.GpsLatitude[2] = GetNumericValue(2);
-                            }
-                        } break;
-                    case ExifGps.Longitude:
-                        {
-                            if (Components == 3)
-                            {
-                                info.GpsLongitude[0] = GetNumericValue(0);
-                                info.GpsLongitude[1] = GetNumericValue(1);
-                                info.GpsLongitude[2] = GetNumericValue(2);
-                            }
-                        } break;
-                }
-            }
-        }
-
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder(64);
-            sb.Append("0x");
-            sb.Append(this.Tag.ToString("X4"));
-            sb.Append("-");
-            sb.Append(((ExifId)this.Tag).ToString());
-            if (this.Components > 0)
-            {
-                sb.Append(": (");
-                sb.Append(GetStringValue(0));
-                if (Format != ExifTagFormat.UNDEFINED && Format != ExifTagFormat.STRING)
-                {
-                    for (int i = 1; i < Components; ++i)
-                        sb.Append(", " + GetStringValue(i));
-                }
-                sb.Append(")");
-            }
-            return sb.ToString();
-        }
+        // ****************************
+        // Zeroth IFD
+        // ****************************
+        NewSubfileType = IFD.Zeroth + 254,
+        SubfileType = IFD.Zeroth + 255,
+        ImageWidth = IFD.Zeroth + 256,
+        ImageLength = IFD.Zeroth + 257,
+        BitsPerSample = IFD.Zeroth + 258,
+        Compression = IFD.Zeroth + 259,
+        PhotometricInterpretation = IFD.Zeroth + 262,
+        Threshholding = IFD.Zeroth + 263,
+        CellWidth = IFD.Zeroth + 264,
+        CellLength = IFD.Zeroth + 265,
+        FillOrder = IFD.Zeroth + 266,
+        DocumentName = IFD.Zeroth + 269,
+        ImageDescription = IFD.Zeroth + 270,
+        Make = IFD.Zeroth + 271,
+        Model = IFD.Zeroth + 272,
+        StripOffsets = IFD.Zeroth + 273,
+        Orientation = IFD.Zeroth + 274,
+        SamplesPerPixel = IFD.Zeroth + 277,
+        RowsPerStrip = IFD.Zeroth + 278,
+        StripByteCounts = IFD.Zeroth + 279,
+        MinSampleValue = IFD.Zeroth + 280,
+        MaxSampleValue = IFD.Zeroth + 281,
+        XResolution = IFD.Zeroth + 282,
+        YResolution = IFD.Zeroth + 283,
+        PlanarConfiguration = IFD.Zeroth + 284,
+        PageName = IFD.Zeroth + 285,
+        XPosition = IFD.Zeroth + 286,
+        YPosition = IFD.Zeroth + 287,
+        FreeOffsets = IFD.Zeroth + 288,
+        FreeByteCounts = IFD.Zeroth + 289,
+        GrayResponseUnit = IFD.Zeroth + 290,
+        GrayResponseCurve = IFD.Zeroth + 291,
+        T4Options = IFD.Zeroth + 292,
+        T6Options = IFD.Zeroth + 293,
+        ResolutionUnit = IFD.Zeroth + 296,
+        PageNumber = IFD.Zeroth + 297,
+        TransferFunction = IFD.Zeroth + 301,
+        Software = IFD.Zeroth + 305,
+        DateTime = IFD.Zeroth + 306,
+        Artist = IFD.Zeroth + 315,
+        HostComputer = IFD.Zeroth + 316,
+        Predictor = IFD.Zeroth + 317,
+        WhitePoint = IFD.Zeroth + 318,
+        PrimaryChromaticities = IFD.Zeroth + 319,
+        ColorMap = IFD.Zeroth + 320,
+        HalftoneHints = IFD.Zeroth + 321,
+        TileWidth = IFD.Zeroth + 322,
+        TileLength = IFD.Zeroth + 323,
+        TileOffsets = IFD.Zeroth + 324,
+        TileByteCounts = IFD.Zeroth + 325,
+        InkSet = IFD.Zeroth + 332,
+        InkNames = IFD.Zeroth + 333,
+        NumberOfInks = IFD.Zeroth + 334,
+        DotRange = IFD.Zeroth + 336,
+        TargetPrinter = IFD.Zeroth + 337,
+        ExtraSamples = IFD.Zeroth + 338,
+        SampleFormat = IFD.Zeroth + 339,
+        SMinSampleValue = IFD.Zeroth + 340,
+        SMaxSampleValue = IFD.Zeroth + 341,
+        TransferRange = IFD.Zeroth + 342,
+        JPEGProc = IFD.Zeroth + 512,
+        JPEGInterchangeFormat = IFD.Zeroth + 513,
+        JPEGInterchangeFormatLength = IFD.Zeroth + 514,
+        JPEGRestartInterval = IFD.Zeroth + 515,
+        JPEGLosslessPredictors = IFD.Zeroth + 517,
+        JPEGPointTransforms = IFD.Zeroth + 518,
+        JPEGQTables = IFD.Zeroth + 519,
+        JPEGDCTables = IFD.Zeroth + 520,
+        JPEGACTables = IFD.Zeroth + 521,
+        YCbCrCoefficients = IFD.Zeroth + 529,
+        YCbCrSubSampling = IFD.Zeroth + 530,
+        YCbCrPositioning = IFD.Zeroth + 531,
+        ReferenceBlackWhite = IFD.Zeroth + 532,
+        Copyright = IFD.Zeroth + 33432,
+        // Pointers to other IFDs
+        EXIFIFDPointer = IFD.Zeroth + 34665,
+        GPSIFDPointer = IFD.Zeroth + 34853,
+        // Windows Tags
+        WindowsTitle = IFD.Zeroth + 0x9c9b,
+        WindowsComment = IFD.Zeroth + 0x9c9c,
+        WindowsAuthor = IFD.Zeroth + 0x9c9d,
+        WindowsKeywords = IFD.Zeroth + 0x9c9e,
+        WindowsSubject = IFD.Zeroth + 0x9c9f,
+        // Rating
+        Rating = IFD.Zeroth + 0x4746,
+        RatingPercent = IFD.Zeroth + 0x4749,
+        // Microsoft specifing padding and offset tags
+        ZerothIFDPadding = IFD.Zeroth + 0xea1c,
+        // ****************************
+        // EXIF Tags
+        // ****************************
+        ExifVersion = IFD.EXIF + 36864,
+        FlashpixVersion = IFD.EXIF + 40960,
+        ColorSpace = IFD.EXIF + 40961,
+        ComponentsConfiguration = IFD.EXIF + 37121,
+        CompressedBitsPerPixel = IFD.EXIF + 37122,
+        PixelXDimension = IFD.EXIF + 40962,
+        PixelYDimension = IFD.EXIF + 40963,
+        MakerNote = IFD.EXIF + 37500,
+        UserComment = IFD.EXIF + 37510,
+        RelatedSoundFile = IFD.EXIF + 40964,
+        DateTimeOriginal = IFD.EXIF + 36867,
+        DateTimeDigitized = IFD.EXIF + 36868,
+        SubSecTime = IFD.EXIF + 37520,
+        SubSecTimeOriginal = IFD.EXIF + 37521,
+        SubSecTimeDigitized = IFD.EXIF + 37522,
+        ExposureTime = IFD.EXIF + 33434,
+        FNumber = IFD.EXIF + 33437,
+        ExposureProgram = IFD.EXIF + 34850,
+        SpectralSensitivity = IFD.EXIF + 34852,
+        ISOSpeedRatings = IFD.EXIF + 34855,
+        OECF = IFD.EXIF + 34856,
+        ShutterSpeedValue = IFD.EXIF + 37377,
+        ApertureValue = IFD.EXIF + 37378,
+        BrightnessValue = IFD.EXIF + 37379,
+        ExposureBiasValue = IFD.EXIF + 37380,
+        MaxApertureValue = IFD.EXIF + 37381,
+        SubjectDistance = IFD.EXIF + 37382,
+        MeteringMode = IFD.EXIF + 37383,
+        LightSource = IFD.EXIF + 37384,
+        Flash = IFD.EXIF + 37385,
+        FocalLength = IFD.EXIF + 37386,
+        SubjectArea = IFD.EXIF + 37396,
+        FlashEnergy = IFD.EXIF + 41483,
+        SpatialFrequencyResponse = IFD.EXIF + 41484,
+        FocalPlaneXResolution = IFD.EXIF + 41486,
+        FocalPlaneYResolution = IFD.EXIF + 41487,
+        FocalPlaneResolutionUnit = IFD.EXIF + 41488,
+        SubjectLocation = IFD.EXIF + 41492,
+        ExposureIndex = IFD.EXIF + 41493,
+        SensingMethod = IFD.EXIF + 41495,
+        FileSource = IFD.EXIF + 41728,
+        SceneType = IFD.EXIF + 41729,
+        CFAPattern = IFD.EXIF + 41730,
+        CustomRendered = IFD.EXIF + 41985,
+        ExposureMode = IFD.EXIF + 41986,
+        WhiteBalance = IFD.EXIF + 41987,
+        DigitalZoomRatio = IFD.EXIF + 41988,
+        FocalLengthIn35mmFilm = IFD.EXIF + 41989,
+        SceneCaptureType = IFD.EXIF + 41990,
+        GainControl = IFD.EXIF + 41991,
+        Contrast = IFD.EXIF + 41992,
+        Saturation = IFD.EXIF + 41993,
+        Sharpness = IFD.EXIF + 41994,
+        DeviceSettingDescription = IFD.EXIF + 41995,
+        SubjectDistanceRange = IFD.EXIF + 41996,
+        ImageUniqueID = IFD.EXIF + 42016,
+        InteroperabilityIFDPointer = IFD.EXIF + 40965,
+        // Microsoft specifing padding and offset tags
+        ExifIFDPadding = IFD.EXIF + 0xea1c,
+        OffsetSchema = IFD.EXIF + 0xea1d,
+        // ****************************
+        // GPS Tags
+        // ****************************
+        GPSVersionID = IFD.GPS + 0,
+        GPSLatitudeRef = IFD.GPS + 1,
+        GPSLatitude = IFD.GPS + 2,
+        GPSLongitudeRef = IFD.GPS + 3,
+        GPSLongitude = IFD.GPS + 4,
+        GPSAltitudeRef = IFD.GPS + 5,
+        GPSAltitude = IFD.GPS + 6,
+        GPSTimeStamp = IFD.GPS + 7,
+        GPSSatellites = IFD.GPS + 8,
+        GPSStatus = IFD.GPS + 9,
+        GPSMeasureMode = IFD.GPS + 10,
+        GPSDOP = IFD.GPS + 11,
+        GPSSpeedRef = IFD.GPS + 12,
+        GPSSpeed = IFD.GPS + 13,
+        GPSTrackRef = IFD.GPS + 14,
+        GPSTrack = IFD.GPS + 15,
+        GPSImgDirectionRef = IFD.GPS + 16,
+        GPSImgDirection = IFD.GPS + 17,
+        GPSMapDatum = IFD.GPS + 18,
+        GPSDestLatitudeRef = IFD.GPS + 19,
+        GPSDestLatitude = IFD.GPS + 20,
+        GPSDestLongitudeRef = IFD.GPS + 21,
+        GPSDestLongitude = IFD.GPS + 22,
+        GPSDestBearingRef = IFD.GPS + 23,
+        GPSDestBearing = IFD.GPS + 24,
+        GPSDestDistanceRef = IFD.GPS + 25,
+        GPSDestDistance = IFD.GPS + 26,
+        GPSProcessingMethod = IFD.GPS + 27,
+        GPSAreaInformation = IFD.GPS + 28,
+        GPSDateStamp = IFD.GPS + 29,
+        GPSDifferential = IFD.GPS + 30,
+        // ****************************
+        // InterOp Tags
+        // ****************************
+        InteroperabilityIndex = IFD.Interop + 1,
+        InteroperabilityVersion = IFD.Interop + 2,
+        RelatedImageWidth = IFD.Interop + 0x1001,
+        RelatedImageHeight = IFD.Interop + 0x1002,
+        // ****************************
+        // First IFD TIFF Tags
+        // ****************************
+        ThumbnailImageWidth = IFD.First + 256,
+        ThumbnailImageLength = IFD.First + 257,
+        ThumbnailBitsPerSample = IFD.First + 258,
+        ThumbnailCompression = IFD.First + 259,
+        ThumbnailPhotometricInterpretation = IFD.First + 262,
+        ThumbnailOrientation = IFD.First + 274,
+        ThumbnailSamplesPerPixel = IFD.First + 277,
+        ThumbnailPlanarConfiguration = IFD.First + 284,
+        ThumbnailYCbCrSubSampling = IFD.First + 530,
+        ThumbnailYCbCrPositioning = IFD.First + 531,
+        ThumbnailXResolution = IFD.First + 282,
+        ThumbnailYResolution = IFD.First + 283,
+        ThumbnailResolutionUnit = IFD.First + 296,
+        ThumbnailStripOffsets = IFD.First + 273,
+        ThumbnailRowsPerStrip = IFD.First + 278,
+        ThumbnailStripByteCounts = IFD.First + 279,
+        ThumbnailJPEGInterchangeFormat = IFD.First + 513,
+        ThumbnailJPEGInterchangeFormatLength = IFD.First + 514,
+        ThumbnailTransferFunction = IFD.First + 301,
+        ThumbnailWhitePoint = IFD.First + 318,
+        ThumbnailPrimaryChromaticities = IFD.First + 319,
+        ThumbnailYCbCrCoefficients = IFD.First + 529,
+        ThumbnailReferenceBlackWhite = IFD.First + 532,
+        ThumbnailDateTime = IFD.First + 306,
+        ThumbnailImageDescription = IFD.First + 270,
+        ThumbnailMake = IFD.First + 271,
+        ThumbnailModel = IFD.First + 272,
+        ThumbnailSoftware = IFD.First + 305,
+        ThumbnailArtist = IFD.First + 315,
+        ThumbnailCopyright = IFD.First + 33432,
+        // ****************************
+        // JFIF Tags
+        // ****************************
+        /// <summary>
+        /// Represents the JFIF version.
+        /// </summary>
+        JFIFVersion = IFD.JFIF + 1,
+        /// <summary>
+        /// Represents units for X and Y densities.
+        /// </summary>
+        JFIFUnits = IFD.JFIF + 101,
+        /// <summary>
+        /// Horizontal pixel density.
+        /// </summary>
+        XDensity = IFD.JFIF + 102,
+        /// <summary>
+        /// Vertical pixel density
+        /// </summary>
+        YDensity = IFD.JFIF + 103,
+        /// <summary>
+        /// Thumbnail horizontal pixel count.
+        /// </summary>
+        JFIFXThumbnail = IFD.JFIF + 201,
+        /// <summary>
+        /// Thumbnail vertical pixel count.
+        /// </summary>
+        JFIFYThumbnail = IFD.JFIF + 202,
+        /// <summary>
+        /// JFIF JPEG thumbnail.
+        /// </summary>
+        JFIFThumbnail = IFD.JFIF + 203,
+        /// <summary>
+        /// Code which identifies the JFIF extension.
+        /// </summary>
+        JFXXExtensionCode = IFD.JFXX + 1,
+        /// <summary>
+        /// Thumbnail horizontal pixel count.
+        /// </summary>
+        JFXXXThumbnail = IFD.JFXX + 101,
+        /// <summary>
+        /// Thumbnail vertical pixel count.
+        /// </summary>
+        JFXXYThumbnail = IFD.JFXX + 102,
+        /// <summary>
+        /// The 256-Color RGB palette.
+        /// </summary>
+        JFXXPalette = IFD.JFXX + 201,
+        /// <summary>
+        /// JFIF thumbnail. The thumbnail will be either a JPEG, 
+        /// a 256 color palette bitmap, or a 24-bit RGB bitmap.
+        /// </summary>
+        JFXXThumbnail = IFD.JFXX + 202,
     }
 }

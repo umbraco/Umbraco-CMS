@@ -30,10 +30,25 @@ namespace Umbraco.Core.Media
         public static Size GetDimensions(Stream imageStream)
         {
             //Try to load with exif 
-            var jpgInfo = ExifReader.ReadJpeg(imageStream);
-            if (jpgInfo.IsValid && jpgInfo.Width > 0 && jpgInfo.Height > 0)
+            try
             {
-                return new Size(jpgInfo.Width, jpgInfo.Height);
+                var jpgInfo = ImageFile.FromStream(imageStream);
+
+                if (jpgInfo.Format != ImageFileFormat.Unknown
+                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
+                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
+                {
+                    var height = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelYDimension].Value);
+                    var width = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelXDimension].Value);
+                    if (height > 0 && width > 0)
+                    {
+                        return new Size(width, height);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                //We will just swallow, just means we can't read exif data, we don't want to log an error either
             }
 
             //we have no choice but to try to read in via GDI
