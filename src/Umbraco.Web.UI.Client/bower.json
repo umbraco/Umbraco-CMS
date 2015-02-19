@@ -34,7 +34,7 @@
             "": "underscore-min.{js,map}"
         },
         "jquery": {
-            "": "dist/jquery.min.{js,map}"
+            "": "jquery.min.{js,map}"  
         },
         "jquery-file-upload": {
             "": "**/jquery.{fileupload,fileupload-process,fileupload-angular,fileupload-image}.js"
