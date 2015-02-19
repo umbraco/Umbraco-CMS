@@ -549,6 +549,7 @@
     <Compile Include="Scheduling\ILatchedBackgroundTask.cs" />
     <Compile Include="Scheduling\RecurringTaskBase.cs" />
     <Compile Include="Security\Identity\AppBuilderExtensions.cs" />
+    <Compile Include="Security\Identity\AuthenticationManagerExtensions.cs" />
     <Compile Include="Security\Identity\BackOfficeCookieManager.cs" />
     <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
     <Compile Include="Security\Identity\OwinExtensions.cs" />

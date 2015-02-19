@@ -39,6 +39,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Task = System.Threading.Tasks.Task;
+using Umbraco.Web.Security.Identity;
 
 namespace Umbraco.Web.Editors
 {
@@ -70,7 +71,9 @@ namespace Umbraco.Web.Editors
             ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
 
             //First check if there's external login info, if there's not proceed as normal
-            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync();
+            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+            
             if (loginInfo == null)
             {
                 return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Web;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 using Umbraco.Core;
@@ -81,7 +78,25 @@ namespace Umbraco.Web.Security.Identity
 
             //app.UseExternalSignInCookie("UmbracoExternalCookie");
 
-            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
+            app.SetDefaultSignInAsAuthenticationType("UmbracoExternalCookie");
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
+                AuthenticationMode = AuthenticationMode.Passive,
+                CookieName = Constants.Security.BackOfficeExternalAuthenticationType,
+                ExpireTimeSpan = TimeSpan.FromMinutes(5),
+                //Custom cookie manager so we can filter requests
+                CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor()),
+                CookiePath = "/",
+                CookieSecure = GlobalSettings.UseSSL ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
+                CookieHttpOnly = true,
+                CookieDomain = UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain
+            });
+
+
+            //NOTE: This works, but this is just the default implementation which we don't want because other devs
+            //might want to use this... right?
+            //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
             return app;
         }
