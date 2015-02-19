@@ -273,6 +273,36 @@ angular.module("umbraco")
                 });
 
         };
+        
+        
+        // *********************************************
+        // Control management functions
+        // *********************************************
+
+        $scope.editControlSettings = function (control) {
+
+            var obj = $scope.model.config;
+            obj.items.config = control.editor.config.settings;
+
+            dialogService.open(
+            {
+                template: "views/propertyeditors/grid/dialogs/config.html",
+                gridItem: { "config": (control.value ? control.value.settings : null) },
+                itemType: null,
+                config: obj,
+                callback: function (data) {
+                    if (angular.isObject(control.value))
+                        control.value.settings = data.config;
+                    else {
+                        control.value = {
+                            "settings": data.config
+                        };
+                    }
+                    //console.log(control.value);
+                    //console.log(control.value.settings);
+                }
+            });
+        };
 
         // *********************************************
         // Area management functions
