@@ -509,8 +509,11 @@ angular.module("umbraco")
 
                     if(area.grid > 0){
                         var currentArea = row.areas[areaIndex];
-                        area.config = currentArea.config;
-                        area.styles = currentArea.styles;
+
+                        if (currentArea) {
+                            area.config = currentArea.config;
+                            area.styles = currentArea.styles;
+                        }
 
                         //copy over existing controls into the new areas
                         if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
