@@ -4,7 +4,7 @@
 * @restrict E
 * @function
 **/
-function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHelper, mediaResource, imageHelper) {
+function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHelper, mediaResource, imageHelper, notificationsService) {
     return {
         restrict: 'E',
         replace: true,
@@ -53,10 +53,9 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                         scope.images = data.items;
                     });
             }
-            
-            //when one is finished
-            scope.$on('fileuploaddone', function(e, data) {
-                scope.$apply(function() {
+
+            function checkComplete(e, data) {
+                scope.$apply(function () {
                     //remove the amount of files complete
                     //NOTE: function is here instead of in the loop otherwise jshint blows up
                     function findFile(file) { return file === data.files[i]; }
@@ -66,13 +65,13 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                     }
 
                     //when none are left resync everything
-                    var remaining = _.filter(scope.files, function(file) { return file.completed !== true; });
+                    var remaining = _.filter(scope.files, function (file) { return file.completed !== true; });
                     if (remaining.length === 0) {
 
                         scope.progress = 100;
 
                         //just the ui transition isn't too abrupt, just wait a little here
-                        $timeout(function() {
+                        $timeout(function () {
                             scope.progress = 0;
                             scope.files = [];
                             scope.uploading = false;
@@ -88,7 +87,11 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
 
                     }
                 });
-
+            }
+            
+            //when one is finished
+            scope.$on('fileuploaddone', function(e, data) {
+                checkComplete(e, data);
             });
 
             //This handler gives us access to the file 'preview', this is the only handler that makes this available for whatever reason
@@ -98,6 +101,21 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                     scope.uploading = true;
                     scope.files.push(data.files[data.index]);
                 });
+            });
+
+            //This is a bit of a hack to check for server errors, currently if there's a non
+            //known server error we will tell them to check the logs, otherwise we'll specifically 
+            //check for the file size error which can only be done with dodgy string checking
+            scope.$on('fileuploadfail', function (e, data) {
+                if (data.jqXHR.status === 500 && data.jqXHR.responseText.indexOf("Maximum request length exceeded") >= 0) {
+                    notificationsService.error(data.errorThrown, "The image file size was too big, check with your site administrator to adjust the maximum size allowed");
+
+                }
+                else {
+                    notificationsService.error(data.errorThrown, data.jqXHR.statusText);
+                }
+
+                checkComplete(e, data);
             });
 
             //This executes prior to the whole processing which we can use to get the UI going faster,

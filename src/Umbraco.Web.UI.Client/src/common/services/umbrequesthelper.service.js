@@ -221,8 +221,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
                     if (status >= 500 && status < 600) {
 
-                        //show a ysod dialog
-                        if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                        //This is a bit of a hack to check if the error is due to a file being uploaded that is too large,
+                        // we have to just check for the existence of a string value but currently that is the best way to
+                        // do this since it's very hacky/difficult to catch this on the server
+                        if (data.indexOf("Maximum request length exceeded") >= 0) {
+                            notificationsService.error("Server error", "The image file size was too big, check with your site administrator to adjust the maximum size allowed");
+                        }                        
+                        else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                            //show a ysod dialog
                             dialogService.ysodDialog({
                                 errorMsg: 'An error occurred',
                                 data: data
