@@ -16,6 +16,8 @@ namespace Umbraco.Core.Models.Identity
         public string[] AllowedApplications { get; set; }
         public string Culture { get; set; }
 
+        public string UserTypeAlias { get; set; }
+
         /// <summary>
         /// Overridden to make the retrieval lazy
         /// </summary>

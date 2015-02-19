@@ -77,6 +77,8 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
 
+            //TODO: Figure out why this isn't working and is only working with the default one, must be a reference somewhere
+
             //app.UseExternalSignInCookie("UmbracoExternalCookie");
 
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);

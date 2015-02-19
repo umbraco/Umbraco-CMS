@@ -9,6 +9,13 @@ namespace Umbraco.Core.Models.Identity
     /// </summary>
     public class IdentityUserLogin : Entity, IIdentityUserLogin
     {
+        public IdentityUserLogin(string loginProvider, string providerKey, int userId)
+        {
+            LoginProvider = loginProvider;
+            ProviderKey = providerKey;
+            UserId = userId;
+        }
+
         public IdentityUserLogin(int id, string loginProvider, string providerKey, int userId, DateTime createDate)
         {
             Id = id;

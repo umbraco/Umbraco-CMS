@@ -344,6 +344,7 @@
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
     <Compile Include="Models\Identity\IdentityUserLogin.cs" />
