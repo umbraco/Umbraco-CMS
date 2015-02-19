@@ -162,6 +162,15 @@
                                                                 <i class="icon icon-settings"></i>
                                                             </a>
                                                         </div>
+                                                        
+                                                        <!-- control setting area -->
+                                                        <div class="cell-tools-edit" ng-if="control.editor.config && control.editor.config.settings">
+                                                            <a class="iconBox"
+                                                               ng-click="editControlSettings(control)"
+                                                               href>
+                                                                <i class="icon icon-hammer"></i>
+                                                            </a>
+                                                        </div>
 
                                                     </div>
 
