@@ -52,6 +52,24 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                 'Login failed for user ' + username);
         },
         
+        unlinkLogin: function (loginProvider, providerKey) {
+            if (!loginProvider || !providerKey) {
+                return angularHelper.rejectedPromise({
+                    errorMsg: 'loginProvider or providerKey cannot be empty'
+                });
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "PostUnLinkLogin"), {
+                            loginProvider: loginProvider,
+                            providerKey: providerKey
+                        }),
+                'Unlinking login provider failed');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.authResource#performLogout

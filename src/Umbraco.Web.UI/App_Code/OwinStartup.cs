@@ -63,7 +63,9 @@ namespace Umbraco.Web.UI
             //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
 
-
+            app.UseGoogleAuthentication(
+            clientId: "1072120697051-07jlhgrd5hodsfe7dgqimdie8qc1omet.apps.googleusercontent.com",
+            clientSecret: "Ue9swN0lEX9rwxzQz1Y_tFzg"); 
          
         }
 

@@ -1,9 +1,11 @@
 angular.module("umbraco")
-    .controller("Umbraco.Dialogs.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService) {
+    .controller("Umbraco.Dialogs.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource) {
 
-        $scope.user = userService.getCurrentUser();
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
+
+        $scope.externalLoginProviders = externalLoginInfo.providers;
+        $scope.externalLinkLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLinkLoginsUrl;
 
         var evtHandlers = [];
         evtHandlers.push(eventsService.on("historyService.add", function (e, args) {
@@ -49,6 +51,20 @@ angular.module("umbraco")
             }, 1000, false); // 1 second, do NOT execute a global digest    
         }
 
+        $scope.unlink = function(e, loginProvider, providerKey) {
+            var result = confirm("Are you sure you want to unlink this account?");
+            if (!result) {
+                e.preventDefault();
+                return;
+            }
+
+            authResource.unlinkLogin(loginProvider, providerKey).then(function (a, b, c) {
+                var asdf = ";"
+            }, function(err) {
+                var asdf = err;
+            });
+        }
+
         //get the user
         userService.getCurrentUser().then(function (user) {
             $scope.user = user;
@@ -57,6 +73,16 @@ angular.module("umbraco")
                 $scope.canEditProfile = _.indexOf($scope.user.allowedSections, "users") > -1;
                 //set the timer
                 updateTimeout();
+
+                //set the linked logins
+                for (var login in $scope.user.linkedLogins) {
+                    var found = _.find($scope.externalLoginProviders, function(i) {
+                        return i.authType == login;
+                    });
+                    if (found) {
+                        found.linkedProviderKey = $scope.user.linkedLogins[login];
+                    }
+                }
             }
         });
 

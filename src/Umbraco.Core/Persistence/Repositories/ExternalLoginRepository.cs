@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
             using (var t = Database.GetTransaction())
             {
                 //clear out logins for member
-                Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
+                Database.Execute("DELETE FROM umbracoExternalLogin WHERE userId=@userId", new { userId = memberId });
 
                 //add them all
                 foreach (var l in logins)

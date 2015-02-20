@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
+using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -22,6 +24,11 @@ namespace Umbraco.Web.Mvc
             : this(UmbracoContext.Current)
         {
             
+        }
+
+        protected IOwinContext OwinContext
+        {
+            get { return Request.GetOwinContext(); }
         }
 
         private UmbracoHelper _umbraco;

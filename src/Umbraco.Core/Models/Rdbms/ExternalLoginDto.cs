@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoExternalLogin")]
     [ExplicitColumns]
-    [PrimaryKey("externalLoginId")]
+    [PrimaryKey("Id")]
     internal class ExternalLoginDto
     {
         [Column("id")]

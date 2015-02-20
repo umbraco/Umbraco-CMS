@@ -52,11 +52,6 @@ namespace Umbraco.Web.Editors
     {
         private BackOfficeUserManager _userManager;
 
-        protected IOwinContext OwinContext
-        {
-            get { return Request.GetOwinContext(); }
-        }
-
         protected BackOfficeUserManager UserManager
         {
             get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
@@ -70,30 +65,25 @@ namespace Umbraco.Web.Editors
         {
             ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
 
+            //check if there's errors in the TempData, assign to view bag and render the view
+            if (TempData["ExternalSignInError"] != null)
+            {
+                ViewBag.ExternalSignInError = TempData["ExternalSignInError"];
+                return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+            }
+
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
-            
+
             if (loginInfo == null)
             {
                 return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
             }
 
-            // Sign in the user with this external login provider if the user already has a login
-            var user = await UserManager.FindAsync(loginInfo.Login);
-            if (user != null)
-            {
-                await SignInAsync(user, isPersistent: false);
-                //all signed in so just render the view as per normal
-                return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
-            }
+            //we're just logging in with an external source, not linking accounts
+            return await ExternalSignInAsync(loginInfo);
 
-            //The user hasn't used this login provider so need to display an error, they must link the provider in the user section
-            // TODO: Or wherever we decide to put that.
-
-            // TODO: Return a real error in one way or another, maybe a different view?
-
-            throw new SecurityNegotiationException("The requested provider " + loginInfo.Login.LoginProvider + " has not been linked to to an account");
         }
 
         /// <summary>
@@ -244,6 +234,8 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoUrls", new Dictionary<string, object>
                     {
+                        {"externalLoginsUrl", Url.Action("ExternalLogin", "BackOffice")},
+                        {"externalLinkLoginsUrl", Url.Action("LinkLogin", "BackOffice")},
                         {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
                         {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
@@ -326,10 +318,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.Fetch(string.Empty))
                         },
                         {
-                                    "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
-                                        controller => controller.GetById(0))
-                                },
-                                {
+                            "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
+                                controller => controller.GetById(0))
+                        },
+                        {
                             "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                                 controller => controller.GetConfiguration())
                         },
@@ -395,7 +387,24 @@ namespace Umbraco.Web.Editors
                     }
                 },
                 {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
-                {"application", GetApplicationState()}
+                {
+                    "application", GetApplicationState()
+                },
+                {
+                    "externalLogins", new Dictionary<string, object>
+                    {
+                        {
+                            "providers", HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+                                .Select(p => new
+                                {
+                                    authType = p.AuthenticationType, caption = p.Caption,
+                                    //TODO: Need to see if this exposes any sensitive data!
+                                    properties = p.Properties
+                                })
+                                .ToArray()
+                        }
+                    }
+                }
             };
 
             //cache the result if debugging is disabled
@@ -410,22 +419,78 @@ namespace Umbraco.Web.Editors
         }
         
         [HttpPost]
-        [AllowAnonymous]
         public ActionResult ExternalLogin(string provider)
         {
             // Request a redirect to the external login provider
             return new ChallengeResult(provider,
-                Url.Action("Default", "BackOffice", new
+                Url.Action("Default", "BackOffice"));
+        }
+
+        [UmbracoAuthorize]
+        [HttpPost]
+        public ActionResult LinkLogin(string provider)
+        {
+            // Request a redirect to the external login provider to link a login for the current user
+            return new ChallengeResult(provider,
+                Url.Action("ExternalLinkLoginCallback", "BackOffice"),
+                User.Identity.GetUserId());
+        }
+
+        
+
+        [HttpGet]
+        public async Task<ActionResult> ExternalLinkLoginCallback()
+        {
+            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
+                Core.Constants.Security.BackOfficeExternalAuthenticationType,
+                XsrfKey, User.Identity.GetUserId());
+            
+            if (loginInfo == null)
+            {
+                //Add error and redirect for it to be displayed
+                TempData["ExternalSignInError"] = new[] { "An error occurred, could not get external login info" };
+                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+            }
+
+            var result = await UserManager.AddLoginAsync(User.Identity.GetUserId<int>(), loginInfo.Login);
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+            }
+
+            //Add errors and redirect for it to be displayed
+            TempData["ExternalSignInError"] = result.Errors;
+            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        }
+
+        private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo)
+        {
+            if (loginInfo == null) throw new ArgumentNullException("loginInfo");
+
+            // Sign in the user with this external login provider if the user already has a login
+            var user = await UserManager.FindAsync(loginInfo.Login);
+            if (user != null)
+            {
+                //sign in
+                await SignInAsync(user, isPersistent: false);
+            }
+            else
+            {
+                ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+
+                //Remove the cookie otherwise this message will keep appearing
+                if (Response.Cookies[Core.Constants.Security.BackOfficeExternalAuthenticationType] != null)
                 {
-                    area = GlobalSettings.UmbracoMvcArea
-                }));
+                    Response.Cookies[Core.Constants.Security.BackOfficeExternalAuthenticationType].Expires = DateTime.MinValue;    
+                }
+            }
+            
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
         }
 
         private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
         {
-            //TODO: I don't think we want to reference the 'default' external cookie since people might be using this on the front-end
-            // we'll need to create a secondary custom handler for the external cookie for the back office
-            OwinContext.Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
+            OwinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
             
             OwinContext.Authentication.SignIn(
                 new AuthenticationProperties() {IsPersistent = isPersistent}, 
@@ -438,6 +503,11 @@ namespace Umbraco.Web.Editors
             // defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
             return userIdentity;
+        }
+
+        private IAuthenticationManager AuthenticationManager
+        {
+            get { return OwinContext.Authentication; }
         }
         
         

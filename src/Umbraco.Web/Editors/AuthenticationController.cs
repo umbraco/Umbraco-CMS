@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
@@ -24,6 +27,9 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.providers;
+using Microsoft.AspNet.Identity.Owin;
+using Newtonsoft.Json.Linq;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Editors
 {
@@ -58,6 +64,54 @@ namespace Umbraco.Web.Editors
             throw new NotSupportedException("An HttpContext is required for this request");
         }
 
+        [WebApi.UmbracoAuthorize]
+        [ValidateAngularAntiForgeryToken]
+        public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
+        {
+            var result = await UserManager.RemoveLoginAsync(
+                User.Identity.GetUserId<int>(),
+                new UserLoginInfo(unlinkLoginModel.LoginProvider, unlinkLoginModel.ProviderKey));
+
+            if (result.Succeeded)
+            {
+                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
+                await SignInAsync(user, isPersistent: false);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            else
+            {
+                AddModelErrors(result);
+                return Request.CreateValidationErrorResponse(ModelState);
+            }
+        }
+
+        private void AddModelErrors(IdentityResult result, string prefix = "")
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(prefix, error);
+            }
+        }
+
+        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
+        {
+            var owinContext = TryGetOwinContext().Result;
+
+            owinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            owinContext.Authentication.SignIn(
+                new AuthenticationProperties() { IsPersistent = isPersistent },
+                await GenerateUserIdentityAsync(user));
+        }
+
+        private async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeIdentityUser user)
+        {
+            // NOTE the authenticationType must match the umbraco one
+            // defined in CookieAuthenticationOptions.AuthenticationType
+            var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
+            return userIdentity;
+        }
+
         /// <summary>
         /// Checks if the current user's cookie is valid and if so returns OK or a 400 (BadRequest)
         /// </summary>
@@ -85,7 +139,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize]
         [SetAngularAntiForgeryTokens]
-        public UserDetail GetCurrentUser()
+        public async Task<UserDetail> GetCurrentUser()
         {
             var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
             var result = Mapper.Map<UserDetail>(user);
@@ -95,7 +149,21 @@ namespace Umbraco.Web.Editors
                 //set their remaining seconds
                 result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
             }
+
+            //now we need to fill in the user's linked logins, we can't do this in the mapper because it has no access to the 
+            // user manager
+
+            var identityUser = await UserManager.FindByIdAsync(user.Id);
+            result.LinkedLogins = identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
+
             return result;
+        }
+
+        private BackOfficeUserManager _userManager;
+
+        protected BackOfficeUserManager UserManager
+        {
+            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>()); }
         }
 
         /// <summary>

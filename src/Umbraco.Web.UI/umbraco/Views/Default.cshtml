@@ -1,4 +1,5 @@
-﻿@using System.Net.Http
+﻿@using System.Collections
+@using System.Net.Http
 @using System.Web.Mvc.Html
 @using Umbraco.Core
 @using ClientDependency.Core
@@ -52,9 +53,13 @@
 
     @{
         var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
-            .Select(p => new {authType = p.AuthenticationType, caption = p.Caption, 
+            .Select(p => new
+            {
+                authType = p.AuthenticationType,
+                caption = p.Caption,
                 //TODO: Need to see if this exposes any sensitive data!
-                properties = p.Properties})
+                properties = p.Properties
+            })
             .ToArray();
     }
 
@@ -63,22 +68,41 @@
         we will load the rest of the server vars after the user is authenticated.
     *@
     <script type="text/javascript">
-    var Umbraco = {};
-    Umbraco.Sys = {};
-    Umbraco.Sys.ServerVariables = {
-        "umbracoUrls": {
-            "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-            "serverVarsJs": "@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")",
-            "externalLoginsUrl": "@(Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))"
-        },
-        "externalLogins": {
-            "providers": @Html.Raw(JsonConvert.SerializeObject(loginProviders))
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "umbracoUrls": {
+                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
+                "serverVarsJs": "@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")",
+                "externalLoginsUrl": "@(Url.Action("ExternalLogin", "BackOffice", new {area = ViewBag.UmbracoPath}))"
         },
         "application": {
             "applicationPath" : "@Context.Request.ApplicationPath"
-        }
+            }
     };       
     </script>
+
+    <script>
+    //define a callback that is executed when we bootstrap angular, this is used to inject angular values
+    //with server side info
+    document.angularReady = function(app) {
+        //add external login values
+        var errors = [];
+        @if (ViewBag.ExternalSignInError != null)
+            {
+                foreach (var error in ViewBag.ExternalSignInError)
+                {
+                    <text>errors.push("@error");</text>
+                }
+            }
+            app.value("externalLoginInfo", {
+                errors: errors,
+                providers: @Html.Raw(JsonConvert.SerializeObject(loginProviders))
+            });
+        }
+    </script>
+
+
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
@@ -104,4 +128,3 @@
 
 </body>
 </html>
-

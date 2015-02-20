@@ -98,14 +98,15 @@ namespace Umbraco.Core.Security
         {
             AddClaims(new[]
             {
+                //This is the id that 'identity' uses to check for the user id
+                new Claim(ClaimTypes.NameIdentifier, Id.ToString(), null, Issuer, Issuer, this), 
+
                 new Claim(Constants.Security.StartContentNodeIdClaimType, StartContentNode.ToInvariantString(), null, Issuer, Issuer, this),
                 new Claim(Constants.Security.StartMediaNodeIdClaimType, StartMediaNode.ToInvariantString(), null, Issuer, Issuer, this),
                 new Claim(Constants.Security.AllowedApplicationsClaimType, string.Join(",", AllowedApplications), null, Issuer, Issuer, this),
                 
                 //TODO: Similar one created by the ClaimsIdentityFactory<TUser, TKey> not sure we need this
-                new Claim(Constants.Security.UserIdClaimType, Id.ToString(), null, Issuer, Issuer, this),
-                new Claim(Constants.Security.CultureClaimType, Culture, null, Issuer, Issuer, this),
-                new Claim(Constants.Security.SessionIdClaimType, SessionId, null, Issuer, Issuer, this),
+                new Claim(Constants.Security.CultureClaimType, Culture, null, Issuer, Issuer, this)                
 
                 //TODO: Role claims are added by the default ClaimsIdentityFactory<TUser, TKey> based on the result from 
                 // the user manager manager.GetRolesAsync method so not sure if we can do that there or needs to be done here
@@ -113,6 +114,13 @@ namespace Umbraco.Core.Security
 
                 //new Claim(ClaimTypes.Role, string.Join(",", Roles), null, Issuer, Issuer, this)
             });
+
+            //TODO: Find out why sessionid is null - this depends on how the identity is created!
+            if (SessionId.IsNullOrWhiteSpace() == false)
+            {
+                AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, null, Issuer, Issuer, this));    
+            }
+            
         }
 
         protected internal UserData UserData { get; private set; }

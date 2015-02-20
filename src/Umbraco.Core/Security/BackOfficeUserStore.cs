@@ -337,7 +337,7 @@ namespace Umbraco.Core.Security
             {
                 //return the first member that matches the result
                 var output = (from l in result
-                            select _userService.GetUserById(l.Id)
+                            select _userService.GetUserById(l.UserId)
                                 into user
                                 where user != null
                                   select Mapper.Map<BackOfficeIdentityUser>(user)).FirstOrDefault();

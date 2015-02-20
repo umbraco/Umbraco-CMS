@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -40,6 +41,15 @@ namespace Umbraco.Web.WebApi
         protected Attempt<HttpContextBase> TryGetHttpContext()
         {
             return Request.TryGetHttpContext();
+        }
+
+        /// <summary>
+        /// Tries to retrieve the current HttpContext if one exists.
+        /// </summary>
+        /// <returns></returns>
+        protected Attempt<IOwinContext> TryGetOwinContext()
+        {
+            return Request.TryGetOwinContext();
         }
 
         /// <summary>
