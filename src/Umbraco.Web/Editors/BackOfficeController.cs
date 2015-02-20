@@ -687,7 +687,7 @@ namespace Umbraco.Web.Editors
                 //Ensure the forms auth module doesn't do a redirect!
                 context.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
 
-                var properties = new AuthenticationProperties() { RedirectUri = RedirectUri };
+                var properties = new AuthenticationProperties() { RedirectUri = RedirectUri.EnsureEndsWith('/') };
                 if (UserId != null)
                 {
                     properties.Dictionary[XsrfKey] = UserId;
