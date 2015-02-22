@@ -43,7 +43,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "allowedSections")]
         public IEnumerable<string> AllowedSections { get; set; }
 
-        [DataMember(Name = "linkedLogins")]
-        public IEnumerable<KeyValuePair<string, string>> LinkedLogins { get; set; } 
+        
     }
 }

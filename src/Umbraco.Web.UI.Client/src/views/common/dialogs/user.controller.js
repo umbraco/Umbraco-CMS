@@ -51,7 +51,37 @@ angular.module("umbraco")
             }, 1000, false); // 1 second, do NOT execute a global digest    
         }
 
-        $scope.unlink = function(e, loginProvider, providerKey) {
+        function updateUserInfo() {
+            //get the user
+            userService.getCurrentUser().then(function (user) {
+                $scope.user = user;
+                if ($scope.user) {
+                    $scope.remainingAuthSeconds = $scope.user.remainingAuthSeconds;
+                    $scope.canEditProfile = _.indexOf($scope.user.allowedSections, "users") > -1;
+                    //set the timer
+                    updateTimeout();
+
+                    authResource.getCurrentUserLinkedLogins().then(function(logins) {
+                        //reset all to be un-linked
+                        for (var provider in $scope.externalLoginProviders) {
+                            $scope.externalLoginProviders[provider].linkedProviderKey = undefined;
+                        }
+
+                        //set the linked logins
+                        for (var login in logins) {
+                            var found = _.find($scope.externalLoginProviders, function (i) {
+                                return i.authType == login;
+                            });
+                            if (found) {
+                                found.linkedProviderKey = logins[login];
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        $scope.unlink = function (e, loginProvider, providerKey) {
             var result = confirm("Are you sure you want to unlink this account?");
             if (!result) {
                 e.preventDefault();
@@ -59,32 +89,11 @@ angular.module("umbraco")
             }
 
             authResource.unlinkLogin(loginProvider, providerKey).then(function (a, b, c) {
-                var asdf = ";"
-            }, function(err) {
-                var asdf = err;
+                updateUserInfo();
             });
         }
 
-        //get the user
-        userService.getCurrentUser().then(function (user) {
-            $scope.user = user;
-            if ($scope.user) {
-                $scope.remainingAuthSeconds = $scope.user.remainingAuthSeconds;
-                $scope.canEditProfile = _.indexOf($scope.user.allowedSections, "users") > -1;
-                //set the timer
-                updateTimeout();
-
-                //set the linked logins
-                for (var login in $scope.user.linkedLogins) {
-                    var found = _.find($scope.externalLoginProviders, function(i) {
-                        return i.authType == login;
-                    });
-                    if (found) {
-                        found.linkedProviderKey = $scope.user.linkedLogins[login];
-                    }
-                }
-            }
-        });
+        updateUserInfo();
 
         //remove all event handlers
         $scope.$on('$destroy', function () {

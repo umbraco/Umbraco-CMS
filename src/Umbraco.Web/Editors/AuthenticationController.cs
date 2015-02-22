@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize]
         [SetAngularAntiForgeryTokens]
-        public async Task<UserDetail> GetCurrentUser()
+        public UserDetail GetCurrentUser()
         {
             var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
             var result = Mapper.Map<UserDetail>(user);
@@ -150,13 +150,15 @@ namespace Umbraco.Web.Editors
                 result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
             }
 
-            //now we need to fill in the user's linked logins, we can't do this in the mapper because it has no access to the 
-            // user manager
-
-            var identityUser = await UserManager.FindByIdAsync(user.Id);
-            result.LinkedLogins = identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
-
             return result;
+        }
+
+        [WebApi.UmbracoAuthorize]
+        [SetAngularAntiForgeryTokens]
+        public async Task<Dictionary<string, string>>  GetCurrentUserLinkedLogins()
+        {
+            var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId());
+            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
         }
 
         private BackOfficeUserManager _userManager;

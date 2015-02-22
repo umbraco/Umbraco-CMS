@@ -19,6 +19,7 @@
         "typeahead.js": "~0.10.5",
         "underscore": "~1.7.0",
         "rgrove-lazyload": "*",
+        "bootstrap-social": "~4.8.0"
         "jquery": "2.0.3",
         "jquery-file-upload": "~9.4.0",
         "jquery-ui": "1.10.3",
@@ -34,8 +35,15 @@
         "underscore": {
             "": "underscore-min.{js,map}"
         },
-        "angular-dynamic-locale": {
-            "": "tmhDynamicLocale.min.{js,js.map}"
+        "bootstrap-social": {
+            "": "bootstrap-social.css"
+        },
+        "font-awesome": {
+            "css": "css/font-awesome.min.css",
+            "fonts" :  "fonts/*"
+        },
+        "bootstrap": {
+            "ignore": "*.ignore"
         },
         "jquery": {
             "": "jquery.min.{js,map}"  

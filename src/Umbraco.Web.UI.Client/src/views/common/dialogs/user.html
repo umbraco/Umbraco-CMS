@@ -1,4 +1,4 @@
-<div class="umb-panel" ng-controller="Umbraco.Dialogs.UserController">
+<div class="umb-panel umb-user-panel" ng-controller="Umbraco.Dialogs.UserController">
     <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="btn-toolbar umb-btn-toolbar">
@@ -30,30 +30,35 @@
                 </p>
             </div>
 
-            <div class="umb-pane">
+            <div class="umb-pane external-logins">
 
                 <h5>External login providers</h5>
 
-                <div ng-repeat="login in externalLoginProviders" class="alert alert-info">
+                <div ng-repeat="login in externalLoginProviders">
 
-                    <form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm" action="{{externalLinkLoginFormAction}}">
-                        <button class="btn btn-default icon-link"
+                    <form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
+                          action="{{externalLinkLoginFormAction}}">
+
+                        <button class="btn btn-block btn-social"
+                                ng-class="login.properties.SocialStyle"
                                 id="{{login.authType}}"
                                 name="provider"
-                                value="{{login.authType}}"
-                                title="Link your user account to your {{login.caption}} account"></button>
+                                value="{{login.authType}}">
+                            <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                            Link your {{login.caption}} account
+                        </button>
                     </form>
 
                     <button ng-if="login.linkedProviderKey != undefined"
                             ng-click="unlink($event, login.authType, login.linkedProviderKey)"
-                            class="btn btn-default icon-remove"
+                            class="btn btn-block btn-social"
+                            ng-class="login.properties.SocialStyle"
                             id="{{login.authType}}"
                             name="provider"
-                            value="{{login.authType}}"
-                            title="Un-link your user account from your {{login.caption}} account"></button>
-
-                    <span>{{login.caption}}</span>
-
+                            value="{{login.authType}}">
+                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                        Un-link your {{login.caption}} account
+                    </button>
                 </div>
 
             </div>

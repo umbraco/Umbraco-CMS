@@ -123,6 +123,16 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                         "GetCurrentUser")),
                 'Server call failed for getting current user'); 
         },
+
+        getCurrentUserLinkedLogins: function () {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "GetCurrentUserLinkedLogins")),
+                'Server call failed for getting current users linked logins');
+        },
         
         /**
          * @ngdoc method

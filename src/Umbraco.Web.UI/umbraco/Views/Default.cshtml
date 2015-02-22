@@ -28,8 +28,13 @@
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
-    @{ Html.RequiresCss("assets/css/umbraco.css", "Umbraco");}
-    @{ Html.RequiresCss("tree/treeicons.css", "UmbracoClient");}
+    @{
+        Html
+            .RequiresCss("assets/css/umbraco.css", "Umbraco")
+            .RequiresCss("tree/treeicons.css", "UmbracoClient")
+            .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
+            .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+    }
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
