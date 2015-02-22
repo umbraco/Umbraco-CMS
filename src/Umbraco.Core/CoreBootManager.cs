@@ -157,6 +157,8 @@ namespace Umbraco.Core
                 factory.GetAllInstances<IUrlSegmentProvider>()));
             container.Register<ApplicationContext>(new PerContainerLifetime());
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
+
+            container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
         }
 
         /// <summary>
