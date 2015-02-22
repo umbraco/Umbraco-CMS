@@ -32,6 +32,7 @@ using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Web.Editors
 {
@@ -404,7 +405,11 @@ namespace Umbraco.Web.Editors
 
                     var mediaService = ApplicationContext.Services.MediaService;
                     var f = mediaService.CreateMedia(fileName, parentId, mediaType);
-                    using (var fs = System.IO.File.OpenRead(file.LocalFileName))
+
+                    var fileInfo = new FileInfo(file.LocalFileName);
+                    var fs = fileInfo.OpenReadWithRetry();
+                    if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
+                    using (fs)
                     {
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
@@ -422,6 +427,25 @@ namespace Umbraco.Web.Editors
                     PropertyAlias = Constants.Conventions.Media.File,
                     TempFilePath = file.LocalFileName
                 });
+            }
+
+            //Different response if this is a 'blueimp' request
+            if (Request.GetQueryNameValuePairs().Any(x => x.Key == "origin"))
+            {
+                var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
+                if (origin.Value == "blueimp")
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK,
+                        tempFiles.UploadedFiles.Select(x => new
+                        {
+                            name = x.FileName,
+                            size = "",
+                            url = "",
+                            thumbnailUrl = ""
+                        }), 
+                        //Don't output the angular xsrf stuff, blue imp doesn't like that
+                        new JsonMediaTypeFormatter());
+                }
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);

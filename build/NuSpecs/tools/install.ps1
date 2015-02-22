@@ -49,94 +49,79 @@ if ($project) {
 	}
 	
 	$copyWebconfig = $false
-	try		
+
+	# SJ - What can I say: big up for James Newton King for teaching us a hack for detecting if this is a new install vs. an upgrade!
+	# https://github.com/JamesNK/Newtonsoft.Json/pull/387 - would never have seen this without the controversial pull request..	
+	Try		
 	{
-	  # SJ - What can I say: big up for James Newton King for teaching us a hack for detecting if this is a new install vs. an upgrade!
-	  # https://github.com/JamesNK/Newtonsoft.Json/pull/387 - would never have seen this without the controversial pull request..
-	  $dte2 = Get-Interface $dte ([EnvDTE80.DTE2])		
-			
-	  if ($dte2.ActiveWindow.Caption -eq "Package Manager Console")		
-	  {		
-		# user is installing from VS NuGet console		
+		# see if user is installing from VS NuGet console		
 		# get reference to the window, the console host and the input history		
 		# copy web.config if "install-package UmbracoCms" was last input		
-			
+		# this is in a try-catch as they might be using the regular NuGet dialog 
+		# instead of package manager console
+		
+		$dte2 = Get-Interface $dte ([EnvDTE80.DTE2])		
+
 		$consoleWindow = $(Get-VSComponentModel).GetService([NuGetConsole.IPowerConsoleWindow])		
 			
 		$props = $consoleWindow.GetType().GetProperties([System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
 			
-		$prop = $props | ? { $_.Name -eq "ActiveHostInfo" } | select -first 1		
-		if ($prop -eq $null) { return }		
+		$prop = $props | ? { $_.Name -eq "ActiveHostInfo" } | select -first 1
 			
-		$hostInfo = $prop.GetValue($consoleWindow)		
-		if ($hostInfo -eq $null) { return }		
+		$hostInfo = $prop.GetValue($consoleWindow)
 			
 		$history = $hostInfo.WpfConsole.InputHistory.History		
 			
-		$lastCommand = $history | select -last 1		
+		$lastCommand = $history | select -last 1
 			
 		if ($lastCommand)		
 		{		
-		  $lastCommand = $lastCommand.Trim().ToLower()		
-		  if ($lastCommand.StartsWith("install-package") -and $lastCommand.Contains("umbracocms"))		
-		  {		
-			$copyWebconfig = $true
-		  }
-		}		
-	  }		
-	  else		
-	  {		
+			$lastCommand = $lastCommand.Trim().ToLower()		
+			if ($lastCommand.StartsWith("install-package") -and $lastCommand.Contains("umbracocms"))		
+			{		
+				$copyWebconfig = $true
+			}
+		}
+	}
+	Catch { }
+	
+	Try		
+	{	
 		# user is installing from VS NuGet dialog		
 		# get reference to the window, then smart output console provider		
 		# copy web.config if messages in buffered console contains "installing...UmbracoCms" in last operation		
 		
 		$instanceField = [NuGet.Dialog.PackageManagerWindow].GetField("CurrentInstance", [System.Reflection.BindingFlags]::Static -bor [System.Reflection.BindingFlags]::NonPublic)		
 		$consoleField = [NuGet.Dialog.PackageManagerWindow].GetField("_smartOutputConsoleProvider", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-		if ($instanceField -eq $null -or $consoleField -eq $null) { return }		
-			
+		
 		$instance = $instanceField.GetValue($null)		
-		if ($instance -eq $null) { return }		
-			
+		
 		$consoleProvider = $consoleField.GetValue($instance)		
-		if ($consoleProvider -eq $null) { return }		
 			
 		$console = $consoleProvider.CreateOutputConsole($false)		
-			
+		
 		$messagesField = $console.GetType().GetField("_messages", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-		if ($messagesField -eq $null) { return }		
 			
 		$messages = $messagesField.GetValue($console)		
-		if ($messages -eq $null) { return }		
-			
+	
 		$operations = $messages -split "=============================="		
 			
 		$lastOperation = $operations | select -last 1		
 			
 		if ($lastOperation)		
 		{		
-		  $lastOperation = $lastOperation.ToLower()		
+			$lastOperation = $lastOperation.ToLower()
+			$lines = $lastOperation -split "`r`n"
+			$installMatch = $lines | ? { $_.Contains("...umbracocms ") } | select -first 1
 			
-		  $lines = $lastOperation -split "`r`n"		
-			
-		  $installMatch = $lines | ? { $_.Contains("...umbracocms ") } | select -first 1		
-			
-		  if ($installMatch)		
-		  {		
-			$copyWebconfig = $true
-		  }		
-		}		
-	  }		
-	}		
-	catch		
-	{		
-	  # stop potential errors from bubbling up		
-	  $ErrorMessage = $_.Exception.Message
-	  $FailedItem = $_.Exception.ItemName
-	  $installLogFile = Join-Path $projectDestinationPath "NuGetInstallError.log"
-	  $text = "Error occurred: " + $ErrorMessage + " failure: " + $FailedItem
-	  $text | Out-File $installLogFile
-	}
-
+			if ($installMatch)		
+			{
+				$copyWebconfig = $true
+			}
+		}
+	} 
+	Catch { }
+	
 	if($copyWebconfig -eq $true) 
 	{
 		$packageWebConfigSource = Join-Path $rootPath "UmbracoFiles\Web.config"

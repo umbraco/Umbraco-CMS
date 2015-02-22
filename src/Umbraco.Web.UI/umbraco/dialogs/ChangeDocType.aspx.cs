@@ -64,26 +64,13 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private bool PopulateListOfValidAlternateDocumentTypes()
         {
-            // Get all content types
+            // Start with all content types
             var documentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
 
-            // Remove current one
-            documentTypes = documentTypes.Where(x => x.Id != _content.ContentType.Id);
-
-            // Remove any not valid for current location
-            if (_content.ParentId == -1)
-            {
-                // Root content, only include those that have been selected as allowed at root
-                documentTypes = documentTypes.Where(x => x.AllowedAsRoot);
-            }
-            else
-            {
-                // Below root, so only include those allowed as sub-nodes for the parent
-                var parentNode = ApplicationContext.Current.Services.ContentService.GetById(_content.ParentId);
-                documentTypes = documentTypes.Where(x => parentNode.ContentType.AllowedContentTypes
-                    .Select(y => y.Id.Value)
-                    .Contains(x.Id));
-            }
+            // Remove invalid ones from list of potential alternatives
+            documentTypes = RemoveCurrentDocumentTypeFromAlternatives(documentTypes);
+            documentTypes = RemoveInvalidByParentDocumentTypesFromAlternatives(documentTypes);
+            documentTypes = RemoveInvalidByChildrenDocumentTypesFromAlternatives(documentTypes);
 
             // If we have at least one, bind to list and return true
             if (documentTypes.Any())
@@ -96,6 +83,43 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             }
 
             return false;
+        }
+
+        private IEnumerable<IContentType> RemoveCurrentDocumentTypeFromAlternatives(IEnumerable<IContentType> documentTypes)
+        {
+            return documentTypes
+                .Where(x => x.Id != _content.ContentType.Id);
+        }
+
+        private IEnumerable<IContentType> RemoveInvalidByParentDocumentTypesFromAlternatives(IEnumerable<IContentType> documentTypes)
+        {
+            if (_content.ParentId == -1)
+            {
+                // Root content, only include those that have been selected as allowed at root
+                return documentTypes
+                    .Where(x => x.AllowedAsRoot);
+            }
+            else
+            {
+                // Below root, so only include those allowed as sub-nodes for the parent
+                var parentNode = ApplicationContext.Current.Services.ContentService.GetById(_content.ParentId);
+                return documentTypes
+                    .Where(x => parentNode.ContentType.AllowedContentTypes
+                        .Select(y => y.Id.Value)
+                        .Contains(x.Id));
+            }
+        }
+
+        private IEnumerable<IContentType> RemoveInvalidByChildrenDocumentTypesFromAlternatives(IEnumerable<IContentType> documentTypes)
+        {
+            var docTypeIdsOfChildren = _content.Children()
+                .Select(x => x.ContentType.Id)
+                .Distinct()
+                .ToList();
+            return documentTypes
+                .Where(x => x.AllowedContentTypes
+                    .Select(y => y.Id.Value)
+                    .ContainsAll(docTypeIdsOfChildren));
         }
 
         private void PopulateListOfTemplates()

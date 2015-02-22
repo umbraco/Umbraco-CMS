@@ -1331,7 +1331,7 @@ namespace Umbraco.Web
         public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
         {
 
-            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery-2.0.3.min.js"" type=""text/javascript""></script>" +
+            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
                                  @"<script src=""{0}"" type=""text/javascript""></script>" +
                                  @"<script src=""{1}"" type=""text/javascript""></script>" +
                                  @"<script type=""text/javascript"">var pageId = '{2}'</script>" +

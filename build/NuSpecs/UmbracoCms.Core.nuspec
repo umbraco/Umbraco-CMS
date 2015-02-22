@@ -15,11 +15,11 @@
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-      <dependency id="Microsoft.AspNet.Mvc" version="[4.0.30506.0,5.0.0)" />
-      <dependency id="Microsoft.AspNet.WebApi" version="[4.0.30506,5.0.0)" />
-      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="[4.0.30506, 5.0.0)" />
-      <dependency id="Microsoft.AspNet.WebApi.Core" version="[4.0.30506, 5.0.0)" />
-      <dependency id="Microsoft.AspNet.WebApi.Client" version="[4.0.30506, 5.0.0)" />
+      <dependency id="Microsoft.AspNet.Mvc" version="[4.0.30506.0,6.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi" version="[4.0.30506,6.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="[4.0.30506, 6.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi.Core" version="[4.0.30506, 6.0.0)" />
+      <dependency id="Microsoft.AspNet.WebApi.Client" version="[4.0.30506, 6.0.0)" />
       <dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.1" />
       <dependency id="Microsoft.Net.Http" version="[2.0.20710.0, 3.0.0)" />
       <dependency id="MiniProfiler" version="[2.1.0, 3.0.0)" />
@@ -28,11 +28,11 @@
       <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
       <dependency id="MySql.Data" version="[6.6.5]" />
       <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
-      <dependency id="ClientDependency" version="[1.8.1, 2.0.0)" />
+      <dependency id="ClientDependency" version="[1.8.2.1, 2.0.0)" />
       <dependency id="ClientDependency-Mvc" version="[1.8.0, 2.0.0)" />
       <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
       <dependency id="Newtonsoft.Json" version="[6.0.5, 7.0.0)" />
-      <dependency id="Examine" version="[0.1.59, 1.0.0)" />
+      <dependency id="Examine" version="[0.1.60, 1.0.0)" />
       <dependency id="ImageProcessor" version="[1.9.5, 3.0.0)" />
       <dependency id="ImageProcessor.Web" version="[3.3.1, 5.0.0)" />
     </dependencies>
@@ -48,7 +48,6 @@
     <file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
     <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
     <file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
-    <file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
     <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
     <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
     <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />

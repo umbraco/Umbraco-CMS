@@ -62,16 +62,17 @@
                                 <!-- delete row -->
                                 <div class="cell-tools-remove">
                                     <div class="iconBox"
-                                         ng-click="deletePrompt = true"
+                                         ng-click="showPrompt(row)"
                                          ng-mouseover="setWarnighlightRow(row)"
                                          ng-mouseleave="disableWarnhighlightRow(row)">
 
-                                        <span ng-if="deletePrompt">
-                                            <localize key="general_areyousure"/>
-                                            <a href style="text-decoration: underline" ng-click="removeRow(section, $index)"><localize key="general_yes"/></a>
+                                        <span class="prompt" ng-if="row.deletePrompt">
+                                            <localize key="general_areyousure" />
+                                            <a href ng-click="removeRow(section, $index)"><localize key="general_yes" /></a>
+                                            <a href ng-click="clearPrompt(row, $event)"><localize key="general_no" /></a>
                                         </span>
 
-                                        <i ng-if="!deletePrompt" class="icon icon-trash"></i>
+                                        <i ng-if="!row.deletePrompt" class="icon icon-trash"></i>
                                     </div>
                                 </div>
 
@@ -120,22 +121,24 @@
 
                                                     <!-- Filled cell tools -->
                                                     <div class="cell-tools"
+                                                         ng-class="{'with-prompt': control.deletePrompt}"
                                                          ng-animate="'fade'"
-                                                         ng-show="control && (currentControl == control)">
+                                                         ng-if="control && (currentControl == control)">
 
                                                         <!-- delete control -->
                                                         <div class="cell-tools-remove">
                                                             <div class="iconBox"
-                                                                 ng-click="deletePrompt = true"
+                                                                 ng-click="showPrompt(control)"
                                                                  ng-mouseover="setWarnhighlightControl(control)"
                                                                  ng-mouseleave="disableWarnhighlightControl(control)">
 
-                                                                <span ng-show="deletePrompt">
-                                                                    <localize key="general_areyousure"/>
-                                                                    <a href style="text-decoration: underline" ng-click="removeControl(area, $index)"><localize key="general_yes"/></a>
+                                                                <span class="prompt" ng-if="control.deletePrompt">
+                                                                    <localize key="general_areyousure" />
+                                                                    <a href ng-click="removeControl(area, $index)"><localize key="general_yes" /></a>
+                                                                    <a href ng-click="clearPrompt(control, $event)"><localize key="general_no" /></a>
                                                                 </span>
 
-                                                                <i ng-show="!deletePrompt" class="icon icon-trash"></i>
+                                                                <i ng-if="!control.deletePrompt" class="icon icon-trash"></i>
                                                             </div>
                                                         </div>
 

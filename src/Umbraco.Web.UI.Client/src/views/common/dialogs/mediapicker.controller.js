@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $element, $timeout) {
 
             var dialogOptions = $scope.dialogOptions;
 
@@ -11,9 +11,15 @@ angular.module("umbraco")
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
             
+            $scope.filesUploading = 0;
+            $scope.dropping = false;
+            $scope.progress = 0;
+
             $scope.options = {
-                url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
+                url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile") + "?origin=blueimp",
                 autoUpload: true,
+                dropZone: $element.find(".umb-dialogs-mediapicker.browser"),
+                fileInput: $element.find("input.uploader"),
                 formData: {
                     currentFolder: -1
                 }
@@ -75,8 +81,39 @@ angular.module("umbraco")
                 $scope.currentFolder = folder;      
             };
 
-            $scope.$on('fileuploadstop', function(event, files) {
-                $scope.gotoFolder($scope.currentFolder);
+            //This executes prior to the whole processing which we can use to get the UI going faster,
+            //this also gives us the start callback to invoke to kick of the whole thing
+            $scope.$on('fileuploadadd', function (e, data) {
+                $scope.$apply(function () {
+                    $scope.filesUploading++;
+                });
+            });
+
+            //when one is finished
+            $scope.$on('fileuploaddone', function (e, data) {
+                $scope.filesUploading--;
+                if ($scope.filesUploading == 0) {
+                    $scope.$apply(function () {
+                        $scope.progress = 0;
+                        $scope.gotoFolder($scope.currentFolder);
+                    });
+                }
+            });
+
+            // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted! 
+            $scope.$on('fileuploaddragover', function (e, data) {
+                if (!$scope.dragClearTimeout) {
+                    $scope.$apply(function () {
+                        $scope.dropping = true;
+                    });
+                }
+                else {
+                    $timeout.cancel($scope.dragClearTimeout);
+                }
+                $scope.dragClearTimeout = $timeout(function () {
+                    $scope.dropping = null;
+                    $scope.dragClearTimeout = null;
+                }, 300);
             });
 
             $scope.clickHandler = function(image, ev, select) {

@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using ClientDependency.Core;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Newtonsoft.Json;
@@ -637,14 +638,19 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<EntityBasic> GetResultForKeys(IEnumerable<Guid> keys, UmbracoEntityTypes entityType)
         {
-            if (keys.Any() == false) return Enumerable.Empty<EntityBasic>();
+            var keysArray = keys.ToArray();
+            if (keysArray.Any() == false) return Enumerable.Empty<EntityBasic>();
 
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var result = Services.EntityService.GetAll(objectType.Value, keys.ToArray())
+                var entities = Services.EntityService.GetAll(objectType.Value, keysArray)
                     .WhereNotNull()
                     .Select(Mapper.Map<EntityBasic>);
+
+                // entities are in "some" order, put them back in order
+                var xref = entities.ToDictionary(x => x.Id);
+                var result = keysArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
             }
@@ -664,14 +670,19 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<EntityBasic> GetResultForIds(IEnumerable<int> ids, UmbracoEntityTypes entityType)
         {
-            if (ids.Any() == false) return Enumerable.Empty<EntityBasic>();
+            var idsArray = ids.ToArray();
+            if (idsArray.Any() == false) return Enumerable.Empty<EntityBasic>();
 
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var result = Services.EntityService.GetAll(objectType.Value, ids.ToArray())
+                var entities = Services.EntityService.GetAll(objectType.Value, idsArray)
                     .WhereNotNull()
                     .Select(Mapper.Map<EntityBasic>);
+
+                // entities are in "some" order, put them back in order
+                var xref = entities.ToDictionary(x => x.Id);
+                var result = idsArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
             }

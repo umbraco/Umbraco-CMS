@@ -33,3 +33,23 @@
       
 //    }
 //}
+            {
+                // here we render <thead> and <tfoot>
+                if (dgTabs.ShowHeader) 
+                    table.Rows[0].TableSection = TableRowSection.TableHeader;
+                if (dgTabs.ShowFooter)
+                    table.Rows[table.Rows.Count - 1].TableSection = TableRowSection.TableFooter;
+            }
+        }
+
+        protected void dgTabs_ItemDataBound(object sender, DataGridItemEventArgs e)
+        {
+            Table table = dgTabs.Controls[0] as Table;
+            if (table != null && table.Rows.Count > 0)
+            {
+                if (dgTabs.ShowHeader)
+                    table.Rows[0].TableSection = TableRowSection.TableHeader;
+                if (dgTabs.ShowFooter)
+                    table.Rows[table.Rows.Count - 1].TableSection = TableRowSection.TableFooter;
+            }
+        }

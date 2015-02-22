@@ -36,8 +36,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
         }
 
-        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
         protected override IDataTypeDefinition PerformGet(int id)
@@ -230,6 +228,10 @@ AND umbracoNode.id <> @id",
             Database.Update(nodeDto);
             Database.Update(dto);
 
+            //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
+            // are querying for them in the Saved event (before the distributed call cache is clearing it)
+            _cacheHelper.RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
+
             entity.ResetDirtyProperties();
         }
 
@@ -267,54 +269,44 @@ AND umbracoNode.id <> @id",
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            using (var l = new UpgradeableReadLock(_locker))
+            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
+            if (cached != null && cached.Any())
             {
-                var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
-                if (cached != null && cached.Any())
-                {
-                    //return from the cache, ensure it's a cloned result
-                    return (PreValueCollection)cached.First().DeepClone();
-                }
-
-                l.UpgradeToWriteLock();
-
-                return GetAndCachePreValueCollection(dataTypeId);
+                //return from the cache, ensure it's a cloned result
+                return (PreValueCollection)cached.First().DeepClone();
             }
+
+            return GetAndCachePreValueCollection(dataTypeId);
         }
 
         public string GetPreValueAsString(int preValueId)
         {
-            using (var l = new UpgradeableReadLock(_locker))
+            //We need to see if we can find the cached PreValueCollection based on the cache key above
+
+            var regex = CacheKeys.DataTypePreValuesCacheKey + @"[\d]+-[,\d]*" + preValueId + @"[,\d$]*";
+
+            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(regex);
+            if (cached != null && cached.Any())
             {
-                //We need to see if we can find the cached PreValueCollection based on the cache key above
-
-                var regex = CacheKeys.DataTypePreValuesCacheKey + @"[\d]+-[,\d]*" + preValueId + @"[,\d$]*";
-
-                var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(regex);
-                if (cached != null && cached.Any())
-                {
-                    //return from the cache
-                    var collection = cached.First();
-                    var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-                    return preVal.Value.Value;
-                }
-
-                l.UpgradeToWriteLock();
-
-                //go and find the data type id for the pre val id passed in
-
-                var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId = preValueId });
-                if (dto == null)
-                {
-                    return string.Empty;
-                }
-                // go cache the collection
-                var preVals = GetAndCachePreValueCollection(dto.DataTypeNodeId);
-
-                //return the single value for this id
-                var pv = preVals.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-                return pv.Value.Value;
+                //return from the cache
+                var collection = cached.First();
+                var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
+                return preVal.Value.Value;
             }
+
+            //go and find the data type id for the pre val id passed in
+
+            var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId = preValueId });
+            if (dto == null)
+            {
+                return string.Empty;
+            }
+            // go cache the collection
+            var preVals = GetAndCachePreValueCollection(dto.DataTypeNodeId);
+
+            //return the single value for this id
+            var pv = preVals.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
+            return pv.Value.Value;
         }
 
         public void AddOrUpdatePreValues(int dataTypeId, IDictionary<string, PreValue> values)

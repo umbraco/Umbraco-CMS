@@ -78,6 +78,16 @@ angular.module("umbraco")
                             r.inline = "span";
                             r.attributes = { id: rule.selector.substring(1) };
                         }
+                        else if (rule.selector[0] != "." && rule.selector.indexOf(".") > -1) {
+                            var split = rule.selector.split(".");
+                            r.block = split[0];
+                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(".", " ");
+                        }
+                        else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
+                            var split = rule.selector.split("#");
+                            r.block = split[0];
+                            r.classes = rule.selector.substring(rule.selector.indexOf("#") + 1);
+                        }
                         else {
                             r.block = rule.selector;
                         }

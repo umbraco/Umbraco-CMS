@@ -34,7 +34,17 @@ namespace Umbraco.Web.Security.Providers
         public abstract string ProviderName { get; }
 
         protected abstract MembershipUser ConvertToMembershipUser(TEntity entity);
-        
+
+        private bool _allowManuallyChangingPassword = true;
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option by default it is true
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return _allowManuallyChangingPassword; }
+        }
+
         /// <summary>
         /// Initializes the provider.
         /// </summary>
@@ -54,6 +64,7 @@ namespace Umbraco.Web.Security.Providers
             // Initialize base provider class
             base.Initialize(name, config);
 
+            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", true);
         }
 
         /// <summary>

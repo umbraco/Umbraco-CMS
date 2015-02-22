@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Dynamics;
 using Umbraco.Web.Models;
 
@@ -907,10 +908,12 @@ namespace Umbraco.Web.Dynamics
 						//SD: I have yet to see extension methods actually being called in the dynamic parsing... need to unit test these
 						// scenarios and figure out why all this type checking occurs.
 
+                        var runtimeCache = ApplicationContext.Current != null ? ApplicationContext.Current.ApplicationCache.RuntimeCache : new NullCacheProvider();
+
 						if (type == typeof(string) && instanceAsString != null)
 						{
 							Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
-							mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id, true);
+							mb = ExtensionMethodFinder.FindExtensionMethod(runtimeCache, typeof(string), newArgs, id, true);
 							if (mb != null)
 							{
 								return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
@@ -919,7 +922,7 @@ namespace Umbraco.Web.Dynamics
 						if (type == typeof(string) && instanceAsString == null && instance is MemberExpression)
 						{
 							Expression[] newArgs = (new List<Expression>() { instance }).Concat(args).ToArray();
-							mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id, true);
+                            mb = ExtensionMethodFinder.FindExtensionMethod(runtimeCache, typeof(string), newArgs, id, true);
 							if (mb != null)
 							{
 								return Expression.Call(null, (MethodInfo)mb, newArgs);
@@ -994,7 +997,7 @@ namespace Umbraco.Web.Dynamics
 						//e.g. uBlogsyPostDate.Date
 						//SD: Removed the NonPublic accessor here because this will never work in medium trust, wondering why it is NonPublic vs Public ? Have changed to Public.
 						//MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
-						MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.Public | BindingFlags.Static);
+						MethodInfo reflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.Public | BindingFlags.Static);
 						ParameterExpression convertDynamicNullToBooleanFalse = Expression.Parameter(typeof(bool), "convertDynamicNullToBooleanFalse");
 						ParameterExpression result = Expression.Parameter(typeof(object), "result");
 						ParameterExpression idParam = Expression.Parameter(typeof(string), "id");
@@ -1008,7 +1011,7 @@ namespace Umbraco.Web.Dynamics
 							new[] { lambdaResult, result, idParam, convertDynamicNullToBooleanFalse },
 							Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(_flagConvertDynamicNullToBooleanFalse, typeof(bool))),
 							Expression.Assign(lambdaResult, Expression.Invoke(instance, lambdaInstanceExpression)),
-							Expression.Assign(result, Expression.Call(ReflectPropertyValue, lambdaResult, Expression.Constant(id))),
+							Expression.Assign(result, Expression.Call(reflectPropertyValue, lambdaResult, Expression.Constant(id))),
 							Expression.IfThen(
 								Expression.AndAlso(
 									Expression.TypeEqual(result, typeof(DynamicNull)),

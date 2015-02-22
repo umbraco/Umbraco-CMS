@@ -18,7 +18,10 @@
     "dependencies": {
         "typeahead.js": "~0.10.5",
         "underscore": "~1.7.0",
-        "rgrove-lazyload": "*"
+        "rgrove-lazyload": "*",
+        "jquery": "2.0.3",
+        "jquery-file-upload": "~9.4.0",
+        "jquery-ui": "1.10.3"
     },
     "exportsOverride": {
         "rgrove-lazyload": {
@@ -29,6 +32,26 @@
         },
         "underscore": {
             "": "underscore-min.{js,map}"
+        },
+        "jquery": {
+            "": "jquery.min.{js,map}"  
+        },
+        "jquery-file-upload": {
+            "": "**/jquery.{fileupload,fileupload-process,fileupload-angular,fileupload-image}.js"
+        },
+        "jquery-ui": {
+            "": "ui/minified/jquery-ui.min.js"
+        },
+        "blueimp-load-image": {
+            "": "js/load-image.all.min.js"
+        },
+
+        "blueimp-tmpl": {
+            "ignore": "*.ignore"
+        },
+        
+        "blueimp-canvas-to-blob": {
+            "ignore": "*.ignore"
         }
     }
 }

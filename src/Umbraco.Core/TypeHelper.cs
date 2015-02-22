@@ -131,8 +131,8 @@ namespace Umbraco.Core
 	        return Attempt<Type>.Fail();
 	    }
 
-		/// <summary>
-		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
+        /// <summary>
+		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation,
 		/// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
 		/// </summary>
 		/// <param name="contract">The type of the contract.</param>
@@ -156,8 +156,20 @@ namespace Umbraco.Core
 			return IsTypeAssignableFrom(typeof(TContract), implementation);
 		}
 
+        /// <summary>
+        /// Determines whether the object instance <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
+        /// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
+        /// </summary>
+        /// <typeparam name="TContract">The type of the contract.</typeparam>
+        /// <param name="implementation">The implementation.</param>
+        public static bool IsTypeAssignableFrom<TContract>(object implementation)
+        {
+            if (implementation == null) throw new ArgumentNullException("implementation");
+            return IsTypeAssignableFrom<TContract>(implementation.GetType());
+        }
+
 		/// <summary>
-		/// A cached method to determine whether <paramref name="implementation"/> represents a value type.
+		/// A method to determine whether <paramref name="implementation"/> represents a value type.
 		/// </summary>
 		/// <param name="implementation">The implementation.</param>
 		public static bool IsValueType(Type implementation)
@@ -166,7 +178,7 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
-		/// A cached method to determine whether <paramref name="implementation"/> is an implied value type (<see cref="Type.IsValueType"/>, <see cref="Type.IsEnum"/> or a string).
+		/// A method to determine whether <paramref name="implementation"/> is an implied value type (<see cref="Type.IsValueType"/>, <see cref="Type.IsEnum"/> or a string).
 		/// </summary>
 		/// <param name="implementation">The implementation.</param>
 		public static bool IsImplicitValueType(Type implementation)
@@ -174,14 +186,8 @@ namespace Umbraco.Core
 		    return IsValueType(implementation) || implementation.IsEnum || implementation == typeof (string);
 		}
 
-		public static bool IsTypeAssignableFrom<TContract>(object implementation)
-		{
-			if (implementation == null) throw new ArgumentNullException("implementation");
-			return IsTypeAssignableFrom<TContract>(implementation.GetType());
-		}
-
 		/// <summary>
-		/// Returns a PropertyInfo from a type
+		/// Returns (and caches) a PropertyInfo from a type
 		/// </summary>
 		/// <param name="type"></param>
 		/// <param name="name"></param>
@@ -203,54 +209,7 @@ namespace Umbraco.Core
 							return x.Name == name;
 						return x.Name.InvariantEquals(name);
 					});
-		}
-
-        /// <summary>
-        /// Returns all public properties including inherited properties even for interfaces
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// taken from http://stackoverflow.com/questions/358835/getproperties-to-return-all-properties-for-an-interface-inheritance-hierarchy
-        /// </remarks>
-        public static PropertyInfo[] GetPublicProperties(Type type)
-        {
-            if (type.IsInterface)
-            {
-                var propertyInfos = new List<PropertyInfo>();
-
-                var considered = new List<Type>();
-                var queue = new Queue<Type>();
-                considered.Add(type);
-                queue.Enqueue(type);
-                while (queue.Count > 0)
-                {
-                    var subType = queue.Dequeue();
-                    foreach (var subInterface in subType.GetInterfaces())
-                    {
-                        if (considered.Contains(subInterface)) continue;
-
-                        considered.Add(subInterface);
-                        queue.Enqueue(subInterface);
-                    }
-
-                    var typeProperties = subType.GetProperties(
-                        BindingFlags.FlattenHierarchy
-                        | BindingFlags.Public
-                        | BindingFlags.Instance);
-
-                    var newPropertyInfos = typeProperties
-                        .Where(x => !propertyInfos.Contains(x));
-
-                    propertyInfos.InsertRange(0, newPropertyInfos);
-                }
-
-                return propertyInfos.ToArray();
-            }
-
-            return type.GetProperties(BindingFlags.FlattenHierarchy
-                | BindingFlags.Public | BindingFlags.Instance);
-        }
+		}        
 
 		/// <summary>
 		/// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
@@ -286,5 +245,109 @@ namespace Umbraco.Core
 				     	            && (includeIndexed || !y.GetIndexParameters().Any()))
 				     	.ToArray());
 		}
+
+
+        #region Match Type
+
+        //TODO: Need to determine if these methods should replace/combine/merge etc with IsTypeAssignableFrom, IsAssignableFromGeneric
+
+        // readings:
+        // http://stackoverflow.com/questions/2033912/c-sharp-variance-problem-assigning-listderived-as-listbase
+        // http://stackoverflow.com/questions/2208043/generic-variance-in-c-sharp-4-0
+        // http://stackoverflow.com/questions/8401738/c-sharp-casting-generics-covariance-and-contravariance
+        // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+        // http://stackoverflow.com/questions/74616/how-to-detect-if-type-is-another-generic-type/1075059#1075059
+
+        private static bool MatchGeneric(Type implementation, Type contract, IDictionary<string, Type> bindings)
+        {
+            // trying to match eg List<int> with List<T>
+            // or List<List<List<int>>> with List<ListList<T>>>
+            // classes are NOT invariant so List<string> does not match List<object>
+
+            if (implementation.IsGenericType == false) return false;
+
+            // must have the same generic type definition
+            var implDef = implementation.GetGenericTypeDefinition();
+            var contDef = contract.GetGenericTypeDefinition();
+            if (implDef != contDef) return false;
+
+            // must have the same number of generic arguments
+            var implArgs = implementation.GetGenericArguments();
+            var contArgs = contract.GetGenericArguments();
+            if (implArgs.Length != contArgs.Length) return false;
+
+            // generic arguments must match
+            // in insta we should have actual types (eg int, string...)
+            // in typea we can have generic parameters (eg <T>)
+            for (var i = 0; i < implArgs.Length; i++)
+            {
+                const bool variance = false; // classes are NOT invariant
+                if (MatchType(implArgs[i], contArgs[i], bindings, variance) == false)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool MatchType(Type implementation, Type contract)
+        {
+            return MatchType(implementation, contract, new Dictionary<string, Type>());
+        }
+
+        internal static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
+        {
+            if (contract.IsGenericType)
+            {
+                // eg type is List<int> or List<T>
+                // if we have variance then List<int> can match IList<T>
+                // if we don't have variance it can't - must have exact type
+
+                // try to match implementation against contract
+                if (MatchGeneric(implementation, contract, bindings)) return true;
+
+                // if no variance, fail
+                if (variance == false) return false;
+
+                // try to match an ancestor of implementation against contract
+                var t = implementation.BaseType;
+                while (t != null)
+                {
+                    if (MatchGeneric(t, contract, bindings)) return true;
+                    t = t.BaseType;
+                }
+
+                // try to match an interface of implementation against contract
+                return implementation.GetInterfaces().Any(i => MatchGeneric(i, contract, bindings));
+            }
+
+            if (contract.IsGenericParameter)
+            {
+                // eg <T>
+
+                if (bindings.ContainsKey(contract.Name))
+                {
+                    // already bound: ensure it's compatible
+                    return bindings[contract.Name] == implementation;
+                }
+
+                // not already bound: bind
+                bindings[contract.Name] = implementation;
+                return true;
+            }
+
+            // not a generic type, not a generic parameter
+            // so normal class or interface
+            // fixme structs? enums? array types?
+            // about primitive types, value types, etc:
+            // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+
+            if (implementation == contract) return true;
+            if (contract.IsClass && implementation.IsClass && implementation.IsSubclassOf(contract)) return true;
+            if (contract.IsInterface && implementation.GetInterfaces().Contains(contract)) return true;
+
+            return false;
+        }
+
+        #endregion
 	}
 }

@@ -151,9 +151,13 @@ IFRAME {overflow:hidden;}
     bottom: 0;
     top: 0;
     right: 0;
-    width: 150px;
+    width: 50px;
     opacity: 0.3;
     z-index: 50;
+}
+
+.usky-grid  .cell-tools.with-prompt {
+    width:200px;
 }
 
 .usky-grid .cell-tools:hover{
@@ -343,8 +347,20 @@ IFRAME {overflow:hidden;}
      border-radius: 200px;
      background: rgba(255,255,255, 1);
      border:1px solid rgb(182, 182, 182);
-     margin: 2px;
+     margin: 2px;    
  }
+
+  .usky-grid  .iconBox span.prompt {
+      display:block;
+      white-space: nowrap;
+      text-align:center;
+
+  }
+
+  .usky-grid  .iconBox span.prompt > a {
+      text-decoration:underline;
+  }
+
  .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
           background: @blue !important;
           color: white !important;

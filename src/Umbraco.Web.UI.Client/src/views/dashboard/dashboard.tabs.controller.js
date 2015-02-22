@@ -190,58 +190,12 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
         var dialogOptions = $scope.dialogOptions;
 
         $scope.filesUploading = [];
-        $scope.options = {
-            url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
-            autoUpload: true,
-            disableImageResize: /Android(?!.*Chrome)|Opera/
-            .test(window.navigator.userAgent),
-            previewMaxWidth: 200,
-            previewMaxHeight: 200,
-            previewCrop: true,
-            formData:{
-                currentFolder: -1
-            }
-        };
+        $scope.nodeId = -1;
 
-
-        $scope.loadChildren = function(){
-            mediaResource.getChildren(-1)
-                .then(function(data) {
-                    $scope.images = data.items;
-                });
-        };
-
-        $scope.$on('fileuploadstop', function(event, files){
-            $scope.loadChildren($scope.options.formData.currentFolder);
-            $scope.queue = [];
-            $scope.filesUploading = [];
+        $scope.onUploadComplete = function () {
             navigationService.reloadSection("media");
-        });
+        }
 
-        $scope.$on('fileuploadprocessalways', function(e,data) {
-            var i;
-            $scope.$apply(function() {
-                $scope.filesUploading.push(data.files[data.index]);
-            });
-        });
-
-        // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted!
-        $scope.$on('fileuploaddragover', function(event, files) {
-            if (!$scope.dragClearTimeout) {
-                $scope.$apply(function() {
-                    $scope.dropping = true;
-                });
-            } else {
-                $timeout.cancel($scope.dragClearTimeout);
-            }
-            $scope.dragClearTimeout = $timeout(function () {
-                $scope.dropping = null;
-                $scope.dragClearTimeout = null;
-            }, 300);
-        });
-
-        //init load
-        $scope.loadChildren();
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.MediaFolderBrowserDashboardController", MediaFolderBrowserDashboardController);
 

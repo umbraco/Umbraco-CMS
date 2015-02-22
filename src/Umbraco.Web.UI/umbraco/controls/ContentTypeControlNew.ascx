@@ -25,18 +25,18 @@
     
   <cc2:Pane ID="Pane1" runat="server" Width="216" Height="80">
     <asp:DataGrid ID="dgTabs" Width="100%" runat="server" CellPadding="2" HeaderStyle-CssClass="propertyHeader"
-      ItemStyle-CssClass="propertyContent" GridLines="None" OnItemCommand="dgTabs_ItemCommand"
+      ItemStyle-CssClass="propertyContent" GridLines="None" OnItemCommand="dgTabs_ItemCommand" OnItemDataBound="dgTabs_ItemDataBound" OnPreRender="dgTabs_PreRender"
       HeaderStyle-Font-Bold="True" AutoGenerateColumns="False" CssClass="tabs-table">
       <Columns>
         <asp:BoundColumn DataField="id" Visible="False"></asp:BoundColumn>
         <asp:TemplateColumn HeaderText="Name & sort order">
           <ItemTemplate>
-            <i class="icon-navigation handle"></i>
+            <i class="icon-navigation handle" style="display:inline-block; margin-top:5px;"></i>
             <asp:TextBox ID="txtTab" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"name")%>'></asp:TextBox>
             <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" style="width:40px;background-color:#f2f2f2;" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
+            <asp:Button ID="btnDelete" runat="server" Text="Delete" CommandName="Delete" CssClass="btn btn-small btn-danger" />
           </ItemTemplate>
         </asp:TemplateColumn>
-        <asp:ButtonColumn ButtonType="PushButton" Text="Delete" CommandName="Delete"></asp:ButtonColumn>
       </Columns>
     </asp:DataGrid>
     <p style="text-align: center;">

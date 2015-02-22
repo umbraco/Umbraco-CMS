@@ -145,6 +145,12 @@ namespace Umbraco.Web.Routing
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
                 if (domainAndUri != null) return domainAndUri;
 
+                // if none matches, try again without the port
+                // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
+                domainAndUri = domainsAndUris
+                    .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash.WithoutPort()));
+                if (domainAndUri != null) return domainAndUri;
+
                 // if none matches, then try to run the filter to pick a domain
                 if (filter != null)
                 {

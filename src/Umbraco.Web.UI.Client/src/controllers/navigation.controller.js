@@ -76,7 +76,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //Listen for section state changes
     eventsService.on("appState.treeState.changed", function (e, args) {
         var f = args;
-        if(args.value.root && args.value.root.children.length === 0){
+        if (args.value.root && args.value.root.metaData.containsTrees === false) {
             $rootScope.emptySection = true;
         }else{
             $rootScope.emptySection = false;

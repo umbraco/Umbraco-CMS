@@ -1,13 +1,8 @@
-<div class="umb-upload-drop-zone" ng-show="dropping || files.length">
-    <div class="info" ng-show="dropping">
+<div class="umb-upload-drop-zone">
+    <div class="info">
         <i class="icon icon-parachute-drop"></i>
         <p>
-        	<localize key="media_dropFilesHere">Drop your files here...</localize>
+            <localize key="media_dropFilesHere">Drop your files here...</localize>
         </p>
-    </div>
-
-    <div ng-show="files.length">
-        <div class="umb-photo-proview" ng-repeat="file in files" umb-upload-preview="file">
-        </div>
     </div>
 </div>
