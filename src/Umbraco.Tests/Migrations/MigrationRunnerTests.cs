@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -18,7 +19,9 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Only_One_Migration_For_Spanning_Multiple_Targets()
         {
             var sqlSyntax = new SqlCeSyntaxProvider();
-            var runner = new MigrationRunner(Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(6, 0, 0), "Test");
+            var runner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(), 
+                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(6, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(sqlSyntax, Mock.Of<ILogger>()) });
 
@@ -35,7 +38,9 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_1()
         {
             var sqlSyntax = new SqlCeSyntaxProvider();
-            var runner = new MigrationRunner(Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(5, 0, 0), "Test");
+            var runner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
+                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(5, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(sqlSyntax, Mock.Of<ILogger>()) });
 
@@ -52,7 +57,9 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_2()
         {
             var sqlSyntax = new SqlCeSyntaxProvider();
-            var runner = new MigrationRunner(Mock.Of<ILogger>(), new Version(5, 0, 1), new Version(6, 0, 0), "Test");
+            var runner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
+                Mock.Of<ILogger>(), new Version(5, 0, 1), new Version(6, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(sqlSyntax, Mock.Of<ILogger>()) });
 

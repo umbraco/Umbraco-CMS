@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Migrations
         {
             // Arrange
             var sqlSyntax = new SqlCeSyntaxProvider();
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>(), sqlSyntax);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, new Database("test", "System.Data.SqlClient"), Mock.Of<ILogger>(), sqlSyntax);
             var stub = new DropForeignKeyMigrationStub(sqlSyntax, Mock.Of<ILogger>());
 
             // Act

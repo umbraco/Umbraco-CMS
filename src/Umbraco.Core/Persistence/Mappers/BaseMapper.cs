@@ -13,16 +13,13 @@ namespace Umbraco.Core.Persistence.Mappers
         protected BaseMapper(ISqlSyntaxProvider sqlSyntax)
         {
             _sqlSyntax = sqlSyntax;
+            Build();
         }
 
         internal abstract ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache { get; }
 
-        private bool _built = false;
-        public void Build()
+        private void Build()
         {
-            if (_built) return;
-
-            _built = true;
             BuildMap();
         }
 

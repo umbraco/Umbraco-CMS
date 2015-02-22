@@ -146,6 +146,10 @@ namespace Umbraco.Core
             container.Register<IDatabaseUnitOfWorkProvider, PetaPocoUnitOfWorkProvider>();
             container.Register<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
             container.Register<BasePublishingStrategy, PublishingStrategy>();
+            container.Register<IMappingResolver>(factory => new MappingResolver(
+                factory.GetInstance<IServiceContainer>(), 
+                factory.GetInstance<ILogger>(),
+                () => PluginManager.ResolveAssignedMapperTypes()));
             container.Register<RepositoryFactory>();
             container.Register<ServiceContext>(factory => new ServiceContext(
                 factory.GetInstance<RepositoryFactory>(),
@@ -337,11 +341,6 @@ namespace Umbraco.Core
             //supplying a username/password, this will automatically disable distributed calls
             // .. we'll override this in the WebBootManager
             ServerMessengerResolver.Current = new ServerMessengerResolver(Container, typeof (DefaultServerMessenger));
-
-            MappingResolver.Current = new MappingResolver(
-                Container, ProfilingLogger.Logger,
-                () => PluginManager.ResolveAssignedMapperTypes());
-
 
 
             //RepositoryResolver.Current = new RepositoryResolver(

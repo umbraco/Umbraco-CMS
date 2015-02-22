@@ -19,22 +19,27 @@ using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
     [TestFixture]
     public class TargetVersionSixthMigrationsTest : BaseDatabaseFactoryTest
     {
         /// <summary>Regular expression that finds multiline block comments.</summary>
         private static readonly Regex FindComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
 
+        private MigrationResolver _migrationResolver;
+
         [SetUp]
         public override void Initialize()
         {
+            base.Initialize();
+
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
-           
-			MigrationResolver.Current = new MigrationResolver(
-                new ServiceContainer(), 
+
+            _migrationResolver = new MigrationResolver(
+                Container, 
                 ProfilingLogger.Logger,
                 () => new List<Type>
 				{
@@ -51,14 +56,6 @@ namespace Umbraco.Tests.Migrations
 					typeof (UpdateCmsContentVersionTable),
 					typeof (UpdateCmsPropertyTypeGroupTable)
 				}.OrderByDescending(x => x.Name));
-
-            //This is needed because the PluginManager is creating the migration instances with their default ctors
-            LoggerResolver.Current = new LoggerResolver(Logger)
-            {
-                CanResolveBeforeFrozen = true
-            };
-
-            Resolution.Freeze();
 
             var engine = new SqlCeEngine("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;");
             engine.CreateDatabase();   
@@ -83,9 +80,11 @@ namespace Umbraco.Tests.Migrations
 
             var configuredVersion = new Version("4.8.0");
             var targetVersion = new Version("6.0.0");
-            var foundMigrations = MigrationResolver.Current.Migrations;
+            var foundMigrations = _migrationResolver.Migrations;
 
-            var migrationRunner = new MigrationRunner(Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(
+                _migrationResolver,
+                Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 
             var context = new MigrationContext(DatabaseProviders.SqlServerCE, db, Logger, SqlSyntax);
@@ -108,7 +107,6 @@ namespace Umbraco.Tests.Migrations
             base.TearDown();
 
             PluginManager.Current = null;
-            MigrationResolver.Reset();
 
             TestHelper.CleanContentDirectories();
 

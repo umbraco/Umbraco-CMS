@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 LogHelper.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData();
+                var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData(MigrationResolver.Current);
 
                 if (result.Success == false)
                 {

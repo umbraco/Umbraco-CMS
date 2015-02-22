@@ -17,11 +17,18 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class FindingMigrationsTest
     {
+
+        private MigrationResolver _migrationResolver;
+
         [SetUp]
         public void Initialize()
         {
-            MigrationResolver.Current = new MigrationResolver(
-                new ServiceContainer(), 
+            var container = new ServiceContainer();
+            container.Register<ILogger>(factory => Mock.Of<ILogger>(), new PerContainerLifetime());
+            container.Register<ISqlSyntaxProvider>(factory => Mock.Of<ISqlSyntaxProvider>(), new PerContainerLifetime());
+
+            _migrationResolver = new MigrationResolver(
+                container, 
                 Mock.Of<ILogger>(),
                 () => new List<Type>
 				{
@@ -38,7 +45,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Can_Find_Migrations_With_Target_Version_Six()
         {
-	        var foundMigrations = MigrationResolver.Current.Migrations;
+            var foundMigrations = _migrationResolver.Migrations;
             var targetVersion = new Version("6.0.0");
             var list = new List<IMigration>();
 
@@ -56,7 +63,11 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
+            var context = new MigrationContext(
+                DatabaseProviders.SqlServerCE,
+                new Database("test", "System.Data.SqlClient"), 
+                Mock.Of<ILogger>(), 
+                new SqlCeSyntaxProvider());
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;
@@ -72,11 +83,5 @@ namespace Umbraco.Tests.Migrations
             }
         }
 
-        [TearDown]
-        public void TearDown()
-        {	        
-            LoggerResolver.Reset();
-            MigrationResolver.Reset();
-        }
     }
 }

@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// <summary>
     /// A resolver to return all IMigrations
     /// </summary>
-    internal class MigrationResolver : ContainerLazyManyObjectsResolver<MigrationResolver, IMigration>
+    internal class MigrationResolver : ContainerLazyManyObjectsResolver<MigrationResolver, IMigration>, IMigrationResolver
     {
 
         public MigrationResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> migrations)

@@ -599,7 +599,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData()
+        internal Result UpgradeSchemaAndData(IMigrationResolver migrationResolver)
         {
             try
             {
@@ -626,7 +626,7 @@ namespace Umbraco.Core
                                                 ? installedVersion
                                                 : new Version(GlobalSettings.ConfigurationStatus);
                 var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(_logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationResolver, _logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                 var upgraded = runner.Execute(database, DatabaseProvider, SqlSyntax, true);
                 message = message + "<p>Upgrade completed!</p>";
 

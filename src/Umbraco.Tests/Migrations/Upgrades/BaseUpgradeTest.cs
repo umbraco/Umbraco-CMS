@@ -23,6 +23,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         /// <summary>Regular expression that finds multiline block comments.</summary>
         private static readonly Regex FindComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
 
+        internal MigrationResolver MigrationResolver { get; private set; }
+
         [SetUp]
         public virtual void Initialize()
         {
@@ -30,9 +32,13 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
-           
-			MigrationResolver.Current = new MigrationResolver(
-                new ServiceContainer(), 
+
+            var container = new ServiceContainer();
+            container.Register<ILogger>(factory => Mock.Of<ILogger>(), new PerContainerLifetime());
+            container.Register<ISqlSyntaxProvider>(factory => Mock.Of<ISqlSyntaxProvider>(), new PerContainerLifetime());
+
+            MigrationResolver = new MigrationResolver(
+                container, 
                 Mock.Of<ILogger>(),
                 () => new List<Type>
 				{
@@ -50,12 +56,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
 					typeof (UpdateCmsPropertyTypeGroupTable)
 				});
 
-            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
-            {
-                CanResolveBeforeFrozen = true
-            };
-
-			Resolution.Freeze();
 
             DatabaseSpecificSetUp();
 
@@ -85,7 +85,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             //Setup the MigrationRunner
-            var migrationRunner = new MigrationRunner(Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(
+                MigrationResolver,
+                Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             bool upgraded = migrationRunner.Execute(db, provider, sqlHelper, true);
 
             Assert.That(upgraded, Is.True);
@@ -105,9 +107,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public virtual void TearDown()
         {
             PluginManager.Current = null;
-			MigrationResolver.Reset();
-            LoggerResolver.Reset();
-
+			
             TestHelper.CleanContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;

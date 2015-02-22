@@ -14,6 +14,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             // Act
             string column = new ContentMapper(new SqlCeSyntaxProvider()).Map("Id");
 
+
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
         }

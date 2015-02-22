@@ -20,10 +20,10 @@ namespace Umbraco.Tests.TestHelpers
             get { return _sqlSyntax ?? (_sqlSyntax = new SqlCeSyntaxProvider()); }
         }
 
-        private IMappingResolver _mappingResolver;
+        private MappingResolver _mappingResolver;
         protected IMappingResolver MappingResolver
         {
-            get { return _mappingResolver ?? (_mappingResolver = Mock.Of<IMappingResolver>()); }
+            get { return _mappingResolver; }
         }
 
         [SetUp]
@@ -33,6 +33,9 @@ namespace Umbraco.Tests.TestHelpers
             container.Register<ISqlSyntaxProvider>(factory => SqlSyntax, new PerContainerLifetime());
             container.Register<ILogger>(factory => Mock.Of<ILogger>(), new PerContainerLifetime());
             container.Register<IProfiler>(factory => Mock.Of<IProfiler>(), new PerContainerLifetime());
+
+            _mappingResolver = new MappingResolver(container, Mock.Of<ILogger>(),
+                () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             
@@ -54,6 +57,7 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
+            Resolution.Reset();
             //MappingResolver.Reset();
             PluginManager.Current = null;
         }

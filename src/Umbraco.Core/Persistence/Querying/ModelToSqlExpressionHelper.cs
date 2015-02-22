@@ -19,6 +19,11 @@ namespace Umbraco.Core.Persistence.Querying
             : base(sqlSyntax)
         {
             _mapper = mappingResolver.ResolveMapperByType(typeof(T));
+
+            if (_mapper == null)
+            {
+                throw new InvalidOperationException("Could not resolve a mapper for type " + typeof (T));
+            }
         }
 
         protected override string VisitMemberAccess(MemberExpression m)

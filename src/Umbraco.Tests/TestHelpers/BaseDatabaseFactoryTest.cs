@@ -104,9 +104,21 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected override void ConfigureContainer()
+        {
+            base.ConfigureContainer();
+
+            Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+        }
+
+        private MappingResolver _mappingResolver;
         protected IMappingResolver MappingResolver
         {
-            get { return Mock.Of<IMappingResolver>(); }
+            get
+            {
+                return _mappingResolver ??
+                       (_mappingResolver = new MappingResolver(Container, Mock.Of<ILogger>(), () => PluginManager.Current.ResolveAssignedMapperTypes()));
+            }
         }
 
         protected virtual ISqlSyntaxProvider SqlSyntax

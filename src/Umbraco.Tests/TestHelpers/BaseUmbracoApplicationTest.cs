@@ -65,17 +65,7 @@ namespace Umbraco.Tests.TestHelpers
 
             InitializeMappers();
 
-            //register basic stuff that might need to be there for some container resolvers to work,  we can 
-            // add more to this in base classes in resolution freezing
-            Container.Register<ILogger>(factory => Logger);
-            Container.Register<CacheHelper>(factory => CacheHelper);
-            Container.Register<ProfilingLogger>(factory => ProfilingLogger);
-            var settings = SettingsForTests.GetDefault();
-            Container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault(), new PerContainerLifetime());
-            Container.Register<IContentSection>(factory => settings.Content, new PerContainerLifetime());
-            Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
-            Container.Register<IServiceProvider, ActivatorServiceProvider>();
-            Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            ConfigureContainer();
 
             FreezeResolution();
 
@@ -99,6 +89,21 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.Dispose();
 
+        }
+
+        protected virtual void ConfigureContainer()
+        {
+            //register basic stuff that might need to be there for some container resolvers to work,  we can 
+            // add more to this in base classes in resolution freezing
+            Container.Register<ILogger>(factory => Logger);
+            Container.Register<CacheHelper>(factory => CacheHelper);
+            Container.Register<ProfilingLogger>(factory => ProfilingLogger);
+            var settings = SettingsForTests.GetDefault();
+            Container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault(), new PerContainerLifetime());
+            Container.Register<IContentSection>(factory => settings.Content, new PerContainerLifetime());
+            Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
+            Container.Register<IServiceProvider, ActivatorServiceProvider>();
+            Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
         }
 
         private static readonly object Locker = new object();
