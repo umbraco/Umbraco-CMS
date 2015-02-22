@@ -315,9 +315,11 @@
     <Compile Include="Persistence\Factories\TaskFactory.cs" />
     <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
+    <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddPublicAccessTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveLanguageLocaleColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
+    <Compile Include="Persistence\Querying\QueryFactory.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
@@ -1133,9 +1135,6 @@
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="IO\ViewHelper.cs" />
-    <Compile Include="Standalone\ServiceContextManager.cs" />
-    <Compile Include="Standalone\StandaloneCoreApplication.cs" />
-    <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
     <Compile Include="Strategies\RelateOnCopyHandler.cs" />
     <Compile Include="Strategies\RelateOnTrashHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />

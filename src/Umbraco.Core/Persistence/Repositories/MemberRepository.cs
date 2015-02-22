@@ -19,6 +19,7 @@ using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -33,16 +34,16 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -531,12 +532,12 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             //get the group id
-            var grpQry = new Query<IMemberGroup>(SqlSyntax).Where(group => group.Name.Equals(roleName));
+            var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
 
             // get the members by username
-            var query = new Query<IMember>(SqlSyntax);
+            var query = QueryFactory.Create<IMember>();
             switch (matchType)
             {
                 case StringPropertyMatchType.Exact:
@@ -586,7 +587,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<IMember> GetByMemberGroup(string groupName)
         {
-            var grpQry = new Query<IMemberGroup>(SqlSyntax).Where(group => group.Name.Equals(groupName));
+            var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(groupName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
             

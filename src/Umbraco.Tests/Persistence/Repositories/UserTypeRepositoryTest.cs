@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private UserTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
+            return new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);            
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
                 var id = userType.Id;
 
-                using (var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+                using (var repository2 = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
                 {
                     repository2.Delete(userType);
                     unitOfWork.Commit();
@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUserType>(SqlSyntax).Where(x => x.Alias == "testUserType1");
+                var query = new Query<IUserType>(SqlSyntax, MappingResolver).Where(x => x.Alias == "testUserType1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUserType>(SqlSyntax).Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
+                var query = new Query<IUserType>(SqlSyntax, MappingResolver).Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
                 var result = repository.Count(query);
 
                 // Assert

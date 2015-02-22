@@ -76,7 +76,7 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName(),
                 Logger);
 
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
 
             _appContext = new ApplicationContext(
                 //assign the db context
@@ -102,6 +102,11 @@ namespace Umbraco.Tests.TestHelpers
                 //ensure the configuration matches the current version for tests
                 SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
             }
+        }
+
+        protected IMappingResolver MappingResolver
+        {
+            get { return Mock.Of<IMappingResolver>(); }
         }
 
         protected virtual ISqlSyntaxProvider SqlSyntax
@@ -209,9 +214,9 @@ namespace Umbraco.Tests.TestHelpers
                  () => PluginManager.Current.ResolvePropertyEditors(),
                  new ManifestBuilder(new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")))));
 
-            MappingResolver.Current = new MappingResolver(
-                Container, Logger,
-               () => PluginManager.Current.ResolveAssignedMapperTypes());
+            //MappingResolver.Current = new MappingResolver(
+            //    Container, Logger,
+            //   () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             if (PropertyValueConvertersResolver.HasCurrent == false)
                 PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -20,19 +20,25 @@ namespace Umbraco.Core.Persistence.Repositories
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
         /// <summary>
+        /// Returns the Query factory
+        /// </summary>
+        public QueryFactory QueryFactory { get; private set; }
+
+        /// <summary>
         /// Used to create a new query instance
         /// </summary>
         /// <returns></returns>
         public override Query<TEntity> Query
         {
-            get { return new Query<TEntity>(SqlSyntax); }
+            get { return QueryFactory.Create<TEntity>(); }
         } 
 
-        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger)
         {
             if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             SqlSyntax = sqlSyntax;
+            QueryFactory = new QueryFactory(SqlSyntax, mappingResolver);
         }
 
         /// <summary>

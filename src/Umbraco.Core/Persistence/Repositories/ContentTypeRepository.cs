@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -21,8 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _templateRepository = templateRepository;
         }

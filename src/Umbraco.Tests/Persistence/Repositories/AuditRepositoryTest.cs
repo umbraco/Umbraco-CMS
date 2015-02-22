@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
                 repo.AddOrUpdate(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
                 unitOfWork.Commit();

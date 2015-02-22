@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ServerRegistrationRepository CreateRepositor(IDatabaseUnitOfWork unitOfWork)
         {
-            return new ServerRegistrationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return new ServerRegistrationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepositor(unitOfWork))
             {
                 // Act
-                var query = new Query<ServerRegistration>(SqlSyntax).Where(x => x.ComputerName.ToUpper() == "COMPUTER3");
+                var query = new Query<ServerRegistration>(SqlSyntax, MappingResolver).Where(x => x.ComputerName.ToUpper() == "COMPUTER3");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepositor(unitOfWork))
             {
                 // Act
-                var query = new Query<ServerRegistration>(SqlSyntax).Where(x => x.ServerAddress.StartsWith("http://"));
+                var query = new Query<ServerRegistration>(SqlSyntax, MappingResolver).Where(x => x.ServerAddress.StartsWith("http://"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -246,7 +246,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = new ServerRegistrationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            using (var repository = new ServerRegistrationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver))
             {
                 repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
                 repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));

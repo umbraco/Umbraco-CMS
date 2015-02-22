@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
         }
 
 
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = new Query<IRelationType>(SqlSyntax).Where(x => x.Alias.StartsWith("relate"));
+                var query = new Query<IRelationType>(SqlSyntax, MappingResolver).Where(x => x.Alias.StartsWith("relate"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var childObjType = new Guid(Constants.ObjectTypes.DocumentType);
-                var query = new Query<IRelationType>(SqlSyntax).Where(x => x.ChildObjectType == childObjType);
+                var query = new Query<IRelationType>(SqlSyntax, MappingResolver).Where(x => x.ChildObjectType == childObjType);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
 
             repository.AddOrUpdate(relateContent);//Id 2
             repository.AddOrUpdate(relateContentType);//Id 3

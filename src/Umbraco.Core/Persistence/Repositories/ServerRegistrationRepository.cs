@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -15,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, ServerRegistration>
     {
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 

@@ -7,7 +7,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 

@@ -2,8 +2,9 @@ using Umbraco.Core.Configuration;
 using System;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -19,20 +20,23 @@ namespace Umbraco.Core.Persistence
         private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly CacheHelper _cacheHelper;
         private readonly IUmbracoSettingsSection _settings;
+        private readonly IMappingResolver _mappingResolver;
 
         #region Ctors
 
-        public RepositoryFactory(CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUmbracoSettingsSection settings)
+        public RepositoryFactory(CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUmbracoSettingsSection settings, IMappingResolver mappingResolver)
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             if (logger == null) throw new ArgumentNullException("logger");
-            //if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
+            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             if (settings == null) throw new ArgumentNullException("settings");
+            if (mappingResolver == null) throw new ArgumentNullException("mappingResolver");
 
             _cacheHelper = cacheHelper;
             _logger = logger;
             _sqlSyntax = sqlSyntax;
             _settings = settings;
+            _mappingResolver = mappingResolver;
         }
 
         #endregion
@@ -46,19 +50,19 @@ namespace Umbraco.Core.Persistence
         {
             return new TaskRepository(uow, 
                 CacheHelper.CreateDisabledCacheHelper(), //never cache
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
         {
-            return new AuditRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+            return new AuditRepository(uow, _cacheHelper, _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual ITagRepository CreateTagRepository(IDatabaseUnitOfWork uow)
         {
             return new TagRepository(
                 uow,
-                _cacheHelper, _logger, _sqlSyntax);
+                _cacheHelper, _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
@@ -70,7 +74,8 @@ namespace Umbraco.Core.Persistence
                 _sqlSyntax,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
-                CreateTagRepository(uow))
+                CreateTagRepository(uow),
+                _mappingResolver)
             {
                 EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming
             };
@@ -82,7 +87,8 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _cacheHelper,
                 _logger, _sqlSyntax,
-                CreateTemplateRepository(uow));
+                CreateTemplateRepository(uow),
+                _mappingResolver);
         }
 
         public virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IDatabaseUnitOfWork uow)
@@ -92,7 +98,8 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,                
                 _cacheHelper,
                 _logger, _sqlSyntax,
-                CreateContentTypeRepository(uow));
+                CreateContentTypeRepository(uow),
+                _mappingResolver);
         }
 
         public virtual IDictionaryRepository CreateDictionaryRepository(IDatabaseUnitOfWork uow)
@@ -102,7 +109,8 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger,
                 _sqlSyntax,
-                CreateLanguageRepository(uow));
+                CreateLanguageRepository(uow),
+                _mappingResolver);
         }
 
         public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
@@ -110,7 +118,8 @@ namespace Umbraco.Core.Persistence
             return new LanguageRepository(
                 uow,
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
@@ -120,7 +129,8 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger, _sqlSyntax,
                 CreateMediaTypeRepository(uow),
-                CreateTagRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateTagRepository(uow),
+                _mappingResolver) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -128,7 +138,8 @@ namespace Umbraco.Core.Persistence
             return new MediaTypeRepository(
                 uow,
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
@@ -137,7 +148,8 @@ namespace Umbraco.Core.Persistence
                 uow,
                 CacheHelper.CreateDisabledCacheHelper(), //never cache
                 _logger, _sqlSyntax,
-                CreateRelationTypeRepository(uow));
+                CreateRelationTypeRepository(uow),
+                _mappingResolver);
         }
 
         public virtual IRelationTypeRepository CreateRelationTypeRepository(IDatabaseUnitOfWork uow)
@@ -145,7 +157,8 @@ namespace Umbraco.Core.Persistence
             return new RelationTypeRepository(
                 uow,
                 CacheHelper.CreateDisabledCacheHelper(), //never cache
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IScriptRepository CreateScriptRepository(IUnitOfWork uow)
@@ -175,7 +188,8 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax,
                 new PhysicalFileSystem(SystemDirectories.Masterpages),
                 new PhysicalFileSystem(SystemDirectories.MvcViews),
-                _settings.Templates);
+                _settings.Templates,
+                _mappingResolver);
         }
 
         internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
@@ -183,7 +197,8 @@ namespace Umbraco.Core.Persistence
             return new ServerRegistrationRepository(
                 uow,
                 CacheHelper.CreateDisabledCacheHelper(), //never cache
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
@@ -192,7 +207,8 @@ namespace Umbraco.Core.Persistence
                 uow,
                 //There's not many user types but we query on users all the time so the result needs to be cached
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
@@ -202,14 +218,16 @@ namespace Umbraco.Core.Persistence
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
                 _logger, _sqlSyntax,
-                CreateUserTypeRepository(uow));
+                CreateUserTypeRepository(uow),
+                _mappingResolver);
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)
         {
             return new MacroRepository(uow,
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
@@ -220,14 +238,16 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax,
                 CreateMemberTypeRepository(uow),
                 CreateMemberGroupRepository(uow),
-                CreateTagRepository(uow));
+                CreateTagRepository(uow),
+                _mappingResolver);
         }
 
         public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new MemberTypeRepository(uow,
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
 
         public virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
@@ -235,24 +255,26 @@ namespace Umbraco.Core.Persistence
             return new MemberGroupRepository(uow,
                 _cacheHelper,
                 _logger, _sqlSyntax,
-                _cacheHelper);
+                _cacheHelper,
+                _mappingResolver);
         }
 
         public virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
         {
-            return new EntityRepository(uow, _sqlSyntax);
+            return new EntityRepository(uow, _sqlSyntax, _mappingResolver);
         }
 
         public IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
         {
-            return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax, CreateContentRepository(uow), CreateLanguageRepository(uow));
+            return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax, CreateContentRepository(uow), CreateLanguageRepository(uow), _mappingResolver);
         }
 
         public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new TaskTypeRepository(uow, 
                 CacheHelper.CreateDisabledCacheHelper(), //never cache
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax,
+                _mappingResolver);
         }
     }
 }

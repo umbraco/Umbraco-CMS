@@ -8,7 +8,7 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal class MappingResolver : ContainerLazyManyObjectsResolver<MappingResolver, BaseMapper>
+    internal class MappingResolver : ContainerLazyManyObjectsResolver<MappingResolver, BaseMapper>, IMappingResolver
     {
         /// <summary>
         /// Constructor accepting a list of BaseMapper types that are attributed with the MapperFor attribute
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Mappers
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal BaseMapper ResolveMapperByType(Type type)
+        public BaseMapper ResolveMapperByType(Type type)
         {
             return _mapperCache.GetOrAdd(type, type1 =>
                 {

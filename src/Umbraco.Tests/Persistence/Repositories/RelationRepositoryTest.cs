@@ -30,8 +30,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out RelationTypeRepository relationTypeRepository)
         {
-            relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, relationTypeRepository);
+            relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            var repository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, relationTypeRepository, MappingResolver);
             return repository;
         }
 
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = new Query<IRelation>(SqlSyntax).Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
+                var query = new Query<IRelation>(SqlSyntax, MappingResolver).Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
                 int count = repository.Count(query);
 
                 // Assert
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 
                 // Act
-                var query = new Query<IRelation>(SqlSyntax).Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
+                var query = new Query<IRelation>(SqlSyntax, MappingResolver).Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
                 var relations = repository.GetByQuery(query);
 
                 // Assert
@@ -265,8 +265,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, relationTypeRepository);
+            var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, relationTypeRepository, MappingResolver);
 
             relationTypeRepository.AddOrUpdate(relateContent);
             relationTypeRepository.AddOrUpdate(relateContentType);

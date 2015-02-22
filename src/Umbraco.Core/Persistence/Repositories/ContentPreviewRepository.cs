@@ -4,7 +4,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentPreviewRepository<TContent> : PetaPocoRepositoryBase<int, ContentPreviewEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentPreviewRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public ContentPreviewRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 

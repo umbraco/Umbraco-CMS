@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -17,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MacroRepository : PetaPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
 
-        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        public MacroRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 

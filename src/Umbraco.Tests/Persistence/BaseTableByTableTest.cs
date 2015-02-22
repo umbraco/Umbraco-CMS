@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Persistence
                 new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, _logger),
                 _logger, SqlSyntaxProvider, "System.Data.SqlServerCe.4.0");
 
-            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings(), Mock.Of<IMappingResolver>());
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context

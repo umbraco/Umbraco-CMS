@@ -35,10 +35,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
-            memberTypeRepository = new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            memberGroupRepository = new MemberGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, CacheHelper.CreateDisabledCacheHelper());
-            var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new MemberRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, memberTypeRepository, memberGroupRepository, tagRepo);
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, CacheHelper.CreateDisabledCacheHelper(), MappingResolver);
+            var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            var repository = new MemberRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, memberTypeRepository, memberGroupRepository, tagRepo, MappingResolver);
             return repository;
         }
 
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var member = CreateTestMember(key: key);
 
                 // Act
-                var query = new Query<IMember>(SqlSyntax).Where(x => x.Key == key);
+                var query = new Query<IMember>(SqlSyntax, MappingResolver).Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -318,7 +318,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Correct_Subquery()
         {
-            var query = new Query<IMember>(SqlSyntax).Where(x =>
+            var query = new Query<IMember>(SqlSyntax, MappingResolver).Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 

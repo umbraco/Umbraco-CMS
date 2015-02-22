@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
@@ -13,11 +15,13 @@ namespace Umbraco.Core.Persistence.Querying
     public class Query<T> : IQuery<T>
     {
         private readonly ISqlSyntaxProvider _sqlSyntax;
+        private readonly IMappingResolver _mappingResolver;
         private readonly List<Tuple<string, object[]>> _wheres = new List<Tuple<string, object[]>>();
 
-        public Query(ISqlSyntaxProvider sqlSyntax)
+        public Query(ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
         {
             _sqlSyntax = sqlSyntax;
+            _mappingResolver = mappingResolver;
         }
 
         /// <summary>
@@ -29,7 +33,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (predicate != null)
             {
-                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax);
+                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax, _mappingResolver);
                 string whereExpression = expressionHelper.Visit(predicate);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));
@@ -46,10 +50,5 @@ namespace Umbraco.Core.Persistence.Querying
             return _wheres;
         }
 
-        [Obsolete("This is no longer used, use the GetWhereClauses method which includes the SQL parameters")]
-        public List<string> WhereClauses()
-        {
-            return _wheres.Select(x => x.Item1).ToList();
-        }
     }
 }

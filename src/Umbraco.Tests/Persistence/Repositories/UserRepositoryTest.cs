@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, userTypeRepository);
+            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, userTypeRepository, MappingResolver);
             return repository;
         }
 
@@ -175,8 +175,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
                 var id = user.Id;
 
-                using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo))
+                using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
+                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo, MappingResolver))
                 {
                     repository2.Delete(user);
                     unitOfWork.Commit();
@@ -252,7 +252,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUser>(SqlSyntax).Where(x => x.Username == "TestUser1");
+                var query = new Query<IUser>(SqlSyntax, MappingResolver).Where(x => x.Username == "TestUser1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -333,7 +333,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var query = new Query<IUser>(SqlSyntax).Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var query = new Query<IUser>(SqlSyntax, MappingResolver).Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 var result = repository.Count(query);
 
                 // Assert
@@ -483,8 +483,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo))
+            using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
+            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo, MappingResolver))
             { 
 
                 // Act
@@ -534,7 +534,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
             {
                 var userType = MockedUserType.CreateUserType();
                 repository.AddOrUpdate(userType);

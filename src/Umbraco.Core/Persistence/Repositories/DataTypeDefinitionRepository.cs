@@ -11,6 +11,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -28,12 +29,12 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly DataTypePreValueRepository _preValRepository;
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
-            IContentTypeRepository contentTypeRepository)
-            : base(work, cache, logger, sqlSyntax)
+            IContentTypeRepository contentTypeRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -81,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public override void Delete(IDataTypeDefinition entity)
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-            var query = new Query<PropertyType>(SqlSyntax).Where(x => x.DataTypeDefinitionId == entity.Id);
+            var query = QueryFactory.Create<PropertyType>().Where(x => x.DataTypeDefinitionId == entity.Id);
 
             //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
@@ -429,8 +430,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
             }
 

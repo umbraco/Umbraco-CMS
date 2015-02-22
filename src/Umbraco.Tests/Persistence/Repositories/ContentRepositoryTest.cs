@@ -41,10 +41,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository);
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, templateRepository, MappingResolver);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, MappingResolver);
             return repository;
         }
 
@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -443,7 +443,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 int totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending);
 
@@ -464,7 +464,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 int totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
 
@@ -485,7 +485,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 int totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending);
 
@@ -506,7 +506,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 int totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending);
 
@@ -527,7 +527,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 int totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page 2");
 
@@ -548,7 +548,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == 2);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
                 int totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page");
 
@@ -629,7 +629,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 int level = 2;
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Level == level);
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == level);
                 var result = repository.Count(query);
 
                 // Assert
@@ -668,7 +668,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var query = new Query<IContent>(SqlSyntax).Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+                var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
                 var content = repository.GetByQuery(query).SingleOrDefault();
 
                 // Assert

@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -27,11 +28,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IDatabaseUnitOfWork _work;
         private readonly ISqlSyntaxProvider _sqlSyntax;
+        private readonly QueryFactory _queryFactory;
 
-        public EntityRepository(IDatabaseUnitOfWork work, ISqlSyntaxProvider sqlSyntax)
+        public EntityRepository(IDatabaseUnitOfWork work, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
         {
             _work = work;
             _sqlSyntax = sqlSyntax;
+            _queryFactory = new QueryFactory(_sqlSyntax, mappingResolver);
         }
 
         /// <summary>
@@ -54,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public Query<IUmbracoEntity> Query
         {
-            get { return new Query<IUmbracoEntity>(_sqlSyntax); }
+            get { return _queryFactory.Create<IUmbracoEntity>(); }
         }
 
         public IUmbracoEntity GetByKey(Guid key)

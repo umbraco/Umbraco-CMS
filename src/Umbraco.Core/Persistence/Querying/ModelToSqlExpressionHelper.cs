@@ -15,10 +15,10 @@ namespace Umbraco.Core.Persistence.Querying
     {
         private readonly BaseMapper _mapper;
 
-        public ModelToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntax)
+        public ModelToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(sqlSyntax)
         {
-            _mapper = MappingResolver.Current.ResolveMapperByType(typeof(T));
+            _mapper = mappingResolver.ResolveMapperByType(typeof(T));
         }
 
         protected override string VisitMemberAccess(MemberExpression m)

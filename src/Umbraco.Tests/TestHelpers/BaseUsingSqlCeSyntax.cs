@@ -20,6 +20,12 @@ namespace Umbraco.Tests.TestHelpers
             get { return _sqlSyntax ?? (_sqlSyntax = new SqlCeSyntaxProvider()); }
         }
 
+        private IMappingResolver _mappingResolver;
+        protected IMappingResolver MappingResolver
+        {
+            get { return _mappingResolver ?? (_mappingResolver = Mock.Of<IMappingResolver>()); }
+        }
+
         [SetUp]
         public virtual void Initialize()
         {
@@ -33,9 +39,10 @@ namespace Umbraco.Tests.TestHelpers
             PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
                 logger,
                 false);
-            MappingResolver.Current = new MappingResolver(
-                container, logger.Logger,
-                () => PluginManager.Current.ResolveAssignedMapperTypes());
+
+            //MappingResolver.Current = new MappingResolver(
+            //    container, logger.Logger,
+            //    () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             Resolution.Freeze();
             SetUp();
@@ -47,7 +54,7 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
-            MappingResolver.Reset();
+            //MappingResolver.Reset();
             PluginManager.Current = null;
         }
     }

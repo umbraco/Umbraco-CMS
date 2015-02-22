@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -18,9 +19,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        private readonly IMappingResolver _mappingResolver;
+
+        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
+            _mappingResolver = mappingResolver;
         }
 
         #region Overrides of RepositoryBase<int,Language>
@@ -155,13 +159,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            var cultureNameRepo = new LanguageByCultureNameRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
+            var cultureNameRepo = new LanguageByCultureNameRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver);
             return cultureNameRepo.Get(cultureName);
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            var isoRepo = new LanguageByIsoCodeRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
+            var isoRepo = new LanguageByIsoCodeRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver);
             return isoRepo.Get(isoCode);
         }
 
@@ -172,8 +176,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly LanguageRepository _languageRepository;
 
-            public LanguageByIsoCodeRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public LanguageByIsoCodeRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _languageRepository = languageRepository;
             }
@@ -212,8 +216,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly LanguageRepository _languageRepository;
 
-            public LanguageByCultureNameRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public LanguageByCultureNameRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _languageRepository = languageRepository;
             }

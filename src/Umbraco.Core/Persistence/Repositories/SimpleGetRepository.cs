@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TDto: class
     {
 
-        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        protected SimpleGetRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 

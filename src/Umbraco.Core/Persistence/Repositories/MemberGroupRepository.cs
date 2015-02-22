@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -22,8 +23,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly CacheHelper _cacheHelper;
 
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, CacheHelper cacheHelper)
-            : base(work, cache, logger, sqlSyntax)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, CacheHelper cacheHelper, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _cacheHelper = cacheHelper;
@@ -139,7 +140,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
                 () =>
                 {
-                    var qry = new Query<IMemberGroup>(SqlSyntax).Where(group => group.Name.Equals(name));
+                    var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(name));
                     var result = GetByQuery(qry);
                     return result.FirstOrDefault();
                 },
@@ -153,7 +154,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var transaction = Database.GetTransaction())
             {
-                var qry = new Query<IMemberGroup>(SqlSyntax).Where(group => group.Name.Equals(roleName));
+                var qry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
                 var result = GetByQuery(qry);
 
                 if (result.Any()) return null;

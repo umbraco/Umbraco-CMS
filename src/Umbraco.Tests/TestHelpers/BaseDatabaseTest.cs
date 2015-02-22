@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.TestHelpers
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
             var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SyntaxProvider, SettingsForTests.GenerateMockSettings(), Mock.Of<IMappingResolver>());
             var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger);
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context

@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -24,8 +25,8 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IAggregateRoot
     {
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
         }
 

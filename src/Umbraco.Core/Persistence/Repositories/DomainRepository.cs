@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -17,12 +18,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentRepository _contentRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IMappingResolver _mappingResolver;
 
-        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentRepository contentRepository, ILanguageRepository languageRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public DomainRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentRepository contentRepository, ILanguageRepository languageRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _contentRepository = contentRepository;
             _languageRepository = languageRepository;
+            _mappingResolver = mappingResolver;
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IDomain PerformGet(int id)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 return factory.BuildDomainEntity(repo.Get(id), _contentRepository, _languageRepository);
@@ -49,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IDomain> PerformGetAll(params int[] ids)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 return factory.BuildDomainEntities(repo.GetAll(ids).ToArray(), _contentRepository, _languageRepository);
@@ -75,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(IDomain entity)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 repo.PersistDeletedItem(factory.BuildEntity(entity));
@@ -94,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IDomain entity)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 var cacheableEntity = factory.BuildEntity(entity);
@@ -107,7 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IDomain entity)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 repo.PersistUpdatedItem(factory.BuildEntity(entity));
@@ -117,7 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public bool Exists(string domainName)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var query = repo.Query.Where(x => x.DomainName.InvariantEquals(domainName));
                 return repo.GetByQuery(query).Any();
@@ -126,7 +129,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 return factory.BuildDomainEntities(repo.GetAll().ToArray(), _contentRepository, _languageRepository)
@@ -136,7 +139,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
 
@@ -176,8 +179,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly DomainRepository _domainRepo;
 
-            public CachedDomainRepository(DomainRepository domainRepo, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public CachedDomainRepository(DomainRepository domainRepo, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _domainRepo = domainRepo;
             }

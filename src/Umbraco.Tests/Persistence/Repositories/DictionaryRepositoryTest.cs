@@ -29,8 +29,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DictionaryRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out LanguageRepository languageRepository)
         {
-            languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var dictionaryRepository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), languageRepository);
+            languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            var dictionaryRepository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), languageRepository, MappingResolver);
             return dictionaryRepository;
         }
 
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = new Query<IDictionaryItem>(SqlSyntax).Where(x => x.ItemKey == "Article");
+                var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey == "Article");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = new Query<IDictionaryItem>(SqlSyntax).Where(x => x.ItemKey.StartsWith("Read"));
+                var query = new Query<IDictionaryItem>(SqlSyntax, MappingResolver).Where(x => x.ItemKey.StartsWith("Read"));
                 var result = repository.Count(query);
 
                 // Assert
@@ -341,8 +341,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), languageRepository);
+            var languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
+            var repository = new DictionaryRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), languageRepository, MappingResolver);
 
             var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNo);

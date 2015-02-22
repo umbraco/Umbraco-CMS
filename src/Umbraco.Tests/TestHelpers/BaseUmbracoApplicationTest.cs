@@ -26,6 +26,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Persistence.Mappers;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
 namespace Umbraco.Tests.TestHelpers
@@ -174,7 +175,7 @@ namespace Umbraco.Tests.TestHelpers
         {
 
             var sqlSyntax = new SqlCeSyntaxProvider();
-            var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
+            var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings(), Mock.Of<IMappingResolver>());
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context

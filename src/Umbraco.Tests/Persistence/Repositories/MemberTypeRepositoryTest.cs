@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
+            return new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);            
         }
 
         [Test]

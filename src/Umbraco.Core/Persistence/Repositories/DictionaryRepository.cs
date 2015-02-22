@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -20,12 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
         private readonly ILanguageRepository _languageRepository;
+        private readonly IMappingResolver _mappingResolver;
 
-        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax, ILanguageRepository languageRepository)
-            : base(work, cache, logger, syntax)
-		{
-		    _languageRepository = languageRepository;
-		}
+        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax, ILanguageRepository languageRepository, IMappingResolver mappingResolver)
+            : base(work, cache, logger, syntax, mappingResolver)
+        {
+            _languageRepository = languageRepository;
+            _mappingResolver = mappingResolver;
+        }
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
 
@@ -224,7 +227,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 return uniqueIdRepo.Get(uniqueId);    
             }
@@ -232,7 +235,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDictionaryItem Get(string key)
         {
-            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 return keyRepo.Get(key);    
             }
@@ -242,8 +245,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _dictionaryRepository = dictionaryRepository;
             }
@@ -283,8 +286,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _dictionaryRepository = dictionaryRepository;
             }
