@@ -14,80 +14,78 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
     public class CreateBuilder : ICreateBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly DatabaseProviders[] _databaseProviders;
 
-        public CreateBuilder(IMigrationContext context, ISqlSyntaxProvider sqlSyntax, params DatabaseProviders[] databaseProviders)
+        public CreateBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
         {
             _context = context;
-            _sqlSyntax = sqlSyntax;
             _databaseProviders = databaseProviders;
-        }
-
-        [Obsolete("Use alternate ctor specifying ISqlSyntaxProvider instead")]
-        public CreateBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
-            :this(context, SqlSyntaxContext.SqlSyntaxProvider, databaseProviders)
-        {
         }
 
         public ICreateTableWithColumnSyntax Table(string tableName)
         {
-            var expression = new CreateTableExpression { TableName = tableName };
+            var expression = new CreateTableExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, _databaseProviders)
+            {
+                TableName = tableName
+            };
             _context.Expressions.Add(expression);
             return new CreateTableBuilder(expression, _context);
         }
 
         public ICreateColumnOnTableSyntax Column(string columnName)
         {
-            var expression = _databaseProviders == null 
-                ? new CreateColumnExpression { Column = { Name = columnName } }
-                : new CreateColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders) { Column = { Name = columnName } };
+            var expression = new CreateColumnExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, _databaseProviders)
+            {
+                Column = { Name = columnName }
+            };
             _context.Expressions.Add(expression);
             return new CreateColumnBuilder(expression, _context);
         }
 
         public ICreateForeignKeyFromTableSyntax ForeignKey()
         {
-            var expression = _databaseProviders == null 
-                ? new CreateForeignKeyExpression()
-                : new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders);
+            var expression = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, _databaseProviders);
             _context.Expressions.Add(expression);
             return new CreateForeignKeyBuilder(expression);
         }
 
         public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName)
         {
-            var expression = _databaseProviders == null 
-                ? new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } }
-                : new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders) { ForeignKey = { Name = foreignKeyName } };
+            var expression = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, _databaseProviders)
+            {
+                ForeignKey = { Name = foreignKeyName }
+            };
             _context.Expressions.Add(expression);
             return new CreateForeignKeyBuilder(expression);
         }
 
         public ICreateIndexForTableSyntax Index()
         {
-            var expression = new CreateIndexExpression(_sqlSyntax);
+            var expression = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, _databaseProviders);
             _context.Expressions.Add(expression);
             return new CreateIndexBuilder(expression);
         }
 
         public ICreateIndexForTableSyntax Index(string indexName)
         {
-            var expression = new CreateIndexExpression(_sqlSyntax) { Index = { Name = indexName } };
+            var expression = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, _databaseProviders)
+            {
+                Index = { Name = indexName }
+            };
             _context.Expressions.Add(expression);
             return new CreateIndexBuilder(expression);
         }
 
         public ICreateConstraintOnTableSyntax PrimaryKey()
         {
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.PrimaryKey, _databaseProviders);
             _context.Expressions.Add(expression);
             return new CreateConstraintBuilder(expression);
         }
 
         public ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
         {
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.PrimaryKey, _databaseProviders);
             expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
             return new CreateConstraintBuilder(expression);
@@ -95,14 +93,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         public ICreateConstraintOnTableSyntax UniqueConstraint()
         {
-            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.Unique, _databaseProviders);
             _context.Expressions.Add(expression);
             return new CreateConstraintBuilder(expression);
         }
 
         public ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName)
         {
-            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.Unique, _databaseProviders);
             expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
             return new CreateConstraintBuilder(expression);
@@ -110,7 +108,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         public ICreateConstraintOnTableSyntax Constraint(string constraintName)
         {
-            var expression = new CreateConstraintExpression(ConstraintType.NonUnique);
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.NonUnique, _databaseProviders);
             expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
             return new CreateConstraintBuilder(expression);

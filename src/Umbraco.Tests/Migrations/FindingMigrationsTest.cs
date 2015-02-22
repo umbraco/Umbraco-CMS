@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -20,7 +21,8 @@ namespace Umbraco.Tests.Migrations
         public void Initialize()
         {
             MigrationResolver.Current = new MigrationResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                new ServiceContainer(), 
+                Mock.Of<ILogger>(),
                 () => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),
@@ -31,16 +33,6 @@ namespace Umbraco.Tests.Migrations
                     typeof (FiveZeroMigration)                   
 				});
 
-            //This is needed because the PluginManager is creating the migration instances with their default ctors
-            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
-            {
-                CanResolveBeforeFrozen = true
-            };
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-			Resolution.Freeze();
-
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
         }
 
         [Test]
@@ -64,7 +56,7 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;

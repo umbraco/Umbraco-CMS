@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsPrimaryKey = true;
 
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.PrimaryKey)
             {
                 Constraint =
                 {
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
 
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+            var expression = new CreateConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider, ConstraintType.PrimaryKey)
             {
                 Constraint =
                 {
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression
+            var fk = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              ForeignKey = new ForeignKeyDefinition
                                               {
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         public ICreateTableColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                             string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression
+            var fk = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              ForeignKey = new ForeignKeyDefinition
                                               {

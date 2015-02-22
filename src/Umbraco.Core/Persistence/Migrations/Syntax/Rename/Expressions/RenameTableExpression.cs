@@ -4,12 +4,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {
     public class RenameTableExpression : MigrationExpressionBase
     {
-        public RenameTableExpression()
-        {
-        }
-
-        public RenameTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
+        public RenameTableExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 
@@ -21,8 +17,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
         {
             if (IsExpressionSupported() == false)
                 return string.Empty;
-            
-            return SqlSyntaxContext.SqlSyntaxProvider.FormatTableRename(OldName, NewName);
+
+            return SqlSyntax.FormatTableRename(OldName, NewName);
         }
     }
 }

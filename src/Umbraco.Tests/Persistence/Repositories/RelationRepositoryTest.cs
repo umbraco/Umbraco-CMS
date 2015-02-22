@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<IRelation>.Builder.Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
+                var query = new Query<IRelation>(SqlSyntax).Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
                 int count = repository.Count(query);
 
                 // Assert
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 
                 // Act
-                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
+                var query = new Query<IRelation>(SqlSyntax).Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
                 var relations = repository.GetByQuery(query);
 
                 // Assert

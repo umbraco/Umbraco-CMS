@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert
 
         public IInsertDataSyntax IntoTable(string tableName)
         {
-            var expression = new InsertDataExpression { TableName = tableName };
+            var expression = new InsertDataExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider) { TableName = tableName };
             _context.Expressions.Add(expression);
             return new InsertDataBuilder(expression);
         }

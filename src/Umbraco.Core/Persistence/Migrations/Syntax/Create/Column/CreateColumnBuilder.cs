@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Column
         {
             Expression.Column.IsIndexed = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Column
         {
             Expression.Column.IsUnique = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -147,7 +147,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Column
         {
             Expression.Column.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression
+            var fk = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              ForeignKey = new ForeignKeyDefinition
                                               {
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Column
         public ICreateColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                        string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression
+            var fk = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              ForeignKey = new ForeignKeyDefinition
                                               {

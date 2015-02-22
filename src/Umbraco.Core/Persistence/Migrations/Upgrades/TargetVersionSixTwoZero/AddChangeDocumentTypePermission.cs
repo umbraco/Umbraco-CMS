@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
@@ -8,6 +10,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class AddChangeDocumentTypePermission : MigrationBase
     {
+        public AddChangeDocumentTypePermission(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             Execute.Code(AddChangeDocumentTypePermissionDo);
@@ -21,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         private static string AddChangeDocumentTypePermissionDo(Database database)
         {
             var adminUserType = database.Fetch<UserTypeDto>("WHERE Id = 1").FirstOrDefault();
-            
+
             if (adminUserType != null)
             {
                 if (adminUserType.DefaultPermissions.Contains("7") == false)
@@ -37,7 +44,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
         private static string UndoChangeDocumentTypePermissionDo(Database database)
         {
             var adminUserType = database.Fetch<UserTypeDto>("WHERE Id = 1").FirstOrDefault();
-            
+
             if (adminUserType != null)
             {
                 if (adminUserType.DefaultPermissions.Contains("7"))

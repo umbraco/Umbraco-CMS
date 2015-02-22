@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Persistence
             var schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
             //Create the umbraco database
-            schemaHelper.CreateDatabaseSchema(false, new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()));
+            schemaHelper.CreateDatabaseSchema();
 
             bool umbracoNodeTable = schemaHelper.TableExist("umbracoNode");
             bool umbracoUserTable = schemaHelper.TableExist("umbracoUser");

@@ -5,11 +5,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {
-        public UpdateDataExpression()
-        {
-        }
-
-        public UpdateDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public UpdateDataExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 
@@ -31,8 +28,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
             foreach (var item in Set)
             {
                 updateItems.Add(string.Format("{0} = {1}",
-                                              SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
-                                              SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                              SqlSyntax.GetQuotedColumnName(item.Key),
+                                              SqlSyntax.GetQuotedValue(item.Value.ToString())));
             }
 
             if (IsAllRows)
@@ -44,14 +41,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
                 foreach (var item in Where)
                 {
                     whereClauses.Add(string.Format("{0} {1} {2}",
-                                                   SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
+                                                   SqlSyntax.GetQuotedColumnName(item.Key),
                                                    item.Value == null ? "IS" : "=",
-                                                   SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                                   SqlSyntax.GetQuotedValue(item.Value.ToString())));
                 }
             }
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.UpdateData,
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                 string.Join(", ", updateItems.ToArray()), 
+            return string.Format(SqlSyntax.UpdateData,
+                                 SqlSyntax.GetQuotedTableName(TableName),
+                                 string.Join(", ", updateItems.ToArray()),
                                  string.Join(" AND ", whereClauses.ToArray()));
         }
     }

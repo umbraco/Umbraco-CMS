@@ -345,7 +345,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Key == key);
+                var query = repository.Query.Where(x => x.Key == key);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }
@@ -360,7 +360,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var query = repository.Query.Where(x => x.ContentTypeId == id);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -371,7 +371,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var query = repository.Query.Where(x => x.ContentTypeId == id);
                 var contents = repository.GetByPublishedVersion(query);
 
                 return contents;
@@ -387,7 +387,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Level == level && !x.Path.StartsWith(Constants.System.RecycleBinContent.ToInvariantString()));
+                var query = repository.Query.Where(x => x.Level == level && !x.Path.StartsWith(Constants.System.RecycleBinContent.ToInvariantString()));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -459,7 +459,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
 
                 return contents;
@@ -485,7 +485,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
 
-                var query = Query<IContent>.Builder;
+                var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -515,7 +515,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
 
-                var query = Query<IContent>.Builder;
+                var query = repository.Query;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -537,7 +537,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == parentId && x.Name.Contains(name));
+                var query = repository.Query.Where(x => x.ParentId == parentId && x.Name.Contains(name));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -569,7 +569,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
                 var pathMatch = content.Path + ",";
-                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != content.Id);
+                var query = repository.Query.Where(x => x.Path.StartsWith(pathMatch) && x.Id != content.Id);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -619,7 +619,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == Constants.System.Root);
+                var query = repository.Query.Where(x => x.ParentId == Constants.System.Root);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -634,7 +634,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
+                var query = repository.Query.Where(x => x.Trashed == false);
                 return repository.GetByPublishedVersion(query);
             }
         }
@@ -647,7 +647,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
+                var query = repository.Query.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -662,7 +662,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+                var query = repository.Query.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -677,7 +677,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
+                var query = repository.Query.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -698,7 +698,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var count = repository.Count(query);
                 return count;
             }
@@ -713,7 +713,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Published == true && x.Id == id && x.Trashed == false);
+                var query = repository.Query.Where(x => x.Published == true && x.Id == id && x.Trashed == false);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -958,7 +958,7 @@ namespace Umbraco.Core.Services
                 {
                     var repository = RepositoryFactory.CreateContentRepository(uow);
                     //NOTE What about content that has the contenttype as part of its composition?
-                    var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
+                    var query = repository.Query.Where(x => x.ContentTypeId == contentTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
 
                     if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
@@ -968,7 +968,7 @@ namespace Umbraco.Core.Services
                     {
                         //Look for children of current content and move that to trash before the current content is deleted
                         var c = content;
-                        var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
+                        var childQuery = repository.Query.Where(x => x.Path.StartsWith(c.Path));
                         var children = repository.GetByQuery(childQuery);
 
                         foreach (var child in children)
@@ -1478,7 +1478,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Trashed == false);
+                var query = repository.Query.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Trashed == false);
                 var contents = repository.GetByPublishedVersion(query);
 
                 return contents;
@@ -1622,7 +1622,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Consider creating a Path query instead of recursive method:
-                //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
+                //var query = repository.Query.Where(x => x.Path.StartsWith(content.Path));
 
                 var updated = new List<IContent>();
                 var list = new List<IContent>();
@@ -1911,7 +1911,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
+                var query = repository.Query.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query);
 
                 if (types.Any() == false)

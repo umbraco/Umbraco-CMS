@@ -15,9 +15,11 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update
 
         public IUpdateSetSyntax Table(string tableName)
         {
-            var expression = _databaseProviders == null 
-                ? new UpdateDataExpression { TableName = tableName }
-                : new UpdateDataExpression(_context.CurrentDatabaseProvider, _databaseProviders) { TableName = tableName };
+            var expression = new UpdateDataExpression(
+                _context.SqlSyntax,
+                _context.CurrentDatabaseProvider,
+                _databaseProviders) {TableName = tableName};
+
             _context.Expressions.Add(expression);
             return new UpdateDataBuilder(expression, _context);
         }

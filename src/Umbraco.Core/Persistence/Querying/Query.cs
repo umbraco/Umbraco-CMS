@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -11,14 +12,12 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     public class Query<T> : IQuery<T>
     {
+        private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly List<Tuple<string, object[]>> _wheres = new List<Tuple<string, object[]>>();
 
-        /// <summary>
-        /// Helper method to be used instead of manually creating an instance
-        /// </summary>
-        public static IQuery<T> Builder
+        public Query(ISqlSyntaxProvider sqlSyntax)
         {
-            get { return new Query<T>(); }
+            _sqlSyntax = sqlSyntax;
         }
 
         /// <summary>
@@ -30,7 +29,7 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (predicate != null)
             {
-                var expressionHelper = new ModelToSqlExpressionHelper<T>();
+                var expressionHelper = new ModelToSqlExpressionHelper<T>(_sqlSyntax);
                 string whereExpression = expressionHelper.Visit(predicate);
 
                 _wheres.Add(new Tuple<string, object[]>(whereExpression, expressionHelper.GetSqlParameters()));

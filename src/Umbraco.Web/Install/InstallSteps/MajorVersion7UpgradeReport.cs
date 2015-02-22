@@ -81,16 +81,18 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var errorReport = new List<string>();
 
+            var sqlSyntax = _applicationContext.DatabaseContext.SqlSyntax;
+
             var sql = new Sql();
             sql
                 .Select(
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumn("cmsDataType", "controlId"),
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumn("umbracoNode", "text"))
-                .From(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))
-                .InnerJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))
+                    sqlSyntax.GetQuotedColumn("cmsDataType", "controlId"),
+                    sqlSyntax.GetQuotedColumn("umbracoNode", "text"))
+                .From(sqlSyntax.GetQuotedTableName("cmsDataType"))
+                .InnerJoin(sqlSyntax.GetQuotedTableName("umbracoNode"))
                 .On(
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumn("umbracoNode", "id"));
+                    sqlSyntax.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
+                    sqlSyntax.GetQuotedColumn("umbracoNode", "id"));
 
             var list = _applicationContext.DatabaseContext.Database.Fetch<dynamic>(sql);
             foreach (var item in list)

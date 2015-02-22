@@ -37,41 +37,13 @@ namespace Umbraco.Core.Persistence
 
         /// <summary>
         /// Creates the Umbraco db schema in the Database of the current Database.
-        /// Safe method that is only able to create the schema in non-configured
-        /// umbraco instances.
         /// </summary>
-        public void CreateDatabaseSchema(ApplicationContext applicationContext)
+        public void CreateDatabaseSchema()
         {
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
-            CreateDatabaseSchema(true, applicationContext);
-        }
-
-        /// <summary>
-        /// Creates the Umbraco db schema in the Database of the current Database
-        /// with the option to guard the db from having the schema created
-        /// multiple times.
-        /// </summary>
-        /// <param name="guardConfiguration"></param>
-        /// <param name="applicationContext"></param>
-        public void CreateDatabaseSchema(bool guardConfiguration, ApplicationContext applicationContext)
-        {
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
-
-            if (guardConfiguration && applicationContext.IsConfigured)
-                throw new Exception("Umbraco is already configured!");
-
             CreateDatabaseSchemaDo();
         }
 
-        internal void CreateDatabaseSchemaDo(bool guardConfiguration, ApplicationContext applicationContext)
-        {
-            if (guardConfiguration && applicationContext.IsConfigured)
-                throw new Exception("Umbraco is already configured!");
-
-            CreateDatabaseSchemaDo();
-        }
-
-        internal void CreateDatabaseSchemaDo()
+        private void CreateDatabaseSchemaDo()
         {
             _logger.Info<Database>("Initializing database schema creation");
 
@@ -97,7 +69,7 @@ namespace Umbraco.Core.Persistence
 
         public void CreateTable(bool overwrite, Type modelType)
         {
-            var tableDefinition = DefinitionFactory.GetTableDefinition(modelType);
+            var tableDefinition = DefinitionFactory.GetTableDefinition(modelType, _syntaxProvider);
             var tableName = tableDefinition.Name;
 
             string createSql = _syntaxProvider.Format(tableDefinition);
@@ -105,10 +77,10 @@ namespace Umbraco.Core.Persistence
             var foreignSql = _syntaxProvider.Format(tableDefinition.ForeignKeys);
             var indexSql = _syntaxProvider.Format(tableDefinition.Indexes);
 
-            var tableExist = _db.TableExist(tableName);
+            var tableExist = TableExist(tableName);
             if (overwrite && tableExist)
             {
-                _db.DropTable(tableName);
+                DropTable(tableName);
                 tableExist = false;
             }
 

@@ -15,14 +15,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter
 
         public IAlterTableSyntax Table(string tableName)
         {
-            var expression = new AlterTableExpression { TableName = tableName };
+            var expression = new AlterTableExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider) { TableName = tableName };
             //_context.Expressions.Add(expression);
             return new AlterTableBuilder(expression, _context);
         }
 
         public IAlterColumnSyntax Column(string columnName)
         {
-            var expression = new AlterColumnExpression { Column = { Name = columnName } };
+            var expression = new AlterColumnExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider) { Column = { Name = columnName } };
             //_context.Expressions.Add(expression);
             return new AlterColumnBuilder(expression, _context);
         }

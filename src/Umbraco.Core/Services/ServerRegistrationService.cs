@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
                 // found this out in CDF a while back: http://clientdependency.codeplex.com/workitem/13191
 
                 var computerName = System.Net.Dns.GetHostName();
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ComputerName.ToUpper() == computerName.ToUpper());
+                var query = repo.Query.Where(x => x.ComputerName.ToUpper() == computerName.ToUpper());
                 var found = repo.GetByQuery(query).ToArray();
                 ServerRegistration server;
                 if (found.Any())
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateServerRegistrationRepository(uow))
             {
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ComputerName.ToUpper() == computerName.ToUpper());
+                var query = repo.Query.Where(x => x.ComputerName.ToUpper() == computerName.ToUpper());
                 var found = repo.GetByQuery(query).ToArray();
                 if (found.Any())
                 {
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateServerRegistrationRepository(uow))
             {
-                var query = Query<ServerRegistration>.Builder.Where(x => x.IsActive);
+                var query = repo.Query.Where(x => x.IsActive);
                 return repo.GetByQuery(query).ToArray();
             }
         }

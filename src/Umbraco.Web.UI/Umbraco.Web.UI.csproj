@@ -1484,8 +1484,6 @@
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
     <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
-    <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="Umbraco\Webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="Umbraco_Client\CodeMirror\LICENSE" />
     <None Include="web.Template.config">

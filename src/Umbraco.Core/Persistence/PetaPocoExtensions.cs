@@ -121,23 +121,8 @@ namespace Umbraco.Core.Persistence
 
         }
 
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void CreateTable<T>(this Database db)
-          where T : new()
-        {
-            var creator = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
-            creator.CreateTable<T>();
-        }
 
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void CreateTable<T>(this Database db, bool overwrite)
-           where T : new()
-        {
-            var creator = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
-            creator.CreateTable<T>(overwrite);
-        }
-
-        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection)
+        public static void BulkInsertRecords<T>(this Database db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -145,7 +130,7 @@ namespace Umbraco.Core.Persistence
 
             using (var tr = db.GetTransaction())
             {
-                db.BulkInsertRecords(collection, tr, true);
+                db.BulkInsertRecords(sqlSyntax, collection, tr, true);
             }
         }
 
@@ -155,10 +140,11 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="db"></param>
+        /// <param name="sqlSyntax"></param>
         /// <param name="collection"></param>
         /// <param name="tr"></param>
         /// <param name="commitTrans"></param>
-        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr, bool commitTrans = false)
+        public static void BulkInsertRecords<T>(this Database db, ISqlSyntaxProvider sqlSyntax, IEnumerable<T> collection, Transaction tr, bool commitTrans = false)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -167,9 +153,9 @@ namespace Umbraco.Core.Persistence
             try
             {
                 //if it is sql ce or it is a sql server version less than 2008, we need to do individual inserts.
-                var sqlServerSyntax = SqlSyntaxContext.SqlSyntaxProvider as SqlServerSyntaxProvider;
-                if ((sqlServerSyntax != null && (int)sqlServerSyntax.VersionName.Value < (int)SqlServerVersionName.V2008) 
-                    || SqlSyntaxContext.SqlSyntaxProvider is SqlCeSyntaxProvider)
+                var sqlServerSyntax = sqlSyntax as SqlServerSyntaxProvider;
+                if ((sqlServerSyntax != null && (int)sqlServerSyntax.VersionName.Value < (int)SqlServerVersionName.V2008)
+                    || sqlSyntax is SqlCeSyntaxProvider)
                 {
                     //SqlCe doesn't support bulk insert statements!
 
@@ -295,78 +281,12 @@ namespace Umbraco.Core.Persistence
             return commands.ToArray();    
         }
 
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void CreateTable(this Database db, bool overwrite, Type modelType)
-        {
-            var creator = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
-            creator.CreateTable(overwrite, modelType);
-        }
-
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void DropTable<T>(this Database db)
-            where T : new()
-        {
-            var helper = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
-            helper.DropTable<T>();
-        }
-
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void DropTable(this Database db, string tableName)
-        {
-            var helper = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
-            helper.DropTable(tableName);
-        }
-
-        public static void TruncateTable(this Database db, string tableName)
+        public static void TruncateTable(this Database db, ISqlSyntaxProvider sqlSyntax, string tableName)
         {
             var sql = new Sql(string.Format(
-                SqlSyntaxContext.SqlSyntaxProvider.TruncateTable,
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName)));
+                sqlSyntax.TruncateTable,
+                sqlSyntax.GetQuotedTableName(tableName)));
             db.Execute(sql);
-        }
-
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static bool TableExist(this Database db, string tableName)
-        {
-            return SqlSyntaxContext.SqlSyntaxProvider.DoesTableExist(db, tableName);
-        }
-
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static bool TableExist(this UmbracoDatabase db, string tableName)
-        {
-            return SqlSyntaxContext.SqlSyntaxProvider.DoesTableExist(db, tableName);
-        }
-
-        /// <summary>
-        /// Creates the Umbraco db schema in the Database of the current Database.
-        /// Safe method that is only able to create the schema in non-configured
-        /// umbraco instances.
-        /// </summary>
-        /// <param name="db">Current PetaPoco <see cref="Database"/> object</param>
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void CreateDatabaseSchema(this Database db)
-        {
-            CreateDatabaseSchema(db, true);
-        }
-
-        /// <summary>
-        /// Creates the Umbraco db schema in the Database of the current Database
-        /// with the option to guard the db from having the schema created
-        /// multiple times.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="guardConfiguration"></param>
-        [Obsolete("Use the DatabaseSchemaHelper instead")]
-        public static void CreateDatabaseSchema(this Database db, bool guardConfiguration)
-        {
-            var helper = new DatabaseSchemaHelper(db, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider);
-            helper.CreateDatabaseSchema(guardConfiguration, ApplicationContext.Current);
-        }
-
-        //TODO: What the heck? This makes no sense at all
-        public static DatabaseProviders GetDatabaseProvider(this Database db)
-        {
-            return ApplicationContext.Current.DatabaseContext.DatabaseProvider;
         }
 
         

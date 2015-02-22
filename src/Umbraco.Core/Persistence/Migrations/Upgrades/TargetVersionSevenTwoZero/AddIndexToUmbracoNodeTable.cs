@@ -1,5 +1,6 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,13 +11,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToUmbracoNodeTable(bool skipIndexCheck)
-        {
-            _skipIndexCheck = skipIndexCheck;
+        public AddIndexToUmbracoNodeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {            
         }
 
-        public AddIndexToUmbracoNodeTable()
+        internal AddIndexToUmbracoNodeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger, bool skipIndexCheck)
+            : base(sqlSyntax, logger)
         {
+            _skipIndexCheck = skipIndexCheck;
         }
 
         public override void Up()
@@ -33,7 +36,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodeUniqueID")) == false)
             {
-				Create.Index("IX_umbracoNodeUniqueID").OnTable("umbracoNode").OnColumn("uniqueID").Ascending().WithOptions().NonClustered();
+                Create.Index("IX_umbracoNodeUniqueID").OnTable("umbracoNode").OnColumn("uniqueID").Ascending().WithOptions().NonClustered();
             }
         }
 

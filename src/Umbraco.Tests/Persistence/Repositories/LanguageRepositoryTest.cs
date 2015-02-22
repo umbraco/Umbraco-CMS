@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == "da-DK");
+                var query = new Query<ILanguage>(SqlSyntax).Where(x => x.IsoCode == "da-DK");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode.StartsWith("D"));
+                var query = new Query<ILanguage>(SqlSyntax).Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert

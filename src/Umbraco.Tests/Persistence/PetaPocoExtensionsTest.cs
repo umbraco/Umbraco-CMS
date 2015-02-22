@@ -234,7 +234,7 @@ namespace Umbraco.Tests.Persistence
             // Act
             using (ProfilingLogger.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
             {
-                db.BulkInsertRecords(servers);    
+                db.BulkInsertRecords(SqlSyntax, servers);    
             }
 
             // Assert

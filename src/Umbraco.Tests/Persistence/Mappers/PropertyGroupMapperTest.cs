@@ -10,11 +10,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new PropertyGroupMapper().Map("Id");
+            string column = new PropertyGroupMapper(new SqlCeSyntaxProvider()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[id]"));
@@ -23,11 +20,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_ParentId_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new PropertyGroupMapper().Map("ParentId");
+            string column = new PropertyGroupMapper(new SqlCeSyntaxProvider()).Map("ParentId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[parentGroupId]"));
@@ -36,11 +30,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_SortOrder_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new PropertyGroupMapper().Map("SortOrder");
+            string column = new PropertyGroupMapper(new SqlCeSyntaxProvider()).Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[sortorder]"));
@@ -49,11 +40,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Name_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new PropertyGroupMapper().Map("Name");
+            string column = new PropertyGroupMapper(new SqlCeSyntaxProvider()).Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[text]"));

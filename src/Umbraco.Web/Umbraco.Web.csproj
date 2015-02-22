@@ -750,9 +750,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -967,9 +965,7 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1083,7 +1079,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.cs">
       <DependentUpon>publish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.designer.cs">
       <DependentUpon>publish.aspx</DependentUpon>
@@ -1139,7 +1134,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.designer.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
@@ -1196,7 +1190,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.cs">
       <DependentUpon>republish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.designer.cs">
       <DependentUpon>republish.aspx</DependentUpon>
@@ -1361,7 +1354,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.designer.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
@@ -1396,7 +1388,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberType.aspx.cs">
       <DependentUpon>EditMemberType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberType.aspx.designer.cs">
       <DependentUpon>EditMemberType.aspx</DependentUpon>
@@ -1457,9 +1448,6 @@
     <Compile Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\TagsAutoCompleteHandler.ashx.cs">
-      <DependentUpon>TagsAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx.cs">
       <DependentUpon>TreeClientService.asmx</DependentUpon>
@@ -1621,9 +1609,6 @@
     <Compile Include="umbraco.presentation\umbraco\webservices\trashcan.asmx.cs">
       <DependentUpon>trashcan.asmx</DependentUpon>
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx.cs">
-      <DependentUpon>UltimatePickerAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1835,8 +1820,6 @@
     <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsx">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
-    <Content Include="umbraco.presentation\umbraco\webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">

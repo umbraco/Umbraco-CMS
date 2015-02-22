@@ -23,10 +23,10 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-               .From<DataTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .From<DataTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 

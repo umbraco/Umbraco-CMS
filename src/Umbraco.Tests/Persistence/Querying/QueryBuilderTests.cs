@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Querying
             sql.Select("*");
             sql.From("umbracoNode");
 
-            var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
+            var query = new Query<IContent>(SqlSyntax).Where(x => x.Path.StartsWith("-1"));
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Querying
             sql.Select("*");
             sql.From("umbracoNode");
 
-            var query = Query<IContent>.Builder.Where(x => x.ParentId == -1);
+            var query = new Query<IContent>(SqlSyntax).Where(x => x.ParentId == -1);
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Persistence.Querying
             sql.Select("*");
             sql.From("umbracoNode");
 
-            var query = Query<IContentType>.Builder.Where(x => x.Alias == "umbTextpage");
+            var query = new Query<IContentType>(SqlSyntax).Where(x => x.Alias == "umbTextpage");
 
             // Act
             var translator = new SqlTranslator<IContentType>(sql, query);
@@ -104,16 +104,16 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax)
+                .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == nodeObjectTypeId);
 
-            var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
+            var query = new Query<IContent>(SqlSyntax).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
 
             // Act
             var translator = new SqlTranslator<IContent>(sql, query);

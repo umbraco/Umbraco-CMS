@@ -9,11 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
     {
         private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
 
-        public DeleteDataExpression()
-        {
-        }
 
-        public DeleteDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public DeleteDataExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 
@@ -32,7 +30,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
             if (IsAllRows)
             {
-                deleteItems.Add(string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteData, SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName), "1 = 1"));
+                deleteItems.Add(string.Format(
+                    SqlSyntax.DeleteData,
+                    SqlSyntax.GetQuotedTableName(TableName), "1 = 1"));
             }
             else
             {
@@ -42,13 +42,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
                     foreach (KeyValuePair<string, object> item in row)
                     {
                         whereClauses.Add(string.Format("{0} {1} {2}",
-                                                       SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
+                                                       SqlSyntax.GetQuotedColumnName(item.Key),
                                                        item.Value == null ? "IS" : "=",
-                                                       SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                                       SqlSyntax.GetQuotedValue(item.Value.ToString())));
                     }
 
-                    deleteItems.Add(string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteData,
-                                                  SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                    deleteItems.Add(string.Format(SqlSyntax.DeleteData,
+                                                  SqlSyntax.GetQuotedTableName(TableName),
                                                   String.Join(" AND ", whereClauses.ToArray())));
                 }
             }

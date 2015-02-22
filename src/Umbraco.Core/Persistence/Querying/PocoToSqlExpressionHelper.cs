@@ -13,11 +13,12 @@ namespace Umbraco.Core.Persistence.Querying
     {
         private readonly Database.PocoData _pd;
 
-        public PocoToSqlExpressionHelper()
+        public PocoToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntaxProvider)
+            : base(sqlSyntaxProvider)
         {
             _pd = new Database.PocoData(typeof(T));
         }
-        
+
         protected override string VisitMemberAccess(MemberExpression m)
         {
             if (m.Expression != null &&
@@ -45,15 +46,15 @@ namespace Umbraco.Core.Persistence.Querying
             //return GetQuotedValue(o, o != null ? o.GetType() : null);
 
         }
-        
+
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
             return string.Format("{0}.{1}",
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
+                SqlSyntax.GetQuotedTableName(pocoData.TableInfo.TableName),
+                SqlSyntax.GetQuotedColumnName(column.Value.ColumnName));
         }
-        
+
         //protected bool IsFieldName(string quotedExp)
         //{
         //    return true;

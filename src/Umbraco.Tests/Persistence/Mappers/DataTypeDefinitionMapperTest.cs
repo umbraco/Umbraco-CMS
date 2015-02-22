@@ -10,11 +10,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DataTypeDefinitionMapper().Map("Id");
+            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -23,11 +21,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Key_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DataTypeDefinitionMapper().Map("Key");
+            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueID]"));
@@ -36,11 +32,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_DatabaseType_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DataTypeDefinitionMapper().Map("DatabaseType");
+            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("DatabaseType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[dbType]"));
@@ -49,11 +43,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_PropertyEditorAlias_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DataTypeDefinitionMapper().Map("PropertyEditorAlias");
+            string column = new DataTypeDefinitionMapper(new SqlCeSyntaxProvider()).Map("PropertyEditorAlias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[propertyEditorAlias]"));

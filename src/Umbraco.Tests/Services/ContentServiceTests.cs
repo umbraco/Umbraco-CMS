@@ -785,7 +785,7 @@ namespace Umbraco.Tests.Services
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.Database.TruncateTable("cmsContentXml");    
+                uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");    
             }
             
 
@@ -820,7 +820,7 @@ namespace Umbraco.Tests.Services
             
             using (var uow = provider.GetUnitOfWork())
             {
-                uow.Database.TruncateTable("cmsContentXml");
+                uow.Database.TruncateTable(SqlSyntax, "cmsContentXml");
             }
             //for this test we are also going to save a revision for a content item that is not published, this is to ensure
             //that it's published version still makes it into the cmsContentXml table!

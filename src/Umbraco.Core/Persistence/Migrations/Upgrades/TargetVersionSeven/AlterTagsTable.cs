@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,6 +11,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 9, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagsTable : MigrationBase
     {
+        public AlterTagsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
@@ -20,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     ColumnName = x.Item3,
                     IsUnique = x.Item4
                 }).ToArray();
-            
+
             //add a foreign key to the parent id column too!
             Create.ForeignKey("FK_cmsTags_cmsTags")
                   .FromTable("cmsTags")
@@ -28,7 +34,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .ToTable("cmsTags")
                   .PrimaryColumn("id")
                   .OnDelete(Rule.None)
-                  .OnUpdate(Rule.None); 
+                  .OnUpdate(Rule.None);
 
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsTags")) == false)
@@ -36,7 +42,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 //add an index to tag/group since it's queried often
                 Create.Index("IX_cmsTags").OnTable("cmsTags").OnColumn("tag").Ascending().OnColumn("group").Ascending().WithOptions().NonClustered();
             }
-            
+
         }
 
         public override void Down()

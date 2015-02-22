@@ -119,7 +119,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
             {
-                var query = new Query<CacheableDomain>().Where(x => x.DomainName.InvariantEquals(domainName));
+                var query = repo.Query.Where(x => x.DomainName.InvariantEquals(domainName));
                 return repo.GetByQuery(query).Any();
             }
         }
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var factory = new DomainModelFactory();
 
-                var query = new Query<CacheableDomain>().Where(x => x.RootContentId == contentId);
+                var query = repo.Query.Where(x => x.RootContentId == contentId);
 
                 return factory.BuildDomainEntities(repo.GetByQuery(query).ToArray(), _contentRepository, _languageRepository)
                     .Where(x => includeWildcards || x.IsWildcard == false);

@@ -37,6 +37,11 @@ namespace Umbraco.Core.Persistence
 
         #endregion
 
+        internal virtual NotificationsRepository CreateNotificationsRepository(IDatabaseUnitOfWork uow)
+        {
+            return new NotificationsRepository(uow, _sqlSyntax);
+        }
+
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
         {
             return new TaskRepository(uow, 
@@ -235,7 +240,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
         {
-            return new EntityRepository(uow);
+            return new EntityRepository(uow, _sqlSyntax);
         }
 
         public IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)

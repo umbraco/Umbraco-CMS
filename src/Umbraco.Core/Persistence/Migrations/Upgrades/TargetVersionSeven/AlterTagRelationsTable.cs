@@ -12,6 +12,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 8, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagRelationsTable : MigrationBase
     {
+        public AlterTagRelationsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             if (Context == null || Context.Database == null) return;
@@ -52,7 +57,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             // at least since 6.0 and the new installation way but perhaps it had them way back in 4.x so we need to check
             // it exists before trying to drop it.
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
-            {   
+            {
                 //this will let us know if this pk exists on this table
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantEquals("PRIMARY")) > 0)
                 {
@@ -65,10 +70,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 var pkName = constraints.FirstOrDefault(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantStartsWith("PK_"));
                 if (pkName != null)
                 {
-                    Delete.PrimaryKey(pkName.Item3).FromTable("cmsTagRelationship");    
+                    Delete.PrimaryKey(pkName.Item3).FromTable("cmsTagRelationship");
                 }
             }
-            
+
         }
 
         private void Upgrade()

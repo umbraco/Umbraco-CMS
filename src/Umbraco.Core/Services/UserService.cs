@@ -189,7 +189,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Email.Equals(email));
+                var query = repository.Query.Where(x => x.Email.Equals(email));
                 var user = repository.GetByQuery(query).FirstOrDefault();
 
                 return user;
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
+                var query = repository.Query.Where(x => x.Username.Equals(username));
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -355,7 +355,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var query = new Query<IUser>();
+                var query = repository.Query;
 
                 switch (matchType)
                 {
@@ -396,7 +396,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var query = new Query<IUser>();
+                var query = repository.Query;
 
                 switch (matchType)
                 {
@@ -442,7 +442,7 @@ namespace Umbraco.Core.Services
                 switch (countType)
                 {
                     case MemberCountType.All:
-                        query = new Query<IUser>();
+                        query = repository.Query;
                         return repository.Count(query);
                     case MemberCountType.Online:
                         throw new NotImplementedException();
@@ -455,12 +455,12 @@ namespace Umbraco.Core.Services
                         //return repository.GetCountByQuery(query);
                     case MemberCountType.LockedOut:
                         query =
-                            Query<IUser>.Builder.Where(
+                            repository.Query.Where(
                                 x => x.IsLockedOut);
                         return repository.GetCountByQuery(query);
                     case MemberCountType.Approved:
                         query =
-                            Query<IUser>.Builder.Where(
+                            repository.Query.Where(
                                 x => x.IsApproved);
                         return repository.GetCountByQuery(query);
                     default:
@@ -563,7 +563,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUserType>.Builder.Where(x => x.Alias == alias);
+                var query = repository.Query.Where(x => x.Alias == alias);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }
@@ -591,7 +591,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUserType>.Builder.Where(x => x.Name == name);
+                var query = repository.Query.Where(x => x.Name == name);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }

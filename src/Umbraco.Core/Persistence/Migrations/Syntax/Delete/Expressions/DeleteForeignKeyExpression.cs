@@ -8,28 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
-        [Obsolete("Use the other constructors specifying an ILogger instead")]
-        public DeleteForeignKeyExpression()
+        public DeleteForeignKeyExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        [Obsolete("Use the other constructors specifying an ILogger instead")]
-        public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        public DeleteForeignKeyExpression(ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax)
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
-        {   
             ForeignKey = new ForeignKeyDefinition();
         }
 

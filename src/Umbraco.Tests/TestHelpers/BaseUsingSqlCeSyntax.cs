@@ -14,13 +14,22 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUsingSqlCeSyntax
     {
+        private SqlCeSyntaxProvider _sqlSyntax;
+        protected SqlCeSyntaxProvider SqlSyntax
+        {
+            get { return _sqlSyntax ?? (_sqlSyntax = new SqlCeSyntaxProvider()); }
+        }
+
         [SetUp]
         public virtual void Initialize()
         {
             var container = new ServiceContainer();
+            container.Register<ISqlSyntaxProvider>(factory => SqlSyntax, new PerContainerLifetime());
+            container.Register<ILogger>(factory => Mock.Of<ILogger>(), new PerContainerLifetime());
+            container.Register<IProfiler>(factory => Mock.Of<IProfiler>(), new PerContainerLifetime());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
+            
             PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), 
                 logger,
                 false);
@@ -39,7 +48,6 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void TearDown()
         {
             MappingResolver.Reset();
-            SqlSyntaxContext.SqlSyntaxProvider = null;
             PluginManager.Current = null;
         }
     }

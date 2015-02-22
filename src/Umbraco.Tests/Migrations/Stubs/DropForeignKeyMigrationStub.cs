@@ -4,22 +4,21 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [MigrationAttribute("6.0.0", 1, "Test")]
-    public class SixZeroMigration1 : MigrationBase
+    [Migration("1.0.0", 0, "Test")]
+    public class DropForeignKeyMigrationStub : MigrationBase
     {
-        public SixZeroMigration1(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+        public DropForeignKeyMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         {
         }
 
         public override void Up()
         {
-            Alter.Table("umbracoUser").AddColumn("secret").AsString(255);
+            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id");
         }
 
         public override void Down()
         {
-            Alter.Table("umbracoUser").AlterColumn("passwordTip").AsString(100);
         }
     }
 }

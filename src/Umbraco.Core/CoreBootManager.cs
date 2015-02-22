@@ -365,7 +365,7 @@ namespace Umbraco.Core
 
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
-                ServiceProvider, ProfilingLogger.Logger,
+                Container, ProfilingLogger.Logger,
                 () => PluginManager.ResolveTypes<IMigration>());
 
 

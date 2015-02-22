@@ -95,7 +95,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             if (isCount)
             {
-                sql.Select("COUNT(*)").From<MacroDto>();
+                sql.Select("COUNT(*)").From<MacroDto>(SqlSyntax);
             }
             else
             {
@@ -104,13 +104,13 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        private static Sql GetBaseQuery()
+        private Sql GetBaseQuery()
         {
             var sql = new Sql();
             sql.Select("*")
-               .From<MacroDto>()
-               .LeftJoin<MacroPropertyDto>()
-               .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
+               .From<MacroDto>(SqlSyntax)
+               .LeftJoin<MacroPropertyDto>(SqlSyntax)
+               .On<MacroDto, MacroPropertyDto>(SqlSyntax, left => left.Id, right => right.Macro);
             return sql;
         }
 

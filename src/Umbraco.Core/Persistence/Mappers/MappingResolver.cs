@@ -42,6 +42,8 @@ namespace Umbraco.Core.Persistence.Mappers
                     var byAttribute = TryGetMapperByAttribute(type);
                     if (byAttribute.Success)
                     {
+                        //ensure it's built
+                        byAttribute.Result.Build();
                         return byAttribute.Result;
                     }
                     throw new Exception("Invalid Type: A Mapper could not be resolved based on the passed in Type");
@@ -64,6 +66,9 @@ namespace Umbraco.Core.Persistence.Mappers
             {
                 return Attempt<BaseMapper>.Fail();
             }
+
+            //ensure it's built
+            mapper.Build();
 
             return Attempt<BaseMapper>.Succeed(mapper);
         }  

@@ -54,8 +54,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
             {
-                var q = new Query<IMacro>();
-                q.Where(macro => macro.Alias == alias);
+                var q = repository.Query.Where(macro => macro.Alias == alias);
                 return repository.GetByQuery(q).FirstOrDefault();
             }
         }

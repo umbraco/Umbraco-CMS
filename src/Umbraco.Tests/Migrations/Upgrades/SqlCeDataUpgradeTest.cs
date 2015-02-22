@@ -18,22 +18,26 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test, NUnit.Framework.Ignore]
         public override void Can_Upgrade_From_470_To_600()
         {
+            var sqlSyntax = new SqlCeSyntaxProvider();
+
             var configuredVersion = new Version("4.11.0");
             var targetVersion = new Version("6.0.0");
             var provider = GetDatabaseProvider();
             var db = GetConfiguredDatabase();
 
-            var fix = new PublishAfterUpgradeToVersionSixth();
+            var fix = new PublishAfterUpgradeToVersionSixth(sqlSyntax);
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
-            bool upgraded = migrationRunner.Execute(db, provider, true);
+            bool upgraded = migrationRunner.Execute(db, provider, sqlSyntax, true);
 
             Assert.That(upgraded, Is.True);
 
-            bool hasTabTable = db.TableExist("cmsTab");
-            bool hasPropertyTypeGroupTable = db.TableExist("cmsPropertyTypeGroup");
-            bool hasAppTreeTable = db.TableExist("umbracoAppTree");
+            var schemaHelper = new DatabaseSchemaHelper(db, Mock.Of<ILogger>(), sqlSyntax);
+
+            bool hasTabTable = schemaHelper.TableExist("cmsTab");
+            bool hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
+            bool hasAppTreeTable = schemaHelper.TableExist("umbracoAppTree");
 
             fix.Unsubscribe();
 

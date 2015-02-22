@@ -61,8 +61,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { Id = id })
-                .Where<DocumentDto>(x => x.Newest)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                .Where<DocumentDto>(SqlSyntax, x => x.Newest)
+                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
             var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //we only want the newest ones with this method
-            sql.Where<DocumentDto>(x => x.Newest);
+            sql.Where<DocumentDto>(SqlSyntax, x => x.Newest);
 
             return ProcessQuery(sql);
         }
@@ -93,9 +93,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Newest)
-                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+                                .Where<DocumentDto>(SqlSyntax, x => x.Newest)
+                                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate)
+                                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             return ProcessQuery(sql);
         }
@@ -108,14 +108,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax)
+                .On<DocumentDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -166,9 +166,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     var subQuery = new Sql()
                             .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>()
-                            .InnerJoin<DocumentDto>()
-                            .On<ContentXmlDto, DocumentDto>(left => left.NodeId, right => right.NodeId);
+                            .From<ContentXmlDto>(SqlSyntax)
+                            .InnerJoin<DocumentDto>(SqlSyntax)
+                            .On<ContentXmlDto, DocumentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
@@ -180,11 +180,11 @@ namespace Umbraco.Core.Persistence.Repositories
                         var id1 = id;
                         var subQuery = new Sql()
                             .Select("cmsDocument.nodeId")
-                            .From<DocumentDto>()
-                            .InnerJoin<ContentDto>()
-                            .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                            .Where<DocumentDto>(dto => dto.Published)
-                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+                            .From<DocumentDto>(SqlSyntax)
+                            .InnerJoin<ContentDto>(SqlSyntax)
+                            .On<DocumentDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                            .Where<DocumentDto>(SqlSyntax, dto => dto.Published)
+                            .Where<ContentDto>(SqlSyntax, dto => dto.ContentTypeId == id1);
 
                         var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                         Database.Execute(deleteSql);
@@ -194,7 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //now insert the data, again if something fails here, the whole transaction is reversed
                 if (contentTypeIds == null)
                 {
-                    var query = Query<IContent>.Builder.Where(x => x.Published == true);
+                    var query = Query.Where(x => x.Published == true);
                     RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
                 }
                 else
@@ -203,7 +203,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     {
                         //copy local
                         var id = contentTypeId;
-                        var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ContentTypeId == id && x.Trashed == false);
+                        var query = Query.Where(x => x.Published == true && x.ContentTypeId == id && x.Trashed == false);
                         RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
                     }
                 }
@@ -226,7 +226,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
 
                 //bulk insert it into the database
-                Database.BulkInsertRecords(xmlItems, tr);
+                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
 
                 processed += xmlItems.Length;
 
@@ -238,7 +238,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
             var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
@@ -254,10 +254,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql()
                 .Select("*")
-                .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
-                .Where<ContentVersionDto>(x => x.VersionId == versionId)
-                .Where<DocumentDto>(x => x.Newest != true);
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(SqlSyntax, x => x.VersionId == versionId)
+                .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
             var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
 
             if (dto == null) return;
@@ -274,11 +274,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql()
                 .Select("*")
-                .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
-                .Where<ContentVersionDto>(x => x.NodeId == id)
-                .Where<ContentVersionDto>(x => x.VersionDate < versionDate)
-                .Where<DocumentDto>(x => x.Newest != true);
+                .From<DocumentDto>(SqlSyntax)
+                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(SqlSyntax, x => x.NodeId == id)
+                .Where<ContentVersionDto>(SqlSyntax, x => x.VersionDate < versionDate)
+                .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
             var list = Database.Fetch<DocumentDto, ContentVersionDto>(sql);
             if (list.Any() == false) return;
 
@@ -578,9 +578,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Published)
-                                .OrderBy<NodeDto>(x => x.Level)
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+                                .Where<DocumentDto>(SqlSyntax, x => x.Published)
+                                .OrderBy<NodeDto>(SqlSyntax, x => x.Level)
+                                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
@@ -606,9 +606,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public int CountPublished()
         {
-            var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
-                .Where<DocumentDto>(x => x.Published == true)
-                .Where<DocumentDto>(x => x.Newest == true);
+            var sql = GetBaseQuery(true).Where<NodeDto>(SqlSyntax, x => x.Trashed == false)
+                .Where<DocumentDto>(SqlSyntax, x => x.Published == true)
+                .Where<DocumentDto>(SqlSyntax, x => x.Newest == true);
             return Database.ExecuteScalar<int>(sql);
         }
 
@@ -851,8 +851,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = new Sql();
             sql.Select("*")
-               .From<NodeDto>()
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+               .From<NodeDto>(SqlSyntax)
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;

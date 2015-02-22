@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                dataTypeSql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
             var dtos = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql);
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public override void Delete(IDataTypeDefinition entity)
         {
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-            var query = Query<PropertyType>.Builder.Where(x => x.DataTypeDefinitionId == entity.Id);
+            var query = new Query<PropertyType>(SqlSyntax).Where(x => x.DataTypeDefinitionId == entity.Id);
 
             //TODO: Don't we need to be concerned about media and member types here too ?
             var contentTypes = _contentTypeRepository.GetByQuery(query);
@@ -115,10 +115,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<DataTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .From<DataTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -326,9 +326,9 @@ AND umbracoNode.id <> @id",
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
                 var sql = new Sql().Select("*")
-                                   .From<DataTypePreValueDto>()
-                                   .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
+                                   .From<DataTypePreValueDto>(SqlSyntax)
+                                   .Where<DataTypePreValueDto>(SqlSyntax, dto => dto.DataTypeNodeId == dataType.Id)
+                                   .OrderBy<DataTypePreValueDto>(SqlSyntax, dto => dto.SortOrder);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 

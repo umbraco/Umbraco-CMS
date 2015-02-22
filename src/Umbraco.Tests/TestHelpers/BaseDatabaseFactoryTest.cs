@@ -243,7 +243,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntax);
                 //Create the umbraco database and its base data
-                schemaHelper.CreateDatabaseSchema(false, ApplicationContext);
+                schemaHelper.CreateDatabaseSchema();
 
                 //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
                 // damn db for each test
@@ -273,7 +273,6 @@ namespace Umbraco.Tests.TestHelpers
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
-                SqlSyntaxContext.SqlSyntaxProvider = null;
             }
 
             base.TearDown();

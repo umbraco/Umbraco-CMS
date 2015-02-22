@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -12,6 +13,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
+        public MigrateAndRemoveTemplateMasterColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
 
@@ -24,14 +30,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
             //update the parentId column for all templates to be correct so it matches the current 'master' template
             //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
-            var templates = Context.Database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());
+            var templates = Context.Database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>(SqlSyntax));
             foreach (var template in templates)
             {
-                Update.Table("umbracoNode").Set(new {parentID = template.master ?? -1}).Where(new {id = template.nodeId});
+                Update.Table("umbracoNode").Set(new { parentID = template.master ?? -1 }).Where(new { id = template.nodeId });
 
                 //now build the correct path for the template
-                Update.Table("umbracoNode").Set(new { path = BuildPath (template, templates)}).Where(new { id = template.nodeId });
-                
+                Update.Table("umbracoNode").Set(new { path = BuildPath(template, templates) }).Where(new { id = template.nodeId });
+
             }
 
             //now remove the master column and key
@@ -46,7 +52,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
                 if (constraints.Any(x => x.Item1.InvariantEquals("cmsTemplate") && x.Item3.InvariantEquals("FK_cmsTemplate_cmsTemplate")))
                 {
-                    Delete.ForeignKey("FK_cmsTemplate_cmsTemplate").OnTable("cmsTemplate");                   
+                    Delete.ForeignKey("FK_cmsTemplate_cmsTemplate").OnTable("cmsTemplate");
                 }
 
                 //TODO: Hopefully it's not named something else silly in some crazy old versions
@@ -55,7 +61,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
             if (columns.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")))
             {
-                Delete.Column("master").FromTable("cmsTemplate");    
+                Delete.Column("master").FromTable("cmsTemplate");
             }
         }
 

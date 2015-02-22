@@ -32,9 +32,11 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void Can_Assert_Created_Database()
         {
-            bool umbracoNodeTable = Database.TableExist("umbracoNode");
-            bool umbracoUserTable = Database.TableExist("umbracoUser");
-            bool cmsTagsTable = Database.TableExist("cmsTags");
+            var schemaHelper = new DatabaseSchemaHelper(Database, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
+
+            bool umbracoNodeTable = schemaHelper.TableExist("umbracoNode");
+            bool umbracoUserTable = schemaHelper.TableExist("umbracoUser");
+            bool cmsTagsTable = schemaHelper.TableExist("cmsTags");
 
             Assert.That(umbracoNodeTable, Is.True);
             Assert.That(umbracoUserTable, Is.True);

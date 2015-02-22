@@ -27,13 +27,13 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentTypeDto>()
-                .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<DocumentTypeDto>(x => x.IsDefault == true);
+                .From<DocumentTypeDto>(SqlSyntax)
+                .RightJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, DocumentTypeDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeNodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectType)
+                .Where<DocumentTypeDto>(SqlSyntax, x => x.IsDefault == true);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -64,14 +64,14 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentTypeDto>()
-                .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<DocumentTypeDto>(x => x.IsDefault)
-                .Where<NodeDto>(x => x.NodeId == 1050);
+                .From<DocumentTypeDto>(SqlSyntax)
+                .RightJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, DocumentTypeDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeNodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectType)
+                .Where<DocumentTypeDto>(SqlSyntax, x => x.IsDefault)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -95,11 +95,11 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-               .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+               .From<PropertyTypeGroupDto>(SqlSyntax)
+               .RightJoin<PropertyTypeDto>(SqlSyntax)
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>(SqlSyntax)
+               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -116,8 +116,8 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-               .From<ContentTypeAllowedContentTypeDto>()
-               .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == 1050);
+               .From<ContentTypeAllowedContentTypeDto>(SqlSyntax)
+               .Where<ContentTypeAllowedContentTypeDto>(SqlSyntax, x => x.Id == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -142,12 +142,12 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-               .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(x => x.ContentTypeId == 1050);
+               .From<PropertyTypeGroupDto>(SqlSyntax)
+               .RightJoin<PropertyTypeDto>(SqlSyntax)
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>(SqlSyntax)
+               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
+               .Where<PropertyTypeDto>(SqlSyntax, x => x.ContentTypeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 

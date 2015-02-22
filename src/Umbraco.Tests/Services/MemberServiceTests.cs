@@ -1028,11 +1028,11 @@ namespace Umbraco.Tests.Services
 
             //now ensure the col is correct
             var sql = new Sql().Select("cmsPropertyData.*")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
-                .Where<PropertyDataDto>(dto => dto.NodeId == member.Id)
-                .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
+                .From<PropertyDataDto>(SqlSyntax)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
+                .Where<PropertyDataDto>(SqlSyntax, dto => dto.NodeId == member.Id)
+                .Where<PropertyTypeDto>(SqlSyntax, dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
             
             var colResult = DatabaseContext.Database.Fetch<PropertyDataDto>(sql);
 

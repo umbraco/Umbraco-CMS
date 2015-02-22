@@ -1,12 +1,11 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
+﻿using Umbraco.Core.Persistence.SqlSyntax;
+
+namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
 {
     public class ExecuteSqlStatementExpression : MigrationExpressionBase
     {
-        public ExecuteSqlStatementExpression()
-        {
-        }
-
-        public ExecuteSqlStatementExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public ExecuteSqlStatementExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 

@@ -18,6 +18,13 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </summary>
     public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHander
     {
+        private readonly ISqlSyntaxProvider _sqlSyntax;
+
+        public EnsureDefaultListViewDataTypesCreated(ISqlSyntaxProvider sqlSyntax)
+        {
+            _sqlSyntax = sqlSyntax;
+        }
+
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             var target720 = new Version(7, 2, 0);
@@ -39,8 +46,8 @@ namespace Umbraco.Web.Strategies.Migrations
                 try
                 {
                     //Turn on identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+                    if (_sqlSyntax.SupportsIdentityInsert())
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", _sqlSyntax.GetQuotedTableName("umbracoNode"))));
 
                     if (e.MigrationContext.Database.Exists<NodeDto>(Constants.System.DefaultContentListViewDataTypeId))
                     {
@@ -55,16 +62,16 @@ namespace Umbraco.Web.Strategies.Migrations
                 finally
                 {
                     //Turn off identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
+                    if (_sqlSyntax.SupportsIdentityInsert())
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", _sqlSyntax.GetQuotedTableName("umbracoNode"))));
                 }
 
 
                 try
                 {
                     //Turn on identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
+                    if (_sqlSyntax.SupportsIdentityInsert())
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", _sqlSyntax.GetQuotedTableName("cmsDataType"))));
 
                     e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = -26, DataTypeId = Constants.System.DefaultContentListViewDataTypeId, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
                     e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = -27, DataTypeId = Constants.System.DefaultMediaListViewDataTypeId, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
@@ -73,8 +80,8 @@ namespace Umbraco.Web.Strategies.Migrations
                 finally
                 {
                     //Turn off identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataType"))));
+                    if (_sqlSyntax.SupportsIdentityInsert())
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", _sqlSyntax.GetQuotedTableName("cmsDataType"))));
                 }
 
 
@@ -82,8 +89,8 @@ namespace Umbraco.Web.Strategies.Migrations
                 try
                 {
                     //Turn on identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataTypePreValues"))));
+                    if (_sqlSyntax.SupportsIdentityInsert())
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", _sqlSyntax.GetQuotedTableName("cmsDataTypePreValues"))));
 
                     //defaults for the member list
                     e.MigrationContext.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -1, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.System.DefaultMembersListViewDataTypeId, Value = "10" });
@@ -94,8 +101,8 @@ namespace Umbraco.Web.Strategies.Migrations
                 finally
                 {
                     //Turn off identity insert if db provider is not mysql
-                    if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsDataTypePreValues"))));
+                    if (_sqlSyntax.SupportsIdentityInsert())
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", _sqlSyntax.GetQuotedTableName("cmsDataTypePreValues"))));
                 }
 
                 

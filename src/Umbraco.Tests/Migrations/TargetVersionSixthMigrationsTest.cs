@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -33,7 +34,8 @@ namespace Umbraco.Tests.Migrations
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
 			MigrationResolver.Current = new MigrationResolver(
-                new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                new ServiceContainer(), 
+                ProfilingLogger.Logger,
                 () => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
@@ -55,11 +57,8 @@ namespace Umbraco.Tests.Migrations
             {
                 CanResolveBeforeFrozen = true
             };
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             Resolution.Freeze();
-
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             var engine = new SqlCeEngine("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;");
             engine.CreateDatabase();   
@@ -89,7 +88,7 @@ namespace Umbraco.Tests.Migrations
             var migrationRunner = new MigrationRunner(Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, db, Logger);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, db, Logger, SqlSyntax);
             foreach (MigrationBase migration in migrations)
             {
                 migration.GetUpExpressions(context);
@@ -109,7 +108,6 @@ namespace Umbraco.Tests.Migrations
             base.TearDown();
 
             PluginManager.Current = null;
-            SqlSyntaxContext.SqlSyntaxProvider = null;
             MigrationResolver.Reset();
 
             TestHelper.CleanContentDirectories();

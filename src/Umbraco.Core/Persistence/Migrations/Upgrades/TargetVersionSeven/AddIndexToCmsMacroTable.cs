@@ -22,9 +22,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToCmsMacroTable()
+        public AddIndexToCmsMacroTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
         {
-            
         }
 
         public override void Up()
@@ -41,9 +41,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacro_Alias")) == false)
             {
-                Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();            
+                Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();
             }
-            
+
         }
 
         public override void Down()

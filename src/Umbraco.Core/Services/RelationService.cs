@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelationType>().Where(x => x.Alias == alias);
+                var query = repository.Query.Where(x => x.Alias == alias);
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+                var query = repository.Query.Where(x => x.RelationTypeId == relationTypeId);
                 return repository.GetByQuery(query);
             }
         }
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.ChildId == id);
+                var query = repository.Query.Where(x => x.ChildId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
+                var query = repository.Query.Where(x => x.ChildId == id || x.ParentId == id);
                 return repository.GetByQuery(query);
             }
         }
@@ -206,15 +206,15 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var relationTypeRepository = RepositoryFactory.CreateRelationTypeRepository(uow))
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(uow))
             {
-                var rtQuery = new Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
-                var relationType = relationTypeRepository.GetByQuery(rtQuery).FirstOrDefault();
+                var rtQuery = repository.Query.Where(x => x.Alias == relationTypeAlias);
+                var relationType = repository.GetByQuery(rtQuery).FirstOrDefault();
                 if (relationType == null) return Enumerable.Empty<IRelation>();
 
                 using (var relationRepo = RepositoryFactory.CreateRelationRepository(uow))
                 {
-                    var query = new Query<IRelation>().Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
+                    var query = relationRepo.Query.Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
                     return relationRepo.GetByQuery(query);
                 }
             }
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Services
             List<int> relationTypeIds = null;
             using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelationType>().Where(x => x.Name == relationTypeName);
+                var query = repository.Query.Where(x => x.Name == relationTypeName);
                 var relationTypes = repository.GetByQuery(query);
                 if (relationTypes.Any())
                 {
@@ -254,7 +254,7 @@ namespace Umbraco.Core.Services
             List<int> relationTypeIds = null;
             using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
+                var query = repository.Query.Where(x => x.Alias == relationTypeAlias);
                 var relationTypes = repository.GetByQuery(query);
                 if (relationTypes.Any())
                 {
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+                var query = repository.Query.Where(x => x.RelationTypeId == relationTypeId);
                 return repository.GetByQuery(query);
             }
         }
@@ -441,7 +441,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+                var query = repository.Query.Where(x => x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -455,7 +455,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
+                var query = repository.Query.Where(x => x.ParentId == id || x.ChildId == id);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -470,7 +470,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
+                var query = repository.Query.Where(x => x.ParentId == parentId && x.ChildId == childId);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -497,13 +497,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="parentId">Id of the Parent relation</param>
         /// <param name="childId">Id of the Child relation</param>
-        /// <param name="relationTypeAlias">Type of relation</param>
+        /// <param name="relationType">Type of relation</param>
         /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
         public bool AreRelated(int parentId, int childId, IRelationType relationType)
         {
             using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
+                var query = repository.Query.Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
             }
         }
@@ -618,7 +618,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
-                var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+                var query = repository.Query.Where(x => x.RelationTypeId == relationType.Id);
                 relations.AddRange(repository.GetByQuery(query).ToList());
 
                 foreach (var relation in relations)
@@ -640,7 +640,7 @@ namespace Umbraco.Core.Services
                 foreach (var relationTypeId in relationTypeIds)
                 {
                     int id = relationTypeId;
-                    var query = new Query<IRelation>().Where(x => x.RelationTypeId == id);
+                    var query = repository.Query.Where(x => x.RelationTypeId == id);
                     relations.AddRange(repository.GetByQuery(query).ToList());
                 }
             }

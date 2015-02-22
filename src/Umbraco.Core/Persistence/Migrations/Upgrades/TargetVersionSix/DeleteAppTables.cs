@@ -1,13 +1,19 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
-    
+
     [Migration("6.0.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class DeleteAppTables : MigrationBase
     {
+        public DeleteAppTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             Delete.Table("umbracoAppTree");
@@ -34,7 +40,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser2app") && x.Item3.InvariantEquals("FK_umbracoUser2app_umbracoUser")))
                 {
                     Delete.ForeignKey("FK_umbracoUser2app_umbracoUser").OnTable("umbracoUser2app");
-                }    
+                }
             }
 
             Delete.Table("umbracoApp");

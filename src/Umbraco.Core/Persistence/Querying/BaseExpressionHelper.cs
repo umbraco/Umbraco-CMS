@@ -12,6 +12,11 @@ namespace Umbraco.Core.Persistence.Querying
 {
     internal abstract class BaseExpressionHelper<T> : BaseExpressionHelper
     {
+        protected BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
+            : base(sqlSyntax)
+        {
+        }
+
         protected abstract string VisitMemberAccess(MemberExpression m);
 
         protected internal virtual string Visit(Expression exp)
@@ -96,7 +101,7 @@ namespace Umbraco.Core.Persistence.Querying
         protected virtual string VisitBinary(BinaryExpression b)
         {
             string left, right;
-            var operand = BindOperant(b.NodeType); 
+            var operand = BindOperant(b.NodeType);
             if (operand == "AND" || operand == "OR")
             {
                 MemberExpression m = b.Left as MemberExpression;
@@ -190,7 +195,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //return GetQuotedValue(o, o.GetType());
             }
             catch (InvalidOperationException)
-            { 
+            {
                 // FieldName ?
                 List<Object> exprs = VisitExpressionList(nex.Arguments);
                 var r = new StringBuilder();
@@ -240,10 +245,10 @@ namespace Umbraco.Core.Persistence.Querying
                         case ExpressionType.MemberAccess:
                             //In this case it wil be a false property , i.e. x => !Trashed
                             SqlParameters.Add(true);
-                            return string.Format("NOT ({0} = @0)", o);                            
+                            return string.Format("NOT ({0} = @0)", o);
                         default:
                             //In this case it could be anything else, such as: x => !x.Path.StartsWith("-20")
-                            return string.Format("NOT ({0})", o);                            
+                            return string.Format("NOT ({0})", o);
                     }
                 default:
                     return Visit(u.Operand);
@@ -325,8 +330,8 @@ namespace Umbraco.Core.Persistence.Querying
 
             var objectForMethod = m.Object ?? m.Arguments[0];
             var visitedObjectForMethod = Visit(objectForMethod);
-            var methodArgs = m.Object == null 
-                ? m.Arguments.Skip(1).ToArray() 
+            var methodArgs = m.Object == null
+                ? m.Arguments.Skip(1).ToArray()
                 : m.Arguments.ToArray();
 
             switch (m.Method.Name)
@@ -351,7 +356,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantEndsWith":
                 case "InvariantContains":
                 case "InvariantEquals":
-                    
+
                     string compareValue;
 
                     if (methodArgs[0].NodeType != ExpressionType.Constant)
@@ -451,7 +456,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //case "As":
                 //    return string.Format("{0} As {1}", r,
                 //                                GetQuotedColumnName(RemoveQuoteFromAlias(RemoveQuote(args[0].ToString()))));
-                
+
                 default:
 
                     throw new ArgumentOutOfRangeException("No logic supported for " + m.Method.Name);
@@ -523,8 +528,15 @@ namespace Umbraco.Core.Persistence.Querying
     /// <summary>
     /// Logic that is shared with the expression helpers
     /// </summary>
-    internal class BaseExpressionHelper 
+    internal class BaseExpressionHelper
     {
+        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+
+        public BaseExpressionHelper(ISqlSyntaxProvider sqlSyntax)
+        {
+            SqlSyntax = sqlSyntax;
+        }
+
         protected List<object> SqlParameters = new List<object>();
 
         public object[] GetSqlParameters()
@@ -538,25 +550,25 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 case "SqlWildcard":
                     SqlParameters.Add(RemoveQuote(val));
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                    return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
                 case "Equals":
                     SqlParameters.Add(RemoveQuote(val));
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, SqlParameters.Count - 1, columnType);
+                    return SqlSyntax.GetStringColumnEqualComparison(col, SqlParameters.Count - 1, columnType);
                 case "StartsWith":
                     SqlParameters.Add(string.Format("{0}{1}",
                         RemoveQuote(val),
-                        SqlSyntaxContext.SqlSyntaxProvider.GetWildcardPlaceholder()));
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                        SqlSyntax.GetWildcardPlaceholder()));
+                    return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
                 case "EndsWith":
                     SqlParameters.Add(string.Format("{0}{1}",
-                        SqlSyntaxContext.SqlSyntaxProvider.GetWildcardPlaceholder(),
+                        SqlSyntax.GetWildcardPlaceholder(),
                         RemoveQuote(val)));
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                    return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
                 case "Contains":
                     SqlParameters.Add(string.Format("{0}{1}{0}",
-                        SqlSyntaxContext.SqlSyntaxProvider.GetWildcardPlaceholder(),
+                        SqlSyntax.GetWildcardPlaceholder(),
                         RemoveQuote(val)));
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+                    return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
                 case "InvariantEquals":
                 case "SqlEquals":
                     //recurse
@@ -627,13 +639,13 @@ namespace Umbraco.Core.Persistence.Querying
         //               : value.ToString();
         //}
 
-        public virtual string EscapeParam(object paramValue)
+        public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax)
         {
-            return paramValue == null 
-                ? string.Empty 
-                : SqlSyntaxContext.SqlSyntaxProvider.EscapeString(paramValue.ToString());
+            return paramValue == null
+                ? string.Empty
+                : sqlSyntax.EscapeString(paramValue.ToString());
         }
-        
+
         public virtual bool ShouldQuoteValue(Type fieldType)
         {
             return true;

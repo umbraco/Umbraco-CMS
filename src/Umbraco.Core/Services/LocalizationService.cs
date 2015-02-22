@@ -20,23 +20,6 @@ namespace Umbraco.Core.Services
     {
         private static readonly Guid RootParentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public LocalizationService()
-            : this(new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public LocalizationService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory, LoggerResolver.Current.Logger)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public LocalizationService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()), LoggerResolver.Current.Logger)
-        {
-        }
-
         public LocalizationService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
             : base(provider, repositoryFactory, logger)
         {
@@ -173,7 +156,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == parentId);
+                var query = repository.Query.Where(x => x.ParentId == parentId);
                 var items = repository.GetByQuery(query);
 
                 return items;
@@ -188,7 +171,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == RootParentId);
+                var query = repository.Query.Where(x => x.ParentId == RootParentId);
                 var items = repository.GetByQuery(query);
 
                 return items;

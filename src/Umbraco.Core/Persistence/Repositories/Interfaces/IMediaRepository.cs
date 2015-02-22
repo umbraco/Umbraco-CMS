@@ -9,7 +9,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IMediaRepository : IRepositoryVersionable<int, IMedia>, IRecycleBinRepository<IMedia>
     {
-        
+        IMedia GetMediaByPath(string mediaPath);
+
         /// <summary>
         /// Used to add/update published xml for the media item
         /// </summary>

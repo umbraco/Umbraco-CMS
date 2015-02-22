@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
-                var query = Query<IUserType>.Builder.Where(x => x.Alias == "testUserType1");
+                var query = new Query<IUserType>(SqlSyntax).Where(x => x.Alias == "testUserType1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
                 // Act
-                var query = Query<IUserType>.Builder.Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
+                var query = new Query<IUserType>(SqlSyntax).Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
                 var result = repository.Count(query);
 
                 // Assert

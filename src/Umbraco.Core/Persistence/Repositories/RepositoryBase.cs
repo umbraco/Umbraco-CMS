@@ -80,6 +80,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
+        /// <summary>
+        /// Used to create a new query instance
+        /// </summary>
+        /// <returns></returns>
+        public abstract Query<TEntity> Query { get; }
+
         #region IRepository<TEntity> Members
 
         /// <summary>
@@ -169,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (allEntities.Any())
                 {
                     //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                    var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
+                    var query = Query.Where(x => x.Id != 0);
                     int totalCount = PerformCount(query);
 
                     if (allEntities.Count() == totalCount)

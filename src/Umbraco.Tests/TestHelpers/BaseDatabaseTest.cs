@@ -80,11 +80,11 @@ namespace Umbraco.Tests.TestHelpers
                     IsReady = true
                 };
 
-            SqlSyntaxContext.SqlSyntaxProvider = SyntaxProvider;
 
             //Create the umbraco database
             _database = new Database(ConnectionString, ProviderName);
-            _database.CreateDatabaseSchema(false);
+            var databaseSchemaHelper = new DatabaseSchemaHelper(_database, Mock.Of<ILogger>(), SyntaxProvider);
+            databaseSchemaHelper.CreateDatabaseSchema();
         }
 
         public abstract string ConnectionString { get; }

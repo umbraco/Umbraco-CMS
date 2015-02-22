@@ -159,7 +159,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.Alias == alias);
+                var query = repository.Query.Where(x => x.Alias == alias);
                 var contentTypes = repository.GetByQuery(query);
 
                 return contentTypes.FirstOrDefault();
@@ -188,7 +188,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -223,7 +223,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -492,7 +492,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMediaType>.Builder.Where(x => x.Alias == alias);
+                var query = repository.Query.Where(x => x.Alias == alias);
                 var contentTypes = repository.GetByQuery(query);
 
                 return contentTypes.FirstOrDefault();
@@ -521,7 +521,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -536,7 +536,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
+                var query = repository.Query.Where(x => x.ParentId == id);
                 int count = repository.Count(query);
                 return count > 0;
             }

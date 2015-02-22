@@ -6,29 +6,10 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateIndexExpression : MigrationExpressionBase
     {
-        public CreateIndexExpression(ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax)
+        public CreateIndexExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
             Index = new IndexDefinition();
-        }
-        
-        public CreateIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
-        {
-            Index = new IndexDefinition();
-        }
-
-        [Obsolete("Use alternate ctor specifying ISqlSyntaxProvider instead")]
-        public CreateIndexExpression()
-            : this(SqlSyntaxContext.SqlSyntaxProvider)
-        {
-
-        }
-
-        [Obsolete("Use alternate ctor specifying ISqlSyntaxProvider instead")]
-        public CreateIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : this(current, databaseProviders, SqlSyntaxContext.SqlSyntaxProvider)
-        {
         }
 
         public virtual IndexDefinition Index { get; set; }

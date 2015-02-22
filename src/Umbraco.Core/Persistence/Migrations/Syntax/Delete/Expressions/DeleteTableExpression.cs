@@ -4,11 +4,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteTableExpression : MigrationExpressionBase
     {
-        public DeleteTableExpression()
-        {
-        }
-
-        public DeleteTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public DeleteTableExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 
@@ -17,8 +14,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DropTable,
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName));
+            return string.Format(SqlSyntax.DropTable,
+                                 SqlSyntax.GetQuotedTableName(TableName));
         }
     }
 }

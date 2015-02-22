@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var member = CreateTestMember(key: key);
 
                 // Act
-                var query = Query<IMember>.Builder.Where(x => x.Key == key);
+                var query = new Query<IMember>(SqlSyntax).Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -318,7 +318,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Correct_Subquery()
         {
-            var query = Query<IMember>.Builder.Where(x =>
+            var query = new Query<IMember>(SqlSyntax).Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
                         ((Member) x).PropertyTypeAlias == "headshot");
 
@@ -327,8 +327,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-                .OrderBy<NodeDto>(x => x.SortOrder);
+                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate)
+                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             Console.WriteLine(sql.SQL);
             Assert.That(sql.SQL, Is.Not.Empty);
@@ -378,12 +378,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var sqlCount = new Sql()
                     .Select("COUNT(*)")
-                    .From<NodeDto>()
-                    .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                    .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                    .From<NodeDto>(SqlSyntax)
+                    .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                    .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
                 return sqlCount;
             }
 
@@ -396,16 +396,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
                 "cmsPropertyType.helpText", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
                 "cmsPropertyType.dataTypeId", "cmsDataType.propertyEditorAlias", "cmsDataType.dbType")
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .From<NodeDto>(SqlSyntax)
+                .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, ContentDto>(SqlSyntax, left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyDataDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -413,16 +413,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select("umbracoNode.id")
-                .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .From<NodeDto>(SqlSyntax)
+                .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, ContentDto>(SqlSyntax, left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyDataDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 

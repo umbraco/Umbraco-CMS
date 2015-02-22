@@ -17,18 +17,18 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename
 
         public IRenameTableSyntax Table(string oldName)
         {
-            var expression = _databaseProviders == null
-                                 ? new RenameTableExpression {OldName = oldName}
-                                 : new RenameTableExpression(_context.CurrentDatabaseProvider, _databaseProviders) { OldName = oldName };
+            var expression = new RenameTableExpression(
+                _context.SqlSyntax,
+                _context.CurrentDatabaseProvider, _databaseProviders) {OldName = oldName};
             _context.Expressions.Add(expression);
             return new RenameTableBuilder(expression);
         }
 
         public IRenameColumnTableSyntax Column(string oldName)
         {
-            var expression = _databaseProviders == null
-                                 ? new RenameColumnExpression {OldName = oldName}
-                                 : new RenameColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders) { OldName = oldName };
+            var expression = new RenameColumnExpression(
+                _context.SqlSyntax,
+                _context.CurrentDatabaseProvider, _databaseProviders) {OldName = oldName};
             _context.Expressions.Add(expression);
             return new RenameColumnBuilder(expression);
         }

@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
                 return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
             }
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMediaType>(sqlClause, query);
             var sql = translator.Translate()
-                .OrderBy<NodeDto>(x => x.Text);
+                .OrderBy<NodeDto>(SqlSyntax, x => x.Text);
 
             var dtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
             return dtos.Any()
@@ -100,10 +100,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<ContentTypeDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .From<ContentTypeDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 

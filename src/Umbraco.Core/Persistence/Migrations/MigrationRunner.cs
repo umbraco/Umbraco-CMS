@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -18,11 +19,6 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly Version _targetVersion;
         private readonly string _productName;
 
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
-            : this(LoggerResolver.Current.Logger, currentVersion, targetVersion, productName)
-        {
-        }
 
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
         {
@@ -37,25 +33,16 @@ namespace Umbraco.Core.Persistence.Migrations
             _productName = productName;
         }
 
-        /// <summary>
-        /// Executes the migrations against the database.
-        /// </summary>
-        /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
-        /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
-        /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, bool isUpgrade = true)
-        {
-            return Execute(database, database.GetDatabaseProvider(), isUpgrade);
-        }
 
         /// <summary>
         /// Executes the migrations against the database.
         /// </summary>
         /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
         /// <param name="databaseProvider"></param>
+        /// <param name="sqlSyntaxProvider"></param>
         /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
         /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
+        public virtual bool Execute(Database database, DatabaseProviders databaseProvider, ISqlSyntaxProvider sqlSyntaxProvider, bool isUpgrade = true)
         {
             _logger.Info<MigrationRunner>("Initializing database migrations");
 
@@ -72,7 +59,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 return false;
 
             //Loop through migrations to generate sql
-            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, isUpgrade);
+            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, sqlSyntaxProvider, isUpgrade);
 
             try
             {
@@ -152,10 +139,15 @@ namespace Umbraco.Core.Persistence.Migrations
             return MigrationResolver.Current.Migrations.ToArray();
         }
 
-        internal MigrationContext InitializeMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
+        internal MigrationContext InitializeMigrations(
+            List<IMigration> migrations, 
+            Database database, 
+            DatabaseProviders databaseProvider, 
+            ISqlSyntaxProvider sqlSyntax,
+            bool isUpgrade = true)
         {
             //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider, database, _logger);
+            var context = new MigrationContext(databaseProvider, database, _logger, sqlSyntax);
 
             foreach (var migration in migrations)
             {

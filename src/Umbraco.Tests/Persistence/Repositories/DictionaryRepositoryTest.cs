@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == "Article");
+                var query = new Query<IDictionaryItem>(SqlSyntax).Where(x => x.ItemKey == "Article");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey.StartsWith("Read"));
+                var query = new Query<IDictionaryItem>(SqlSyntax).Where(x => x.ItemKey.StartsWith("Read"));
                 var result = repository.Count(query);
 
                 // Assert

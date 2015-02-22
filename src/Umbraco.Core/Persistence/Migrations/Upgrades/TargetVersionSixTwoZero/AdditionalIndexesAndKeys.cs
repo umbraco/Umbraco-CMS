@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -11,6 +12,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : MigrationBase
     {
+        public AdditionalIndexesAndKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
 
@@ -27,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodeTrashed")) == false)
             {
-                Create.Index("IX_umbracoNodeTrashed").OnTable("umbracoNode").OnColumn("trashed").Ascending().WithOptions().NonClustered();    
+                Create.Index("IX_umbracoNodeTrashed").OnTable("umbracoNode").OnColumn("trashed").Ascending().WithOptions().NonClustered();
             }
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsContentVersion_ContentId")) == false)
             {
@@ -52,7 +58,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             // it follows the standard naming convention
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
             {
-                Delete.Index("umbracoUserLogins_Index").OnTable("umbracoUserLogins");                
+                Delete.Index("umbracoUserLogins_Index").OnTable("umbracoUserLogins");
             }
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoUserLogins_Index")) == false)
             {

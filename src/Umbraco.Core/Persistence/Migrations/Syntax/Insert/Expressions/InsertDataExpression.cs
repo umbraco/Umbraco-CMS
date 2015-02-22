@@ -9,24 +9,21 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
     {
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
 
-        public InsertDataExpression()
-        {
-        }
-
-        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public InsertDataExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 
         public string SchemaName { get; set; }
         public string TableName { get; set; }
 
-       
+
         public List<InsertionDataDefinition> Rows
         {
             get { return _rows; }
         }
 
-        
+
 
         public override string ToString()
         {
@@ -36,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                 return string.Empty;
 
             var insertItems = new List<string>();
-            
+
             foreach (var item in Rows)
             {
                 var cols = "";
@@ -50,10 +47,11 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                 vals = vals.TrimEnd(',');
 
 
-                var sql = string.Format(SqlSyntaxContext.SqlSyntaxProvider.InsertData,
-                              SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                              cols, vals);
-                
+                var sql = string.Format(
+                    SqlSyntax.InsertData,
+                    SqlSyntax.GetQuotedTableName(TableName),
+                    cols, vals);
+
                 insertItems.Add(sql);
             }
 
@@ -64,12 +62,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
         {
             var type = val.GetType();
             switch (Type.GetTypeCode(type))
-            {                
+            {
                 case TypeCode.Boolean:
-                    return ((bool) val) ? "1" : "0";
+                    return ((bool)val) ? "1" : "0";
                 case TypeCode.Single:
                 case TypeCode.Double:
-                case TypeCode.Decimal:             
+                case TypeCode.Decimal:
                 case TypeCode.SByte:
                 case TypeCode.Int16:
                 case TypeCode.Int32:
@@ -80,7 +78,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                 case TypeCode.UInt64:
                     return val.ToString();
                 default:
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(val.ToString());
+                    return SqlSyntax.GetQuotedValue(val.ToString());
             }
         }
     }

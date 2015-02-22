@@ -21,14 +21,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToCmsMacroPropertyTable()
+        public AddIndexToCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
         {
-            
         }
 
         public override void Up()
         {
-            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[]{} : SqlSyntax.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .Unique();
             }
 
-            
+
         }
 
         public override void Down()

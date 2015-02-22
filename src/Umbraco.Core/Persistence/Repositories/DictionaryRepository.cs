@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new {Id = id})
-                .OrderBy<DictionaryDto>(x => x.UniqueId);
+                .OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
             var dto = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql).FirstOrDefault();
             if (dto == null)
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
-            sql.OrderBy<DictionaryDto>(x => x.UniqueId);
+            sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
             return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
                 .Select(ConvertFromDto);
@@ -81,14 +81,14 @@ namespace Umbraco.Core.Persistence.Repositories
             if(isCount)
             {
                 sql.Select("COUNT(*)")
-                    .From<DictionaryDto>();
+                    .From<DictionaryDto>(SqlSyntax);
             }
             else
             {
                 sql.Select("*")
-                   .From<DictionaryDto>()
-                   .LeftJoin<LanguageTextDto>()
-                   .On<DictionaryDto, LanguageTextDto>(left => left.UniqueId, right => right.UniqueId);
+                   .From<DictionaryDto>(SqlSyntax)
+                   .LeftJoin<LanguageTextDto>(SqlSyntax)
+                   .On<DictionaryDto, LanguageTextDto>(SqlSyntax, left => left.UniqueId, right => right.UniqueId);
             }
             return sql;
         }

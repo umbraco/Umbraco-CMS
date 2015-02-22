@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<RelationTypeDto>();
+               .From<RelationTypeDto>(SqlSyntax);
             return sql;
         }
 

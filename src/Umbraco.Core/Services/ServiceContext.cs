@@ -161,7 +161,7 @@ namespace Umbraco.Core.Services
                     logger));
 
             if (_notificationService == null)
-                _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
+                _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, repositoryFactory, logger));
 
             if (_serverRegistrationService == null)
                 _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory, logger));

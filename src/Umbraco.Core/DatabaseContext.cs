@@ -35,17 +35,6 @@ namespace Umbraco.Core
         private string _providerName;
         private DatabaseSchemaResult _result;
 
-        [Obsolete("Use the constructor specifying all dependencies instead")]
-        public DatabaseContext(IDatabaseFactory factory)
-            : this(factory, LoggerResolver.Current.Logger, new SqlSyntaxProviders(new ISqlSyntaxProvider[]
-            {
-                new MySqlSyntaxProvider(LoggerResolver.Current.Logger),
-                new SqlCeSyntaxProvider(), 
-                new SqlServerSyntaxProvider()
-            }))
-        {
-        }
-
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -74,7 +63,6 @@ namespace Umbraco.Core
         {
             _providerName = providerName;
             SqlSyntax = sqlSyntax;
-            SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
             _factory = factory;
             _logger = logger;
             _configured = true;
@@ -150,7 +138,7 @@ namespace Umbraco.Core
                 _providerName = "System.Data.SqlClient";
                 if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
                 {
-                    if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName) == false)
                         _providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
                 }
                 else
@@ -458,8 +446,6 @@ namespace Umbraco.Core
                     throw new InvalidOperationException("No " + typeof(ISqlSyntaxProvider) + " specified or no " + typeof(SqlSyntaxProviders) + " instance specified");
                 }
                 
-                SqlSyntaxContext.SqlSyntaxProvider = SqlSyntax;
-                
                 _configured = true;
             }
             catch (Exception e)
@@ -523,7 +509,7 @@ namespace Umbraco.Core
         internal DatabaseSchemaResult ValidateDatabaseSchema()
         {
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
-                return new DatabaseSchemaResult();
+                return new DatabaseSchemaResult(SqlSyntax);
 
             if (_result == null)
             {
@@ -583,7 +569,8 @@ namespace Umbraco.Core
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
-                    database.CreateDatabaseSchema();
+                    var schemaHelper = new DatabaseSchemaHelper(database, _logger, SqlSyntax);
+                    schemaHelper.CreateDatabaseSchema();
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
@@ -640,7 +627,7 @@ namespace Umbraco.Core
                                                 : new Version(GlobalSettings.ConfigurationStatus);
                 var targetVersion = UmbracoVersion.Current;
                 var runner = new MigrationRunner(_logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
-                var upgraded = runner.Execute(database, true);
+                var upgraded = runner.Execute(database, DatabaseProvider, SqlSyntax, true);
                 message = message + "<p>Upgrade completed!</p>";
 
                 //now that everything is done, we need to determine the version of SQL server that is executing

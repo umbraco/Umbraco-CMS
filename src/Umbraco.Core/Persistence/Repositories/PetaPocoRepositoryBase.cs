@@ -19,6 +19,15 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
+        /// <summary>
+        /// Used to create a new query instance
+        /// </summary>
+        /// <returns></returns>
+        public override Query<TEntity> Query
+        {
+            get { return new Query<TEntity>(SqlSyntax); }
+        } 
+
         protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger)
         {

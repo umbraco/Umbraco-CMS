@@ -2295,11 +2295,6 @@ namespace Umbraco.Core.Persistence
 			_args = args;
 		}
 
-		public static Sql Builder
-		{
-			get { return new Sql(); }
-		}
-
 		string _sql;
 		object[] _args;
 		Sql _rhs;

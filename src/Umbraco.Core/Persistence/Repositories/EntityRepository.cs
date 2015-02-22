@@ -11,6 +11,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Strings;
 
@@ -25,11 +26,13 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class EntityRepository : DisposableObject, IEntityRepository
     {
         private readonly IDatabaseUnitOfWork _work;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        public EntityRepository(IDatabaseUnitOfWork work)
-		{
-		    _work = work;
-		}
+        public EntityRepository(IDatabaseUnitOfWork work, ISqlSyntaxProvider sqlSyntax)
+        {
+            _work = work;
+            _sqlSyntax = sqlSyntax;
+        }
 
         /// <summary>
         /// Returns the Unit of Work added to the repository
@@ -48,6 +51,11 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #region Query Methods
+
+        public Query<IUmbracoEntity> Query
+        {
+            get { return new Query<IUmbracoEntity>(_sqlSyntax); }
+        }
 
         public IUmbracoEntity GetByKey(Guid key)
         {
@@ -246,6 +254,22 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public UmbracoObjectTypes GetObjectType(int id)
+        {
+            var sql = new Sql().Select("nodeObjectType").From<NodeDto>(_sqlSyntax).Where<NodeDto>(_sqlSyntax, x => x.NodeId == id);
+            var nodeObjectTypeId = _work.Database.ExecuteScalar<Guid>(sql);
+            var objectTypeId = nodeObjectTypeId;
+            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+        }
+
+        public UmbracoObjectTypes GetObjectType(Guid key)
+        {
+            var sql = new Sql().Select("nodeObjectType").From<NodeDto>(_sqlSyntax).Where<NodeDto>(_sqlSyntax, x => x.UniqueId == key);
+            var nodeObjectTypeId = _work.Database.ExecuteScalar<Guid>(sql);
+            var objectTypeId = nodeObjectTypeId;
+            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+        }
+
         #endregion
         
 
@@ -284,13 +308,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var joinSql = new Sql()
                 .Select("contentNodeId, versionId, dataNvarchar, dataNtext, propertyEditorAlias, alias as propertyTypeAlias")
-                .From<PropertyDataDto>()
-                .InnerJoin<NodeDto>()
-                .On<PropertyDataDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyTypeDto, PropertyDataDto>(dto => dto.Id, dto => dto.PropertyTypeId)
-                .InnerJoin<DataTypeDto>()
-                .On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
+                .From<PropertyDataDto>(_sqlSyntax)
+                .InnerJoin<NodeDto>(_sqlSyntax)
+                .On<PropertyDataDto, NodeDto>(_sqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .InnerJoin<PropertyTypeDto>(_sqlSyntax)
+                .On<PropertyTypeDto, PropertyDataDto>(_sqlSyntax, dto => dto.Id, dto => dto.PropertyTypeId)
+                .InnerJoin<DataTypeDto>(_sqlSyntax)
+                .On<PropertyTypeDto, DataTypeDto>(_sqlSyntax, dto => dto.DataTypeId, dto => dto.DataTypeId)
                 .Where("umbracoNode.nodeObjectType = @nodeObjectType", new {nodeObjectType = Constants.ObjectTypes.Media});
 
             if (filter != null)

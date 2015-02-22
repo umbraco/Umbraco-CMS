@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
 
         public IAlterColumnOptionSyntax WithDefault(SystemMethods method)
         {
-            var dc = new AlterDefaultConstraintExpression
+            var dc = new AlterDefaultConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              TableName = Expression.TableName,
                              SchemaName = Expression.SchemaName,
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
 
         public IAlterColumnOptionSyntax WithDefaultValue(object value)
         {
-            var dc = new AlterDefaultConstraintExpression
+            var dc = new AlterDefaultConstraintExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              TableName = Expression.TableName,
                              SchemaName = Expression.SchemaName,
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
         {
             Expression.Column.IsIndexed = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
         {
             Expression.Column.IsUnique = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -172,7 +172,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
         {
             Expression.Column.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression
+            var fk = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              ForeignKey = new ForeignKeyDefinition
                                               {
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
         public IAlterColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                       string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression
+            var fk = new CreateForeignKeyExpression(_context.SqlSyntax, _context.CurrentDatabaseProvider)
                          {
                              ForeignKey = new ForeignKeyDefinition
                                               {

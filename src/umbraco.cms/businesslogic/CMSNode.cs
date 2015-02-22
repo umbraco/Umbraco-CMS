@@ -18,10 +18,8 @@ using Umbraco.Core.IO;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.workflow;
-using umbraco.cms.businesslogic.Tags;
 using File = System.IO.File;
 using Media = umbraco.cms.businesslogic.media.Media;
-using Tag = umbraco.cms.businesslogic.Tags.Tag;
 using Notification = umbraco.cms.businesslogic.workflow.Notification;
 using Task = umbraco.cms.businesslogic.task.Task;
 
@@ -568,8 +566,8 @@ order by level,sortOrder";
                 //remove permissions
                 Permission.DeletePermissions(this);
 
-                //removes tag associations (i know the key is set to cascade but do it anyways)
-                Tag.RemoveTagsFromNode(this.Id);
+                ////removes tag associations (i know the key is set to cascade but do it anyways)
+                //Tag.RemoveTagsFromNode(this.Id);
 
                 SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
                 FireAfterDelete(e);

@@ -1,15 +1,12 @@
 ﻿using System;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
 {
     public class ExecuteCodeStatementExpression : MigrationExpressionBase
     {
-        public ExecuteCodeStatementExpression()
-        {
-        }
-
-        public ExecuteCodeStatementExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
+        public ExecuteCodeStatementExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
+            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
         {
         }
 
@@ -17,7 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
 
         public override string Process(Database database)
         {
-            if(CodeStatement != null)
+            if (CodeStatement != null)
                 return CodeStatement(database);
 
             return base.Process(database);

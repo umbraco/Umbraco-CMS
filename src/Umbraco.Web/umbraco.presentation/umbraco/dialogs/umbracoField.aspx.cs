@@ -61,7 +61,7 @@ namespace umbraco.dialogs
 			{
                 //exclude built-in memberhip properties from showing up here
 			    var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs()
-                    .Select(x => SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(x.Key)).ToArray();
+                    .Select(x => ApplicationContext.Current.DatabaseContext.SqlSyntax.GetQuotedValue(x.Key)).ToArray();
 
 				fieldSql = string.Format(
                     "select distinct alias from cmsPropertyType where alias not in ({0}) order by alias",

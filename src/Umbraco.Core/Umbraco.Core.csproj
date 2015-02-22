@@ -323,6 +323,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
@@ -899,7 +900,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlSyntaxContext.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviders.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />

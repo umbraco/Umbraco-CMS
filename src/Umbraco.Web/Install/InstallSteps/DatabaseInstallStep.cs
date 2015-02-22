@@ -21,6 +21,9 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(object model)
         {
+            if (_applicationContext.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
             var result = _applicationContext.DatabaseContext.CreateDatabaseSchemaAndData();
 
             if (result.Success == false)

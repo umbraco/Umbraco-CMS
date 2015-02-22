@@ -243,7 +243,6 @@
     <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\ProviderBase.cs" />
-    <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />

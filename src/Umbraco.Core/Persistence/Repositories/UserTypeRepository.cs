@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                sql.Where<UserTypeDto>(x => x.Id >= 0);
+                sql.Where<UserTypeDto>(SqlSyntax, x => x.Id >= 0);
             }
 
             var dtos = Database.Fetch<UserTypeDto>(sql);
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<UserTypeDto>();
+                .From<UserTypeDto>(SqlSyntax);
             return sql;
         }
 

@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Services
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
-                    DatabaseContext.Database.BulkInsertRecords(xmlItems);
+                    DatabaseContext.Database.BulkInsertRecords(SqlSyntax, xmlItems);
                 }
             }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Services
                                                     INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        DatabaseContext.Database.BulkInsertRecords(xmlItems, tr);
+                        DatabaseContext.Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
 
                         tr.Complete();
                     }
@@ -288,21 +288,21 @@ namespace Umbraco.Tests.Services
                     Path = ""
                 });
             }
-            DatabaseContext.Database.BulkInsertRecords(nodes);
+            DatabaseContext.Database.BulkInsertRecords(SqlSyntax, nodes);
 
             //re-get the nodes with ids
             var sql = new Sql();
-            sql.Select("*").From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
+            sql.Select("*").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == customObjectType);
             nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
 
             //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
             var contentTypeId = 0;
             var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
-            DatabaseContext.Database.BulkInsertRecords(cmsContentItems);
+            DatabaseContext.Database.BulkInsertRecords(SqlSyntax, cmsContentItems);
 
             //create the xml data
             var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
-            DatabaseContext.Database.BulkInsertRecords(xmlItems);
+            DatabaseContext.Database.BulkInsertRecords(SqlSyntax, xmlItems);
 
             return nodes;
         }

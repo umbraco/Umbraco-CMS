@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -12,21 +13,23 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class NotificationsRepository
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        public NotificationsRepository(IDatabaseUnitOfWork unitOfWork)
+        public NotificationsRepository(IDatabaseUnitOfWork unitOfWork, ISqlSyntaxProvider sqlSyntax)
         {
             _unitOfWork = unitOfWork;
+            _sqlSyntax = sqlSyntax;
         }
 
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
             var sql = new Sql()
                 .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
-                .From<User2NodeNotifyDto>()
-                .InnerJoin<NodeDto>()
-                .On<User2NodeNotifyDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<User2NodeNotifyDto>(dto => dto.UserId == (int)user.Id)
-                .OrderBy<NodeDto>(dto => dto.NodeId);
+                .From<User2NodeNotifyDto>(_sqlSyntax)
+                .InnerJoin<NodeDto>(_sqlSyntax)
+                .On<User2NodeNotifyDto, NodeDto>(_sqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .Where<User2NodeNotifyDto>(_sqlSyntax, dto => dto.UserId == (int)user.Id)
+                .OrderBy<NodeDto>(_sqlSyntax, dto => dto.NodeId);
 
             var dtos = _unitOfWork.Database.Fetch<dynamic>(sql);
             //need to map the results
@@ -37,11 +40,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql()
                 .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
-                .From<User2NodeNotifyDto>()
-                .InnerJoin<NodeDto>()
-                .On<User2NodeNotifyDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<User2NodeNotifyDto>(dto => dto.NodeId == entity.Id)
-                .OrderBy<NodeDto>(dto => dto.NodeId);
+                .From<User2NodeNotifyDto>(_sqlSyntax)
+                .InnerJoin<NodeDto>(_sqlSyntax)
+                .On<User2NodeNotifyDto, NodeDto>(_sqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .Where<User2NodeNotifyDto>(_sqlSyntax, dto => dto.NodeId == entity.Id)
+                .OrderBy<NodeDto>(_sqlSyntax, dto => dto.NodeId);
 
             var dtos = _unitOfWork.Database.Fetch<dynamic>(sql);
             //need to map the results
@@ -68,8 +71,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql()
                 .Select("DISTINCT nodeObjectType")
-                .From<NodeDto>()
-                .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
+                .From<NodeDto>(_sqlSyntax)
+                .Where<NodeDto>(_sqlSyntax, nodeDto => nodeDto.NodeId == entity.Id);
             var nodeType = _unitOfWork.Database.ExecuteScalar<Guid>(sql);
 
             var dto = new User2NodeNotifyDto()

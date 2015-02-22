@@ -46,7 +46,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax)
+                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
                 return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
             }
@@ -57,7 +58,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
             var sql = translator.Translate()
-                .OrderBy<NodeDto>(x => x.Text);
+                .OrderBy<NodeDto>(SqlSyntax, x => x.Text);
 
             var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
             return dtos.Any()
@@ -96,12 +97,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
 
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ContentTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-               .LeftJoin<DocumentTypeDto>()
-               .On<DocumentTypeDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+               .From<ContentTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+               .LeftJoin<DocumentTypeDto>(SqlSyntax)
+               .On<DocumentTypeDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
         }
@@ -149,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </remarks>
         protected override void PersistDeletedItem(IContentType entity)
         {
-            var query = Query<IContentType>.Builder.Where(x => x.ParentId == entity.Id);
+            var query = Query.Where(x => x.ParentId == entity.Id);
             var children = GetByQuery(query);
             foreach (var child in children)
             {
