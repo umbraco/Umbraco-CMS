@@ -36,14 +36,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-        public static string MetablogConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/metablogConfig.config";
-            }
-        }
-
         public static string DashboardConfig
         {
             get

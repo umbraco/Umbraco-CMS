@@ -895,8 +895,6 @@
     <Content Include="Umbraco\Actions\editContent.aspx" />
     <Content Include="Umbraco\Actions\preview.aspx" />
     <Content Include="Umbraco\Actions\publish.aspx" />
-    <Content Include="Umbraco\Channels\rsd.aspx" />
-    <Content Include="Umbraco\Channels\wlwmanifest.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
     <Content Include="Umbraco\Config\Lang\de.xml" />
     <Content Include="Umbraco\Config\Lang\es.xml" />
