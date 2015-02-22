@@ -11,7 +11,23 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObject, IUserStore<BackOfficeIdentityUser, int>, IUserPasswordStore<BackOfficeIdentityUser, int>, IUserEmailStore<BackOfficeIdentityUser, int>, IUserLoginStore<BackOfficeIdentityUser, int>
+    public class BackOfficeUserStore : DisposableObject, 
+        IUserStore<BackOfficeIdentityUser, int>, 
+        IUserPasswordStore<BackOfficeIdentityUser, int>, 
+        IUserEmailStore<BackOfficeIdentityUser, int>, 
+        IUserLoginStore<BackOfficeIdentityUser, int>
+
+        //IUserRoleStore<BackOfficeIdentityUser, int>,
+
+        //TODO: This will require additional columns/tables
+        //IUserLockoutStore<BackOfficeIdentityUser, int>
+
+        //TODO: Implement this - might need to add a new column for this 
+        // http://stackoverflow.com/questions/19487322/what-is-asp-net-identitys-iusersecuritystampstoretuser-interface
+        //IUserSecurityStampStore<BackOfficeIdentityUser, int>
+
+        //TODO: To do this we need to implement IQueryable - seems pretty overkill?
+        //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
         private readonly IExternalLoginService _externalLoginService;

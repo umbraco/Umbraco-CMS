@@ -13,33 +13,6 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Security
 {
     /// <summary>
-    /// A custom password hasher that conforms to the current password hashing done in Umbraco
-    /// </summary>
-    internal class MembershipPasswordHasher : IPasswordHasher
-    {
-        private readonly MembershipProviderBase _provider;
-
-        public MembershipPasswordHasher(MembershipProviderBase provider)
-        {
-            _provider = provider;
-        }
-
-        public string HashPassword(string password)
-        {
-            return _provider.HashPasswordForStorage(password);
-        }
-
-        public PasswordVerificationResult VerifyHashedPassword(string hashedPassword, string providedPassword)
-        {
-            return _provider.VerifyPassword(providedPassword, hashedPassword)
-                ? PasswordVerificationResult.Success
-                : PasswordVerificationResult.Failed;
-        }
-
-
-    }
-
-    /// <summary>
     /// Back office user manager
     /// </summary>
     public class BackOfficeUserManager : UserManager<BackOfficeIdentityUser, int>
@@ -50,6 +23,12 @@ namespace Umbraco.Core.Security
         }
 
         #region What we support currently
+
+        //NOTE: Not sure if we really want/need to ever support this 
+        public override bool SupportsUserClaim
+        {
+            get { return false; }
+        }
 
         //TODO: Support this
         public override bool SupportsUserRole
@@ -75,11 +54,13 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
 
+        //TODO: Support this
         public override bool SupportsUserTwoFactor
         {
             get { return false; }
         }
 
+        //TODO: Support this
         public override bool SupportsUserPhoneNumber
         {
             get { return false; }
@@ -127,7 +108,7 @@ namespace Umbraco.Core.Security
             }
 
             //custom identity factory for creating the identity object for which we auth against in the back office
-            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
+            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();            
 
             //NOTE: Not implementing these currently
 

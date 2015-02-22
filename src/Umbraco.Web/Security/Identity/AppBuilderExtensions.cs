@@ -37,6 +37,9 @@ namespace Umbraco.Web.Security.Identity
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
+
+            //Configure Umbraco role manager to be created per request
+            app.CreatePerOwinContext<BackOfficeRoleManager>((options, owinContext) => BackOfficeRoleManager.Create(options));
         }
 
         /// <summary>
@@ -70,13 +73,15 @@ namespace Umbraco.Web.Security.Identity
             return app;
         }
 
+        /// <summary>
+        /// Ensures that the cookie middleware for validating external logins is assigned to the pipeline with the correct
+        /// Umbraco back office configuration
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
         public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app)
         {
             if (app == null) throw new ArgumentNullException("app");
-
-            //TODO: Figure out why this isn't working and is only working with the default one, must be a reference somewhere
-
-            //app.UseExternalSignInCookie("UmbracoExternalCookie");
 
             app.SetDefaultSignInAsAuthenticationType("UmbracoExternalCookie");
             app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -92,11 +97,6 @@ namespace Umbraco.Web.Security.Identity
                 CookieHttpOnly = true,
                 CookieDomain = UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain
             });
-
-
-            //NOTE: This works, but this is just the default implementation which we don't want because other devs
-            //might want to use this... right?
-            //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
             return app;
         }
