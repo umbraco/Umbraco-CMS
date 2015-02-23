@@ -54,7 +54,7 @@ namespace Umbraco.Tests.TestHelpers
         //Used to flag if its the first test in the current fixture
         private bool _isFirstTestInFixture = false;
 
-        private ApplicationContext _appContext;
+        //private ApplicationContext _appContext;
 
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
@@ -68,40 +68,17 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-
-            var dbFactory = new DefaultDatabaseFactory(
-                GetDbConnectionString(),
-                GetDbProviderName(),
-                Logger);
-
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
-
-            _appContext = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
-                //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger, new[] { new DefaultUrlSegmentProvider() }),
-                cacheHelper,
-                ProfilingLogger)
-            {
-                IsReady = true
-            };
-
             base.Initialize();
 
-            using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("init"))
-            {
-                //TODO: Somehow make this faster - takes 5s +
+            
 
-                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
-                CreateSqlCeDatabase();
-                InitializeDatabase();
+            
 
-                //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
-            }
+            
+
+            
+
+            
         }
 
         protected override void ConfigureContainer()
@@ -128,7 +105,40 @@ namespace Umbraco.Tests.TestHelpers
 
         protected override void SetupApplicationContext()
         {
-            ApplicationContext.Current = _appContext;
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
+            var dbFactory = new DefaultDatabaseFactory(
+                GetDbConnectionString(),
+                GetDbProviderName(),
+                Logger);
+
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
+
+            var appContext = new ApplicationContext(
+                //assign the db context
+                new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
+                //assign the service context
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger, new[] { new DefaultUrlSegmentProvider() }),
+                cacheHelper,
+                ProfilingLogger)
+            {
+                IsReady = true
+            };
+
+            ApplicationContext.Current = appContext;
+
+            using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("init"))
+            {
+                //TODO: Somehow make this faster - takes 5s +
+
+                appContext.DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                CreateSqlCeDatabase();
+                InitializeDatabase();
+
+                //ensure the configuration matches the current version for tests
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+            }            
         }
 
         /// <summary>

@@ -311,7 +311,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get the referenced column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
-            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
+            var mapper = QueryFactory.MappingResolver.ResolveMapperByType(typeof(IUser));
             var mappedField = mapper.Map(expressionMember.Name);
             if (mappedField.IsNullOrWhiteSpace())
             {
