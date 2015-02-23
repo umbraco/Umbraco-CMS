@@ -236,10 +236,6 @@ namespace Umbraco.Tests.TestHelpers
                  () => PluginManager.Current.ResolvePropertyEditors(),
                  new ManifestBuilder(new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")))));
 
-            //MappingResolver.Current = new MappingResolver(
-            //    Container, Logger,
-            //   () => PluginManager.Current.ResolveAssignedMapperTypes());
-
             if (PropertyValueConvertersResolver.HasCurrent == false)
                 PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
 

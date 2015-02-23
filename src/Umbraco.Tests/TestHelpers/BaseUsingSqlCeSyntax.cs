@@ -43,10 +43,6 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            //MappingResolver.Current = new MappingResolver(
-            //    container, logger.Logger,
-            //    () => PluginManager.Current.ResolveAssignedMapperTypes());
-
             Resolution.Freeze();
             SetUp();
         }
