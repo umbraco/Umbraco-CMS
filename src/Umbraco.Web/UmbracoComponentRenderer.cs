@@ -153,7 +153,7 @@ namespace Umbraco.Web
                 //NOTE: the value could have html encoded values, so we need to deal with that
                 macroProps.Add(i.Key.ToLowerInvariant(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
-            var macroControl = m.renderMacro(macroProps,
+            var macroControl = m.RenderMacro(macroProps,
                 umbracoPage.Elements,
                 _umbracoContext.PageId.Value);
 

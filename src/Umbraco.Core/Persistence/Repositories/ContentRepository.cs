@@ -329,7 +329,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<AccessRuleDto>(SqlSyntax)
                 .InnerJoin<AccessDto>(SqlSyntax)
                 .On<AccessRuleDto, AccessDto>(SqlSyntax, left => left.AccessId, right => right.Id)
-                .Where<AccessDto>(dto => dto.NodeId == entity.Id);
+                .Where<AccessDto>(SqlSyntax, dto => dto.NodeId == entity.Id);
             Database.Execute(SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
 
             //now let the normal delete clauses take care of everything else

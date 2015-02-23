@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence
         {
             return new PublicAccessRepository(uow,
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence
         {
             return new AuditRepository(uow,
                 CacheHelper.CreateDisabledCacheHelper(), //never cache
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual ITagRepository CreateTagRepository(IDatabaseUnitOfWork uow)
