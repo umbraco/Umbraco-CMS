@@ -641,12 +641,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="content"></param>
         /// <returns>True if the content has any published versiom otherwise False</returns>
+        [Obsolete("Use the HasPublishedVersion property.", false)]
         public static bool HasPublishedVersion(this IContent content)
         {
-            if (content.HasIdentity == false)
-                return false;
-
-            return ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
+            return content.HasPublishedVersion;
         }
 
         #region Tag methods

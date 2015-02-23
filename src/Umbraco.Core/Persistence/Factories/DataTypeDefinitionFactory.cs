@@ -24,10 +24,7 @@ namespace Umbraco.Core.Persistence.Factories
                                              CreateDate = dto.NodeDto.CreateDate,
                                              DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true),
                                              Id = dto.DataTypeId,
-                                             Key =
-                                                 dto.NodeDto.UniqueId.HasValue
-                                                     ? dto.NodeDto.UniqueId.Value
-                                                     : dto.DataTypeId.ToGuid(),
+                                             Key = dto.NodeDto.UniqueId,
                                              Level = dto.NodeDto.Level,
                                              UpdateDate = dto.NodeDto.CreateDate,
                                              Name = dto.NodeDto.Text,

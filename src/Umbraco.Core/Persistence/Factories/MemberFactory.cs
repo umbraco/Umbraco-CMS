@@ -35,10 +35,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dto.Email,dto.LoginName,dto.Password, _contentType)
             {
                 Id = _id,
-                Key =
-                    dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.HasValue
-                        ? dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.Value
-                        : _id.ToGuid(),
+                Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId,
                 Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
                 CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
                 Level = dto.ContentVersionDto.ContentDto.NodeDto.Level,

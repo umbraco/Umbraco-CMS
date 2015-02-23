@@ -177,6 +177,7 @@
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
@@ -463,7 +464,6 @@
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
-    <Compile Include="TestHelpers\DisposableUmbracoTest.cs" />
     <Compile Include="TreesAndSections\BaseContentTreeTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />

@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest)
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -107,6 +107,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
+            var sqlx = string.Format("LEFT OUTER JOIN {0} {1} ON ({1}.{2}={0}.{2} AND {1}.{3}=1)",
+                SqlSyntax.GetQuotedTableName("cmsDocument"),
+                SqlSyntax.GetQuotedTableName("cmsDocument2"),
+                SqlSyntax.GetQuotedColumnName("nodeId"),
+                SqlSyntax.GetQuotedColumnName("published"));
+
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From<DocumentDto>(SqlSyntax)
@@ -116,6 +122,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+
+                // cannot do this because PetaPoco does not know how to alias the table
+                //.LeftOuterJoin<DocumentPublishedReadOnlyDto>()
+                //.On<DocumentDto, DocumentPublishedReadOnlyDto>(left => left.NodeId, right => right.NodeId)
+                // so have to rely on writing our own SQL
+                .Append(sqlx/*, new { @published = true }*/)
+
                 .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -142,7 +155,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
+                               "DELETE FROM umbracoNode WHERE id = @Id",
+                               "DELETE FROM umbracoAccess WHERE nodeId = @Id"
                            };
             return list;
         }
@@ -241,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -306,6 +320,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
+        protected override void PersistDeletedItem(IContent entity)
+        {
+            //We need to clear out all access rules but we need to do this in a manual way since 
+            // nothing in that table is joined to a content id
+            var subQuery = new Sql()
+                .Select("umbracoAccessRule.accessId")
+                .From<AccessRuleDto>(SqlSyntax)
+                .InnerJoin<AccessDto>(SqlSyntax)
+                .On<AccessRuleDto, AccessDto>(SqlSyntax, left => left.AccessId, right => right.Id)
+                .Where<AccessDto>(dto => dto.NodeId == entity.Id);
+            Database.Execute(SqlSyntax.GetDeleteSubquery("umbracoAccessRule", "accessId", subQuery));
+
+            //now let the normal delete clauses take care of everything else
+            base.PersistDeletedItem(entity);
+        }
+
         protected override void PersistNewItem(IContent entity)
         {
             ((Content)entity).AddingEntity();
@@ -343,7 +373,6 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
             entity.Level = level;
-
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161     
@@ -402,6 +431,19 @@ namespace Umbraco.Core.Persistence.Repositories
             if (entity.Published)
             {
                 UpdatePropertyTags(entity, _tagRepository);
+            }
+
+            // published => update published version infos, else leave it blank
+            if (entity.Published)
+            {
+                dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
+                {
+                    VersionId = dto.VersionId,
+                    Newest = true,
+                    NodeId = dto.NodeId,
+                    Published = true
+                };
+                ((Content)entity).PublishedVersionGuid = dto.VersionId;
             }
 
             entity.ResetDirtyProperties();
@@ -561,6 +603,31 @@ namespace Umbraco.Core.Persistence.Repositories
                 ClearEntityTags(entity, _tagRepository);
             }
 
+            // published => update published version infos,
+            // else if unpublished then clear published version infos
+            if (entity.Published)
+            {
+                dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
+                {
+                    VersionId = dto.VersionId,
+                    Newest = true,
+                    NodeId = dto.NodeId,
+                    Published = true
+                };
+                ((Content)entity).PublishedVersionGuid = dto.VersionId;
+            }
+            else if (publishedStateChanged)
+            {
+                dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
+                {
+                    VersionId = default(Guid),
+                    Newest = false,
+                    NodeId = dto.NodeId,
+                    Published = false
+                };
+                ((Content)entity).PublishedVersionGuid = default(Guid);
+            }
+
             entity.ResetDirtyProperties();
         }
 
@@ -584,7 +651,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
 
             foreach (var dto in dtos)
             {
@@ -742,7 +809,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IContent> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
 
             //nothing found
             if (dtos.Any() == false) return Enumerable.Empty<IContent>();

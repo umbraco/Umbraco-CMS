@@ -287,6 +287,13 @@ namespace Umbraco.Core.Services
         IContent GetPublishedVersion(int id);
 
         /// <summary>
+        /// Gets the published version of a <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <returns>The published version, if any; otherwise, null.</returns>
+        IContent GetPublishedVersion(IContent content);
+
+        /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any children
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/></param>

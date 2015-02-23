@@ -115,17 +115,15 @@ namespace Umbraco.Web.Cache
             ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
 
             //public access events
-            Access.AfterSave += Access_AfterSave;
+            PublicAccessService.Saved += PublicAccessService_Saved;
         }
-
-       
 
         #region Public access event handlers
 
-        static void Access_AfterSave(Access sender, SaveEventArgs e)
+        static void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
         {
             DistributedCache.Instance.RefreshPublicAccess();
-        } 
+        }
 
         #endregion
 

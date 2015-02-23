@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
 using Umbraco.Core;
@@ -15,8 +16,11 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models;
+using Umbraco.Core.Profiling;
 using umbraco.DataLayer;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Web.Scheduling;
 using File = System.IO.File;
 
 namespace umbraco
@@ -26,6 +30,18 @@ namespace umbraco
     /// </summary>
     public class content
     {
+        private static readonly BackgroundTaskRunner<XmlCacheFilePersister> FilePersister
+            = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions { LongRunning = true });
+
+        private XmlCacheFilePersister _persisterTask;
+
+        private content()
+        {
+            _persisterTask = new XmlCacheFilePersister(FilePersister, this, UmbracoXmlDiskCacheFileName,
+                new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler));
+            FilePersister.Add(_persisterTask);
+        }
+
         #region Declarations
 
         // Sync access to disk file
@@ -63,7 +79,6 @@ namespace umbraco
         }
 
         #endregion
-
 
         #region Singleton
 
@@ -123,7 +138,7 @@ namespace umbraco
         /// <remarks>
         /// Before returning we always check to ensure that the xml is loaded
         /// </remarks>
-        protected virtual XmlDocument XmlContentInternal
+        protected internal virtual XmlDocument XmlContentInternal
         {
             get
             {
@@ -309,8 +324,7 @@ namespace umbraco
                 // and clear the queue in case is this a web request, we don't want it reprocessing.
                 if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
                 {
-                    RemoveXmlFilePersistenceQueue();
-                    PersistXmlToFile(xmlDoc);
+                    QueueXmlForPersistence();
                 }
             }
         }
@@ -888,54 +902,6 @@ namespace umbraco
 
         #region Protected & Private methods
 
-        internal const string PersistenceFlagContextKey = "vnc38ykjnkjdnk2jt98ygkxjng";
-
-		/// <summary>
-		/// Removes the flag that queues the file for persistence
-		/// </summary>
-		internal void RemoveXmlFilePersistenceQueue()
-		{
-		    if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
-		    {
-                UmbracoContext.Current.HttpContext.Application.Lock();
-                UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] = null;
-                UmbracoContext.Current.HttpContext.Application.UnLock();   
-		    }			
-		}
-
-        internal bool IsXmlQueuedForPersistenceToFile
-        {
-            get
-            {
-                if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
-                {
-                    bool val = UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] != null;
-                    if (val)
-                    {
-                        DateTime persistenceTime = DateTime.MinValue;
-                        try
-                        {
-                            persistenceTime = (DateTime)UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey];
-                            if (persistenceTime > GetCacheFileUpdateTime())
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                RemoveXmlFilePersistenceQueue();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            // Nothing to catch here - we'll just persist
-                            LogHelper.Error<content>("An error occurred checking if xml file is queued for persistence", ex);
-                        }
-                    }
-                }
-                return false;
-            }
-        }
-
         /// <summary>
         /// Invalidates the disk content cache file. Effectively just deletes it.
         /// </summary>
@@ -1183,51 +1149,26 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
+        [Obsolete("This method should not be used, xml file persistence is done in a queue using a BackgroundTaskRunner")]
         public void PersistXmlToFile()
-        {
-            PersistXmlToFile(_xmlContent);
-        }
-
-        /// <summary>
-        /// Persist a XmlDocument to the Disk Cache
-        /// </summary>
-        /// <param name="xmlDoc"></param>
-        internal void PersistXmlToFile(XmlDocument xmlDoc)
         {
             lock (ReaderWriterSyncLock)
             {
-                if (xmlDoc != null)
-                {
-                    LogHelper.Debug<content>("Saving content to disk on thread '{0}' (Threadpool? {1})",
-                        () => Thread.CurrentThread.Name,
-                        () => Thread.CurrentThread.IsThreadPoolThread);
-                    
+                if (_xmlContent != null)
+                {                    
                     try
                     {
-                        Stopwatch stopWatch = Stopwatch.StartNew();
+                        // create directory for cache path if it doesn't yet exist
+                        var directoryName = Path.GetDirectoryName(UmbracoXmlDiskCacheFileName);
+                        Directory.CreateDirectory(directoryName);
 
-                        DeleteXmlCache();
-
-                        // Try to create directory for cache path if it doesn't yet exist
-                        string directoryName = Path.GetDirectoryName(UmbracoXmlDiskCacheFileName);
-                        if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(directoryName))
-                        {
-                            // We're already in a try-catch and saving will fail if this does, so don't need another
-                            Directory.CreateDirectory(directoryName);
-                        }
-
-                        xmlDoc.Save(UmbracoXmlDiskCacheFileName);
-                        
-                        LogHelper.Debug<content>("Saved content on thread '{0}' in {1} (Threadpool? {2})",
-                            () => Thread.CurrentThread.Name,
-                            () => stopWatch.Elapsed,
-                            () => Thread.CurrentThread.IsThreadPoolThread);
+                        _xmlContent.Save(UmbracoXmlDiskCacheFileName);
                     }
                     catch (Exception ee)
                     {
                         // If for whatever reason something goes wrong here, invalidate disk cache
                         DeleteXmlCache();
-                        
+
                         LogHelper.Error<content>(string.Format(
                             "Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})",
                             Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread), ee);
@@ -1237,48 +1178,17 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         }
 
         /// <summary>
-        /// Marks a flag in the HttpContext so that, upon page execution completion, the Xml cache will
-        /// get persisted to disk. Ensure this method is only called from a thread executing a page request
-        /// since UmbracoModule is the only monitor of this flag and is responsible
-        /// for enacting the persistence at the PostRequestHandlerExecute stage of the page lifecycle.
+        /// Adds a task to the xml cache file persister
         /// </summary>
         private void QueueXmlForPersistence()
         {
-            //if this is called outside a web request we cannot queue it it will run in the current thread.
-            
-            if (UmbracoContext.Current != null && UmbracoContext.Current.HttpContext != null)
-            {
-                UmbracoContext.Current.HttpContext.Application.Lock();
-                try
-                {
-                    if (UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] != null)
-                    {
-                        UmbracoContext.Current.HttpContext.Application.Add(PersistenceFlagContextKey, null);
-                    }
-                    UmbracoContext.Current.HttpContext.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
-                }
-                finally
-                {
-                    UmbracoContext.Current.HttpContext.Application.UnLock();    
-                }
-            }          
-            else
-            {
-                // Save copy of content
-                if (UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent)
-                {
-                    XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
-                    PersistXmlToFile(xmlContentCopy);
-                }
-                else
-                {
-                    PersistXmlToFile();
-                }
-            }    
+            _persisterTask = _persisterTask.Touch();
         }
 
         internal DateTime GetCacheFileUpdateTime()
         {
+            //TODO: Should there be a try/catch here in case the file is being written to while this is trying to be executed?
+
             if (File.Exists(UmbracoXmlDiskCacheFileName))
             {
                 return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTimeUtc;

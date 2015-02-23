@@ -13,27 +13,59 @@ namespace Umbraco.Core.Persistence
 {
     public static class PetaPocoExtensions
     {
-        
+        // NOTE
+        //
+        // proper way to do it with TSQL and SQLCE
+        //   IF EXISTS (SELECT ... FROM table WITH (UPDLOCK,HOLDLOCK)) WHERE ...)
+        //   BEGIN
+        //     UPDATE table SET ... WHERE ...
+        //   END
+        //   ELSE
+        //   BEGIN
+        //     INSERT INTO table (...) VALUES (...)
+        //   END
+        //
+        // works in READ COMMITED, TSQL & SQLCE lock the constraint even if it does not exist, so INSERT is OK
+        //
+        // proper way to do it with MySQL
+        //   IF EXISTS (SELECT ... FROM table WHERE ... FOR UPDATE)
+        //   BEGIN
+        //     UPDATE table SET ... WHERE ...
+        //   END
+        //   ELSE
+        //   BEGIN
+        //     INSERT INTO table (...) VALUES (...)
+        //   END
+        //
+        // MySQL locks the constraint ONLY if it exists, so INSERT may fail...
+        //   in theory, happens in READ COMMITTED but not REPEATABLE READ
+        //   http://www.percona.com/blog/2012/08/28/differences-between-read-committed-and-repeatable-read-transaction-isolation-levels/
+        //   but according to
+        //   http://dev.mysql.com/doc/refman/5.0/en/set-transaction.html
+        //   it won't work for exact index value (only ranges) so really...
+        //
+        // MySQL should do
+        //   INSERT INTO table (...) VALUES (...) ON DUPLICATE KEY UPDATE ...
+        //
+        // also the lock is released when the transaction is committed
+        // not sure if that can have unexpected consequences on our code?
+        //
+        // so... for the time being, let's do with that somewhat crazy solution below...
 
         /// <summary>
-        /// This will handle the issue of inserting data into a table when there can be a violation of a primary key or unique constraint which
-        /// can occur when two threads are trying to insert data at the exact same time when the data violates this constraint. 
+        /// Safely inserts a record, or updates if it exists, based on a unique constraint.
         /// </summary>
         /// <param name="db"></param>
         /// <param name="poco"></param>       
-        /// <returns>
-        /// Returns the action that executed, either an insert or an update
-        /// 
-        /// NOTE: If an insert occurred and a PK value got generated, the poco object passed in will contain the updated value.
-        /// </returns>
+        /// <returns>The action that executed, either an insert or an update. If an insert occurred and a PK value got generated, the poco object
+        /// passed in will contain the updated value.</returns>
         /// <remarks>
-        /// In different databases, there are a few raw SQL options like MySql's ON DUPLICATE KEY UPDATE or MSSQL's MERGE WHEN MATCHED, but since we are 
-        /// also supporting SQLCE for which this doesn't exist we cannot simply rely on the underlying database to help us here. So we'll actually need to 
-        /// try to be as proficient as possible when we know this can occur and manually handle the issue. 
-        /// 
-        /// We do this by first trying to Update the record, this will return the number of rows affected. If it is zero then we insert, if it is one, then
-        /// we know the update was successful and the row was already inserted by another thread. If the rowcount is zero and we insert and get an exception, 
-        /// that's due to a race condition, in which case we need to retry and update.
+        /// <para>We cannot rely on database-specific options such as MySql ON DUPLICATE KEY UPDATE or MSSQL MERGE WHEN MATCHED because SQLCE
+        /// does not support any of them. Ideally this should be achieved with proper transaction isolation levels but that would mean revisiting
+        /// isolation levels globally. We want to keep it simple for the time being and manage it manually.</para>
+        /// <para>We handle it by trying to update, then insert, etc. until something works, or we get bored.</para>
+        /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
+        /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
         internal static RecordPersistenceType InsertOrUpdate<T>(this Database db, T poco)
             where T : class
@@ -42,66 +74,69 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <summary>
-        /// This will handle the issue of inserting data into a table when there can be a violation of a primary key or unique constraint which
-        /// can occur when two threads are trying to insert data at the exact same time when the data violates this constraint. 
+        /// Safely inserts a record, or updates if it exists, based on a unique constraint.
         /// </summary>
         /// <param name="db"></param>
         /// <param name="poco"></param>
         /// <param name="updateArgs"></param>      
         /// <param name="updateCommand">If the entity has a composite key they you need to specify the update command explicitly</param>
-        /// <returns>
-        /// Returns the action that executed, either an insert or an update
-        /// 
-        /// NOTE: If an insert occurred and a PK value got generated, the poco object passed in will contain the updated value.
-        /// </returns>
+        /// <returns>The action that executed, either an insert or an update. If an insert occurred and a PK value got generated, the poco object
+        /// passed in will contain the updated value.</returns>
         /// <remarks>
-        /// In different databases, there are a few raw SQL options like MySql's ON DUPLICATE KEY UPDATE or MSSQL's MERGE WHEN MATCHED, but since we are 
-        /// also supporting SQLCE for which this doesn't exist we cannot simply rely on the underlying database to help us here. So we'll actually need to 
-        /// try to be as proficient as possible when we know this can occur and manually handle the issue. 
-        /// 
-        /// We do this by first trying to Update the record, this will return the number of rows affected. If it is zero then we insert, if it is one, then
-        /// we know the update was successful and the row was already inserted by another thread. If the rowcount is zero and we insert and get an exception, 
-        /// that's due to a race condition, in which case we need to retry and update.
+        /// <para>We cannot rely on database-specific options such as MySql ON DUPLICATE KEY UPDATE or MSSQL MERGE WHEN MATCHED because SQLCE
+        /// does not support any of them. Ideally this should be achieved with proper transaction isolation levels but that would mean revisiting
+        /// isolation levels globally. We want to keep it simple for the time being and manage it manually.</para>
+        /// <para>We handle it by trying to update, then insert, etc. until something works, or we get bored.</para>
+        /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
+        /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
         internal static RecordPersistenceType InsertOrUpdate<T>(this Database db,
-            T poco, 
-            string updateCommand, 
+            T poco,
+            string updateCommand,
             object updateArgs)
             where T : class
         {
-            if (poco == null) throw new ArgumentNullException("poco");
+            if (poco == null)
+                throw new ArgumentNullException("poco");
 
+            // try to update
             var rowCount = updateCommand.IsNullOrWhiteSpace()
                     ? db.Update(poco)
-                    : db.Update<T>(updateCommand, updateArgs); 
-
-            if (rowCount > 0) return RecordPersistenceType.Update;
-
-            try
-            {
-                db.Insert(poco);
-                return RecordPersistenceType.Insert;
-            }
-            //TODO: Need to find out if this is the same exception that will occur for all databases... pretty sure it will be
-            catch (SqlException ex)
-            {
-                //This will occur if the constraint was violated and this record was already inserted by another thread, 
-                //at this exact same time, in this case we need to do an update
-
-                rowCount = updateCommand.IsNullOrWhiteSpace() 
-                    ? db.Update(poco) 
-                    : db.Update<T>(updateCommand, updateArgs);                
-
-                if (rowCount == 0)
-                {
-                    //this would be strange! in this case the only circumstance would be that at the exact same time, 3 threads executed, one
-                    // did the insert and the other somehow managed to do a delete precisely before this update was executed... now that would
-                    // be real crazy. In that case we need to throw an exception.
-                    throw new DataException("Record could not be inserted or updated");
-                }
-
+                    : db.Update<T>(updateCommand, updateArgs);
+            if (rowCount > 0)
                 return RecordPersistenceType.Update;
+
+            // failed: does not exist, need to insert
+            // RC1 race cond here: another thread may insert a record with the same constraint
+
+            var i = 0;
+            while (i++ < 4)
+            {
+                try
+                {
+                    // try to insert
+                    db.Insert(poco);
+                    return RecordPersistenceType.Insert;
+                }
+                catch (SqlException) // TODO: need to find out if all db will throw that exception - probably OK
+                {
+                    // failed: exists (due to race cond RC1)
+                    // RC2 race cond here: another thread may remove the record
+
+                    // try to update
+                    rowCount = updateCommand.IsNullOrWhiteSpace()
+                        ? db.Update(poco)
+                        : db.Update<T>(updateCommand, updateArgs);
+                    if (rowCount > 0)
+                        return RecordPersistenceType.Update;
+
+                    // failed: does not exist (due to race cond RC2), need to insert 
+                    // loop
+                }
             }
+
+            // this can go on forever... have to break at some point and report an error.
+            throw new DataException("Record could not be inserted or updated.");
         }
 
         /// <summary>

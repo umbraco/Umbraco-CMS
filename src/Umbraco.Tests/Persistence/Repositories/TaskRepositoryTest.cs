@@ -96,6 +96,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 task.Comment = "blah";
                 task.Closed = true;
 
+                repo.AddOrUpdate(task);
+                unitOfWork.Commit();
+
+                //re-get 
+                task = repo.Get(task.Id);
+
                 Assert.AreEqual(true, task.Closed);
                 Assert.AreEqual("blah", task.Comment);
             }            

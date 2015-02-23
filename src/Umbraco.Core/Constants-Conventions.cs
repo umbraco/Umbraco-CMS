@@ -11,6 +11,17 @@ namespace Umbraco.Core
 		/// </summary>
 		public static class Conventions
 		{
+		    public static class PublicAccess
+		    {
+                public const string MemberUsernameRuleType = "MemberUsername";               
+                public const string MemberRoleRuleType = "MemberRole";
+
+                [Obsolete("No longer supported, this is here for backwards compatibility only")]
+                public const string MemberIdRuleType = "MemberId";
+                [Obsolete("No longer supported, this is here for backwards compatibility only")]
+                public const string MemberGroupIdRuleType = "MemberGroupId";
+		    }
+
 		    public static class Localization
 		    {
                 /// <summary>

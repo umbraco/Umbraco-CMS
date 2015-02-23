@@ -61,6 +61,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
         private string GetQuotedValue(object val)
         {
             var type = val.GetType();
+
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.Boolean:

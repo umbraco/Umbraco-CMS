@@ -29,6 +29,8 @@ namespace Umbraco.Core.Cache
         public const string MemberBusinessLogicCacheKey = "MemberCacheItem_";
         
         public const string TemplateFrontEndCacheKey = "template";
+
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string TemplateBusinessLogicCacheKey = "UmbracoTemplateCache";
 
         public const string UserContextCacheKey = "UmbracoUserContext";

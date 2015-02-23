@@ -82,27 +82,27 @@ namespace umbraco.cms.businesslogic.web
             this._optimizedMode = optimizedMode;
             if (optimizedMode)
             {
-                Content = ApplicationContext.Current.Services.ContentService.GetById(id);
+                ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(id);
                 bool hasChildren = ApplicationContext.Current.Services.ContentService.HasChildren(id);
-                int templateId = Content.Template == null ? 0 : Content.Template.Id;
+                int templateId = ContentEntity.Template == null ? 0 : ContentEntity.Template.Id;
 
-                SetupDocumentForTree(Content.Key, Content.Level, Content.ParentId, Content.CreatorId,
-                                     Content.WriterId,
-                                     Content.Published, Content.Path, Content.Name, Content.CreateDate,
-                                     Content.UpdateDate, Content.UpdateDate, Content.ContentType.Icon, hasChildren,
-                                     Content.ContentType.Alias, Content.ContentType.Thumbnail,
-                                     Content.ContentType.Description, null, Content.ContentType.Id,
-                                     templateId, Content.ContentType.IsContainer);
+                SetupDocumentForTree(ContentEntity.Key, ContentEntity.Level, ContentEntity.ParentId, ContentEntity.CreatorId,
+                                     ContentEntity.WriterId,
+                                     ContentEntity.Published, ContentEntity.Path, ContentEntity.Name, ContentEntity.CreateDate,
+                                     ContentEntity.UpdateDate, ContentEntity.UpdateDate, ContentEntity.ContentType.Icon, hasChildren,
+                                     ContentEntity.ContentType.Alias, ContentEntity.ContentType.Thumbnail,
+                                     ContentEntity.ContentType.Description, null, ContentEntity.ContentType.Id,
+                                     templateId, ContentEntity.ContentType.IsContainer);
 
-                var tmpReleaseDate = Content.ReleaseDate.HasValue ? Content.ReleaseDate.Value : new DateTime();
-                var tmpExpireDate = Content.ExpireDate.HasValue ? Content.ExpireDate.Value : new DateTime();
-                var creator = new User(Content.CreatorId, true);
-                var writer = new User(Content.WriterId, true);
+                var tmpReleaseDate = ContentEntity.ReleaseDate.HasValue ? ContentEntity.ReleaseDate.Value : new DateTime();
+                var tmpExpireDate = ContentEntity.ExpireDate.HasValue ? ContentEntity.ExpireDate.Value : new DateTime();
+                var creator = new User(ContentEntity.CreatorId, true);
+                var writer = new User(ContentEntity.WriterId, true);
 
-                InitializeContent(Content.ContentType.Id, Content.Version, Content.UpdateDate,
-                                  Content.ContentType.Icon);
-                InitializeDocument(creator, writer, Content.Name, templateId, tmpReleaseDate, tmpExpireDate,
-                                   Content.UpdateDate, Content.Published);
+                InitializeContent(ContentEntity.ContentType.Id, ContentEntity.Version, ContentEntity.UpdateDate,
+                                  ContentEntity.ContentType.Icon);
+                InitializeDocument(creator, writer, ContentEntity.Name, templateId, tmpReleaseDate, tmpExpireDate,
+                                   ContentEntity.UpdateDate, ContentEntity.Published);
             }
         }
 
@@ -155,7 +155,7 @@ namespace umbraco.cms.businesslogic.web
         private User _writer;
         private int? _writerId;
         private readonly bool _optimizedMode;
-        protected internal IContent Content;
+        protected internal IContent ContentEntity;
 
         /// <summary>
         /// This is used to cache the child documents of Document when the children property
@@ -349,17 +349,17 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                return Content == null ? base.sortOrder : Content.SortOrder;
+                return ContentEntity == null ? base.sortOrder : ContentEntity.SortOrder;
             }
             set
             {
-                if (Content == null)
+                if (ContentEntity == null)
                 {
                     base.sortOrder = value;
                 }
                 else
                 {
-                    Content.SortOrder = value;
+                    ContentEntity.SortOrder = value;
                 }
             }
         }
@@ -368,17 +368,17 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                return Content == null ? base.Level : Content.Level;
+                return ContentEntity == null ? base.Level : ContentEntity.Level;
             }
             set
             {
-                if (Content == null)
+                if (ContentEntity == null)
                 {
                     base.Level = value;
                 }
                 else
                 {
-                    Content.Level = value;
+                    ContentEntity.Level = value;
                 }
             }
         }
@@ -387,7 +387,7 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                return Content == null ? base.ParentId : Content.ParentId;
+                return ContentEntity == null ? base.ParentId : ContentEntity.ParentId;
             }
         }
 
@@ -395,17 +395,17 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                return Content == null ? base.Path : Content.Path;
+                return ContentEntity == null ? base.Path : ContentEntity.Path;
             }
             set
             {
-                if (Content == null)
+                if (ContentEntity == null)
                 {
                     base.Path = value;
                 }
                 else
                 {
-                    Content.Path = value;
+                    ContentEntity.Path = value;
                 }
             }
         }
@@ -488,11 +488,11 @@ namespace umbraco.cms.businesslogic.web
                 _published = value;
                 if (_published)
                 {
-                    Content.ChangePublishedState(PublishedState.Published);
+                    ContentEntity.ChangePublishedState(PublishedState.Published);
                 }
                 else
                 {
-                    Content.ChangePublishedState(PublishedState.Unpublished);
+                    ContentEntity.ChangePublishedState(PublishedState.Unpublished);
                     
                 }
             }
@@ -506,7 +506,7 @@ namespace umbraco.cms.businesslogic.web
 		{
 			get
 			{
-				return ApplicationContext.Current.Services.ContentService.IsPublishable(Content);
+				return ApplicationContext.Current.Services.ContentService.IsPublishable(ContentEntity);
 			}
 		}
 
@@ -515,12 +515,12 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                return Content.Name;
+                return ContentEntity.Name;
             }
             set
             {
                 value = value.Trim();
-                Content.Name = value;
+                ContentEntity.Name = value;
             }
         }
 
@@ -534,7 +534,7 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _updated = value;
-                Content.UpdateDate = value;
+                ContentEntity.UpdateDate = value;
                 /*SqlHelper.ExecuteNonQuery("update cmsDocument set updateDate = @value where versionId = @versionId",
                                           SqlHelper.CreateParameter("@value", value),
                                           SqlHelper.CreateParameter("@versionId", Version));*/
@@ -551,7 +551,7 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _release = value;
-                Content.ReleaseDate = value;
+                ContentEntity.ReleaseDate = value;
             }
         }
 
@@ -565,7 +565,7 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _expire = value;
-                Content.ExpireDate = value;
+                ContentEntity.ExpireDate = value;
             }
         }
 
@@ -588,12 +588,12 @@ namespace umbraco.cms.businesslogic.web
                 _template = value;
                 if (value == 0)
                 {
-                    Content.Template = null;
+                    ContentEntity.Template = null;
                 }
                 else
                 {
                     var template = ApplicationContext.Current.Services.FileService.GetTemplate(value);
-                    Content.Template = template;
+                    ContentEntity.Template = template;
                 }
             }
         }
@@ -628,7 +628,7 @@ namespace umbraco.cms.businesslogic.web
             FireBeforeSendToPublish(e);
             if (e.Cancel == false)
             {
-                var sent = ApplicationContext.Current.Services.ContentService.SendToPublication(Content, u.Id);
+                var sent = ApplicationContext.Current.Services.ContentService.SendToPublication(ContentEntity, u.Id);
                 if (sent)
                 {
                     FireAfterSendToPublish(e);
@@ -668,7 +668,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ApplicationContext.Current.Services.ContentService.PublishWithStatus(Content, u.Id);
+                var result = ApplicationContext.Current.Services.ContentService.PublishWithStatus(ContentEntity, u.Id);
                 _published = result.Success;
                 
                 FireAfterPublish(e);
@@ -684,7 +684,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            var result = ApplicationContext.Current.Services.ContentService.PublishWithChildrenWithStatus(Content, u.Id, true);
+            var result = ApplicationContext.Current.Services.ContentService.PublishWithChildrenWithStatus(ContentEntity, u.Id, true);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
             return result.Single(x => x.Result.ContentItem.Id == Id).Success;
@@ -704,7 +704,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                Content = ApplicationContext.Current.Services.ContentService.Rollback(Id, VersionId, u.Id);
+                ContentEntity = ApplicationContext.Current.Services.ContentService.Rollback(Id, VersionId, u.Id);
 
                 FireAfterRollBack(e);
             }
@@ -725,7 +725,7 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 IEnumerable<Attempt<PublishStatus>> publishedResults = ApplicationContext.Current.Services.ContentService
-                    .PublishWithChildrenWithStatus(Content, u.Id);
+                    .PublishWithChildrenWithStatus(ContentEntity, u.Id);
 
                 FireAfterPublish(e);
             }
@@ -742,7 +742,7 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 publishedResults = ApplicationContext.Current.Services.ContentService
-                    .PublishWithChildrenWithStatus(Content, userId, includeUnpublished);
+                    .PublishWithChildrenWithStatus(ContentEntity, userId, includeUnpublished);
 
                 FireAfterPublish(e);
             }
@@ -761,7 +761,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content);
+                _published = ApplicationContext.Current.Services.ContentService.UnPublish(ContentEntity);
                 
                 FireAfterUnPublish(e);
             }
@@ -773,7 +773,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
         {
-            return Content.HasPublishedVersion();
+            return ContentEntity.HasPublishedVersion;
         }
 
         /// <summary>
@@ -785,7 +785,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Instead of calling this just check if the latest version of the content is published", false)]
         public bool HasPendingChanges()
         {
-            return Content.Published == false && ((Umbraco.Core.Models.Content)Content).PublishedState != PublishedState.Unpublished;
+            return ContentEntity.Published == false && ((Umbraco.Core.Models.Content)ContentEntity).PublishedState != PublishedState.Unpublished;
         }
 
         /// <summary>
@@ -864,7 +864,7 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 // Make the new document
-                var content = ApplicationContext.Current.Services.ContentService.Copy(Content, CopyTo, RelateToOrignal, u.Id);
+                var content = ApplicationContext.Current.Services.ContentService.Copy(ContentEntity, CopyTo, RelateToOrignal, u.Id);
                 newDoc = new Document(content);
                 
                 // Then save to preserve any changes made by action handlers
@@ -910,9 +910,9 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetDescendants()", false)]
         public override IEnumerable GetDescendants()
         {
-            var descendants = Content == null
+            var descendants = ContentEntity == null
                                   ? ApplicationContext.Current.Services.ContentService.GetDescendants(Id)
-                                  : ApplicationContext.Current.Services.ContentService.GetDescendants(Content);
+                                  : ApplicationContext.Current.Services.ContentService.GetDescendants(ContentEntity);
 
             return descendants.Select(x => new Document(x.Id, true));
         }
@@ -965,32 +965,32 @@ namespace umbraco.cms.businesslogic.web
 
         private void SetupNode(IContent content)
         {
-            Content = content;
+            ContentEntity = content;
             //Also need to set the ContentBase item to this one so all the propery values load from it
-            ContentBase = Content;
+            ContentBase = ContentEntity;
 
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(ContentEntity, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)
-                Version = Content.Version;
+                Version = ContentEntity.Version;
 
             //Setting private properties from IContent replacing Document.setupNode()
-            _creator = User.GetUser(Content.CreatorId);
-            _writer = User.GetUser(Content.WriterId);
-            _updated = Content.UpdateDate;
+            _creator = User.GetUser(ContentEntity.CreatorId);
+            _writer = User.GetUser(ContentEntity.WriterId);
+            _updated = ContentEntity.UpdateDate;
 
-            if (Content.Template != null)
-                _template = Content.Template.Id;
+            if (ContentEntity.Template != null)
+                _template = ContentEntity.Template.Id;
 
-            if (Content.ExpireDate.HasValue)
-                _expire = Content.ExpireDate.Value;
+            if (ContentEntity.ExpireDate.HasValue)
+                _expire = ContentEntity.ExpireDate.Value;
 
-            if (Content.ReleaseDate.HasValue)
-                _release = Content.ReleaseDate.Value;
+            if (ContentEntity.ReleaseDate.HasValue)
+                _release = ContentEntity.ReleaseDate.Value;
 
-            _published = Content.Published;
+            _published = ContentEntity.Published;
         }
 
         [Obsolete("Obsolete", false)]
@@ -1115,14 +1115,14 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                if (Content != null)
+                if (ContentEntity != null)
                 {
-                    ApplicationContext.Current.Services.ContentService.Delete(Content);
+                    ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
                 }
                 else
                 {
-                    Content = ApplicationContext.Current.Services.ContentService.GetById(Id);
-                    ApplicationContext.Current.Services.ContentService.Delete(Content);
+                    ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
+                    ApplicationContext.Current.Services.ContentService.Delete(ContentEntity);
                 }
 
                 //Keeping the base.delete() as it looks to be clear 'private/internal cache'
@@ -1146,14 +1146,14 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 UnPublish();
-                if (Content != null)
+                if (ContentEntity != null)
                 {
-                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(Content);
+                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
                 }
                 else
                 {
-                    Content = ApplicationContext.Current.Services.ContentService.GetById(Id);
-                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(Content);
+                    ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(Id);
+                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(ContentEntity);
                 }
                 FireAfterMoveToTrash(e);
             }

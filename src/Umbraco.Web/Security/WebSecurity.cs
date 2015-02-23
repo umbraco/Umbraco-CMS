@@ -26,10 +26,6 @@ namespace Umbraco.Web.Security
         {
             _httpContext = httpContext;
             _applicationContext = applicationContext;
-            //This ensures the dispose method is called when the request terminates, though
-            // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
-            // http context items.
-            _httpContext.DisposeOnPipelineCompleted(this);
         }
         
         /// <summary>
@@ -61,7 +57,7 @@ namespace Umbraco.Web.Security
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        public IUser CurrentUser
+        public virtual IUser CurrentUser
         {
             get
             {
@@ -85,7 +81,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="userId">The user Id</param>
         /// <returns>returns the number of seconds until their session times out</returns>
-        public double PerformLogin(int userId)
+        public virtual double PerformLogin(int userId)
         {
             var user = _applicationContext.Services.UserService.GetUserById(userId);
             return PerformLogin(user).GetRemainingAuthSeconds();
@@ -96,7 +92,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="user"></param>
         /// <returns>returns the number of seconds until their session times out</returns>
-        public FormsAuthenticationTicket PerformLogin(IUser user)
+        public virtual FormsAuthenticationTicket PerformLogin(IUser user)
         {
             var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
             {
@@ -119,7 +115,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Clears the current login for the currently logged in user
         /// </summary>
-        public void ClearCurrentLogin()
+        public virtual void ClearCurrentLogin()
         {
             _httpContext.UmbracoLogout();
         }
@@ -127,7 +123,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Renews the user's login ticket
         /// </summary>
-        public void RenewLoginTimeout()
+        public virtual void RenewLoginTimeout()
         {
             _httpContext.RenewUmbracoAuthTicket();
         }
@@ -138,7 +134,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public bool ValidateBackOfficeCredentials(string username, string password)
+        public virtual bool ValidateBackOfficeCredentials(string username, string password)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
@@ -150,7 +146,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="setOnline"></param>
         /// <returns></returns>
-        public MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
+        public virtual MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
@@ -275,7 +271,7 @@ namespace Umbraco.Web.Security
         /// Gets the currnet user's id.
         /// </summary>
         /// <returns></returns>
-        public int GetUserId()
+        public virtual int GetUserId()
         {
             var identity = _httpContext.GetCurrentIdentity(false);
             if (identity == null)
@@ -287,7 +283,7 @@ namespace Umbraco.Web.Security
         /// Returns the current user's unique session id - used to mitigate csrf attacks or any other reason to validate a request
         /// </summary>
         /// <returns></returns>
-        public string GetSessionId()
+        public virtual string GetSessionId()
         {
             var identity = _httpContext.GetCurrentIdentity(false);
             if (identity == null)
@@ -310,7 +306,7 @@ namespace Umbraco.Web.Security
         /// Validates the currently logged in user and ensures they are not timed out
         /// </summary>
         /// <returns></returns>
-        public bool ValidateCurrentUser()
+        public virtual bool ValidateCurrentUser()
         {
             var result = ValidateCurrentUser(false);
             return result == ValidateRequestAttempt.Success; 

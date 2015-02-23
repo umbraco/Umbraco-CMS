@@ -33,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
+        private readonly RepositoryCacheOptions _cacheOptions;
 
         internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -42,9 +43,27 @@ namespace Umbraco.Core.Persistence.Repositories
             _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
+
+            _cacheOptions = new RepositoryCacheOptions
+            {
+                //Allow a zero count cache entry because GetAll() gets used quite a lot and we want to ensure
+                // if there are no templates, that it doesn't keep going to the db.
+                GetAllCacheAllowZeroCount = true,
+                //GetAll gets called a lot, we want to ensure that all templates are in the cache, default is 100 which
+                // would normally be fine but we'll increase it in case people have a ton of templates.
+                GetAllCacheThresholdLimit = 500
+            };
         }
 
-        
+
+        /// <summary>
+        /// Returns the repository cache options
+        /// </summary>
+        protected override RepositoryCacheOptions RepositoryCacheOptions
+        {
+            get { return _cacheOptions; }
+        }
+
         #region Overrides of RepositoryBase<int,ITemplate>
 
         protected override ITemplate PerformGet(int id)

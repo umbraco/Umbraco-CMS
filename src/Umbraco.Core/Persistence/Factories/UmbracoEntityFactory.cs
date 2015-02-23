@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Factories
                                  CreateDate = dto.CreateDate,
                                  CreatorId = dto.UserId.Value,
                                  Id = dto.NodeId,
-                                 Key = dto.UniqueId.Value,
+                                 Key = dto.UniqueId,
                                  Level = dto.Level,
                                  Name = dto.Text,
                                  NodeObjectTypeId = dto.NodeObjectType.Value,

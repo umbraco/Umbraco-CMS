@@ -19,6 +19,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<IPublicAccessService> _publicAccessService; 
         private Lazy<ITaskService> _taskService; 
         private Lazy<IDomainService> _domainService; 
         private Lazy<IAuditService> _auditService; 
@@ -68,6 +69,7 @@ namespace Umbraco.Core.Services
         /// <param name="domainService"></param>
         /// <param name="taskService"></param>
         /// <param name="macroService"></param>
+        /// <param name="publicAccessService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -90,7 +92,8 @@ namespace Umbraco.Core.Services
             IAuditService auditService = null,
             IDomainService domainService = null,
             ITaskService taskService = null, 
-            IMacroService macroService = null)
+            IMacroService macroService = null,
+            IPublicAccessService publicAccessService = null)
         {
             if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
             if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
@@ -114,6 +117,7 @@ namespace Umbraco.Core.Services
             if (domainService != null) _domainService = new Lazy<IDomainService>(() => domainService);
             if (taskService != null) _taskService = new Lazy<ITaskService>(() => taskService);
             if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
+            if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
         }
 
         internal ServiceContext(
@@ -145,6 +149,9 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
+
+            if (_publicAccessService == null)
+                _publicAccessService = new Lazy<IPublicAccessService>(() => new PublicAccessService(provider, repositoryFactory, logger));
 
             if (_taskService == null)
                 _taskService = new Lazy<ITaskService>(() => new TaskService(provider, repositoryFactory, logger));
@@ -219,6 +226,14 @@ namespace Umbraco.Core.Services
             if (_memberGroupService == null)
                 _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory, logger));
 
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IPublicAccessService"/>
+        /// </summary>
+        public IPublicAccessService PublicAccessService
+        {
+            get { return _publicAccessService.Value; }
         }
 
         /// <summary>

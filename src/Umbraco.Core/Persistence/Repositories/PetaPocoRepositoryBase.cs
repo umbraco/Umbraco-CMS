@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlServerCe;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
@@ -87,8 +88,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var deletes = GetDeleteClauses();
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new {Id = entity.Id});
+                Database.Execute(delete, new { Id = GetEntityId(entity) });
             }
+        }
+
+        protected virtual TId GetEntityId(TEntity entity)
+        {
+            return (TId)(object)entity.Id;
         }
     }
 }

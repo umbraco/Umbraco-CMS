@@ -654,12 +654,6 @@ namespace Umbraco.Core.Services
                                            ValidationRegExp = property.Element("Validation").Value
                                        };
 
-                var helpTextElement = property.Element("HelpText");
-                if (helpTextElement != null)
-                {
-                    propertyType.HelpText = helpTextElement.Value;
-                }
-
                 var tab = property.Element("Tab").Value;
                 if (string.IsNullOrEmpty(tab))
                 {

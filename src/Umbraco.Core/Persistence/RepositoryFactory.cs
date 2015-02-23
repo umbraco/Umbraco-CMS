@@ -46,6 +46,13 @@ namespace Umbraco.Core.Persistence
             return new NotificationsRepository(uow, _sqlSyntax);
         }
 
+        public virtual IPublicAccessRepository CreatePublicAccessRepository(IDatabaseUnitOfWork uow)
+        {
+            return new PublicAccessRepository(uow,
+                _cacheHelper,
+                _logger, _sqlSyntax);
+        }
+
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
         {
             return new TaskRepository(uow, 
@@ -55,7 +62,9 @@ namespace Umbraco.Core.Persistence
 
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
         {
-            return new AuditRepository(uow, _cacheHelper, _logger, _sqlSyntax, _mappingResolver);
+            return new AuditRepository(uow,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _logger, _sqlSyntax);
         }
 
         public virtual ITagRepository CreateTagRepository(IDatabaseUnitOfWork uow)

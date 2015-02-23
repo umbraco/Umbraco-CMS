@@ -319,6 +319,17 @@ namespace Umbraco.Core.Models
         internal PublishedState PublishedState { get; set; }
 
         /// <summary>
+        /// Gets or sets the unique identifier of the published version, if any.
+        /// </summary>
+        [IgnoreDataMember]
+        public Guid PublishedVersionGuid { get; internal set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the content has a published version.
+        /// </summary>
+        public bool HasPublishedVersion { get { return PublishedVersionGuid != default(Guid); } }
+
+        /// <summary>
         /// Changes the Trashed state of the content object
         /// </summary>
         /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>

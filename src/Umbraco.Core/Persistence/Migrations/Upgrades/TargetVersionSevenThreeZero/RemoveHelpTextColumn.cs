@@ -1,0 +1,23 @@
+using System.Linq;
+using Umbraco.Core.Configuration;
+
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
+{
+    [Migration("7.3.0", 8, GlobalSettings.UmbracoMigrationName)]
+    public class RemoveHelpTextColumn : MigrationBase
+    {
+        public override void Up()
+        {
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+
+            if (columns.Any(x => x.ColumnName.InvariantEquals("helpText") && x.TableName.InvariantEquals("cmsPropertyType")))
+            {
+                Delete.Column("helpText").FromTable("cmsPropertyType");
+            }
+        }
+
+        public override void Down()
+        {
+        }
+    }
+}
