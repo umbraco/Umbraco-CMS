@@ -35,6 +35,7 @@ namespace Umbraco.Core.ObjectResolution
         internal LazyManyObjectsResolverBase(ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : base(logger, scope)
         {
+            if (typeListProducerList == null) throw new ArgumentNullException("typeListProducerList");
             _typeListProducerList.Add(typeListProducerList);
             Initialize();
         }

@@ -23,6 +23,7 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerLazyManyObjectsResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
             : base(logger, typeListProducerList, scope)
         {
+            if (container == null) throw new ArgumentNullException("container");
             _container = container;
         }
 
