@@ -8,7 +8,13 @@
  * 
 */
 function LegacyController($scope, $routeParams, $element) {
-	$scope.legacyPath = decodeURIComponent($routeParams.url);
+
+    var url = $routeParams.url;
+    var toClean = "*?(){}[];:%<>/\\|&'\"";
+    for (var i = 0; i < toClean.length; i++) {
+        url = url.replace(toClean[i], "");
+    }
+    $scope.legacyPath = decodeURIComponent(url);
 }
 
 angular.module("umbraco").controller('Umbraco.LegacyController', LegacyController);
