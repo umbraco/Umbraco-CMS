@@ -88,7 +88,7 @@ namespace Umbraco.Web
                 cropUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
                 cropUrl.Append("&mode=crop");
             }
-            else if (crop != null && crop.Coordinates != null)
+            else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
             {
                 cropUrl.Append("?crop=");
                 cropUrl.Append(crop.Coordinates.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
