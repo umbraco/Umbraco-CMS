@@ -17,14 +17,17 @@ namespace Umbraco.Core.PropertyEditors
         public PropertyEditorResolver(Func<IEnumerable<Type>> typeListProducerList)
             : base(typeListProducerList, ObjectLifetimeScope.Application)
         {
+            _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(ManifestBuilder.PropertyEditors).ToList());
         }
+
+        private readonly Lazy<List<PropertyEditor>> _unioned;
 
         /// <summary>
         /// Returns the property editors
         /// </summary>
         public IEnumerable<PropertyEditor> PropertyEditors
         {
-            get { return Values.Union(ManifestBuilder.PropertyEditors); }
+            get { return _unioned.Value; }
         }
 
         /// <summary>
