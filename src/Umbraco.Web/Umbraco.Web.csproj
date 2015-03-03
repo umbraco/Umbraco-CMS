@@ -934,9 +934,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\helpRedirect.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

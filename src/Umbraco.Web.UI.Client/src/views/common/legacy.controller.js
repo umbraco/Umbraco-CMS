@@ -9,12 +9,13 @@
 */
 function LegacyController($scope, $routeParams, $element) {
 
-    var url = $routeParams.url;
-    var toClean = "*?(){}[];:%<>/\\|&'\"";
+    var url = decodeURIComponent($routeParams.url.toLowerCase().trimStart("javascript:"));
+    var toClean = "*(){}[];:<>\\|'\"";
     for (var i = 0; i < toClean.length; i++) {
-        url = url.replace(toClean[i], "");
+        var reg = new RegExp("\\" + toClean[i], "g");
+        url = url.replace(reg, "");
     }
-    $scope.legacyPath = decodeURIComponent(url);
+    $scope.legacyPath = url;
 }
 
 angular.module("umbraco").controller('Umbraco.LegacyController', LegacyController);
