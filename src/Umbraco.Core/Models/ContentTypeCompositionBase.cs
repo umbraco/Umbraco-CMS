@@ -255,11 +255,15 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (ContentTypeCompositionBase)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign since this is an internal field and will not be automatically mapped
             clone.RemovedContentTypeKeyTracker = new List<int>();
             clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

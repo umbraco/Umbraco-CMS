@@ -193,12 +193,15 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (Template)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign since they are readonly properties
             clone._alias = Alias;
             clone._name = Name;
-
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

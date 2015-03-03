@@ -415,15 +415,18 @@ namespace Umbraco.Core.Models.Membership
         public override object DeepClone()
         {
             var clone = (User)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
             clone._addedSections = new List<string>();
             clone._removedSections = new List<string>();
             clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
             //re-create the event handler
             clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;
-
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }
