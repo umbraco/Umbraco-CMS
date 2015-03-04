@@ -274,7 +274,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="ServerRegistrationService"/>
         /// </summary>
-        internal ServerRegistrationService ServerRegistrationService
+        public ServerRegistrationService ServerRegistrationService
         {
             get { return _serverRegistrationService.Value; }
         }

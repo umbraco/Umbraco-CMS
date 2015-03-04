@@ -15,22 +15,19 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("address")]
         [Length(500)]
-        public string Address { get; set; }
+        public string ServerAddress { get; set; }
 
-        /// <summary>
-        /// A unique column in the database, a computer name must always be unique!
-        /// </summary>
         [Column("computerName")]
         [Length(255)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_computerName")]
-        public string ComputerName { get; set; }
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_computerName")] // server identity is unique
+        public string ServerIdentity { get; set; }
 
         [Column("registeredDate")]
         [Constraint(Default = "getdate()")]
         public DateTime DateRegistered { get; set; }
 
         [Column("lastNotifiedDate")]
-        public DateTime LastNotified { get; set; }
+        public DateTime DateAccessed { get; set; }
 
         [Column("isActive")]
         [Index(IndexTypes.NonClustered)]

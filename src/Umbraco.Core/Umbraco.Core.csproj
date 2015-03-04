@@ -385,9 +385,11 @@
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
+    <Compile Include="Logging\AppDomainTokenFormatter.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggerResolver.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\CreateCacheInstructionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
     <Compile Include="Services\DomainService.cs" />
@@ -457,6 +459,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\PartialView.cs" />
+    <Compile Include="Models\Rdbms\CacheInstructionDto.cs" />
     <Compile Include="Models\TagCacheStorageType.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TaggedEntity.cs" />
@@ -1174,15 +1177,23 @@
     <Compile Include="Strategies\RelateOnTrashHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
+    <Compile Include="Sync\BatchedDatabaseServerMessenger.cs" />
+    <Compile Include="Sync\BatchedWebServiceServerMessenger.cs" />
     <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />
+    <Compile Include="Sync\DatabaseServerMessenger.cs" />
+    <Compile Include="Sync\DatabaseServerMessengerOptions.cs" />
+    <Compile Include="Sync\DatabaseServerRegistrarOptions.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />
+    <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="Sync\ServerEnvironmentHelper.cs" />
+    <Compile Include="Sync\RefreshMethodType.cs" />
+    <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
     <Compile Include="Strings\UrlSegmentProviderResolver.cs" />
     <Compile Include="Sync\DatabaseServerRegistrar.cs" />
-    <Compile Include="Sync\DefaultServerMessenger.cs" />
+    <Compile Include="Sync\WebServiceServerMessenger.cs" />
     <Compile Include="Cache\ICacheRefresher.cs" />
     <Compile Include="Sync\ServerSyncWebServiceClient.cs">
       <SubType>Component</SubType>

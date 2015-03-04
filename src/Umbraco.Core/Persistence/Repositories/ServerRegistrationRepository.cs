@@ -125,5 +125,12 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
         }
 
+        public void DeactiveStaleServers(TimeSpan staleTimeout)
+        {
+            var timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
+
+            Database.Update<ServerRegistrationDto>("SET isActive=0 WHERE lastNotifiedDate < @timeoutDate", new {timeoutDate = timeoutDate});
+        }
+
     }
 }

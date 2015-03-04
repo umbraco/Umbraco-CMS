@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Core.Sync;
 using umbraco.presentation.webservices;
 
 namespace Umbraco.Tests.Cache
@@ -13,8 +14,10 @@ namespace Umbraco.Tests.Cache
         [TestCase("fffffff28449cf3", "123456", "testmachine", true)]
         public void Continue_Refreshing_For_Request(string hash, string appDomainAppId, string machineName, bool expected)
         {
-            var refresher = new CacheRefresher();
-            Assert.AreEqual(expected, refresher.ContinueRefreshingForRequest(hash, appDomainAppId, machineName));
+            if (expected)
+                Assert.AreEqual(hash, WebServiceServerMessenger.GetServerHash(appDomainAppId, machineName));
+            else
+                Assert.AreNotEqual(hash, WebServiceServerMessenger.GetServerHash(appDomainAppId, machineName));
         }
 
     }
