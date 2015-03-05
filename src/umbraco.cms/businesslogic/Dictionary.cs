@@ -69,7 +69,6 @@ namespace umbraco.cms.businesslogic
                 {
                     throw new ArgumentException("No key " + key + " exists in dictionary");
                 }
-                var item = DictionaryItems[key];
             }
 
             public DictionaryItem(Guid id)
