@@ -79,8 +79,8 @@ namespace Umbraco.Tests.Plugins
             var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
 
             Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
-            Assert.AreEqual(5, typesFound.Count());
-            Assert.AreEqual(5, originalTypesFound.Count());
+            Assert.AreEqual(7, typesFound.Count());
+            Assert.AreEqual(7, originalTypesFound.Count());
         }
 
         [Test]
