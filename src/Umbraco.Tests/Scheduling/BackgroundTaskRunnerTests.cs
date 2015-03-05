@@ -452,7 +452,7 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(1000);
                 Assert.IsTrue(runner.IsRunning); // waiting on delay
                 Assert.AreEqual(0, MyDelayedRecurringTask.RunCount);
-                Thread.Sleep(1000);
+                Thread.Sleep(1200);
                 Assert.AreEqual(1, MyDelayedRecurringTask.RunCount);
                 Thread.Sleep(5000);
                 Assert.GreaterOrEqual(MyDelayedRecurringTask.RunCount, 2); // keeps running, count >= 2
