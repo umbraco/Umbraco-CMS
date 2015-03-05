@@ -15,6 +15,18 @@ namespace Umbraco.Core.Sync
         // but at the moment it is exposed in CacheRefresher webservice
         // so for the time being we keep it as-is for backward compatibility reasons
 
+        // need the public one so it can be de-serialized
+        // otherwise, should use GetInstructions(...)
+        public RefreshInstruction(Guid refresherId, RefreshMethodType refreshType, Guid guidId, int intId, string jsonIds, string jsonPayload)
+        {
+            RefresherId = refresherId;
+            RefreshType = refreshType;
+            GuidId = guidId;
+            IntId = intId;
+            JsonIds = jsonIds;
+            JsonPayload = jsonPayload;
+        }
+
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType)
         {
             RefresherId = refresher.UniqueIdentifier;

@@ -64,7 +64,11 @@ namespace Umbraco.Web
         {
             var httpContext = UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext;
             if (httpContext == null)
-                throw new NotSupportedException("Cannot execute without a valid/current UmbracoContext with an HttpContext assigned.");
+            {
+                if (ensure)
+                    throw new NotSupportedException("Cannot execute without a valid/current UmbracoContext with an HttpContext assigned.");
+                return null;
+            }
 
             var key = typeof (BatchedDatabaseServerMessenger).Name;
 

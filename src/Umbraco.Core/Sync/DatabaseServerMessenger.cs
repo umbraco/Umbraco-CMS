@@ -98,8 +98,7 @@ namespace Umbraco.Core.Sync
         protected void Boot()
         {
             ReadLastSynced();
-            if (_lastId < 0) // never synced before
-                Initialize();
+            Initialize();
         }
 
         /// <summary>
@@ -107,24 +106,28 @@ namespace Umbraco.Core.Sync
         /// </summary>
         /// <remarks>
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
+        /// Callers MUST ensure thread-safety.
         /// </remarks>
         private void Initialize()
         {
-            // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new 
-            // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-            LogHelper.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
+            if (_lastId < 0) // never synced before
+            {
+                // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new 
+                // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
+                LogHelper.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
 
-            // go get the last id in the db and store it
-            // note: do it BEFORE initializing otherwise some instructions might get lost
-            // when doing it before, some instructions might run twice - not an issue
-            var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
-            if (lastId > 0)
-                SaveLastSynced(lastId);
+                // go get the last id in the db and store it
+                // note: do it BEFORE initializing otherwise some instructions might get lost
+                // when doing it before, some instructions might run twice - not an issue
+                var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
+                if (lastId > 0)
+                    SaveLastSynced(lastId);
 
-            // execute initializing callbacks
-            if (_options.InitializingCallbacks != null)
-                foreach (var callback in _options.InitializingCallbacks)
-                    callback();
+                // execute initializing callbacks
+                if (_options.InitializingCallbacks != null)
+                    foreach (var callback in _options.InitializingCallbacks)
+                        callback();
+            }
 
             _initialized = true;
         }

@@ -148,7 +148,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
 
-            LogHelper.Debug<WebServiceServerMessenger>("Invoking refresher {0} on local server for message type {1}",
+            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
                 refresher.GetType,
                 () => messageType);
 
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
 
-            LogHelper.Debug<WebServiceServerMessenger>("Invoking refresher {0} on local server for message type {1}",
+            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
                 refresher.GetType,
                 () => messageType);
 
@@ -238,7 +238,7 @@ namespace Umbraco.Core.Sync
         //{
         //    if (refresher == null) throw new ArgumentNullException("refresher");
 
-        //    LogHelper.Debug<DefaultServerMessenger>("Invoking refresher {0} on local server for message type Notify",
+        //    LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type Notify",
         //        () => refresher.GetType());
 
         //    refresher.Notify(payload);
