@@ -15,6 +15,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
@@ -62,7 +63,9 @@ namespace Umbraco.Web.Editors
         {
             var cultureInfo = culture == null 
                 //if the user is logged in, get their culture, otherwise default to 'en'
-                ? User.Identity.IsAuthenticated ? Security.CurrentUser.GetUserCulture(Services.TextService) : CultureInfo.GetCultureInfo("en")
+                ? User.Identity.IsAuthenticated && User.Identity is UmbracoBackOfficeIdentity
+                    ? Security.CurrentUser.GetUserCulture(Services.TextService) 
+                    : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
 
             var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
