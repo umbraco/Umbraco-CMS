@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Strings
             });
 
             Assert.AreEqual(@"body {font-family:Arial;}/**umb_name:My new rule*/
-p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}", result);
+p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}".CrLf(), result);
         }
 
         [Test]
@@ -40,7 +40,7 @@ p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {m
             Assert.AreEqual(@"body {font-family:Arial;}/** Umb_Name: Test1 */ p { font-size: 1em; } /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}
 
 /**umb_name:My new rule*/
-p{font-size:1em; color:blue;}", result);
+p{font-size:1em; color:blue;}".CrLf(), result);
         }
 
         [Test]
@@ -95,7 +95,7 @@ font-size: 1em;
             //Assert.IsTrue(results.First().RuleId.Value.Value.ToString() == file.Id.Value.Value + "/" + name);
             Assert.AreEqual(name, results.First().Name);
             Assert.AreEqual(selector, results.First().Selector);
-            Assert.AreEqual(styles, results.First().Styles);
+            Assert.AreEqual(styles.CrLf(), results.First().Styles);
         }
 
         // No Name: keyword
