@@ -24,6 +24,7 @@ namespace umbraco.presentation.webservices
         // in which case we should ignore the message because it's been processed locally already
         internal static bool SelfMessage(string hash)
         {
+            if (string.IsNullOrEmpty(hash)) return false; // no hash = don't know = not self
             if (hash != WebServiceServerMessenger.GetCurrentServerHash()) return false;
 
             LogHelper.Debug<CacheRefresher>(

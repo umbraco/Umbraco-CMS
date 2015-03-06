@@ -126,8 +126,8 @@ namespace Umbraco.Core.Sync
         public static string GetServerHash(string machineName, string appDomainAppId)
         {
             var hasher = new HashCodeCombiner();
-            hasher.AddCaseInsensitiveString(NetworkHelper.MachineName);
-            hasher.AddCaseInsensitiveString(System.Web.HttpRuntime.AppDomainAppId);
+            hasher.AddCaseInsensitiveString(appDomainAppId);
+            hasher.AddCaseInsensitiveString(machineName);
             return hasher.GetCombinedHashCode();
         }
 
