@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         {
             try
             {
-                var culture = CultureInfo.GetCultureInfo(userLanguage);
+                var culture = CultureInfo.GetCultureInfo(userLanguage.Replace("_", "-"));
                 //TODO: This is a hack because we store the user language as 2 chars instead of the full culture 
                 // which is actually stored in the language files (which are also named with 2 chars!) so we need to attempt
                 // to convert to a supported full culture
