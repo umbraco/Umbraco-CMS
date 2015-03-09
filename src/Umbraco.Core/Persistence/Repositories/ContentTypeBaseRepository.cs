@@ -414,7 +414,7 @@ AND umbracoNode.id <> @id",
                .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == id);
 
             var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql);
-            return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), Alias = x.ContentTypeDto.Alias, SortOrder = x.SortOrder }).ToList();
+            return allowedContentTypeDtos.Select(x => new ContentTypeSort(new Lazy<int>(() => x.AllowedId), x.SortOrder, x.ContentTypeDto.Alias)).ToList();
         }
 
         protected PropertyGroupCollection GetPropertyGroupCollection(int id, DateTime createDate, DateTime updateDate)

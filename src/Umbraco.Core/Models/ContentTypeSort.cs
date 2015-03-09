@@ -8,8 +8,16 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class ContentTypeSort : IValueObject, IDeepCloneable
     {
+        [Obsolete("This parameterless constructor should never be used")]
         public ContentTypeSort()
         {
+            
+        }
+
+        public ContentTypeSort(Lazy<int> id, int sortOrder)
+        {
+            Id = id;
+            SortOrder = sortOrder;
         }
 
         public ContentTypeSort(Lazy<int> id, int sortOrder, string @alias)
@@ -45,9 +53,16 @@ namespace Umbraco.Core.Models
 
         protected bool Equals(ContentTypeSort other)
         {
-            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
+            return Id.Equals(other.Id) && string.Equals(Alias, other.Alias);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
+        /// </summary>
+        /// <returns>
+        /// true if the specified object  is equal to the current object; otherwise, false.
+        /// </returns>
+        /// <param name="obj">The object to compare with the current object. </param>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -56,11 +71,17 @@ namespace Umbraco.Core.Models
             return Equals((ContentTypeSort) obj);
         }
 
+        /// <summary>
+        /// Serves as a hash function for a particular type. 
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="T:System.Object"/>.
+        /// </returns>
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Id.GetHashCode()*397) ^ Alias.GetHashCode();
+                return (Id.Value.GetHashCode()*397) ^ (Alias != null ? Alias.GetHashCode() : 0);
             }
         }
 
