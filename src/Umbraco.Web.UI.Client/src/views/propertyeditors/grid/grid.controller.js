@@ -291,15 +291,7 @@ angular.module("umbraco")
                 itemType: null,
                 config: obj,
                 callback: function (data) {
-                    if (angular.isObject(control.value))
-                        control.value.settings = data.config;
-                    else {
-                        control.value = {
-                            "settings": data.config
-                        };
-                    }
-                    //console.log(control.value);
-                    //console.log(control.value.settings);
+                    control.settings = data.config;
                 }
             });
         };
