@@ -87,6 +87,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                 editorState.set($scope.content);
             }
             deferred.reject(err);
+            $scope.busy = false;
         });
 
         return deferred.promise;
