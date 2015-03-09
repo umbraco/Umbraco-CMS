@@ -190,7 +190,7 @@
                                                      ng-if="!currentToolsControl"
                                                      ng-animate="'fade'">
 
-                                                    <a class="iconBox" href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
+                                                    <a class="iconBox" href ng-show="area.maxItems == '' || area.maxItems == -1 || area.maxItems > area.controls.length" ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
                                                         <i class=" icon icon-add"></i>
                                                     </a>
 

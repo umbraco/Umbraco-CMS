@@ -744,6 +744,9 @@
 
     <key alias="allowAllEditors">Permitir todos los controles de edición</key>
     <key alias="allowAllRowConfigurations">Permitir todas las configuraciones de fila</key>
+
+    <key alias="maxItems">Artículos máximos</key>
+    <key alias="maxItemsDescription">Dejar en blanco o se establece en -1 para ilimitada</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Campo opcional</key>
