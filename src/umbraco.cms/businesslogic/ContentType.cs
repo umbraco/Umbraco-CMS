@@ -880,7 +880,7 @@ namespace umbraco.cms.businesslogic
                     foreach (var i in value)
                     {
                         int id = i;
-                        list.Add(new ContentTypeSort(new Lazy<int>(() => id), sort));
+                        list.Add(new ContentTypeSort(id, sort));
                         sort++;
                     }
 

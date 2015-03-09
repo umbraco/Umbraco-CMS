@@ -11,12 +11,14 @@ namespace Umbraco.Core.Models
         [Obsolete("This parameterless constructor should never be used")]
         public ContentTypeSort()
         {
-            
         }
 
-        public ContentTypeSort(Lazy<int> id, int sortOrder)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+        /// </summary>
+        public ContentTypeSort(int id, int sortOrder)
         {
-            Id = id;
+            Id = new Lazy<int>(() => id);
             SortOrder = sortOrder;
         }
 
@@ -53,16 +55,9 @@ namespace Umbraco.Core.Models
 
         protected bool Equals(ContentTypeSort other)
         {
-            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
+            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);    
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
-        /// </summary>
-        /// <returns>
-        /// true if the specified object  is equal to the current object; otherwise, false.
-        /// </returns>
-        /// <param name="obj">The object to compare with the current object. </param>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -71,17 +66,13 @@ namespace Umbraco.Core.Models
             return Equals((ContentTypeSort) obj);
         }
 
-        /// <summary>
-        /// Serves as a hash function for a particular type. 
-        /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="T:System.Object"/>.
-        /// </returns>
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Id.Value.GetHashCode()*397) ^ (Alias != null ? Alias.GetHashCode() : 0);
+                //The hash code will just be the alias if one is assigned, otherwise it will be the hash code of the Id.
+                //In some cases the alias can be null of the non lazy ctor is used, in that case, the lazy Id will already have a value created.
+                return Alias != null ? Alias.GetHashCode() : (Id.Value.GetHashCode() * 397);
             }
         }
 
