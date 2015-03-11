@@ -164,7 +164,7 @@
                                                         </div>
                                                         
                                                         <!-- control setting area -->
-                                                        <div class="cell-tools-edit" ng-if="control.editor.config && control.editor.config.settings">
+                                                        <div class="cell-tools-edit" ng-style="hasSettings && $first && {'top': '99px'}" ng-if="control.editor.config && control.editor.config.settings">
                                                             <a class="iconBox"
                                                                ng-click="editControlSettings(control)"
                                                                href>
