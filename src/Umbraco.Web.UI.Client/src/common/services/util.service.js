@@ -507,6 +507,25 @@ function umbDataFormatter() {
             return saveModel;
         },
 
+        /** formats the display model used to display the dictionary item to the model used to save the dictionary item */
+        formatDictionaryItemPostData: function (displayModel, translations, action) {
+            var saveModel = {
+                parentId: displayModel.parentId,
+                id: displayModel.id,
+                name: displayModel.name,
+                action: action,
+                translations: []
+            };
+            for (var i = 0; i < translations.length; i++) {
+
+                saveModel.translations.push({
+                    language: translations[i].language,
+                    value: translations[i].value
+                });
+            }
+            return saveModel;
+        },
+
         /** formats the display model used to display the member to the model used to save the member */
         formatMemberPostData: function(displayModel, action) {
             //this is basically the same as for media but we need to explicitly add the username,email, password to the save model

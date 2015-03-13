@@ -29,7 +29,8 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, "Dictionary", action: "openDictionary()", sortOrder: 3)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
+    //[Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, "Dictionary", action: "openDictionary()", sortOrder: 3)]
     public class loadDictionary : BaseTree
 	{
         public loadDictionary(string application) : base(application) { }

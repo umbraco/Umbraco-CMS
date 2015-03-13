@@ -309,6 +309,7 @@
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
@@ -316,6 +317,10 @@
     <Compile Include="Editors\CanvasDesignerController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryItemDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryItemSave.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
+    <Compile Include="Models\Mapping\DictionaryModelMapper.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\MemberBasic.cs" />
@@ -505,6 +510,7 @@
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
