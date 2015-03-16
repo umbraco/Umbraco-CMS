@@ -52,9 +52,15 @@
             ko.applyBindings(self);
 
             $.validator.addMethod("domain", function (value, element, param) {
+                // beware! encode('test') == 'test-'
+                // read eg https://rt.cpan.org/Public/Bug/Display.html?id=94347
                 value = punycode.encode(value);
-                var re = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*)?$/gi;
-                return this.optional(element) || re.test(value);
+                // that regex is best-effort and certainly not exact
+                var re = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi;
+                var isopt = this.optional(element);
+                var retest = re.test(value);
+                var ret = isopt || retest;
+                return ret;
             }, self._opts.invalidDomain);
 
             $.validator.addMethod("duplicate", function (value, element, param) {
@@ -85,7 +91,7 @@
                     return false;
                 
                 var mask = $('#komask');
-                var masked = mask.next();
+                var masked = mask.parent();
                 mask.height(masked.height());
                 mask.width(masked.width());
                 mask.show();
