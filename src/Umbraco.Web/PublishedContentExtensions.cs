@@ -1898,7 +1898,7 @@ namespace Umbraco.Web
         public static CultureInfo GetCulture(this IPublishedContent content, Uri current = null)
         {
             return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
-                ApplicationContext.Current.Services.DomainService, ApplicationContext.Current.Services.LocalizationService,
+                ApplicationContext.Current.Services.LocalizationService,
                 content.Id, content.Path,
                 current);
         }

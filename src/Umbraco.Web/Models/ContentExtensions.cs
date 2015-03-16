@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models
         public static CultureInfo GetCulture(this IContent content, Uri current = null)
         {
             return GetCulture(UmbracoContext.Current,
-                ApplicationContext.Current.Services.DomainService, ApplicationContext.Current.Services.LocalizationService,
+                ApplicationContext.Current.Services.LocalizationService,
                 content.Id, content.Path,
                 current);
         }
@@ -30,23 +30,20 @@ namespace Umbraco.Web.Models
         /// within the context of a specified current request.
         /// </summary>
         /// <param name="umbracoContext">An <see cref="UmbracoContext"/> instance.</param>
-        /// <param name="domainService">An <see cref="IDomainService"/> implementation.</param>
         /// <param name="localizationService">An <see cref="ILocalizationService"/> implementation.</param>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="contentPath">The content path.</param>
         /// <param name="current">The request Uri.</param>
         /// <returns>The culture that would be selected to render the content.</returns>
-        public static CultureInfo GetCulture(UmbracoContext umbracoContext, IDomainService domainService, ILocalizationService localizationService,
+        public static CultureInfo GetCulture(UmbracoContext umbracoContext, ILocalizationService localizationService,
             int contentId, string contentPath, Uri current)
         {
             var route = umbracoContext.ContentCache.GetRouteById(contentId); // cached
             var pos = route.IndexOf('/');
 
-            var domainHelper = new DomainHelper(domainService);
-
             var domain = pos == 0
                 ? null
-                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current).UmbracoDomain;
+                : DomainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current).Domain;
 
             if (domain == null)
             {
@@ -54,10 +51,10 @@ namespace Umbraco.Web.Models
                 return defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
             }
 
-            var wcDomain = DomainHelper.FindWildcardDomainInPath(domainService.GetAll(true), contentPath, domain.RootContent.Id);
+            var wcDomain = DomainHelper.FindWildcardDomainInPath(DomainHelper.GetAllDomains(true), contentPath, domain.RootNodeId);
             return wcDomain == null
-                ? new CultureInfo(domain.Language.IsoCode)
-                : new CultureInfo(wcDomain.Language.IsoCode);
+                ? new CultureInfo(domain.Language.CultureAlias)
+                : new CultureInfo(wcDomain.Language.CultureAlias);
         }
     }
 }
