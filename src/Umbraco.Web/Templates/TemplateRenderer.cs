@@ -11,6 +11,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.cms.businesslogic.language;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Templates
 {
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Templates
 			//set the doc that was found by id
 			contentRequest.PublishedContent = doc;
 			//set the template, either based on the AltTemplate found or the standard template of the doc
-			contentRequest.TemplateModel = !AltTemplate.HasValue 
+			contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false 
 				? ApplicationContext.Current.Services.FileService.GetTemplate(doc.TemplateId)
 				: ApplicationContext.Current.Services.FileService.GetTemplate(AltTemplate.Value);
 
