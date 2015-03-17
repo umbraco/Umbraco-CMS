@@ -6,6 +6,8 @@
 
         bool InternalRedirectPreservesTemplate { get; }
 
+        bool DisableAlternativeTemplates { get; }
+
         string UrlProviderMode { get; }
     }
 

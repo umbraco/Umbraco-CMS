@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using Umbraco.Core.IO;
 using umbraco.NodeFactory;
+using Umbraco.Core;
 
 namespace umbraco {
 
@@ -277,10 +278,13 @@ namespace umbraco {
                 {
                     _redirectID = int.Parse(urlNode.Attributes.GetNamedItem("id").Value);
 
-                    HttpContext.Current.Items["altTemplate"] = templateAlias;
-                    HttpContext.Current.Trace.Write("umbraco.altTemplateHandler",
-                                                    string.Format("Templated changed to: '{0}'",
-                                                                  HttpContext.Current.Items["altTemplate"]));
+                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
+                    {
+                        HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] = templateAlias;
+                        HttpContext.Current.Trace.Write("umbraco.altTemplateHandler",
+                            string.Format("Template changed to: '{0}'", HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate]));
+                    }
+
                     _succes = true;
                 }
             }

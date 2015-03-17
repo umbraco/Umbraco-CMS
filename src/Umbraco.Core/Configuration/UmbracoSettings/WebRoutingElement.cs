@@ -16,6 +16,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (bool) base["internalRedirectPreservesTemplate"]; }
         }
 
+        [ConfigurationProperty("disableAlternativeTemplates", DefaultValue = "false")]
+        public bool DisableAlternativeTemplates
+        {
+            get { return (bool) base["disableAlternativeTemplates"]; }
+        }
+
         [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
         public string UrlProviderMode
         {
