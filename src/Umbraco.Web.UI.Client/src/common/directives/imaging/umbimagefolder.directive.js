@@ -108,7 +108,7 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
             //check for the file size error which can only be done with dodgy string checking
             scope.$on('fileuploadfail', function (e, data) {
                 if (data.jqXHR.status === 500 && data.jqXHR.responseText.indexOf("Maximum request length exceeded") >= 0) {
-                    notificationsService.error(data.errorThrown, "The image file size was too big, check with your site administrator to adjust the maximum size allowed");
+                    notificationsService.error(data.errorThrown, "The uploaded file was too large, check with your site administrator to adjust the maximum size allowed");
 
                 }
                 else {
