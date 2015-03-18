@@ -572,18 +572,31 @@ angular.module("umbraco")
             control.$index = index;
             control.$uniqueId = $scope.setUniqueId();
 
+            //error handling in case of missing editor..
+            //should only happen if stripped earlier 
+            if(!control.editor){
+                control.$editorPath = "views/propertyeditors/grid/editors/error.html";
+            }
+
             if(!control.$editorPath){
                 var editorConfig = $scope.getEditor(control.editor.alias);
-                control.editor = editorConfig;
 
-                //if its a path
-                if(_.indexOf(control.editor.view, "/") >= 0){
-                    control.$editorPath = control.editor.view;
+                if(editorConfig){
+                    control.editor = editorConfig;
+                    
+                    //if its a path
+                    if(_.indexOf(control.editor.view, "/") >= 0){
+                        control.$editorPath = control.editor.view;
+                    }else{
+                        //use convention
+                        control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
+                    }
                 }else{
-                    //use convention
-                    control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
+                    control.$editorPath = "views/propertyeditors/grid/editors/error.html";
                 }
             }
+
+            
         };
 
 
