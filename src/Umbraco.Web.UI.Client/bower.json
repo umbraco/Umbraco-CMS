@@ -38,7 +38,7 @@
             "": "tmhDynamicLocale.min.{js,js.map}"
         },
         "jquery": {
-            "": "jquery.min.{js,map}"  
+            "": "dist/jquery.min.{js,map}"  
         },
         "jquery-file-upload": {
             "": "**/jquery.{fileupload,fileupload-process,fileupload-angular,fileupload-image}.js"
