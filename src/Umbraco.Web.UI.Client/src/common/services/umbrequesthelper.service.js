@@ -225,7 +225,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         // we have to just check for the existence of a string value but currently that is the best way to
                         // do this since it's very hacky/difficult to catch this on the server
                         if (data.indexOf("Maximum request length exceeded") >= 0) {
-                            notificationsService.error("Server error", "The image file size was too big, check with your site administrator to adjust the maximum size allowed");
+                            notificationsService.error("Server error", "The uploaded file was too large, check with your site administrator to adjust the maximum size allowed");
                         }                        
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
