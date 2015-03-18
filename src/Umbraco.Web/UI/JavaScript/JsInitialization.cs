@@ -45,9 +45,6 @@ namespace Umbraco.Web.UI.JavaScript
         public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
             var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
-            //create a unique hash code of the current umb version and the current cdf version
-            var versionHash = UrlHelperExtensions.GetCacheBustHash();
-            var version = "'" + versionHash + "'";
                 
             return ParseMain(
                 result.ToString(),
@@ -68,7 +65,7 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             //now we can optimize if in release mode
-            umbracoInit = CheckIfReleaseAndOptimized(umbracoInit, ClientDependencyType.Javascript, httpContext);
+            umbracoInit = OptimizeAssetCollection(umbracoInit, ClientDependencyType.Javascript, httpContext);
 
             //now we need to merge in any found cdf declarations on property editors
             ManifestParser.MergeJArrays(umbracoInit, ScanPropertyEditors(ClientDependencyType.Javascript, httpContext));
