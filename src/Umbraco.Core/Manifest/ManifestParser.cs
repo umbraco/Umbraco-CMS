@@ -20,7 +20,7 @@ namespace Umbraco.Core.Manifest
         
         //used to strip comments
         private static readonly Regex CommentsSurround = new Regex(@"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", RegexOptions.Compiled);
-        private static readonly Regex CommentsLine = new Regex(@"//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex CommentsLine = new Regex(@"^\s*//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
         public ManifestParser(DirectoryInfo pluginsDir)
         {
