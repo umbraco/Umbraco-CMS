@@ -8,6 +8,30 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
         /**
          * @ngdoc method
+         * @name umbraco.services.umbRequestHelper#convertVirtualToAbsolutePath
+         * @methodOf umbraco.services.umbRequestHelper
+         * @function
+         *
+         * @description
+         * This will convert a virtual path (i.e. ~/App_Plugins/Blah/Test.html ) to an absolute path
+         * 
+         * @param {string} a virtual path, if this is already an absolute path it will just be returned, if this is a relative path an exception will be thrown
+         */
+        convertVirtualToAbsolutePath: function(virtualPath) {
+            if (virtualPath.startsWith("/")) {
+                return virtualPath;
+            }
+            if (!virtualPath.startsWith("~/")) {
+                throw "The path " + virtualPath + " is not a virtual path";
+            }
+            if (!Umbraco.Sys.ServerVariables.application.applicationPath) { 
+                throw "No applicationPath defined in Umbraco.ServerVariables.application.applicationPath";
+            }
+            return Umbraco.Sys.ServerVariables.application.applicationPath + virtualPath.trimStart("~/");
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.umbRequestHelper#dictionaryToQueryString
          * @methodOf umbraco.services.umbRequestHelper
          * @function

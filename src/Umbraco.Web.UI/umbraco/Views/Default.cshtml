@@ -58,6 +58,9 @@
             "umbracoUrls": {                
                 "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
                 "serverVarsJs": '@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")'
+            },
+            "application": {
+                "applicationPath" : "@Context.Request.ApplicationPath"
             }
         };       
     </script>

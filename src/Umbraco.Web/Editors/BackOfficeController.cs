@@ -281,15 +281,17 @@ namespace Umbraco.Web.Editors
                             }
                     },
                     {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
-                    {
-                        "application", GetApplicationState()
-                    }
+                    {"application", GetApplicationState()}
                 };
 
 
             return JavaScript(ServerVariablesParser.Parse(d));
         }
         
+        /// <summary>
+        /// Returns the server variables regarding the application state
+        /// </summary>
+        /// <returns></returns>
         private Dictionary<string, object> GetApplicationState()
         {
             if (ApplicationContext.IsConfigured == false)
@@ -306,6 +308,8 @@ namespace Umbraco.Web.Editors
 
             app.Add("version", version);
             app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);
+            //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
+            app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
         

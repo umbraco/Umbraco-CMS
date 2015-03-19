@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout) {
+    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
 
         // Grid status variables
         $scope.currentRow = null;
@@ -576,10 +576,11 @@ angular.module("umbraco")
                 var editorConfig = $scope.getEditor(control.editor.alias);
                 control.editor = editorConfig;
 
-                //if its a path
-                if(_.indexOf(control.editor.view, "/") >= 0){
-                    control.$editorPath = control.editor.view;
-                }else{
+                //if its an absolute path
+                if (control.editor.view.startsWith("/") || control.editor.view.startsWith("~/")) {
+                    control.$editorPath = umbRequestHelper.convertVirtualToAbsolutePath(control.editor.view);
+                }                
+                else {
                     //use convention
                     control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
                 }
