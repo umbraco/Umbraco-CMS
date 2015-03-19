@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
@@ -11,73 +13,92 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class ManifestBuilder
     {
+        private readonly IRuntimeCacheProvider _cache;
+        private readonly ManifestParser _parser;
 
-        private static readonly ConcurrentDictionary<string, object> StaticCache = new ConcurrentDictionary<string, object>();
-        
-        private const string ManifestKey = "manifests";
+        public ManifestBuilder(IRuntimeCacheProvider cache, ManifestParser parser)
+        {
+            _cache = cache;
+            _parser = parser;
+        }
+
+        private const string GridEditorsKey = "grideditors";
         private const string PropertyEditorsKey = "propertyeditors";
         private const string ParameterEditorsKey = "parametereditors";
 
         /// <summary>
-        /// Returns all property editors found in the manfifests
+        /// Returns all grid editors found in the manfifests
         /// </summary>
-        internal static IEnumerable<PropertyEditor> PropertyEditors
+        internal IEnumerable<GridEditor> GridEditors
         {
             get
             {
-                return (IEnumerable<PropertyEditor>) StaticCache.GetOrAdd(
-                    PropertyEditorsKey,
-                    s =>
+                return _cache.GetCacheItem<IEnumerable<GridEditor>>(
+                    typeof (ManifestBuilder) + GridEditorsKey,
+                    () =>
+                    {
+                        var editors = new List<GridEditor>();
+                        foreach (var manifest in _parser.GetManifests())
                         {
-                            var editors = new List<PropertyEditor>();
-                            foreach (var manifest in GetManifests())
+                            if (manifest.GridEditors != null)
                             {
-                                if (manifest.PropertyEditors != null)
-                                {
-                                    editors.AddRange(ManifestParser.GetPropertyEditors(manifest.PropertyEditors));    
-                                }
-                                
+                                editors.AddRange(ManifestParser.GetGridEditors(manifest.GridEditors));
                             }
-                            return editors;
-                        });
+
+                        }
+                        return editors;
+                    }, new TimeSpan(0, 10, 0));
+            }
+        }
+
+        /// <summary>
+        /// Returns all property editors found in the manfifests
+        /// </summary>
+        internal IEnumerable<PropertyEditor> PropertyEditors
+        {
+            get
+            {
+                return _cache.GetCacheItem<IEnumerable<PropertyEditor>>(
+                    typeof(ManifestBuilder) + PropertyEditorsKey,
+                    () =>
+                    {
+                        var editors = new List<PropertyEditor>();
+                        foreach (var manifest in _parser.GetManifests())
+                        {
+                            if (manifest.PropertyEditors != null)
+                            {
+                                editors.AddRange(ManifestParser.GetPropertyEditors(manifest.PropertyEditors));
+                            }
+
+                        }
+                        return editors;
+                    }, new TimeSpan(0, 10, 0));
             }
         }
 
         /// <summary>
         /// Returns all parameter editors found in the manfifests and all property editors that are flagged to be parameter editors
         /// </summary>
-        internal static IEnumerable<ParameterEditor> ParameterEditors
+        internal IEnumerable<ParameterEditor> ParameterEditors
         {
             get
             {
-                return (IEnumerable<ParameterEditor>)StaticCache.GetOrAdd(
-                    ParameterEditorsKey,
-                    s =>
+                return _cache.GetCacheItem<IEnumerable<ParameterEditor>>(
+                    typeof (ManifestBuilder) + ParameterEditorsKey,
+                    () =>
                     {
                         var editors = new List<ParameterEditor>();
-                        foreach (var manifest in GetManifests())
+                        foreach (var manifest in _parser.GetManifests())
                         {
                             if (manifest.ParameterEditors != null)
                             {
-                                editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));    
+                                editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));
                             }
                         }
                         return editors;
-                    });
+                    }, new TimeSpan(0, 10, 0));
             }
         } 
-
-        /// <summary>
-        /// Ensures the manifests are found and loaded into memory
-        /// </summary>
-        private static IEnumerable<PackageManifest> GetManifests()
-        {
-            return (IEnumerable<PackageManifest>) StaticCache.GetOrAdd(ManifestKey, s =>
-                {
-                    var parser = new ManifestParser(new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")));
-                    return parser.GetManifests();
-                });
-        }
-
+        
     }
 }

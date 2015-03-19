@@ -1,7 +1,7 @@
 angular.module('umbraco.services')
 	.factory('gridService', function ($http, $q){
 
-		var configPath = "../config/grid.editors.config.js";
+	    var configPath = Umbraco.Sys.ServerVariables.umbracoUrls.gridConfig;
         var service = {
 			getGridEditors: function () {
 				return $http.get(configPath);
