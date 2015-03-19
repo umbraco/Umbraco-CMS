@@ -100,8 +100,14 @@
 
                             <!-- row container -->
                             <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                                 ng-class="{last:$last,first:$first,warnhighlight:currentWarnhighlightRow == row, infohighlight:currentInfohighlightRow == row}">
+                                 ng-class="{last:$last,
+                                            first:$first,
+                                            warnhighlight:currentWarnhighlightRow == row, 
+                                            infohighlight:currentInfohighlightRow == row,
+                                            selectedRow:currentRow == row && currentControl === null}">
 
+                                <ins class="item-label">{{row.name}}</ins>
+                                    
                                 <div class="mainTb">
                                     <div class="tb">
                                         <div class="tr">
@@ -170,7 +176,9 @@
                                                                infohighlight:currentInfohighlightControl == control,
                                                                warnhighlight:currentWarnhighlightControl == control,
                                                                selectedControl:currentControl == control}">
-                                                        <ins class="alert alert-info">{{control.editor.name}}</ins>
+                                                        
+                                                        <ins class="item-label">{{control.editor.name}}</ins>
+
                                                         <!-- Redering the editor for specific control -->
                                                         <div ng-if="control && control.$editorPath"
                                                              ng-include="control.$editorPath"
