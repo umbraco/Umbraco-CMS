@@ -111,8 +111,12 @@ namespace Umbraco.Web
 
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
-            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
+            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection
+            {
+                { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
+            });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
+            
 
             InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();

@@ -31,7 +31,7 @@ function inArray(key, arr)
 
 	tinymce = parent.tinymce;
 	editor = tinymce.activeEditor;
-	var i, userSettings = editor.settings.codemirror ? JSON.parse(editor.settings.codemirror) : {};
+	var i, userSettings = editor.settings.codemirror ? (typeof editor.settings.codemirror === 'object') ? editor.settings.codemirror : JSON.parse(editor.settings.codemirror) : {};
 	CMsettings = {
 		path: userSettings.path || 'CodeMirror',
 		indentOnInit: userSettings.indentOnInit || false,

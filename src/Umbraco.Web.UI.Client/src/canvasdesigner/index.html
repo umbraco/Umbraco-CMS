@@ -25,7 +25,7 @@
 
             <ul class="sections" ng-class="{selected: showDevicesPreview}">
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
-                    <a href="#"><i class="icon {{device.icon}}"></i><span></span></a>
+                    <a href="#"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
                 <li ng-click="closePreviewDevice()" ng-if="enableCanvasdesigner > 0">
                     <a href="" class="more-options">

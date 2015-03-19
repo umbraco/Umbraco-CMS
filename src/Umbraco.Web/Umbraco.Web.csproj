@@ -115,9 +115,9 @@
     <Reference Include="dotless.Core">
       <HintPath>..\packages\dotless.1.4.1.0\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.60.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.61.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.60.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.61.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -275,6 +275,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
+    <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Models\ContentEditing\RelationType.cs" />
     <Compile Include="IDynamicPublishedContentQuery.cs" />
@@ -285,6 +286,7 @@
     <Compile Include="Models\LegacyConvertedNode.cs" />
     <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
     <Compile Include="Models\Mapping\RelationModelMapper.cs" />
+    <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
     <Compile Include="Mvc\ReflectedFixedRazorViewEngine.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
@@ -960,9 +962,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\helpRedirect.aspx.cs">

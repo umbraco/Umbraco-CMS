@@ -321,7 +321,7 @@ namespace umbraco.controls
 
                     int i = 0;
                     var ids = SaveAllowedChildTypes();
-                    _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
+                    _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort(x, i++));
 
                     // figure out whether compositions are locked
                     var allContentTypes = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx")

@@ -38,7 +38,7 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             //now we can optimize if in release mode
-            merged = CheckIfReleaseAndOptimized(merged, ClientDependencyType.Css, httpContext);
+            merged = OptimizeAssetCollection(merged, ClientDependencyType.Css, httpContext);
 
             //now we need to merge in any found cdf declarations on property editors
             ManifestParser.MergeJArrays(merged, ScanPropertyEditors(ClientDependencyType.Css, httpContext));

@@ -601,8 +601,9 @@ namespace Umbraco.Web.Routing
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
             // + optionnally, apply the alternate template on internal redirects
-            var useAltTemplate = _pcr.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
+            var useAltTemplate = _webRoutingSection.DisableAlternativeTemplates == false 
+                && (_pcr.IsInitialPublishedContent
+                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent));
             string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;

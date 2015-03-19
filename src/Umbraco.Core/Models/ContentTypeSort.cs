@@ -8,8 +8,18 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class ContentTypeSort : IValueObject, IDeepCloneable
     {
+        [Obsolete("This parameterless constructor should never be used")]
         public ContentTypeSort()
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+        /// </summary>
+        public ContentTypeSort(int id, int sortOrder)
+        {
+            Id = new Lazy<int>(() => id);
+            SortOrder = sortOrder;
         }
 
         public ContentTypeSort(Lazy<int> id, int sortOrder, string @alias)
@@ -45,7 +55,7 @@ namespace Umbraco.Core.Models
 
         protected bool Equals(ContentTypeSort other)
         {
-            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
+            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);    
         }
 
         public override bool Equals(object obj)
@@ -60,7 +70,9 @@ namespace Umbraco.Core.Models
         {
             unchecked
             {
-                return (Id.GetHashCode()*397) ^ Alias.GetHashCode();
+                //The hash code will just be the alias if one is assigned, otherwise it will be the hash code of the Id.
+                //In some cases the alias can be null of the non lazy ctor is used, in that case, the lazy Id will already have a value created.
+                return Alias != null ? Alias.GetHashCode() : (Id.Value.GetHashCode() * 397);
             }
         }
 

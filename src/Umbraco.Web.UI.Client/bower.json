@@ -21,7 +21,8 @@
         "rgrove-lazyload": "*",
         "jquery": "2.0.3",
         "jquery-file-upload": "~9.4.0",
-        "jquery-ui": "1.10.3"
+        "jquery-ui": "1.10.3",
+        "angular-dynamic-locale":  "~0.1.27"
     },
     "exportsOverride": {
         "rgrove-lazyload": {
@@ -32,6 +33,9 @@
         },
         "underscore": {
             "": "underscore-min.{js,map}"
+        },
+        "angular-dynamic-locale": {
+            "": "tmhDynamicLocale.min.{js,js.map}"
         },
         "jquery": {
             "": "jquery.min.{js,map}"  

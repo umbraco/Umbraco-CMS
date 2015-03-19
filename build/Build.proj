@@ -327,7 +327,7 @@
       ReplacementText="$(BUILD_RELEASE)"/>
 
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
-      Regex="CurrentComment { get { return &quot;([a-zA-Z]+)?&quot;"
+      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
       ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
 	
 	<XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"

@@ -80,7 +80,11 @@ namespace Umbraco.Core.Models
                 {
                     _translations = value;
                     return _translations;
-                }, _translations, TranslationsSelector);
+                }, _translations, TranslationsSelector,
+                    //Custom comparer for enumerable
+                    new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
+                        (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
+                        enumerable => enumerable.GetHashCode()));
             }
         }
 

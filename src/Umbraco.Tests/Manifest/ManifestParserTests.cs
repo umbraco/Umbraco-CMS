@@ -64,6 +64,61 @@ namespace Umbraco.Tests.Manifest
         }
 
         [Test]
+        public void Parse_Grid_Editors()
+        {
+            var a = JsonConvert.DeserializeObject<JArray>(@"[
+    {
+        alias: 'Test.Test1',
+        name: 'Test 1',        
+        view: 'blah',    
+        icon: 'hello'
+    },
+    {
+        alias: 'Test.Test2',
+        name: 'Test 2',        
+        config: { key1: 'some default val' },
+        view: '/hello/world.cshtml',
+        icon: 'helloworld'
+    },
+    {
+        alias: 'Test.Test3',
+        name: 'Test 3',        
+        config: { key1: 'some default val' },
+        view: '/hello/world.html',
+        render: '/hello/world.cshtml',
+        icon: 'helloworld'
+    }
+]");
+            var parser = ManifestParser.GetGridEditors(a).ToArray();
+
+            Assert.AreEqual(3, parser.Count());
+
+            Assert.AreEqual("Test.Test1", parser.ElementAt(0).Alias);
+            Assert.AreEqual("Test 1", parser.ElementAt(0).Name);
+            Assert.AreEqual("blah", parser.ElementAt(0).View);
+            Assert.AreEqual("hello", parser.ElementAt(0).Icon);
+            Assert.IsNull(parser.ElementAt(0).Render);
+            Assert.AreEqual(0, parser.ElementAt(0).Config.Count);
+
+            Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);
+            Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
+            Assert.AreEqual("/hello/world.cshtml", parser.ElementAt(1).View);
+            Assert.AreEqual("helloworld", parser.ElementAt(1).Icon);
+            Assert.IsNull(parser.ElementAt(1).Render);
+            Assert.AreEqual(1, parser.ElementAt(1).Config.Count);
+            Assert.AreEqual("some default val", parser.ElementAt(1).Config["key1"]);
+
+            Assert.AreEqual("Test.Test3", parser.ElementAt(2).Alias);
+            Assert.AreEqual("Test 3", parser.ElementAt(2).Name);
+            Assert.AreEqual("/hello/world.html", parser.ElementAt(2).View);
+            Assert.AreEqual("helloworld", parser.ElementAt(2).Icon);
+            Assert.AreEqual("/hello/world.cshtml", parser.ElementAt(2).Render);
+            Assert.AreEqual(1, parser.ElementAt(2).Config.Count);
+            Assert.AreEqual("some default val", parser.ElementAt(2).Config["key1"]);
+            
+        }
+
+        [Test]
         public void Parse_Property_Editors()
         {
 

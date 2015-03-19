@@ -8,6 +8,7 @@ using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -37,9 +38,23 @@ namespace Umbraco.Web.UI.Pages
         /// Authorizes the user
         /// </summary>
         /// <param name="e"></param>
+        /// <remarks>
+        /// Checks if the page exists outside of the /umbraco route, in which case the request will not have been authenticated for the back office 
+        /// so we'll force authentication.
+        /// </remarks>
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
+
+            //If this is not a back office request, then the module won't have authenticated it, in this case we
+            // need to do the auth manually and since this is an UmbracoEnsuredPage, this is the anticipated behavior
+            // TODO: When we implement Identity, this process might not work anymore, will be an interesting challenge
+            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false)
+            {
+                var http = new HttpContextWrapper(Context);
+                var ticket = http.GetUmbracoAuthTicket();
+                http.AuthenticateCurrentRequest(ticket, true);
+            }
 
             try
             {

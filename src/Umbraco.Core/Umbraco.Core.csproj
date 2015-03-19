@@ -402,6 +402,7 @@
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
     <Compile Include="Models\IPartialView.cs" />
     <Compile Include="Persistence\DatabaseSchemaHelper.cs" />
+    <Compile Include="PropertyEditors\GridEditor.cs" />
     <Compile Include="Persistence\Repositories\SimpleGetRepository.cs" />
     <Compile Include="Services\LocalizedTextService.cs" />
     <Compile Include="Services\ILocalizedTextService.cs" />

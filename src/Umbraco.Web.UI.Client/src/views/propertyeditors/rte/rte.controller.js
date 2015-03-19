@@ -1,7 +1,7 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
     function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
-
+        
         $scope.isLoading = true;
 
         //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
@@ -125,6 +125,31 @@ angular.module("umbraco")
 
 
                 if (tinyMceConfig.customConfig) {
+
+                    //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to 
+                    // convert it to json instead of having it as a string since this is what tinymce requires
+                    for (var i in tinyMceConfig.customConfig) {
+                        var val = tinyMceConfig.customConfig[i];
+                        if (val) {
+                            val = val.toString().trim();
+                            if (val.detectIsJson()) {
+                                try {
+                                    tinyMceConfig.customConfig[i] = JSON.parse(val);
+                                    //now we need to check if this custom config key is defined in our baseline, if it is we don't want to 
+                                    //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
+                                    //if it's an object it will overwrite the baseline
+                                    if (angular.isArray(baseLineConfigObj[i]) && angular.isArray(tinyMceConfig.customConfig[i])) {
+                                        //concat it and below this concat'd array will overwrite the baseline in angular.extend
+                                        tinyMceConfig.customConfig[i] = baseLineConfigObj[i].concat(tinyMceConfig.customConfig[i]);
+                                    }
+                                }
+                                catch (e) {
+                                    //cannot parse, we'll just leave it
+                                } 
+                            }
+                        }
+                    }
+
                     angular.extend(baseLineConfigObj, tinyMceConfig.customConfig);
                 }
 

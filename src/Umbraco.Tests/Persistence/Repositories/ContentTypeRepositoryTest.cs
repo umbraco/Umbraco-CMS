@@ -375,18 +375,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed);
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                     {
-                        new ContentTypeSort
-                            {
-                                Alias = subpageContentType.Alias,
-                                Id = new Lazy<int>(() => subpageContentType.Id),
-                                SortOrder = 0
-                            },
-                        new ContentTypeSort
-                            {
-                                Alias = simpleSubpageContentType.Alias,
-                                Id = new Lazy<int>(() => simpleSubpageContentType.Id),
-                                SortOrder = 1
-                            }
+                        new ContentTypeSort(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias),
+                        new ContentTypeSort(new Lazy<int>(() => simpleSubpageContentType.Id), 1, simpleSubpageContentType.Alias)
                     };
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();

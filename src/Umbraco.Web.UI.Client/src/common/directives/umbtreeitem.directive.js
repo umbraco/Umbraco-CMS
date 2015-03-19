@@ -41,9 +41,9 @@ angular.module("umbraco.directives")
             '<ins style="width:18px;"></ins>' +
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
             '<i class="icon umb-tree-icon sprTree"></i>' +
-            '<a href ng-click="select(node, $event)" on-right-click="altSelect(node, $event)"></a>' +
+            '<a ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a href class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
+            '<a class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>',
@@ -59,6 +59,7 @@ angular.module("umbraco.directives")
 
             // Helper function to emit tree events
             function emitEvent(eventName, args) {
+
                 if (scope.eventhandler) {
                     $(scope.eventhandler).trigger(eventName, args);
                 }

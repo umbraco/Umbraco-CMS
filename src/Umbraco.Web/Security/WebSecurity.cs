@@ -209,7 +209,6 @@ namespace Umbraco.Web.Security
                 Language = GlobalSettings.DefaultUILanguage,
                 Name = membershipUser.UserName,
                 RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
-                DefaultPermissions = writer.Permissions,
                 Username = membershipUser.UserName,
                 StartContentId = -1,
                 StartMediaId = -1,
