@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models
         /// <param name="contentPath">The content path.</param>
         /// <param name="current">The request Uri.</param>
         /// <returns>The culture that would be selected to render the content.</returns>
-        public static CultureInfo GetCulture(UmbracoContext umbracoContext, ILocalizationService localizationService,
+        internal static CultureInfo GetCulture(UmbracoContext umbracoContext, ILocalizationService localizationService,
             int contentId, string contentPath, Uri current)
         {
             var route = umbracoContext.ContentCache.GetRouteById(contentId); // cached
