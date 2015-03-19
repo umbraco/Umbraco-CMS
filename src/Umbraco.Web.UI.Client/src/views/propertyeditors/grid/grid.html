@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid" id="usky-grid">
+<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid umb-editor umb-grid" id="usky-grid">
 
     <div ng-if="contentReady">
 
@@ -57,7 +57,8 @@
                              ng-mouseleave="disableCurrentRow()">
 
                             <!-- Row tool -->
-                            <div class="row-tools" ng-animate="'fade'" ng-if="currentRow === row && currentControl === null">
+                            <div class="row-tools" ng-animate="'fade'" 
+                                ng-if="currentRow === row && currentControl === null">
 
                                 <!-- delete row -->
                                 <div class="cell-tools-remove">
