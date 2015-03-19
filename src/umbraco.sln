@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		..\build\BuildBelle.bat = ..\build\BuildBelle.bat
 		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
+		SolutionInfo.cs = SolutionInfo.cs
 		umbraco.presentation.targets = umbraco.presentation.targets
 		..\build\UmbracoVersion.txt = ..\build\UmbracoVersion.txt
 		..\build\webpihash.txt = ..\build\webpihash.txt
