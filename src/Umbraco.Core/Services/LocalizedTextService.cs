@@ -229,7 +229,7 @@ namespace Umbraco.Core.Services
             return "[" + key + "]";
         }
 
-        private static string GetFromXmlSource(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
+        private string GetFromXmlSource(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
         {
             if (xmlSource.ContainsKey(culture) == false)
             {
