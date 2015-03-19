@@ -1024,7 +1024,7 @@ namespace umbraco
                 catch (Exception e)
                 {
                     // This is really bad, loading from cache file failed for some reason, now fallback to loading from database
-                    Debug.WriteLine("Content file cache load failed: " + e);
+                    LogHelper.Error<content>("Content file cache load failed", e);
                     DeleteXmlCache();
                 }
             }

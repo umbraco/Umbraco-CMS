@@ -456,14 +456,17 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (PropertyType)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {
                 clone._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);    
             }
-
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

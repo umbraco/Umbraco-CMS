@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout) {
+    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
 
         // Grid status variables
         $scope.currentRow = null;
@@ -63,7 +63,7 @@ angular.module("umbraco")
             handle: '.cell-tools-move',
             connectWith: ".usky-cell",
             forcePlaceholderSize: true,
-            tolerance:"pointer",
+            tolerance: "pointer",
             zIndex: 999999999999999999,
             scrollSensitivity: 100,
             cursorAt: {
@@ -152,7 +152,7 @@ angular.module("umbraco")
             key: undefined
         };
 
-        $scope.addItemOverlay = function(event, area, index, key){
+        $scope.addItemOverlay = function (event, area, index, key) {
             $scope.overlayMenu.area = area;
             $scope.overlayMenu.index = index;
             $scope.overlayMenu.style = {};
@@ -163,10 +163,10 @@ angular.module("umbraco")
             var height = $(window).height();
             var width = $(window).width();
 
-            if((height-offset.top) < 250){
+            if ((height - offset.top) < 250) {
                 $scope.overlayMenu.style.bottom = 0;
                 $scope.overlayMenu.style.top = "initial";
-            }else if(offset.top < 300){
+            } else if (offset.top < 300) {
                 $scope.overlayMenu.style.top = 190;
             }
 
@@ -187,7 +187,7 @@ angular.module("umbraco")
             $scope.model.value = angular.copy(template);
 
             //default row data
-            _.forEach($scope.model.value.sections, function(section){
+            _.forEach($scope.model.value.sections, function (section) {
                 $scope.initSection(section);
             });
         };
@@ -221,14 +221,14 @@ angular.module("umbraco")
             $scope.currentInfohighlightRow = null;
         };
 
-        $scope.getAllowedLayouts = function(column){
+        $scope.getAllowedLayouts = function (column) {
             var layouts = $scope.model.config.items.layouts;
 
-            if(column.allowed && column.allowed.length > 0){
-                return _.filter(layouts, function(layout){
+            if (column.allowed && column.allowed.length > 0) {
+                return _.filter(layouts, function (layout) {
                     return _.indexOf(column.allowed, layout.name) >= 0;
                 });
-            }else{
+            } else {
                 return layouts;
             }
         };
@@ -242,8 +242,8 @@ angular.module("umbraco")
             row = $scope.initRow(row);
 
             // Push the new row
-            if(row){
-               section.rows.push(row);
+            if (row) {
+                section.rows.push(row);
             }
         };
 
@@ -264,7 +264,7 @@ angular.module("umbraco")
                     gridItem: gridItem,
                     config: $scope.model.config,
                     itemType: itemType,
-                    callback: function(data){
+                    callback: function (data) {
 
                         gridItem.styles = data.styles;
                         gridItem.config = data.config;
@@ -286,11 +286,11 @@ angular.module("umbraco")
             $scope.currentCell = null;
         };
 
-        $scope.cellPreview = function(cell){
-            if(cell && cell.$allowedEditors){
+        $scope.cellPreview = function (cell) {
+            if (cell && cell.$allowedEditors) {
                 var editor = cell.$allowedEditors[0];
                 return editor.icon;
-            }else{
+            } else {
                 return "icon-layout";
             }
         };
@@ -355,7 +355,7 @@ angular.module("umbraco")
             };
         })();
 
-        $scope.addControl = function (editor, cell, index){
+        $scope.addControl = function (editor, cell, index) {
             $scope.closeItemOverlay();
 
             var newControl = {
@@ -369,18 +369,18 @@ angular.module("umbraco")
             }
 
             //populate control
-            $scope.initControl(newControl, index+1);
+            $scope.initControl(newControl, index + 1);
 
             cell.controls.splice(index + 1, 0, newControl);
         };
 
-        $scope.addTinyMce = function(cell){
+        $scope.addTinyMce = function (cell) {
             var rte = $scope.getEditor("rte");
             $scope.addControl(rte, cell);
         };
 
-        $scope.getEditor = function(alias){
-            return  _.find($scope.availableEditors, function(editor){return editor.alias === alias;});
+        $scope.getEditor = function (alias) {
+            return _.find($scope.availableEditors, function (editor) { return editor.alias === alias; });
         };
 
         $scope.removeControl = function (cell, $index) {
@@ -388,12 +388,12 @@ angular.module("umbraco")
             cell.controls.splice($index, 1);
         };
 
-        $scope.percentage = function(spans){
-            return (( spans/ $scope.model.config.items.columns ) *100).toFixed(1);
+        $scope.percentage = function (spans) {
+            return ((spans / $scope.model.config.items.columns) * 100).toFixed(1);
         };
 
 
-        $scope.clearPrompt = function(scopedObject, e) {
+        $scope.clearPrompt = function (scopedObject, e) {
             scopedObject.deletePrompt = false;
             e.preventDefault();
             e.stopPropagation();
@@ -416,68 +416,68 @@ angular.module("umbraco")
         // *********************************************
         // Init template + sections
         // *********************************************
-        $scope.initContent = function() {
+        $scope.initContent = function () {
             var clear = true;
 
             //settings indicator shortcut
-            if($scope.model.config.items.config || $scope.model.config.items.styles){
+            if ($scope.model.config.items.config || $scope.model.config.items.styles) {
                 $scope.hasSettings = true;
             }
 
             //ensure the grid has a column value set, if nothing is found, set it to 12
-            if($scope.model.config.items.columns && angular.isString($scope.model.config.items.columns)){
+            if ($scope.model.config.items.columns && angular.isString($scope.model.config.items.columns)) {
                 $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
-            }else{
+            } else {
                 $scope.model.config.items.columns = 12;
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
-                _.forEach($scope.model.value.sections, function(section, index){
+                _.forEach($scope.model.value.sections, function (section, index) {
 
-                    if(section.grid > 0){
+                    if (section.grid > 0) {
                         $scope.initSection(section);
 
                         //we do this to ensure that the grid can be reset by deleting the last row
-                        if(section.rows.length > 0){
+                        if (section.rows.length > 0) {
                             clear = false;
                         }
-                    }else{
+                    } else {
                         $scope.model.value.sections.splice(index, 1);
                     }
                 });
-            }else if($scope.model.config.items.templates && $scope.model.config.items.templates.length === 1){
+            } else if ($scope.model.config.items.templates && $scope.model.config.items.templates.length === 1) {
                 $scope.addTemplate($scope.model.config.items.templates[0]);
             }
 
-            if(clear){
+            if (clear) {
                 $scope.model.value = undefined;
             }
         };
 
-        $scope.initSection = function(section){
+        $scope.initSection = function (section) {
             section.$percentage = $scope.percentage(section.grid);
 
             var layouts = $scope.model.config.items.layouts;
 
-            if(section.allowed && section.allowed.length > 0){
-                section.$allowedLayouts = _.filter(layouts, function(layout){
+            if (section.allowed && section.allowed.length > 0) {
+                section.$allowedLayouts = _.filter(layouts, function (layout) {
                     return _.indexOf(section.allowed, layout.name) >= 0;
                 });
-            }else{
+            } else {
                 section.$allowedLayouts = layouts;
             }
 
-            if(!section.rows){
+            if (!section.rows) {
                 section.rows = [];
-            }else{
-                _.forEach(section.rows, function(row, index){
-                    if(!row.$initialized){
+            } else {
+                _.forEach(section.rows, function (row, index) {
+                    if (!row.$initialized) {
                         var initd = $scope.initRow(row);
 
                         //if init fails, remove
-                        if(!initd){
+                        if (!initd) {
                             section.rows.splice(index, 1);
-                        }else{
+                        } else {
                             section.rows[index] = initd;
                         }
                     }
@@ -489,25 +489,25 @@ angular.module("umbraco")
         // *********************************************
         // Init layout / row
         // *********************************************
-        $scope.initRow = function(row){
+        $scope.initRow = function (row) {
 
             //merge the layout data with the original config data
             //if there are no config info on this, splice it out
             var original = _.find($scope.model.config.items.layouts, function (o) { return o.name === row.name; });
 
-            if(!original){
+            if (!original) {
                 return null;
-            }else{
+            } else {
                 //make a copy to not touch the original config
                 original = angular.copy(original);
                 original.styles = row.styles;
                 original.config = row.config;
 
                 //sync area configuration
-                _.each(original.areas, function(area, areaIndex){
+                _.each(original.areas, function (area, areaIndex) {
 
 
-                    if(area.grid > 0){
+                    if (area.grid > 0) {
                         var currentArea = row.areas[areaIndex];
 
                         if (currentArea) {
@@ -516,14 +516,14 @@ angular.module("umbraco")
                         }
 
                         //copy over existing controls into the new areas
-                        if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
+                        if (row.areas.length > areaIndex && row.areas[areaIndex].controls) {
                             area.controls = currentArea.controls;
 
-                            _.forEach(area.controls, function(control, controlIndex){
+                            _.forEach(area.controls, function (control, controlIndex) {
                                 $scope.initControl(control, controlIndex);
                             });
 
-                        }else{
+                        } else {
                             area.controls = [];
                         }
 
@@ -532,19 +532,19 @@ angular.module("umbraco")
                         area.$uniqueId = $scope.setUniqueId();
 
                         //set editor permissions
-                        if(!area.allowed || area.allowAll === true){
+                        if (!area.allowed || area.allowAll === true) {
                             area.$allowedEditors = $scope.availableEditors;
                             area.$allowsRTE = true;
-                        }else{
-                            area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
+                        } else {
+                            area.$allowedEditors = _.filter($scope.availableEditors, function (editor) {
                                 return _.indexOf(area.allowed, editor.alias) >= 0;
                             });
 
-                            if(_.indexOf(area.allowed,"rte")>=0){
+                            if (_.indexOf(area.allowed, "rte") >= 0) {
                                 area.$allowsRTE = true;
                             }
                         }
-                    }else{
+                    } else {
                         original.areas.splice(areaIndex, 1);
                     }
                 });
@@ -568,26 +568,41 @@ angular.module("umbraco")
         // Init control
         // *********************************************
 
-        $scope.initControl = function(control, index){
+        $scope.initControl = function (control, index) {
             control.$index = index;
             control.$uniqueId = $scope.setUniqueId();
 
-            if(!control.$editorPath){
-                var editorConfig = $scope.getEditor(control.editor.alias);
-                control.editor = editorConfig;
+            //error handling in case of missing editor..
+            //should only happen if stripped earlier 
+            if (!control.editor) {
+                control.$editorPath = "views/propertyeditors/grid/editors/error.html";
+            }
 
-                //if its a path
-                if(_.indexOf(control.editor.view, "/") >= 0){
-                    control.$editorPath = control.editor.view;
-                }else{
-                    //use convention
-                    control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
+            if (!control.$editorPath) {
+                var editorConfig = $scope.getEditor(control.editor.alias);
+
+                if (editorConfig) {
+                    control.editor = editorConfig;
+
+                    //if its an absolute path
+                    if (control.editor.view.startsWith("/") || control.editor.view.startsWith("~/")) {
+                        control.$editorPath = umbRequestHelper.convertVirtualToAbsolutePath(control.editor.view);
+                    }
+                    else {
+                        //use convention
+                        control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
+                    }
+                }
+                else {
+                    control.$editorPath = "views/propertyeditors/grid/editors/error.html";
                 }
             }
+
+
         };
 
 
-        gridService.getGridEditors().then(function(response){
+        gridService.getGridEditors().then(function (response) {
             $scope.availableEditors = response.data;
 
             $scope.contentReady = true;

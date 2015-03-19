@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid" id="usky-grid">
+<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid umb-editor umb-grid" id="usky-grid">
 
     <div ng-if="contentReady">
 
@@ -57,7 +57,8 @@
                              ng-mouseleave="disableCurrentRow()">
 
                             <!-- Row tool -->
-                            <div class="row-tools" ng-animate="'fade'" ng-if="currentRow === row && currentControl === null">
+                            <div class="row-tools" ng-animate="'fade'" 
+                                ng-if="currentRow === row && currentControl === null">
 
                                 <!-- delete row -->
                                 <div class="cell-tools-remove">
@@ -72,7 +73,7 @@
                                             <a href ng-click="clearPrompt(row, $event)"><localize key="general_no" /></a>
                                         </span>
 
-                                        <i ng-if="!row.deletePrompt" class="icon icon-trash"></i>
+                                        <i ng-if="!row.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
                                     </div>
                                 </div>
 
@@ -81,7 +82,7 @@
                                        ng-mouseover="setInfohighlightRow(row)"
                                        ng-mouseleave="disableInfohighlightRow(row)"
                                        href>
-                                        <i class="icon icon-navigation"></i>
+                                        <i class="icon icon-navigation" title="@general_move" localize="title"></i>
                                     </a>
                                 </div>
 
@@ -91,7 +92,7 @@
                                        ng-mouseleave="disableInfohighlightRow(row)"
                                        ng-click="editGridItemSettings(row, 'row')"
                                        href>
-                                        <i class="icon icon-settings"></i>
+                                        <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
                                     </a>
                                 </div>
 
@@ -99,8 +100,14 @@
 
                             <!-- row container -->
                             <div class="{{row.cssClass}} mainContainer usky-row-inner"
-                                 ng-class="{last:$last,first:$first,warnhighlight:currentWarnhighlightRow == row, infohighlight:currentInfohighlightRow == row}">
+                                 ng-class="{last:$last,
+                                            first:$first,
+                                            warnhighlight:currentWarnhighlightRow == row, 
+                                            infohighlight:currentInfohighlightRow == row,
+                                            selectedRow:currentRow == row && currentControl === null}">
 
+                                <ins class="item-label">{{row.name}}</ins>
+                                    
                                 <div class="mainTb">
                                     <div class="tb">
                                         <div class="tr">
@@ -138,7 +145,7 @@
                                                                     <a href ng-click="clearPrompt(control, $event)"><localize key="general_no" /></a>
                                                                 </span>
 
-                                                                <i ng-if="!control.deletePrompt" class="icon icon-trash"></i>
+                                                                <i ng-if="!control.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
                                                             </div>
                                                         </div>
 
@@ -148,7 +155,7 @@
                                                                ng-mouseover="setInfohighlightControl(control)"
                                                                ng-mouseleave="disableInfohighlightControl(control)"
                                                                href>
-                                                                <i class="icon icon-navigation"></i>
+                                                                <i class="icon icon-navigation" title="@general_move" localize="title"></i>
                                                             </a>
                                                         </div>
 
@@ -159,7 +166,7 @@
                                                                ng-mouseleave="disableInfohighlightArea(area)"
                                                                ng-click="editGridItemSettings(area, 'cell')"
                                                                href>
-                                                                <i class="icon icon-settings"></i>
+                                                                <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
                                                             </a>
                                                         </div>
 
@@ -169,6 +176,9 @@
                                                                infohighlight:currentInfohighlightControl == control,
                                                                warnhighlight:currentWarnhighlightControl == control,
                                                                selectedControl:currentControl == control}">
+                                                        
+                                                        <ins class="item-label">{{control.editor.name}}</ins>
+
                                                         <!-- Redering the editor for specific control -->
                                                         <div ng-if="control && control.$editorPath"
                                                              ng-include="control.$editorPath"
@@ -191,7 +201,7 @@
                                                      ng-animate="'fade'">
 
                                                     <a class="iconBox" href ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
-                                                        <i class=" icon icon-add"></i>
+                                                        <i class=" icon icon-add" title="@general_add" localize="title"></i>
                                                     </a>
 
                                                     <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>

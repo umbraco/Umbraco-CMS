@@ -63,7 +63,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\MySql.Data.dll) { Remove-Item $umbracoBinFolder\MySql.Data.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Newtonsoft.Json.dll) { Remove-Item $umbracoBinFolder\Newtonsoft.Json.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Net.Http.Formatting.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Formatting.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\System.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\System.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Http.dll) { Remove-Item $umbracoBinFolder\System.Web.Http.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Http.WebHost.dll) { Remove-Item $umbracoBinFolder\System.Web.Http.WebHost.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Mvc.dll) { Remove-Item $umbracoBinFolder\System.Web.Mvc.dll -Force -Confirm:$false }

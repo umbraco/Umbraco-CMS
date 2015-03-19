@@ -90,7 +90,11 @@ namespace Umbraco.Core.Models
                 {
                     _allowedTemplates = value;
                     return _allowedTemplates;
-                }, _allowedTemplates, AllowedTemplatesSelector);
+                }, _allowedTemplates, AllowedTemplatesSelector,
+                    //Custom comparer for enumerable
+                    new DelegateEqualityComparer<IEnumerable<ITemplate>>(
+                        (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
+                        templates => templates.GetHashCode()));
             }
         }
 

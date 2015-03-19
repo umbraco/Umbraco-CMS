@@ -122,7 +122,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string DefaultPermissions
         {
-            get { return string.Join("", UserTypeItem.Permissions); }
+            get { return UserTypeItem.Permissions == null ? string.Empty : string.Join("", UserTypeItem.Permissions); }
             set { UserTypeItem.Permissions = value.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)); }
         }
 

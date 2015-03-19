@@ -12,6 +12,35 @@ namespace Umbraco.Tests
     {
 
         [Test]
+        public void Unsorted_Sequence_Equal()
+        {
+            var list1 = new[] { 1, 2, 3, 4, 5, 6 };
+            var list2 = new[] { 6, 5, 3, 2, 1, 4 };
+            var list3 = new[] { 6, 5, 4, 3, 2, 2 };
+
+            Assert.IsTrue(list1.UnsortedSequenceEqual(list2));
+            Assert.IsTrue(list2.UnsortedSequenceEqual(list1));
+            Assert.IsFalse(list1.UnsortedSequenceEqual(list3));
+
+            Assert.IsTrue(((IEnumerable<object>)null).UnsortedSequenceEqual(null));
+            Assert.IsFalse(((IEnumerable<int>)null).UnsortedSequenceEqual(list1));
+            Assert.IsFalse(list1.UnsortedSequenceEqual(null));
+        }
+
+        [Test]
+        public void Contains_All()
+        {
+            var list1 = new[] {1, 2, 3, 4, 5, 6};
+            var list2 = new[] {6, 5, 3, 2, 1, 4};
+            var list3 = new[] {6, 5, 4, 3};
+
+            Assert.IsTrue(list1.ContainsAll(list2));
+            Assert.IsTrue(list2.ContainsAll(list1));
+            Assert.IsTrue(list1.ContainsAll(list3));
+            Assert.IsFalse(list3.ContainsAll(list1));
+        }
+
+        [Test]
         public void Flatten_List_2()
         {
             var hierarchy = new TestItem()

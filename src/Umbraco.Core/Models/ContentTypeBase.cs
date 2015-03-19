@@ -351,7 +351,11 @@ namespace Umbraco.Core.Models
                 {
                     _allowedContentTypes = value;
                     return _allowedContentTypes;
-                }, _allowedContentTypes, AllowedContentTypesSelector);
+                }, _allowedContentTypes, AllowedContentTypesSelector,
+                    //Custom comparer for enumerable
+                    new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
+                        (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
+                        sorts => sorts.GetHashCode()));
             }
         }
 
@@ -609,13 +613,18 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (ContentTypeBase)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually wire up the event handlers for the property type collections - we've ensured
             // its ignored from the auto-clone process because its return values are unions, not raw and 
             // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
             clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();
             clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;
+            //this shouldn't really be needed since we're not tracking
+            clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

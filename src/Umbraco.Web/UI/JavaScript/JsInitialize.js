@@ -11,7 +11,7 @@
 
     'lib/angular/angular-ui-sortable.js',
 
-    'lib/angular/tmhDynamicLocale.js',
+    'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
 
     'lib/blueimp-load-image/load-image.all.min.js',
     'lib/jquery-file-upload/jquery.fileupload.js',    

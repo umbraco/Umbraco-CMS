@@ -12,7 +12,7 @@ LazyLoad.js(
 
         'lib/angular/angular-ui-sortable.js',
 
-        'lib/angular/tmhDynamicLocale.js',
+        'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
 
         /* App-wide file-upload helper */
         'lib/jquery-file-upload/jquery.fileupload.js',

@@ -347,6 +347,7 @@
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Models\IPartialView.cs" />
+    <Compile Include="PropertyEditors\GridEditor.cs" />
     <Compile Include="Services\LocalizedTextService.cs" />
     <Compile Include="Services\ILocalizedTextService.cs" />
     <Compile Include="Macros\XsltExtension.cs" />
@@ -1124,6 +1125,7 @@
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneCoreApplication.cs" />
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
+    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
     <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />
