@@ -234,7 +234,7 @@ namespace Umbraco.Web.Security
 
                     var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
                     return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+                }, new TimeSpan(0, 5, 0));
         }
 
         public IPublishedContent GetById(int memberId)
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Security
 
                     var result = _applicationContext.Services.MemberService.GetById(memberId);
                     return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+                }, new TimeSpan(0, 5, 0));
         }
 
         public IPublishedContent GetByUsername(string username)
@@ -266,7 +266,7 @@ namespace Umbraco.Web.Security
 
                     var result = _applicationContext.Services.MemberService.GetByUsername(username);
                     return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+                }, new TimeSpan(0, 5, 0));
         }
 
         public IPublishedContent GetByEmail(string email)
@@ -282,7 +282,7 @@ namespace Umbraco.Web.Security
 
                     var result = _applicationContext.Services.MemberService.GetByEmail(email);
                     return result == null ? null : new MemberPublishedContent(result).CreateModel();
-                });
+                }, new TimeSpan(0, 5, 0));
         }
 
         /// <summary>
@@ -827,7 +827,7 @@ namespace Umbraco.Web.Security
                     var username = provider.GetCurrentUserName();
                     var member = _applicationContext.Services.MemberService.GetByUsername(username);
                     return member;
-                });
+                }, new TimeSpan(0, 5, 0));
         }
 
         private string GetCacheKey(string key, params object[] additional)

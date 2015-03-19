@@ -271,6 +271,7 @@
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Models\LegacyConvertedNode.cs" />
     <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
+    <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
     <Compile Include="Mvc\ReflectedFixedRazorViewEngine.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />

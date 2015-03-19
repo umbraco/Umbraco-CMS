@@ -128,7 +128,7 @@ namespace Umbraco.Core.Services
                     return list;
 
 
-                });
+                }, new TimeSpan(0, 10, 0));
         }
 
         /// <summary>
