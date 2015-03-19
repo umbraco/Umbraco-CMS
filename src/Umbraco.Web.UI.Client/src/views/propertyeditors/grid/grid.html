@@ -118,7 +118,7 @@
                                                      ng-mouseover="setCurrentControl(control)"
                                                      ng-mouseleave="disableCurrentControl(control)"
                                                      ng-animate="'fade'"
-                                                     class="usky-control" title="{{control.editor.name}}">
+                                                     class="usky-control">
 
                                                     <!-- Filled cell tools -->
                                                     <div class="cell-tools"
@@ -170,6 +170,7 @@
                                                                infohighlight:currentInfohighlightControl == control,
                                                                warnhighlight:currentWarnhighlightControl == control,
                                                                selectedControl:currentControl == control}">
+                                                        <ins class="alert alert-info">{{control.editor.name}}</ins>
                                                         <!-- Redering the editor for specific control -->
                                                         <div ng-if="control && control.$editorPath"
                                                              ng-include="control.$editorPath"
