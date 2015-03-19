@@ -152,11 +152,6 @@ namespace Umbraco.Core.Models
             //Automatically deep clone ref properties that are IDeepCloneable
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
 
-            //TODO: This was part of the merge process, we need to test if this is required!!
-            ////need to manually assign since they are readonly properties
-            //clone._alias = Alias;
-            //clone._name = Name;
-
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
             //re-enable tracking
