@@ -47,85 +47,31 @@ if ($project) {
 		robocopy $umbracoClientFolder $umbracoClientBackupPath /e /LOG:$copyLogsPath\UmbracoClientBackup.log
 		robocopy $umbracoClientFolderSource $umbracoClientFolder /is /it /e /LOG:$copyLogsPath\UmbracoClientCopy.log		
 	}
-	
-	$copyWebconfig = $false
 
-	# SJ - What can I say: big up for James Newton King for teaching us a hack for detecting if this is a new install vs. an upgrade!
-	# https://github.com/JamesNK/Newtonsoft.Json/pull/387 - would never have seen this without the controversial pull request..	
-	Try		
+	$copyWebconfig = $true
+	$destinationWebConfig = Join-Path $projectDestinationPath "Web.config"
+
+	if(Test-Path $destinationWebConfig) 
 	{
-		# see if user is installing from VS NuGet console		
-		# get reference to the window, the console host and the input history		
-		# copy web.config if "install-package UmbracoCms" was last input		
-		# this is in a try-catch as they might be using the regular NuGet dialog 
-		# instead of package manager console
-		
-		$dte2 = Get-Interface $dte ([EnvDTE80.DTE2])		
-
-		$consoleWindow = $(Get-VSComponentModel).GetService([NuGetConsole.IPowerConsoleWindow])		
+		Try 
+		{
+			[xml]$config = Get-Content $destinationWebConfig
 			
-		$props = $consoleWindow.GetType().GetProperties([System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-			
-		$prop = $props | ? { $_.Name -eq "ActiveHostInfo" } | select -first 1
-			
-		$hostInfo = $prop.GetValue($consoleWindow)
-			
-		$history = $hostInfo.WpfConsole.InputHistory.History		
-			
-		$lastCommand = $history | select -last 1
-			
-		if ($lastCommand)		
-		{		
-			$lastCommand = $lastCommand.Trim().ToLower()		
-			if ($lastCommand.StartsWith("install-package") -and $lastCommand.Contains("umbracocms"))		
-			{		
-				$copyWebconfig = $true
+			$config.configuration.appSettings.ChildNodes | ForEach-Object { 
+				if($_.key -eq "umbracoConfigurationStatus") 
+				{
+					# The web.config has an umbraco-specific appSetting in it
+					# don't overwrite it and let config transforms do their thing
+					$copyWebconfig = $false 
+				}
 			}
-		}
+		} 
+		Catch { }
 	}
-	Catch { }
-	
-	Try		
-	{	
-		# user is installing from VS NuGet dialog		
-		# get reference to the window, then smart output console provider		
-		# copy web.config if messages in buffered console contains "installing...UmbracoCms" in last operation		
-		
-		$instanceField = [NuGet.Dialog.PackageManagerWindow].GetField("CurrentInstance", [System.Reflection.BindingFlags]::Static -bor [System.Reflection.BindingFlags]::NonPublic)		
-		$consoleField = [NuGet.Dialog.PackageManagerWindow].GetField("_smartOutputConsoleProvider", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-		
-		$instance = $instanceField.GetValue($null)		
-		
-		$consoleProvider = $consoleField.GetValue($instance)		
-			
-		$console = $consoleProvider.CreateOutputConsole($false)		
-		
-		$messagesField = $console.GetType().GetField("_messages", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-			
-		$messages = $messagesField.GetValue($console)		
-	
-		$operations = $messages -split "=============================="		
-			
-		$lastOperation = $operations | select -last 1		
-			
-		if ($lastOperation)		
-		{		
-			$lastOperation = $lastOperation.ToLower()
-			$lines = $lastOperation -split "`r`n"
-			$installMatch = $lines | ? { $_.Contains("...umbracocms ") } | select -first 1
-			
-			if ($installMatch)		
-			{
-				$copyWebconfig = $true
-			}
-		}
-	} 
-	Catch { }
 	
 	if($copyWebconfig -eq $true) 
 	{
 		$packageWebConfigSource = Join-Path $rootPath "UmbracoFiles\Web.config"
-		$destinationWebConfig = Join-Path $projectDestinationPath "Web.config"
 		Copy-Item $packageWebConfigSource $destinationWebConfig -Force
 	}
 
