@@ -560,6 +560,7 @@
     <Compile Include="Security\Identity\AuthenticationManagerExtensions.cs" />
     <Compile Include="Security\Identity\BackOfficeCookieManager.cs" />
     <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
+    <Compile Include="Security\Identity\NaiveSessionCache.cs" />
     <Compile Include="Security\Identity\OwinExtensions.cs" />
     <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthenticationOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
