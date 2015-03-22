@@ -1878,7 +1878,6 @@
     <Content Include="Umbraco\Plugins\Tinymce3\insertChar.aspx" />
     <Content Include="Umbraco\Webservices\TreeClientService.asmx" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
-    <Content Include="Umbraco_Client\PasswordStrength\passwordstrength.js" />
     <Content Include="Umbraco_Client\Ui\jQueryWresize.js" />
     <Content Include="Umbraco\Search\quickSearch.js" />
     <Content Include="Umbraco\Members\search.aspx" />
