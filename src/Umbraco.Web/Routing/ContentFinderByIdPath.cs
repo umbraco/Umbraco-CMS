@@ -2,6 +2,7 @@ using System;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Routing
 {
@@ -20,6 +21,9 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TryFindContent(PublishedContentRequest docRequest)
         {
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableFindContentByIdPath)
+                return false;
+
             IPublishedContent node = null;
 			var path = docRequest.Uri.GetAbsolutePathDecoded();
 
