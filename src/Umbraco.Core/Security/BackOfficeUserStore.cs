@@ -15,9 +15,8 @@ namespace Umbraco.Core.Security
         IUserStore<BackOfficeIdentityUser, int>, 
         IUserPasswordStore<BackOfficeIdentityUser, int>, 
         IUserEmailStore<BackOfficeIdentityUser, int>, 
-        IUserLoginStore<BackOfficeIdentityUser, int>
-
-        //IUserRoleStore<BackOfficeIdentityUser, int>,
+        IUserLoginStore<BackOfficeIdentityUser, int>,
+        IUserRoleStore<BackOfficeIdentityUser, int>
 
         //TODO: This will require additional columns/tables
         //IUserLockoutStore<BackOfficeIdentityUser, int>
@@ -442,5 +441,76 @@ namespace Umbraco.Core.Security
             return anythingChanged;
         }
 
+        /// <summary>
+        /// Adds a user to a role (section)
+        /// </summary>
+        /// <param name="user"/><param name="roleName"/>
+        /// <returns/>
+        public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
+        {
+            if (user.AllowedApplications.InvariantContains(roleName)) return Task.FromResult(0);
+            
+            var asInt = user.Id.TryConvertTo<int>();
+            if (asInt == false)
+            {
+                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
+            }
+
+            var found = _userService.GetUserById(asInt.Result);
+
+            if (found != null)
+            {
+                found.AddAllowedSection(roleName);
+                _userService.Save(found);
+            }
+
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Removes the role (allowed section) for the user
+        /// </summary>
+        /// <param name="user"/><param name="roleName"/>
+        /// <returns/>
+        public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
+        {
+            if (user.AllowedApplications.InvariantContains(roleName) == false) return Task.FromResult(0);
+
+            var asInt = user.Id.TryConvertTo<int>();
+            if (asInt == false)
+            {
+                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
+            }
+
+            var found = _userService.GetUserById(asInt.Result);
+
+            if (found != null)
+            {
+                found.RemoveAllowedSection(roleName);
+                _userService.Save(found);
+            }
+
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns the roles for this user
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user)
+        {
+            return Task.FromResult((IList<string>)user.AllowedApplications.ToList());
+        }
+
+        /// <summary>
+        /// Returns true if a user is in the role
+        /// </summary>
+        /// <param name="user"/><param name="roleName"/>
+        /// <returns/>
+        public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string roleName)
+        {
+            return Task.FromResult(user.AllowedApplications.InvariantContains(roleName));
+        }
     }
 }
