@@ -414,25 +414,25 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.Language = identityUser.Culture;
             }
-            if (user.StartMediaId != identityUser.StartMediaNode)
+            if (user.StartMediaId != identityUser.StartMediaId)
             {
                 anythingChanged = true;
-                user.StartMediaId = identityUser.StartMediaNode;
+                user.StartMediaId = identityUser.StartMediaId;
             }
-            if (user.StartContentId != identityUser.StartContentNode)
+            if (user.StartContentId != identityUser.StartContentId)
             {
                 anythingChanged = true;
-                user.StartContentId = identityUser.StartContentNode;
+                user.StartContentId = identityUser.StartContentId;
             }
-            if (user.AllowedSections.ContainsAll(identityUser.AllowedApplications) == false
-                || identityUser.AllowedApplications.ContainsAll(user.AllowedSections) == false)
+            if (user.AllowedSections.ContainsAll(identityUser.AllowedSections) == false
+                || identityUser.AllowedSections.ContainsAll(user.AllowedSections) == false)
             {
                 anythingChanged = true;
                 foreach (var allowedSection in user.AllowedSections)
                 {
                     user.RemoveAllowedSection(allowedSection);
                 }
-                foreach (var allowedApplication in identityUser.AllowedApplications)
+                foreach (var allowedApplication in identityUser.AllowedSections)
                 {
                     user.AddAllowedSection(allowedApplication);
                 }
@@ -448,7 +448,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
         {
-            if (user.AllowedApplications.InvariantContains(roleName)) return Task.FromResult(0);
+            if (user.AllowedSections.InvariantContains(roleName)) return Task.FromResult(0);
             
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
@@ -474,7 +474,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
         {
-            if (user.AllowedApplications.InvariantContains(roleName) == false) return Task.FromResult(0);
+            if (user.AllowedSections.InvariantContains(roleName) == false) return Task.FromResult(0);
 
             var asInt = user.Id.TryConvertTo<int>();
             if (asInt == false)
@@ -500,7 +500,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user)
         {
-            return Task.FromResult((IList<string>)user.AllowedApplications.ToList());
+            return Task.FromResult((IList<string>)user.AllowedSections.ToList());
         }
 
         /// <summary>
@@ -510,7 +510,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string roleName)
         {
-            return Task.FromResult(user.AllowedApplications.InvariantContains(roleName));
+            return Task.FromResult(user.AllowedSections.InvariantContains(roleName));
         }
     }
 }

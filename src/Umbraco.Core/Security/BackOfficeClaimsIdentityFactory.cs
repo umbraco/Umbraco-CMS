@@ -22,11 +22,11 @@ namespace Umbraco.Core.Security
                 Id = user.Id,
                 Username = user.UserName,
                 RealName = user.Name,
-                AllowedApplications = user.AllowedApplications,
+                AllowedApplications = user.AllowedSections,
                 Culture = user.Culture,
                 Roles = user.Roles.Select(x => x.RoleId).ToArray(),
-                StartContentNode = user.StartContentNode,
-                StartMediaNode = user.StartMediaNode
+                StartContentNode = user.StartContentId,
+                StartMediaNode = user.StartMediaId
             });
 
             return umbracoIdentity;

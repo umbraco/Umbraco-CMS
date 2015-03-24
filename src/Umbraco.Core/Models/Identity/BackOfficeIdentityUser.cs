@@ -11,9 +11,9 @@ namespace Umbraco.Core.Models.Identity
         /// Gets/sets the user's real name
         /// </summary>
         public string Name { get; set; }
-        public int StartContentNode { get; set; }
-        public int StartMediaNode { get; set; }
-        public string[] AllowedApplications { get; set; }
+        public int StartContentId { get; set; }
+        public int StartMediaId { get; set; }
+        public string[] AllowedSections { get; set; }
         public string Culture { get; set; }
 
         public string UserTypeAlias { get; set; }

@@ -43,7 +43,14 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
-        
+
+        private BackOfficeUserManager _userManager;
+
+        protected BackOfficeUserManager UserManager
+        {
+            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>()); }
+        }
+
         /// <summary>
         /// This is a special method that will return the current users' remaining session seconds, the reason
         /// it is special is because this route is ignored in the UmbracoModule so that the auth ticket doesn't get
@@ -83,33 +90,6 @@ namespace Umbraco.Web.Editors
                 AddModelErrors(result);
                 return Request.CreateValidationErrorResponse(ModelState);
             }
-        }
-
-        private void AddModelErrors(IdentityResult result, string prefix = "")
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(prefix, error);
-            }
-        }
-
-        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
-        {
-            var owinContext = TryGetOwinContext().Result;
-
-            owinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
-            owinContext.Authentication.SignIn(
-                new AuthenticationProperties() { IsPersistent = isPersistent },
-                await GenerateUserIdentityAsync(user));
-        }
-
-        private async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeIdentityUser user)
-        {
-            // NOTE the authenticationType must match the umbraco one
-            // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
-            return userIdentity;
         }
 
         /// <summary>
@@ -154,18 +134,11 @@ namespace Umbraco.Web.Editors
         }
 
         [WebApi.UmbracoAuthorize]
-        [SetAngularAntiForgeryTokens]
+        [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>>  GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId());
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
-        }
-
-        private BackOfficeUserManager _userManager;
-
-        protected BackOfficeUserManager UserManager
-        {
-            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>()); }
         }
 
         /// <summary>
@@ -173,34 +146,33 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        public UserDetail PostLogin(LoginModel loginModel)
+        public HttpResponseMessage PostLogin(LoginModel loginModel)
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
             {
+                //get the user
                 var user = Security.GetBackOfficeUser(loginModel.Username);
+                var userDetail = Mapper.Map<UserDetail>(user);
 
-                //TODO: Clean up the int cast!
-                var ticket = UmbracoContext.Security.PerformLogin(user);
+                //create a response with the userDetail object
+                var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
 
-                //TODO: Normally we'd do something like this for identity, but we're mixing and matching legacy and new here
-                // so we'll keep the legacy way and move forward with this in our custom handler for now, eventually replacing 
-                // the above legacy logic with the new stuff.
-
-                //OwinContext.Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                //OwinContext.Authentication.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent },
-                //    await user.GenerateUserIdentityAsync(UserManager));
+                //set the response cookies with the ticket (NOTE: This needs to be done with the custom webapi extension because
+                // we cannot mix HttpContext.Response.Cookies and the way WebApi/Owin work)
+                var ticket = response.UmbracoLoginWebApi(user);
 
                 var http = this.TryGetHttpContext();
                 if (http.Success == false)
                 {
                     throw new InvalidOperationException("This method requires that an HttpContext be active");
                 }
+                //This ensure the current principal is set, otherwise any logic executing after this wouldn't actually be authenticated
                 http.Result.AuthenticateCurrentRequest(ticket, false);
+                
+                //update the userDetail and set their remaining seconds
+                userDetail.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
 
-                var result = Mapper.Map<UserDetail>(user);
-                //set their remaining seconds
-                result.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
-                return result;
+                return response;
             }
 
             //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
@@ -221,6 +193,33 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostLogout()
         {           
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        private void AddModelErrors(IdentityResult result, string prefix = "")
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(prefix, error);
+            }
+        }
+
+        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
+        {
+            var owinContext = TryGetOwinContext().Result;
+
+            owinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            owinContext.Authentication.SignIn(
+                new AuthenticationProperties() { IsPersistent = isPersistent },
+                await GenerateUserIdentityAsync(user));
+        }
+
+        private async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeIdentityUser user)
+        {
+            // NOTE the authenticationType must match the umbraco one
+            // defined in CookieAuthenticationOptions.AuthenticationType
+            var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
+            return userIdentity;
         }
     }
 }

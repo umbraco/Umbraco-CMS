@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Helpers;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -54,8 +56,9 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 AntiForgery.Validate(cookieToken, headerToken);
             }
-            catch
+            catch (Exception ex)
             {
+                LogHelper.Error(typeof(AngularAntiForgeryHelper), "Could not validate XSRF token", ex);
                 return false;
             }
             return true;
