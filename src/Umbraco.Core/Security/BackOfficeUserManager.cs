@@ -61,20 +61,58 @@ namespace Umbraco.Core.Security
         } 
         #endregion
 
+        /// <summary>
+        /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="userService"></param>
+        /// <param name="externalLoginService"></param>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
-            IOwinContext context,
             IUserService userService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider)
         {
             if (options == null) throw new ArgumentNullException("options");
-            if (context == null) throw new ArgumentNullException("context");
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, externalLoginService, membershipProvider));
 
+            return InitUserManager(manager, membershipProvider, options);
+        }
+
+        /// <summary>
+        /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="customUserStore"></param>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
+        public static BackOfficeUserManager Create(
+           IdentityFactoryOptions<BackOfficeUserManager> options,
+           BackOfficeUserStore customUserStore,
+           MembershipProviderBase membershipProvider)
+        {
+            if (options == null) throw new ArgumentNullException("options");
+            if (customUserStore == null) throw new ArgumentNullException("customUserStore");
+
+            var manager = new BackOfficeUserManager(customUserStore);
+
+            return InitUserManager(manager, membershipProvider, options);
+        }
+
+        /// <summary>
+        /// Initializes the user manager with the correct options
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="membershipProvider"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        private static BackOfficeUserManager InitUserManager(BackOfficeUserManager manager, MembershipProviderBase membershipProvider, IdentityFactoryOptions<BackOfficeUserManager> options)
+        {
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<BackOfficeIdentityUser, int>(manager)
             {
@@ -102,7 +140,7 @@ namespace Umbraco.Core.Security
             }
 
             //custom identity factory for creating the identity object for which we auth against in the back office
-            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();            
+            manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
 
             //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
 

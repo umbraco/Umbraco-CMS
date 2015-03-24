@@ -17,8 +17,9 @@ namespace Umbraco.Web.Security.Identity
     public static class AppBuilderExtensions
     {
         #region Backoffice
+
         /// <summary>
-        /// Configure Identity User Manager for Umbraco
+        /// Configure Default Identity User Manager for Umbraco
         /// </summary>
         /// <param name="app"></param>
         /// <param name="appContext"></param>
@@ -36,9 +37,33 @@ namespace Umbraco.Web.Security.Identity
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
-                    owinContext,
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
+                    userMembershipProvider));
+        }
+
+        /// <summary>
+        /// Configure a custom UserStore with the Identity User Manager for Umbraco
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="userMembershipProvider"></param>
+        /// <param name="customUserStore"></param>
+        public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
+            ApplicationContext appContext,
+            MembershipProviderBase userMembershipProvider,
+            BackOfficeUserStore customUserStore)
+        {
+            //Don't proceed if the app is not ready
+            if (appContext.IsConfigured == false
+                || appContext.DatabaseContext == null
+                || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
+
+            //Configure Umbraco user manager to be created per request
+            app.CreatePerOwinContext<BackOfficeUserManager>(
+                (options, owinContext) => BackOfficeUserManager.Create(
+                    options,
+                    customUserStore,
                     userMembershipProvider));
         }
 
