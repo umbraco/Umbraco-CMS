@@ -221,7 +221,7 @@ namespace umbraco.presentation.developer.packages
             var packageId = 0;
             int.TryParse(Request.GetItemAsString("pId"), out packageId);
 
-            switch (currentStep)
+            switch (currentStep.ToLowerInvariant())
             {
                 case "businesslogic":
                     //first load in the config from the temporary directory
@@ -242,7 +242,7 @@ namespace umbraco.presentation.developer.packages
                         Response.Redirect("installer.aspx?installing=refresh&dir=" + dir + "&pId=" + packageId.ToString() + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     break;
-                case "customInstaller":
+                case "custominstaller":
                     var customControl = Request.GetItemAsString("customControl");
 
                     if (customControl.IsNullOrWhiteSpace() == false)
