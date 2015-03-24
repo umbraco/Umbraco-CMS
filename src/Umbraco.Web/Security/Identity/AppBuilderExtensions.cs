@@ -23,7 +23,9 @@ namespace Umbraco.Web.Security.Identity
         /// <param name="app"></param>
         /// <param name="appContext"></param>
         /// <param name="userMembershipProvider"></param>
-        public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app, ApplicationContext appContext, MembershipProviderBase userMembershipProvider)
+        public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app, 
+            ApplicationContext appContext, 
+            MembershipProviderBase userMembershipProvider)
         {
             //Don't proceed if the app is not ready
             if (appContext.IsConfigured == false
@@ -38,9 +40,6 @@ namespace Umbraco.Web.Security.Identity
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
-
-            //Configure Umbraco role manager to be created per request
-            app.CreatePerOwinContext<BackOfficeRoleManager>((options, owinContext) => BackOfficeRoleManager.Create(options));
         }
 
         /// <summary>

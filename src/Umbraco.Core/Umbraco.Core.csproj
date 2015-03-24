@@ -345,7 +345,6 @@
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
-    <Compile Include="Models\Identity\BackOfficeIdentityRole.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
@@ -420,8 +419,6 @@
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
-    <Compile Include="Security\BackOfficeRoleManager.cs" />
-    <Compile Include="Security\BackOfficeRoleStore.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
