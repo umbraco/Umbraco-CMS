@@ -16,6 +16,7 @@ namespace Umbraco.Web.Security.Identity
 {
     public static class AppBuilderExtensions
     {
+        #region Backoffice
         /// <summary>
         /// Configure Identity User Manager for Umbraco
         /// </summary>
@@ -32,8 +33,8 @@ namespace Umbraco.Web.Security.Identity
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
-                    options, 
-                    owinContext, 
+                    options,
+                    owinContext,
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Security.Identity
                     GlobalSettings.UseSSL)
             {
                 Provider = new CookieAuthenticationProvider
-                {                
+                {
                     //// Enables the application to validate the security stamp when the user 
                     //// logs in. This is a security feature which is used when you 
                     //// change a password or add an external login to your account.  
@@ -99,7 +100,8 @@ namespace Umbraco.Web.Security.Identity
             });
 
             return app;
-        }
+        } 
+        #endregion
 
     }
 }

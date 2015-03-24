@@ -7,6 +7,33 @@
                 <span ng-show="dialogData.isTimedOut"><localize key="login_timeout">Log in below</localize>.</span>
                 <localize key="login_instruction">Log in below</localize>
             </p>
+            
+            <div class="external-logins" ng-if="externalLoginProviders.length > 0">
+                
+                <div class="alert alert-error" ng-repeat="error in externalLoginInfo.errors">
+                    <span>{{error}}</span>
+                </div>
+
+                <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
+
+                    <div ng-repeat="login in externalLoginProviders">
+
+                        <button type="submit" class="btn btn-block btn-social"
+                                ng-class="login.properties.SocialStyle"
+                                id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                title="Log in using your {{login.caption}} account">
+                            <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                            Sign in with {{login.caption}}
+                        </button>
+
+                    </div>
+                </form>
+
+                <div id="hrOr">
+                    <hr/><div>Or</div>
+                </div>
+
+            </div>
 
             <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
                 <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
@@ -24,27 +51,6 @@
                 </div>
             </form>
             
-            <hr />
-            
-            <p>External login providers</p>
-            
-            <div class="alert alert-error" ng-repeat="error in externalLoginInfo.errors">
-                <span>{{error}}</span>
-            </div>
-
-            <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
-
-                <div ng-repeat="login in externalLoginProviders">
-
-                    <button type="submit" class="btn btn-block btn-large btn-social"
-                            ng-class="login.properties.SocialStyle"
-                            id="{{login.authType}}" name="provider" value="{{login.authType}}"
-                            title="Log in using your {{login.caption}} account">
-                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                        Sign in with {{login.caption}}
-                    </button>
-                  
-                </div>
-            </form>
+        </div>
     </div>
 </div>

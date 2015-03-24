@@ -191,6 +191,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Owin.Security.Google.3.0.1\lib\net45\Microsoft.Owin.Security.Google.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Owin.Security.MicrosoftAccount">
+      <HintPath>..\packages\Microsoft.Owin.Security.MicrosoftAccount.3.0.1\lib\net45\Microsoft.Owin.Security.MicrosoftAccount.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
@@ -380,6 +383,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Content Include="App_Code\OwinStartup.cs" />
+    <Content Include="App_Code\IdentityAuthExtensions.cs" />
     <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
