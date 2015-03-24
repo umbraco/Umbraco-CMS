@@ -9,16 +9,15 @@ using Umbraco.Web.UI;
 
 namespace Umbraco.Web.UI
 {
-
     /// <summary>
     /// Default OWIN startup class
     /// </summary>
     public class OwinStartup
     {
-
         public void Configuration(IAppBuilder app)
         {
-            //Single method to configure the Identity user manager for use with Umbraco Back office
+            //Configure the Identity user manager for use with Umbraco Back office 
+            // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 ApplicationContext.Current,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
