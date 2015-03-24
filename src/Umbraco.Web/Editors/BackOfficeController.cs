@@ -493,23 +493,14 @@ namespace Umbraco.Web.Editors
             OwinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
             
             OwinContext.Authentication.SignIn(
-                new AuthenticationProperties() {IsPersistent = isPersistent}, 
-                await GenerateUserIdentityAsync(user));
-        }
-
-        private async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeIdentityUser user)
-        {
-            // NOTE the authenticationType must match the umbraco one
-            // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
-            return userIdentity;
+                new AuthenticationProperties() {IsPersistent = isPersistent},
+                await user.GenerateUserIdentityAsync(UserManager));
         }
 
         private IAuthenticationManager AuthenticationManager
         {
             get { return OwinContext.Authentication; }
-        }
-        
+        }        
         
         /// <summary>
         /// Returns the server variables regarding the application state

@@ -38,5 +38,10 @@ namespace Umbraco.Core.Models.Membership
         /// Exposes the basic profile data
         /// </summary>
         IProfile ProfileData { get; }
+
+        /// <summary>
+        /// The security stamp used by ASP.Net identity
+        /// </summary>
+        string SecurityStamp { get; set; }
     }
 }

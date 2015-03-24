@@ -16,20 +16,22 @@ namespace Umbraco.Core.Security
         IUserPasswordStore<BackOfficeIdentityUser, int>, 
         IUserEmailStore<BackOfficeIdentityUser, int>, 
         IUserLoginStore<BackOfficeIdentityUser, int>,
-        IUserRoleStore<BackOfficeIdentityUser, int>
+        IUserRoleStore<BackOfficeIdentityUser, int>,
+        IUserSecurityStampStore<BackOfficeIdentityUser, int>
+        
+        //TODO: This would require additional columns/tables for now people will need to implement this on their own
+        //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
+        //IUserTwoFactorStore<BackOfficeIdentityUser, int>,
 
         //TODO: This will require additional columns/tables
         //IUserLockoutStore<BackOfficeIdentityUser, int>
 
-        //TODO: Implement this - might need to add a new column for this 
-        // http://stackoverflow.com/questions/19487322/what-is-asp-net-identitys-iusersecuritystampstoretuser-interface
-        //IUserSecurityStampStore<BackOfficeIdentityUser, int>
-
-        //TODO: To do this we need to implement IQueryable - seems pretty overkill?
+        //TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
         //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
         private readonly IExternalLoginService _externalLoginService;
+        private bool _disposed = false;
 
         public BackOfficeUserStore(IUserService userService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
         {
@@ -53,6 +55,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         protected override void DisposeResources()
         {
+            _disposed = true;
         }
 
         /// <summary>
@@ -62,6 +65,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task CreateAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             var userType = _userService.GetUserTypeByAlias(
@@ -108,6 +112,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public async Task UpdateAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             var asInt = user.Id.TryConvertTo<int>();
@@ -139,6 +144,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task DeleteAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             var asInt = user.Id.TryConvertTo<int>();
@@ -164,6 +170,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<BackOfficeIdentityUser> FindByIdAsync(int userId)
         {
+            ThrowIfDisposed();
             var user = _userService.GetUserById(userId);
             if (user == null)
             {
@@ -179,6 +186,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<BackOfficeIdentityUser> FindByNameAsync(string userName)
         {
+            ThrowIfDisposed();
             var user = _userService.GetByUsername(userName);
             if (user == null)
             {
@@ -197,6 +205,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             if (passwordHash.IsNullOrWhiteSpace()) throw new ArgumentNullException("passwordHash");
 
@@ -212,6 +221,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<string> GetPasswordHashAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             return Task.FromResult(user.PasswordHash);
@@ -224,6 +234,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<bool> HasPasswordAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             return Task.FromResult(user.PasswordHash.IsNullOrWhiteSpace() == false);
@@ -236,6 +247,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task SetEmailAsync(BackOfficeIdentityUser user, string email)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             if (email.IsNullOrWhiteSpace()) throw new ArgumentNullException("email");
 
@@ -251,6 +263,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<string> GetEmailAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
 
             return Task.FromResult(user.Email);
@@ -263,6 +276,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<bool> GetEmailConfirmedAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             throw new NotImplementedException();
         }
 
@@ -273,6 +287,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task SetEmailConfirmedAsync(BackOfficeIdentityUser user, bool confirmed)
         {
+            ThrowIfDisposed();
             throw new NotImplementedException();
         }
 
@@ -283,6 +298,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<BackOfficeIdentityUser> FindByEmailAsync(string email)
         {
+            ThrowIfDisposed();
             var user = _userService.GetByEmail(email);
             var result = user == null
                 ? null
@@ -298,6 +314,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task AddLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             if (login == null) throw new ArgumentNullException("login");
 
@@ -316,6 +333,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task RemoveLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             if (login == null) throw new ArgumentNullException("login");
 
@@ -335,6 +353,7 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public Task<IList<UserLoginInfo>> GetLoginsAsync(BackOfficeIdentityUser user)
         {
+            ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException("user");
             return Task.FromResult((IList<UserLoginInfo>)
                 user.Logins.Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey)).ToList());
@@ -345,7 +364,10 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <returns/>
         public Task<BackOfficeIdentityUser> FindAsync(UserLoginInfo login)
-        {
+        {            
+            ThrowIfDisposed();
+            if (login == null) throw new ArgumentNullException("login");
+
             //get all logins associated with the login id
             var result = _externalLoginService.Find(login).ToArray();
             if (result.Any())
@@ -361,6 +383,117 @@ namespace Umbraco.Core.Security
             }
 
             return Task.FromResult<BackOfficeIdentityUser>(null);
+        }
+
+
+        /// <summary>
+        /// Adds a user to a role (section)
+        /// </summary>
+        /// <param name="user"/><param name="roleName"/>
+        /// <returns/>
+        public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
+        {            
+            ThrowIfDisposed();
+            if (user == null) throw new ArgumentNullException("user");
+
+            if (user.AllowedSections.InvariantContains(roleName)) return Task.FromResult(0);
+            
+            var asInt = user.Id.TryConvertTo<int>();
+            if (asInt == false)
+            {
+                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
+            }
+
+            var found = _userService.GetUserById(asInt.Result);
+
+            if (found != null)
+            {
+                found.AddAllowedSection(roleName);
+            }
+
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Removes the role (allowed section) for the user
+        /// </summary>
+        /// <param name="user"/><param name="roleName"/>
+        /// <returns/>
+        public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
+        {            
+            ThrowIfDisposed();
+            if (user == null) throw new ArgumentNullException("user");
+
+            if (user.AllowedSections.InvariantContains(roleName) == false) return Task.FromResult(0);
+
+            var asInt = user.Id.TryConvertTo<int>();
+            if (asInt == false)
+            {
+                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
+            }
+
+            var found = _userService.GetUserById(asInt.Result);
+
+            if (found != null)
+            {
+                found.RemoveAllowedSection(roleName);
+            }
+
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns the roles for this user
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user)
+        {            
+            ThrowIfDisposed();
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult((IList<string>)user.AllowedSections.ToList());
+        }
+
+        /// <summary>
+        /// Returns true if a user is in the role
+        /// </summary>
+        /// <param name="user"/><param name="roleName"/>
+        /// <returns/>
+        public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string roleName)
+        {            
+            ThrowIfDisposed();
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.AllowedSections.InvariantContains(roleName));
+        }
+
+        /// <summary>
+        /// Set the security stamp for the user
+        /// </summary>
+        /// <param name="user"/><param name="stamp"/>
+        /// <returns/>
+        public Task SetSecurityStampAsync(BackOfficeIdentityUser user, string stamp)
+        {   
+            ThrowIfDisposed();
+            if (user == null) throw new ArgumentNullException("user");
+
+            user.SecurityStamp = stamp;
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Get the user security stamp
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<string> GetSecurityStampAsync(BackOfficeIdentityUser user)
+        {            
+            ThrowIfDisposed();
+            if (user == null) throw new ArgumentNullException("user");
+
+            //the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
+            return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace() 
+                ? user.PasswordHash.ToMd5()
+                : user.SecurityStamp);
         }
 
         private BackOfficeIdentityUser AssignLoginsCallback(BackOfficeIdentityUser user)
@@ -424,6 +557,11 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.StartContentId = identityUser.StartContentId;
             }
+            if (user.SecurityStamp != identityUser.SecurityStamp)
+            {
+                anythingChanged = true;
+                user.SecurityStamp = identityUser.SecurityStamp;
+            }
             if (user.AllowedSections.ContainsAll(identityUser.AllowedSections) == false
                 || identityUser.AllowedSections.ContainsAll(user.AllowedSections) == false)
             {
@@ -441,76 +579,10 @@ namespace Umbraco.Core.Security
             return anythingChanged;
         }
 
-        /// <summary>
-        /// Adds a user to a role (section)
-        /// </summary>
-        /// <param name="user"/><param name="roleName"/>
-        /// <returns/>
-        public Task AddToRoleAsync(BackOfficeIdentityUser user, string roleName)
+        private void ThrowIfDisposed()
         {
-            if (user.AllowedSections.InvariantContains(roleName)) return Task.FromResult(0);
-            
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
-            {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var found = _userService.GetUserById(asInt.Result);
-
-            if (found != null)
-            {
-                found.AddAllowedSection(roleName);
-                _userService.Save(found);
-            }
-
-            return Task.FromResult(0);
-        }
-
-        /// <summary>
-        /// Removes the role (allowed section) for the user
-        /// </summary>
-        /// <param name="user"/><param name="roleName"/>
-        /// <returns/>
-        public Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {
-            if (user.AllowedSections.InvariantContains(roleName) == false) return Task.FromResult(0);
-
-            var asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
-            {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            var found = _userService.GetUserById(asInt.Result);
-
-            if (found != null)
-            {
-                found.RemoveAllowedSection(roleName);
-                _userService.Save(found);
-            }
-
-            return Task.FromResult(0);
-        }
-
-        /// <summary>
-        /// Returns the roles for this user
-        /// </summary>
-        /// <param name="user"/>
-        /// <returns/>
-        public Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user)
-        {
-            return Task.FromResult((IList<string>)user.AllowedSections.ToList());
-        }
-
-        /// <summary>
-        /// Returns true if a user is in the role
-        /// </summary>
-        /// <param name="user"/><param name="roleName"/>
-        /// <returns/>
-        public Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string roleName)
-        {
-            return Task.FromResult(user.AllowedSections.InvariantContains(roleName));
+            if (_disposed)
+                throw new ObjectDisposedException(GetType().Name);
         }
     }
 }

@@ -30,6 +30,7 @@ using umbraco.providers;
 using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models.Identity;
+using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
 {
@@ -146,7 +147,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        public HttpResponseMessage PostLogin(LoginModel loginModel)
+        public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
             {
@@ -160,6 +161,10 @@ namespace Umbraco.Web.Editors
                 //set the response cookies with the ticket (NOTE: This needs to be done with the custom webapi extension because
                 // we cannot mix HttpContext.Response.Cookies and the way WebApi/Owin work)
                 var ticket = response.UmbracoLoginWebApi(user);
+
+                //Identity does some of it's own checks as well so we need to use it's sign in process too... this will essentially re-create the
+                // ticket/cookie above but we need to create the ticket now so we can assign the Current Thread User/IPrinciple below                
+                await SignInAsync(Mapper.Map<IUser, BackOfficeIdentityUser>(user), isPersistent: true);
 
                 var http = this.TryGetHttpContext();
                 if (http.Success == false)
@@ -211,15 +216,8 @@ namespace Umbraco.Web.Editors
 
             owinContext.Authentication.SignIn(
                 new AuthenticationProperties() { IsPersistent = isPersistent },
-                await GenerateUserIdentityAsync(user));
+                await user.GenerateUserIdentityAsync(UserManager));
         }
 
-        private async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeIdentityUser user)
-        {
-            // NOTE the authenticationType must match the umbraco one
-            // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await UserManager.CreateIdentityAsync(user, global::Umbraco.Core.Constants.Security.BackOfficeAuthenticationType);
-            return userIdentity;
-        }
     }
 }

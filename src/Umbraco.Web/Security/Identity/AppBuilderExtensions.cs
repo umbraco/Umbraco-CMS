@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Security;
@@ -11,6 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -84,16 +87,14 @@ namespace Umbraco.Web.Security.Identity
             {
                 Provider = new CookieAuthenticationProvider
                 {
-                    //TODO: Need to implement IUserSecurityStampStore on BackOfficeUserStore!
-
-                    //// Enables the application to validate the security stamp when the user 
-                    //// logs in. This is a security feature which is used when you 
-                    //// change a password or add an external login to your account.  
-                    //OnValidateIdentity = SecurityStampValidator
-                    //    .OnValidateIdentity<UmbracoMembersUserManager<UmbracoApplicationUser>, UmbracoApplicationUser, int>(
-                    //        TimeSpan.FromMinutes(30),
-                    //        (manager, user) => user.GenerateUserIdentityAsync(manager),
-                    //        identity => identity.GetUserId<int>())
+                    // Enables the application to validate the security stamp when the user 
+                    // logs in. This is a security feature which is used when you 
+                    // change a password or add an external login to your account.  
+                    OnValidateIdentity = SecurityStampValidator
+                        .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                            TimeSpan.FromMinutes(30),
+                            (manager, user) => user.GenerateUserIdentityAsync(manager),
+                            identity => identity.GetUserId<int>())
                 }
             });
 

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Security
             : base(store)
         {
         }
-
+        
         #region What we support do not currently
 
         //NOTE: Not sure if we really want/need to ever support this 
@@ -38,12 +38,6 @@ namespace Umbraco.Core.Security
 
         //TODO: Support this
         public override bool SupportsUserLockout
-        {
-            get { return false; }
-        }
-
-        //TODO: Support this
-        public override bool SupportsUserSecurityStamp
         {
             get { return false; }
         }
