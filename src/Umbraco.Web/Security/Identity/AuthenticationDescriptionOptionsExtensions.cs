@@ -1,4 +1,5 @@
 using Microsoft.Owin.Security;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -10,13 +11,21 @@ namespace Umbraco.Web.Security.Identity
         /// <param name="options"></param>
         /// <param name="style"></param>
         /// <param name="icon"></param>
-        public static void ForUmbracoBackOffice(this AuthenticationDescription options, string style, string icon)
+        public static void ForUmbracoBackOffice(this AuthenticationOptions options, string style, string icon)
         {
-            options.Properties["SocialStyle"] = style;
-            options.Properties["SocialIcon"] = icon;
+            Mandate.ParameterNotNullOrEmpty(options.AuthenticationType, "options.AuthenticationType");
+
+            //Ensure the prefix is set
+            if (options.AuthenticationType.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix) == false)
+            {
+                options.AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationTypePrefix + options.AuthenticationType;    
+            }
+
+            options.Description.Properties["SocialStyle"] = style;
+            options.Description.Properties["SocialIcon"] = icon;
 
             //flag for use in back office
-            options.Properties["UmbracoBackOffice"] = true;
+            options.Description.Properties["UmbracoBackOffice"] = true;
         }
     }
 }

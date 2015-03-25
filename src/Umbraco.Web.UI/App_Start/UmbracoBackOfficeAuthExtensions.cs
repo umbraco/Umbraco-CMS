@@ -54,51 +54,52 @@ namespace Umbraco.Web.UI
                 ClientSecret = clientSecret,
                 SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
-            msOptions.Description.ForUmbracoBackOffice(style, icon);
+            msOptions.ForUmbracoBackOffice(style, icon);
             msOptions.Caption = caption;
             app.UseMicrosoftAccountAuthentication(msOptions);
         }
 
-        */
-
-        /////  <summary>
-        /////  Configure google sign-in
-        /////  </summary>
-        /////  <param name="app"></param>
-        /////  <param name="clientId"></param>
-        /////  <param name="clientSecret"></param>
-        ///// <param name="caption"></param>
-        ///// <param name="style"></param>
-        ///// <param name="icon"></param>
-        ///// <remarks>
-        /////  
-        /////  Nuget installation:
-        /////      Microsoft.Owin.Security.Google
-        ///// 
-        /////  Google account documentation for ASP.Net Identity can be found:
-        /////  
-        /////  http://www.asp.net/web-api/overview/security/external-authentication-services#GOOGLE
-        /////  
-        /////  Google apps can be created here:
-        /////  
-        /////  https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
-        /////  
-        /////  </remarks>
-        //public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret,
-        //    string caption = "Google", string style = "btn-google-plus", string icon = "fa-google-plus")
-        //{
-        //    var googleOptions = new GoogleOAuth2AuthenticationOptions
-        //    {
-        //        ClientId = clientId,
-        //        ClientSecret = clientSecret,
-        //        SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
-        //    };
-        //    googleOptions.Description.ForUmbracoBackOffice(style, icon);
-        //    googleOptions.Caption = caption;
-        //    app.UseGoogleAuthentication(googleOptions);
-        //}
-
-        /*
+        ///  <summary>
+        ///  Configure google sign-in
+        ///  </summary>
+        ///  <param name="app"></param>
+        ///  <param name="clientId"></param>
+        ///  <param name="clientSecret"></param>
+        /// <param name="caption"></param>
+        /// <param name="style"></param>
+        /// <param name="icon"></param>
+        /// <remarks>
+        ///  
+        ///  Nuget installation:
+        ///      Microsoft.Owin.Security.Google
+        /// 
+        ///  Google account documentation for ASP.Net Identity can be found:
+        ///  
+        ///  http://www.asp.net/web-api/overview/security/external-authentication-services#GOOGLE
+        ///  
+        ///  Google apps can be created here:
+        ///  
+        ///  https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
+        ///  
+        ///  </remarks>
+        public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret,
+            string caption = "Google", string style = "btn-google-plus", string icon = "fa-google-plus")
+        {
+            var googleOptions = new GoogleOAuth2AuthenticationOptions
+            {
+                ClientId = clientId,
+                ClientSecret = clientSecret, 
+                //In order to allow using different google providers on the front-end vs the back office,
+                // these settings are very important to make them distinguished from one another.
+                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
+                //  By default this is '/signin-google', you will need to change that default value in your
+                //  Google developer settings for your web-app in the "REDIRECT URIS" setting
+                CallbackPath = new PathString("/umbraco-google-signin")
+            };
+            googleOptions.ForUmbracoBackOffice(style, icon);
+            googleOptions.Caption = caption;
+            app.UseGoogleAuthentication(googleOptions);
+        }
 
         ///  <summary>
         ///  Configure facebook sign-in
@@ -130,13 +131,18 @@ namespace Umbraco.Web.UI
             {
                 AppId = appId,
                 AppSecret = appSecret,
-                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
+                //In order to allow using different google providers on the front-end vs the back office,
+                // these settings are very important to make them distinguished from one another.
+                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
+                //  By default this is '/signin-facebook', you will need to change that default value in your
+                //  Facebook developer settings for your app in the Advanced settings under "Client OAuth Login"
+                //  in the "Valid OAuth redirect URIs", specify the full URL, for example: http://mysite.com/umbraco-facebook-signin
+                CallbackPath = new PathString("/umbraco-facebook-signin")
             };
-            fbOptions.Description.ForUmbracoBackOffice(style, icon);
+            fbOptions.ForUmbracoBackOffice(style, icon);
             fbOptions.Caption = caption;
             app.UseFacebookAuthentication(fbOptions);
         }
-
 
         ///  <summary>
         ///  Configure ActiveDirectory sign-in
@@ -210,7 +216,7 @@ namespace Umbraco.Web.UI
                 }
 
             };
-            adOptions.Description.ForUmbracoBackOffice(style, icon);
+            adOptions.ForUmbracoBackOffice(style, icon);
             adOptions.Caption = caption;
             app.UseOpenIdConnectAuthentication(adOptions);
         }
