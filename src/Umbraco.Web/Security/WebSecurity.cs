@@ -99,7 +99,7 @@ namespace Umbraco.Web.Security
             // and cookie handling is different with httpcontext vs webapi and owin, normally we'd do:
             //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
-            var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalAuthenticationType);
+            var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalCookieName);
             if (externalLoginCookie != null)
             {
                 externalLoginCookie.Expires = DateTime.Now.AddYears(-1);

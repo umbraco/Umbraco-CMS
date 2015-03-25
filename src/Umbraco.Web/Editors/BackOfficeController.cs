@@ -479,9 +479,9 @@ namespace Umbraco.Web.Editors
                 ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
 
                 //Remove the cookie otherwise this message will keep appearing
-                if (Response.Cookies[Core.Constants.Security.BackOfficeExternalAuthenticationType] != null)
+                if (Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName] != null)
                 {
-                    Response.Cookies[Core.Constants.Security.BackOfficeExternalAuthenticationType].Expires = DateTime.MinValue;    
+                    Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
                 }
             }
             

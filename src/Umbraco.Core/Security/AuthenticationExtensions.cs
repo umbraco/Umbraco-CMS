@@ -166,7 +166,7 @@ namespace Umbraco.Core.Security
                 Path = "/"
             };
             //remove the external login cookie too
-            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalAuthenticationType, "")
+            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalCookieName, "")
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Security
             if (response == null) throw new ArgumentNullException("response");
 
             //remove the external login cookie
-            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalAuthenticationType, "")
+            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalCookieName, "")
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
@@ -352,7 +352,7 @@ namespace Umbraco.Core.Security
         {
             if (http == null) throw new ArgumentNullException("http");
             //clear the preview cookie and external login
-            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalAuthenticationType };
+            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName };
             foreach (var c in cookies)
             {
                 //remove from the request

@@ -111,12 +111,12 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
 
-            app.SetDefaultSignInAsAuthenticationType("UmbracoExternalCookie");
+            app.SetDefaultSignInAsAuthenticationType(Constants.Security.BackOfficeExternalAuthenticationType);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,
-                CookieName = Constants.Security.BackOfficeExternalAuthenticationType,
+                CookieName = Constants.Security.BackOfficeExternalCookieName,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
                 //Custom cookie manager so we can filter requests
                 CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor()),
