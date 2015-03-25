@@ -58,11 +58,11 @@
 
     @{
         var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+            .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
             .Select(p => new
             {
                 authType = p.AuthenticationType,
                 caption = p.Caption,
-                //TODO: Need to see if this exposes any sensitive data!
                 properties = p.Properties
             })
             .ToArray();

@@ -395,6 +395,7 @@ namespace Umbraco.Web.Editors
                     {
                         {
                             "providers", HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,
