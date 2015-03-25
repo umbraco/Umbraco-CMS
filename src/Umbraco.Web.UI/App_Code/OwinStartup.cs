@@ -47,10 +47,10 @@ namespace Umbraco.Web.UI
              *  methods to suit your needs. 
              */
 
-            //app.ConfigureGoogleAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
-            //app.ConfigureFacebookAuth("YOUR_APP_ID", "YOUR_APP_SECRET");
-            //app.ConfigureMicrosoftAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
-            //app.ConfigureActiveDirectory("YOUR_TENANT", "YOUR_CLIENT_ID", "YOUR_POST_LOGIN_REDIRECT_URL", "YOUR_APP_KEY", "YOUR_AUTH_TYPE");
+            //app.ConfigureBackOfficeGoogleAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
+            //app.ConfigureBackOfficeFacebookAuth("YOUR_APP_ID", "YOUR_APP_SECRET");
+            //app.ConfigureBackOfficeMicrosoftAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
+            //app.ConfigureBackOfficeActiveDirectoryAuth("YOUR_TENANT", "YOUR_CLIENT_ID", "YOUR_POST_LOGIN_REDIRECT_URL", "YOUR_APP_KEY", "YOUR_AUTH_TYPE");
         }
     }
 }

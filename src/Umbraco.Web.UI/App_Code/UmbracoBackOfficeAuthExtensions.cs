@@ -16,7 +16,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.UI
 {
-    public static class IdentityAuthExtensions
+    public static class UmbracoBackOfficeAuthExtensions
     {
 
         /*
@@ -42,12 +42,13 @@ namespace Umbraco.Web.UI
         /// http://go.microsoft.com/fwlink/?LinkID=144070
         /// 
         /// </remarks>
-        public static void ConfigureMicrosoftAuth(this IAppBuilder app, string clientId, string clientSecret)
+        public static void ConfigureBackOfficeMicrosoftAuth(this IAppBuilder app, string clientId, string clientSecret)
         {
             var msOptions = new MicrosoftAccountAuthenticationOptions
             {
                 ClientId = clientId,
-                ClientSecret = clientSecret
+                ClientSecret = clientSecret,
+                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
             //Defines styles for buttons
             msOptions.Description.Properties["SocialStyle"] = "btn-microsoft";
@@ -59,7 +60,7 @@ namespace Umbraco.Web.UI
         */
 
         /*
-         
+
         /// <summary>
         /// Configure google sign-in
         /// </summary>
@@ -80,12 +81,13 @@ namespace Umbraco.Web.UI
         /// https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
         /// 
         /// </remarks>
-        public static void ConfigureGoogleAuth(this IAppBuilder app, string clientId, string clientSecret)
+        public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret)
         {
             var googleOptions = new GoogleOAuth2AuthenticationOptions
             {
                 ClientId = clientId,
-                ClientSecret = clientSecret
+                ClientSecret = clientSecret,
+                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
             //Defines styles for buttons
             googleOptions.Description.Properties["SocialStyle"] = "btn-google-plus";
@@ -95,6 +97,7 @@ namespace Umbraco.Web.UI
         }
 
         */
+
 
         /*
 
@@ -118,12 +121,13 @@ namespace Umbraco.Web.UI
         /// https://developers.facebook.com/
         /// 
         /// </remarks>
-        public static void ConfigureFacebookAuth(this IAppBuilder app, string appId, string appSecret)
+        public static void ConfigureBackOfficeFacebookAuth(this IAppBuilder app, string appId, string appSecret)
         {
             var fbOptions = new FacebookAuthenticationOptions
             {
                 AppId = appId,
                 AppSecret = appSecret,
+                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
             //Defines styles for buttons
             fbOptions.Description.Properties["SocialStyle"] = "btn-facebook";
@@ -167,7 +171,7 @@ namespace Umbraco.Web.UI
         /// This configuration requires the NaiveSessionCache class below which will need to be un-commented
         ///
         /// </remarks>
-        public static void ConfigureActiveDirectory(this IAppBuilder app, 
+        public static void ConfigureBackOfficeActiveDirectoryAuth(this IAppBuilder app, 
             string tenant, string clientId, string postLoginRedirectUri, string appKey,
             string authType)
         {         
@@ -178,6 +182,7 @@ namespace Umbraco.Web.UI
             var adOptions = new OpenIdConnectAuthenticationOptions
             {
                 AuthenticationType = authType,
+                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
                 ClientId = clientId,
                 Authority = authority,
                 PostLogoutRedirectUri = postLoginRedirectUri,
