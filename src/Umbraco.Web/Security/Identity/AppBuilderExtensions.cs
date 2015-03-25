@@ -111,7 +111,6 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
 
-            app.SetDefaultSignInAsAuthenticationType(Constants.Security.BackOfficeExternalAuthenticationType);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
