@@ -59,44 +59,46 @@ namespace Umbraco.Web.UI
             app.UseMicrosoftAccountAuthentication(msOptions);
         }
 
+        */
 
-        ///  <summary>
-        ///  Configure google sign-in
-        ///  </summary>
-        ///  <param name="app"></param>
-        ///  <param name="clientId"></param>
-        ///  <param name="clientSecret"></param>
-        /// <param name="caption"></param>
-        /// <param name="style"></param>
-        /// <param name="icon"></param>
-        /// <remarks>
-        ///  
-        ///  Nuget installation:
-        ///      Microsoft.Owin.Security.Google
-        /// 
-        ///  Google account documentation for ASP.Net Identity can be found:
-        ///  
-        ///  http://www.asp.net/web-api/overview/security/external-authentication-services#GOOGLE
-        ///  
-        ///  Google apps can be created here:
-        ///  
-        ///  https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
-        ///  
-        ///  </remarks>
-        public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret,
-            string caption = "Google", string style = "btn-google-plus", string icon = "fa-google-plus")
-        {
-            var googleOptions = new GoogleOAuth2AuthenticationOptions
-            {
-                ClientId = clientId,
-                ClientSecret = clientSecret,
-                SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
-            };
-            googleOptions.Description.ForUmbracoBackOffice(style, icon);
-            googleOptions.Caption = caption;
-            app.UseGoogleAuthentication(googleOptions);
-        }
+        /////  <summary>
+        /////  Configure google sign-in
+        /////  </summary>
+        /////  <param name="app"></param>
+        /////  <param name="clientId"></param>
+        /////  <param name="clientSecret"></param>
+        ///// <param name="caption"></param>
+        ///// <param name="style"></param>
+        ///// <param name="icon"></param>
+        ///// <remarks>
+        /////  
+        /////  Nuget installation:
+        /////      Microsoft.Owin.Security.Google
+        ///// 
+        /////  Google account documentation for ASP.Net Identity can be found:
+        /////  
+        /////  http://www.asp.net/web-api/overview/security/external-authentication-services#GOOGLE
+        /////  
+        /////  Google apps can be created here:
+        /////  
+        /////  https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
+        /////  
+        /////  </remarks>
+        //public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret,
+        //    string caption = "Google", string style = "btn-google-plus", string icon = "fa-google-plus")
+        //{
+        //    var googleOptions = new GoogleOAuth2AuthenticationOptions
+        //    {
+        //        ClientId = clientId,
+        //        ClientSecret = clientSecret,
+        //        SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
+        //    };
+        //    googleOptions.Description.ForUmbracoBackOffice(style, icon);
+        //    googleOptions.Caption = caption;
+        //    app.UseGoogleAuthentication(googleOptions);
+        //}
 
+        /*
 
         ///  <summary>
         ///  Configure facebook sign-in

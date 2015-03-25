@@ -5,12 +5,12 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.UI;
 
-[assembly: OwinStartup(typeof(OwinStartup))]
+[assembly: OwinStartup("UmbracoStartup", typeof(OwinStartup))]
 
 namespace Umbraco.Web.UI
 {
     /// <summary>
-    /// Default OWIN startup class
+    /// Default OWIN startup class as specified in appSettings
     /// </summary>
     public class OwinStartup
     {
@@ -47,7 +47,7 @@ namespace Umbraco.Web.UI
              *  methods to suit your needs. 
              */
 
-            //app.ConfigureBackOfficeGoogleAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
+            //app.ConfigureBackOfficeGoogleAuth("1072120697051-p41pro11srud3o3n90j7m00geq426jqt.apps.googleusercontent.com", "ak0msWvSE4w9nujcsfVy8_Y0");
             //app.ConfigureBackOfficeFacebookAuth("YOUR_APP_ID", "YOUR_APP_SECRET");
             //app.ConfigureBackOfficeMicrosoftAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
             //app.ConfigureBackOfficeActiveDirectoryAuth("YOUR_TENANT", "YOUR_CLIENT_ID", "YOUR_POST_LOGIN_REDIRECT_URL", "YOUR_APP_KEY", "YOUR_AUTH_TYPE");
