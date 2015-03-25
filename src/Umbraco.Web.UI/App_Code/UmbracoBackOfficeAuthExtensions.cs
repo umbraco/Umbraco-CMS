@@ -8,41 +8,45 @@ using System.Web;
 using Microsoft.Owin;
 using Owin;
 using Umbraco.Core;
-//using Microsoft.Owin.Security.MicrosoftAccount;
-//using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Umbraco.Web.Security.Identity;
 //using Microsoft.Owin.Security.Facebook;
 //using Microsoft.Owin.Security.Google;
 //using Microsoft.Owin.Security.OpenIdConnect;
+//using Microsoft.Owin.Security.MicrosoftAccount;
+//using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace Umbraco.Web.UI
 {
     public static class UmbracoBackOfficeAuthExtensions
     {
-
         /*
 
-        /// <summary>
-        /// Configure microsoft account sign-in
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="clientId"></param>
-        /// <param name="clientSecret"></param>
+        ///  <summary>
+        ///  Configure microsoft account sign-in
+        ///  </summary>
+        ///  <param name="app"></param>
+        ///  <param name="clientId"></param>
+        ///  <param name="clientSecret"></param>
+        /// <param name="caption"></param>
+        /// <param name="style"></param>
+        /// <param name="icon"></param>
         /// <remarks>
+        ///  
+        ///  Nuget installation:
+        ///      Microsoft.Owin.Security.MicrosoftAccount
         /// 
-        /// Nuget installation:
-        ///     Microsoft.Owin.Security.MicrosoftAccount
-        ///
-        /// Microsoft account documentation for ASP.Net Identity can be found:
-        /// 
-        /// http://www.asp.net/web-api/overview/security/external-authentication-services#MICROSOFT
-        /// http://blogs.msdn.com/b/webdev/archive/2012/09/19/configuring-your-asp-net-application-for-microsoft-oauth-account.aspx
-        /// 
-        /// Microsoft apps can be created here:
-        /// 
-        /// http://go.microsoft.com/fwlink/?LinkID=144070
-        /// 
-        /// </remarks>
-        public static void ConfigureBackOfficeMicrosoftAuth(this IAppBuilder app, string clientId, string clientSecret)
+        ///  Microsoft account documentation for ASP.Net Identity can be found:
+        ///  
+        ///  http://www.asp.net/web-api/overview/security/external-authentication-services#MICROSOFT
+        ///  http://blogs.msdn.com/b/webdev/archive/2012/09/19/configuring-your-asp-net-application-for-microsoft-oauth-account.aspx
+        ///  
+        ///  Microsoft apps can be created here:
+        ///  
+        ///  http://go.microsoft.com/fwlink/?LinkID=144070
+        ///  
+        ///  </remarks>
+        public static void ConfigureBackOfficeMicrosoftAuth(this IAppBuilder app, string clientId, string clientSecret,
+            string caption = "Microsoft", string style = "btn-microsoft", string icon = "fa-windows")
         {
             var msOptions = new MicrosoftAccountAuthenticationOptions
             {
@@ -50,38 +54,37 @@ namespace Umbraco.Web.UI
                 ClientSecret = clientSecret,
                 SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
-            //Defines styles for buttons
-            msOptions.Description.Properties["SocialStyle"] = "btn-microsoft";
-            msOptions.Description.Properties["SocialIcon"] = "fa-windows";
-            msOptions.Caption = "Microsoft";
+            msOptions.Description.ForUmbracoBackOffice(style, icon);
+            msOptions.Caption = caption;
             app.UseMicrosoftAccountAuthentication(msOptions);
         }
 
-        */
 
-        /*
-
-        /// <summary>
-        /// Configure google sign-in
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="clientId"></param>
-        /// <param name="clientSecret"></param>
+        ///  <summary>
+        ///  Configure google sign-in
+        ///  </summary>
+        ///  <param name="app"></param>
+        ///  <param name="clientId"></param>
+        ///  <param name="clientSecret"></param>
+        /// <param name="caption"></param>
+        /// <param name="style"></param>
+        /// <param name="icon"></param>
         /// <remarks>
+        ///  
+        ///  Nuget installation:
+        ///      Microsoft.Owin.Security.Google
         /// 
-        /// Nuget installation:
-        ///     Microsoft.Owin.Security.Google
-        ///
-        /// Google account documentation for ASP.Net Identity can be found:
-        /// 
-        /// http://www.asp.net/web-api/overview/security/external-authentication-services#GOOGLE
-        /// 
-        /// Google apps can be created here:
-        /// 
-        /// https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
-        /// 
-        /// </remarks>
-        public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret)
+        ///  Google account documentation for ASP.Net Identity can be found:
+        ///  
+        ///  http://www.asp.net/web-api/overview/security/external-authentication-services#GOOGLE
+        ///  
+        ///  Google apps can be created here:
+        ///  
+        ///  https://developers.google.com/accounts/docs/OpenIDConnect#getcredentials
+        ///  
+        ///  </remarks>
+        public static void ConfigureBackOfficeGoogleAuth(this IAppBuilder app, string clientId, string clientSecret,
+            string caption = "Google", string style = "btn-google-plus", string icon = "fa-google-plus")
         {
             var googleOptions = new GoogleOAuth2AuthenticationOptions
             {
@@ -89,39 +92,37 @@ namespace Umbraco.Web.UI
                 ClientSecret = clientSecret,
                 SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
-            //Defines styles for buttons
-            googleOptions.Description.Properties["SocialStyle"] = "btn-google-plus";
-            googleOptions.Description.Properties["SocialIcon"] = "fa-google-plus";
-            googleOptions.Caption = "Google";
+            googleOptions.Description.ForUmbracoBackOffice(style, icon);
+            googleOptions.Caption = caption;
             app.UseGoogleAuthentication(googleOptions);
         }
 
-        */
 
-
-        /*
-
-        /// <summary>
-        /// Configure facebook sign-in
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="appId"></param>
-        /// <param name="appSecret"></param>
+        ///  <summary>
+        ///  Configure facebook sign-in
+        ///  </summary>
+        ///  <param name="app"></param>
+        ///  <param name="appId"></param>
+        ///  <param name="appSecret"></param>
+        /// <param name="caption"></param>
+        /// <param name="style"></param>
+        /// <param name="icon"></param>
         /// <remarks>
+        ///  
+        ///  Nuget installation:
+        ///      Microsoft.Owin.Security.Facebook
         /// 
-        /// Nuget installation:
-        ///     Microsoft.Owin.Security.Facebook
-        ///
-        /// Facebook account documentation for ASP.Net Identity can be found:
+        ///  Facebook account documentation for ASP.Net Identity can be found:
+        ///  
+        ///  http://www.asp.net/web-api/overview/security/external-authentication-services#FACEBOOK
+        ///  
+        ///  Facebook apps can be created here:
         /// 
-        /// http://www.asp.net/web-api/overview/security/external-authentication-services#FACEBOOK
-        /// 
-        /// Facebook apps can be created here:
-        ///
-        /// https://developers.facebook.com/
-        /// 
-        /// </remarks>
-        public static void ConfigureBackOfficeFacebookAuth(this IAppBuilder app, string appId, string appSecret)
+        ///  https://developers.facebook.com/
+        ///  
+        ///  </remarks>
+        public static void ConfigureBackOfficeFacebookAuth(this IAppBuilder app, string appId, string appSecret,
+            string caption = "Facebook", string style = "btn-facebook", string icon = "fa-facebook")
         {
             var fbOptions = new FacebookAuthenticationOptions
             {
@@ -129,51 +130,49 @@ namespace Umbraco.Web.UI
                 AppSecret = appSecret,
                 SignInAsAuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType
             };
-            //Defines styles for buttons
-            fbOptions.Description.Properties["SocialStyle"] = "btn-facebook";
-            fbOptions.Description.Properties["SocialIcon"] = "fa-facebook";
-            fbOptions.Caption = "Facebook";
+            fbOptions.Description.ForUmbracoBackOffice(style, icon);
+            fbOptions.Caption = caption;
             app.UseFacebookAuthentication(fbOptions);
         }
-        
-        */
 
 
-        /*
-         
-        /// <summary>
-        /// Configure ActiveDirectory sign-in
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="tenant"></param>
-        /// <param name="clientId"></param>
-        /// <param name="postLoginRedirectUri">
-        /// The URL that will be redirected to after login is successful, example: http://mydomain.com/umbraco/;
-        /// </param>
-        /// <param name="appKey"></param>
-        /// <param name="authType">
-        /// This by default is 'OpenIdConnect' but that doesn't match what ASP.Net Identity actually stores in the
-        /// loginProvider field in the database which looks something like this (for example): 
-        ///     https://sts.windows.net/3bb0b4c5-364f-4394-ad36-0f29f95e5ggg/
-        /// and is based on your AD setup. This value needs to match in order for accounts to 
-        /// detected as linked/un-linked in the back office. 
-        /// </param>
+        ///  <summary>
+        ///  Configure ActiveDirectory sign-in
+        ///  </summary>
+        ///  <param name="app"></param>
+        ///  <param name="tenant"></param>
+        ///  <param name="clientId"></param>
+        ///  <param name="postLoginRedirectUri">
+        ///  The URL that will be redirected to after login is successful, example: http://mydomain.com/umbraco/;
+        ///  </param>
+        ///  <param name="appKey"></param>
+        ///  <param name="authType">
+        ///  This by default is 'OpenIdConnect' but that doesn't match what ASP.Net Identity actually stores in the
+        ///  loginProvider field in the database which looks something like this (for example): 
+        ///      https://sts.windows.net/3bb0b4c5-364f-4394-ad36-0f29f95e5ggg/
+        ///  and is based on your AD setup. This value needs to match in order for accounts to 
+        ///  detected as linked/un-linked in the back office. 
+        ///  </param>
+        /// <param name="caption"></param>
+        /// <param name="style"></param>
+        /// <param name="icon"></param>
         /// <remarks>
+        ///  
+        ///  Nuget installation:
+        ///      Microsoft.Owin.Security.OpenIdConnect
+        ///      Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory
         /// 
-        /// Nuget installation:
-        ///     Microsoft.Owin.Security.OpenIdConnect
-        ///     Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory
-        ///
-        /// ActiveDirectory account documentation for ASP.Net Identity can be found:
+        ///  ActiveDirectory account documentation for ASP.Net Identity can be found:
+        ///  
+        ///  https://github.com/AzureADSamples/WebApp-WebAPI-OpenIDConnect-DotNet
         /// 
-        /// https://github.com/AzureADSamples/WebApp-WebAPI-OpenIDConnect-DotNet
-        ///
-        /// This configuration requires the NaiveSessionCache class below which will need to be un-commented
-        ///
-        /// </remarks>
+        ///  This configuration requires the NaiveSessionCache class below which will need to be un-commented
+        /// 
+        ///  </remarks>
         public static void ConfigureBackOfficeActiveDirectoryAuth(this IAppBuilder app, 
             string tenant, string clientId, string postLoginRedirectUri, string appKey,
-            string authType)
+            string authType,
+            string caption = "Active Directory", string style = "btn-microsoft", string icon = "fa-windows")
         {         
             const string aadInstance = "https://login.windows.net/{0}";
             const string graphResourceId = "https://graph.windows.net";
@@ -209,14 +208,16 @@ namespace Umbraco.Web.UI
                 }
 
             };
-            adOptions.Description.Properties["SocialStyle"] = "btn-microsoft";
-            adOptions.Description.Properties["SocialIcon"] = "fa-windows";
-            adOptions.Caption = "Active Directory";
+            adOptions.Description.ForUmbracoBackOffice(style, icon);
+            adOptions.Caption = caption;
             app.UseOpenIdConnectAuthentication(adOptions);
         }
-         
-        */
+    
+         */
+    
     }
+    
+    
 
     /*
 
