@@ -14,21 +14,18 @@ namespace Umbraco.Core.Sync
     //
     public abstract class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
-        private readonly Func<bool, ICollection<RefreshInstructionEnvelope>> _getBatch;
 
-        protected BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options,
-            Func<bool, ICollection<RefreshInstructionEnvelope>> getBatch)
+        protected BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : base(appContext, enableDistCalls, options)
         {
-            if (getBatch == null)
-                throw new ArgumentNullException("getBatch");
 
-            _getBatch = getBatch;
         }
+
+        protected abstract ICollection<RefreshInstructionEnvelope> GetBatch(bool ensureHttpContext);
 
         public void FlushBatch()
         {
-            var batch = _getBatch(false);
+            var batch = GetBatch(false);
             if (batch == null) return;
 
             var instructions = batch.SelectMany(x => x.Instructions).ToArray();
@@ -64,7 +61,7 @@ namespace Umbraco.Core.Sync
             Type idType = null,
             string json = null)
         {
-            var batch = _getBatch(true);
+            var batch = GetBatch(true);
             if (batch == null)
                 throw new Exception("Failed to get a batch.");
 

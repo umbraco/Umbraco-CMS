@@ -11,7 +11,7 @@ namespace Umbraco.Web
     public class BatchedDatabaseServerMessenger : Core.Sync.BatchedDatabaseServerMessenger
     {
         public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(appContext, enableDistCalls, options, GetBatch)
+            : base(appContext, enableDistCalls, options)
         {
             UmbracoApplicationBase.ApplicationStarted += Application_Started;
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
@@ -60,12 +60,12 @@ namespace Umbraco.Web
             FlushBatch();
         }
 
-        private static ICollection<RefreshInstructionEnvelope> GetBatch(bool ensure)
+        protected override ICollection<RefreshInstructionEnvelope> GetBatch(bool ensureHttpContext)
         {
             var httpContext = UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext;
             if (httpContext == null)
             {
-                if (ensure)
+                if (ensureHttpContext)
                     throw new NotSupportedException("Cannot execute without a valid/current UmbracoContext with an HttpContext assigned.");
                 return null;
             }
@@ -74,7 +74,7 @@ namespace Umbraco.Web
 
             // no thread-safety here because it'll run in only 1 thread (request) at a time
             var batch = (ICollection<RefreshInstructionEnvelope>)httpContext.Items[key];
-            if (batch == null && ensure)
+            if (batch == null && ensureHttpContext)
                 httpContext.Items[key] = batch = new List<RefreshInstructionEnvelope>();
             return batch;
         }
