@@ -8,6 +8,12 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
+    /// <summary>
+    /// An <see cref="IServerMessenger"/> implementation that works by storing messages in the database.
+    /// </summary>
+    /// <remarks>
+    /// This binds to appropriate umbraco events in order to trigger the Boot(), Sync() & FlushBatch() calls
+    /// </remarks>
     public class BatchedDatabaseServerMessenger : Core.Sync.BatchedDatabaseServerMessenger
     {
         public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)

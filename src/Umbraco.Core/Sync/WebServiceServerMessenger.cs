@@ -14,10 +14,11 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// An <see cref="IServerMessenger"/> that works by messaging servers via web services.
     /// </summary>
-    //
-    // this messenger sends ALL instructions to ALL servers, including the local server.
-    // the CacheRefresher web service will run ALL instructions, so there may be duplicated,
-    // except for "bulk" refresh, where it excludes those coming from the local server
+    /// <remarks>
+    /// this messenger sends ALL instructions to ALL servers, including the local server.
+    /// the CacheRefresher web service will run ALL instructions, so there may be duplicated,
+    /// except for "bulk" refresh, where it excludes those coming from the local server
+    /// </remarks>        
     //
     // TODO see Message() method: stop sending to local server!
     // just need to figure out WebServerUtility permissions issues, if any

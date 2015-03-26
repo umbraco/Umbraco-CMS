@@ -7,11 +7,15 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.Sync
 {
-    // abstract because it needs to be inherited by a class that will
-    // - trigger FlushBatch() when appropriate
-    // - trigger Boot() when appropriate
-    // - trigger Sync() when appropriate
-    //
+    /// <summary>
+    /// An <see cref="IServerMessenger"/> that works by storing messages in the database.
+    /// </summary>
+    /// <remarks>
+    /// abstract because it needs to be inherited by a class that will
+    /// - trigger FlushBatch() when appropriate
+    /// - trigger Boot() when appropriate
+    /// - trigger Sync() when appropriate
+    /// </remarks>
     public abstract class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
 

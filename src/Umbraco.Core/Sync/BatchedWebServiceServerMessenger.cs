@@ -5,52 +5,40 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.Sync
 {
-    // abstract because it needs to be inherited by a class that will
-    // - implement ProcessBatch()
-    // - trigger FlushBatch() when appropriate
-    //
+    /// <summary>
+    /// An <see cref="IServerMessenger"/> that works by messaging servers via web services.
+    /// </summary>
+    /// <remarks>
+    /// Abstract because it needs to be inherited by a class that will
+    /// - implement ProcessBatch()
+    /// - trigger FlushBatch() when appropriate
+    /// </remarks>
     internal abstract class BatchedWebServiceServerMessenger : WebServiceServerMessenger
     {
-        private readonly Func<bool, ICollection<RefreshInstructionEnvelope>> _getBatch;
-
-        internal BatchedWebServiceServerMessenger(Func<bool, ICollection<RefreshInstructionEnvelope>> getBatch)
+        internal BatchedWebServiceServerMessenger()
         {
-            if (getBatch == null)
-                throw new ArgumentNullException("getBatch");
-
-            _getBatch = getBatch;
         }
 
-        internal BatchedWebServiceServerMessenger(string login, string password, Func<bool, ICollection<RefreshInstructionEnvelope>> getBatch)
+        internal BatchedWebServiceServerMessenger(string login, string password)
             : base(login, password)
         {
-            if (getBatch == null)
-                throw new ArgumentNullException("getBatch");
-
-            _getBatch = getBatch;
         }
 
-        internal BatchedWebServiceServerMessenger(string login, string password, bool useDistributedCalls, Func<bool, ICollection<RefreshInstructionEnvelope>> getBatch)
+        internal BatchedWebServiceServerMessenger(string login, string password, bool useDistributedCalls)
             : base(login, password, useDistributedCalls)
         {
-            if (getBatch == null)
-                throw new ArgumentNullException("getBatch");
-
-            _getBatch = getBatch;
         }
 
-        protected BatchedWebServiceServerMessenger(Func<Tuple<string, string>> getLoginAndPassword, Func<bool, ICollection<RefreshInstructionEnvelope>> getBatch)
+        protected BatchedWebServiceServerMessenger(Func<Tuple<string, string>> getLoginAndPassword)
             : base(getLoginAndPassword)
         {
-            if (getBatch == null)
-                throw new ArgumentNullException("getBatch");
-
-            _getBatch = getBatch;
         }
+
+        protected abstract ICollection<RefreshInstructionEnvelope> GetBatch(bool ensureHttpContext);
 
         protected void FlushBatch()
         {
-            var batch = _getBatch(false);
+            var batch = GetBatch(false);
             if (batch == null) return;
 
             var batcha = batch.ToArray();
@@ -82,7 +70,7 @@ namespace Umbraco.Core.Sync
             Type idType = null,
             string json = null)
         {
-            var batch = _getBatch(true);
+            var batch = GetBatch(true);
             if (batch == null)
                 throw new Exception("Failed to get a batch.");
 
