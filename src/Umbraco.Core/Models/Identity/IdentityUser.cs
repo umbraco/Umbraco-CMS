@@ -18,6 +18,18 @@ namespace Umbraco.Core.Models.Identity
         where TRole : IdentityUserRole<string>
         where TClaim : IdentityUserClaim<TKey>
     {
+
+        /// <summary>
+        /// Constructor
+        /// 
+        /// </summary>
+        public IdentityUser()
+        {
+            this.Claims = new List<TClaim>();
+            this.Roles = new List<TRole>();
+            this.Logins = new List<TLogin>();
+        }
+
         /// <summary>
         /// Email
         /// 
@@ -108,15 +120,6 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public virtual string UserName { get; set; }
 
-        /// <summary>
-        /// Constructor
-        /// 
-        /// </summary>
-        public IdentityUser()
-        {
-            this.Claims = new List<TClaim>();
-            this.Roles = new List<TRole>();
-            this.Logins = new List<TLogin>();
-        }
+        
     }
 }

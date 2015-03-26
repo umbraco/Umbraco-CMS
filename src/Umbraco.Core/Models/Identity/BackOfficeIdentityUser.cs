@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Identity
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>
     {
 
-        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager manager)
+        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager manager)
         {
             // NOTE the authenticationType must match the umbraco one
             // defined in CookieAuthenticationOptions.AuthenticationType

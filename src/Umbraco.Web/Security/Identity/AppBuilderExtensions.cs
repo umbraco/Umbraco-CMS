@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -31,6 +32,9 @@ namespace Umbraco.Web.Security.Identity
             ApplicationContext appContext, 
             MembershipProviderBase userMembershipProvider)
         {
+            if (appContext == null) throw new ArgumentNullException("appContext");
+            if (userMembershipProvider == null) throw new ArgumentNullException("userMembershipProvider");
+
             //Don't proceed if the app is not ready
             if (appContext.IsConfigured == false
                 || appContext.DatabaseContext == null
@@ -57,6 +61,10 @@ namespace Umbraco.Web.Security.Identity
             MembershipProviderBase userMembershipProvider,
             BackOfficeUserStore customUserStore)
         {
+            if (appContext == null) throw new ArgumentNullException("appContext");
+            if (userMembershipProvider == null) throw new ArgumentNullException("userMembershipProvider");
+            if (customUserStore == null) throw new ArgumentNullException("customUserStore");
+
             //Don't proceed if the app is not ready
             if (appContext.IsConfigured == false
                 || appContext.DatabaseContext == null
@@ -68,6 +76,30 @@ namespace Umbraco.Web.Security.Identity
                     options,
                     customUserStore,
                     userMembershipProvider));
+        }
+
+        /// <summary>
+        /// Configure a custom BackOfficeUserManager for Umbraco
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="userManager"></param>
+        public static void ConfigureUserManagerForUmbracoBackOffice<TManager, TUser>(this IAppBuilder app,
+            ApplicationContext appContext,
+            Func<IdentityFactoryOptions<TManager>, IOwinContext, TManager> userManager)
+            where TManager : BackOfficeUserManager<TUser> 
+            where TUser : BackOfficeIdentityUser
+        {
+            if (appContext == null) throw new ArgumentNullException("appContext");
+            if (userManager == null) throw new ArgumentNullException("userManager");
+
+            //Don't proceed if the app is not ready
+            if (appContext.IsConfigured == false
+                || appContext.DatabaseContext == null
+                || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
+
+            //Configure Umbraco user manager to be created per request
+            app.CreatePerOwinContext<TManager>(userManager);
         }
 
         /// <summary>

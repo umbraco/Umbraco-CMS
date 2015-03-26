@@ -13,47 +13,14 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Security
 {
     /// <summary>
-    /// Back office user manager
+    /// Default back office user manager
     /// </summary>
-    public class BackOfficeUserManager : UserManager<BackOfficeIdentityUser, int>
+    public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
     {
         public BackOfficeUserManager(IUserStore<BackOfficeIdentityUser, int> store)
             : base(store)
         {
         }
-        
-        #region What we support do not currently
-
-        //NOTE: Not sure if we really want/need to ever support this 
-        public override bool SupportsUserClaim
-        {
-            get { return false; }
-        }
-
-        //TODO: Support this
-        public override bool SupportsQueryableUsers
-        {
-            get { return false; }
-        }
-
-        //TODO: Support this
-        public override bool SupportsUserLockout
-        {
-            get { return false; }
-        }
-
-        //TODO: Support this
-        public override bool SupportsUserTwoFactor
-        {
-            get { return false; }
-        }
-
-        //TODO: Support this
-        public override bool SupportsUserPhoneNumber
-        {
-            get { return false; }
-        } 
-        #endregion
 
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
@@ -155,10 +122,51 @@ namespace Umbraco.Core.Security
 
             return manager;
         }
+    }
 
-        protected override void Dispose(bool disposing)
+    /// <summary>
+    /// Generic Back office user manager
+    /// </summary>
+    public class BackOfficeUserManager<T> : UserManager<T, int>
+        where T : BackOfficeIdentityUser
+    {
+        public BackOfficeUserManager(IUserStore<T, int> store)
+            : base(store)
         {
-            base.Dispose(disposing);
         }
+
+        #region What we support do not currently
+
+        //NOTE: Not sure if we really want/need to ever support this 
+        public override bool SupportsUserClaim
+        {
+            get { return false; }
+        }
+
+        //TODO: Support this
+        public override bool SupportsQueryableUsers
+        {
+            get { return false; }
+        }
+
+        //TODO: Support this
+        public override bool SupportsUserLockout
+        {
+            get { return false; }
+        }
+
+        //TODO: Support this
+        public override bool SupportsUserTwoFactor
+        {
+            get { return false; }
+        }
+
+        //TODO: Support this
+        public override bool SupportsUserPhoneNumber
+        {
+            get { return false; }
+        }
+        #endregion
+
     }
 }
