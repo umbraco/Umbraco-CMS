@@ -357,7 +357,8 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Start\OwinStartup.cs" />
+    <Compile Include="App_Start\CustomUmbracoOwinStartup.cs" />
+    <Compile Include="App_Start\StandardUmbracoOwinStartup.cs" />
     <Compile Include="App_Start\UmbracoBackOfficeAuthExtensions.cs" />
     <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>

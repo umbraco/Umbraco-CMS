@@ -5,14 +5,19 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.UI;
 
-[assembly: OwinStartup("UmbracoStartup", typeof(OwinStartup))]
+[assembly: OwinStartup("CustomUmbracoStartup", typeof(StandardUmbracoOwinStartup))]
 
 namespace Umbraco.Web.UI
 {
     /// <summary>
-    /// Default OWIN startup class as specified in appSettings
+    /// A custom way to configure OWIN for Umbraco
     /// </summary>
-    public class OwinStartup
+    /// <remarks>
+    /// The startup type is specified in appSettings under owin:appStartup - change it to "CustomUmbracoStartup" to use this class
+    /// 
+    /// This startup class would allow you to customize the Identity IUserStore and/or IUserManager for the Umbraco Backoffice
+    /// </remarks>
+    public class CustomUmbracoOwinStartup
     {
         public void Configuration(IAppBuilder app)
         {
@@ -22,14 +27,13 @@ namespace Umbraco.Web.UI
                 ApplicationContext.Current,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
 
-            //Ensure owin is configured for Umbraco back office authentication. If you have any front-end OWIN
-            // cookie configuration, this must be declared after it.
+            //Ensure owin is configured for Umbraco back office authentication
             app
                 .UseUmbracoBackOfficeCookieAuthentication()
                 .UseUmbracoBackOfficeExternalCookieAuthentication();
 
             /* 
-             * Configure external logins:
+             * Configure external logins for the back office:
              * 
              * Depending on the authentication sources you would like to enable, you will need to install 
              * certain Nuget packages. 
@@ -47,7 +51,7 @@ namespace Umbraco.Web.UI
              *  methods to suit your needs. 
              */
 
-            //app.ConfigureBackOfficeGoogleAuth("1072120697051-p41pro11srud3o3n90j7m00geq426jqt.apps.googleusercontent.com", "ak0msWvSE4w9nujcsfVy8_Y0");
+            //app.ConfigureBackOfficeGoogleAuth("YOUR_APP_ID", "YOUR_APP_SECRET");
             //app.ConfigureBackOfficeFacebookAuth("YOUR_APP_ID", "YOUR_APP_SECRET");
             //app.ConfigureBackOfficeMicrosoftAuth("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET");
             //app.ConfigureBackOfficeActiveDirectoryAuth("YOUR_TENANT", "YOUR_CLIENT_ID", "YOUR_POST_LOGIN_REDIRECT_URL", "YOUR_APP_KEY", "YOUR_AUTH_TYPE");
