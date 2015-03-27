@@ -51,7 +51,6 @@ namespace Umbraco.Web.Scheduling
 
         }
 
-        // scrubbing interval, in milliseconds
         public static int GetLogScrubbingInterval(IUmbracoSettingsSection settings)
         {
             var interval = 4 * 60 * 60 * 1000; // 4 hours, in milliseconds
@@ -62,7 +61,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception e)
             {
-                LogHelper.Error<Scheduler>("Unable to locate a log scrubbing interval. Defaulting to 4 hours.", e);
+                LogHelper.Error<LogScrubber>("Unable to locate a log scrubbing interval. Defaulting to 4 hours.", e);
             }
             return interval;
         }

@@ -21,6 +21,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (bool) base["disableAlternativeTemplates"]; }
         }
+        [ConfigurationProperty("disableFindContentByIdPath", DefaultValue = "false")]
+        public bool DisableFindContentByIdPath
+        {
+            get { return (bool) base["disableFindContentByIdPath"]; }
+        }
 
         [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
         public string UrlProviderMode
