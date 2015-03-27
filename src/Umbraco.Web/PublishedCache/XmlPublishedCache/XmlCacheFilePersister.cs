@@ -47,12 +47,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             if (touched == false) return;
 
-            LogHelper.Debug<XmlCacheFilePersister>("Create new touched, start.");
+            _logger.Logger.Debug<XmlCacheFilePersister>("Create new touched, start.");
 
             _initialTouch = DateTime.Now;
             _timer = new Timer(_ => Release());
 
-            LogHelper.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
+            _logger.Logger.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
             _timer.Change(WaitMilliseconds, 0);
         }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             {
                 if (_released)
                 {
-                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was released, create new.");
+                    _logger.Logger.Debug<XmlCacheFilePersister>("Touched, was released, create new.");
 
                     // released, has run or is running, too late, add & return a new task
                     var persister = new XmlCacheFilePersister(_runner, _content, _xmlFileName, _logger, true);
@@ -72,12 +72,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 if (_timer == null)
                 {
-                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was idle, start.");
+                    _logger.Logger.Debug<XmlCacheFilePersister>("Touched, was idle, start.");
 
                     // not started yet, start
                     _initialTouch = DateTime.Now;
                     _timer = new Timer(_ => Release());
-                    LogHelper.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
+                    _logger.Logger.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
                     _timer.Change(WaitMilliseconds, 0);
                     return this;
                 }
@@ -87,13 +87,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 if (DateTime.Now - _initialTouch < TimeSpan.FromMilliseconds(MaxWaitMilliseconds))
                 {
-                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was waiting, wait.", () => WaitMilliseconds);
-                    LogHelper.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
+                    _logger.Logger.Debug<XmlCacheFilePersister>("Touched, was waiting, wait.", () => WaitMilliseconds);
+                    _logger.Logger.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
                     _timer.Change(WaitMilliseconds, 0);
                 }
                 else
                 {
-                    LogHelper.Debug<XmlCacheFilePersister>("Save now, release.");
+                    _logger.Logger.Debug<XmlCacheFilePersister>("Save now, release.");
                     ReleaseLocked();
                 }
 
@@ -111,7 +111,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private void ReleaseLocked()
         {
-            LogHelper.Debug<XmlCacheFilePersister>("Timer: save now, release.");
+            _logger.Logger.Debug<XmlCacheFilePersister>("Timer: save now, release.");
             if (_timer != null)
                 _timer.Dispose();
             _timer = null;
@@ -131,7 +131,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public async Task RunAsync(CancellationToken token)
         {
-            LogHelper.Debug<XmlCacheFilePersister>("Run now.");
+            _logger.Logger.Debug<XmlCacheFilePersister>("Run now.");
             var doc = _content.XmlContentInternal;
             await PersistXmlToFileAsync(doc);
         }
@@ -167,7 +167,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         // If for whatever reason something goes wrong here, invalidate disk cache
                         DeleteXmlCache();
 
-                        LogHelper.Error<XmlCacheFilePersister>("Error saving content to disk", ee);
+                        _logger.Logger.Error<XmlCacheFilePersister>("Error saving content to disk", ee);
                     }
                 }
 
