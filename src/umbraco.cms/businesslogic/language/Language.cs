@@ -41,9 +41,6 @@ namespace umbraco.cms.businesslogic.language
         {
             get { return Application.SqlHelper; }
         }
-
-        protected internal const string m_SQLOptimizedGetAll = @"SELECT * FROM umbracoLanguage ORDER BY languageISOCode ASC";
-
         #endregion
         
         #region Constructors
@@ -91,10 +88,12 @@ namespace umbraco.cms.businesslogic.language
                         SqlHelper.CreateParameter("@CultureCode", cultureCode));
 
                     //get it's id
-                    var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoLanguage WHERE languageISOCode=@cultureCode", SqlHelper.CreateParameter("@cultureCode", cultureCode));
+                    var newId = SqlHelper.ExecuteScalar<int>(
+                        "SELECT MAX(id) FROM umbracoLanguage WHERE languageISOCode = @cultureCode",
+                        SqlHelper.CreateParameter("@cultureCode", cultureCode));
 
                     //load it and raise events
-                    using (var dr = SqlHelper.ExecuteReader(string.Format("{0} where id = {1}", m_SQLOptimizedGetAll, newId)))
+                    using (var dr = SqlHelper.ExecuteReader(string.Format("SELECT * FROM umbracoLanguage where id = {0} ORDER BY languageISOCode ASC", newId)))
                     {
                         while (dr.Read())
                         {
@@ -135,7 +134,7 @@ namespace umbraco.cms.businesslogic.language
                 () =>
                     {
                         var languages = new List<Language>();
-                        using (var dr = SqlHelper.ExecuteReader(m_SQLOptimizedGetAll))
+                        using (var dr = SqlHelper.ExecuteReader("SELECT * FROM umbracoLanguage ORDER BY languageISOCode ASC"))
                         {
                             while (dr.Read())
                             {
