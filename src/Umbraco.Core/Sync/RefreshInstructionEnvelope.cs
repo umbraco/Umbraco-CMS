@@ -3,7 +3,11 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.Sync
 {
-    public class RefreshInstructionEnvelope
+    /// <summary>
+    /// Used for any 'Batched' <see cref="IServerMessenger"/> instances which specifies a set of <see cref="RefreshInstruction"/> targeting a collection of 
+    /// <see cref="IServerAddress"/>
+    /// </summary>
+    public sealed class RefreshInstructionEnvelope
     {
         public RefreshInstructionEnvelope(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, IEnumerable<RefreshInstruction> instructions)
         {

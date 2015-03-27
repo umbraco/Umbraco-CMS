@@ -144,6 +144,16 @@ namespace Umbraco.Core.Sync
 
         #region Deliver
 
+        /// <summary>
+        /// Executes the non strongly typed <see cref="ICacheRefresher"/> on the local/current server
+        /// </summary>
+        /// <param name="refresher"></param>
+        /// <param name="messageType"></param>
+        /// <param name="ids"></param>
+        /// <param name="json"></param>
+        /// <remarks>
+        /// Since this is only for non strongly typed <see cref="ICacheRefresher"/> it will throw for message types that by instance
+        /// </remarks>
         protected void DeliverLocal(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -195,7 +205,18 @@ namespace Umbraco.Core.Sync
                     throw new NotSupportedException("Invalid message type " + messageType);
             }
         }
-
+        
+        /// <summary>
+        /// Executes the strongly typed <see cref="ICacheRefresher{T}"/> on the local/current server
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="refresher"></param>
+        /// <param name="messageType"></param>
+        /// <param name="getId"></param>
+        /// <param name="instances"></param>
+        /// <remarks>
+        /// Since this is only for strongly typed <see cref="ICacheRefresher{T}"/> it will throw for message types that are not by instance
+        /// </remarks>
         protected void DeliverLocal<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
         {
             if (refresher == null) throw new ArgumentNullException("refresher");

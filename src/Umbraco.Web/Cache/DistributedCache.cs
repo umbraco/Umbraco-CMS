@@ -10,8 +10,13 @@ namespace Umbraco.Web.Cache
     /// Represents the entry point into Umbraco's distributed cache infrastructure.
     /// </summary>
     /// <remarks>
-    /// <para>The distributed cache infrastructure ensures that distributed caches are
-    /// invalidated properly in load balancing environments.</para>
+    /// <para>
+    /// The distributed cache infrastructure ensures that distributed caches are
+    /// invalidated properly in load balancing environments.
+    /// </para>
+    /// <para>
+    /// Distribute caches include static (in-memory) cache, runtime cache, front-end content cache, Examine/Lucene indexes
+    /// </para>
     /// </remarks>
     public sealed class DistributedCache
     {
