@@ -24,7 +24,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     {
         private readonly IBackgroundTaskRunner<XmlCacheFilePersister> _runner;
         private readonly string _xmlFileName;
-        private readonly ProfilingLogger _logger;
+        //private readonly ProfilingLogger _logger;
         private readonly content _content;
         private readonly ManualResetEventSlim _latch = new ManualResetEventSlim(false);
         private readonly object _locko = new object();
@@ -38,12 +38,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // save the cache when the app goes down
         public bool RunsOnShutdown { get { return true; } }
 
-        public XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content, string xmlFileName, ProfilingLogger logger, bool touched = false)
+        public XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content, string xmlFileName, /*ProfilingLogger logger, */bool touched = false)
         {
             _runner = runner;
             _content = content;
             _xmlFileName = xmlFileName;
-            _logger = logger;
+            //_logger = logger;
 
             if (touched == false) return;
 
@@ -65,7 +65,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     LogHelper.Debug<XmlCacheFilePersister>("Touched, was released, create new.");
 
                     // released, has run or is running, too late, add & return a new task
-                    var persister = new XmlCacheFilePersister(_runner, _content, _xmlFileName, _logger, true);
+                    var persister = new XmlCacheFilePersister(_runner, _content, _xmlFileName, /*_logger, */true);
                     _runner.Add(persister);
                     return persister;
                 }
@@ -149,7 +149,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             if (xmlDoc != null)
             {
-                using (_logger.DebugDuration<XmlCacheFilePersister>(
+                //using (_logger.DebugDuration<XmlCacheFilePersister>(
+                using(DisposableTimer.DebugDuration<XmlCacheFilePersister>(
                     string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread),
                     string.Format("Saved content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread)))
                 {

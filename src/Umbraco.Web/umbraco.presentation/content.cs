@@ -39,8 +39,8 @@ namespace umbraco
 
         private content()
         {
-            _persisterTask = new XmlCacheFilePersister(FilePersister, this, UmbracoXmlDiskCacheFileName,
-                new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler));
+            _persisterTask = new XmlCacheFilePersister(FilePersister, this, UmbracoXmlDiskCacheFileName
+                /*,new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler)*/);
             FilePersister.Add(_persisterTask);
         }
 
