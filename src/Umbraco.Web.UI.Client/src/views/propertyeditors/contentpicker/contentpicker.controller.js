@@ -175,8 +175,10 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
                 return d.id == id;
             });
            
-            entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-            $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+            if(entity != undefined) {
+                entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
+                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+            }
            
         });
 
