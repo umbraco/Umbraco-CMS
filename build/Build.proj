@@ -90,8 +90,6 @@
     <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
     <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
     <ExaminePDFPath>$(BuildFolderAbsolutePath)UmbracoExamine.PDF\</ExaminePDFPath>
-    <ExamineAzurePath>$(BuildFolderAbsolutePath)UmbracoExamine.Azure\</ExamineAzurePath>
-    <ExaminePDFAzurePath>$(BuildFolderAbsolutePath)UmbracoExamine.PDF.Azure\</ExaminePDFAzurePath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -283,34 +281,22 @@
 
     <!-- First remove old files from the examine builds -->
     <ItemGroup>
-      <FilesToDeleteBeforeBuild Include="$(ExaminePDFPath)*;$(ExamineAzurePath)*"/>
+      <FilesToDeleteBeforeBuild Include="$(ExaminePDFPath)*"/>
     </ItemGroup>
     <Delete Files="@(FilesToDeleteBeforeBuild)" />
     <!-- 
-      Build the UmbracoExamine.PDF.Azure library ... this builds the 3 projects that we want to bundle separately so no need to build each one separately .
-      We'll just build this one and then manually copy the DLLs to where we want them.
+      Build the UmbracoExamine.PDF library
     -->
-    <MSBuild Projects="..\src\UmbracoExamine.PDF.Azure\UmbracoExamine.PDF.Azure.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);PipelineDependsOnBuild=False;OutDir=$(ExaminePDFAzurePath);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\UmbracoExamine.PDF\UmbracoExamine.PDF.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);PipelineDependsOnBuild=False;OutDir=$(ExaminePDFPath);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
     <ItemGroup>
-      <ExaminePDFFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.pdf;$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.xml;$(ExaminePDFAzurePath)**\itextsharp.dll" />
-      <ExamineAzureFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.pdb;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.xml" />
-      <ExaminePDFAzureFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.pdb;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.xml" />
+      <ExaminePDFFiles Include="$(ExaminePDFPath)**\UmbracoExamine.PDF.dll;$(ExaminePDFPath)**\UmbracoExamine.PDF.pdf;$(ExaminePDFPath)**\UmbracoExamine.PDF.xml;$(ExaminePDFPath)**\itextsharp.dll" />
     </ItemGroup>
     <!-- Now copy the built files to their correct deployment folders-->
     <Copy SourceFiles="@(ExaminePDFFiles)"
         DestinationFolder="$(ExaminePDFPath)"
         OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />
-    <Copy SourceFiles="@(ExamineAzureFiles)"
-        DestinationFolder="$(ExamineAzurePath)"
-        OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />
-    <!-- Then just delete the files we don't want to ship in the UmbracoExamine.Azure.PDF folder -->
-    <ItemGroup>
-      <FilesToDeleteAfterBuild Include="$(ExaminePDFAzurePath)*" Exclude="$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.dll;$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.pdb;$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.xml"/>
-    </ItemGroup>
-    <Delete Files="@(FilesToDeleteAfterBuild)" />
+        SkipUnchangedFiles="false" />      
   </Target>
 
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
