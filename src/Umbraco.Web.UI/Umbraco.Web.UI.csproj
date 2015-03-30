@@ -357,9 +357,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Start\CustomUmbracoOwinStartup.cs" />
-    <Compile Include="App_Start\StandardUmbracoOwinStartup.cs" />
-    <Compile Include="App_Start\UmbracoBackOfficeAuthExtensions.cs" />
     <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2557,6 +2554,7 @@
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
     <Folder Include="App_Plugins\" />
+    <Folder Include="App_Start\" />
     <Folder Include="Css\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />

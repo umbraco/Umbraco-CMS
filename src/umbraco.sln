@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 		..\build\NuSpecs\UmbracoCms.Core.AllBinaries.nuspec = ..\build\NuSpecs\UmbracoCms.Core.AllBinaries.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec = ..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec
+		..\build\NuSpecs\UmbracoCms.Identity.nuspec = ..\build\NuSpecs\UmbracoCms.Identity.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 	EndProjectSection
 EndProject

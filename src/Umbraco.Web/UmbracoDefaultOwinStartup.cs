@@ -5,7 +5,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Security.Identity;
 
-[assembly: OwinStartup("DefaultUmbracoStartup", typeof(DefaultUmbracoOwinStartup))]
+[assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 
 namespace Umbraco.Web
 {
@@ -15,7 +15,7 @@ namespace Umbraco.Web
     /// <remarks>
     /// The startup type is specified in appSettings under owin:appStartup
     /// </remarks>
-    public class DefaultUmbracoOwinStartup
+    public class UmbracoDefaultOwinStartup
     {
         public virtual void Configuration(IAppBuilder app)
         {

@@ -5,32 +5,22 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.UI;
 
-[assembly: OwinStartup("CustomUmbracoStartup", typeof(StandardUmbracoOwinStartup))]
+[assembly: OwinStartup("StandardUmbracoOwinStartup", typeof(StandardUmbracoOwinStartup))]
 
 namespace Umbraco.Web.UI
 {
     /// <summary>
-    /// A custom way to configure OWIN for Umbraco
+    /// The standard way to configure OWIN for Umbraco
     /// </summary>
     /// <remarks>
-    /// The startup type is specified in appSettings under owin:appStartup - change it to "CustomUmbracoStartup" to use this class
-    /// 
-    /// This startup class would allow you to customize the Identity IUserStore and/or IUserManager for the Umbraco Backoffice
+    /// The startup type is specified in appSettings under owin:appStartup - change it to "StandardUmbracoStartup" to use this class
     /// </remarks>
-    public class CustomUmbracoOwinStartup
+    public class StandardUmbracoOwinStartup : DefaultUmbracoOwinStartup
     {
-        public void Configuration(IAppBuilder app)
+        public override void Configuration(IAppBuilder app)
         {
-            //Configure the Identity user manager for use with Umbraco Back office 
-            // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
-            app.ConfigureUserManagerForUmbracoBackOffice(
-                ApplicationContext.Current,
-                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
-
-            //Ensure owin is configured for Umbraco back office authentication
-            app
-                .UseUmbracoBackOfficeCookieAuthentication()
-                .UseUmbracoBackOfficeExternalCookieAuthentication();
+            //ensure the default options are configured
+            base.Configuration(app);
 
             /* 
              * Configure external logins for the back office:

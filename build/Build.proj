@@ -88,6 +88,7 @@
     <WebAppFolderAbsolutePath>$(BuildFolderAbsolutePath)WebApp\</WebAppFolderAbsolutePath>
     <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
     <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
+    <IdentityTemplatesPath>$(BuildFolderAbsolutePath)IdentityTemplates\</IdentityTemplatesPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -157,6 +158,28 @@
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
   
+  <Target Name="MakeIdentityTemplateFiles" DependsOnTargets="CreateSystemFolders" >
+    <Message Text="Starting to create Umbraco Identity template files" Importance="high" />
+
+    <ItemGroup>
+      <IdentityFiles Include="..\src\Umbraco.Web.UI\App_Start\Umbraco*.cs"  />
+    </ItemGroup>
+
+    <!-- Copy and rename to be suffixed with .pp extension for nuget templates -->
+    <Copy SourceFiles="@(IdentityFiles)"
+        DestinationFiles="@(IdentityFiles->'$(IdentityTemplatesPath)App_Start\%(RecursiveDir)%(Filename)%(Extension).pp')" />
+
+    <!-- Replace the namespace with the token for each file for nuget templates -->
+    <ItemGroup>
+      <IdentityTemplateFiles Include="$(IdentityTemplatesPath)\**\*.pp"  />
+    </ItemGroup>
+
+    <FileUpdate
+      Files="@(IdentityTemplateFiles)"
+      Regex=" Umbraco\.Web\.UI"
+      ReplacementText=" $rootnamespace$"/>
+  </Target>
+
   <Target Name="CreateSystemFolders" DependsOnTargets="CopyBelleBuild" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
     <MakeDir Directories="@(SystemFolders)" />
   </Target>
@@ -266,6 +289,7 @@
     <Message Text="Finished compiling projects" Importance="high" />
   </Target>
 
+    
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <PropertyGroup>
       <NewVersion>$(BUILD_RELEASE)</NewVersion>
