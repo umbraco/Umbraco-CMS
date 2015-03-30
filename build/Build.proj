@@ -75,7 +75,7 @@
     <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
     <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
     <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
-    <BuildZipExaminePDFName>UmbracoExamine.PDF.0.6.0.zip</BuildZipExaminePDFName>
+    <BuildZipExaminePDFName>UmbracoExamine.PDF.0.7.0.zip</BuildZipExaminePDFName>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
@@ -296,7 +296,13 @@
     <Copy SourceFiles="@(ExaminePDFFiles)"
         DestinationFolder="$(ExaminePDFPath)"
         OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />      
+        SkipUnchangedFiles="false" />
+    <!-- Then just delete the files we don't want to ship in the UmbracoExamine.PDF folder -->
+    <ItemGroup>
+      <FilesToDeleteAfterBuild Include="$(ExaminePDFPath)*" Exclude="$(ExaminePDFPath)UmbracoExamine.PDF.dll;$(ExaminePDFPath)UmbracoExamine.PDF.pdb;$(ExaminePDFPath)UmbracoExamine.PDF.xml"/>
+    </ItemGroup>
+    <Delete Files="@(FilesToDeleteAfterBuild)" />
+    
   </Target>
 
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
