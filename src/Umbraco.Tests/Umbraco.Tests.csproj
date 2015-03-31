@@ -579,14 +579,10 @@
     <EmbeddedResource Include="TreesAndSections\applications.config" />
     <EmbeddedResource Include="TreesAndSections\trees.config" />
     <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
-    <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
-    <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
-    <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="UmbracoExamine\TestFiles\umbraco.config" />
-    <None Include="UmbracoExamine\TestFiles\windows-vista.pdf" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
