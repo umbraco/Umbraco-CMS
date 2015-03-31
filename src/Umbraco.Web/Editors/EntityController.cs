@@ -557,6 +557,7 @@ namespace Umbraco.Web.Editors
 
                 return Services.EntityService.GetAll(objectType.Value, ids)
                     .WhereNotNull()
+                    .OrderBy(x => x.Level)
                     .Select(Mapper.Map<EntityBasic>);
             }
             //now we need to convert the unknown ones

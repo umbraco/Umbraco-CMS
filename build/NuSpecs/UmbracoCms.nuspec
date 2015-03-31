@@ -6,7 +6,7 @@
     <title>Umbraco Cms</title>
     <authors>Umbraco HQ</authors>
     <owners>Umbraco HQ</owners>
-    <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://umbraco.com/</projectUrl>
     <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

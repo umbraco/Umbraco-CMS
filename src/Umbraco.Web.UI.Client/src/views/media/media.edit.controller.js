@@ -71,7 +71,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     //We fetch all ancestors of the node to generate the footer breadcrump navigation
                     entityResource.getAncestors($routeParams.id, "media")
                         .then(function (anc) {
-                            $scope.ancestors = anc.reverse();
+                            $scope.ancestors = anc;
                         });
                 }
 

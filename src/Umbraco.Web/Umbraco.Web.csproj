@@ -917,8 +917,7 @@
     <Compile Include="Search\ExamineEvents.cs" />
     <Compile Include="Strategies\DataTypes\LegacyUploadFieldWorkaround.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
-    <Compile Include="Strategies\Publishing\UpdateCacheAfterPublish.cs" />
-    <Compile Include="Strategies\Publishing\UpdateCacheAfterUnPublish.cs" />
+    <Compile Include="Strategies\LegacyClasses.cs" />
     <Compile Include="Strategies\Migrations\EnsureAppsTreesUpdatedOnUpgrade.cs" />
     <Compile Include="Strategies\ServerRegistrationEventHandler.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />

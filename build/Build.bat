@@ -56,7 +56,6 @@ REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 ECHO Packing the NuGet release files
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version%
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoExamine.PDF.nuspec
                         
 IF ERRORLEVEL 1 GOTO :showerror
 

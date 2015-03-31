@@ -75,7 +75,6 @@
     <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
     <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
     <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
-    <BuildZipExaminePDFName>UmbracoExamine.PDF.0.6.0.zip</BuildZipExaminePDFName>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
@@ -89,9 +88,6 @@
     <WebAppFolderAbsolutePath>$(BuildFolderAbsolutePath)WebApp\</WebAppFolderAbsolutePath>
     <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
     <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
-    <ExaminePDFPath>$(BuildFolderAbsolutePath)UmbracoExamine.PDF\</ExaminePDFPath>
-    <ExamineAzurePath>$(BuildFolderAbsolutePath)UmbracoExamine.Azure\</ExamineAzurePath>
-    <ExaminePDFAzurePath>$(BuildFolderAbsolutePath)UmbracoExamine.PDF.Azure\</ExaminePDFAzurePath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -152,7 +148,7 @@
     <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22" />
   </Target>
 
-  <Target Name="ZipWebApp" DependsOnTargets="ZipUmbracoExaminePDF" >
+  <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
 
     <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22 -x!dotLess.Core.dll" />
@@ -160,15 +156,7 @@
 
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
-
-  <Target Name="ZipUmbracoExaminePDF" DependsOnTargets="CreateSystemFolders" >
-    <Message Text="Starting to zip to $(buildDate)-$(BuildZipExaminePDFName)" Importance="high" />
-
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipExaminePDFName)%22 %22$(ExaminePDFPath)*%22" />
-
-    <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipExaminePDFName)" Importance="high" />
-  </Target>
-
+  
   <Target Name="CreateSystemFolders" DependsOnTargets="CopyBelleBuild" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
     <MakeDir Directories="@(SystemFolders)" />
   </Target>
@@ -266,7 +254,7 @@
     <RemoveDir Directories="@(PresentationFolderToDelete)" />
   </Target>
 
-  <Target Name="CompileProjects" DependsOnTargets="CompileExternalExamineProjects">
+  <Target Name="CompileProjects" DependsOnTargets="SetVersionNumber">
 
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
     <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
@@ -276,41 +264,6 @@
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
-  </Target>
-
-  <Target Name="CompileExternalExamineProjects" DependsOnTargets="SetVersionNumber">
-    <Message Text="Building externally shipped examine projects" Importance="high" />
-
-    <!-- First remove old files from the examine builds -->
-    <ItemGroup>
-      <FilesToDeleteBeforeBuild Include="$(ExaminePDFPath)*;$(ExamineAzurePath)*"/>
-    </ItemGroup>
-    <Delete Files="@(FilesToDeleteBeforeBuild)" />
-    <!-- 
-      Build the UmbracoExamine.PDF.Azure library ... this builds the 3 projects that we want to bundle separately so no need to build each one separately .
-      We'll just build this one and then manually copy the DLLs to where we want them.
-    -->
-    <MSBuild Projects="..\src\UmbracoExamine.PDF.Azure\UmbracoExamine.PDF.Azure.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);PipelineDependsOnBuild=False;OutDir=$(ExaminePDFAzurePath);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-    </MSBuild>
-    <ItemGroup>
-      <ExaminePDFFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.pdf;$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.xml;$(ExaminePDFAzurePath)**\itextsharp.dll" />
-      <ExamineAzureFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.pdb;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.xml" />
-      <ExaminePDFAzureFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.pdb;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.xml" />
-    </ItemGroup>
-    <!-- Now copy the built files to their correct deployment folders-->
-    <Copy SourceFiles="@(ExaminePDFFiles)"
-        DestinationFolder="$(ExaminePDFPath)"
-        OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />
-    <Copy SourceFiles="@(ExamineAzureFiles)"
-        DestinationFolder="$(ExamineAzurePath)"
-        OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />
-    <!-- Then just delete the files we don't want to ship in the UmbracoExamine.Azure.PDF folder -->
-    <ItemGroup>
-      <FilesToDeleteAfterBuild Include="$(ExaminePDFAzurePath)*" Exclude="$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.dll;$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.pdb;$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.xml"/>
-    </ItemGroup>
-    <Delete Files="@(FilesToDeleteAfterBuild)" />
   </Target>
 
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
