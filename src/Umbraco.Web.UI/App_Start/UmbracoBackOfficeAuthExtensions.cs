@@ -167,7 +167,7 @@ namespace Umbraco.Web.UI
         /// <remarks>
         ///  
         ///  Nuget installation:
-        ///      Microsoft.Owin.Security.OpenIdConnect
+        ///      Install-Package Microsoft.Owin.Security.OpenIdConnect
         ///      Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory
         /// 
         ///  ActiveDirectory account documentation for ASP.Net Identity can be found:
@@ -222,7 +222,7 @@ namespace Umbraco.Web.UI
         }
     
          */
-    
+
     }
     
     
