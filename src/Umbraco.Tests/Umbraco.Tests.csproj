@@ -509,7 +509,6 @@
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
-    <Compile Include="UmbracoExamine\PdfIndexerTests.cs" />
     <Compile Include="UmbracoExamine\SearchTests.cs" />
     <Compile Include="UmbracoExamine\TestDataService.cs" />
     <Compile Include="UmbracoExamine\TestFiles.Designer.cs">
