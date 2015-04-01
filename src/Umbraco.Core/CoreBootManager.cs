@@ -327,7 +327,7 @@ namespace Umbraco.Core
             //supplying a username/password, this will automatically disable distributed calls
             // .. we'll override this in the WebBootManager
             ServerMessengerResolver.Current = new ServerMessengerResolver(
-                new DefaultServerMessenger());
+                new WebServiceServerMessenger());
 
             MappingResolver.Current = new MappingResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,

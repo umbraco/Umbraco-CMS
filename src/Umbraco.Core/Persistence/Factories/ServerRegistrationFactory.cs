@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
-            var model = new ServerRegistration(dto.Id, dto.Address, dto.ComputerName, dto.DateRegistered, dto.LastNotified, dto.IsActive);
+            var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive);
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             model.ResetDirtyProperties(false);
@@ -19,16 +18,17 @@ namespace Umbraco.Core.Persistence.Factories
 
         public ServerRegistrationDto BuildDto(ServerRegistration entity)
         {
-            var dto = new ServerRegistrationDto()
+            var dto = new ServerRegistrationDto
                 {
-                    Address = entity.ServerAddress,
+                    ServerAddress = entity.ServerAddress,
                     DateRegistered = entity.CreateDate,
                     IsActive = entity.IsActive,
-                    LastNotified = entity.UpdateDate,
-                    ComputerName = entity.ComputerName
+                    DateAccessed = entity.UpdateDate,
+                    ServerIdentity = entity.ServerIdentity
                 };
+
             if (entity.HasIdentity)
-                dto.Id = int.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
+                dto.Id = entity.Id;
 
             return dto;
         }

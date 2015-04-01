@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Cannot_Add_Duplicate_Computer_Names()
+        public void Cannot_Add_Duplicate_Server_Identities()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Cannot_Update_To_Duplicate_Computer_Names()
+        public void Cannot_Update_To_Duplicate_Server_Identities()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepositor(unitOfWork))
             {
                 var server = repository.Get(1);
-                server.ComputerName = "COMPUTER2";
+                server.ServerIdentity = "COMPUTER2";
                 repository.AddOrUpdate(server);
                 Assert.Throws<SqlCeException>(unitOfWork.Commit);
             }
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepositor(unitOfWork))
             {
                 // Act
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ComputerName.ToUpper() == "COMPUTER3");
+                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == "COMPUTER3");
                 var result = repository.GetByQuery(query);
 
                 // Assert

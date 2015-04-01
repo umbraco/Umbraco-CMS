@@ -114,13 +114,11 @@ namespace Umbraco.Core
 
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
         {
-            //any character that is not alphanumeric, convert to a hyphen
-            var mName = input;
-            foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
-            {
-                mName = mName.Replace(c, replacement);
-            }
-            return mName;
+            var inputArray = input.ToCharArray();
+            var outputArray = new char[input.Length];
+            for (var i = 0; i < inputArray.Length; i++)
+                outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
+            return new string(outputArray);
         }
 
         /// <summary>
