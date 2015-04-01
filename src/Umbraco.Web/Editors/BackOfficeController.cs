@@ -94,6 +94,8 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public ActionResult AuthorizeUpgrade()
         {
+            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
+
             return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml");
         }
 

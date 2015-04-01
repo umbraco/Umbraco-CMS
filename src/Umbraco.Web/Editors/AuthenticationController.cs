@@ -49,7 +49,19 @@ namespace Umbraco.Web.Editors
 
         protected BackOfficeUserManager UserManager
         {
-            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>()); }
+            get
+            {
+                if (_userManager == null)
+                {
+                    var mgr = TryGetOwinContext().Result.GetUserManager<BackOfficeUserManager>();
+                    if (mgr == null)
+                    {
+                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
+                    }
+                    _userManager = mgr;
+                }
+                return _userManager;
+            }
         }
 
         /// <summary>
