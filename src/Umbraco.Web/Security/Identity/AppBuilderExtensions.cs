@@ -36,9 +36,7 @@ namespace Umbraco.Web.Security.Identity
             if (userMembershipProvider == null) throw new ArgumentNullException("userMembershipProvider");
 
             //Don't proceed if the app is not ready
-            if (appContext.IsConfigured == false
-                || appContext.DatabaseContext == null
-                || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
+            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return;
 
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
@@ -66,9 +64,7 @@ namespace Umbraco.Web.Security.Identity
             if (customUserStore == null) throw new ArgumentNullException("customUserStore");
 
             //Don't proceed if the app is not ready
-            if (appContext.IsConfigured == false
-                || appContext.DatabaseContext == null
-                || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
+            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return;
 
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
@@ -94,9 +90,7 @@ namespace Umbraco.Web.Security.Identity
             if (userManager == null) throw new ArgumentNullException("userManager");
 
             //Don't proceed if the app is not ready
-            if (appContext.IsConfigured == false
-                || appContext.DatabaseContext == null
-                || appContext.DatabaseContext.IsDatabaseConfigured == false) return;
+            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return;
 
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<TManager>(userManager);

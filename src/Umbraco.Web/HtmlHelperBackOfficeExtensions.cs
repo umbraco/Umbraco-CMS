@@ -39,8 +39,7 @@ namespace Umbraco.Web
                     ""application"": {
                         ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @"""
                     },
-                    //""isDebuggingEnabled"" : " + html.ViewContext.HttpContext.IsDebuggingEnabled.ToString().ToLowerInvariant() + @"
-                    ""isDebuggingEnabled"" : false
+                    ""isDebuggingEnabled"" : " + html.ViewContext.HttpContext.IsDebuggingEnabled.ToString().ToLowerInvariant() + @"
                 };       
             </script>";
 
