@@ -50,7 +50,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.StartContentNode, opt => opt.MapFrom(user => user.StartContentId))
                 .ForMember(detail => detail.StartMediaNode, opt => opt.MapFrom(user => user.StartMediaId))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)));
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
+                .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
 
         } 
      
