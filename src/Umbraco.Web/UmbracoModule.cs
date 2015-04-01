@@ -166,43 +166,6 @@ namespace Umbraco.Web
 				RewriteToUmbracoHandler(httpContext, pcr);
 		}
 
-        /// <summary>
-        /// Authenticates the request by reading the FormsAuthentication cookie and setting the 
-        /// context and thread principle object
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param> 
-        /// <remarks>
-        /// We will set the identity, culture, etc... for any request that is:
-        /// * A back office request
-        /// * An installer request
-        /// * A /base request (since these can be back office web service requests)
-        /// </remarks>
-        static void AuthenticateRequest(object sender, EventArgs e)
-        {
-            //var app = (HttpApplication)sender;
-            //var http = new HttpContextWrapper(app.Context);
-
-            //// do not process if client-side request
-            //if (http.Request.Url.IsClientSideRequest())
-            //    return;
-
-            //var req = new HttpRequestWrapper(app.Request);
-
-            //if (ShouldAuthenticateRequest(req, UmbracoContext.Current.OriginalRequestUrl))
-            //{
-            //    //TODO: Here we should have an authentication mechanism, this mechanism should be smart in the way that the ASP.Net 5 pipeline works
-            //    // in which each registered handler will attempt to authenticate and if it fails it will just call Next() so the next handler
-            //    // executes. If it is successful, it doesn't call next and assigns the current user/principal.
-            //    // This might actually all be possible with ASP.Net Identity and how it is setup to work already, need to investigate.
-                
-            //    var ticket = http.GetUmbracoAuthTicket();
-
-            //    http.AuthenticateCurrentRequest(ticket, ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http) == false);
-            //}
-
-        }
-
 		#endregion
 
 		#region Methods
@@ -589,8 +552,6 @@ namespace Umbraco.Web
 				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
-
-            app.AuthenticateRequest += AuthenticateRequest;
 
             app.PostResolveRequestCache += (sender, e) =>
 				{

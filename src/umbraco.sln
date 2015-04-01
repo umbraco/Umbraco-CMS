@@ -27,7 +27,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\UmbracoCms.ActiveDirectory.nuspec = ..\build\NuSpecs\UmbracoCms.ActiveDirectory.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.AllBinaries.nuspec = ..\build\NuSpecs\UmbracoCms.Core.AllBinaries.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec = ..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec
