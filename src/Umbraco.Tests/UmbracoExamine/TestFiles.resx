@@ -118,25 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Converting_file_to_PDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>testfiles\converting_file_to_pdf.pdf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="media" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>testfiles\media.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="PDFStandards" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>testfiles\pdfstandards.pdf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="umbraco" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>testfiles\umbraco.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="umbraco_sort" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>testfiles\umbraco-sort.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="windows_vista" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>testfiles\windows-vista.pdf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SurviorFlipCup" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>testfiles\surviorflipcup.pdf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
