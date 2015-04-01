@@ -1205,32 +1205,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        [Obsolete("This method should not be used, xml file persistence is done in a queue using a BackgroundTaskRunner")]
+        [Obsolete("This method should not be used and does nothing, xml file persistence is done in a queue using a BackgroundTaskRunner")]
         public void PersistXmlToFile()
         {
-            lock (ReaderWriterSyncLock)
-            {
-                if (_xmlContent != null)
-                {                    
-                    try
-                    {
-                        // create directory for cache path if it doesn't yet exist
-                        var directoryName = Path.GetDirectoryName(UmbracoXmlDiskCacheFileName);
-                        Directory.CreateDirectory(directoryName);
-
-                        _xmlContent.Save(UmbracoXmlDiskCacheFileName);
-                    }
-                    catch (Exception ee)
-                    {
-                        // If for whatever reason something goes wrong here, invalidate disk cache
-                        DeleteXmlCache();
-
-                        LogHelper.Error<content>(string.Format(
-                            "Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})",
-                            Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread), ee);
-                    }
-                }
-            }
         }
 
         /// <summary>
