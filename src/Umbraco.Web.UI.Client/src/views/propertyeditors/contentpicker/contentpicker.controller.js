@@ -175,7 +175,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
                 return d.id == id;
             });
            
-            if(entity != undefined) {
+            if(entity) {
                 entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
                 $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
             }
