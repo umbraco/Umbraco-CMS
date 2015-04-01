@@ -51,6 +51,11 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(10)]
         public string UserLanguage { get; set; }
+
+        [Column("securityStampToken")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(255)]
+        public string SecurityStampToken { get; set; }
         
         [ResultColumn]
         public List<User2AppDto> User2AppDtos { get; set; }

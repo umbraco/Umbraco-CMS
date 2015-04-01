@@ -2,46 +2,72 @@
 // -------------------------
 
 .login-overlay {
-  width: 100%;
-  height: 100%;
-  background: @blackLight url(../img/application/logo.png) no-repeat 25px 30px fixed !important;
-  background-size: 30px 30px !important;
-  color: @white;
-  position: absolute;
-  z-index: 2000;
-  top: 0px;
-  left: 0px;
-  margin: 0 !Important;
-  padding: 0;
-  border-radius: 0
+    width: 100%;
+    height: 100%;
+    background: @blackLight url(../img/application/logo.png) no-repeat 25px 30px fixed !important;
+    background-size: 30px 30px !important;
+    color: @white;
+    position: absolute;
+    z-index: 2000;
+    top: 0px;
+    left: 0px;
+    margin: 0 !Important;
+    padding: 0;
+    border-radius: 0;
 }
 
-.login-overlay .umb-modalcolumn{
-  background: none;
-  border: none;
+.login-overlay .umb-modalcolumn {
+    background: none;
+    border: none;
 }
 
 .login-overlay .form {
-  display: block;
-  padding-top: 100px;
-  padding-left: 165px;
-  width: 370px;
-  text-align: right
+    display: block;
+    padding-top: 100px;
+    padding-left: 165px;
+    width: 370px;
+    text-align: right;
 }
 
 .login-overlay h1 {
-  display: block;
-  text-align: right;
-  color: @white;
-  font-size: 18px;
-  font-weight: normal
+    display: block;
+    text-align: right;
+    color: @white;
+    font-size: 18px;
+    font-weight: normal;
 }
 
-.login-overlay .alert.alert-error{
+.login-overlay .alert.alert-error {
     display: inline-block;
-    width: 270px;
     padding-right: 6px;
     padding-left: 6px;
     margin-top: 10px;
     text-align: center;
+}
+
+#hrOr {
+    height: 30px;
+    text-align: center;
+    position: relative;
+    padding-top: 20px;
+}
+
+#hrOr hr {
+    margin: 0px;
+    border: none;
+    background-color: @gray;
+    height: 1px;
+}
+
+#hrOr div {
+    background-color: black;
+    position: relative;
+    top: -16px;
+    border: 1px solid @gray;
+    padding: 4px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    margin: auto;
+    color: @grayLight;
 }

@@ -266,6 +266,7 @@
     <Message Text="Finished compiling projects" Importance="high" />
   </Target>
 
+    
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <PropertyGroup>
       <NewVersion>$(BUILD_RELEASE)</NewVersion>

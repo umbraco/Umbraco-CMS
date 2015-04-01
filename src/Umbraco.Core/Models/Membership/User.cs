@@ -58,6 +58,7 @@ namespace Umbraco.Core.Models.Membership
 
         private IUserType _userType;
         private string _name;
+        private string _securityStamp;
         private List<string> _addedSections;
         private List<string> _removedSections;
         private ObservableCollection<string> _sectionCollection;
@@ -76,6 +77,7 @@ namespace Umbraco.Core.Models.Membership
         
         private bool _defaultToLiveEditing;
 
+        private static readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
         private static readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
         private static readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartContentId);
         private static readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
@@ -230,6 +232,22 @@ namespace Umbraco.Core.Models.Membership
         public IProfile ProfileData
         {
             get { return new UserProfile(this); }
+        }
+
+        /// <summary>
+        /// The security stamp used by ASP.Net identity
+        /// </summary>
+        public string SecurityStamp
+        {
+            get { return _securityStamp; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _securityStamp = value;
+                    return _securityStamp;
+                }, _securityStamp, SecurityStampSelector);
+            }
         }
 
         /// <summary>

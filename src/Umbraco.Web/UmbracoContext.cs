@@ -16,7 +16,6 @@ using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 
 namespace Umbraco.Web
 {
-
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>

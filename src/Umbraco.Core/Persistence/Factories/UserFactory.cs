@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
@@ -32,7 +33,9 @@ namespace Umbraco.Core.Persistence.Factories
                     IsLockedOut = dto.NoConsole,
                     IsApproved = dto.Disabled == false,
                     Email = dto.Email,
-                    Language = dto.UserLanguage
+                    Language = dto.UserLanguage,
+                    //make it a GUID if it's empty
+                    SecurityStamp = dto.SecurityStampToken.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString() : dto.SecurityStampToken
                 };
 
             foreach (var app in dto.User2AppDtos)
@@ -61,7 +64,8 @@ namespace Umbraco.Core.Persistence.Factories
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
-                              User2AppDtos = new List<User2AppDto>()
+                              User2AppDtos = new List<User2AppDto>(),
+                              SecurityStampToken = entity.SecurityStamp
                           };
 
             foreach (var app in entity.AllowedSections)
