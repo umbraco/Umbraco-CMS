@@ -98,6 +98,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(7, 0, 0);
             }
 
+            //if the error is for umbracoAccess it must be the previous version to 7.3 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoAccess"))))
+            {
+                return new Version(7, 2, 5);
+            }
+
             return UmbracoVersion.Current;
         }
 

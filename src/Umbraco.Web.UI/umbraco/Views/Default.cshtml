@@ -1,8 +1,12 @@
-﻿@using System.Net.Http
+﻿@using System.Collections
+@using System.Net.Http
 @using System.Web.Mvc.Html
 @using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Microsoft.Owin.Security
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
 @using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Web.Editors
@@ -23,17 +27,22 @@
     <meta name="robots" content="noindex, nofollow">
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
-    
-    @{ Html.RequiresCss("assets/css/umbraco.css", "Umbraco");}
-    @{ Html.RequiresCss("tree/treeicons.css", "UmbracoClient");}
+
+    @{
+        Html
+            .RequiresCss("assets/css/umbraco.css", "Umbraco")
+            .RequiresCss("tree/treeicons.css", "UmbracoClient")
+            .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
+            .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+    }
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
-    
+
 
 </head>
 <body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    <div ng-hide="!authenticated" ng-cloak id="mainwrapper"  id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
         <umb-navigation></umb-navigation>
 
@@ -47,28 +56,63 @@
     <umb-notifications></umb-notifications>
 
 
+    @{
+        var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+            .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+            .Select(p => new
+            {
+                authType = p.AuthenticationType,
+                caption = p.Caption,
+                properties = p.Properties
+            })
+            .ToArray();
+    }
+
     @*
         These are the bare minimal server variables that are required for the application to start without being authenticated,
         we will load the rest of the server vars after the user is authenticated.
-    *@    
+    *@
     <script type="text/javascript">
         var Umbraco = {};
         Umbraco.Sys = {};
         Umbraco.Sys.ServerVariables = {
-            "umbracoUrls": {                
+            "umbracoUrls": {
                 "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-                "serverVarsJs": '@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")'
-            },
-            "application": {
-                "applicationPath" : "@Context.Request.ApplicationPath"
+                "serverVarsJs": "@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")",
+                "externalLoginsUrl": "@(Url.Action("ExternalLogin", "BackOffice", new {area = ViewBag.UmbracoPath}))"
+        },
+        "application": {
+            "applicationPath" : "@Context.Request.ApplicationPath"
             }
-        };       
+    };       
     </script>
+
+    <script>
+    //define a callback that is executed when we bootstrap angular, this is used to inject angular values
+    //with server side info
+    document.angularReady = function(app) {
+        //add external login values
+        var errors = [];
+        @if (ViewBag.ExternalSignInError != null)
+            {
+                foreach (var error in ViewBag.ExternalSignInError)
+                {
+                    <text>errors.push("@error");</text>
+                }
+            }
+            app.value("externalLoginInfo", {
+                errors: errors,
+                providers: @Html.Raw(JsonConvert.SerializeObject(loginProviders))
+            });
+        }
+    </script>
+
+
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
     <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
-    
+
     @{
         var isDebug = false;
         if (Request.RawUrl.IndexOf('?') >= 0)
@@ -78,9 +122,9 @@
             if (attempt && attempt.Result)
             {
                 isDebug = true;
-            } 
+            }
         }
-        
+
     }
     @if (isDebug)
     {
@@ -89,4 +133,3 @@
 
 </body>
 </html>
-

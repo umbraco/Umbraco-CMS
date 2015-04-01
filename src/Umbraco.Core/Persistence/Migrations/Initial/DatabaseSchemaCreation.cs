@@ -82,6 +82,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
                                                                               {43, typeof(CacheInstructionDto)}
+                                                                              {44, typeof (ExternalLoginDto)}
                                                                           };
         #endregion
         
