@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
 			MigrationResolver.Current = new MigrationResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                Mock.Of<ILogger>(),
                 () => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),

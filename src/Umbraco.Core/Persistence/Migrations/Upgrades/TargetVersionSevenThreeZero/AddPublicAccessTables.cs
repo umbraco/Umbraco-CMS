@@ -1,12 +1,19 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
     [Migration("7.3.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class AddPublicAccessTables : MigrationBase
     {
+        public AddPublicAccessTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             //Don't exeucte if the table is already there

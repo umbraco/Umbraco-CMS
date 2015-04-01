@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Migrations
         public void Initialize()
         {
             MigrationResolver.Current = new MigrationResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                Mock.Of<ILogger>(),
                 () => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),

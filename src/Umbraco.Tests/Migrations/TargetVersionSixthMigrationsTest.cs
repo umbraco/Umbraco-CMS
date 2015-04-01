@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Migrations
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
 			MigrationResolver.Current = new MigrationResolver(
-                new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                ProfilingLogger.Logger,
                 () => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),

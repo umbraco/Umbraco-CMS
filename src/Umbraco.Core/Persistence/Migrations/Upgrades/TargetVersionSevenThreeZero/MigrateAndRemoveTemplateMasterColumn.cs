@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -12,6 +13,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
+
+        public MigrateAndRemoveTemplateMasterColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
 

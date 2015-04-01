@@ -1,12 +1,19 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
     [Migration("7.3.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class UpdateUniqueIdToHaveCorrectIndexType : MigrationBase
     {
+        public UpdateUniqueIdToHaveCorrectIndexType(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         //see: http://issues.umbraco.org/issue/U4-6188, http://issues.umbraco.org/issue/U4-6187
         public override void Up()
         {
@@ -35,8 +42,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 //must be a uniqe index
                 Create.Index("IX_umbracoNode_uniqueID").OnTable("umbracoNode").OnColumn("uniqueID").Unique();
             }
-
-            
         }
 
         public override void Down()

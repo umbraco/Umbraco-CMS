@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.SqlSyntax;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
@@ -21,6 +23,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class MigrateStylesheetDataToFile : MigrationBase
     {
+        public MigrateStylesheetDataToFile(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             //Don't exeucte if the stylesheet table is not there
@@ -30,7 +37,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             //This is all rather nasty but it's how stylesheets used to work in the 2 various ugly ways so we just have to 
             // deal with that to get this migration done
 
-            
+
             var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/CssMigration/");
             if (Directory.Exists(tempFolder))
             {
@@ -44,7 +51,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             }
             //create the temp folder
             var tempDir = Directory.CreateDirectory(IOHelper.MapPath("~/App_Data/TEMP/CssMigration/"));
-            
+
 
             var sheets = Context.Database.Fetch<dynamic>("SELECT * FROM cmsStylesheet INNER JOIN umbracoNode on cmsStylesheet.nodeId = umbracoNode.id");
             foreach (var sheet in sheets)
@@ -55,7 +62,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 //we will always use the file content over the db content if there is any
                 using (var memStream = new MemoryStream(Encoding.UTF8.GetBytes(sheet.content)))
                 {
-                    dbContent = GetContentAboveUmbracoProps(memStream);    
+                    dbContent = GetContentAboveUmbracoProps(memStream);
                 }
 
                 var fileContent = string.Empty;
@@ -69,7 +76,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 {
                     using (var stream = File.OpenRead(filePath))
                     {
-                        fileContent = GetContentAboveUmbracoProps(stream);    
+                        fileContent = GetContentAboveUmbracoProps(stream);
                     }
                 }
 
@@ -86,10 +93,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 {
                     if (stylesheetInstance.Properties.Any(x => x.Name == prop.text) == false)
                     {
-                        stylesheetInstance.AddProperty(new StylesheetProperty(prop.text, prop.stylesheetPropertyAlias, prop.stylesheetPropertyValue));        
+                        stylesheetInstance.AddProperty(new StylesheetProperty(prop.text, prop.stylesheetPropertyAlias, prop.stylesheetPropertyValue));
                     }
                 }
-                
+
                 //Save to temp folder
 
                 //ensure the folder for the file exists since it could be in a sub folder
@@ -97,7 +104,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));
 
                 File.WriteAllText(tempFilePath, stylesheetInstance.Content, Encoding.UTF8);
-                
+
             }
         }
 

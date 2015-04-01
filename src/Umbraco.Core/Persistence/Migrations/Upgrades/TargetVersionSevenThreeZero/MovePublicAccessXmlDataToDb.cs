@@ -6,13 +6,17 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
     [Migration("7.3.0", 7, GlobalSettings.UmbracoMigrationName)]
     public class MovePublicAccessXmlDataToDb : MigrationBase
     {
-
+        public MovePublicAccessXmlDataToDb(ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
+        {
+        }
 
         public override void Up()
         {
@@ -32,14 +36,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
                 foreach (var page in xml.Root.Elements("page"))
                 {
-                    var pageId = (int?) page.Attribute("id");
-                    var loginPageId = (int?) page.Attribute("loginPage");
+                    var pageId = (int?)page.Attribute("id");
+                    var loginPageId = (int?)page.Attribute("loginPage");
                     var noRightsPageId = (int?)page.Attribute("noRightsPage");
-                    if (pageId.HasValue == false || loginPageId.HasValue == false || noRightsPageId.HasValue == false) 
+                    if (pageId.HasValue == false || loginPageId.HasValue == false || noRightsPageId.HasValue == false)
                         continue;
 
                     //ensure this page exists!
-                    var umbracoNode = Context.Database.FirstOrDefault<NodeDto>("WHERE id = @Id", new {Id = pageId.Value});
+                    var umbracoNode = Context.Database.FirstOrDefault<NodeDto>("WHERE id = @Id", new { Id = pageId.Value });
                     if (umbracoNode != null)
                     {
                         var loginNode = Context.Database.FirstOrDefault<NodeDto>("WHERE id = @Id", new { Id = loginPageId.Value });
@@ -60,7 +64,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                 });
 
                                 //if a memberId has been specified, then add that as a rule
-                                var memberId = (string) page.Attribute("memberId");
+                                var memberId = (string)page.Attribute("memberId");
                                 if (memberId.IsNullOrWhiteSpace() == false)
                                 {
                                     Insert.IntoTable("umbracoAccessRule").Row(new
@@ -91,7 +95,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                                             createDate = DateTime.Now,
                                             updateDate = DateTime.Now
                                         });
-                                    }   
+                                    }
                                 }
 
                             }
@@ -104,7 +108,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                         {
                             Logger.Warn<AddPublicAccessTables>("No umbracoNode could be found with id " + loginPageId.Value);
                         }
-                            
+
                     }
                     else
                     {
