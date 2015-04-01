@@ -1899,6 +1899,7 @@ namespace Umbraco.Web
         {
             return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
                 ApplicationContext.Current.Services.LocalizationService,
+                ApplicationContext.Current.Services.ContentService,
                 content.Id, content.Path,
                 current);
         }
