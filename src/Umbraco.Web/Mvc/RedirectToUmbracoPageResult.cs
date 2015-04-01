@@ -5,8 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
