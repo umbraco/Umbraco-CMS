@@ -21,7 +21,8 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TryFindContent(PublishedContentRequest docRequest)
         {
-            if (UmbracoContext.Current.InPreviewMode == false && UmbracoConfig.For.UmbracoSettings().WebRouting.DisableFindContentByIdPath)
+            if (UmbracoContext.Current != null &&  UmbracoContext.Current.InPreviewMode == false 
+                && UmbracoConfig.For.UmbracoSettings().WebRouting.DisableFindContentByIdPath)
                 return false;
 
             IPublishedContent node = null;
