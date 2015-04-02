@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,8 +32,7 @@ namespace Umbraco.Web
 	//  Request.RawUrl is still there
 	// response.Redirect does?! always remap to /vdir?!
 
-	public class 
-        UmbracoModule : IHttpModule
+	public class UmbracoModule : IHttpModule
 	{
 		#region HttpModule event handlers
 
@@ -277,7 +277,7 @@ namespace Umbraco.Web
 		/// <param name="httpContext"></param>
 		/// <param name="uri"></param>
 		/// <returns></returns>
-		static bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
+		bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
 		{
 			var maybeDoc = true;
 			var lpath = uri.AbsolutePath.ToLowerInvariant();
@@ -311,7 +311,7 @@ namespace Umbraco.Web
 			// at that point, either we have no extension, or it is .aspx
 
 			// if the path is reserved then it cannot be a document request
-			if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath, httpContext, RouteTable.Routes))
+            if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath, httpContext, _combinedRouteCollection.Value))
 				maybeDoc = false;
 
 			//NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
@@ -612,5 +612,42 @@ namespace Umbraco.Web
                 EndRequest(this, args);
         } 
         #endregion
+
+
+        /// <summary>
+        /// This is used to be passed into the GlobalSettings.IsReservedPathOrUrl and will include some 'fake' routes
+        /// used to determine if a path is reserved.
+        /// </summary>
+        /// <remarks>
+        /// This is basically used to reserve paths dynamically
+        /// </remarks>
+        private readonly Lazy<RouteCollection> _combinedRouteCollection = new Lazy<RouteCollection>(() =>
+        {
+            var allRoutes = new RouteCollection();
+            foreach (var route in RouteTable.Routes)
+            {
+                allRoutes.Add(route);
+            }
+            foreach (var reservedPath in ReservedPaths)
+            {
+                try
+                {
+                    allRoutes.Add("_umbreserved_" + reservedPath.ReplaceNonAlphanumericChars(""),
+                                new Route(reservedPath.TrimStart('/'), new StopRoutingHandler()));
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoModule>("Could not add reserved path route", ex);
+                }
+            }
+
+            return allRoutes;
+        }); 
+
+        /// <summary>
+        /// This is used internally to track any registered callback paths for Identity providers. If the request path matches
+        /// any of the registered paths, then the module will let the request keep executing
+        /// </summary>
+        internal static readonly ConcurrentHashSet<string> ReservedPaths = new ConcurrentHashSet<string>();
 	}
 }

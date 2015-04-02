@@ -19,13 +19,16 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="html"></param>
         /// <param name="uri"></param>
-        /// <param name="umbracoPath"></param>
+        /// <param name="externalLoginsUrl">
+        /// The post url used to sign in with external logins - this can change depending on for what service the external login is service.
+        /// Example: normal back office login or authenticating upgrade login
+        /// </param>
         /// <returns></returns>
         /// <remarks>
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariables(this HtmlHelper html, UrlHelper uri, string umbracoPath)
+        public static IHtmlString BareMinimumServerVariables(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
         {
             var str = @"<script type=""text/javascript"">
                 var Umbraco = {};
@@ -34,7 +37,7 @@ namespace Umbraco.Web
                     ""umbracoUrls"": {
                         ""authenticationApiBaseUrl"": """ + uri.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)) + @""",
                         ""serverVarsJs"": """ + uri.GetUrlWithCacheBust("ServerVariables", "BackOffice") + @""",
-                        ""externalLoginsUrl"": """ + uri.Action("ExternalLogin", "BackOffice", new {area = umbracoPath}) + @"""
+                        ""externalLoginsUrl"": """ + externalLoginsUrl + @"""
                     },
                     ""application"": {
                         ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @"""

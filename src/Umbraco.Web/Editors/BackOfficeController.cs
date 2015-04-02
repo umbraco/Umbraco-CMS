@@ -63,27 +63,9 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public async Task<ActionResult> Default()
         {
-            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
-
-            //check if there's errors in the TempData, assign to view bag and render the view
-            if (TempData["ExternalSignInError"] != null)
-            {
-                ViewBag.ExternalSignInError = TempData["ExternalSignInError"];
-                return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
-            }
-
-            //First check if there's external login info, if there's not proceed as normal
-            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
-            if (loginInfo == null)
-            {
-                return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
-            }
-
-            //we're just logging in with an external source, not linking accounts
-            return await ExternalSignInAsync(loginInfo);
-
+            return await RenderDefaultOrProcessExternalLoginAsync(
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"));
         }
 
         /// <summary>
@@ -92,11 +74,13 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>      
         [HttpGet]
-        public ActionResult AuthorizeUpgrade()
+        public async Task<ActionResult> AuthorizeUpgrade()
         {
-            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
-
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml");
+            return await RenderDefaultOrProcessExternalLoginAsync(
+                //The default view to render when there is no external login info or errors
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml"),
+                //The ActionResult to perform if external login is successful
+                () => Redirect("/"));
         }
 
         /// <summary>
@@ -422,11 +406,15 @@ namespace Umbraco.Web.Editors
         }
         
         [HttpPost]
-        public ActionResult ExternalLogin(string provider)
+        public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
+            if (redirectUrl == null)
+            {
+                redirectUrl = Url.Action("Default", "BackOffice");
+            }
+
             // Request a redirect to the external login provider
-            return new ChallengeResult(provider,
-                Url.Action("Default", "BackOffice"));
+            return new ChallengeResult(provider, redirectUrl);
         }
 
         [UmbracoAuthorize]
@@ -466,9 +454,42 @@ namespace Umbraco.Web.Editors
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
-        private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo)
+        /// <summary>
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, otherwise
+        /// process the external login info.
+        /// </summary>
+        /// <returns></returns>
+        private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(Func<ActionResult> defaultResponse, Func<ActionResult> externalSignInResponse)
+        {
+            if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
+            if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
+
+            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
+
+            //check if there's errors in the TempData, assign to view bag and render the view
+            if (TempData["ExternalSignInError"] != null)
+            {
+                ViewBag.ExternalSignInError = TempData["ExternalSignInError"];
+                return defaultResponse();
+            }
+
+            //First check if there's external login info, if there's not proceed as normal
+            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            if (loginInfo == null)
+            {
+                return defaultResponse();
+            }
+
+            //we're just logging in with an external source, not linking accounts
+            return await ExternalSignInAsync(loginInfo, externalSignInResponse);
+        }
+
+        private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<ActionResult> response)
         {
             if (loginInfo == null) throw new ArgumentNullException("loginInfo");
+            if (response == null) throw new ArgumentNullException("response");
 
             // Sign in the user with this external login provider if the user already has a login
             var user = await UserManager.FindAsync(loginInfo.Login);
@@ -493,8 +514,8 @@ namespace Umbraco.Web.Editors
                     Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
                 }
             }
-            
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+
+            return response();
         }
 
         private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)

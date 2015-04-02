@@ -51,7 +51,15 @@
 
     <umb-notifications></umb-notifications>
 
-    @Html.BareMinimumServerVariables(Url, (string)ViewBag.UmbracoPath)
+    @{
+        var externalLoginUrl = Url.Action("ExternalLogin", "BackOffice", new
+        {
+            area = ViewBag.UmbracoPath, 
+            //Custom redirect URL since we don't want to just redirect to the back office since this is for authing upgrades
+            redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
+        });
+    }
+    @Html.BareMinimumServerVariables(Url, externalLoginUrl)
 
     @Html.AngularExternalLoginInfoValues((IEnumerable<string>)ViewBag.ExternalSignInError)
 
