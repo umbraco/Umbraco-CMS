@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Web;
 using System.Web.Hosting;
-using System.Web.Mvc;
-using StackExchange.Profiling;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -33,8 +30,6 @@ namespace Umbraco.Core
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
-            //don't output the MVC version header (security)
-            MvcHandler.DisableMvcResponseHeader = true;
 
             //boot up the application
             GetBootManager()

@@ -274,6 +274,9 @@
     <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
     <Compile Include="Mvc\ReflectedFixedRazorViewEngine.cs" />
+    <Compile Include="Mvc\ProfilingView.cs" />
+    <Compile Include="Mvc\ProfilingViewEngine.cs" />
+    <Compile Include="Mvc\UrlHelperExtensions.cs" />	
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
