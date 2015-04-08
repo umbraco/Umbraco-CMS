@@ -376,7 +376,8 @@ namespace Umbraco.Web.Scheduling
                     using (bgTask) // ensure it's disposed
                     {
                         if (bgTask.IsAsync)
-                            await bgTask.RunAsync(token);
+                            //configure await = false since we don't care about the context, we're on a background thread.
+                            await bgTask.RunAsync(token).ConfigureAwait(false);
                         else
                             bgTask.Run();
                     }
