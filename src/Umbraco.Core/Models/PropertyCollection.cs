@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PropertyCollection : KeyedCollection<string, Property>, INotifyCollectionChanged, IDeepCloneable
     {
-        private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
+        private readonly object _addLocker = new object();
         internal Action OnAdd;
         internal Func<Property, bool> ValidateAdd { get; set; }
 
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Models
 
         internal new void Add(Property item)
         {
-            using (new WriteLock(_addLocker))
+            lock (_addLocker)
             {
                 var key = GetKeyForItem(item);
                 if (key != null)
