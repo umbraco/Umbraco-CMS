@@ -161,19 +161,7 @@ namespace Umbraco.Tests.Scheduling
             await runner; // wait for the entire runner operation to complete
             Assert.Throws<InvalidOperationException>(() => runner.Add(new MyTask()));
         }
-
-        [Test]
-        public async void Startup_IsRunning()
-        {
-            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
-            {
-                Assert.IsFalse(runner.IsRunning);
-                runner.StartUp();
-                Assert.IsTrue(runner.IsRunning);
-                await runner; // wait for the entire runner operation to complete
-            }
-        }
-
+      
         [Test]
         public void Startup_KeepAlive_IsRunning()
         {

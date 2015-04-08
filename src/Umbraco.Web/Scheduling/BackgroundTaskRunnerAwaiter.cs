@@ -49,7 +49,7 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         public bool IsCompleted
         {
-            get { return _runner.IsRunning == false && _tcs.Task.IsCompleted; }
+            get { return _runner.IsRunning == false; }
         }
 
         public void OnCompleted(Action continuation)
