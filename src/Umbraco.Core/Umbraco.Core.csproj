@@ -188,6 +188,7 @@
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NullCacheProvider.cs" />
+    <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />

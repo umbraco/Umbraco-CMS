@@ -4,17 +4,16 @@ using umbraco.interfaces;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// A base class for json cache refreshers that ensures the correct events are raised when 
-    /// cache refreshing occurs.
+    /// Provides a base class for "json" cache refreshers.
     /// </summary>
-    /// <typeparam name="TInstanceType">The real cache refresher type, this is used for raising strongly typed events</typeparam>
-    public abstract class JsonCacheRefresherBase<TInstanceType> : CacheRefresherBase<TInstanceType>, IJsonCacheRefresher 
-        where TInstanceType : ICacheRefresher
+    /// <typeparam name="TInstance">The actual cache refresher type.</typeparam>
+    /// <remarks>Ensures that the correct events are raised when cache refreshing occurs.</remarks>
+    public abstract class JsonCacheRefresherBase<TInstance> : CacheRefresherBase<TInstance>, IJsonCacheRefresher
+        where TInstance : ICacheRefresher
     {        
-
-        public virtual void Refresh(string jsonPayload)
+        public virtual void Refresh(string json)
         {            
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(jsonPayload, MessageType.RefreshByJson));
+            OnCacheUpdated(Instance, new CacheRefresherEventArgs(json, MessageType.RefreshByJson));
         }
     }
 }
