@@ -187,25 +187,42 @@ namespace Umbraco.Core.Sync
             // the local server as they've already been processed. We should NOT assume that the sequence of
             // instructions in the database makes any sense whatsoever, because it's all async.
             var localIdentity = GetLocalIdentity();
-            var remoteDtos = dtos.Where(x => x.OriginIdentity != localIdentity);
 
             var lastId = 0;
-            foreach (var dto in remoteDtos)
+            foreach (var dto in dtos)
             {
+                if (dto.OriginIdentity == localIdentity)
+                {
+                    // just skip that local one but update lastId nevertheless
+                    lastId = dto.Id;
+                    continue;
+                }
+
+                // deserialize remote instructions & skip if it fails
+                JArray jsonA;
                 try
                 {
-                    var jsonArray = JsonConvert.DeserializeObject<JArray>(dto.Instructions);
-                    NotifyRefreshers(jsonArray);
-                    lastId = dto.Id;
+                    jsonA = JsonConvert.DeserializeObject<JArray>(dto.Instructions);
                 }
                 catch (JsonException ex)
                 {
-                    // FIXME
-                    // if we cannot deserialize then it's OK to skip the instructions
-                    // but what if NotifyRefreshers throws?!
-
-                    LogHelper.Error<DatabaseServerMessenger>("Could not deserialize a distributed cache instruction (\"" + dto.Instructions + "\").", ex);
+                    LogHelper.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
+                    lastId = dto.Id; // skip
+                    continue;
                 }
+
+                // execute remote instructions & update lastId
+                try
+                {
+                    NotifyRefreshers(jsonA);
+                    lastId = dto.Id;
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<DatabaseServerMessenger>(string.Format("Failed to execute instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
+                    LogHelper.Warn<DatabaseServerMessenger>("BEWARE - DISTRIBUTED CACHE IS NOT UPDATED.");
+                    throw;
+                 }
             }
 
             if (lastId > 0)
