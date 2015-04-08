@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.Scheduling
@@ -13,20 +14,14 @@ namespace Umbraco.Tests.Scheduling
     [TestFixture]
     public class BackgroundTaskRunnerTests
     {
-        private static void AssertRunnerStopsRunning<T>(BackgroundTaskRunner<T> runner, int timeoutMilliseconds = 2000)
-            where T : class, IBackgroundTask
+        [TestFixtureSetUp]
+        public void InitializeFixture()
         {
-            const int period = 200;
-
-            var i = 0;
-            var m = timeoutMilliseconds/period;
-            while (runner.IsRunning && i++ < m)
-                Thread.Sleep(period);
-            Assert.IsFalse(runner.IsRunning, "Runner is still running.");
+            TestHelper.SetupLog4NetForTests();
         }
 
         [Test]
-        public void ShutdownWaitWhenRunning()
+        public async void ShutdownWaitWhenRunning()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { AutoStart = true, KeepAlive = true }))
             {
@@ -34,36 +29,41 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(800); // for long
                 Assert.IsTrue(runner.IsRunning);
                 runner.Shutdown(false, true); // -force +wait
-                AssertRunnerStopsRunning(runner);
+                await runner; // wait for the entire runner operation to complete
                 Assert.IsTrue(runner.IsCompleted);
             }
         }
 
         [Test]
-        public void ShutdownWhenRunning()
+        public async void ShutdownWhenRunning()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
-                // do NOT try to do this because the code must run on the UI thread which
-                // is not availably, and so the thread never actually starts - wondering
-                // what it means for ASP.NET?
-                //runner.TaskStarting += (sender, args) => Console.WriteLine("starting {0:c}", DateTime.Now);
-                //runner.TaskCompleted += (sender, args) => Console.WriteLine("completed {0:c}", DateTime.Now);
+                Console.WriteLine("Begin {0}", DateTime.Now);
+
+                runner.TaskStarting += (sender, args) => Console.WriteLine("starting {0}", DateTime.Now);
+                runner.TaskCompleted += (sender, args) => Console.WriteLine("completed {0}", DateTime.Now);
 
                 Assert.IsFalse(runner.IsRunning);
+
+                Console.WriteLine("Adding task {0}", DateTime.Now);
                 runner.Add(new MyTask(5000));
                 Assert.IsTrue(runner.IsRunning); // is running the task
+                Console.WriteLine("Shutting down {0}", DateTime.Now);
                 runner.Shutdown(false, false); // -force -wait
                 Assert.IsTrue(runner.IsCompleted);
                 Assert.IsTrue(runner.IsRunning); // still running that task
-                Thread.Sleep(3000);
+                Thread.Sleep(3000);              // wait slightly less than the task takes to complete
                 Assert.IsTrue(runner.IsRunning); // still running that task
-                AssertRunnerStopsRunning(runner, 10000);
+
+                await runner; // wait for the entire runner operation to complete
+                
+                Console.WriteLine("End {0}", DateTime.Now);
             }
         }
 
         [Test]
-        public void ShutdownFlushesTheQueue()
+        public async void ShutdownFlushesTheQueue()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -74,13 +74,13 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(t);
                 Assert.IsTrue(runner.IsRunning); // is running the first task
                 runner.Shutdown(false, false); // -force -wait
-                AssertRunnerStopsRunning(runner, 10000);
+                await runner; // wait for the entire runner operation to complete
                 Assert.AreNotEqual(DateTime.MinValue, t.Ended); // t has run
             }
         }
 
         [Test]
-        public void ShutdownForceTruncatesTheQueue()
+        public async void ShutdownForceTruncatesTheQueue()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -91,13 +91,13 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(t);
                 Assert.IsTrue(runner.IsRunning); // is running the first task
                 runner.Shutdown(true, false); // +force -wait
-                AssertRunnerStopsRunning(runner, 10000);
+                await runner; // wait for the entire runner operation to complete
                 Assert.AreEqual(DateTime.MinValue, t.Ended); // t has not run
             }
         }
 
         [Test]
-        public void ShutdownThenForce()
+        public async void ShutdownThenForce()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(3000);
                 Assert.IsTrue(runner.IsRunning); // still running that task
                 runner.Shutdown(true, false); // +force -wait
-                AssertRunnerStopsRunning(runner, 20000);
+                await runner; // wait for the entire runner operation to complete
             }
         }
 
@@ -126,12 +126,12 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public void Create_AutoStart_IsRunning()
+        public async void Create_AutoStart_IsRunning()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { AutoStart = true }))
             {
                 Assert.IsTrue(runner.IsRunning);
-                AssertRunnerStopsRunning(runner); // though not for long
+                await runner; // wait for the entire runner operation to complete
             }
         }
 
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public void Dispose_IsRunning()
+        public async void Dispose_IsRunning()
         {
             BackgroundTaskRunner<IBackgroundTask> runner;
             using (runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { AutoStart = true, KeepAlive = true }))
@@ -157,19 +157,19 @@ namespace Umbraco.Tests.Scheduling
                 // dispose will stop it
             }
 
-            AssertRunnerStopsRunning(runner);
+            await runner; // wait for the entire runner operation to complete
             Assert.Throws<InvalidOperationException>(() => runner.Add(new MyTask()));
         }
 
         [Test]
-        public void Startup_IsRunning()
+        public async void Startup_IsRunning()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
                 Assert.IsFalse(runner.IsRunning);
                 runner.StartUp();
                 Assert.IsTrue(runner.IsRunning);
-                AssertRunnerStopsRunning(runner); // though not for long
+                await runner; // wait for the entire runner operation to complete
             }
         }
 
@@ -186,13 +186,19 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public void Create_AddTask_IsRunning()
+        public async void Create_AddTask_IsRunning()
         {
             using (var runner = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions()))
             {
+                var waitHandle = new ManualResetEvent(false);
+                runner.TaskCompleted += (sender, args) =>
+                {
+                    waitHandle.Set();
+                };
                 runner.Add(new MyTask());
                 Assert.IsTrue(runner.IsRunning);
-                Thread.Sleep(800); // task takes 500ms
+                waitHandle.WaitOne();
+                await runner; //since we are not being kept alive, it will quit
                 Assert.IsFalse(runner.IsRunning);
             }
         }
@@ -202,11 +208,16 @@ namespace Umbraco.Tests.Scheduling
         {
             using (var runner = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions { KeepAlive = true }))
             {
+                var waitHandle = new ManualResetEvent(false);
+                runner.TaskCompleted += (sender, args) =>
+                {
+                    Assert.IsTrue(sender.IsRunning);
+                    waitHandle.Set();
+                };
                 runner.Add(new MyTask());
+                waitHandle.WaitOne();
+                Thread.Sleep(1000); // we are waiting a second just to prove that it's still running and hasn't been shut off
                 Assert.IsTrue(runner.IsRunning);
-                Thread.Sleep(800); // task takes 500ms
-                Assert.IsTrue(runner.IsRunning);
-                // dispose will stop it
             }
         }
 
@@ -218,9 +229,9 @@ namespace Umbraco.Tests.Scheduling
                 var task = new MyTask();
                 Assert.IsTrue(task.Ended == default(DateTime));
                 runner.Add(task);
-                await runner; // wait 'til it's not running anymore
+                await runner.CurrentThreadingTask;   // wait for the Task operation to complete
                 Assert.IsTrue(task.Ended != default(DateTime)); // task is done
-                AssertRunnerStopsRunning(runner); // though not for long
+                await runner;               // wait for the entire runner operation to complete
             }
         }
 
@@ -235,19 +246,19 @@ namespace Umbraco.Tests.Scheduling
             {
                 tasks.ForEach(runner.Add);
 
-                await runner; // wait 'til it's not running anymore
+                await runner; // wait for the entire runner operation to complete
 
                 // check that tasks are done
                 Assert.IsTrue(tasks.All(x => x.Ended != default(DateTime)));
 
-                Assert.AreEqual(TaskStatus.RanToCompletion, runner.TaskStatus);
+                Assert.AreEqual(TaskStatus.RanToCompletion, runner.CurrentThreadingTask.Status);
                 Assert.IsFalse(runner.IsRunning);
                 Assert.IsFalse(runner.IsDisposed);
             }
         }
 
         [Test]
-        public void WaitOnTask()
+        public async void WaitOnTask()
         {
             using (var runner = new BackgroundTaskRunner<BaseTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -258,12 +269,12 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(task);
                 waitHandle.WaitOne(); // wait 'til task is done
                 Assert.IsTrue(task.Ended != default(DateTime)); // task is done
-                AssertRunnerStopsRunning(runner); // though not for long
+                await runner; // wait for the entire runner operation to complete
             }
         }
 
         [Test]
-        public void WaitOnTasks()
+        public async void WaitOnTasks()
         {
             var tasks = new Dictionary<BaseTask, ManualResetEvent>();
             for (var i = 0; i < 10; i++)
@@ -278,7 +289,7 @@ namespace Umbraco.Tests.Scheduling
                 WaitHandle.WaitAll(tasks.Values.Select(x => (WaitHandle)x).ToArray());
                 Assert.IsTrue(tasks.All(x => x.Key.Ended != default(DateTime)));
 
-                AssertRunnerStopsRunning(runner); // though not for long
+                await runner; // wait for the entire runner operation to complete
             }
         }
 
@@ -349,9 +360,9 @@ namespace Umbraco.Tests.Scheduling
                 tasks.ForEach(tManager.Add);
 
                 //wait till the thread is done
-                await tManager;
+                await tManager.CurrentThreadingTask;
 
-                Assert.AreEqual(TaskStatus.RanToCompletion, tManager.TaskStatus);
+                Assert.AreEqual(TaskStatus.RanToCompletion, tManager.CurrentThreadingTask.Status);
                 Assert.IsFalse(tManager.IsRunning);
                 Assert.IsFalse(tManager.IsDisposed);
 
@@ -367,14 +378,14 @@ namespace Umbraco.Tests.Scheduling
                 tasks.ForEach(tManager.Add);
 
                 //wait till the thread is done
-                await tManager;
+                await tManager.CurrentThreadingTask;
       
                 foreach (var task in tasks)
                 {
                     Assert.IsTrue(task.Ended != default(DateTime));
                 }
 
-                Assert.AreEqual(TaskStatus.RanToCompletion, tManager.TaskStatus);
+                Assert.AreEqual(TaskStatus.RanToCompletion, tManager.CurrentThreadingTask.Status);
                 Assert.IsFalse(tManager.IsRunning);
                 Assert.IsFalse(tManager.IsDisposed);
             }
@@ -383,31 +394,39 @@ namespace Umbraco.Tests.Scheduling
         [Test]
         public void RecurringTaskTest()
         {
-            // note: can have BackgroundTaskRunner<IBackgroundTask> and use it in MyRecurringTask ctor
-            // because that ctor wants IBackgroundTaskRunner<MyRecurringTask> and the generic type
-            // parameter is contravariant ie defined as IBackgroundTaskRunner<in T> so doing the
-            // following is legal:
-            // var IBackgroundTaskRunner<Base> b = ...;
-            // var IBackgroundTaskRunner<Derived> d = b; // legal
-
+            var runCount = 0;
+            var waitHandle = new ManualResetEvent(false);
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
+                runner.TaskCompleted += (sender, args) => runCount++;
+                runner.TaskStarting += async (sender, args) =>
+                {
+                    //wait for each task to finish once it's started
+                    await sender.CurrentThreadingTask;
+                    if (runCount > 3)
+                    {
+                        waitHandle.Set();
+                    }
+                };
+
                 var task = new MyRecurringTask(runner, 200, 500);
-                MyRecurringTask.RunCount = 0;
+                
                 runner.Add(task);
-                Thread.Sleep(5000);
-                Assert.GreaterOrEqual(MyRecurringTask.RunCount, 2); // keeps running, count >= 2
+
+                Assert.IsTrue(runner.IsRunning); // waiting on delay
+                Assert.AreEqual(0, runCount);
+
+                waitHandle.WaitOne();
+
+                Assert.AreEqual(4, runCount);
 
                 // stops recurring
                 runner.Shutdown(false, false);
-                AssertRunnerStopsRunning(runner);
-
-                // timer may try to add a task but it won't work because runner is completed
             }
         }
 
         [Test]
-        public void DelayedTaskRuns()
+        public async void DelayedTaskRuns()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -418,14 +437,14 @@ namespace Umbraco.Tests.Scheduling
                 Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
                 task.Release();
-                Thread.Sleep(500);
+                await runner.CurrentThreadingTask; //wait for current task to complete
                 Assert.IsTrue(task.HasRun);
-                AssertRunnerStopsRunning(runner); // runs task & exit
+                await runner; // wait for the entire runner operation to complete
             }
         }
 
         [Test]
-        public void DelayedTaskStops()
+        public async void DelayedTaskStops()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -436,7 +455,7 @@ namespace Umbraco.Tests.Scheduling
                 Assert.IsTrue(runner.IsRunning); // still waiting for the task to release               
                 Assert.IsFalse(task.HasRun);
                 runner.Shutdown(false, false);
-                AssertRunnerStopsRunning(runner); // runs task & exit
+                await runner; // wait for the entire runner operation to complete
                 Assert.IsTrue(task.HasRun);
             }
         }
@@ -444,29 +463,36 @@ namespace Umbraco.Tests.Scheduling
         [Test]
         public void DelayedRecurring()
         {
+            var runCount = 0;
+            var waitHandle = new ManualResetEvent(false);
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
+                runner.TaskCompleted += (sender, args) => runCount++;
+                runner.TaskStarting += async (sender, args) =>
+                {
+                    //wait for each task to finish once it's started
+                    await sender.CurrentThreadingTask;
+                    if (runCount > 3)
+                    {
+                        waitHandle.Set();
+                    }
+                };
+
                 var task = new MyDelayedRecurringTask(runner, 2000, 1000);
-                MyDelayedRecurringTask.RunCount = 0; 
                 runner.Add(task);
-                Thread.Sleep(1000);
                 Assert.IsTrue(runner.IsRunning); // waiting on delay
-                Assert.AreEqual(0, MyDelayedRecurringTask.RunCount);
-                Thread.Sleep(1000);
-                Assert.AreEqual(1, MyDelayedRecurringTask.RunCount);
-                Thread.Sleep(5000);
-                Assert.GreaterOrEqual(MyDelayedRecurringTask.RunCount, 2); // keeps running, count >= 2
+                Assert.AreEqual(0, runCount);
+
+                waitHandle.WaitOne();
+                Assert.AreEqual(4, runCount);
 
                 // stops recurring
                 runner.Shutdown(false, false);
-                AssertRunnerStopsRunning(runner);
-
-                // timer may try to add a task but it won't work because runner is completed
             }
         }
 
         [Test]
-        public void FailingTaskSync()
+        public async void FailingTaskSync()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -476,14 +502,14 @@ namespace Umbraco.Tests.Scheduling
                 var task = new MyFailingTask(false); // -async
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
-                AssertRunnerStopsRunning(runner); // runs task & exit
+                await runner; // wait for the entire runner operation to complete
 
                 Assert.AreEqual(1, exceptions.Count); // traced and reported
             }
         }
 
         [Test]
-        public void FailingTaskAsync()
+        public async void FailingTaskAsync()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
@@ -493,7 +519,7 @@ namespace Umbraco.Tests.Scheduling
                 var task = new MyFailingTask(true); // +async
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
-                AssertRunnerStopsRunning(runner); // runs task & exit
+                await runner; // wait for the entire runner operation to complete
 
                 Assert.AreEqual(1, exceptions.Count); // traced and reported
             }
@@ -540,8 +566,6 @@ namespace Umbraco.Tests.Scheduling
                 : base(source)
             { }
 
-            public static int RunCount { get; set; }
-
             public override bool IsAsync
             {
                 get { return false; }
@@ -550,7 +574,6 @@ namespace Umbraco.Tests.Scheduling
             public override void PerformRun()
             {
                 // nothing to do at the moment
-                RunCount += 1;
             }
 
             public override Task PerformRunAsync()
@@ -621,7 +644,6 @@ namespace Umbraco.Tests.Scheduling
         {
             private readonly int _runMilliseconds;
 
-            public static int RunCount { get; set; }
 
             public MyRecurringTask(IBackgroundTaskRunner<MyRecurringTask> runner, int runMilliseconds, int periodMilliseconds)
                 : base(runner, periodMilliseconds)
@@ -636,8 +658,7 @@ namespace Umbraco.Tests.Scheduling
             }
 
             public override void PerformRun()
-            {
-                RunCount += 1;
+            {                
                 Thread.Sleep(_runMilliseconds);
             }
 
