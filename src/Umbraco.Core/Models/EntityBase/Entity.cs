@@ -17,7 +17,6 @@ namespace Umbraco.Core.Models.EntityBase
     public abstract class Entity : TracksChangesEntityBase, IEntity, IRememberBeingDirty, ICanBeDirty
     {
         private bool _hasIdentity;
-        private int? _hash;
         private int _id;
         private Guid _key;
         private DateTime _createDate;
@@ -175,6 +174,7 @@ namespace Umbraco.Core.Models.EntityBase
             }
         }
 
+        //TODO: Make this NOT virtual or even exist really!
         public virtual bool SameIdentityAs(IEntity other)
         {
             if (ReferenceEquals(null, other))
@@ -195,11 +195,13 @@ namespace Umbraco.Core.Models.EntityBase
             return SameIdentityAs(other);
         }
 
+        //TODO: Make this NOT virtual or even exist really!
         public virtual Type GetRealType()
         {
             return GetType();
         }
 
+        //TODO: Make this NOT virtual or even exist really!
         public virtual bool SameIdentityAs(Entity other)
         {
             if (ReferenceEquals(null, other))
@@ -226,9 +228,13 @@ namespace Umbraco.Core.Models.EntityBase
 
         public override int GetHashCode()
         {
-            if (!_hash.HasValue)
-                _hash = !HasIdentity ? new int?(base.GetHashCode()) : new int?(Id.GetHashCode() * 397 ^ GetType().GetHashCode());
-            return _hash.Value;
+            unchecked
+            {
+                var hashCode = HasIdentity.GetHashCode();
+                hashCode = (hashCode * 397) ^ Id;
+                hashCode = (hashCode * 397) ^ GetType().GetHashCode();
+                return hashCode;
+            }
         }
 
         public virtual object DeepClone()
