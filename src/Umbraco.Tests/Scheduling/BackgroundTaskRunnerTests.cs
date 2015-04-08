@@ -12,6 +12,7 @@ using Umbraco.Web.Scheduling;
 namespace Umbraco.Tests.Scheduling
 {
     [TestFixture]
+    [Timeout(30000)]
     public class BackgroundTaskRunnerTests
     {
         [TestFixtureSetUp]
