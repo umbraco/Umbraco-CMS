@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Scheduling
         [Test]
         public async void Startup_IsRunning()
         {
-            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
+            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(){AutoStart = false}))
             {
                 Assert.IsFalse(runner.IsRunning);
                 runner.StartUp();
