@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Scheduling
         [Test]
         public async void Startup_IsRunning()
         {
-            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(){AutoStart = false}))
+            using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions()))
             {
                 Assert.IsFalse(runner.IsRunning);
                 runner.StartUp();
@@ -419,7 +419,7 @@ namespace Umbraco.Tests.Scheduling
 
                 waitHandle.WaitOne();
 
-                Assert.AreEqual(4, runCount);
+                Assert.GreaterOrEqual(runCount, 4);
 
                 // stops recurring
                 runner.Shutdown(false, false);
@@ -485,7 +485,7 @@ namespace Umbraco.Tests.Scheduling
                 Assert.AreEqual(0, runCount);
 
                 waitHandle.WaitOne();
-                Assert.AreEqual(4, runCount);
+                Assert.GreaterOrEqual(runCount, 4);
 
                 // stops recurring
                 runner.Shutdown(false, false);
