@@ -260,6 +260,8 @@ namespace Umbraco.Web.Scheduling
                 {
                     if (token.IsCancellationRequested || _tasks.Count == 0)
                     {
+                        LogHelper.Debug<BackgroundTaskRunner<T>>("_isRunning = false");
+
                         _isRunning = false; // done
                         if (_options.PreserveRunningTask == false)
                             _runningTask = null;

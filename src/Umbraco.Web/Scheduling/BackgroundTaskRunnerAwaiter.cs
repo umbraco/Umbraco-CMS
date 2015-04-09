@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -27,16 +28,23 @@ namespace Umbraco.Web.Scheduling
 
             _tcs = new TaskCompletionSource<int>();
 
+            _awaiter = _tcs.Task.GetAwaiter();
+
             if (_runner.IsRunning)
             {
-                _runner.Completed += (s, e) => _tcs.SetResult(0);                    
+                _runner.Completed += (s, e) =>
+                {
+                    LogHelper.Debug<BackgroundTaskRunnerAwaiter<T>>("Setting result");
+
+                    _tcs.SetResult(0);
+                };
             }
             else
             {
                 //not running, just set the result
                 _tcs.SetResult(0);
             }
-            _awaiter = _tcs.Task.GetAwaiter();
+            
         }
 
         public BackgroundTaskRunnerAwaiter<T> GetAwaiter()
@@ -49,7 +57,12 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         public bool IsCompleted
         {
-            get { return _runner.IsRunning == false; }
+            get
+            {
+                LogHelper.Debug<BackgroundTaskRunnerAwaiter<T>>("IsCompleted :: " + _tcs.Task.IsCompleted + ", " + (_runner.IsRunning == false));
+                //Need to check if the task is completed because it might already be done on the ctor and the runner never runs
+                return _tcs.Task.IsCompleted || _runner.IsRunning == false;
+            }
         }
 
         public void OnCompleted(Action continuation)
