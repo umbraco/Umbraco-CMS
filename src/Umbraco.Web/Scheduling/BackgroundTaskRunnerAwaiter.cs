@@ -1,6 +1,9 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using ClientDependency.Core.Logging;
+using Umbraco.Core.Logging;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -17,26 +20,36 @@ namespace Umbraco.Web.Scheduling
     internal class BackgroundTaskRunnerAwaiter<T> : INotifyCompletion where T : class, IBackgroundTask
     {
         private readonly BackgroundTaskRunner<T> _runner;
+        private readonly ILogger _logger;
         private readonly TaskCompletionSource<int> _tcs;
         private readonly TaskAwaiter<int> _awaiter;
 
-        public BackgroundTaskRunnerAwaiter(BackgroundTaskRunner<T> runner)
+        public BackgroundTaskRunnerAwaiter(BackgroundTaskRunner<T> runner, ILogger logger)
         {            
             if (runner == null) throw new ArgumentNullException("runner");
+            if (logger == null) throw new ArgumentNullException("logger");
             _runner = runner;
+            _logger = logger;
 
             _tcs = new TaskCompletionSource<int>();
 
+            _awaiter = _tcs.Task.GetAwaiter();
+
             if (_runner.IsRunning)
             {
-                _runner.Completed += (s, e) => _tcs.SetResult(0);                    
+                _runner.Completed += (s, e) =>
+                {
+                    _logger.Debug<BackgroundTaskRunnerAwaiter<T>>("Setting result");
+
+                    _tcs.SetResult(0);
+                };                    
             }
             else
             {
                 //not running, just set the result
                 _tcs.SetResult(0);
             }
-            _awaiter = _tcs.Task.GetAwaiter();
+            
         }
 
         public BackgroundTaskRunnerAwaiter<T> GetAwaiter()
@@ -49,7 +62,13 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         public bool IsCompleted
         {
-            get { return _runner.IsRunning == false; }
+            get
+            {
+                _logger.Debug<BackgroundTaskRunnerAwaiter<T>>("IsCompleted :: " + _tcs.Task.IsCompleted + ", " + (_runner.IsRunning == false));
+
+                //Need to check if the task is completed because it might already be done on the ctor and the runner never runs
+                return _tcs.Task.IsCompleted || _runner.IsRunning == false;
+            }
         }
 
         public void OnCompleted(Action continuation)

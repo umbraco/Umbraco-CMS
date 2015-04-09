@@ -121,7 +121,7 @@ namespace Umbraco.Web.Scheduling
         /// </remarks>        
         public BackgroundTaskRunnerAwaiter<T> GetAwaiter()
         {
-            return _awaiter ?? (_awaiter = new BackgroundTaskRunnerAwaiter<T>(this));
+            return _awaiter ?? (_awaiter = new BackgroundTaskRunnerAwaiter<T>(this, _logger));
         }
 
         /// <summary>
@@ -264,6 +264,8 @@ namespace Umbraco.Web.Scheduling
                 {
                     if (token.IsCancellationRequested || _tasks.Count == 0)
                     {
+                        _logger.Debug<BackgroundTaskRunner<T>>("_isRunning = false");
+
                         _isRunning = false; // done
                         if (_options.PreserveRunningTask == false)
                             _runningTask = null;
