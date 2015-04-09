@@ -174,7 +174,6 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
-    <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />

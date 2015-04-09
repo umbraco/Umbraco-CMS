@@ -20,6 +20,7 @@ namespace Umbraco.Web.Scheduling
         where T : class, IBackgroundTask
     {
         private readonly BackgroundTaskRunnerOptions _options;
+        private readonly ILogger _logger;
         private readonly BlockingCollection<T> _tasks = new BlockingCollection<T>();
         private readonly object _locker = new object();
         private readonly ManualResetEventSlim _completedEvent = new ManualResetEventSlim(false);
@@ -40,19 +41,22 @@ namespace Umbraco.Web.Scheduling
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
-        public BackgroundTaskRunner()
-            : this(new BackgroundTaskRunnerOptions())
+        public BackgroundTaskRunner(ILogger logger)
+            : this(new BackgroundTaskRunnerOptions(), logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class with a set of options.
         /// </summary>
         /// <param name="options">The set of options.</param>
-        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options)
+        /// <param name="logger"></param>
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger)
         {
             if (options == null) throw new ArgumentNullException("options");
+            if (logger == null) throw new ArgumentNullException("logger");
             _options = options;
-            
+            _logger = logger;
+
             HostingEnvironment.RegisterObject(this);
 
             if (options.AutoStart)
@@ -133,7 +137,7 @@ namespace Umbraco.Web.Scheduling
                     throw new InvalidOperationException("The task runner has completed.");
 
                 // add task
-                LogHelper.Debug<BackgroundTaskRunner<T>>("Task added {0}", task.GetType);
+                _logger.Debug<BackgroundTaskRunner<T>>("Task added {0}", task.GetType);
                 _tasks.Add(task);
 
                 // start
@@ -154,7 +158,7 @@ namespace Umbraco.Web.Scheduling
                 if (_isCompleted) return false;
 
                 // add task
-                LogHelper.Debug<BackgroundTaskRunner<T>>("Task added {0}", task.GetType);
+                _logger.Debug<BackgroundTaskRunner<T>>("Task added {0}", task.GetType);
                 _tasks.Add(task);
 
                 // start
@@ -195,7 +199,7 @@ namespace Umbraco.Web.Scheduling
             // create a new token source since this is a new process
             _tokenSource = new CancellationTokenSource();
             _runningTask = PumpIBackgroundTasks(Task.Factory, _tokenSource.Token);
-            LogHelper.Debug<BackgroundTaskRunner<T>>("Starting");
+            _logger.Debug<BackgroundTaskRunner<T>>("Starting");
         }
 
         /// <summary>
@@ -286,7 +290,7 @@ namespace Umbraco.Web.Scheduling
                 if (task != null && task.IsFaulted)
                 {
                     var exception = task.Exception;
-                    LogHelper.Error<BackgroundTaskRunner<T>>("Task runner exception.", exception);
+                    _logger.Error<BackgroundTaskRunner<T>>("Task runner exception.", exception);
                 }
 
                 // is it ok to run?
@@ -392,7 +396,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception ex)
             {
-                LogHelper.Error<BackgroundTaskRunner<T>>("Task has failed.", ex);
+                _logger.Error<BackgroundTaskRunner<T>>("Task has failed.", ex);
             }            
         }
 
@@ -415,7 +419,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<BackgroundTaskRunner<T>>("TaskStarting exception occurred", ex);
+                    _logger.Error<BackgroundTaskRunner<T>>("TaskStarting exception occurred", ex);
                 }
             }
         }
@@ -431,7 +435,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<BackgroundTaskRunner<T>>("TaskCompleted exception occurred", ex);
+                    _logger.Error<BackgroundTaskRunner<T>>("TaskCompleted exception occurred", ex);
                 }
             }
         }
@@ -447,7 +451,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<BackgroundTaskRunner<T>>("TaskCancelled exception occurred", ex);
+                    _logger.Error<BackgroundTaskRunner<T>>("TaskCancelled exception occurred", ex);
                 }
             }
 
@@ -466,7 +470,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<BackgroundTaskRunner<T>>("OnCompleted exception occurred", ex);
+                    _logger.Error<BackgroundTaskRunner<T>>("OnCompleted exception occurred", ex);
                 }
             }
         }
@@ -529,7 +533,7 @@ namespace Umbraco.Web.Scheduling
                 // processing, call the UnregisterObject method, and then return or it can return immediately and complete
                 // processing asynchronously before calling the UnregisterObject method.
 
-                LogHelper.Debug<BackgroundTaskRunner<T>>("Shutting down, waiting for tasks to complete.");
+                _logger.Debug<BackgroundTaskRunner<T>>("Shutting down, waiting for tasks to complete.");
                 Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
 
                 lock (_locker)
@@ -538,12 +542,12 @@ namespace Umbraco.Web.Scheduling
                         _runningTask.ContinueWith(_ =>
                         {
                             HostingEnvironment.UnregisterObject(this);
-                            LogHelper.Info<BackgroundTaskRunner<T>>("Down, tasks completed.");
+                            _logger.Info<BackgroundTaskRunner<T>>("Down, tasks completed.");
                         });
                     else
                     {
                         HostingEnvironment.UnregisterObject(this);
-                        LogHelper.Info<BackgroundTaskRunner<T>>("Down, tasks completed.");
+                        _logger.Info<BackgroundTaskRunner<T>>("Down, tasks completed.");
                     }
                 }
             }
@@ -554,10 +558,10 @@ namespace Umbraco.Web.Scheduling
                 // immediate parameter is true, the registered object must call the UnregisterObject method before returning;
                 // otherwise, its registration will be removed by the application manager.
 
-                LogHelper.Info<BackgroundTaskRunner<T>>("Shutting down immediately.");
+                _logger.Info<BackgroundTaskRunner<T>>("Shutting down immediately.");
                 Shutdown(true, true); // cancel all tasks, wait for the current one to end
                 HostingEnvironment.UnregisterObject(this);
-                LogHelper.Info<BackgroundTaskRunner<T>>("Down.");
+                _logger.Info<BackgroundTaskRunner<T>>("Down.");
             }
         }
 
