@@ -33,7 +33,9 @@ namespace umbraco
     public class content
     {
         private static readonly BackgroundTaskRunner<XmlCacheFilePersister> FilePersister
-            = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions { LongRunning = true }, LoggerResolver.Current.Logger);
+            = new BackgroundTaskRunner<XmlCacheFilePersister>(
+                new BackgroundTaskRunnerOptions { LongRunning = true }, 
+                LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger());
 
         private XmlCacheFilePersister _persisterTask;
 
