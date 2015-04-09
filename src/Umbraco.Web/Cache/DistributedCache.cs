@@ -145,6 +145,16 @@ namespace Umbraco.Web.Cache
                 id);
         }
 
+        public void RefreshByPayload(Guid factoryGuid, object payload)
+        {
+            if (factoryGuid == Guid.Empty || payload == null) return;
+
+            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid),
+                payload);
+        }
+
         /// <summary>
         /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>

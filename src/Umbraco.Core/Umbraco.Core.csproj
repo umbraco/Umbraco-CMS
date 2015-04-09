@@ -181,12 +181,14 @@
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
+    <Compile Include="Cache\IPayloadCacheRefresher.cs" />
     <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IRuntimeCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NullCacheProvider.cs" />
+    <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
