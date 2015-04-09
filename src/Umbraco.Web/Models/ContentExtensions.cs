@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -86,6 +87,12 @@ namespace Umbraco.Web.Models
             return wcDomain == null
                 ? new CultureInfo(domain.Language.IsoCode)
                 : new CultureInfo(wcDomain.Language.IsoCode);
+        }
+
+        private static CultureInfo GetDefaultCulture(ILocalizationService localizationService)
+        {
+            var defaultLanguage = localizationService.GetAllLanguages().FirstOrDefault();
+            return defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
         }
 
         private static CultureInfo GetDefaultCulture(ILocalizationService localizationService)

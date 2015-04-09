@@ -46,14 +46,14 @@ namespace Umbraco.Tests.Migrations.Upgrades
                     "tags1", "tags1",
                     new PropertyTypeCollection(new[]
                     {
-                        new PropertyType("test", DataTypeDatabaseType.Ntext) {Alias = "tags1", Name = "tags1", SortOrder = 1, DataTypeDefinitionId = 1041},
+                        new PropertyType("test", DataTypeDatabaseType.Ntext, "tags1") {Name = "tags1", SortOrder = 1, DataTypeDefinitionId = 1041},
                     }));
                 var contentTypeWith2Tags = MockedContentTypes.CreateSimpleContentType(
                     "tags2", "tags2",
                     new PropertyTypeCollection(new[]
                     {
-                        new PropertyType("test", DataTypeDatabaseType.Ntext) {Alias = "tags1", Name = "tags1", SortOrder = 1, DataTypeDefinitionId = 1041},
-                        new PropertyType("test", DataTypeDatabaseType.Ntext) {Alias = "tags2", Name = "tags2", SortOrder = 1, DataTypeDefinitionId = 1041}
+                        new PropertyType("test", DataTypeDatabaseType.Ntext, "tags1") {Name = "tags1", SortOrder = 1, DataTypeDefinitionId = 1041},
+                        new PropertyType("test", DataTypeDatabaseType.Ntext, "tags2") {Name = "tags2", SortOrder = 1, DataTypeDefinitionId = 1041}
                     }));
 
                 contentTypeRepository.AddOrUpdate(contentTypeWith1Tag);

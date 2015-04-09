@@ -133,7 +133,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             _logger.Logger.Debug<XmlCacheFilePersister>("Run now.");
             var doc = _content.XmlContentInternal;
-            await PersistXmlToFileAsync(doc);
+            await PersistXmlToFileAsync(doc).ConfigureAwait(false);
         }
 
         public bool IsAsync
@@ -160,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         // create dir if it is not there, if it's there, this will proceed as normal
                         Directory.CreateDirectory(directoryName);
 
-                        await xmlDoc.SaveAsync(_xmlFileName);
+                        await xmlDoc.SaveAsync(_xmlFileName).ConfigureAwait(false);
                     }
                     catch (Exception ee)
                     {

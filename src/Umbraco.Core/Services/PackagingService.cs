@@ -652,9 +652,8 @@ namespace Umbraco.Core.Services
                     if (dataTypeDefinition == null) continue;
                 }
 
-                var propertyType = new PropertyType(dataTypeDefinition)
+                var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
                                        {
-                                           Alias = property.Element("Alias").Value,
                                            Name = property.Element("Name").Value,
                                            Description = property.Element("Description").Value,
                                            Mandatory = property.Element("Mandatory").Value.ToLowerInvariant().Equals("true"),

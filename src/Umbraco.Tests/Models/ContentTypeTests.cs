@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Models
             }
             //add a property type without a property group
             contentType.PropertyTypeCollection.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "title2", Name = "Title2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                new PropertyType("test", DataTypeDatabaseType.Ntext, "title2") { Name = "Title2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
 
             contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
-            clone.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Nvarchar) { Alias = "blah" });
+            clone.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Nvarchar, "blah"));
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
             clone.AddPropertyGroup("hello");

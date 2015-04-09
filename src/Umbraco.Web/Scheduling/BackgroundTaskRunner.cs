@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -21,6 +23,7 @@ namespace Umbraco.Web.Scheduling
         private readonly BlockingCollection<T> _tasks = new BlockingCollection<T>();
         private readonly object _locker = new object();
         private readonly ManualResetEventSlim _completedEvent = new ManualResetEventSlim(false);
+        private BackgroundTaskRunnerAwaiter<T> _awaiter;
 
         private volatile bool _isRunning; // is running
         private volatile bool _isCompleted; // does not accept tasks anymore, may still be running
@@ -28,10 +31,11 @@ namespace Umbraco.Web.Scheduling
 
         private CancellationTokenSource _tokenSource;
 
-        internal event EventHandler<TaskEventArgs<T>> TaskError;
-        internal event EventHandler<TaskEventArgs<T>> TaskStarting;
-        internal event EventHandler<TaskEventArgs<T>> TaskCompleted;
-        internal event EventHandler<TaskEventArgs<T>> TaskCancelled;
+        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskError;
+        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskStarting;
+        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskCompleted;
+        internal event TypedEventHandler<BackgroundTaskRunner<T>, TaskEventArgs<T>> TaskCancelled;
+        internal event TypedEventHandler<BackgroundTaskRunner<T>, EventArgs> Completed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
@@ -48,7 +52,7 @@ namespace Umbraco.Web.Scheduling
         {
             if (options == null) throw new ArgumentNullException("options");
             _options = options;
-
+            
             HostingEnvironment.RegisterObject(this);
 
             if (options.AutoStart)
@@ -80,42 +84,40 @@ namespace Umbraco.Web.Scheduling
         }
 
         /// <summary>
-        /// Gets the status of the running task.
+        /// Gets an awaiter used to await the running Threading.Task.
         /// </summary>
         /// <exception cref="InvalidOperationException">There is no running task.</exception>
-        /// <remarks>Unless the AutoStart option is true, there will be no running task until
+        /// <remarks>
+        /// Unless the AutoStart option is true, there will be no running task until
         /// a background task is added to the queue. Unless the KeepAlive option is true, there
-        /// will be no running task when the queue is empty.</remarks>
-        public TaskStatus TaskStatus
+        /// will be no running task when the queue is empty.
+        /// </remarks>
+        public ThreadingTaskAwaiter CurrentThreadingTask
         {
             get
             {
                 if (_runningTask == null)
-                    throw new InvalidOperationException("There is no current task.");
-                return _runningTask.Status;
+                    throw new InvalidOperationException("There is no current Threading.Task.");
+                return new ThreadingTaskAwaiter(_runningTask);
             }
         }
-      
+
         /// <summary>
-        /// Gets an awaiter used to await the running task.
+        /// Gets an awaiter used to await the BackgroundTaskRunner running operation
         /// </summary>
-        /// <returns>An awaiter for the running task.</returns>
+        /// <returns>An awaiter for the BackgroundTaskRunner running operation</returns>
         /// <remarks>
-        /// This is just the coolest thing ever, check this article out:
-        /// http://blogs.msdn.com/b/pfxteam/archive/2011/01/13/10115642.aspx
-        /// 
-        /// So long as we have a method called GetAwaiter() that returns an instance of INotifyCompletion 
-        /// we can await anything! :)
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">There is no running task.</exception>
-        /// <remarks>Unless the AutoStart option is true, there will be no running task until
-        /// a background task is added to the queue. Unless the KeepAlive option is true, there
-        /// will be no running task when the queue is empty.</remarks>
-        public TaskAwaiter GetAwaiter()
+        /// <para>This is used to wait until the background task runner is no longer running (IsRunning == false)
+        /// </para>
+        /// <para> So long as we have a method called GetAwaiter() that returns an instance of INotifyCompletion 
+        /// we can await anything. In this case we are awaiting with a custom BackgroundTaskRunnerAwaiter
+        /// which waits for the Completed event to be raised. 
+        /// ref:  http://blogs.msdn.com/b/pfxteam/archive/2011/01/13/10115642.aspx
+        /// </para>
+        /// </remarks>        
+        public BackgroundTaskRunnerAwaiter<T> GetAwaiter()
         {
-            if (_runningTask == null)
-                throw new InvalidOperationException("There is no current task.");
-            return _runningTask.GetAwaiter();
+            return _awaiter ?? (_awaiter = new BackgroundTaskRunnerAwaiter<T>(this));
         }
 
         /// <summary>
@@ -261,6 +263,8 @@ namespace Umbraco.Web.Scheduling
                         _isRunning = false; // done
                         if (_options.PreserveRunningTask == false)
                             _runningTask = null;
+                        //raise event
+                        OnCompleted();
                         return;
                     }
                 }
@@ -372,7 +376,8 @@ namespace Umbraco.Web.Scheduling
                     using (bgTask) // ensure it's disposed
                     {
                         if (bgTask.IsAsync)
-                            await bgTask.RunAsync(token);
+                            //configure await = false since we don't care about the context, we're on a background thread.
+                            await bgTask.RunAsync(token).ConfigureAwait(false);
                         else
                             bgTask.Run();
                     }
@@ -388,7 +393,7 @@ namespace Umbraco.Web.Scheduling
             catch (Exception ex)
             {
                 LogHelper.Error<BackgroundTaskRunner<T>>("Task has failed.", ex);
-            }
+            }            
         }
 
         #region Events
@@ -402,22 +407,68 @@ namespace Umbraco.Web.Scheduling
         protected virtual void OnTaskStarting(TaskEventArgs<T> e)
         {
             var handler = TaskStarting;
-            if (handler != null) handler(this, e);
+            if (handler != null)
+            {
+                try
+                {
+                    handler(this, e);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<BackgroundTaskRunner<T>>("TaskStarting exception occurred", ex);
+                }
+            }
         }
 
         protected virtual void OnTaskCompleted(TaskEventArgs<T> e)
         {
             var handler = TaskCompleted;
-            if (handler != null) handler(this, e);
+            if (handler != null)
+            {
+                try
+                {
+                    handler(this, e);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<BackgroundTaskRunner<T>>("TaskCompleted exception occurred", ex);
+                }
+            }
         }
 
         protected virtual void OnTaskCancelled(TaskEventArgs<T> e)
         {
             var handler = TaskCancelled;
-            if (handler != null) handler(this, e);
+            if (handler != null)
+            {
+                try
+                {
+                    handler(this, e);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<BackgroundTaskRunner<T>>("TaskCancelled exception occurred", ex);
+                }
+            }
 
             //dispose it
             e.Task.Dispose();
+        }
+
+        protected virtual void OnCompleted()
+        {
+            var handler = Completed;
+            if (handler != null)
+            {
+                try
+                {
+                    handler(this, EventArgs.Empty);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<BackgroundTaskRunner<T>>("OnCompleted exception occurred", ex);
+                }
+            }
         }
 
         #endregion
@@ -509,5 +560,7 @@ namespace Umbraco.Web.Scheduling
                 LogHelper.Info<BackgroundTaskRunner<T>>("Down.");
             }
         }
+
+        
     }
 }

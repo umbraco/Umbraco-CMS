@@ -1229,44 +1229,38 @@ namespace Umbraco.Core.Services
                     Name = "Membership",
                     Id = --identity
                 };
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, Constants.Conventions.Member.Comments)
                 {
-                    Alias = Constants.Conventions.Member.Comments,
                     Name = Constants.Conventions.Member.CommentsLabel,
                     SortOrder = 0,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, Constants.Conventions.Member.IsApproved)
                 {
-                    Alias = Constants.Conventions.Member.IsApproved,
                     Name = Constants.Conventions.Member.IsApprovedLabel,
                     SortOrder = 3,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, Constants.Conventions.Member.IsLockedOut)
                 {
-                    Alias = Constants.Conventions.Member.IsLockedOut,
                     Name = Constants.Conventions.Member.IsLockedOutLabel,
                     SortOrder = 4,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastLockoutDate)
                 {
-                    Alias = Constants.Conventions.Member.LastLockoutDate,
                     Name = Constants.Conventions.Member.LastLockoutDateLabel,
                     SortOrder = 5,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastLoginDate)
                 {
-                    Alias = Constants.Conventions.Member.LastLoginDate,
                     Name = Constants.Conventions.Member.LastLoginDateLabel,
                     SortOrder = 6,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
                 {
-                    Alias = Constants.Conventions.Member.LastPasswordChangeDate,
                     Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
                     SortOrder = 7,
                     Id = --identity
