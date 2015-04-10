@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using umbraco.interfaces;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Sync;
-using umbraco.interfaces;
 
-namespace Umbraco.Tests.DistributedCache
+namespace Umbraco.Tests.Cache.DistributedCache
 {
     /// <summary>
     /// Ensures that calls to DistributedCache methods carry through to the IServerMessenger correctly
