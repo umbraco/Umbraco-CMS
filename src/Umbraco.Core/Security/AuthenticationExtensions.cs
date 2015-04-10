@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
@@ -14,6 +15,7 @@ using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
+using Microsoft.Owin;
 
 namespace Umbraco.Core.Security
 {
@@ -95,8 +97,14 @@ namespace Umbraco.Core.Security
         {
             if (http == null) throw new ArgumentNullException("http");
             if (http.User == null) return null; //there's no user at all so no identity
-            var identity = http.User.Identity as UmbracoBackOfficeIdentity;
-            if (identity != null) return identity;
+
+            //If it's already a UmbracoBackOfficeIdentity
+            var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
+            if (backOfficeIdentity != null) return backOfficeIdentity;
+
+            //Otherwise convert to a UmbracoBackOfficeIdentity
+            var claimsIdentity = http.User.Identity as ClaimsIdentity;
+            if (claimsIdentity != null) return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
 
             if (authenticateRequestIfNotFound == false) return null;
 

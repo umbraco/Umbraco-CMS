@@ -345,6 +345,8 @@
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="Logging\OwinLogger.cs" />
+    <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
