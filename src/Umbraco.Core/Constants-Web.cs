@@ -25,6 +25,7 @@
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
 	        public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
+            public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
 
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
