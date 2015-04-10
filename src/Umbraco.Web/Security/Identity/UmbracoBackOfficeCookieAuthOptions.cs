@@ -10,14 +10,14 @@ namespace Umbraco.Web.Security.Identity
     /// <summary>
     /// Umbraco auth cookie options
     /// </summary>
-    public sealed class UmbracoBackOfficeCookieAuthenticationOptions : CookieAuthenticationOptions
+    public sealed class UmbracoBackOfficeCookieAuthOptions : CookieAuthenticationOptions
     {
-        public UmbracoBackOfficeCookieAuthenticationOptions()
+        public UmbracoBackOfficeCookieAuthOptions()
             : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
         {            
         }
 
-        public UmbracoBackOfficeCookieAuthenticationOptions(            
+        public UmbracoBackOfficeCookieAuthOptions(            
             ISecuritySection securitySection, 
             int loginTimeoutMinutes, 
             bool forceSsl, 

@@ -10,13 +10,26 @@ namespace Umbraco.Web.Security.Identity
     /// <summary>
     /// A simple OAuth server provider to verify back office users
     /// </summary>
-    public class BackOfficeAuthorizationServerProvider : OAuthAuthorizationServerProvider
-    {  
+    public class BackOfficeAuthServerProvider : OAuthAuthorizationServerProvider
+    {
+        private readonly BackOfficeAuthServerProviderOptions _options;
+
+        public BackOfficeAuthServerProvider(BackOfficeAuthServerProviderOptions options = null)
+        {            
+            if (options == null)
+                options = new BackOfficeAuthServerProviderOptions();
+            _options = options;
+        }
+
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var userManager = context.OwinContext.GetUserManager<BackOfficeUserManager>();
 
-            context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
+            if (_options.AllowCors)
+            {
+                context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });    
+            }
+            
 
             var user = await userManager.FindAsync(context.UserName, context.Password);
 

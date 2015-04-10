@@ -116,7 +116,7 @@ namespace Umbraco.Web.Security.Identity
             if (app == null) throw new ArgumentNullException("app");
 
 
-            app.UseCookieAuthentication(new UmbracoBackOfficeCookieAuthenticationOptions(
+            app.UseCookieAuthentication(new UmbracoBackOfficeCookieAuthOptions(
                     UmbracoConfig.For.UmbracoSettings().Security,
                     GlobalSettings.TimeOutInMinutes,
                     GlobalSettings.UseSSL)

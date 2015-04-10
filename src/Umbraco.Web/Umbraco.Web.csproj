@@ -309,7 +309,8 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
-    <Compile Include="Security\Identity\BackOfficeAuthorizationServerProvider.cs" />
+    <Compile Include="Security\Identity\BackOfficeAuthServerProvider.cs" />
+    <Compile Include="Security\Identity\BackOfficeAuthServerProviderOptions.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
@@ -566,7 +567,7 @@
     <Compile Include="Security\Identity\BackOfficeCookieManager.cs" />
     <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
     <Compile Include="Security\Identity\OwinExtensions.cs" />
-    <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthenticationOptions.cs" />
+    <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="SingletonUmbracoContextAccessor.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
