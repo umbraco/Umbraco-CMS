@@ -24,12 +24,11 @@ namespace Umbraco.Web.WebApi
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             UmbracoContext = umbracoContext;
-            InstanceId = Guid.NewGuid();
-            Umbraco = new UmbracoHelper(umbracoContext);
-            _membershipHelper = new MembershipHelper(UmbracoContext);
+            InstanceId = Guid.NewGuid();            
         }
 
-        private readonly MembershipHelper _membershipHelper;
+        private MembershipHelper _membershipHelper;
+        private UmbracoHelper _umbraco;
 
         /// <summary>
         /// Tries to retrieve the current HttpContext if one exists.
@@ -92,7 +91,10 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
-        public UmbracoHelper Umbraco { get; private set; }
+        public UmbracoHelper Umbraco
+        {
+            get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
+        }
 
         /// <summary>
         /// Returns the current UmbracoContext
@@ -112,7 +114,7 @@ namespace Umbraco.Web.WebApi
         /// </summary>
         public MembershipHelper Members
         {
-            get { return _membershipHelper; }
+            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
         }
 
         /// <summary>
