@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
@@ -31,10 +32,27 @@ namespace Umbraco.Web.Mvc
             InstanceId = Guid.NewGuid();
         }
 
+        protected PluginController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
+            UmbracoContext = umbracoContext;
+            InstanceId = Guid.NewGuid();
+            _umbracoHelper = umbracoHelper;
+        }
+
         /// <summary>
         /// Useful for debugging
         /// </summary>
         internal Guid InstanceId { get; private set; }
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return Umbraco.MembershipHelper; }
+        }
 
         /// <summary>
         /// Returns an UmbracoHelper object

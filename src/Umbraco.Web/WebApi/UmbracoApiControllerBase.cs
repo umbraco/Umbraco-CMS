@@ -27,7 +27,15 @@ namespace Umbraco.Web.WebApi
             InstanceId = Guid.NewGuid();            
         }
 
-        private MembershipHelper _membershipHelper;
+        protected UmbracoApiControllerBase(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
+            UmbracoContext = umbracoContext;
+            InstanceId = Guid.NewGuid();
+            _umbraco = umbracoHelper;            
+        }
+
         private UmbracoHelper _umbraco;
 
         /// <summary>
@@ -59,7 +67,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Returns a ProfilingLogger
         /// </summary>
-        public ProfilingLogger ProfilingLogger
+        public virtual ProfilingLogger ProfilingLogger
         {
             get { return UmbracoContext.Application.ProfilingLogger; }
         }
@@ -67,7 +75,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Returns the current ApplicationContext
         /// </summary>
-        public ApplicationContext ApplicationContext
+        public virtual ApplicationContext ApplicationContext
         {
             get { return UmbracoContext.Application; }
         }
@@ -91,7 +99,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
-        public UmbracoHelper Umbraco
+        public virtual UmbracoHelper Umbraco
         {
             get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
         }
@@ -99,7 +107,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        public UmbracoContext UmbracoContext { get; private set; }
+        public virtual UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Returns the WebSecurity instance
@@ -114,7 +122,7 @@ namespace Umbraco.Web.WebApi
         /// </summary>
         public MembershipHelper Members
         {
-            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
+            get { return Umbraco.MembershipHelper; }
         }
 
         /// <summary>

@@ -25,22 +25,17 @@ namespace Umbraco.Web.Mvc
         {
         }
 
+        protected SurfaceController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+            : base(umbracoContext, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// Empty constructor, uses Singleton to resolve the UmbracoContext
         /// </summary>
         protected SurfaceController()
             : base(UmbracoContext.Current)
         {
-        }
-
-        private MembershipHelper _membershipHelper;
-
-        /// <summary>
-        /// Returns the MemberHelper instance
-        /// </summary>
-        public virtual MembershipHelper Members
-        {
-            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
         }
 
         /// <summary>
@@ -165,13 +160,13 @@ namespace Umbraco.Web.Mvc
         {
             get
             {
-			    var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
+                var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
                 if (!routeDefAttempt.Success)
                 {
                     throw routeDefAttempt.Exception;
                 }
 
-			    var routeDef = routeDefAttempt.Result;
+                var routeDef = routeDefAttempt.Result;
                 return routeDef.PublishedContentRequest.PublishedContent;
             }
         }
@@ -192,7 +187,7 @@ namespace Umbraco.Web.Mvc
                 var currentRouteData = currentContext.RouteData;
                 if (currentRouteData.DataTokens.ContainsKey("umbraco-route-def"))
                 {
-                    return Attempt.Succeed((RouteDefinition) currentRouteData.DataTokens["umbraco-route-def"]);
+                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens["umbraco-route-def"]);
                 }
                 if (currentContext.IsChildAction)
                 {
@@ -207,8 +202,8 @@ namespace Umbraco.Web.Mvc
             }
             return Attempt<RouteDefinition>.Fail(
                 new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request"));
-        } 
-        
+        }
+
 
     }
 }

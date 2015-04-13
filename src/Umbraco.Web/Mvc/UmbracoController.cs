@@ -20,6 +20,14 @@ namespace Umbraco.Web.Mvc
             UmbracoContext = umbracoContext;
         }
 
+        protected UmbracoController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
+            UmbracoContext = umbracoContext;
+            _umbraco = umbracoHelper;
+        }
+
         protected UmbracoController()
             : this(UmbracoContext.Current)
         {
@@ -32,6 +40,14 @@ namespace Umbraco.Web.Mvc
         }
 
         private UmbracoHelper _umbraco;
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return Umbraco.MembershipHelper; }
+        }
 
         /// <summary>
         /// Returns an UmbracoHelper object
