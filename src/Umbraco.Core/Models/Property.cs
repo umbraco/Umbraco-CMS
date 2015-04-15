@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        internal PropertyType PropertyType { get { return _propertyType; } }
+        public PropertyType PropertyType { get { return _propertyType; } }
         
         /// <summary>
         /// Gets or Sets the version id for the Property

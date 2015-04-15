@@ -83,14 +83,20 @@ namespace Umbraco.Core.Configuration
             return _dashboardSection;
         }        
 
-        //ONLY for unit testing
+        /// <summary>
+        /// Only for testing
+        /// </summary>
+        /// <param name="value"></param>
         internal void SetDashboardSettings(IDashboardSection value)
         {
             _dashboardSection = value;
         }
 
-        //ONLY for unit testing
-        internal void SetUmbracoSettings(IUmbracoSettingsSection value)
+        /// <summary>
+        /// Only for testing
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetUmbracoSettings(IUmbracoSettingsSection value)
         {
             _umbracoSettings = value;
         }
@@ -110,7 +116,10 @@ namespace Umbraco.Core.Configuration
             return _umbracoSettings;
         }
         
-        //ONLY for unit testing
+        /// <summary>
+        /// Only for testing
+        /// </summary>
+        /// <param name="value"></param>
         public void SetBaseRestExtensions(IBaseRestSection value)
         {
             _baseRestExtensions = value;
