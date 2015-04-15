@@ -209,6 +209,13 @@ namespace Umbraco.Core.Security
 
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, Culture, ClaimValueTypes.String, Issuer, Issuer, this));
+            
+            ////TODO: Not sure why this is null sometimes, it shouldn't be. Somewhere it's not being set 
+            /// I think it's due to some bug I had in chrome, we'll see 
+            //if (UserData.SessionId.IsNullOrWhiteSpace())
+            //{
+            //    UserData.SessionId = Guid.NewGuid().ToString();
+            //}
 
             if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false)
                 AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
@@ -233,12 +240,7 @@ namespace Umbraco.Core.Security
                 }
             }
 
-            ////TODO: Find out why sessionid is null - this depends on how the identity is created!
-            //// in this case generate one?
-            //if (SessionId.IsNullOrWhiteSpace() == false)
-            //{
-                
-            //}
+            
             
         }
 
