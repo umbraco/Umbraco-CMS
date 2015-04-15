@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Microsoft.Owin;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Security
 {
@@ -102,9 +103,20 @@ namespace Umbraco.Core.Security
             var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
             if (backOfficeIdentity != null) return backOfficeIdentity;
 
-            //Otherwise convert to a UmbracoBackOfficeIdentity
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
             var claimsIdentity = http.User.Identity as ClaimsIdentity;
-            if (claimsIdentity != null) return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
+            if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
+            {
+                try
+                {
+                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    //This will occur if the required claim types are missing which would mean something strange is going on
+                    LogHelper.Error(typeof(AuthenticationExtensions), "The current identity cannot be converted to " + typeof(UmbracoBackOfficeIdentity), ex);
+                }
+            }
 
             if (authenticateRequestIfNotFound == false) return null;
 
