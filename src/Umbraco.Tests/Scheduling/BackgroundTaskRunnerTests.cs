@@ -224,6 +224,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
+        [Ignore]
         [Test]
         public async void WaitOnRunner_Tasks()
         {
@@ -449,6 +450,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
+        [Ignore]
         [Test]
         public void DelayedRecurring()
         {
