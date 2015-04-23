@@ -73,13 +73,20 @@ if ($project) {
 	{
 		$packageWebConfigSource = Join-Path $rootPath "UmbracoFiles\Web.config"
 		Copy-Item $packageWebConfigSource $destinationWebConfig -Force
-	}
+	} 
 
 	$installFolder = Join-Path $projectDestinationPath "Install"
 	if(Test-Path $installFolder) {
 		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
 	
-	# Open readme.txt file
-	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
+	# Open appropriate readme
+	if($copyWebconfig -eq $true)  
+	{
+		$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
+	} 
+	else 
+	{	
+		$DTE.ItemOperations.OpenFile($toolsPath + '\ReadmeUpgrade.txt')
+	}
 }
