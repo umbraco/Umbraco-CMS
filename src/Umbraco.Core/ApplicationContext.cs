@@ -175,7 +175,9 @@ namespace Umbraco.Core
 				try
 				{
 					string configStatus = ConfigurationStatus;
-					string currentVersion = UmbracoVersion.Current.ToString(3);
+                    string currentVersion = string.Format("{0}.{1}.{2}", UmbracoVersion.Current.Major, UmbracoVersion.Current.Minor, UmbracoVersion.Current.Build);
+				    if (UmbracoVersion.CurrentComment != string.Empty)
+				        currentVersion = string.Format("{0}.{1}", currentVersion, UmbracoVersion.CurrentComment);
 
 
 					if (currentVersion != configStatus)
