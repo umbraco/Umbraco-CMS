@@ -85,14 +85,14 @@ namespace Umbraco.Core.Services
                     }
 
                     //get the lazy value from cache                
-                    result.Add(culture, new Lazy<XDocument>(() => _cache.GetCacheItem<XDocument>(
-                        string.Format("{0}-{1}", typeof(LocalizedTextServiceFileSources).Name, culture.Name), () =>
+                    result[culture] = new Lazy<XDocument>(() => _cache.GetCacheItem<XDocument>(
+                        string.Format("{0}-{1}", typeof (LocalizedTextServiceFileSources).Name, culture.Name), () =>
                         {
                             using (var fs = localCopy.OpenRead())
                             {
                                 return XDocument.Load(fs);
                             }
-                        }, isSliding: true, timeout: TimeSpan.FromMinutes(10), dependentFiles: new[] { localCopy.FullName })));
+                        }, isSliding: true, timeout: TimeSpan.FromMinutes(10), dependentFiles: new[] {localCopy.FullName}));
                 }
                 return result;
             });
