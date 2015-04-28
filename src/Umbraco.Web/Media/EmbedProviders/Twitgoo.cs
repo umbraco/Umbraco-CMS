@@ -4,12 +4,9 @@ namespace Umbraco.Web.Media.EmbedProviders
 {
     public class Twitgoo : AbstractProvider
     {
-        public override bool SupportsDimensions
+        protected Twitgoo()
         {
-            get
-            {
-                return false;
-            }
+            SupportsDimensions = false;
         }
 
         public override string GetMarkup(string url, int maxWidth, int maxHeight)
