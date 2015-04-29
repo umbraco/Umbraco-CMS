@@ -10,12 +10,10 @@ namespace Umbraco.Web.Media.EmbedProviders
 {
     public abstract class AbstractOEmbedProvider: IEmbedProvider
     {
-        protected AbstractOEmbedProvider()
+        public virtual bool SupportsDimensions
         {
-            SupportsDimensions = true;
+            get { return true; }
         }
-
-        public bool SupportsDimensions { get; set; }
 
         [ProviderSetting]
         public string APIEndpoint{ get;set; }
@@ -25,7 +23,7 @@ namespace Umbraco.Web.Media.EmbedProviders
 
         public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
 
-        public virtual string BuildRequestUrl(string url, int maxWidth, int maxHeight)
+        public virtual string BuildFullUrl(string url, int maxWidth, int maxHeight)
         {
             var fullUrl = new StringBuilder();
 

@@ -4,7 +4,7 @@
     {
         public override string GetMarkup(string url, int maxWidth, int maxHeight)
         {
-            string requestUrl = BuildRequestUrl(url, maxWidth, maxHeight);
+            string requestUrl = BuildFullUrl(url, maxWidth, maxHeight);
 
             var jsonResponse = GetJsonResponse<OEmbedResponse>(requestUrl);
             return jsonResponse.GetHtml();

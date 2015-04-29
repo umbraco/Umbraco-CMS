@@ -41,9 +41,9 @@ namespace Umbraco.Web.PropertyEditors
                     var prov = (IEmbedProvider)Activator.CreateInstance(Type.GetType(node.Attributes["type"].Value));
 
                     if (node.Attributes["supportsDimensions"] != null)
-                    {
-                        prov.SupportsDimensions = node.Attributes["supportsDimensions"].Value == "True";
-                    }
+                        result.SupportsDimensions = node.Attributes["supportsDimensions"].Value == "True";
+                    else
+                        result.SupportsDimensions = prov.SupportsDimensions;
 
                     var settings = node.ChildNodes.Cast<XmlNode>().ToDictionary(settingNode => settingNode.Name);
 
@@ -64,7 +64,6 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     try
                     {
-                        result.SupportsDimensions = prov.SupportsDimensions;
                         result.Markup = prov.GetMarkup(url, width, height);
                         result.Status = Status.Success;
                     }
