@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Text;
+using System.Web;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
@@ -13,27 +15,34 @@ namespace Umbraco.Web.Media.EmbedProviders
 
         public string Title { get; set; }
 
+        [JsonProperty("author_name")]
         public string AuthorName { get; set; }
 
+        [JsonProperty("author_url")]
         public string AuthorUrl { get; set; }
 
+        [JsonProperty("provider_name")]
         public string ProviderName { get; set; }
 
+        [JsonProperty("provider_url")]
         public string ProviderUrl { get; set; }
 
+        [JsonProperty("thumbnail_url")]
         public string ThumbnailUrl { get; set; }
 
-        public string ThumbnailHeight { get; set; }
+        [JsonProperty("thumbnail_height")]
+        public int? ThumbnailHeight { get; set; }
 
-        public string ThumbnailWidth { get; set; }
+        [JsonProperty("thumbnail_width")]
+        public int? ThumbnailWidth { get; set; }
 
         public string Html { get; set; }
 
         public string Url { get; set; }
 
-        public string Height { get; set; }
+        public int? Height { get; set; }
 
-        public string Width { get; set; }
+        public int? Width { get; set; }
 
         /// <summary>
         /// Gets the HTML.
