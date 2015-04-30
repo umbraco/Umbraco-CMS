@@ -49,7 +49,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Returns the property editors
         /// </summary>
-        public IEnumerable<PropertyEditor> PropertyEditors
+        public virtual IEnumerable<PropertyEditor> PropertyEditors
         {
             get { return _unioned.Value; }
         }
@@ -59,7 +59,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public PropertyEditor GetByAlias(string alias)
+        public virtual PropertyEditor GetByAlias(string alias)
         {
             return PropertyEditors.SingleOrDefault(x => x.Alias == alias);
         }
