@@ -103,7 +103,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
-        internal virtual ManifestValueValidator RequiredValidator
+        public virtual ManifestValueValidator RequiredValidator
         {
             get { return new RequiredManifestValueValidator(); }
         }
@@ -117,7 +117,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The default validator used is the RegexValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
-        internal virtual ManifestValueValidator RegexValidator
+        public virtual ManifestValueValidator RegexValidator
         {
             get { return new RegexValidator(); }
         }

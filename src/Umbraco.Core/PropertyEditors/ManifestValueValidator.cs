@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// A validator used to validate a value based on a validator name defined in a package manifest
     /// </summary>
-    internal abstract class ManifestValueValidator
+    public abstract class ManifestValueValidator
     {
         protected ManifestValueValidator()
         {
