@@ -49,12 +49,11 @@ ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it w
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
 
 ECHO Adding Web.config transform files to the NuGet package
-REN .\_BuildOutput\WebApp\MacroScripts\Web.config Web.config.transform
 REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
 REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO Packing the NuGet release files
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version% -Symbols
 ..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version%
                         
 IF ERRORLEVEL 1 GOTO :showerror

@@ -145,7 +145,7 @@
         DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
 
     <!-- Zip the files -->
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22 -x!dotLess.Core.dll" />
   </Target>
 
   <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
