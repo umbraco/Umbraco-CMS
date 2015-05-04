@@ -39,7 +39,7 @@
         @Umbraco.If(singleColumn, "<div class='container'>")
         <div class="row clearfix">
             @foreach ( var area in row.areas ) {
-            <div class="col-md-@area.grid column">
+            <div class="col-md-@area.grid @area.gridClasses column">
                 <div @RenderElementAttributes(area)>
                     @foreach (var control in area.controls) {
                         if (control !=null && control.editor != null && control.editor.view != null ) {
