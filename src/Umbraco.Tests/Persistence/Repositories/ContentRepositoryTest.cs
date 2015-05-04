@@ -442,7 +442,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending);
 
                 // Assert
@@ -463,7 +463,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
 
                 // Assert
@@ -484,7 +484,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending);
 
                 // Assert
@@ -505,7 +505,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending);
 
                 // Assert
@@ -526,7 +526,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page 2");
 
                 // Assert
@@ -547,7 +547,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page");
 
                 // Assert

@@ -472,7 +472,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private void RebuildXmlStructuresProcessQuery(Func<IMember, XElement> serializer, IQuery<IMember> query, Transaction tr, int pageSize)
         {
             var pageIndex = 0;
-            var total = int.MinValue;
+            var total = long.MinValue;
             var processed = 0;
             do
             {
@@ -642,7 +642,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
+        public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "")
         {
             var args = new List<object>();
