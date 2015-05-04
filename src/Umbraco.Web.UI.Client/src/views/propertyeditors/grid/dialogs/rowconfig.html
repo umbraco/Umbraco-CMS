@@ -47,7 +47,9 @@ ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
                         </div>
                     </div>
                 </umb-control-group>
-
+     <umb-control-group label="Additional Grid Css Classes for this cell (Optional)">
+                  <input type="text" ng-model="currentCell.gridClasses" />
+                </umb-control-group>
 
                 <umb-control-group hide-label="true">
                     <ul class="unstyled">
