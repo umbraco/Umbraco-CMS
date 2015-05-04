@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -71,6 +72,11 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetChildren(int id);
 
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
         /// </summary>
@@ -82,8 +88,13 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalRecords,
+        IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -96,7 +107,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
+        IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
