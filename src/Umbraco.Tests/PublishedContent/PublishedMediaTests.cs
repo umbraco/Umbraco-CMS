@@ -27,6 +27,9 @@ using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco.BusinessLogic;
 using System.Linq;
+using Umbraco.Core.LightInject;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -50,6 +53,17 @@ namespace Umbraco.Tests.PublishedContent
             base.TearDown();
             UmbracoExamineSearcher.DisableInitializationCheck = null;
             BaseUmbracoIndexer.DisableInitializationCheck = null;
+        }
+
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
+        {
+            var container = new ServiceContainer();
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
+
+            base.FreezeResolution();
         }
 
         /// <summary>

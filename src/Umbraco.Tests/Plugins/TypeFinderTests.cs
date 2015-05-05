@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Plugins
 		    _assemblies = new[]
 			    {
 			        this.GetType().Assembly, 
-                    //typeof(ApplicationStartupHandler).Assembly,
+                    typeof(ApplicationAttribute).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,

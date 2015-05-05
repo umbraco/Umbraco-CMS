@@ -14,10 +14,9 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUsingSqlCeSyntax
     {
-        private SqlCeSyntaxProvider _sqlSyntax;
-        protected SqlCeSyntaxProvider SqlSyntax
+        protected virtual SqlCeSyntaxProvider SqlSyntax
         {
-            get { return _sqlSyntax ?? (_sqlSyntax = new SqlCeSyntaxProvider()); }
+            get { return new SqlCeSyntaxProvider(); }
         }
 
         private MappingResolver _mappingResolver;

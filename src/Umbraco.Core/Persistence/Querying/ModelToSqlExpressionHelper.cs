@@ -15,6 +15,13 @@ namespace Umbraco.Core.Persistence.Querying
     {
         private readonly BaseMapper _mapper;
 
+        public ModelToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntax, BaseMapper mapper)
+            : base(sqlSyntax)
+        {
+            if (mapper == null) throw new ArgumentNullException("mapper");
+            _mapper = mapper;
+        }
+
         public ModelToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(sqlSyntax)
         {

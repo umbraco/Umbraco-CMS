@@ -74,7 +74,7 @@ namespace Umbraco.Core.ObjectResolution
         internal ContainerSingleObjectResolver(IServiceContainer container, Expression<Func<IServiceFactory, TResolved>> implementationType)
         {
             _container = container;
-            _container.Register<TResolved>(implementationType);
+            _container.Register<TResolved>(implementationType, new PerContainerLifetime());
         }
 
         /// <summary>

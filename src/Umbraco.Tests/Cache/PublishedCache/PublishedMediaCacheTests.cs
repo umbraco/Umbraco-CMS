@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
+
 using System.Linq;
 using System.Xml;
 using Examine;
+using Moq;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.LightInject;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache;
@@ -21,10 +26,13 @@ namespace Umbraco.Tests.Cache.PublishedCache
 	{
         protected override void FreezeResolution()
         {
+            var container = new ServiceContainer();
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(container, Mock.Of<ILogger>(), typeof(DefaultUrlSegmentProvider));
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
             base.FreezeResolution();
         }
         
+        //NOTE: This is "Without_Examine" too
         [Test]
 		public void Get_Root_Docs()
 		{
