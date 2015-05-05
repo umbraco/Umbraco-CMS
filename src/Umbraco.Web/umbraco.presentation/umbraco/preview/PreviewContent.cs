@@ -102,7 +102,7 @@ namespace umbraco.presentation.preview
                 if (document.ContentEntity.Published == false 
                     && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
                     previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
-                content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
+                content.AddOrUpdateXmlNode(XmlContent, document.Id, document.Level, parentId, previewXml);
             }
 
             if (includeSubs)
@@ -112,7 +112,7 @@ namespace umbraco.presentation.preview
                     var previewXml = XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml)));
                     if (prevNode.IsDraft)
                         previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
-                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml, XmlContent);
+                    content.AddOrUpdateXmlNode(XmlContent, prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml);
                 }
             }
 

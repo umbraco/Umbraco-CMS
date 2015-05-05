@@ -50,14 +50,14 @@
                     <td>
                         <a href="#" ng-click="sort('Name', true)" prevent-default class="sortable">
                             <localize key="general_name">Name</localize>
-                            <i class="icon" ng-class="{'icon-navigation-down': isSortDirection('Name', 'asc'), 'icon-navigation-up': isSortDirection('Name', 'desc')}"></i>
+                            <i class="icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
                         </a>
                     </td>
 
                     <td ng-repeat="column in options.includeProperties">
                         <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'sortable':column.allowSorting}" prevent-default>                          
                             <span ng-bind="column.header"></span>
-                            <i class="icon" ng-class="{'icon-navigation-down': isSortDirection(column.alias, 'asc'), 'icon-navigation-up': isSortDirection(column.alias, 'desc')}"></i>
+                            <i class="icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
                         </a>
                     </td>
 

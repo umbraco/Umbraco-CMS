@@ -215,164 +215,166 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)] 
         public JavaScriptResult ServerVariables()
         {
-            Func<Dictionary<string, object>> getResult = () => new Dictionary<string, object>
-            {
+            Func<string> getResult = () =>
+            {                
+                var defaultVals = new Dictionary<string, object>
                 {
-                    "umbracoUrls", new Dictionary<string, object>
                     {
+                        "umbracoUrls", new Dictionary<string, object>
+                        {
                         {"externalLoginsUrl", Url.Action("ExternalLogin", "BackOffice")},
                         {"externalLinkLoginsUrl", Url.Action("LinkLogin", "BackOffice")},
-                        {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
-                        {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
-                        {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
-                        {"serverVarsJs", Url.Action("Application", "BackOffice")},
-                        //API URLs
-                        {
-                            "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                                controller => controller.GetEmbed("", 0, 0))
-                        },
-                        {
-                            "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UserController>(
-                                controller => controller.PostDisableUser(0))
-                        },
-                        {
-                            "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(
-                                controller => controller.PostSave(null))
-                        },
-                        {
-                            "mediaApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaController>(
-                                controller => controller.GetRootMedia())
-                        },
-                        {
-                            "imagesApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(0))
-                        },
-                        {
-                            "sectionApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<SectionController>(
-                                controller => controller.GetSections())
-                        },
-                        {
-                            "treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null))
-                        },
-                        {
-                            "contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
-                                controller => controller.GetAllowedChildren(0))
-                        },
-                        {
-                            "mediaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
-                                controller => controller.GetAllowedChildren(0))
-                        },
-                        {
-                            "macroApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MacroController>(
-                                controller => controller.GetMacroParameters(0))
-                        },
-                        {
-                            "authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
-                                controller => controller.PostLogin(null))
-                        },
-                        {
-                            "currentUserApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                                controller => controller.GetMembershipProviderConfig())
-                        },
-                        {
-                            "legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>(
-                                controller => controller.DeleteLegacyItem(null, null, null))
-                        },
-                        {
-                            "entityApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<EntityController>(
-                                controller => controller.GetById(0, UmbracoEntityTypes.Media))
-                        },
-                        {
-                            "dataTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DataTypeController>(
-                                controller => controller.GetById(0))
-                        },
-                        {
-                            "dashboardApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                                controller => controller.GetDashboard(null))
-                        },
-                        {
-                            "logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetEntityLog(0))
-                        },
-                        {
-                            "memberApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberController>(
-                                controller => controller.GetByKey(Guid.Empty))
-                        },
-                        {
-                            "packageInstallApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
-                                controller => controller.Fetch(string.Empty))
-                        },
-                        {
+                            {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
+                            {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
+                            {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
+                            {"serverVarsJs", Url.Action("Application", "BackOffice")},
+                            //API URLs
+                            {
+                                "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
+                                    controller => controller.GetEmbed("", 0, 0))
+                            },
+                            {
+                                "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UserController>(
+                                    controller => controller.PostDisableUser(0))
+                            },
+                            {
+                                "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(
+                                    controller => controller.PostSave(null))
+                            },
+                            {
+                                "mediaApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaController>(
+                                    controller => controller.GetRootMedia())
+                            },
+                            {
+                                "imagesApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ImagesController>(
+                                    controller => controller.GetBigThumbnail(0))
+                            },
+                            {
+                                "sectionApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<SectionController>(
+                                    controller => controller.GetSections())
+                            },
+                            {
+                                "treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
+                                    controller => controller.GetApplicationTrees(null, null, null))
+                            },
+                            {
+                                "contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
+                                    controller => controller.GetAllowedChildren(0))
+                            },
+                            {
+                                "mediaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTypeController>(
+                                    controller => controller.GetAllowedChildren(0))
+                            },
+                            {
+                                "macroApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MacroController>(
+                                    controller => controller.GetMacroParameters(0))
+                            },
+                            {
+                                "authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
+                                    controller => controller.PostLogin(null))
+                            },
+                            {
+                                "currentUserApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
+                                    controller => controller.GetMembershipProviderConfig())
+                            },
+                            {
+                                "legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>(
+                                    controller => controller.DeleteLegacyItem(null, null, null))
+                            },
+                            {
+                                "entityApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<EntityController>(
+                                    controller => controller.GetById(0, UmbracoEntityTypes.Media))
+                            },
+                            {
+                                "dataTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DataTypeController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
+                                "dashboardApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DashboardController>(
+                                    controller => controller.GetDashboard(null))
+                            },
+                            {
+                                "logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>(
+                                    controller => controller.GetEntityLog(0))
+                            },
+                            {
+                                "memberApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberController>(
+                                    controller => controller.GetByKey(Guid.Empty))
+                            },
+                            {
+                                "packageInstallApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
+                                    controller => controller.Fetch(string.Empty))
+                            },
+                            {
                             "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
                                 controller => controller.GetById(0))
                         },
                         {
-                            "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
-                                controller => controller.GetConfiguration())
-                        },
-                        {
-                            "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
-                                controller => controller.GetAll())
-                        },
-                        {
-                            "memberTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
-                                controller => controller.GetAllTypes())
-                        },
-                        {
-                            "updateCheckApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
-                                controller => controller.GetCheck())
-                        },
-                        {
-                            "tagApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsController>(
-                                controller => controller.GetAllTags(null))
-                        },
-                        {
-                            "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
-                                controller => controller.GetNodes("-1", null))
-                        },
-                        {
-                            "mediaTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
-                                controller => controller.GetNodes("-1", null))
-                        },
-                        {
-                            "contentTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
-                                controller => controller.GetNodes("-1", null))
-                        },
-                        {
-                            "tagsDataBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags(""))
-                        },
-                        {
-                            "examineMgmtBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
-                                controller => controller.GetIndexerDetails())
-                        },
-                        {
-                            "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
-                                controller => controller.CheckContentXmlTable())
+                                "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
+                                    controller => controller.GetConfiguration())
+                            },
+                            {
+                                "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
+                                    controller => controller.GetAll())
+                            },
+                            {
+                                "memberTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
+                                    controller => controller.GetAllTypes())
+                            },
+                            {
+                                "updateCheckApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
+                                    controller => controller.GetCheck())
+                            },
+                            {
+                                "tagApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsController>(
+                                    controller => controller.GetAllTags(null))
+                            },
+                            {
+                                "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
+                                    controller => controller.GetNodes("-1", null))
+                            },
+                            {
+                                "mediaTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
+                                    controller => controller.GetNodes("-1", null))
+                            },
+                            {
+                                "contentTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
+                                    controller => controller.GetNodes("-1", null))
+                            },
+                            {
+                                "tagsDataBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsDataController>(
+                                    controller => controller.GetTags(""))
+                            },
+                            {
+                                "examineMgmtBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
+                                    controller => controller.GetIndexerDetails())
+                            },
+                            {
+                                "xmlDataIntegrityBaseUrl", Url.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
+                                    controller => controller.CheckContentXmlTable())
+                            }
                         }
-                    }
-                },
-                {
-                    "umbracoSettings", new Dictionary<string, object>
+                    },
                     {
-                        {"umbracoPath", GlobalSettings.Path},
-                        {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
-                        {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
+                        "umbracoSettings", new Dictionary<string, object>
                         {
-                            "imageFileTypes",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
-                        },
-                        {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
-                    }
-                },
-                {
-                    "umbracoPlugins", new Dictionary<string, object>
+                            {"umbracoPath", GlobalSettings.Path},
+                            {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
+                            {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
+                            {
+                                "imageFileTypes",
+                                string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
+                            },
+                            {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
+                        }
+                    },
                     {
-                        {"trees", GetTreePluginsMetaData()}
-                    }
-                },
-                {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
+                        "umbracoPlugins", new Dictionary<string, object>
+                        {
+                            {"trees", GetTreePluginsMetaData()}
+                        }
+                    },
+                    {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
                 {
                     "application", GetApplicationState()
                 },
@@ -392,17 +394,21 @@ namespace Umbraco.Web.Editors
                         }
                     }
                 }
+                };
+
+                //Parse the variables to a string
+                return ServerVariablesParser.Parse(defaultVals);
             };
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<Dictionary<string, object>>(
+                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(
                     typeof(BackOfficeController) + "ServerVariables",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
 
-            return JavaScript(ServerVariablesParser.Parse(result));
+            return JavaScript(result);
         }
         
         [HttpPost]

@@ -1,9 +1,6 @@
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -23,14 +20,19 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     internal class XmlCacheFilePersister : ILatchedBackgroundTask
     {
         private readonly IBackgroundTaskRunner<XmlCacheFilePersister> _runner;
-        private readonly string _xmlFileName;
-        private readonly ProfilingLogger _logger;
         private readonly content _content;
         private readonly ManualResetEventSlim _latch = new ManualResetEventSlim(false);
         private readonly object _locko = new object();
         private bool _released;
         private Timer _timer;
         private DateTime _initialTouch;
+        private readonly AsyncLock _runLock = new AsyncLock(); // ensure we run once at a time
+
+        // note:
+        // as long as the runner controls the runs, we know that we run once at a time, but
+        // when the AppDomain goes down and the runner has completed and yet the persister is
+        // asked to save, then we need to run immediately - but the runner may be running, so
+        // we need to make sure there's no collision - hence _runLock
 
         private const int WaitMilliseconds = 4000; // save the cache 4s after the last change (ie every 4s min)
         private const int MaxWaitMilliseconds = 30000; // save the cache after some time (ie no more than 30s of changes)
@@ -38,85 +40,115 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // save the cache when the app goes down
         public bool RunsOnShutdown { get { return true; } }
 
-        public XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content, string xmlFileName, ProfilingLogger logger, bool touched = false)
+        // initialize the first instance, which is inactive (not touched yet)
+        public XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content)
+            : this(runner, content, false)
+        { }
+
+        private XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content, bool touched)
         {
             _runner = runner;
             _content = content;
-            _xmlFileName = xmlFileName;
-            _logger = logger;
+
+            if (runner.TryAdd(this) == false)
+            {
+                _runner = null; // runner's down
+                _released = true; // don't mess with timer
+                return;
+            }
+
+            // runner could decide to run it anytime now
 
             if (touched == false) return;
 
-            _logger.Logger.Debug<XmlCacheFilePersister>("Create new touched, start.");
-
+            LogHelper.Debug<XmlCacheFilePersister>("Created, save in {0}ms.", () => WaitMilliseconds);
             _initialTouch = DateTime.Now;
-            _timer = new Timer(_ => Release());
-
-            _logger.Logger.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
+            _timer = new Timer(_ => TimerRelease());
             _timer.Change(WaitMilliseconds, 0);
         }
 
         public XmlCacheFilePersister Touch()
         {
+            // if _released is false then we're going to setup a timer
+            //  then the runner wants to shutdown & run immediately
+            //  this sets _released to true & the timer will trigger eventualy & who cares?
+            // if _released is true, either it's a normal release, or
+            //  a runner shutdown, in which case we won't be able to
+            //  add a new task, and so we'll run immediately
+
+            var ret = this;
+            var runNow = false;
+
             lock (_locko)
             {
-                if (_released)
+                if (_released) // our timer has triggered OR the runner is shutting down
                 {
-                    _logger.Logger.Debug<XmlCacheFilePersister>("Touched, was released, create new.");
+                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was released...");
 
-                    // released, has run or is running, too late, add & return a new task
-                    var persister = new XmlCacheFilePersister(_runner, _content, _xmlFileName, _logger, true);
-                    _runner.Add(persister);
-                    return persister;
+                    // release: has run or is running, too late, return a new task (adds itself to runner)
+                    if (_runner == null)
+                    {
+                        LogHelper.Debug<XmlCacheFilePersister>("Runner is down, run now.");
+                        runNow = true;
+                    }
+                    else
+                    {
+                        LogHelper.Debug<XmlCacheFilePersister>("Create new...");
+                        ret = new XmlCacheFilePersister(_runner, _content, true);
+                        if (ret._runner == null)
+                        {
+                            // could not enlist with the runner, runner is completed, must run now
+                            LogHelper.Debug<XmlCacheFilePersister>("Runner is down, run now.");
+                            runNow = true;
+                        }
+                    }
                 }
 
-                if (_timer == null)
+                else if (_timer == null) // we don't have a timer yet
                 {
-                    _logger.Logger.Debug<XmlCacheFilePersister>("Touched, was idle, start.");
-
-                    // not started yet, start
+                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was idle, start and save in {0}ms.");
                     _initialTouch = DateTime.Now;
-                    _timer = new Timer(_ => Release());
-                    _logger.Logger.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
-                    _timer.Change(WaitMilliseconds, 0);
-                    return this;
-                }
-
-                // set the timer to trigger in WaitMilliseconds unless we've been touched first more
-                // than MaxWaitMilliseconds ago and then release now
-
-                if (DateTime.Now - _initialTouch < TimeSpan.FromMilliseconds(MaxWaitMilliseconds))
-                {
-                    _logger.Logger.Debug<XmlCacheFilePersister>("Touched, was waiting, wait.", () => WaitMilliseconds);
-                    _logger.Logger.Debug<XmlCacheFilePersister>("Save in {0}ms.", () => WaitMilliseconds);
+                    _timer = new Timer(_ => TimerRelease());
                     _timer.Change(WaitMilliseconds, 0);
                 }
-                else
-                {
-                    _logger.Logger.Debug<XmlCacheFilePersister>("Save now, release.");
-                    ReleaseLocked();
-                }
 
-                return this; // still available
+                else // we have a timer
+                {
+                    // change the timer to trigger in WaitMilliseconds unless we've been touched first more
+                    // than MaxWaitMilliseconds ago and then leave the time unchanged
+
+                    if (DateTime.Now - _initialTouch < TimeSpan.FromMilliseconds(MaxWaitMilliseconds))
+                    {
+                        LogHelper.Debug<XmlCacheFilePersister>("Touched, was waiting, can delay, save in {0}ms.", () => WaitMilliseconds);
+                        _timer.Change(WaitMilliseconds, 0);
+                    }
+                    else
+                    {
+                        LogHelper.Debug<XmlCacheFilePersister>("Touched, was waiting, cannot delay.");
+                    }
+                }
             }
+
+            if (runNow)
+                Run();
+
+            return ret; // this, by default, unless we created a new one
         }
 
-        private void Release()
+        private void TimerRelease()
         {
             lock (_locko)
             {
-                ReleaseLocked();
-            }
-        }
+                LogHelper.Debug<XmlCacheFilePersister>("Timer: release.");
+                if (_timer != null)
+                    _timer.Dispose();
+                _timer = null;
+                _released = true;
 
-        private void ReleaseLocked()
-        {
-            _logger.Logger.Debug<XmlCacheFilePersister>("Timer: save now, release.");
-            if (_timer != null)
-                _timer.Dispose();
-            _timer = null;
-            _released = true;
-            _latch.Set();
+                // if running (because of shutdown) this will have no effect
+                // else it tells the runner it is time to run the task
+                _latch.Set();
+            }
         }
 
         public WaitHandle Latch
@@ -131,9 +163,21 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public async Task RunAsync(CancellationToken token)
         {
-            _logger.Logger.Debug<XmlCacheFilePersister>("Run now.");
-            var doc = _content.XmlContentInternal;
-            await PersistXmlToFileAsync(doc).ConfigureAwait(false);
+            lock (_locko)
+            {
+                LogHelper.Debug<XmlCacheFilePersister>("Run now (async).");
+                // just make sure - in case the runner is running the task on shutdown
+                _released = true;
+            }
+
+            // http://stackoverflow.com/questions/13489065/best-practice-to-call-configureawait-for-all-server-side-code
+            // http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
+            // do we really need that ConfigureAwait here?
+
+            using (await _runLock.LockAsync())
+            {
+                await _content.SaveXmlToFileAsync().ConfigureAwait(false);
+            }
         }
 
         public bool IsAsync
@@ -141,61 +185,22 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             get { return true; }
         }
 
-        /// <summary>
-        /// Persist a XmlDocument to the Disk Cache
-        /// </summary>
-        /// <param name="xmlDoc"></param>
-        internal async Task PersistXmlToFileAsync(XmlDocument xmlDoc)
-        {
-            if (xmlDoc != null)
-            {
-                using (_logger.DebugDuration<XmlCacheFilePersister>(
-                    string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread),
-                    string.Format("Saved content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread)))
-                {
-                    try
-                    {
-                        // Try to create directory for cache path if it doesn't yet exist
-                        var directoryName = Path.GetDirectoryName(_xmlFileName);
-                        // create dir if it is not there, if it's there, this will proceed as normal
-                        Directory.CreateDirectory(directoryName);
-
-                        await xmlDoc.SaveAsync(_xmlFileName).ConfigureAwait(false);
-                    }
-                    catch (Exception ee)
-                    {
-                        // If for whatever reason something goes wrong here, invalidate disk cache
-                        DeleteXmlCache();
-
-                        _logger.Logger.Error<XmlCacheFilePersister>("Error saving content to disk", ee);
-                    }
-                }
-
-                
-            }
-        }
-
-        private void DeleteXmlCache()
-        {
-            if (File.Exists(_xmlFileName) == false) return;
-
-            // Reset file attributes, to make sure we can delete file
-            try
-            {
-                File.SetAttributes(_xmlFileName, FileAttributes.Normal);
-            }
-            finally
-            {
-                File.Delete(_xmlFileName);
-            }
-        }
-
         public void Dispose()
         { }
 
         public void Run()
         {
-            throw new NotImplementedException();
+            lock (_locko)
+            {
+                LogHelper.Debug<XmlCacheFilePersister>("Run now (sync).");
+                // not really needed but safer (it's only us invoking Run, but the method is public...)
+                _released = true;
+            }
+
+            using (_runLock.Lock())
+            {
+                _content.SaveXmlToFile();
+            }
         }
     }
 }
