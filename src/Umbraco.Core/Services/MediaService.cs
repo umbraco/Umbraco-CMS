@@ -396,15 +396,14 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMedia>.Builder;
                 //if the id is -1, then just get all
                 if (id != -1)
                 {
-                    query.Where(x => x.ParentId == id);
+                    repository.Query.Where(x => x.ParentId == id);
                 }
 
                 long total;
-                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
+                var medias = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
 
                 totalChildren = Convert.ToInt32(total);
                 return medias;
@@ -449,15 +448,13 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
             {
-
-                var query = Query<IMedia>.Builder;
                 //if the id is -1, then just get all
                 if (id != -1)
                 {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                    repository.Query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
                 long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
                 totalChildren = Convert.ToInt32(total);
                 return contents;
             }

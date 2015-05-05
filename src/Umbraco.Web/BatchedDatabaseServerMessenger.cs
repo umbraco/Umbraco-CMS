@@ -16,10 +16,10 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : Core.Sync.BatchedDatabaseServerMessenger
     {
-        public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
+        public BatchedDatabaseServerMessenger(UmbracoApplicationBase appBase, ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : base(appContext, enableDistCalls, options)
         {
-            UmbracoApplicationBase.ApplicationStarted += Application_Started;
+            appBase.ApplicationStarted += Application_Started;
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
             UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
         }

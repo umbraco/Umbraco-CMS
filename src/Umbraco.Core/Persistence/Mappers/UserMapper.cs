@@ -13,19 +13,18 @@ namespace Umbraco.Core.Persistence.Mappers
     public sealed class ExternalLoginMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-        public ExternalLoginMapper()
+       
+        public ExternalLoginMapper(ISqlSyntaxProvider sqlSyntax)
+            : base(sqlSyntax)
         {
-            BuildMap();
         }
-
-        #region Overrides of BaseMapper
 
         internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
         {
             get { return PropertyInfoCacheInstance; }
         }
 
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.Id, dto => dto.Id);
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.CreateDate, dto => dto.CreateDate);
@@ -33,8 +32,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.ProviderKey, dto => dto.ProviderKey);
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.UserId, dto => dto.UserId);
         }
-
-        #endregion
     }
 
     [MapperFor(typeof(IUser))]
@@ -46,7 +43,8 @@ namespace Umbraco.Core.Persistence.Mappers
 
         #region Overrides of BaseMapper
 
-        public UserMapper(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
+        public UserMapper(ISqlSyntaxProvider sqlSyntax)
+            : base(sqlSyntax)
         {
         }
 

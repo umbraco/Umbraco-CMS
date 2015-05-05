@@ -114,8 +114,7 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(Logger, plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+            var parser = GetManifestParser();
             var initJs = new JsInitialization(parser);
             var initCss = new CssInitialization(parser);
 
@@ -138,8 +137,7 @@ namespace Umbraco.Web.Editors
         {
             Func<JArray> getResult = () =>
             {
-                var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(Logger, plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+                var parser = GetManifestParser();
                 var initJs = new JsInitialization(parser);
                 var initCss = new CssInitialization(parser);
                 var jsResult = initJs.GetJavascriptInitializationArray(HttpContext, new JArray());
@@ -165,6 +163,7 @@ namespace Umbraco.Web.Editors
         {
             Func<List<GridEditor>> getResult = () =>
             {
+                var parser = GetManifestParser();
                 var editors = new List<GridEditor>();
                 var gridConfig = Server.MapPath("~/Config/grid.editors.config.js");
                 if (System.IO.File.Exists(gridConfig))
@@ -173,7 +172,7 @@ namespace Umbraco.Web.Editors
                     {
                         var arr = JArray.Parse(System.IO.File.ReadAllText(gridConfig));
                         //ensure the contents parse correctly to objects
-                        var parsed = ManifestParser.GetGridEditors(arr);
+                        var parsed = parser.GetGridEditors(arr);
                         editors.AddRange(parsed);
                     }
                     catch (Exception ex)
@@ -181,9 +180,6 @@ namespace Umbraco.Web.Editors
                         LogHelper.Error<BackOfficeController>("Could not parse the contents of grid.editors.config.js into a JSON array", ex);
                     }
                 }
-
-                var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-                var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
                 var builder = new ManifestBuilder(ApplicationContext.ApplicationCache.RuntimeCache, parser);
                 foreach (var gridEditor in builder.GridEditors)
                 {
@@ -458,6 +454,13 @@ namespace Umbraco.Web.Editors
             //Add errors and redirect for it to be displayed
             TempData["ExternalSignInError"] = result.Errors;
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        }
+
+        private ManifestParser GetManifestParser()
+        {
+            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
+            var parser = new ManifestParser(Logger, plugins, ApplicationContext.ApplicationCache.RuntimeCache);
+            return parser;
         }
 
         /// <summary>

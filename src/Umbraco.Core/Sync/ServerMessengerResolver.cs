@@ -10,14 +10,15 @@ namespace Umbraco.Core.Sync
     /// </summary>
     public sealed class ServerMessengerResolver : ContainerSingleObjectResolver<ServerMessengerResolver, IServerMessenger>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ServerMessengerResolver"/> class with a messenger.
-        /// </summary>
-        /// <param name="factory">An instance of a messenger.</param>
-        /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
-        /// initialized before being accessed, otherwise an exception will be thrown when reading it.</remarks>
-        public ServerMessengerResolver(IServerMessenger value) : base(value)
-        { }
+        internal ServerMessengerResolver(IServiceContainer container, Type implementationType)
+            : base(container, implementationType)
+        {
+        }
+
+        internal ServerMessengerResolver(IServiceContainer container, Expression<Func<IServiceFactory, IServerMessenger>> implementationType)
+            : base(container, implementationType)
+        {
+        }
 
         /// <summary>
         /// Sets the messenger.

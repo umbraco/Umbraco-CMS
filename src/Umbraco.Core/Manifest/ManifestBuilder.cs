@@ -43,7 +43,7 @@ namespace Umbraco.Core.Manifest
                         {
                             if (manifest.GridEditors != null)
                             {
-                                editors.AddRange(ManifestParser.GetGridEditors(manifest.GridEditors));
+                                editors.AddRange(_parser.GetGridEditors(manifest.GridEditors));
                             }
 
                         }

@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence
         {
             return new ExternalLoginRepository(uow,
                 _cacheHelper,
-                _logger, _sqlSyntax);
+                _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual IPublicAccessRepository CreatePublicAccessRepository(IDatabaseUnitOfWork uow)

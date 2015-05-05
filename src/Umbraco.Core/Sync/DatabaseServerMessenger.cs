@@ -175,10 +175,12 @@ namespace Umbraco.Core.Sync
             //
             // FIXME not true if we're running on a background thread, assuming we can?
 
+            var sqlSyntax = _appContext.DatabaseContext.SqlSyntax;
+
             var sql = new Sql().Select("*")
-                .From<CacheInstructionDto>()
-                .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
-                .OrderBy<CacheInstructionDto>(dto => dto.Id);
+                .From<CacheInstructionDto>(sqlSyntax)
+                .Where<CacheInstructionDto>(sqlSyntax, dto => dto.Id > _lastId)
+                .OrderBy<CacheInstructionDto>(sqlSyntax, dto => dto.Id);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
             if (dtos.Count <= 0) return;

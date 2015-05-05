@@ -127,12 +127,6 @@ namespace Umbraco.Web.Cache
         
         #region Data type cache
 
-            if (dataType == null) return;
-            dc.RefreshByJson(DistributedCache.DataTypeCacheRefresherGuid, DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
-       
-            if (dataType == null) return;
-            dc.RefreshByJson(DistributedCache.DataTypeCacheRefresherGuid, DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
-
         public static void RefreshDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
         {
             if (dataType == null) return;

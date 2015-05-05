@@ -81,6 +81,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 new UpdateCmsContentVersionTable(sql, logger),
                 new UpdateCmsPropertyTypeGroupTable(sql, logger));
 
+            bool upgraded = migrationRunner.Execute(db, provider, sqlHelper, true);
 
             Assert.That(upgraded, Is.True);
 

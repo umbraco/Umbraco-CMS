@@ -70,8 +70,8 @@ namespace Umbraco.Tests.Plugins
         [Test]
         public void Find_Classes_Of_Type()
         {
-            var typesFound = TypeFinder.FindClassesOfType<IApplicationStartupHandler>(_assemblies);            
-            var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
+            var typesFound = TypeFinder.FindClassesOfType<IApplicationEventHandler>(_assemblies);
+            var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationEventHandler>(_assemblies);
 
             Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
             Assert.AreEqual(8, typesFound.Count());

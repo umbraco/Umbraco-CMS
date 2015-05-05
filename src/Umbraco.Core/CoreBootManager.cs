@@ -315,8 +315,8 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual void InitializeResolvers()
         {
-            var manifestParser = new ManifestParser(ProfilingLogger.Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")));
-            var manifestBuilder = new ManifestBuilder(manifestParser);
+            var manifestParser = new ManifestParser(ProfilingLogger.Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), _cacheHelper.RuntimeCache);
+            var manifestBuilder = new ManifestBuilder(_cacheHelper.RuntimeCache, manifestParser);
 
             PropertyEditorResolver.Current = new PropertyEditorResolver(
                 Container, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(),

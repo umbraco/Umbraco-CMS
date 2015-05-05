@@ -130,7 +130,7 @@ namespace UmbracoExamine
                         memberCount = 0;
                         foreach (var member in members)
                         {
-                            AddNodesToIndex(new[] { serializer.Serialize(_dataTypeService, member) }, type);
+                            AddNodesToIndex(new[] { serializer.Serialize(DataTypeService, member) }, type);
                             memberCount++;
                         }
                         pageIndex++;
@@ -147,7 +147,7 @@ namespace UmbracoExamine
                     memberCount = 0;
                     foreach (var member in members)
                     {
-                        AddNodesToIndex(new[] {serializer.Serialize(_dataTypeService, member)}, type);
+                        AddNodesToIndex(new[] { serializer.Serialize(DataTypeService, member) }, type);
                         memberCount++;
                     }
                     pageIndex++;

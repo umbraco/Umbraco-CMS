@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")));
+            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider());
         }
         
         [Test]
@@ -101,7 +102,7 @@ namespace Umbraco.Tests.Manifest
         icon: 'helloworld'
     }
 ]");
-            var parser = ManifestParser.GetGridEditors(a).ToArray();
+            var parser = _parser.GetGridEditors(a).ToArray();
 
             Assert.AreEqual(3, parser.Count());
 
@@ -413,11 +414,11 @@ javascript: ['~/test.js', '~/test2.js']}";
     }
 ]}";
 
-            var result = ManifestParser.CreateManifests(package1, package2, package3, package4, package5).ToArray();
-            
-            var paramEditors = result.SelectMany(x => ManifestParser.GetParameterEditors(x.ParameterEditors)).ToArray();
-            var propEditors = result.SelectMany(x => ManifestParser.GetPropertyEditors(x.PropertyEditors)).ToArray();
-            var gridEditors = result.SelectMany(x => ManifestParser.GetGridEditors(x.GridEditors)).ToArray();
+            var result = _parser.CreateManifests(package1, package2, package3, package4, package5).ToArray();
+
+            var paramEditors = result.SelectMany(x => _parser.GetParameterEditors(x.ParameterEditors)).ToArray();
+            var propEditors = result.SelectMany(x => _parser.GetPropertyEditors(x.PropertyEditors)).ToArray();
+            var gridEditors = result.SelectMany(x => _parser.GetGridEditors(x.GridEditors)).ToArray();
             
             Assert.AreEqual(2, gridEditors.Count());
             Assert.AreEqual(2, paramEditors.Count());

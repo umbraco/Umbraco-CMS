@@ -476,15 +476,13 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-
-                var query = Query<IContent>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    query.Where(x => x.ParentId == id);
+                    repository.Query.Where(x => x.ParentId == id);
                 }
                 long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
                 totalChildren = Convert.ToInt32(total);
                 return contents;
             }
@@ -529,15 +527,13 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
-
-                var query = Query<IContent>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                    repository.Query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
                 long total;
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(repository.Query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
                 totalChildren = Convert.ToInt32(total);
                 return contents;
             }

@@ -126,13 +126,7 @@ namespace umbraco
         #endregion
 
         #region Public Methods
-
-        [Obsolete("This is no longer used and will be removed in future versions, if you use this method it will not refresh 'async' it will perform the refresh on the current thread which is how it should be doing it")]
-        public virtual void RefreshContentFromDatabaseAsync()
-        {
-            RefreshContentFromDatabase();
-        }
-
+        
         /// <summary>
         /// Load content from database and replaces active content when done.
         /// </summary>
@@ -292,41 +286,6 @@ namespace umbraco
             }
         }
 
-        /// <summary>
-        /// Updates the document cache for multiple documents
-        /// </summary>
-        /// <param name="Documents">The documents.</param>
-        [Obsolete("This is not used and will be removed from the codebase in future versions")]
-        public virtual void UpdateDocumentCache(List<Document> Documents)
-        {
-            // We need to lock content cache here, because we cannot allow other threads
-            // making changes at the same time, they need to be queued
-            int parentid = Documents[0].Id;
-
-
-            using (var safeXml = GetSafeXmlWriter())
-            {
-                foreach (Document d in Documents)
-                {
-                    PublishNodeDo(d, safeXml.Xml, true);
-                }
-            }
-
-            ClearContextCache();
-        }
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
-        public virtual void UpdateDocumentCacheAsync(int documentId)
-        {
-            UpdateDocumentCache(documentId);
-        }
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
-        public virtual void ClearDocumentCacheAsync(int documentId)
-        {
-            ClearDocumentCache(documentId);
-        }
-
         public virtual void ClearDocumentCache(int documentId)
         {
             // Get the document
@@ -376,21 +335,9 @@ namespace umbraco
 
                 //SD: changed to fire event BEFORE running the sitemap!! argh.
                 FireAfterClearDocumentCache(doc, e);
-
-                      
-                }
+                
             }
-        }
-
-        /// <summary>
-        /// Unpublishes the  node.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
-        [Obsolete("Please use: umbraco.content.ClearDocumentCache", true)]
-        public virtual void UnPublishNode(int documentId)
-        {
-            ClearDocumentCache(documentId);
-        }
+        }   
 
         #endregion
 
@@ -555,18 +502,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 foreach (int childId in children)
                 {
                     XmlNode childNode = nodeIndex[childId];
-
                     parentNode.AppendChild(childNode);
-
+                    
                     // Recursively build the content tree under the current child
                     GenerateXmlDocument(hierarchy, nodeIndex, childId, childNode);
                 }
             }
-        }
-
-        [Obsolete("This method should not be used and does nothing, xml file persistence is done in a queue using a BackgroundTaskRunner")]
-        public void PersistXmlToFile()
-        {
         }
 
         /// <summary>
@@ -621,36 +562,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
         }
 
-        // whether to use the legacy schema
-        private static bool UseLegacySchema
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
-        }
-
-        // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
-        // for audit purposes - false by default, not in umbracoSettings.config
-        // whether to... no idea what that one does
-        // it is false by default and not in UmbracoSettings.config anymore - ignoring
-        /*
-        private static bool GlobalPreviewStorageEnabled
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled; }
-        }
-        */
-
-        // ensures config is valid
-        private void EnsureConfigurationIsValid()
-        {
-            if (SyncToXmlFile && SyncFromXmlFile)
-                throw new Exception("Cannot run with both ContinouslyUpdateXmlDiskCache and XmlContentCheckForDiskChanges being true.");
-
-            if (XmlIsImmutable == false)
-                //LogHelper.Warn<XmlStore>("Running with CloneXmlContent being false is a bad idea.");
-                LogHelper.Warn<content>("CloneXmlContent is false - ignored, we always clone.");
-
-            // note: if SyncFromXmlFile then we should also disable / warn that local edits are going to cause issues...
-        }
-
         #endregion
 
         #region Xml
@@ -679,11 +590,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        [Obsolete("Please use: content.Instance.XmlContent")]
-        public static XmlDocument xmlContent
-        {
-            get { return Instance.XmlContent; }
-        }
+    
 
         // to be used by content.Instance
         protected internal virtual XmlDocument XmlContentInternal
@@ -864,22 +771,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
         private static string ChildNodesXPath
         {
-            get
-            {
-                return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                    ? "./node"
-                    : "./* [@id]";
-            }
+            get { return "./* [@id]"; }
         }
 
         private static string DataNodesXPath
         {
-            get
-            {
-                return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                    ? "./data"
-                    : "./* [not(@id)]";
-            }
+            get { return "./* [not(@id)]"; }
         }
 
         #endregion
@@ -982,18 +879,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
                 _fileLock = null; // ensure we don't lock again
             }
-        }
-
-        // not used - just try to read the file
-        //private bool XmlFileExists
-        //{
-        //    get
-        //    {
-        //        // check that the file exists and has content (is not empty)
-        //        var fileInfo = new FileInfo(_xmlFileName);
-        //        return fileInfo.Exists && fileInfo.Length > 0;
-        //    }
-        //}
+        }     
 
         private DateTime XmlFileLastWriteTime
         {
@@ -1182,7 +1068,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // if the document is not there already then it's a new document
             // we must make sure that its document type exists in the schema
-            if (currentNode == null && UseLegacySchema == false)
+            if (currentNode == null)
                 EnsureSchema(docNode.Name, xml);
 
             // find the parent

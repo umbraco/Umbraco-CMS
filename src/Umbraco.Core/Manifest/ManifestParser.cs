@@ -26,12 +26,13 @@ namespace Umbraco.Core.Manifest
         private static readonly Regex CommentsSurround = new Regex(@"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", RegexOptions.Compiled);
         private static readonly Regex CommentsLine = new Regex(@"^\s*//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
-        public ManifestParser(ILogger logger, DirectoryInfo pluginsDir)
+        public ManifestParser(ILogger logger, DirectoryInfo pluginsDir, IRuntimeCacheProvider cache)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             if (pluginsDir == null) throw new ArgumentNullException("pluginsDir");
             _pluginsDir = pluginsDir;
             _logger = logger;
+            _cache = cache;
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         /// <param name="jsonEditors"></param>
         /// <returns></returns>
-        internal static IEnumerable<GridEditor> GetGridEditors(JArray jsonEditors)
+        internal IEnumerable<GridEditor> GetGridEditors(JArray jsonEditors)
         {
             return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(
                 jsonEditors.ToString(),
