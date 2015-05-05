@@ -58,9 +58,9 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.60.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.62.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.60.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.62.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -111,14 +111,9 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Extensions">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.28\lib\net45\System.Net.Http.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Primitives">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.28\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Caching" />
@@ -129,14 +124,16 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll</HintPath>
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http.SelfHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.SelfHost.4.0.30506.0\lib\net40\System.Web.Http.SelfHost.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -182,9 +179,12 @@
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
+    <Compile Include="Security\UmbracoBackOfficeIdentityTests.cs" />
+    <Compile Include="StringNewlineExtensions.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
+    <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
@@ -310,7 +310,7 @@
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
-    <Compile Include="PublishedCache\PublishedMediaCacheTests.cs" />
+    <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />
     <Compile Include="Strings\ShortStringHelperResolverTest.cs" />
     <Compile Include="Strings\LegacyShortStringHelperTests.cs" />
@@ -415,7 +415,7 @@
     <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
     <Compile Include="PublishedContent\DynamicDocumentTestsBase.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
-    <Compile Include="PublishedCache\PublishedContentCacheTests.cs" />
+    <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
     <Compile Include="Resolvers\ManyResolverTests.cs" />
     <Compile Include="Resolvers\SingleResolverTests.cs" />
@@ -440,7 +440,7 @@
     </Compile>
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Controllers\PluginControllerAreaTests.cs" />
-    <Compile Include="DistributedCache\DistributedCacheTests.cs" />
+    <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
@@ -471,7 +471,6 @@
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
-    <Compile Include="UmbracoExamine\PdfIndexerTests.cs" />
     <Compile Include="UmbracoExamine\SearchTests.cs" />
     <Compile Include="UmbracoExamine\TestDataService.cs" />
     <Compile Include="UmbracoExamine\TestFiles.Designer.cs">
@@ -530,14 +529,10 @@
     <EmbeddedResource Include="TreesAndSections\applications.config" />
     <EmbeddedResource Include="TreesAndSections\trees.config" />
     <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
-    <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
-    <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
-    <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="UmbracoExamine\TestFiles\umbraco.config" />
-    <None Include="UmbracoExamine\TestFiles\windows-vista.pdf" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -574,10 +569,6 @@
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UmbracoExamine.PDF\UmbracoExamine.PDF.csproj">
-      <Project>{f30dddb8-3994-4673-82ae-057123c6e1a8}</Project>
-      <Name>UmbracoExamine.PDF</Name>
     </ProjectReference>
     <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
@@ -669,11 +660,6 @@
 xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

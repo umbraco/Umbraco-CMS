@@ -151,13 +151,13 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
             int id, 
-            int pageNumber = 0, 
+            int pageNumber = 0,  //TODO: This should be '1' as it's not the index
             int pageSize = 0, 
             string orderBy = "SortOrder", 
             Direction orderDirection = Direction.Ascending, 
             string filter = "")
         {
-            int totalChildren;
+            long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {

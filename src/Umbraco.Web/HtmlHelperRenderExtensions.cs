@@ -18,7 +18,6 @@ using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web
 {
-
     /// <summary>
 	/// HtmlHelper extensions for use in templates
 	/// </summary>

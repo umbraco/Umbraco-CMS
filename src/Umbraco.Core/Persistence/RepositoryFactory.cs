@@ -46,6 +46,13 @@ namespace Umbraco.Core.Persistence
             return new NotificationsRepository(uow, _sqlSyntax);
         }
 
+        public virtual IExternalLoginRepository CreateExternalLoginRepository(IDatabaseUnitOfWork uow)
+        {
+            return new ExternalLoginRepository(uow,
+                _cacheHelper,
+                _logger, _sqlSyntax);
+        }
+
         public virtual IPublicAccessRepository CreatePublicAccessRepository(IDatabaseUnitOfWork uow)
         {
             return new PublicAccessRepository(uow,

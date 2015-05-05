@@ -141,15 +141,22 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
+        
             //We cannot call in to the base classes to clone because the base File class treats Alias, Name.. differently so we need to manually do the clone
 
             //Memberwise clone on Entity will work since it doesn't have any deep elements
             // for any sub class this will work for standard properties as well that aren't complex object's themselves.
             var clone = (Template)MemberwiseClone();
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //Automatically deep clone ref properties that are IDeepCloneable
-            DeepCloneHelper.DeepCloneRefProperties(this, clone);           
+            DeepCloneHelper.DeepCloneRefProperties(this, clone);
 
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
+
             return clone;
         }
 

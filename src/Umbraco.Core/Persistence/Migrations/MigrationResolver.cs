@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.LightInject;
+using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations
 {

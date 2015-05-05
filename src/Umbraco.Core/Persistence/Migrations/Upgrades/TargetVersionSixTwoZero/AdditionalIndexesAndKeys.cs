@@ -12,10 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : MigrationBase
     {
-        public AdditionalIndexesAndKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AdditionalIndexesAndKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

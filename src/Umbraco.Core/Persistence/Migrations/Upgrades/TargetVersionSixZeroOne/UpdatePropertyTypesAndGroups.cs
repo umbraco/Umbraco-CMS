@@ -10,10 +10,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
     [Migration("6.0.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
-        public UpdatePropertyTypesAndGroups(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public UpdatePropertyTypesAndGroups(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -9,6 +10,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Publishing;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
@@ -114,9 +116,89 @@ namespace Umbraco.Web.Cache
             ContentService.Trashed += ContentServiceTrashed;
             ContentService.EmptiedRecycleBin += ContentServiceEmptiedRecycleBin;
 
+            PublishingStrategy.Published += PublishingStrategy_Published;
+            PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
+
             //public access events
             PublicAccessService.Saved += PublicAccessService_Saved;
         }
+
+        #region Publishing
+
+        void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        {
+            if (e.PublishedEntities.Any())
+            {
+                if (e.PublishedEntities.Count() > 1)
+                {
+                    foreach (var c in e.PublishedEntities)
+                    {
+                        UnPublishSingle(c);
+                    }
+                }
+                else
+                {
+                    var content = e.PublishedEntities.FirstOrDefault();
+                    UnPublishSingle(content);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the xml cache for a single node by removing it
+        /// </summary>
+        private void UnPublishSingle(IContent content)
+        {
+            DistributedCache.Instance.RemovePageCache(content);
+        }
+
+        void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        {
+            if (e.PublishedEntities.Any())
+            {
+                if (e.IsAllRepublished)
+                {
+                    UpdateEntireCache();
+                    return;
+                }
+
+                if (e.PublishedEntities.Count() > 1)
+                {
+                    UpdateMultipleContentCache(e.PublishedEntities);
+                }
+                else
+                {
+                    var content = e.PublishedEntities.FirstOrDefault();
+                    UpdateSingleContentCache(content);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the xml cache for all nodes
+        /// </summary>
+        private void UpdateEntireCache()
+        {
+            DistributedCache.Instance.RefreshAllPageCache();
+        }
+
+        /// <summary>
+        /// Refreshes the xml cache for nodes in list
+        /// </summary>
+        private void UpdateMultipleContentCache(IEnumerable<IContent> content)
+        {
+            DistributedCache.Instance.RefreshPageCache(content.ToArray());
+        }
+
+        /// <summary>
+        /// Refreshes the xml cache for a single node
+        /// </summary>
+        private void UpdateSingleContentCache(IContent content)
+        {
+            DistributedCache.Instance.RefreshPageCache(content);
+        }
+
+        #endregion
 
         #region Public access event handlers
 

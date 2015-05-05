@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Concurrent;
 using System.Web.Mvc;
-using System.Web.Routing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Web.Security;
+using System.Collections.Specialized;
 
 namespace Umbraco.Web.Mvc
 {
@@ -26,22 +25,17 @@ namespace Umbraco.Web.Mvc
         {
         }
 
+        protected SurfaceController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+            : base(umbracoContext, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// Empty constructor, uses Singleton to resolve the UmbracoContext
         /// </summary>
         protected SurfaceController()
             : base(UmbracoContext.Current)
         {
-        }
-
-        private MembershipHelper _membershipHelper;
-
-        /// <summary>
-        /// Returns the MemberHelper instance
-        /// </summary>
-        public virtual MembershipHelper Members
-        {
-            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
         }
 
         /// <summary>
@@ -55,6 +49,28 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="queryStringValues"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, NameValueCollection queryStringValues)
+        {
+            return new RedirectToUmbracoPageResult(pageId, queryStringValues, UmbracoContext);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, string queryString)
+        {
+            return new RedirectToUmbracoPageResult(pageId, queryString, UmbracoContext);
+        }
+
+        /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>
         /// <param name="publishedContent"></param>
@@ -62,6 +78,28 @@ namespace Umbraco.Web.Mvc
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
         {
             return new RedirectToUmbracoPageResult(publishedContent, UmbracoContext);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="publishedContent"></param>
+        /// <param name="queryStringValues"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, NameValueCollection queryStringValues)
+        {
+            return new RedirectToUmbracoPageResult(publishedContent, queryStringValues, UmbracoContext);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="publishedContent"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, string queryString)
+        {
+            return new RedirectToUmbracoPageResult(publishedContent, queryString, UmbracoContext);
         }
 
         /// <summary>
@@ -73,6 +111,25 @@ namespace Umbraco.Web.Mvc
             return new RedirectToUmbracoPageResult(CurrentPage, UmbracoContext);
         }
 
+        /// <summary>
+        /// Redirects to the currently rendered Umbraco page and passes provided querystring
+        /// </summary>
+        /// <param name="queryStringValues"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(NameValueCollection queryStringValues)
+        {
+            return new RedirectToUmbracoPageResult(CurrentPage, queryStringValues, UmbracoContext);
+        }
+
+        /// <summary>
+        /// Redirects to the currently rendered Umbraco page and passes provided querystring
+        /// </summary>
+        /// <param name="queryStringValues"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(string queryString)
+        {
+            return new RedirectToUmbracoPageResult(CurrentPage, queryString, UmbracoContext);
+        }
         /// <summary>
         /// Redirects to the currently rendered Umbraco URL
         /// </summary>
@@ -103,13 +160,13 @@ namespace Umbraco.Web.Mvc
         {
             get
             {
-			    var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
+                var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
                 if (!routeDefAttempt.Success)
                 {
                     throw routeDefAttempt.Exception;
                 }
 
-			    var routeDef = routeDefAttempt.Result;
+                var routeDef = routeDefAttempt.Result;
                 return routeDef.PublishedContentRequest.PublishedContent;
             }
         }
@@ -130,7 +187,7 @@ namespace Umbraco.Web.Mvc
                 var currentRouteData = currentContext.RouteData;
                 if (currentRouteData.DataTokens.ContainsKey("umbraco-route-def"))
                 {
-                    return Attempt.Succeed((RouteDefinition) currentRouteData.DataTokens["umbraco-route-def"]);
+                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens["umbraco-route-def"]);
                 }
                 if (currentContext.IsChildAction)
                 {
@@ -145,8 +202,8 @@ namespace Umbraco.Web.Mvc
             }
             return Attempt<RouteDefinition>.Fail(
                 new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request"));
-        } 
-        
+        }
+
 
     }
 }

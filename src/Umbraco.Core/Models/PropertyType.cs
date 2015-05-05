@@ -38,11 +38,21 @@ namespace Umbraco.Core.Models
             _propertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDefinition.DatabaseType;
         }
+
+        public PropertyType(IDataTypeDefinition dataTypeDefinition, string propertyTypeAlias)
+            : this(dataTypeDefinition)
+        {
+            SetAlias(propertyTypeAlias);
+        }
         
-        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
+        public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
             : this(propertyEditorAlias, dataTypeDatabaseType, false)
         {
-            PropertyEditorAlias = propertyEditorAlias;
+        }
+
+        public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, string propertyTypeAlias)
+            : this(propertyEditorAlias, dataTypeDatabaseType, false, propertyTypeAlias)
+        {           
         }
 
         /// <summary>
@@ -56,6 +66,21 @@ namespace Umbraco.Core.Models
             _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDatabaseType;
+        }
+
+        /// <summary>
+        /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
+        /// </summary>
+        /// <param name="propertyEditorAlias"></param>
+        /// <param name="dataTypeDatabaseType"></param>
+        /// <param name="isExplicitDbType"></param>
+        /// <param name="propertyTypeAlias"></param>
+        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType, string propertyTypeAlias)
+        {
+            _isExplicitDbType = isExplicitDbType;
+            _propertyEditorAlias = propertyEditorAlias;
+            _dataTypeDatabaseType = dataTypeDatabaseType;
+            SetAlias(propertyTypeAlias);
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
@@ -96,15 +121,9 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
-                // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
-                // which is used internally
-
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
-                        ? value 
-                        : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
+                    SetAlias(value);
                     return _alias;
                 }, _alias, AliasSelector);
             }
@@ -284,6 +303,17 @@ namespace Umbraco.Core.Models
             }
         }
 
+        private void SetAlias(string value)
+        {
+            //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
+            // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
+            // which is used internally
+
+            _alias = value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
+                        ? value
+                        : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
+        }
+
         /// <summary>
         /// Create a new Property object from a "raw" database value.
         /// </summary>
@@ -431,39 +461,38 @@ namespace Umbraco.Core.Models
 
         public bool Equals(PropertyType other)
         {
-            //Check whether the compared object is null. 
-            if (ReferenceEquals(other, null)) return false;
-
-            //Check whether the compared object references the same data. 
-            if (ReferenceEquals(this, other)) return true;
+            if (base.Equals(other)) return true;
 
             //Check whether the PropertyType's properties are equal. 
-            return Alias.Equals(other.Alias) && Name.Equals(other.Name);
+            return Alias.InvariantEquals(other.Alias);
         }
 
         public override int GetHashCode()
         {
             //Get hash code for the Name field if it is not null. 
-            int hashName = Name == null ? 0 : Name.GetHashCode();
+            int baseHash = base.GetHashCode();
 
             //Get hash code for the Alias field. 
-            int hashAlias = Alias.GetHashCode();
+            int hashAlias = Alias.ToLowerInvariant().GetHashCode();
 
             //Calculate the hash code for the product. 
-            return hashName ^ hashAlias;
+            return baseHash ^ hashAlias;
         }
 
         public override object DeepClone()
         {
             var clone = (PropertyType)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {
                 clone._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);    
             }
-
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

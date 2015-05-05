@@ -122,7 +122,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
                                "DELETE FROM umbracoUserLogins WHERE userID = @Id",
                                "DELETE FROM umbracoUser2app WHERE " + SqlSyntax.GetQuotedColumnName("user") + "=@Id",
-                               "DELETE FROM umbracoUser WHERE id = @Id"
+                               "DELETE FROM umbracoUser WHERE id = @Id",
+                               "DELETE FROM umbracoExternalLogin WHERE id = @Id"
                            };
             return list;
         }
@@ -169,7 +170,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 {"userName", "Name"},
                 {"userLogin", "Username"},                
                 {"userEmail", "Email"},                
-                {"userLanguage", "Language"}
+                {"userLanguage", "Language"},
+                {"securityStampToken", "SecurityStamp"}
             };
 
             //create list of properties that have changed
@@ -182,6 +184,15 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dirtyEntity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
             {
                 changedCols.Add("userPassword");
+
+                //special case - when using ASP.Net identity the user manager will take care of updating the security stamp, however
+                // when not using ASP.Net identity (i.e. old membership providers), we'll need to take care of updating this manually
+                // so we can just detect if that property is dirty, if it's not we'll set it manually
+                if (dirtyEntity.IsPropertyDirty("SecurityStamp") == false)
+                {
+                    userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                    changedCols.Add("securityStampToken");
+                }
             }
 
             //only update the changed cols

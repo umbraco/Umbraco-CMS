@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.ObjectResolution;
 
@@ -22,14 +24,17 @@ namespace Umbraco.Core.PropertyEditors
             : base(container, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
             _builder = builder;
+            _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(builder.PropertyEditors).ToList());
         }
+
+        private readonly Lazy<List<PropertyEditor>> _unioned;
 
         /// <summary>
         /// Returns the property editors
         /// </summary>
-        public IEnumerable<PropertyEditor> PropertyEditors
+        public virtual IEnumerable<PropertyEditor> PropertyEditors
         {
-            get { return Values.Union(_builder.PropertyEditors); }
+            get { return _unioned.Value; }
         }
 
         /// <summary>
@@ -37,7 +42,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public PropertyEditor GetByAlias(string alias)
+        public virtual PropertyEditor GetByAlias(string alias)
         {
             return PropertyEditors.SingleOrDefault(x => x.Alias == alias);
         }

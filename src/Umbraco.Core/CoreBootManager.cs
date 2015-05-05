@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -22,6 +23,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Strings;
@@ -340,7 +342,7 @@ namespace Umbraco.Core
             //by default (outside of the web) we'll use the default server messenger without
             //supplying a username/password, this will automatically disable distributed calls
             // .. we'll override this in the WebBootManager
-            ServerMessengerResolver.Current = new ServerMessengerResolver(Container, typeof (DefaultServerMessenger));
+            ServerMessengerResolver.Current = new ServerMessengerResolver(Container, typeof (WebServiceServerMessenger));
 
 
             //RepositoryResolver.Current = new RepositoryResolver(

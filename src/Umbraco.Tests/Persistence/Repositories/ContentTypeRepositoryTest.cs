@@ -126,9 +126,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 contentType.Thumbnail = "Doc2.png";
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
                 {
-                    Alias = "subtitle",
                     Name = "Subtitle",
                     Description = "Optional Subtitle",
                     Mandatory = false,
@@ -332,9 +331,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Act
-            var urlAlias = new PropertyType("test", DataTypeDatabaseType.Nvarchar)
+                var urlAlias = new PropertyType("test", DataTypeDatabaseType.Nvarchar, "urlAlias")
                     {
-                        Alias = "urlAlias",
                         Name = "Url Alias",
                         Description = "",
                         Mandatory = false,
@@ -375,18 +373,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed);
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                     {
-                        new ContentTypeSort
-                            {
-                                Alias = subpageContentType.Alias,
-                                Id = new Lazy<int>(() => subpageContentType.Id),
-                                SortOrder = 0
-                            },
-                        new ContentTypeSort
-                            {
-                                Alias = simpleSubpageContentType.Alias,
-                                Id = new Lazy<int>(() => simpleSubpageContentType.Id),
-                                SortOrder = 1
-                            }
+                        new ContentTypeSort(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias),
+                        new ContentTypeSort(new Lazy<int>(() => simpleSubpageContentType.Id), 1, simpleSubpageContentType.Alias)
                     };
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
@@ -444,7 +432,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-            propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -471,7 +459,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-            propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -510,7 +498,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentType.RemovePropertyType("keywords");
                 //Add PropertyType
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-            propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 

@@ -8,8 +8,7 @@ namespace Umbraco.Tests.Migrations.Stubs
     public class AlterUserTableMigrationStub : MigrationBase
     {
 
-        public AlterUserTableMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AlterUserTableMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
 

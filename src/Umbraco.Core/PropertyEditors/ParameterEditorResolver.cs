@@ -17,7 +17,7 @@ namespace Umbraco.Core.PropertyEditors
     internal class ParameterEditorResolver : LazyManyObjectsResolverBase<ParameterEditorResolver, IParameterEditor>
     {
         private readonly ManifestBuilder _builder;
-
+        
         public ParameterEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
             : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {

@@ -232,12 +232,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType1);
             contentType1.AllowedContentTypes = new List<ContentTypeSort>
                 {
-                    new ContentTypeSort
-                        {
-                            Alias = contentType1.Alias,
-                            Id = new Lazy<int>(() => contentType1.Id),
-                            SortOrder = 0
-                        }
+                    new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias)
                 };
             var result = new List<IContent>();
             ServiceContext.ContentTypeService.Save(contentType1);            

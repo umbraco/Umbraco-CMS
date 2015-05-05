@@ -124,11 +124,12 @@ IFRAME {overflow:hidden;}
      border: 1px dashed rgba(0,0,0,0);
 }
 
-.usky-grid .tb:hover .usky-row{
-    border-bottom:1px dashed rgba(182, 182, 182, 0.3);
+.umb-grid .tb:hover .usky-row{
+    border-bottom:1px dashed rgba(182, 182, 182, 0) !important;
 }
 
-/*.usky-grid .selectedRow {
+/*
+.usky-grid .selectedRow {
      border: 1px solid rgba(182, 182, 182, 0.3);
 }*/
 
@@ -155,6 +156,8 @@ IFRAME {overflow:hidden;}
     opacity: 0.3;
     z-index: 50;
 }
+//special rule to ensure forms doesnt overrride (forms will align in a later release)
+.umb-grid .cell-tools{width: 50px !important;}
 
 .usky-grid  .cell-tools.with-prompt {
     width:200px;
@@ -233,7 +236,7 @@ IFRAME {overflow:hidden;}
 
 .usky-grid  .usky-control:hover{
     /*border: 1px solid rgba(182, 182, 182, 0.3);*/
-    //border-bottom: 1px solid rgba(182, 182, 182, 0.3);
+    /*border-bottom: 1px solid rgba(182, 182, 182, 0.3);*/
 }
 
 .usky-grid  .usky-control-placeholder:hover{
@@ -249,9 +252,39 @@ IFRAME {overflow:hidden;}
      border: 1px dashed @blue !important;
 }
 
-.usky-grid .usky-control-inner{
-    min-height: 60px;
+.usky-grid .warnhighlight > ins.item-label{border-color: @red; color: @red;}
+.usky-grid .infohighlight > ins.item-label{border-color: @blue; color: @blue;}
+
+
+.usky-grid ins.item-label {
+    position: absolute;
+    top: -22px;
+    left: -1px;
+    text-decoration: none;
+    padding: 0px 7px;
+    display:none;
+    font-size:0.8em;
+    background-color: white;
+    color: @grayLight;
+    border: 1px dashed @grayLight;
+    border-bottom: 1px solid white !important;
+    height: 20px;
+    overflow: hidden;
 }
+
+.usky-grid .usky-row-inner > ins.item-label{
+    top: -20px;
+    left: 0px;
+}
+
+.usky-grid .usky-control-inner.selectedControl , .usky-grid .usky-row-inner.selectedRow{
+    border: 1px dashed @grayLight;
+    
+    > ins.item-label {
+        display: block;
+        z-index:100000;
+    }
+} 
 
 
 
@@ -504,6 +537,7 @@ IFRAME {overflow:hidden;}
  /**************************************************************************************************/
 
  .usky-grid .usky-cell{
+    padding-top: 5px;
     padding-bottom: 15px;
  }
 
@@ -522,12 +556,16 @@ IFRAME {overflow:hidden;}
     border: 1px dashed transparent;
  }
 
- .usky-grid .usky-control-inner{
+ .usky-grid .usky-control-inner {
     padding: 5px;
     margin-right: 45px;
     margin-bottom: 15px;
+
     border: 1px dashed transparent;
+    min-height: 60px;
+    position:relative;
  }
+
 
 
  /**************************************************************************************************/

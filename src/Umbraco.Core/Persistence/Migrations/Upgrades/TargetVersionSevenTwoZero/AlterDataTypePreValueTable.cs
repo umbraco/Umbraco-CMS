@@ -12,10 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AlterDataTypePreValueTable : MigrationBase
     {
-        public AlterDataTypePreValueTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AlterDataTypePreValueTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

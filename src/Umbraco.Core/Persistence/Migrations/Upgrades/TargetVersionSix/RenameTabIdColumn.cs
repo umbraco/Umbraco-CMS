@@ -8,10 +8,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 7, GlobalSettings.UmbracoMigrationName)]
     public class RenameTabIdColumn : MigrationBase
     {
-        public RenameTabIdColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public RenameTabIdColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

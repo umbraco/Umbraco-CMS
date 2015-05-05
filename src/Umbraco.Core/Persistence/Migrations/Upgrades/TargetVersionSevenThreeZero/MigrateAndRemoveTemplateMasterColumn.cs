@@ -13,6 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
     [Migration("7.3.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class MigrateAndRemoveTemplateMasterColumn : MigrationBase
     {
+
         public MigrateAndRemoveTemplateMasterColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         {

@@ -14,6 +14,7 @@ namespace Umbraco.Core.Services
     public class LocalizedTextService : ILocalizedTextService
     {
         private readonly ILogger _logger;
+        private readonly LocalizedTextServiceFileSources _fileSources;
         private readonly IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource;
         private readonly IDictionary<CultureInfo, Lazy<XDocument>> _xmlSource;
 
@@ -26,7 +27,8 @@ namespace Umbraco.Core.Services
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            _xmlSource = fileSources.GetXmlSources();
+            if (fileSources == null) throw new ArgumentNullException("fileSources");
+            _fileSources = fileSources;
         }
 
         /// <summary>
@@ -59,6 +61,9 @@ namespace Umbraco.Core.Services
         {
             Mandate.ParameterNotNull(culture, "culture");
 
+            //TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
+            culture = ConvertToSupportedCultureWithRegionCode(culture);
+
             //This is what the legacy ui service did
             if (string.IsNullOrEmpty(key))
                 return string.Empty;
@@ -67,10 +72,14 @@ namespace Umbraco.Core.Services
             var area = keyParts.Length > 1 ? keyParts[0] : null;
             var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
 
-            if (_xmlSource != null)
+            var xmlSource = _xmlSource ?? (_fileSources != null
+                ? _fileSources.GetXmlSources()
+                : null);
+
+            if (xmlSource != null)
             {
-                return GetFromXmlSource(culture, area, alias, tokens);
-            }
+                return GetFromXmlSource(xmlSource, culture, area, alias, tokens);
+            }          
             else
             {
                 return GetFromDictionarySource(culture, area, alias, tokens);
@@ -85,18 +94,25 @@ namespace Umbraco.Core.Services
         {
             if (culture == null) throw new ArgumentNullException("culture");
 
+            //TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
+            culture = ConvertToSupportedCultureWithRegionCode(culture);
+
             var result = new Dictionary<string, string>();
 
-            if (_xmlSource != null)
+            var xmlSource = _xmlSource ?? (_fileSources != null
+                ? _fileSources.GetXmlSources()
+                : null);
+
+            if (xmlSource != null)
             {
-                if (_xmlSource.ContainsKey(culture) == false)
+                if (xmlSource.ContainsKey(culture) == false)
                 {
                     _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
                     return result;
                 }
 
                 //convert all areas + keys to a single key with a '/'
-                var areas = _xmlSource[culture].Value.XPathSelectElements("//area");
+                var areas = xmlSource[culture].Value.XPathSelectElements("//area");
                 foreach (var area in areas)
                 {
                     var keys = area.XPathSelectElements("./key");
@@ -143,7 +159,36 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<CultureInfo> GetSupportedCultures()
         {
-            return _xmlSource != null ? _xmlSource.Keys : _dictionarySource.Keys;
+            var xmlSource = _xmlSource ?? (_fileSources != null
+                ? _fileSources.GetXmlSources()
+                : null);
+
+            return xmlSource != null ? xmlSource.Keys : _dictionarySource.Keys;
+        }
+
+        /// <summary>
+        /// Tries to resolve a full 4 letter culture from a 2 letter culture name
+        /// </summary>
+        /// <param name="currentCulture">
+        /// The culture to determine if it is only a 2 letter culture, if so we'll try to convert it, otherwise it will just be returned
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// TODO: This is just a hack due to the way we store the language files, they should be stored with 4 letters since that 
+        /// is what they reference but they are stored with 2, further more our user's languages are stored with 2. So this attempts
+        /// to resolve the full culture if possible.
+        /// 
+        /// This only works when this service is constructed with the LocalizedTextServiceFileSources
+        /// </remarks>
+        public CultureInfo ConvertToSupportedCultureWithRegionCode(CultureInfo currentCulture)
+        {
+            if (currentCulture == null) throw new ArgumentNullException("currentCulture");
+            
+            if (_fileSources == null) return currentCulture;
+            if (currentCulture.Name.Length > 2) return currentCulture;
+
+            var attempt = _fileSources.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
+            return attempt ? attempt.Result : currentCulture;
         }
 
         private string GetFromDictionarySource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
@@ -184,15 +229,15 @@ namespace Umbraco.Core.Services
             return "[" + key + "]";
         }
 
-        private string GetFromXmlSource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
+        private string GetFromXmlSource(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
         {
-            if (_xmlSource.ContainsKey(culture) == false)
+            if (xmlSource.ContainsKey(culture) == false)
             {
                 _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
                 return "[" + key + "]";                
             }
 
-            var cultureSource = _xmlSource[culture].Value;
+            var cultureSource = xmlSource[culture].Value;
             
             var xpath = area.IsNullOrWhiteSpace()
                     ? string.Format("//key [@alias = '{0}']", key)
@@ -223,7 +268,7 @@ namespace Umbraco.Core.Services
         /// we support a dictionary which means in the future we can really have any sort of token system. 
         /// Currently though, the token key's will need to be an integer and sequential - though we aren't going to throw exceptions if that is not the case.
         /// </remarks>
-        internal string ParseTokens(string value, IDictionary<string, string> tokens)
+        internal static string ParseTokens(string value, IDictionary<string, string> tokens)
         {
             if (tokens == null || tokens.Any() == false)
             {

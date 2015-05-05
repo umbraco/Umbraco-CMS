@@ -19,6 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly Version _currentVersion;
         private readonly Version _targetVersion;
         private readonly string _productName;
+        private readonly IMigration[] _migrations;
 
 
         public MigrationRunner(IMigrationResolver resolver, ILogger logger, Version currentVersion, Version targetVersion, string productName)
@@ -33,6 +34,20 @@ namespace Umbraco.Core.Persistence.Migrations
             _currentVersion = currentVersion;
             _targetVersion = targetVersion;
             _productName = productName;
+        }
+        
+        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (currentVersion == null) throw new ArgumentNullException("currentVersion");
+            if (targetVersion == null) throw new ArgumentNullException("targetVersion");
+            Mandate.ParameterNotNullOrEmpty(productName, "productName");
+
+            _logger = logger;
+            _currentVersion = currentVersion;
+            _targetVersion = targetVersion;
+            _productName = productName;
+            _migrations = migrations;
         }
 
 
@@ -138,7 +153,7 @@ namespace Umbraco.Core.Persistence.Migrations
         protected virtual IMigration[] FindMigrations()
         {
             //MCH NOTE: Consider adding the ProductName filter to the Resolver so we don't get a bunch of irrelevant migrations
-            return _resolver.Migrations.ToArray();
+            return _migrations ?? _resolver.Migrations.ToArray();
         }
 
         internal MigrationContext InitializeMigrations(

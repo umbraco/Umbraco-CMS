@@ -617,10 +617,14 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (Member)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually clone this since it's not settable
             clone._contentType = (IMemberType)ContentType.DeepClone();
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
 

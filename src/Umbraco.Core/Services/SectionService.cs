@@ -147,7 +147,7 @@ namespace Umbraco.Core.Services
 
                         return list;
 
-                    });
+                    }, new TimeSpan(0, 10, 0));
         }
 
         internal void LoadXml(Func<XDocument, bool> callback, bool saveAfterCallbackIfChanged)

@@ -6,7 +6,7 @@
     <title>Umbraco Cms</title>
     <authors>Umbraco HQ</authors>
     <owners>Umbraco HQ</owners>
-    <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://umbraco.com/</projectUrl>
     <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -34,6 +34,7 @@
     <file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
+    <file src="tools\ReadmeUpgrade.txt" target="tools\ReadmeUpgrade.txt" />
     <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
     <file src="tools\applications.config.install.xdt" target="Content\config\applications.config.install.xdt" />
     <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />

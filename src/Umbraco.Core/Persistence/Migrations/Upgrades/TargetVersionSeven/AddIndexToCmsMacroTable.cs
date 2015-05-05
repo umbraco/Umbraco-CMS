@@ -22,8 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToCmsMacroTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddIndexToCmsMacroTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
 

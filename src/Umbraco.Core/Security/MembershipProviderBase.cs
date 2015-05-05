@@ -16,6 +16,19 @@ namespace Umbraco.Core.Security
     /// </summary>
     public abstract class MembershipProviderBase : MembershipProvider
     {
+
+        public string HashPasswordForStorage(string password)
+        {
+            string salt;
+            var hashed = EncryptOrHashNewPassword(password, out salt);
+            return FormatPasswordForStorage(hashed, salt);
+        }
+
+        public bool VerifyPassword(string password, string hashedPassword)
+        {
+            return CheckPassword(password, hashedPassword);
+        }
+
         /// <summary>
         /// Providers can override this setting, default is 7
         /// </summary>

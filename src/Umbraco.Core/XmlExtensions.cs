@@ -38,7 +38,7 @@ namespace Umbraco.Core
                 //NOTE: There are no nice methods to write it async, only flushing it async. We
                 // could implement this ourselves but it'd be a very manual process.
                 xdoc.WriteTo(xmlWriter);
-                await xmlWriter.FlushAsync();
+                await xmlWriter.FlushAsync().ConfigureAwait(false);
             }
 	    }
 

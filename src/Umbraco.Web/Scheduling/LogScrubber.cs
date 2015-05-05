@@ -34,9 +34,10 @@ namespace Umbraco.Web.Scheduling
             return new LogScrubber(this);
         }
 
+        // maximum age, in minutes
         private int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
         {
-            int maximumAge = 24 * 60 * 60;
+            var maximumAge = 24 * 60; // 24 hours, in minutes
             try
             {
                 if (settings.Logging.MaxLogAge > -1)
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception e)
             {
-                LogHelper.Error<Scheduler>("Unable to locate a log scrubbing maximum age.  Defaulting to 24 horus", e);
+                LogHelper.Error<Scheduler>("Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.", e);
             }
             return maximumAge;
 
@@ -52,7 +53,7 @@ namespace Umbraco.Web.Scheduling
 
         public static int GetLogScrubbingInterval(IUmbracoSettingsSection settings)
         {
-            int interval = 24 * 60 * 60; //24 hours
+            var interval = 4 * 60 * 60 * 1000; // 4 hours, in milliseconds
             try
             {
                 if (settings.Logging.CleaningMiliseconds > -1)
@@ -60,14 +61,14 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception e)
             {
-                LogHelper.Error<LogScrubber>("Unable to locate a log scrubbing interval.  Defaulting to 24 horus", e);
+                LogHelper.Error<LogScrubber>("Unable to locate a log scrubbing interval. Defaulting to 4 hours.", e);
             }
             return interval;
         }
 
         public override void PerformRun()
         {
-            using (DisposableTimer.DebugDuration<LogScrubber>(() => "Log scrubbing executing", () => "Log scrubbing complete"))
+            using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
             }           

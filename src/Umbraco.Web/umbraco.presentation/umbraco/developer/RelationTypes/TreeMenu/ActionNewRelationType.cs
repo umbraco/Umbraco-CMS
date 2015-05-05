@@ -59,7 +59,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
 		/// </summary>
 		public string Icon
 		{
-			get { return ".sprNew"; } // .sprNew refers to an existing sprite
+			get { return "add"; } // add refers to an existing sprite
 		}
 
 		/// <summary>

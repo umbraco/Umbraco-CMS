@@ -1,38 +1,25 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Web.Services.Protocols;
-using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
-using umbraco.BusinessLogic;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    //public class CacheUpdatedEventArgs : EventArgs
-    //{
-        
-    //}
-
     /// <summary>
-    /// DistributedCache is used to invalidate cache throughout the application which also takes in to account load balancing environments automatically
+    /// Represents the entry point into Umbraco's distributed cache infrastructure.
     /// </summary>
     /// <remarks>
-    /// Distributing calls to all registered load balanced servers, ensuring that content are synced and cached on all servers.
-    /// Dispatcher is exendable, so 3rd party services can easily be integrated into the workflow, using the interfaces.ICacheRefresher interface.
-    /// 
-    /// Dispatcher can refresh/remove content, templates and macros.
+    /// <para>
+    /// The distributed cache infrastructure ensures that distributed caches are
+    /// invalidated properly in load balancing environments.
+    /// </para>
+    /// <para>
+    /// Distribute caches include static (in-memory) cache, runtime cache, front-end content cache, Examine/Lucene indexes
+    /// </para>
     /// </remarks>
     public sealed class DistributedCache
     {
-
         #region Public constants/Ids
 
         public const string ApplicationTreeCacheRefresherId = "0AC6C028-9860-4EA4-958D-14D39F45886E";
@@ -56,21 +43,45 @@ namespace Umbraco.Web.Cache
         public const string DictionaryCacheRefresherId = "D1D7E227-F817-4816-BFE9-6C39B6152884";
         public const string PublicAccessCacheRefresherId = "1DB08769-B104-4F8B-850E-169CAC1DF2EC";
 
+        public static readonly Guid ApplicationTreeCacheRefresherGuid = new Guid(ApplicationTreeCacheRefresherId);
+        public static readonly Guid ApplicationCacheRefresherGuid = new Guid(ApplicationCacheRefresherId);
+        public static readonly Guid TemplateRefresherGuid = new Guid(TemplateRefresherId);
+        public static readonly Guid PageCacheRefresherGuid = new Guid(PageCacheRefresherId);
+        public static readonly Guid UnpublishedPageCacheRefresherGuid = new Guid(UnpublishedPageCacheRefresherId);
+        public static readonly Guid MemberCacheRefresherGuid = new Guid(MemberCacheRefresherId);
+        public static readonly Guid MemberGroupCacheRefresherGuid = new Guid(MemberGroupCacheRefresherId);
+        public static readonly Guid MediaCacheRefresherGuid = new Guid(MediaCacheRefresherId);
+        public static readonly Guid MacroCacheRefresherGuid = new Guid(MacroCacheRefresherId);
+        public static readonly Guid UserCacheRefresherGuid = new Guid(UserCacheRefresherId);
+        public static readonly Guid UserPermissionsCacheRefresherGuid = new Guid(UserPermissionsCacheRefresherId);
+        public static readonly Guid UserTypeCacheRefresherGuid = new Guid(UserTypeCacheRefresherId);
+        public static readonly Guid ContentTypeCacheRefresherGuid = new Guid(ContentTypeCacheRefresherId);
+        public static readonly Guid LanguageCacheRefresherGuid = new Guid(LanguageCacheRefresherId);
+        public static readonly Guid DomainCacheRefresherGuid = new Guid(DomainCacheRefresherId);
+        public static readonly Guid StylesheetCacheRefresherGuid = new Guid(StylesheetCacheRefresherId);
+        public static readonly Guid StylesheetPropertyCacheRefresherGuid = new Guid(StylesheetPropertyCacheRefresherId);
+        public static readonly Guid DataTypeCacheRefresherGuid = new Guid(DataTypeCacheRefresherId);
+        public static readonly Guid DictionaryCacheRefresherGuid = new Guid(DictionaryCacheRefresherId);
+        public static readonly Guid PublicAccessCacheRefresherGuid = new Guid(PublicAccessCacheRefresherId);
+
         #endregion
 
+        #region Constructor & Singleton
+
+        // note - should inject into the application instead of using a singleton
         private static readonly DistributedCache InstanceObject = new DistributedCache();
 
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="DistributedCache"/> class.
         /// </summary>
         private DistributedCache()
-        {                 
-        }
+        { }
         
         /// <summary>
-        /// Singleton
+        /// Gets the static unique instance of the <see cref="DistributedCache"/> class.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The static unique instance of the <see cref="DistributedCache"/> class.</returns>
+        /// <remarks>Exists so that extension methods can be added to the distributed cache.</remarks>
         public static DistributedCache Instance
         {
             get
@@ -79,22 +90,25 @@ namespace Umbraco.Web.Cache
             }
         }
 
+        #endregion
+
+        #region Core notification methods
+
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to refresh node with the specified Id
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="factoryGuid"></param>
-        /// <param name="getNumericId">The callback method to retrieve the ID from an instance</param>
-        /// <param name="instances">The instances containing Ids</param>
+        /// <typeparam name="T">The type of the invalidated items.</typeparam>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="getNumericId">A function returning the unique identifier of items.</param>
+        /// <param name="instances">The invalidated items.</param>
         /// <remarks>
-        /// This method is much better for performance because it does not need to re-lookup an object instance
+        /// This method is much better for performance because it does not need to re-lookup object instances.
         /// </remarks>
         public void Refresh<T>(Guid factoryGuid, Func<T, int> getNumericId, params T[] instances)
         {
             if (factoryGuid == Guid.Empty || instances.Length == 0 || getNumericId == null) return;
 
-            ServerMessengerResolver.Current.Messenger.PerformRefresh<T>(
+            ServerMessengerResolver.Current.Messenger.PerformRefresh(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(factoryGuid),
                 getNumericId,
@@ -102,11 +116,10 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to refresh node with the specified Id
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of a specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher used to refresh the node.</param>
-        /// <param name="id">The id of the node.</param>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="id">The unique identifier of the invalidated item.</param>
         public void Refresh(Guid factoryGuid, int id)
         {
             if (factoryGuid == Guid.Empty || id == default(int)) return;
@@ -118,11 +131,10 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to refresh the node with the specified guid
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of a specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher used to refresh the node.</param>
-        /// <param name="id">The guid of the node.</param>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="id">The unique identifier of the invalidated item.</param>
         public void Refresh(Guid factoryGuid, Guid id)
         {
             if (factoryGuid == Guid.Empty || id == Guid.Empty) return;
@@ -134,11 +146,10 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to refresh data based on the custom json payload
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="factoryGuid"></param>
-        /// <param name="jsonPayload"></param>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="jsonPayload">The notification content.</param>
         public void RefreshByJson(Guid factoryGuid, string jsonPayload)
         {
             if (factoryGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
@@ -149,26 +160,37 @@ namespace Umbraco.Web.Cache
                 jsonPayload);
         }
 
+        ///// <summary>
+        ///// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
+        ///// </summary>
+        ///// <param name="refresherId">The unique identifier of the ICacheRefresher.</param>
+        ///// <param name="payload">The notification content.</param>
+        //internal void Notify(Guid refresherId, object payload)
+        //{
+        //    if (refresherId == Guid.Empty || payload == null) return;
+
+        //    ServerMessengerResolver.Current.Messenger.Notify(
+        //        ServerRegistrarResolver.Current.Registrar.Registrations,
+        //        GetRefresherById(refresherId),
+        //        json);
+        //}
+
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to refresh all nodes
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of a global invalidation for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="factoryGuid">The unique identifier.</param>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
         public void RefreshAll(Guid factoryGuid)
         {
             if (factoryGuid == Guid.Empty) return;
-
             RefreshAll(factoryGuid, true);
         }
 
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to refresh all nodes
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of a global invalidation for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="factoryGuid">The unique identifier.</param>
-        /// <param name="allServers">
-        /// If true will send the request out to all registered LB servers, if false will only execute the current server
-        /// </param>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="allServers">If true, all servers in the load balancing environment are notified; otherwise,
+        /// only the local server is notified.</param>
         public void RefreshAll(Guid factoryGuid, bool allServers)
         {
             if (factoryGuid == Guid.Empty) return;
@@ -181,11 +203,10 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to remove the node with the specified id
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of a specified item removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="factoryGuid">The unique identifier.</param>
-        /// <param name="id">The id.</param>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="id">The unique identifier of the removed item.</param>
         public void Remove(Guid factoryGuid, int id)
         {
             if (factoryGuid == Guid.Empty || id == default(int)) return;
@@ -195,28 +216,32 @@ namespace Umbraco.Web.Cache
                 GetRefresherById(factoryGuid),
                 id);
         }
-        
+
         /// <summary>
-        /// Sends a request to all registered load-balanced servers to remove the node specified
-        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// Notifies the distributed cache of specifieds item removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="factoryGuid"></param>
-        /// <param name="getNumericId"></param>
-        /// <param name="instances"></param>
+        /// <typeparam name="T">The type of the removed items.</typeparam>
+        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
+        /// <param name="getNumericId">A function returning the unique identifier of items.</param>
+        /// <param name="instances">The removed items.</param>
+        /// <remarks>
+        /// This method is much better for performance because it does not need to re-lookup object instances.
+        /// </remarks>
         public void Remove<T>(Guid factoryGuid, Func<T, int> getNumericId, params T[] instances)
         {
-            ServerMessengerResolver.Current.Messenger.PerformRemove<T>(
+            ServerMessengerResolver.Current.Messenger.PerformRemove(
                 ServerRegistrarResolver.Current.Registrar.Registrations,
                 GetRefresherById(factoryGuid),
                 getNumericId,
                 instances);
-        }       
+        }
 
+        #endregion
+
+        // helper method to get an ICacheRefresher by its unique identifier
         private static ICacheRefresher GetRefresherById(Guid uniqueIdentifier)
         {
             return CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
         }
-
     }
 }

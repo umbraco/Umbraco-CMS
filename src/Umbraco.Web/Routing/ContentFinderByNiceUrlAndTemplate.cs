@@ -1,6 +1,7 @@
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Routing
 {
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Routing
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
 
-                    if (node != null)
+                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false && node != null)
                         docRequest.TemplateModel = template;
                 }
                 else

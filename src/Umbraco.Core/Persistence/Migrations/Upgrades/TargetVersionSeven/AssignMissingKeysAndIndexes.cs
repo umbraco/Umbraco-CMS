@@ -15,10 +15,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingKeysAndIndexes : MigrationBase
     {
-        public AssignMissingKeysAndIndexes(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AssignMissingKeysAndIndexes(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

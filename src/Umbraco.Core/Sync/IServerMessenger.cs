@@ -5,81 +5,97 @@ using umbraco.interfaces;
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// Defines a server messenger for server sync and distrubuted cache
+    /// Broadcasts distributed cache notifications to all servers of a load balanced environment.
     /// </summary>
+    /// <remarks>Also ensures that the notification is processed on the local environment.</remarks>
     public interface IServerMessenger
     {
+        // TODO
+        // everything we do "by JSON" means that data is serialized then deserialized on the local server
+        // we should stop using this, and instead use Notify() with an actual object that can be passed
+        // around locally, and serialized for remote messaging - but that would break backward compat ;-(
+        //
+        // and then ServerMessengerBase must be able to handle Notify(), and all messengers too
+        // and then ICacheRefresher (or INotifiableCacheRefresher?) must be able to handle it too
+        //
+        // >> v8
 
         /// <summary>
-        /// Performs a refresh and sends along the JSON payload to each server
+        /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers"></param>
-        /// <param name="refresher"></param>
-        /// <param name="jsonPayload">
-        /// A pre-formatted custom json payload to be sent to the servers, the cache refresher will deserialize and use to refresh cache
-        /// </param>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="jsonPayload">The notification content.</param>
         void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload);
 
+        ///// <summary>
+        ///// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
+        ///// </summary>
+        ///// <param name="servers">The servers that compose the load balanced environment.</param>
+        ///// <param name="refresher">The ICacheRefresher.</param>
+        ///// <param name="payload">The notification content.</param>
+        ///// <param name="serializer">A custom Json serializer.</param>
+        //void Notify(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload, Func<object, string> serializer = null);
+
         /// <summary>
-        /// Performs a sync against all instance objects
+        /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="servers">The servers to sync against</param>
-        /// <param name="refresher"></param>
-        /// <param name="getNumericId">A delegate to return the Id for each instance to be used to sync to other servers</param>
-        /// <param name="instances"></param>
+        /// <typeparam name="T">The type of the invalidated items.</typeparam>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="getNumericId">A function returning the unique identifier of items.</param>
+        /// <param name="instances">The invalidated items.</param>
         void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
-        
+
         /// <summary>
-        /// Performs a sync against all instance objects
+        /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="servers">The servers to sync against</param>
-        /// <param name="refresher"></param>
-        /// <param name="getGuidId">A delegate to return the Id for each instance to be used to sync to other servers</param>
-        /// <param name="instances"></param>
+        /// <typeparam name="T">The type of the invalidated items.</typeparam>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="getGuidId">A function returning the unique identifier of items.</param>
+        /// <param name="instances">The invalidated items.</param>
         void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
 
         /// <summary>
-        /// Removes the cache for the specified items
+        /// Notifies all servers of specified items removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="servers"></param>
-        /// <param name="refresher"></param>
-        /// <param name="getNumericId">A delegate to return the Id for each instance to be used to sync to other servers</param>
-        /// <param name="instances"></param>
+        /// <typeparam name="T">The type of the removed items.</typeparam>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="getNumericId">A function returning the unique identifier of items.</param>
+        /// <param name="instances">The removed items.</param>
         void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
-        /// Removes the cache for the specified items
+        /// Notifies all servers of specified items removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers"></param>
-        /// <param name="refresher"></param>
-        /// <param name="numericIds"></param>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="numericIds">The unique identifiers of the removed items.</param>
         void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds);
 
         /// <summary>
-        /// Performs a sync against all Ids
+        /// Notifies all servers of specified items invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers to sync against</param>
-        /// <param name="refresher"></param>
-        /// <param name="numericIds"></param>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="numericIds">The unique identifiers of the invalidated items.</param>
         void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds);
-        
+
         /// <summary>
-        /// Performs a sync against all Ids
+        /// Notifies all servers of specified items invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers to sync against</param>
-        /// <param name="refresher"></param>
-        /// <param name="guidIds"></param>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
+        /// <param name="guidIds">The unique identifiers of the invalidated items.</param>
         void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds);
 
         /// <summary>
-        /// Performs entire cache refresh for a specified refresher
+        /// Notifies all servers of a global invalidation for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers"></param>
-        /// <param name="refresher"></param>
+        /// <param name="servers">The servers that compose the load balanced environment.</param>
+        /// <param name="refresher">The ICacheRefresher.</param>
         void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher);
     }
-
 }

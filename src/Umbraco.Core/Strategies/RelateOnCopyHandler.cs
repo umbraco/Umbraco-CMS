@@ -5,6 +5,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Strategies
 {
+    //TODO: This should just exist in the content service/repo! 
     public sealed class RelateOnCopyHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)

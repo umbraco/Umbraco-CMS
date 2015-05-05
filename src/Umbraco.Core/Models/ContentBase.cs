@@ -436,7 +436,7 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
             {
                 throw new Exception(String.Format("No PropertyType exists with the supplied alias: {0}", propertyTypeAlias));

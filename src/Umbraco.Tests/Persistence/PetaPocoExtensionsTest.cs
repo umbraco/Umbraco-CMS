@@ -176,9 +176,8 @@ namespace Umbraco.Tests.Persistence
             }
             contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory" + Guid.NewGuid().ToString("N"), "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext)
+                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
                 {
-                    Alias = "tags",
                     DataTypeDefinitionId = 1041
                 });
             contentTypeService.Save(contentType);
@@ -223,11 +222,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        Address = "address" + i,
-                        ComputerName = "computer" + i,
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        LastNotified = DateTime.Now
+                        DateAccessed = DateTime.Now
                     });
             }
 
@@ -252,11 +251,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        Address = "address" + i,
-                        ComputerName = "computer" + i,
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        LastNotified = DateTime.Now
+                        DateAccessed = DateTime.Now
                     });
             }
             db.OpenSharedConnection();
@@ -283,11 +282,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                 {
-                    Address = "address" + i,
-                    ComputerName = "computer" + i,
+                    ServerAddress = "address" + i,
+                    ServerIdentity = "computer" + i,
                     DateRegistered = DateTime.Now,
                     IsActive = true,
-                    LastNotified = DateTime.Now
+                    DateAccessed = DateTime.Now
                 });
             }
             db.OpenSharedConnection();

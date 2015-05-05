@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Routing
         /// Sets up the mock domain service
         /// </summary>
         /// <param name="allDomains"></param>
-        protected void SetupDomainServiceMock(IEnumerable<IDomain> allDomains)
+        protected IDomainService SetupDomainServiceMock(IEnumerable<IDomain> allDomains)
         {
             var domainService = Mock.Get(ServiceContext.DomainService);
             //setup mock domain service
@@ -29,6 +29,7 @@ namespace Umbraco.Tests.Routing
                 .Returns((bool incWildcards) => incWildcards ? allDomains : allDomains.Where(d => d.IsWildcard == false));
             domainService.Setup(service => service.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
                 .Returns((int id, bool incWildcards) => allDomains.Where(d => d.RootContent.Id == id && (incWildcards || d.IsWildcard == false)));
+            return domainService.Object;
         }
 
         protected ServiceContext GetServiceContext(IUmbracoSettingsSection umbracoSettings, ILogger logger)

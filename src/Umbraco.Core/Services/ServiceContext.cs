@@ -43,6 +43,7 @@ namespace Umbraco.Core.Services
         private Lazy<IMemberTypeService> _memberTypeService;
         private Lazy<IMemberGroupService> _memberGroupService;
         private Lazy<INotificationService> _notificationService;
+        private Lazy<IExternalLoginService> _externalLoginService;
 
         /// <summary>
         /// public ctor - will generally just be used for unit testing all items are optional and if not specified, the defaults will be used
@@ -93,8 +94,10 @@ namespace Umbraco.Core.Services
             IDomainService domainService = null,
             ITaskService taskService = null, 
             IMacroService macroService = null,
-            IPublicAccessService publicAccessService = null)
+            IPublicAccessService publicAccessService = null,
+            IExternalLoginService externalLoginService = null)
         {
+            if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
             if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
             if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
             if (tagService != null) _tagService = new Lazy<ITagService>(() => tagService);
@@ -149,6 +152,9 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
+
+            if (_externalLoginService == null)
+                _externalLoginService = new Lazy<IExternalLoginService>(() => new ExternalLoginService(provider, repositoryFactory, logger));
 
             if (_publicAccessService == null)
                 _publicAccessService = new Lazy<IPublicAccessService>(() => new PublicAccessService(provider, repositoryFactory, logger));
@@ -279,7 +285,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="ServerRegistrationService"/>
         /// </summary>
-        internal ServerRegistrationService ServerRegistrationService
+        public ServerRegistrationService ServerRegistrationService
         {
             get { return _serverRegistrationService.Value; }
         }
@@ -420,5 +426,9 @@ namespace Umbraco.Core.Services
             get { return _memberGroupService.Value; }
         }
 
+        public IExternalLoginService ExternalLoginService
+        {
+            get { return _externalLoginService.Value; }
+        }
     }
 }

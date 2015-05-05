@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// Represents a paged result for a model collection
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [DataContract(Name = "pagedCollection", Namespace = "")] 
+    [DataContract(Name = "pagedCollection", Namespace = "")]
     public class PagedResult<T>
     {
         public PagedResult(long totalItems, long pageNumber, long pageSize)
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
 
             if (pageSize > 0)
             {
-                TotalPages = (long) Math.Ceiling(totalItems/(Decimal) pageSize);
+                TotalPages = (long)Math.Ceiling(totalItems / (Decimal)pageSize);
             }
             else
             {
@@ -48,16 +48,13 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// Returns 0 if the page number or page size is zero
         /// </remarks>
-        internal int SkipSize
+        public int GetSkipSize()
         {
-            get
+            if (PageNumber > 0 && PageSize > 0)
             {
-                if (PageNumber > 0 && PageSize > 0)
-                {
-                    return Convert.ToInt32((PageNumber - 1)*PageSize);
-                }
-                return 0;
+                return Convert.ToInt32((PageNumber - 1) * PageSize);
             }
+            return 0;
         }
     }
 }

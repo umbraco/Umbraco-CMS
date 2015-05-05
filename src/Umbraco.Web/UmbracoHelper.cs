@@ -245,7 +245,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderTemplate(int pageId, int? altTemplateId = null)
 	    {
-	        return _componentRenderer.RenderTemplate(pageId, altTemplateId);
+            return UmbracoComponentRenderer.RenderTemplate(pageId, altTemplateId);
 	    }
 
 		#region RenderMacro
@@ -257,7 +257,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderMacro(string alias)
 		{
-            return _componentRenderer.RenderMacro(alias, new { });
+            return UmbracoComponentRenderer.RenderMacro(alias, new { });
 		}
 
 		/// <summary>
@@ -268,7 +268,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderMacro(string alias, object parameters)
 		{
-            return _componentRenderer.RenderMacro(alias, parameters.ToDictionary<object>());
+            return UmbracoComponentRenderer.RenderMacro(alias, parameters.ToDictionary<object>());
 		}
 
 		/// <summary>
@@ -279,7 +279,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
 		{
-		    return _componentRenderer.RenderMacro(alias, parameters);
+            return UmbracoComponentRenderer.RenderMacro(alias, parameters);
 		}
 
 		#endregion

@@ -37,7 +37,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             if (content.parentId && content.parentId != -1) {
                 entityResource.getAncestors(content.id, "document")
                .then(function (anc) {
-                   $scope.ancestors = anc.reverse();
+                   $scope.ancestors = anc;
                });
             }
         }

@@ -9,10 +9,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
     [MigrationAttribute("4.9.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
-        public RemoveUmbracoAppConstraints(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public RemoveUmbracoAppConstraints(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

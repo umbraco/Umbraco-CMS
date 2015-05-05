@@ -10,6 +10,8 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Migrations.Stubs;
 
 namespace Umbraco.Tests.Migrations

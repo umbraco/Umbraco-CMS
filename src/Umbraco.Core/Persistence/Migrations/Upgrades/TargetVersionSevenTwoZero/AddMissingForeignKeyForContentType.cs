@@ -11,10 +11,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AddMissingForeignKeyForContentType : MigrationBase
     {
-        public AddMissingForeignKeyForContentType(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AddMissingForeignKeyForContentType(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

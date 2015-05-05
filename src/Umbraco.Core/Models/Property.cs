@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -81,7 +84,7 @@ namespace Umbraco.Core.Models
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        internal PropertyType PropertyType { get { return _propertyType; } }
+        public PropertyType PropertyType { get { return _propertyType; } }
         
         /// <summary>
         /// Gets or Sets the version id for the Property
@@ -120,7 +123,7 @@ namespace Umbraco.Core.Models
             {
                 bool typeValidation = _propertyType.IsPropertyTypeValid(value);
 
-                if (!typeValidation)
+                if (typeValidation == false)
                     throw new Exception(
                         string.Format(
                             "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
@@ -130,7 +133,21 @@ namespace Umbraco.Core.Models
                 {
                     _value = value;
                     return _value;
-                }, _value, ValueSelector);
+                }, _value, ValueSelector, 
+                new DelegateEqualityComparer<object>(
+                    (o, o1) =>
+                    {
+                        //Custom comparer for enumerable if it is enumerable
+                        if (o == null && o1 == null) return true;
+                        if (o == null || o1 == null) return false;
+                        var enum1 = o as IEnumerable;
+                        var enum2 = o1 as IEnumerable;
+                        if (enum1 != null && enum2 != null)
+                        {
+                            return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
+                        }
+                        return o.Equals(o1);
+                    }, o => o.GetHashCode()));
             }
         }
 
@@ -160,10 +177,14 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (Property)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign since this is a readonly property
             clone._propertyType = (PropertyType)PropertyType.DeepClone();
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
             
             return clone;
         }

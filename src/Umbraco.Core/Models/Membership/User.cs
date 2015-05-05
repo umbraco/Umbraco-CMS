@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Membership
             if (userType == null) throw new ArgumentNullException("userType");
 
             _userType = userType;
-            _defaultPermissions = _userType.Permissions;
+            _defaultPermissions = _userType.Permissions == null ? Enumerable.Empty<string>() : new List<string>(_userType.Permissions);
             //Groups = new List<object> { userType };
             SessionTimeout = 60;
             _sectionCollection = new ObservableCollection<string>();
@@ -58,6 +58,7 @@ namespace Umbraco.Core.Models.Membership
 
         private IUserType _userType;
         private string _name;
+        private string _securityStamp;
         private List<string> _addedSections;
         private List<string> _removedSections;
         private ObservableCollection<string> _sectionCollection;
@@ -71,9 +72,12 @@ namespace Umbraco.Core.Models.Membership
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
-        private IEnumerable<string> _defaultPermissions;
+
+        private IEnumerable<string> _defaultPermissions; 
+        
         private bool _defaultToLiveEditing;
 
+        private static readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
         private static readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
         private static readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartContentId);
         private static readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
@@ -86,7 +90,7 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo IsLockedOutSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsLockedOut);
         private static readonly PropertyInfo IsApprovedSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsApproved);
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
-        private static readonly PropertyInfo DefaultPermissionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.DefaultPermissions);
+
         private static readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
         private static readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
         
@@ -231,6 +235,22 @@ namespace Umbraco.Core.Models.Membership
         }
 
         /// <summary>
+        /// The security stamp used by ASP.Net identity
+        /// </summary>
+        public string SecurityStamp
+        {
+            get { return _securityStamp; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _securityStamp = value;
+                    return _securityStamp;
+                }, _securityStamp, SecurityStampSelector);
+            }
+        }
+
+        /// <summary>
         /// Used internally to check if we need to add a section in the repository to the db
         /// </summary>
         internal IEnumerable<string> AddedSections
@@ -319,19 +339,13 @@ namespace Umbraco.Core.Models.Membership
                 }, _language, LanguageSelector);
             }
         }
-        
+
+        //TODO: This should be a private set
         [DataMember]
         public IEnumerable<string> DefaultPermissions
         {
-            get { return _defaultPermissions; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _defaultPermissions = value;
-                    return _defaultPermissions;
-                }, _defaultPermissions, DefaultPermissionsSelector);
-            }
+            get {  return _defaultPermissions;}
+            set { _defaultPermissions = value; }
         }
 
         [IgnoreDataMember]
@@ -415,15 +429,19 @@ namespace Umbraco.Core.Models.Membership
         public override object DeepClone()
         {
             var clone = (User)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to create new collections otherwise they'll get copied by ref
             clone._addedSections = new List<string>();
             clone._removedSections = new List<string>();
             clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
+            clone._defaultPermissions = new List<string>(_defaultPermissions.ToList());
             //re-create the event handler
             clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;
-
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

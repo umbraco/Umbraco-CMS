@@ -12,10 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class UpdateControlIdToPropertyEditorAlias : MigrationBase
     {
-        public UpdateControlIdToPropertyEditorAlias(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public UpdateControlIdToPropertyEditorAlias(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

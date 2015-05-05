@@ -173,12 +173,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                 {
-                    new ContentTypeSort
-                        {
-                            Alias = contentType.Alias,
-                            Id = new Lazy<int>(() => contentType.Id),
-                            SortOrder = 0
-                        }
+                    new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
                 };
                 var parentPage = MockedContent.CreateSimpleContent(contentType);
                 contentTypeRepository.AddOrUpdate(contentType);
@@ -444,7 +439,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending);
 
                 // Assert
@@ -465,7 +460,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 1, 1, out totalRecords, "Name", Direction.Ascending);
 
                 // Assert
@@ -486,7 +481,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 2, out totalRecords, "Name", Direction.Ascending);
 
                 // Assert
@@ -507,7 +502,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Descending);
 
                 // Assert
@@ -528,7 +523,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page 2");
 
                 // Assert
@@ -549,7 +544,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = new Query<IContent>(SqlSyntax, MappingResolver).Where(x => x.Level == 2);
-                int totalRecords;
+                long totalRecords;
                 var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "Name", Direction.Ascending, "Page");
 
                 // Assert

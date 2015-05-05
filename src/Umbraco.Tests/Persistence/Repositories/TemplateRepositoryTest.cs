@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 <asp:Content ContentPlaceHolderID=""ContentPlaceHolderDefault"" runat=""server"">
 
 </asp:Content>
-", template.Content);
+".CrLf(), template.Content);
             }
 
         }
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(_masterPageFileSystem.FileExists("test2.master"), Is.True);
                 Assert.AreEqual(@"<%@ Master Language=""C#"" MasterPageFile=""~/masterpages/test.master"" AutoEventWireup=""true"" %>
 
-", template2.Content);
+".CrLf(), template2.Content);
             }
 
         }

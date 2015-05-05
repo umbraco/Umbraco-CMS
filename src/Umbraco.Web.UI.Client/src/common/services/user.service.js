@@ -56,7 +56,7 @@ angular.module('umbraco.services')
 
         /** 
         Method to count down the current user's timeout seconds, 
-        this will continually count down their current remaining seconds every 2 seconds until
+        this will continually count down their current remaining seconds every 5 seconds until
         there are no more seconds remaining.
         */
         function countdownUserTimeout() {
@@ -64,8 +64,8 @@ angular.module('umbraco.services')
             $timeout(function () {
 
                 if (currentUser) {
-                    //countdown by 2 seconds since that is how long our timer is for.
-                    currentUser.remainingAuthSeconds -= 2;
+                    //countdown by 5 seconds since that is how long our timer is for.
+                    currentUser.remainingAuthSeconds -= 5;
 
                     //if there are more than 30 remaining seconds, recurse!
                     if (currentUser.remainingAuthSeconds > 30) {
@@ -128,7 +128,7 @@ angular.module('umbraco.services')
                         }
                     }
                 }
-            }, 2000, //every 2 seconds
+            }, 5000, //every 5 seconds
                 false); //false = do NOT execute a digest for every iteration
         }
 

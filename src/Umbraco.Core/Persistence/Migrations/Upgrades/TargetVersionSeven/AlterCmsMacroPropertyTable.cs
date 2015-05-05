@@ -20,10 +20,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class AlterCmsMacroPropertyTable : MigrationBase
     {
-        public AlterCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public AlterCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

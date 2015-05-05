@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords,
+        IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string filter = "");
 
         //IEnumerable<IMember> GetPagedResultsByQuery<TDto>(

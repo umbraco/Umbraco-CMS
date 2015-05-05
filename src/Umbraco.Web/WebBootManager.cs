@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -40,6 +41,7 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 using TypeHelper = Umbraco.Core.TypeHelper;
 using Umbraco.Core.LightInject;
@@ -104,9 +106,12 @@ namespace Umbraco.Web
 
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
-            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
+            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection
+            {
+                { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
+            });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
-
+            
             var insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();
 
@@ -321,13 +326,18 @@ namespace Umbraco.Web
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
-            //Override the ServerMessengerResolver to set a username/password for the distributed calls
-            ServerMessengerResolver.Current.SetServerMessenger(new BatchedServerMessenger(() =>
+            ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
             {
                 //we should not proceed to change this if the app/database is not configured since there will 
                 // be no user, plus we don't need to have server messages sent if this is the case.
                 if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
                 {
+                    //disable if they are not enabled
+                    if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                    {
+                        return null;
+                    }
+
                     try
                     {
                         var user = User.GetUser(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);

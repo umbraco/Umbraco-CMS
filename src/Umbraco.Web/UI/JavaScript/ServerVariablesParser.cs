@@ -8,7 +8,7 @@ namespace Umbraco.Web.UI.JavaScript
     {
 
         /// <summary>
-        /// Could allow developers to add custom variables on startup
+        /// Allows developers to add custom variables on parsing
         /// </summary>
         public static event EventHandler<Dictionary<string, object>> Parsing;
 
@@ -18,6 +18,7 @@ namespace Umbraco.Web.UI.JavaScript
         {
             var vars = Resources.ServerVariables;
 
+            //Raise event for developers to add custom variables
             if (Parsing != null)
             {
                 Parsing(null, items);

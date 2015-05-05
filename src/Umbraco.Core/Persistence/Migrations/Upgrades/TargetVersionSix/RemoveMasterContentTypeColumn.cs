@@ -7,10 +7,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class RemoveMasterContentTypeColumn : MigrationBase
     {
-        public RemoveMasterContentTypeColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public RemoveMasterContentTypeColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {

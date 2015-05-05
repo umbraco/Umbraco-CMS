@@ -6,20 +6,18 @@ using Umbraco.Core.ObjectResolution;
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// The resolver to return the currently registered IServerRegistrar object
+    /// Resolves the IServerRegistrar object.
     /// </summary>
     public sealed class ServerRegistrarResolver : ContainerSingleObjectResolver<ServerRegistrarResolver, IServerRegistrar>
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="SingleObjectResolverBase{TResolver, TResolved}"/> class with an instance of the resolved object.
+        /// Initializes a new instance of the <see cref="ServerRegistrarResolver"/> class with a registrar.
         /// </summary>
-        /// <param name="value">An instance of the resolved object.</param>
-        /// <remarks>By default <c>CanBeNull</c> is false, so <c>value</c> has to be non-null, or <c>Value</c> has to be
-        /// initialized before being accessed, otherwise an exception will be thrown when reading it.</remarks>
+        /// <param name="factory">An instance of a registrar.</param>
+        /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
         public ServerRegistrarResolver(IServerRegistrar value) : base(value)
         {
         }
-
         internal ServerRegistrarResolver(IServiceContainer container, Type implementationType)
             : base(container, implementationType)
         {
@@ -31,14 +29,18 @@ namespace Umbraco.Core.Sync
         }
 
         /// <summary>
-        /// Can be used at runtime to set a custom IServerRegistrar at app startup
+        /// Sets the registrar.
         /// </summary>
-        /// <param name="serverRegistrar"></param>
+        /// <param name="serverRegistrar">The registrar.</param>
+        /// <remarks>For developers, at application startup.</remarks>
         public void SetServerRegistrar(IServerRegistrar serverRegistrar)
         {
             Value = serverRegistrar;
         }
 
+        /// <summary>
+        /// Gets the registrar.
+        /// </summary>
         public IServerRegistrar Registrar
         {
             get { return Value; }

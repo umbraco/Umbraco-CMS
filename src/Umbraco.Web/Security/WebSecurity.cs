@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
@@ -91,21 +92,21 @@ namespace Umbraco.Web.Security
         /// Logs the user in
         /// </summary>
         /// <param name="user"></param>
-        /// <returns>returns the number of seconds until their session times out</returns>
+        /// <returns>returns the Forms Auth ticket created which is used to log them in</returns>
         public virtual FormsAuthenticationTicket PerformLogin(IUser user)
         {
-            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
+            //clear the external cookie - we do this without owin context because we're writing cookies directly to httpcontext 
+            // and cookie handling is different with httpcontext vs webapi and owin, normally we'd do:
+            //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
+
+            var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalCookieName);
+            if (externalLoginCookie != null)
             {
-                Id = user.Id,
-                AllowedApplications = user.AllowedSections.ToArray(),
-                RealName = user.Name,
-                //currently we only have one user type!
-                Roles = new[] { user.UserType.Alias },
-                StartContentNode = user.StartContentId,
-                StartMediaNode = user.StartMediaId,
-                Username = user.Username,
-                Culture = ui.Culture(user)
-            });
+                externalLoginCookie.Expires = DateTime.Now.AddYears(-1);
+                _httpContext.Response.Cookies.Set(externalLoginCookie);
+            }
+
+            var ticket = _httpContext.CreateUmbracoAuthTicket(Mapper.Map<UserData>(user));
             
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
 
@@ -209,7 +210,6 @@ namespace Umbraco.Web.Security
                 Language = GlobalSettings.DefaultUILanguage,
                 Name = membershipUser.UserName,
                 RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
-                DefaultPermissions = writer.Permissions,
                 Username = membershipUser.UserName,
                 StartContentId = -1,
                 StartMediaId = -1,

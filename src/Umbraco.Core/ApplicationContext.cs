@@ -202,6 +202,14 @@ namespace Umbraco.Core
             }
         }
 
+        /// <summary>
+        /// If the db is configured and there is a database context, but we are not 'configured' , then it means we are upgrading
+        /// </summary>
+	    public bool IsUpgrading
+	    {
+	        get { return IsConfigured == false && DatabaseContext != null && DatabaseContext.IsDatabaseConfigured; }
+	    }
+
 	    /// <summary>
         /// The original/first url that the web application executes
         /// </summary>
