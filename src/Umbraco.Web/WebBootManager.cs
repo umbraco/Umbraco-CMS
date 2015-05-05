@@ -383,7 +383,7 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
-                ServiceProvider, ProfilingLogger.Logger,
+                Container, ProfilingLogger.Logger,
                 //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider),
                     typeof(CustomRouteUrlProvider)

@@ -137,7 +137,9 @@ namespace Umbraco.Core
             var settings = UmbracoConfig.For.UmbracoSettings();
             container.Register<IUmbracoSettingsSection>(factory => settings);
             container.Register<IContentSection>(factory => settings.Content);
+            container.Register<IRequestHandlerSection>(factory => settings.RequestHandler);
             //TODO: Add the other config areas...
+
             container.Register<CacheHelper>(factory => _cacheHelper, new PerContainerLifetime());
             container.Register<IRuntimeCacheProvider>(factory => _cacheHelper.RuntimeCache, new PerContainerLifetime());
             container.Register<IServiceProvider, ActivatorServiceProvider>();

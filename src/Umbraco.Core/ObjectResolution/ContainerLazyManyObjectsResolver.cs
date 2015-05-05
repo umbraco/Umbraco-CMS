@@ -25,6 +25,9 @@ namespace Umbraco.Core.ObjectResolution
         {
             if (container == null) throw new ArgumentNullException("container");
             _container = container;
+
+            //Register ourselves in the case that a resolver instance should be injected someplace
+            _container.Register<TResolver>(factory => (TResolver)(object)this);
         }
 
         /// <summary>
